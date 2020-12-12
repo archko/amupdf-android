@@ -1,0 +1,59 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+        vectorDrawables {
+            /*
+             *  Do not generate pngs from vector drawable resources.
+             *
+             *  The vector drawables  can now be used directly on all
+             *  platforms we support.
+             */
+            useSupportLibrary = true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles 'proguard-rules.pro'
+        }
+    }
+
+    flavorDimensions "one-dimension"
+
+    productFlavors {
+        regular {
+        }
+        mupdf {
+            matchingFallbacks = ['regular']
+        }
+        project {
+            dimension = 'one-dimension'
+        }
+    }
+
+    sourceSets {
+        main {
+            java {
+            }
+        }
+    }
+
+    project.tasks.whenTaskAdded { task ->
+        if (task.name =~ 'BuildConfig') {
+            task.enabled = false
+        }
+    }
+}
+
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+}

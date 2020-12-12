@@ -1,0 +1,4 @@
+<resources>
+    <!-- Dummy public resource to make all other resoures ptivate. -->
+    <public />
+</resources>

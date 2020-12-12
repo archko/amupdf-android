@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/sodk_editor_number_format_popup">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/sodk_editor_cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sodk_editor_cancel"
+            android:background="@android:color/transparent"
+            android:textColor="@color/sodk_editor_listwheel_choser_btn_textcolor"
+            android:textSize="18sp"
+            android:padding="5dp"
+            />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/sodk_editor_update_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sodk_editor_update"
+            android:background="@android:color/transparent"
+            android:textColor="@color/sodk_editor_listwheel_choser_btn_textcolor"
+            android:textSize="18sp"
+            android:padding="5dp"
+            />
+
+    </LinearLayout>
+
+    <kankan.wheel.widget.WheelView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/wheel">
+
+    </kankan.wheel.widget.WheelView>
+
+</LinearLayout>

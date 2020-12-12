@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.artifex.sonui.editor.SOHorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/sodk_editor_toolbar">
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/redact_toolbar"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/sodk_editor_toolbar"
+            android:paddingTop="@dimen/sodk_editor_toolbar_v_padding"
+            android:paddingBottom="@dimen/sodk_editor_toolbar_v_padding">
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/redact_button_mark"
+                android:drawableTop="@drawable/sodk_editor_icon_redact_mark"
+                android:text="@string/sodk_editor_redact_mark_upper" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/redact_button_mark_area"
+                android:background="@drawable/sodk_editor_toolbar_button2"
+                android:drawableTop="@drawable/sodk_editor_icon_redact_mark"
+                android:text="@string/sodk_editor_redact_mark_area_upper" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/redact_button_remove"
+                android:drawableTop="@drawable/sodk_editor_icon_redact_remove"
+                android:text="@string/sodk_editor_redact_remove_upper" />
+
+            <!--a divider-->
+            <View style="@style/sodk_editor_toolbar_divider" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/redact_button_apply"
+                android:drawableTop="@drawable/sodk_editor_icon_redact_apply"
+                android:text="@string/sodk_editor_redact_apply_upper" />
+
+        </LinearLayout>
+
+    </com.artifex.sonui.editor.SOHorizontalScrollView>
+
+</merge>

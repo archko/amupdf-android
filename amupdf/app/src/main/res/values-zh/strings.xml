@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AMuPDF</string>
+    <string name="outline_title">目录</string>
+    <string name="auto_crop">自动切边</string>
+
+    <string name="toast_set_as_home">请设置图书目录</string>
+
+    <string name="about_title">关于 AMupdf</string>
+    <string name="about_commmon_title">"应用信息"</string>
+    <string name="about_3dparty_title">"第三方软件"</string>
+    <string name="about_changelog_title">"版本变化"</string>
+
+    <string name="label_filename">文件名:</string>
+    <string name="label_filesize">大小:</string>
+    <string name="label_read">上次阅读:</string>
+    <string name="label_lastmodified">上次更新:</string>
+    <string name="label_pagecount">阅读页数:</string>
+    <string name="label_location">位置:</string>
+    <string name="label_read_count">阅读次数:</string>
+
+    <string name="menu_vudroid">用Vudroid方式打开</string>
+    <string name="menu_mupdf">用AMupdf方式打开</string>
+    <string name="menu_other">用其它应用打开</string>
+    <string name="menu_info">查看文件信息</string>
+    <string name="menu_remove_from_recent">从最近中移出</string>
+    <string name="menu_delete">删除</string>
+    <string name="menu_add_to_fav">添加到收藏夹</string>
+    <string name="menu_remove_from_fav">取消收藏</string>
+
+    <string name="dialog_title_backup">选择备份</string>
+    <string name="dialog_sub_title_backup">选择备份文件恢复</string>
+</resources>

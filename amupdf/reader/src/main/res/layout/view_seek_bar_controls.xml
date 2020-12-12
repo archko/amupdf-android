@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/layout_title"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:background="@color/menu_bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:background="@drawable/button"
+            android:scaleType="center"
+            android:src="@drawable/ic_back"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp">
+
+            <TextView
+                android:id="@+id/path"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:text=""
+                android:textColor="@android:color/white"
+                android:textSize="12sp"/>
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:text=""
+                android:textColor="@android:color/white"
+                android:textSize="14sp"/>
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/autoCropButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button"
+            android:contentDescription="@string/auto_crop"
+            android:src="@drawable/ic_crop"
+            android:visibility="gone"/>
+
+        <ImageButton
+            android:id="@+id/reflowButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button"
+            android:contentDescription="@string/toggle_reflow_mode"
+            android:src="@drawable/ic_format_size_white_24dp"
+            android:visibility="visible"/>
+
+        <ImageButton
+            android:id="@+id/outlineButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button"
+            android:contentDescription="@string/outline_title"
+            android:src="@drawable/ic_toc_white_24dp"/>
+    </LinearLayout>
+
+    <SeekBar
+        android:id="@+id/seek_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layout_title"
+        android:layout_marginTop="1px"
+        android:background="@color/menu_bg"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:progressDrawable="@drawable/seek_line"
+        android:thumb="@drawable/seek_thumb"/>
+
+    <TextView
+        android:id="@+id/page_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/seek_bar"
+        android:layout_marginLeft="120dp"
+        android:layout_marginTop="0dp"
+        android:background="@drawable/bg_page_num"
+        android:textColor="@color/white"/>
+
+    <FrameLayout
+        android:id="@+id/layout_outline"
+        android:layout_width="360dp"
+        android:layout_height="match_parent"
+        android:layout_below="@id/seek_bar"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="1px"
+        android:background="@color/menu_bg"
+        android:visibility="gone"/>
+
+</RelativeLayout>

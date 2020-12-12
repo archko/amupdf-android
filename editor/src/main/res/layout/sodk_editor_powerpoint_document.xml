@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <!-- Dummy item to prevent others from receiving focus automatically -->
+    <LinearLayout
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_width="0px"
+        android:layout_height="0px"/>
+
+    <TabHost
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight = "0"
+        android:id="@+id/tabhost">
+
+        <LinearLayout
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/header_top_spacer"
+                android:layout_width="fill_parent"
+                android:layout_height="5dp"
+                android:background="@color/sodk_editor_header_ppt_color" />
+
+            <LinearLayout
+                android:id="@+id/header_top"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="bottom"
+                android:background="@color/sodk_editor_header_ppt_color">
+
+                <ImageButton
+                    android:id="@+id/back_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="5dp"
+                    android:src="@drawable/sodk_editor_icon_back"
+                    android:contentDescription="@string/sodk_editor_nav_back"
+                    android:background="@color/sodk_editor_transparent"/>
+
+                <Space
+                    android:id="@+id/back_button_after"
+                    android:layout_width="30dp"
+                    android:layout_height="1dp"/>
+
+                <HorizontalScrollView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TabWidget
+                        android:id="@android:id/tabs"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                    </TabWidget>
+                </HorizontalScrollView>
+
+                <Space
+                    android:layout_width="5dp"
+                    android:layout_height="1dp"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/undo_button"
+                    android:drawableTop="@drawable/sodk_editor_icon_undo"
+                    android:background="@color/sodk_editor_transparent"
+                    android:textSize="0sp"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="7dp"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/redo_button"
+                    android:drawableTop="@drawable/sodk_editor_icon_redo"
+                    android:background="@color/sodk_editor_transparent"
+                    android:textSize="0sp"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingLeft="7dp"
+                    android:paddingRight="5dp"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/search_button"
+                    android:textSize="0sp"
+                    android:drawableTop="@drawable/sodk_editor_icon_find"
+                    android:background="@drawable/sodk_editor_search_button"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:layout_marginTop="5dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="15dp"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/fullscreen_button"
+                    android:textSize="0sp"
+                    android:drawableTop="@drawable/sodk_editor_icon_fullscreen"
+                    android:background="@drawable/sodk_editor_search_button"
+                    android:layout_gravity="center_vertical"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="15dp"
+                    />
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/hiddenTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fileTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/sodk_editor_toolbar"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/sodk_editor_file_toolbar"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/editTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/sodk_editor_toolbar"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/sodk_editor_edit_toolbar"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/insertTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/sodk_editor_toolbar"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/sodk_editor_powerpoint_insert_toolbar"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/formatTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/sodk_editor_toolbar"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/sodk_editor_powerpoint_format_toolbar"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/slidesTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/sodk_editor_toolbar"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/sodk_editor_powerpoint_slides_toolbar"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/searchTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/sodk_editor_toolbar"
+                    android:visibility="gone"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/sodk_editor_search_toolbar"/>
+
+                </LinearLayout>
+
+            </FrameLayout>
+        </LinearLayout>
+    </TabHost>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/sodk_editor_content_border"
+        android:layout_weight = "1">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dip"
+            android:layout_weight="@integer/sodk_editor_page_width_percentage"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/doc_inner_container">
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="0dip"
+            android:layout_weight="@integer/sodk_editor_pagelist_width_percentage"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:id="@+id/pages_container"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp">
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight = "0"
+        android:id="@+id/footer">
+
+        <View
+            android:layout_weight = "0"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/sodk_editor_footer"
+            android:id="@+id/footer_lead"
+            />
+
+        <com.artifex.sonui.editor.SOTextView
+            android:layout_weight = "1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/sodk_editor_footer"
+            android:textColor="@color/sodk_editor_footer_text"
+            android:paddingRight="5dp"
+            android:singleLine="true"
+            android:ellipsize="middle"
+            android:paddingLeft="5dp"
+            android:gravity="center_horizontal"
+            android:id="@+id/footer_text"/>
+
+        <com.artifex.sonui.editor.SOTextView
+            android:layout_weight = "0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="5dp"
+            android:paddingLeft="5dp"
+            android:singleLine="true"
+            android:background="@color/sodk_editor_footer"
+            android:textColor="@color/sodk_editor_footer_page_text"
+            android:id="@+id/footer_page_text"/>
+
+    </LinearLayout>
+
+</LinearLayout>

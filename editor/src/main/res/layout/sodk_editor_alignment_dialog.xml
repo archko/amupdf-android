@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:background="@drawable/sodk_editor_alignment"
+              android:orientation="vertical"
+              android:padding="0dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentTop="true">
+
+            <!--<com.artifex.sonui.editor.SOTextView-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="@color/sodk_editor_palette_bluish_grey"-->
+            <!--android:textColor="#FFFFFFFF"-->
+            <!--android:textSize="12pt"-->
+            <!--android:id="@+id/color_dialog_title" />-->
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal"
+                          android:id="@+id/row1"
+                          android:padding="0dp">
+
+                <ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_grid_alignment_button" android:src="@drawable/sodk_editor_icon_align_top_left"/>
+                <ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_grid_alignment_button" android:src="@drawable/sodk_editor_icon_align_top"/>
+                <ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_grid_alignment_button" android:src="@drawable/sodk_editor_icon_align_top_right"/>
+
+            </LinearLayout>
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal"
+                          android:id="@+id/row2">
+
+                <ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_grid_alignment_button" android:src="@drawable/sodk_editor_icon_align_left"/>
+                <ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_grid_alignment_button" android:src="@drawable/sodk_editor_icon_align_center"/>
+                <ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_grid_alignment_button" android:src="@drawable/sodk_editor_icon_align_right"/>
+
+            </LinearLayout>
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal"
+                          android:id="@+id/row3"
+                >
+
+                <ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_grid_alignment_button" android:src="@drawable/sodk_editor_icon_align_bottom_left"/>
+                <ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_grid_alignment_button" android:src="@drawable/sodk_editor_icon_align_bottom"/>
+                <ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_grid_alignment_button" android:src="@drawable/sodk_editor_icon_align_bottom_right"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

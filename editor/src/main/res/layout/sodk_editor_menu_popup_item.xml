@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.artifex.sonui.editor.SOTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/text1"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textColor="@color/sodk_editor_menu_popup_text_color"
+    android:background="@color/sodk_editor_menu_popup_background_color"
+    android:textSize="18sp"
+    android:gravity="center_vertical"
+    android:padding="8dp"
+    />

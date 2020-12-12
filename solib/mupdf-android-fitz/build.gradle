@@ -1,0 +1,94 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+apply plugin: 'com.android.library'
+
+def filters = project.getProperties().get("abiFilters")
+if (filters==null)
+	filters = "armeabi-v7a"
+
+def ndkArgs
+
+android {
+	compileSdkVersion rootProject.ext.compileSdkVersion
+	defaultConfig {
+		minSdkVersion rootProject.ext.minSdkVersion
+		targetSdkVersion rootProject.ext.targetSdkVersion
+
+		ndk.abiFilters filters.split()
+
+		consumerProguardFiles 'proguard-rules.pro'
+
+		//  enable all formats.
+		ndkArgs = 'MUPDF_EXTRA_CFLAGS="-DHAVE_LCMS2MT -UTOFU_NOTO -DTOFU -DTOFU_CJK"'
+
+		if (project.hasProperty('addressSanitizer'))
+		{
+			// Remove the closing double quote from 'ndkArgs'
+			def length         = ndkArgs.length() - 2
+			def noClosingQUote = ndkArgs.getAt(0..length)
+
+			/*
+			 * Add the CFLAGS/LDFLAGS required for the address
+			 * sanitizer
+			 *
+			 * NB. MUDPF_EXTRA_LDFLAGS is mispelt  to match
+			 *     'libmupdf; Android.mk
+			 */
+			 ndkArgs = noClosingQUote + ' -fsanitize=address -fsanitize-recover=address -fno-omit-frame-pointer" MUDPF_EXTRA_LDFLAGS="-fsanitize=address"'
+		}
+
+		externalNativeBuild {
+			ndkBuild {
+				abiFilters filters.split()
+				arguments ndkArgs
+			}
+		}
+	}
+
+	sourceSets {
+		main {
+			manifest.srcFile 'AndroidManifest.xml'
+			java.srcDirs 'libmupdf/platform/java/src'
+		}
+	}
+
+	sourceSets {
+		regular {
+			manifest.srcFile 'AndroidManifest.xml'
+			java.srcDirs 'libmupdf/platform/java/src'
+		}
+		mupdf {
+			manifest.srcFile 'AndroidManifest.xml'
+			java.srcDirs 'libmupdf/platform/java/src'
+		}
+	}
+
+	externalNativeBuild {
+		ndkBuild.path 'libmupdf/platform/java/Android.mk'
+	}
+
+	flavorDimensions "one-dimension"
+
+	productFlavors {
+		regular {
+			/* Not including vectorDrawables{} here since this library has no resources. */
+		}
+		mupdf {
+			/* Not including vectorDrawables{} here since this library has no resources. */
+		}
+        project {
+            dimension = 'one-dimension'
+        }
+    }
+
+	buildTypes {
+		release {
+		}
+		debug {
+		}
+	}
+}
+
+dependencies {
+}

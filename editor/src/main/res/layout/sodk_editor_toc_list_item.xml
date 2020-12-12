@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <com.artifex.sonui.editor.SOTextView
+        style="@style/sodk_editor_pdf_toc_text_box_style"
+        android:id="@+id/toc_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
+</RelativeLayout>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/opts_viewer">
+        <ListPreference
+            android:defaultValue="@string/opts_default_orientation"
+            android:entries="@array/opts_orientation_labels"
+            android:entryValues="@array/opts_orientations"
+            android:key="orientation"
+            android:title="@string/opts_orientation"/>
+
+        <ListPreference
+            android:defaultValue="@string/opts_default_list_style"
+            android:entries="@array/opts_list_style_labels"
+            android:entryValues="@array/opts_list_styles"
+            android:key="list_style"
+            android:title="@string/opts_list_style"/>
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="fullscreen"
+            android:title="@string/opts_fullscreen"/>
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="verticalScrollLock"
+            android:summary="@string/opts_vertical_scroll_lock_sub"
+            android:title="@string/opts_vertical_scroll_lock"/>
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="autocrop"
+            android:summary="@string/opts_autocrop_summary"
+            android:title="@string/opts_autocrop"/>
+        <ListPreference
+            android:defaultValue="@string/opts_default_side_margin"
+            android:entries="@array/opts_margin_labels"
+            android:entryValues="@array/opts_margins"
+            android:key="sideMargins2"
+            android:title="@string/opts_side_margin"/>
+        <ListPreference
+            android:defaultValue="@string/opts_default_top_margin"
+            android:entries="@array/opts_margin_labels"
+            android:entryValues="@array/opts_margins"
+            android:key="topMargin"
+            android:title="@string/opts_top_margin"/>
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="keepOn"
+            android:title="@string/opts_keep_on"/>
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/opts_selector">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="dirsFirst"
+            android:title="@string/opts_dirs_first"/>
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="showExtension"
+            android:title="@string/opts_show_extension"/>
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- font color selection button. -->
+    <style name="sodk_editor_font_color_button" parent="@android:style/Widget.Button">
+        <item name="android:layout_height">17pt</item>
+        <item name="android:layout_width">17pt</item>
+        <item name="android:layout_margin">8dp</item>
+    </style>
+
+    <!--toolbar button-->
+    <style name="sodk_editor_toolbar_button">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:scaleType">fitXY</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/sodk_editor_button_text</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:tint">@color/sodk_editor_button_tint</item>
+        <item name="android:background">@drawable/sodk_editor_toolbar_button</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+    </style>
+
+    <!--toolbar button-->
+    <style name="sodk_editor_cellinc_button">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:scaleType">fitXY</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/sodk_editor_button_text</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:tint">@color/sodk_editor_button_tint</item>
+        <item name="android:background">@drawable/sodk_editor_toolbar_button</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:scaleX">.7</item>
+        <item name="android:scaleY">.7</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+    </style>
+
+    <style name="sodk_editor_toolbar_button_no_text" parent="@style/sodk_editor_toolbar_button">
+        <item name="android:textSize">0sp</item>
+    </style>
+
+    <style name="sodk_editor_toolbar_font_button_no_text" parent="@style/sodk_editor_toolbar_button">
+        <item name="android:tint">@color/sodk_editor_palette_so_grey</item>
+        <item name="android:textSize">0sp</item>
+        <item name="android:textColor">@color/sodk_editor_palette_so_grey</item>
+    </style>
+
+    <!--toolbar divider-->
+    <style name="sodk_editor_toolbar_divider">
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">2dp</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:layout_marginRight">10dp</item>
+        <item name="android:background">@color/sodk_editor_palette_grey_4</item>
+        <item name="android:tag">toolbar_divider</item>
+    </style>
+
+    <style name="sodk_editor_page_menu_style">
+        <item name="android:padding">5dp</item>
+        <item name="android:background">@drawable/sodk_editor_page_menu</item>
+    </style>
+
+    <style name="sodk_editor_page_menu_divider_style">
+        <item name="android:padding">5dp</item>
+        <item name="android:background">@color/sodk_editor_palette_black</item>
+    </style>
+
+    <style name="sodk_editor_page_menu_item_style">
+        <item name="android:padding">5dp</item>
+        <item name="android:background">@color/sodk_editor_palette_white</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="sodk_editor_wheel_title_style">
+        <item name="android:textColor">@color/sodk_editor_palette_white</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:paddingTop">5dp</item>
+    </style>
+
+    <style name="sodk_editor_wheel_checkbox_style" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">@color/sodk_editor_palette_ltgrey</item>
+        <item name="colorControlActivated">@color/sodk_editor_palette_ltgrey</item>
+    </style>
+
+    <style name="sodk_editor_wheel_checkbox_label_style">
+        <item name="android:textColor">@color/sodk_editor_palette_white</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:paddingLeft">10dp</item>
+    </style>
+
+    <style name="sodk_editor_wheel_plus_style">
+        <item name="android:textColor">@color/sodk_editor_palette_green_1</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingRight">10dp</item>
+    </style>
+
+    <style name="sodk_editor_alert_edit_text_style">
+    </style>
+
+    <style name="sodk_editor_alert_button_style">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/sodk_editor_alert_button_color</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="sodk_editor_alert_dialog_style" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColor">@color/sodk_editor_palette_black</item>
+        <item name="android:buttonStyle">@style/sodk_editor_alert_button_style</item>
+    </style>
+
+    <style name="sodk_editor_alert_dialog_style_nodim" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColor">@color/sodk_editor_palette_black</item>
+        <item name="android:buttonStyle">@style/sodk_editor_alert_button_style</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <!-- Color Picker Dialog Title.-->
+    <style name="sodk_editor_dialog_title_style" >
+        <item name="android:background">@color/sodk_editor_picker_bg_color</item>
+        <item name="android:textColor">@color/sodk_editor_picker_text_color</item>
+        <item name="android:textSize">12pt</item>
+    </style>
+
+    <!--Shape Picker Dialog Title.-->
+    <style name="sodk_editor_shape_dialog_title_style">
+        <item name="android:background">@color/sodk_editor_shape_picker_bg_color</item>
+        <item name="android:textColor">@color/sodk_editor_shape_picker_text_color</item>
+        <item name="android:textSize">12pt</item>
+    </style>
+
+    <!-- Note Editor Text View -->
+    <style name="sodk_editor_note_editor_textview_style" >
+        <item name="android:background">@color/sodk_editor_transparent</item>
+        <item name="android:textColor">@color/sodk_editor_palette_black</item>
+        <item name="android:layout_width">@dimen/sodk_editor_note_editor_width</item>
+    </style>
+
+    <!-- Formula Category Text Box -->
+    <style name="sodk_editor_font_formula_text_box_style" >
+        <item name="android:textColor">@color/sodk_editor_palette_white</item>
+        <item name="android:background">@color/sodk_editor_palette_slate_grey</item>
+    </style>
+
+    <!-- Pdf TOC Item Text Box -->
+    <style name="sodk_editor_pdf_toc_text_box_style" >
+        <item name="android:textColor">@color/sodk_editor_palette_black</item>
+        <item name="android:background">@color/sodk_editor_palette_white</item>
+    </style>
+
+    <!-- Certificate dialog styles -->
+    <style name="sodk_editor_dialog_style" parent="sodk_editor_alert_dialog_style">
+    </style>
+
+    <style name="sodk_editor_dialog_separator">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_alignParentTop">true</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:background">@color/sodk_editor_palette_celurian</item>
+    </style>
+
+
+    <style name="sodk_editor_dialog_button">
+        <item name="android:color">@color/sodk_editor_palette_celurian</item>
+        <item name="android:textColor">@color/sodk_editor_palette_celurian</item>
+        <item name="android:background">@color/sodk_editor_palette_white</item>
+    </style>
+
+    <style name="sodk_editor_dialog_panel">
+        <item name="android:layout_margin">15dp</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="sodk_editor_dialog_panel_border" parent="sodk_editor_dialog_panel">
+        <item name="android:background">@drawable/sodk_editor_dialog_border</item>
+    </style>
+
+    <style name="sodk_editor_cert_detail_title">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">10sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="sodk_editor_cert_detail_heading" parent="sodk_editor_cert_detail_title">
+        <item name="android:layout_marginTop">10sp</item>
+    </style>
+
+    <style name="sodk_editor_cert_detail_subheading" parent="sodk_editor_cert_detail_heading">
+        <item name="android:layout_marginStart">20sp</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="sodk_editor_cert_detail_description" parent="sodk_editor_cert_detail_subheading">
+        <item name="android:layout_marginStart">30sp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+</resources>

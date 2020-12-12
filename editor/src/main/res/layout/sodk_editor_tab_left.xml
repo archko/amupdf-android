@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/sodk_editor_tab_left"
+    android:padding="10dip"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <com.artifex.sonui.editor.SOTextView android:id="@+id/tabText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="15dip" />
+
+</LinearLayout>

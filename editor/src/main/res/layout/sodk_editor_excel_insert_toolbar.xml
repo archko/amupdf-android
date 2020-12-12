@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.artifex.sonui.editor.SOHorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                          android:layout_width="match_parent"
+                          android:layout_height="match_parent"
+        >
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                      android:orientation="horizontal"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:background="@color/sodk_editor_toolbar"
+                      android:paddingTop="10dp"
+                      android:paddingBottom="10dp">
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button_no_text"
+                android:id="@+id/insert_row_above_button"
+                android:drawableTop="@drawable/sodk_editor_icon_insert_row_above"
+                />
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button_no_text"
+                android:id="@+id/insert_row_below_button"
+                android:drawableTop="@drawable/sodk_editor_icon_insert_row_below"
+                />
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button_no_text"
+                android:id="@+id/insert_column_left_button"
+                android:drawableTop="@drawable/sodk_editor_icon_insert_column_left"
+                />
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button_no_text"
+                android:textSize="0sp"
+                android:id="@+id/insert_column_right_button"
+                android:drawableTop="@drawable/sodk_editor_icon_insert_column_right"
+                />
+
+            <!--a divider-->
+            <View style="@style/sodk_editor_toolbar_divider" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button_no_text"
+                android:id="@+id/delete_row_button"
+                android:drawableTop="@drawable/sodk_editor_icon_delete_row"
+                />
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button_no_text"
+                android:id="@+id/delete_column_button"
+                android:drawableTop="@drawable/sodk_editor_icon_delete_column"
+                />
+
+        </LinearLayout>
+
+    </com.artifex.sonui.editor.SOHorizontalScrollView>
+
+</merge>

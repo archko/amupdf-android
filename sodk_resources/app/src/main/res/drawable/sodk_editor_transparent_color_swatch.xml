@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape>
+            <stroke android:color="@color/sodk_editor_palette_black" android:width="1dp" />
+            <solid android:color="@color/sodk_editor_palette_white" />
+        </shape>
+    </item>
+
+    <item>
+        <rotate
+            android:fromDegrees="45">
+            <shape
+                android:shape="line" >
+                <stroke android:color="@color/sodk_editor_palette_red" android:width="4dp" />
+            </shape>
+        </rotate>
+    </item>
+
+</layer-list>

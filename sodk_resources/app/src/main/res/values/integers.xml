@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer name="sodk_editor_ui_doc_tab_color_from_doctype">0</integer>
+    <integer name="sodk_editor_ui_doc_tabbar_color_from_doctype">1</integer>
+
+    <integer name="sodk_editor_page_width_percentage">85</integer>
+    <integer name="sodk_editor_pagelist_width_percentage">15</integer>
+
+    <!-- in dp, smallest width -->
+    <integer name="sodk_editor_minimum_tablet_width">600</integer>
+
+    <integer name="sodk_editor_explorer_left_width">220</integer>
+
+    <integer name="sodk_editor_selected_page_border_width">10</integer>
+
+    <integer name="sodk_editor_explorer_swipe_controls_duration">500</integer>
+
+    <integer name="sodk_editor_text_highlight_alpha">60</integer>
+    <integer name="sodk_editor_form_field_alpha">60</integer>
+
+    <integer name="sodk_editor_single_tab_text_size">14</integer>
+
+</resources>

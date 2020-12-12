@@ -1,0 +1,85 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.artifex.sonui.editor.SOHorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/sodk_editor_toolbar">
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/review_toolbar"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/sodk_editor_toolbar"
+            android:paddingTop="@dimen/sodk_editor_toolbar_v_padding"
+            android:paddingBottom="@dimen/sodk_editor_toolbar_v_padding">
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/track_changes_button"
+                android:drawableTop="@drawable/sodk_editor_icon_toggle_off"
+                android:text="@string/sodk_editor_track_changes_upper" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/show_changes_button"
+                android:drawableTop="@drawable/sodk_editor_icon_toggle_off"
+                android:text="@string/sodk_editor_show_changes_upper" />
+
+            <!--a divider-->
+            <View style="@style/sodk_editor_toolbar_divider" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/comment_button"
+                android:drawableTop="@drawable/sodk_editor_icon_highlight"
+                android:text="@string/sodk_editor_comment_upper" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/delete_comment_button"
+                android:drawableTop="@drawable/sodk_editor_icon_delete_highlight"
+                android:text="@string/sodk_editor_delete_comment_upper" />
+
+            <!--a divider-->
+            <View style="@style/sodk_editor_toolbar_divider" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/accept_button"
+                android:drawableTop="@drawable/sodk_editor_icon_accept_change"
+                android:text="@string/sodk_editor_accept_upper" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/reject_button"
+                android:drawableTop="@drawable/sodk_editor_icon_reject_change"
+                android:text="@string/sodk_editor_reject_upper" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/next_button"
+                android:drawableTop="@drawable/sodk_editor_icon_next_change"
+                android:text="@string/sodk_editor_next_upper" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/previous_button"
+                android:drawableTop="@drawable/sodk_editor_icon_previous_change"
+                android:text="@string/sodk_editor_previous_upper" />
+
+            <!--a divider-->
+            <View style="@style/sodk_editor_toolbar_divider"
+                android:id="@+id/author_button_divider" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/author_button"
+                android:drawableTop="@drawable/sodk_editor_icon_author"
+                android:text="@string/sodk_editor_author_upper" />
+
+        </LinearLayout>
+
+    </com.artifex.sonui.editor.SOHorizontalScrollView>
+
+</merge>

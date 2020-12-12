@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AMuPDF</string>
+    <string name="outline_title">Table of Contents</string>
+    <string name="auto_crop">auto crop bound</string>
+
+    <string name="toast_set_as_home">Please Set Book Directory</string>
+
+    <string name="about_title">About AMupdf</string>
+    <string name="about_commmon_title">"Application info"</string>
+    <string name="about_3dparty_title">"3rd party software"</string>
+    <string name="about_changelog_title">"3rd party software"</string>
+
+    <string name="label_filename">FileName:</string>
+    <string name="label_filesize">FileSize:</string>
+    <string name="label_read">LastRead:</string>
+    <string name="label_lastmodified">LastModified:</string>
+    <string name="label_pagecount">read page:</string>
+    <string name="label_location">Location:</string>
+    <string name="label_read_count">Read Counts:</string>
+
+    <string name="menu_vudroid">Open with Vudroid</string>
+    <string name="menu_mupdf">Open with AMupdf</string>
+    <string name="menu_other">Open with Other App</string>
+    <string name="menu_info">View File Info</string>
+    <string name="menu_remove_from_recent">Remove from recent</string>
+    <string name="menu_delete">Delete</string>
+    <string name="menu_add_to_fav">Add To Favorites</string>
+    <string name="menu_remove_from_fav">Remove from Favorites</string>
+
+    <string name="dialog_title_backup">Select Backup</string>
+    <string name="dialog_sub_title_backup">Select Backup file to restore</string>
+</resources>

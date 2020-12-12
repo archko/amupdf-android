@@ -1,0 +1,20 @@
+dependencies {
+    api deps.arch_core.runtime
+    api deps.core_ktx
+    api deps.fragment.runtime
+    api deps.fragment.runtime_ktx
+    api deps.app_compat
+    api deps.lifecycle.viewmodel
+    api deps.lifecycle.viewmodel_ktx
+    api deps.lifecycle.livedata_ktx
+    api deps.lifecycle.extensions
+    api deps.coroutines.android
+
+    api deps.kotlin.stdlib
+    api deps.coroutines.android
+
+    api deps.live_event_bus_x
+
+    api deps.umeng.analytics
+    api deps.umeng.umeng_common
+}

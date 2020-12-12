@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/sodk_editor_page_menu_style"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <!--this wrapper can be hidden, and so the divider will also be hidden.-->
+    <LinearLayout
+        android:id="@+id/delete_button_wrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            style="@style/sodk_editor_page_menu_item_style"
+            android:text="Delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/delete_button" />
+
+        <View
+            style="@style/sodk_editor_page_menu_divider_style"
+            android:layout_width="1dp"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+    <Button
+        style="@style/sodk_editor_page_menu_item_style"
+        android:text="Duplicate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/duplicate_button" />
+
+</LinearLayout>

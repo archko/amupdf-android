@@ -1,0 +1,37 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    apply from: 'versions.gradle'
+    addRepos(repositories)
+
+    dependencies {
+        classpath deps.android_gradle_plugin
+        classpath deps.kotlin.plugin
+        classpath deps.kotlin.allopen
+    }
+}
+
+allprojects {
+    addRepos(repositories)
+    repositories {
+        // 引入AAR
+        flatDir {
+            List<String> dirs = new ArrayList<>()
+            rootProject.subprojects.each {
+                dirs.add(it.projectDir.absolutePath + "/aars")
+                dirs.add(it.projectDir.absolutePath + "/libs")
+            }
+            dir dirs
+        }
+    }
+
+    project.ext {
+        minSdkVersion=21
+        targetSdkVersion=28
+        compileSdkVersion=29
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

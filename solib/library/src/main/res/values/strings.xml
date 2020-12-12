@@ -1,0 +1,7 @@
+<resources>
+    <string name="sodk_library_app_name">solib</string>
+
+    <string translatable="false" name="sodk_library_annot_author_mupdf">muPDF</string>
+    <string translatable="false" name="sodk_library_annot_author_so">SmartOffice</string>
+
+</resources>

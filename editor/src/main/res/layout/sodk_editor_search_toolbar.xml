@@ -1,0 +1,101 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/search_toolbar"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/sodk_editor_toolbar"
+        android:gravity="center_vertical"
+        >
+
+        <Space
+            android:layout_width="15dp"
+            android:layout_height="1dp"
+            android:layout_weight="0"/>
+
+        <LinearLayout
+            android:id="@+id/search_input_wrapper"
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:background="@drawable/sodk_editor_search_input_wrapper"
+            >
+
+            <Space
+                android:layout_width="5dp"
+                android:layout_height="1dp"
+                android:layout_weight="0"/>
+
+            <ImageView
+                android:id="@+id/search_icon"
+                android:layout_width="@dimen/sodk_editor_search_icon_size"
+                android:layout_height="@dimen/sodk_editor_search_icon_size"
+                android:tint="@color/sodk_editor_find_icon_tint"
+                android:src="@drawable/sodk_editor_icon_find"
+                android:layout_weight="0"
+                />
+
+            <LinearLayout
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:layout_width="0px"
+                android:layout_height="0px"
+                android:layout_weight="0"/>
+
+            <com.artifex.sonui.editor.SOEditText
+                android:hint="@string/sodk_editor_find"
+                android:textColorHint="@color/sodk_editor_search_text_hint"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight = "1"
+                android:id="@+id/search_text_input"
+                android:textSize="20sp"
+                android:background="@drawable/sodk_editor_search_text_input"
+                android:textColor="@color/sodk_editor_search_text"
+                android:maxLines="1"
+                android:inputType="text"
+                android:imeOptions="flagNoExtractUi|actionDone"
+                />
+
+            <Space
+                android:layout_width="5dp"
+                android:layout_height="1dp"
+                android:layout_weight="0"/>
+
+            <ImageView
+                android:id="@+id/search_text_clear"
+                android:layout_width="@dimen/sodk_editor_search_clear_button_size"
+                android:layout_height="@dimen/sodk_editor_search_clear_button_size"
+                android:src="@drawable/sodk_editor_clear_text"
+                android:layout_weight="0"
+                android:layout_marginRight="10dp"
+                />
+
+        </LinearLayout>
+
+        <Space
+            android:layout_width="5dp"
+            android:layout_height="1dp"
+            android:layout_weight="0"/>
+
+        <com.artifex.sonui.editor.ToolbarButton
+            android:layout_weight="0"
+            style="@style/sodk_editor_toolbar_button"
+            android:id="@+id/search_next"
+            android:drawableTop="@drawable/sodk_editor_icon_find_next"
+            android:text="@string/sodk_editor_next_upper" />
+
+        <com.artifex.sonui.editor.ToolbarButton
+            android:layout_weight="0"
+            style="@style/sodk_editor_toolbar_button"
+            android:id="@+id/search_previous"
+            android:drawableTop="@drawable/sodk_editor_icon_find_previous"
+            android:text="@string/sodk_editor_previous_upper" />
+
+    </LinearLayout>
+
+</merge>

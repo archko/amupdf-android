@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/sodk_editor_slide_show_container">
+
+    <com.artifex.sonui.editor.SlideShowView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/sodk_editor_slide_show_view">
+    </com.artifex.sonui.editor.SlideShowView>
+
+    <!-- this view will handle all the input -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/sodk_editor_mask"
+        android:longClickable="true">
+    </View>
+
+</RelativeLayout>

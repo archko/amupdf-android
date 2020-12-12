@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="600dp"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="10dp" >
+
+    <com.artifex.sonui.editor.SOTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sodk_editor_like_to_retain"
+        android:textColor="@color/sodk_editor_author_textcolor"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="16dp"
+        />
+
+    <com.artifex.sonui.editor.SOEditText
+        style="@style/sodk_editor_alert_edit_text_style"
+        android:id="@+id/editTextDialogUserInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <requestFocus />
+
+    </com.artifex.sonui.editor.SOEditText>
+
+</LinearLayout>

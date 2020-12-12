@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/sodk_editor_sheet_button_normal" />
+    <stroke android:width="1px" android:color="@color/sodk_editor_excel_sheet_tab_stroke" />
+    <padding android:left="10dp" android:top="2dp"
+             android:right="10dp" android:bottom="2dp" />
+    <corners android:topRightRadius="0.1dp"
+             android:topLeftRadius="0.1dp"
+             android:bottomLeftRadius="9dp"
+             android:bottomRightRadius="9dp" />
+</shape>
+
+

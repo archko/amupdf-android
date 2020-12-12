@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:background="@drawable/sodk_editor_number_format_popup">
+
+    <com.artifex.sonui.editor.SOTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sodk_editor_number_format_number"
+        style="@style/sodk_editor_wheel_title_style"
+        android:paddingBottom="4dp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <kankan.wheel.widget.WheelView
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/left_wheel"
+            android:layout_marginRight="5dp"/>
+
+        <kankan.wheel.widget.WheelView
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/right_wheel"
+            android:layout_marginLeft="5dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal">
+        <com.artifex.sonui.editor.SOTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/sodk_editor_wheel_checkbox_label_style"
+            android:text="@string/sodk_editor_thousand_separator"/>
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+        <CheckBox
+            android:id="@+id/thousand_sep_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/sodk_editor_wheel_checkbox_style"
+            android:scaleX="1.5"
+            android:scaleY="1.5"
+            android:checked="true"
+            />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal">
+        <com.artifex.sonui.editor.SOTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/sodk_editor_wheel_checkbox_label_style"
+            android:text="@string/sodk_editor_scientific"/>
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+        <CheckBox
+            android:id="@+id/scientific_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/sodk_editor_wheel_checkbox_style"
+            android:scaleX="1.5"
+            android:scaleY="1.5"
+            android:checked="true"
+            />
+    </LinearLayout>
+
+
+</LinearLayout>

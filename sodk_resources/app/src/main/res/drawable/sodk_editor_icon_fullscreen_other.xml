@@ -1,0 +1,11 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:height="40dp"
+    android:viewportHeight="48"
+    android:viewportWidth="48"
+    android:width="40dp"
+    android:tint="@color/sodk_editor_fullscreen_icon_other_color">
+    
+    <path android:fillAlpha="1" android:fillColor="#FF000000"
+        android:fillType="nonZero"
+        android:pathData="M6,6L6,20L11.5625,14.4375L17.5625,20.4375L20.4375,17.5625L14.4375,11.5625L20,6ZM28,6L33.5625,11.5625L27.5625,17.5625L30.4375,20.4375L36.4375,14.4375L42,20L42,6ZM17.5625,27.5625L11.5625,33.5625L6,28L6,42L20,42L14.4375,36.4375L20.4375,30.4375ZM30.4375,27.5625L27.5625,30.4375L33.5625,36.4375L28,42L42,42L42,28L36.4375,33.5625ZM30.4375,27.5625" android:strokeColor="#00000000"/>
+</vector>

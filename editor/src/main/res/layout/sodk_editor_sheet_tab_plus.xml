@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/sodk_editor_sheet_tab_plus"
+        android:textSize="20sp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:textColor="@color/sodk_editor_excel_sheet_tab_plus_color">
+</Button>

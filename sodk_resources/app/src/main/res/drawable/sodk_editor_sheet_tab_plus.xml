@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape>
+            <solid android:color="@color/sodk_editor_button_pressed" />
+            <stroke android:width="1px" android:color="@color/sodk_editor_excel_sheet_tab_plus_stroke" />
+            <padding android:left="10dp" android:top="2dp" android:right="10dp" android:bottom="2dp" />
+            <corners android:topRightRadius="0.1dp"
+                     android:topLeftRadius="0.1dp"
+                     android:bottomLeftRadius="9dp"
+                     android:bottomRightRadius="9dp" />
+        </shape>
+    </item>
+    <item android:state_focused="true">
+        <shape>
+            <solid android:color="@color/sodk_editor_button_normal" />
+            <stroke android:width="1px" android:color="@color/sodk_editor_excel_sheet_tab_plus_stroke" />
+            <padding android:left="10dp" android:top="2dp" android:right="10dp" android:bottom="2dp" />
+            <corners android:topRightRadius="0.1dp"
+                     android:topLeftRadius="0.1dp"
+                     android:bottomLeftRadius="9dp"
+                     android:bottomRightRadius="9dp" />
+        </shape>
+    </item>
+    <item android:state_selected="true">
+        <shape>
+            <solid android:color="@color/sodk_editor_sheet_button_selected" />
+            <stroke android:width="1px" android:color="@color/sodk_editor_excel_sheet_tab_plus_stroke" />
+            <padding android:left="10dp" android:top="2dp" android:right="10dp" android:bottom="2dp" />
+            <corners android:topRightRadius="0.1dp"
+                     android:topLeftRadius="0.1dp"
+                     android:bottomLeftRadius="9dp"
+                     android:bottomRightRadius="9dp" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="@color/sodk_editor_sheet_button_plus_normal" />
+            <stroke android:width="1px" android:color="@color/sodk_editor_excel_sheet_tab_plus_stroke" />
+            <padding android:left="10dp" android:top="2dp" android:right="10dp" android:bottom="2dp" />
+            <corners android:topRightRadius="0.1dp"
+                     android:topLeftRadius="0.1dp"
+                     android:bottomLeftRadius="9dp"
+                     android:bottomRightRadius="9dp" />
+        </shape>
+    </item>
+</selector>

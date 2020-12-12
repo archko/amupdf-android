@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="50dp"
+    android:height="50dp"
+    android:viewportWidth="50"
+    android:viewportHeight="50"
+    android:tint="@color/sodk_editor_icon_tint">
+
+    <path
+        android:strokeColor="#333333"
+        android:strokeWidth="1.768"
+        android:pathData="M 38.631 14.754 L 38.631 40.594 L 11.37 40.594 L 11.37 7.407 L 31.33 7.407 L 34.572 10.815 Z" />
+    <path
+        android:strokeColor="#333333"
+        android:strokeWidth="1.768"
+        android:pathData="M 29.536 7.974 L 29.536 16.721 L 38.281 16.721 " />
+    <path
+        android:fillColor="#333333"
+        android:pathData="M28.955,25.609h-0.398v-3.097c0-1.965-1.6-3.564-3.564-3.564
+c-1.965,0-3.564,1.599-3.564,3.564v3.097h-0.518c-0.37,0-0.671,0.301-0.671,0.671v6.556c0,0.369,0.301,0.828,0.671,0.828h8.044
+c0.37,0,0.671-0.301,0.671-0.671V26.28C29.626,25.91,29.325,25.609,28.955,25.609
+M26.028,31.906l-2.251,0.009l0.525-2.222
+c-0.385-0.214-0.648-0.619-0.648-1.092c0-0.691,0.561-1.252,1.253-1.252c0.692,0,1.252,0.561,1.252,1.252
+c0,0.48-0.271,0.89-0.666,1.102L26.028,31.906z
+M27.187,25.609h-4.389v-3.097c0-1.21,0.984-2.194,2.195-2.194
+c1.209,0,2.194,0.984,2.194,2.194V25.609z" />
+</vector>

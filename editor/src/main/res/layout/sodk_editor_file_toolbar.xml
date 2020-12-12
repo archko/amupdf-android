@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.artifex.sonui.editor.SOHorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/sodk_editor_toolbar">
+
+        <LinearLayout
+            android:id="@+id/file_toolbar"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/sodk_editor_toolbar"
+            android:paddingTop="@dimen/sodk_editor_toolbar_v_padding"
+            android:paddingBottom="@dimen/sodk_editor_toolbar_v_padding">
+
+            <!-- Include the product flavor "custom save button. -->
+            <include layout="@layout/sodk_editor_custom_save_support"/>
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/save_button"
+                android:drawableTop="@drawable/sodk_editor_icon_save"
+                android:textColor="@color/sodk_editor_button_text"
+                android:text="@string/sodk_editor_save_upper" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/save_as_button"
+                android:drawableTop="@drawable/sodk_editor_icon_save_as"
+                android:text="@string/sodk_editor_save_as_upper" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/save_pdf_button"
+                android:drawableTop="@drawable/sodk_editor_icon_save_pdf"
+                android:text="@string/sodk_editor_save_pdf_upper" />
+
+            <!--a divider-->
+            <View style="@style/sodk_editor_toolbar_divider"
+                android:id="@+id/file_divider"/>
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/copy_button2"
+                android:drawableTop="@drawable/sodk_editor_icon_copy"
+                android:text="@string/sodk_editor_copy_upper"/>
+
+            <!--a divider-->
+            <View style="@style/sodk_editor_toolbar_divider"
+                android:id="@+id/copy_divider"/>
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/print_button"
+                android:drawableTop="@drawable/sodk_editor_icon_print"
+                android:text="@string/sodk_editor_print_upper" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/share_button"
+                android:drawableTop="@drawable/sodk_editor_icon_share"
+                android:text="@string/sodk_editor_share_upper" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/open_in_button"
+                android:drawableTop="@drawable/sodk_editor_icon_open_in"
+                android:text="@string/sodk_editor_open_in_upper" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/open_pdf_in_button"
+                android:drawableTop="@drawable/sodk_editor_icon_open_pdf_in"
+                android:text="@string/sodk_editor_open_pdf_in_upper" />
+
+            <com.artifex.sonui.editor.ToolbarButton
+                style="@style/sodk_editor_toolbar_button"
+                android:id="@+id/protect_button"
+                android:drawableTop="@drawable/sodk_editor_icon_protect"
+                android:text="@string/sodk_editor_protect_upper" />
+
+            <!--&lt;!&ndash;a divider&ndash;&gt;-->
+            <!--<View style="@style/sodk_editor_toolbar_divider" />-->
+
+        </LinearLayout>
+
+    </com.artifex.sonui.editor.SOHorizontalScrollView>
+
+</merge>

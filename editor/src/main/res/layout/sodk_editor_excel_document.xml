@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <!-- Dummy item to prevent others from receiving focus automatically -->
+    <LinearLayout
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_width="0px"
+        android:layout_height="0px"/>
+
+    <TabHost
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight = "0"
+        android:id="@+id/tabhost">
+
+        <LinearLayout
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/header_top_spacer"
+                android:layout_width="fill_parent"
+                android:layout_height="5dp"
+                android:background="@color/sodk_editor_header_xls_color" />
+
+            <LinearLayout
+                android:id="@+id/header_top"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="bottom"
+                android:background="@color/sodk_editor_header_xls_color">
+
+                <ImageButton
+                    android:id="@+id/back_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="5dp"
+                    android:src="@drawable/sodk_editor_icon_back"
+                    android:contentDescription="@string/sodk_editor_nav_back"
+                    android:background="@color/sodk_editor_transparent"/>
+
+                <Space
+                    android:id="@+id/back_button_after"
+                    android:layout_width="30dp"
+                    android:layout_height="1dp"/>
+
+                <HorizontalScrollView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TabWidget
+                        android:id="@android:id/tabs"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                    </TabWidget>
+                </HorizontalScrollView>
+
+                <Space
+                    android:layout_width="5dp"
+                    android:layout_height="1dp"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/undo_button"
+                    android:drawableTop="@drawable/sodk_editor_icon_undo"
+                    android:background="@color/sodk_editor_transparent"
+                    android:textSize="0sp"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="7dp"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/redo_button"
+                    android:drawableTop="@drawable/sodk_editor_icon_redo"
+                    android:background="@color/sodk_editor_transparent"
+                    android:textSize="0sp"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingLeft="7dp"
+                    android:paddingRight="5dp"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/search_button"
+                    android:textSize="0sp"
+                    android:drawableTop="@drawable/sodk_editor_icon_find"
+                    android:background="@drawable/sodk_editor_search_button"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:layout_marginTop="5dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="15dp"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/fullscreen_button"
+                    android:textSize="0sp"
+                    android:drawableTop="@drawable/sodk_editor_icon_fullscreen"
+                    android:background="@drawable/sodk_editor_search_button"
+                    android:layout_gravity="center_vertical"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="15dp"
+                    />
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/hiddenTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fileTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/sodk_editor_toolbar"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/sodk_editor_file_toolbar"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/editTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/sodk_editor_toolbar"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/sodk_editor_excel_edit_toolbar"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/insertTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/sodk_editor_toolbar"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/sodk_editor_excel_insert_toolbar"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/formatTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/sodk_editor_toolbar"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/sodk_editor_format_toolbar"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/formulasTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/sodk_editor_toolbar"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/sodk_editor_formulas_toolbar"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/searchTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/sodk_editor_toolbar"
+                    android:visibility="gone"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/sodk_editor_search_toolbar"/>
+
+                </LinearLayout>
+
+            </FrameLayout>
+        </LinearLayout>
+    </TabHost>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight = "1">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dip"
+            android:layout_weight="5"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:id="@+id/fx_bar"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.artifex.sonui.editor.SOTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sodk_editor_fx"
+                    android:id="@+id/fx_button"
+                    android:textSize="20sp"
+                    android:textStyle="italic"
+                    android:background="@drawable/sodk_editor_fx_button"
+                    android:textColor="@color/sodk_editor_fx_textcolor"
+                    />
+
+                <com.artifex.sonui.editor.SOEditText
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/text_input"
+                    android:textSize="20sp"
+                    android:background="@drawable/sodk_editor_text_input"
+                    android:textColor="@color/sodk_editor_fx_textcolor"
+                    android:maxLines="1"
+                    android:imeOptions="actionDone|flagNoExtractUi"
+                    android:inputType="text"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/sodk_editor_hruler_base_size"
+                    android:id="@+id/hruler_holder">
+
+                    <LinearLayout
+                        android:layout_width="@dimen/sodk_editor_hruler_base_size"
+                        android:layout_height="match_parent"
+                        android:background="@color/sodk_editor_excel_doc_bg_color"
+                        android:id="@+id/hruler_spacer">
+                    </LinearLayout>
+
+                    <com.artifex.sonui.editor.HorizontalRuler
+                        android:orientation="horizontal"
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/horizontal_ruler"
+                        android:background="@color/sodk_editor_excel_doc_bg_color">
+                    </com.artifex.sonui.editor.HorizontalRuler>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <com.artifex.sonui.editor.VerticalRuler
+                        android:orientation="vertical"
+                        android:layout_width="@dimen/sodk_editor_vruler_base_size"
+                        android:layout_height="match_parent"
+                        android:id="@+id/vertical_ruler"
+                        android:background="@color/sodk_editor_excel_doc_bg_color">
+                    </com.artifex.sonui.editor.VerticalRuler>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/doc_inner_container">
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+                <HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                                      android:layout_width="match_parent"
+                                      android:layout_height="wrap_content"
+                                      android:background="@color/sodk_editor_excel_doc_bg_color">
+
+                    <LinearLayout
+                                  android:orientation="horizontal"
+                                  android:layout_width="match_parent"
+                                  android:layout_height="match_parent"
+                                  android:background="@color/sodk_editor_excel_doc_bg_color"
+                                  android:id="@+id/excel_sheets_bar" >
+
+                    </LinearLayout>
+
+                </HorizontalScrollView>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight = "0"
+        android:id="@+id/footer">
+
+        <View
+            android:layout_weight = "0"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/sodk_editor_footer"
+            android:id="@+id/footer_lead"
+            />
+
+        <com.artifex.sonui.editor.SOTextView
+            android:layout_weight = "1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/sodk_editor_footer"
+            android:textColor="@color/sodk_editor_footer_text"
+            android:paddingRight="5dp"
+            android:singleLine="true"
+            android:ellipsize="middle"
+            android:paddingLeft="5dp"
+            android:gravity="center_horizontal"
+            android:id="@+id/footer_text"/>
+
+        <com.artifex.sonui.editor.SOTextView
+            android:layout_weight = "0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="5dp"
+            android:paddingLeft="5dp"
+            android:singleLine="true"
+            android:background="@color/sodk_editor_footer"
+            android:textColor="@color/sodk_editor_footer_page_text"
+            android:id="@+id/footer_page_text"/>
+
+    </LinearLayout>
+
+</LinearLayout>

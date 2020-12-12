@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auto_crop">自动切边</string>
+    <string name="entering_reflow_mode">输入重排模式</string>
+    <string name="in_reflow_mode">重排模式</string>
+    <string name="leaving_reflow_mode">正在离开重排模式</string>
+    <string name="toggle_reflow_mode">切换重排模式</string>
+    <string name="outline_title">目录</string>
+
+    <string name="menu_goto_page">跳转到页…</string>
+    <string name="menu_set_as_home">设为主目录</string>
+    <string name="menu_search">搜索</string>
+    <string name="menu_backup">备份历史</string>
+    <string name="menu_restore">恢复历史</string>
+    <string name="menu_about">关于</string>
+    <string name="menu_style">样式(列表/网格)</string>
+
+    <string name="menu_progress_outline">进度/目录/切割/重排</string>
+    <string name="menu_zoom">缩放</string>
+    <string name="menu_exit">退出</string>
+    <string name="menu_font">字体</string>
+    <string name="menu_settings">设置</string>
+
+    <string name="go_home">主目录</string>
+
+    <string name="options">设置</string>
+    <string name="opts_dirs_first">目录优先</string>
+    <string name="opts_show_extension">显示文件扩展名</string>
+    <string name="opts_orientation">方向</string>
+    <string-array name="opts_orientation_labels">
+        <item>自动</item>
+        <item>不变</item>
+        <item>锁定竖屏</item>
+        <item>锁定横屏</item>
+        <item>反向竖屏</item>
+        <item>反向横屏</item>
+        <item>感应竖屏</item>
+        <item>感应横屏</item>
+    </string-array>
+
+    <string name="opts_list_style">列表风格</string>
+    <string-array name="opts_list_style_labels">
+        <item>列表</item>
+        <item>网格</item>
+    </string-array>
+    <string name="opts_viewer">PDF 查看器</string>
+    <string name="opts_selector">文件选择器</string>
+    <string name="opts_fullscreen">全屏</string>
+    <string name="opts_autocrop">自动切边</string>
+    <string name="opts_autocrop_summary">自动切去空白边界</string>
+
+    <string name="opts_vertical_scroll_lock">垂直滚动锁定</string>
+    <string name="opts_vertical_scroll_lock_sub">要水平滚动,你要先滚动屏幕的1/5.</string>
+
+    <string name="opts_side_margin">额外的间距</string>
+    <string-array name="opts_margin_labels">
+        <item>none</item>
+        <item>small</item>
+        <item>medium</item>
+        <item>large</item>
+        <item>-20</item>
+        <item>-15</item>
+        <item>-10</item>
+        <item>-5</item>
+    </string-array>
+    <string name="opts_top_margin">页面间距</string>
+    <string name="opts_default_top_margin">0</string>
+    <string name="opts_volume_pair">音量键行为</string>
+    <string name="opts_up_down_pair">上/下键行为</string>
+    <string name="opts_left_right_pair">左/右键行为</string>
+    <string name="opts_keep_on">阅读保持屏幕亮度</string>
+    <string name="opts_table_of_contents">大纲</string>
+
+    <string name="opts_list_style_list">列表</string>
+    <string name="opts_list_style_grid">网格</string>
+
+    <string name="tab_history">历史</string>
+    <string name="tab_browser">浏览器</string>
+    <string name="tab_favorite">收藏</string>
+
+    <string name="menu_font_size">字号</string>
+    <string name="menu_font_face">字体</string>
+    <string name="menu_line_space">行间距</string>
+    <string name="menu_font_color">字体颜色</string>
+    <string name="menu_font_bg">背景</string>
+    <string name="menu_font_fg">前景</string>
+
+    <string name="dialog_title_font">选择字体</string>
+    <string name="dialog_sub_title_font">请将字体放入 /sdcard/amupdf/fonts 目录</string>
+    <string name="dialog_item_title_font">%s:测试字体</string>
+</resources>

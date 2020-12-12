@@ -1,0 +1,284 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+apply plugin: 'com.android.library'
+
+def filters = project.getProperties().get("abiFilters")
+if (filters==null)
+    filters = "armeabi-v7a"
+
+def getCurrentFlavor() {
+    Gradle gradle = getGradle()
+    String  tskReqStr = gradle.getStartParameter().getTaskRequests().toString()
+
+    Pattern pattern;
+
+    if( tskReqStr.contains( "assemble" ) )
+        pattern = Pattern.compile("assemble(\\w+)(Release|Debug)")
+    else
+        pattern = Pattern.compile("generate(\\w+)(Release|Debug)")
+
+    Matcher matcher = pattern.matcher( tskReqStr )
+
+    if( matcher.find() )
+        return matcher.group(1).toLowerCase()
+    else
+    {
+        println "SOLib: NO MATCH FOUND FOR FLAVOR: " + tskReqStr
+        return "";
+    }
+}
+
+// Extract the JNI files of a given archive (aar, jar ...),
+// to the speciied location.
+def extractJniLibs(String archive, String destination) {
+    copy {
+        from (zipTree(archive)) {
+            include "jni/**"
+        }
+        into "$buildDir/tmp/$destination"
+    }
+}
+
+// Before attempting compilation unpack any required archives.
+gradle.taskGraph.beforeTask { Task task ->
+    if (task.name =~ /compile.*/)
+    {
+        if (project.hasProperty('solib_gd_aar') &&
+                rootProject.ext.solib_gd_aar != "" &&
+                file(rootProject.ext.solib_gd_aar).exists())
+        {
+            /*
+             * A valid GD SDK aar file has bee specified.
+             * Unpack it to a temp location to allow us to use it's
+             * JNI libraries.
+             */
+            task.doFirst() {
+                extractJniLibs(rootProject.ext.solib_gd_aar, "gd_sdk")
+            }
+        }
+    }
+}
+ 
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    // Encapsulates your external native build configurations.
+    if (getCurrentFlavor()!="mupdf") {
+        externalNativeBuild {
+            ndkBuild {
+                path "src/main/jni/Android.mk"
+            }
+        }
+    }
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode  1
+        versionName  "1.0"
+
+        if (getCurrentFlavor()!="mupdf") {
+
+            // Initialise the JNI flavour if not done by the application.
+            if (! project.hasProperty('solib_jni_flavour')) {
+               rootProject.ext.solib_jni_flavour = ""
+            }
+
+            ndk {
+                moduleName "so"
+                abiFilters filters.split()
+            }
+
+            externalNativeBuild {
+                ndkBuild {
+                    arguments "FLAVOUR=${rootProject.ext.solib_jni_flavour}"
+
+                    if (project.hasProperty('solib_gd_aar') &&
+                            rootProject.ext.solib_gd_aar != "" &&
+                            file(rootProject.ext.solib_gd_aar).exists())
+                    {
+                        /*
+                         * Pass the location of the extracted GD SDK shared
+                         * objects to ndk-build.
+                         */
+                        arguments "GDSDK=$buildDir/tmp/gd_sdk/jni"
+
+                        /*
+                         * Extract the SDK id from the name.
+                         * ie. Isolate the filename from the path and drop
+                         *     the file extension.
+                         */
+                        def matcher =
+                            rootProject.ext.solib_gd_aar =~ /([^\/]+).aar/
+
+                        if (matcher.size() != 1)
+                        {
+                            throw new GradleException(
+                                'Could not calculate GD SDK inludes ' +
+                                'directory name from "' +
+                                    rootProject.ext.solib_gd_aar + '".')
+                        }
+
+                        /*
+                         * Pass the expected header file folder name to
+                         * ndk-build.
+                         */
+                        arguments "GDSDKINCS=" + matcher[0][1]
+                    }
+
+                    if (project.hasProperty('addressSanitizer'))
+                    {
+                        arguments "CLANG_ADDRESS_SANITIZER=1"
+                    }
+
+                    if (project.hasProperty('SCREENS_ARE_R8G8B8X8'))
+                    {
+                        arguments "SCREENS_ARE_R8G8B8X8=1"
+                    }
+                    else if (project.hasProperty('SCREENS_ARE_B5G6R5'))
+                    {
+                        arguments "SCREENS_ARE_B5G6R5=1"
+                    }
+                    else
+                    {
+                        println "Default to B5G6R5"
+                        arguments "SCREENS_ARE_B5G6R5=1"
+                    }
+                }
+            }
+        }
+
+        if (project.hasProperty('SCREENS_ARE_R8G8B8X8'))
+        {
+            buildConfigField("String", "SCREENS_ARE", "\"R8G8B8X8\"")
+        }
+        else if (project.hasProperty('SCREENS_ARE_B5G6R5'))
+        {
+            buildConfigField("String", "SCREENS_ARE", "\"B5G6R5\"")
+        }
+        else
+        {
+            println "Default to B5G6R5"
+            buildConfigField("String", "SCREENS_ARE", "\"B5G6R5\"")
+        }
+
+        vectorDrawables {
+            /*
+             *  Do not generate pngs from vector drawable resources.
+             *
+             *  The vector drawables  can now be used directly on all
+             *  platforms we support.
+             */
+            useSupportLibrary = true
+        }
+    }
+
+    flavorDimensions "one-dimension"
+
+    productFlavors {
+        regular {
+        }
+        mupdf {
+        }
+        project {
+            dimension = 'one-dimension'
+        }
+    }
+
+    sourceSets {
+        main {
+            java {
+            }
+            jni.srcDirs = []
+        }
+        regular {
+            java {
+                /*
+                 * Include all files from the main sourceset in this
+                 * release.
+                 */
+                srcDirs "src/main/java", "src/smartoffice/java", "src/mupdf/java"
+            }
+        }
+        mupdf {
+            java {
+                /*
+                 * Include all files from the main sourceset in this
+                 * release.
+                 */
+                srcDirs "src/main/java", "src/mupdf/java", "src/mupdf2/java"
+                jni.srcDirs = []
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            consumerProguardFiles 'proguard-rules.pro'
+        }
+        debug {
+            consumerProguardFiles 'proguard-rules.pro'
+        }
+    }
+
+    libraryVariants.all { variant ->
+        task("${variant.name}Javadoc",
+              type: Javadoc) {
+
+            def javaCompileTask
+            if (variant.hasProperty('javaCompileProvider')) {
+                // Android plugin 3.3.0+
+                javaCompileTask = variant.javaCompileProvider.get()
+            } else {
+                javaCompileTask = variant.javaCompile
+            }
+
+            source = javaCompileTask.source
+
+            //  this works to pick up all of the mupdf java files, but will
+            //  break if there are any .class files.
+            //  which will not be the case with a fresh sdk  build (I presume).
+            source += files('../mupdf-android-fitz/libmupdf/platform/java/src')
+
+            // Disable lint
+            options.addStringOption('Xdoclint:none', '-quiet')
+            // Create a custom 'Not' tag.
+            options.addStringOption('tag', 'note:a:Note:')
+
+
+            title = "Smart Office API"
+
+            doFirst {
+                classpath += files(javaCompileTask.classpath.files)
+                classpath += files(android.getBootClasspath())
+            }
+
+            // We're excluding these generated files
+            exclude '**/BuildConfig.java'
+            exclude '**/R.java'
+        }
+    }
+
+    // Generate the javadoc archive for the project.
+    libraryVariants.all { variant ->
+        task("${variant.name}JavadocJar",
+             type: Jar, dependsOn: "${variant.name}Javadoc") {
+
+            classifier = 'javadoc'
+            from tasks["${variant.name}Javadoc"].destinationDir
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    // This *should* add 'library-javadoc.jar' to the solib.aar, if it has
+    // been built. However only an empty jar is actually added.
+    //
+    // For the moment this is corrected in smartoffice-devkit-android-package.py
+    if (getCurrentFlavor()!="mupdf") {
+        implementation fileTree(include: ['*.jar'], dir: 'build/libs')
+    }
+    implementation project(':mupdf-android-fitz')
+}

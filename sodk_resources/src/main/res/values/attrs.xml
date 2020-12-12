@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--  attributes for the Slider class  -->
+    <declare-styleable name="sodk_editor_Slider">
+        <attr name="trackColor" format="color"/>
+        <attr name="trackWidth" format="dimension"/>
+        <attr name="thumbColor" format="color"/>
+        <attr name="thumbRadius" format="dimension"/>
+    </declare-styleable>
+
+    <!--  attributes for the BlurringView class  -->
+    <declare-styleable name="sodk_editor_PxBlurringView">
+        <attr name="blurRadius" format="integer"/>
+        <attr name="downsampleFactor" format="integer"/>
+        <attr name="overlayColor" format="color"/>
+    </declare-styleable>
+
+</resources>

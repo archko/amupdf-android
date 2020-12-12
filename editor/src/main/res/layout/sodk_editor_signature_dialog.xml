@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
+
+    <TextView
+        android:textAppearance="?android:attr/textAppearanceLarge" android:textSize="24sp"
+        android:textStyle="bold"
+        android:text="@string/sodk_editor_signature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="10dp"
+        android:layout_weight="0" />
+
+    <com.artifex.sonui.editor.SOTextView
+        android:id="@+id/message"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/sodk_editor_signature_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="10dp"
+        android:layout_weight="0" />
+
+    <Button
+        android:id="@+id/sign_button"
+        android:text="@string/sodk_editor_signature_sign"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:background="@android:color/transparent"
+        android:textColor="@color/sodk_editor_palette_dodger_blue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:text="@string/sodk_editor_signature_reposition"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:background="@android:color/transparent"
+        android:textColor="@color/sodk_editor_palette_dodger_blue"
+        android:id="@+id/reposition_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:text="@string/sodk_editor_delete"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:background="@android:color/transparent"
+        android:textColor="@color/sodk_editor_palette_dodger_blue"
+        android:id="@+id/delete_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:text="@string/sodk_editor_cancel"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:background="@android:color/transparent"
+        android:textColor="@color/sodk_editor_palette_dodger_blue"
+        android:id="@+id/cancel_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

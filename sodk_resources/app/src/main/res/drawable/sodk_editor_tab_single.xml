@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- This is the line -->
+    <item>
+        <shape>
+            <padding android:left="1dp" android:top="2dp" android:right="1dp" android:bottom="0dp"/>
+            <solid android:color="@color/sodk_editor_tab_stroke" />
+            <corners
+                android:bottomRightRadius="0.1dp"
+                android:bottomLeftRadius="0.1dp"
+                android:topLeftRadius="@dimen/sodk_editor_tab_radius"
+                android:topRightRadius="@dimen/sodk_editor_tab_radius" />
+        </shape>
+    </item>
+    <!-- This is the main color -->
+    <item android:id="@+id/tab_bg_color">
+        <shape>
+            <solid/>
+            <corners
+                android:bottomRightRadius="0.1dp"
+                android:bottomLeftRadius="0.1dp"
+                android:topLeftRadius="@dimen/sodk_editor_tab_radius"
+                android:topRightRadius="@dimen/sodk_editor_tab_radius" />
+        </shape>
+    </item>
+</layer-list>
+

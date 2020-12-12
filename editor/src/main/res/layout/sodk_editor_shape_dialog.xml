@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:background="@drawable/sodk_editor_shape"
+              android:orientation="vertical"
+              android:padding="0dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentTop="true">
+
+            <com.artifex.sonui.editor.SOTextView
+                style="@style/sodk_editor_shape_dialog_title_style"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/shape_dialog_title" />
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal"
+                          android:id="@+id/row1">
+
+                <ImageButton android:tag="diamond" android:scaleX="0.75" android:scaleY="0.75"
+                             android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_shape_button" android:src="@drawable/sodk_editor_icon_shape_diamond"/>
+                <ImageButton android:tag="speech1" android:scaleX="0.75" android:scaleY="0.75"
+                             android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_shape_button" android:src="@drawable/sodk_editor_icon_shape_speech_bubble1"/>
+                <ImageButton android:tag="speech2" android:scaleX="0.75" android:scaleY="0.75"
+                             android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_shape_button" android:src="@drawable/sodk_editor_icon_shape_speech_bubble2"/>
+                <ImageButton android:tag="pentagon" android:scaleX="0.75" android:scaleY="0.75"
+                             android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_shape_button" android:src="@drawable/sodk_editor_icon_shape_pentagon"/>
+                <ImageButton android:tag="star" android:scaleX="0.75" android:scaleY="0.75"
+                             android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_shape_button" android:src="@drawable/sodk_editor_icon_shape_star"/>
+
+            </LinearLayout>
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal"
+                          android:id="@+id/row2">
+
+                <ImageButton android:tag="circle" android:scaleX="0.75" android:scaleY="0.75"
+                             android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_shape_button" android:src="@drawable/sodk_editor_icon_shape_circle"/>
+                <ImageButton android:tag="triangle1" android:scaleX="0.75" android:scaleY="0.75"
+                             android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_shape_button" android:src="@drawable/sodk_editor_icon_shape_triangle1"/>
+                <ImageButton android:tag="triangle2" android:scaleX="0.75" android:scaleY="0.75"
+                             android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_shape_button" android:src="@drawable/sodk_editor_icon_shape_triangle2"/>
+                <ImageButton android:tag="arrow1" android:scaleX="0.75" android:scaleY="0.75"
+                             android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_shape_button" android:src="@drawable/sodk_editor_icon_shape_arrow1"/>
+                <ImageButton android:tag="arrow2" android:scaleX="0.75" android:scaleY="0.75"
+                             android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_shape_button" android:src="@drawable/sodk_editor_icon_shape_arrow2"/>
+
+            </LinearLayout>
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal"
+                          android:id="@+id/row3">
+
+                <ImageButton android:tag="text" android:scaleX="0.75" android:scaleY="0.75"
+                             android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_shape_button" android:src="@drawable/sodk_editor_icon_shape_textbox"/>
+                <ImageButton android:tag="line" android:scaleX="0.75" android:scaleY="0.75"
+                             android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_shape_button" android:src="@drawable/sodk_editor_icon_shape_line"/>
+                <ImageButton android:tag="arrow-line" android:scaleX="0.75" android:scaleY="0.75"
+                             android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_shape_button" android:src="@drawable/sodk_editor_icon_shape_line_arrow"/>
+                <ImageButton android:tag="square" android:scaleX="0.75" android:scaleY="0.75"
+                             android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_shape_button" android:src="@drawable/sodk_editor_icon_shape_square"/>
+                <ImageButton android:tag="rounded-square" android:scaleX="0.75" android:scaleY="0.75"
+                             android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sodk_editor_shape_button" android:src="@drawable/sodk_editor_icon_shape_rounded_square"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,48 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+
+    <!-- unscaled sizes for the excel rulers -->
+    <dimen name="sodk_editor_hruler_base_size">8dp</dimen>
+    <dimen name="sodk_editor_vruler_base_size">13dp</dimen>
+
+    <!-- for explorer grid view -->
+    <dimen name="sodk_editor_explorer_grid_cell_height">200dp</dimen>
+    <dimen name="sodk_editor_explorer_grid_image_height">120dp</dimen>
+    <dimen name="sodk_editor_explorer_grid_cell_textsize">16sp</dimen>
+    <dimen name="sodk_editor_explorer_grid_cell_textpadding">5sp</dimen>
+
+    <!-- for explorer list entry controls -->
+    <dimen name="sodk_editor_control_icon_height">35dp</dimen>
+    <dimen name="sodk_editor_control_icon_width">45dp</dimen>
+    <dimen name="sodk_editor_control_icon_margin">8dp</dimen>
+    <dimen name="sodk_editor_control_icon_padding">0dp</dimen>
+
+    <!-- Slider dimensions -->
+    <dimen name="sodk_editor_slider_thumb_radius">10dp</dimen>
+    <dimen name="sodk_editor_slider_track_width">3dp</dimen>
+
+    <dimen name="sodk_editor_thumbnail_size">120dp</dimen>
+
+    <dimen name="sodk_editor_so_button_h_padding">8dp</dimen>
+    <dimen name="sodk_editor_toolbar_v_padding">8dp</dimen>
+    <dimen name="sodk_editor_so_button_text_size">11sp</dimen>
+
+    <dimen name="sodk_editor_search_clear_button_size">26dp</dimen>
+    <dimen name="sodk_editor_search_icon_size">40dp</dimen>
+
+    <dimen name="sodk_editor_note_editor_width">200dp</dimen>
+
+    <dimen name="sodk_editor_tab_radius">12dp</dimen>
+    <dimen name="sodk_editor_menu_popup_radius">7dp</dimen>
+
+    <dimen name="sodk_editor_toc_offsetx">10dp</dimen>
+    <dimen name="sodk_editor_toc_offsety">135dp</dimen>
+
+    //  Android uses this value for things like scroll detection
+    //  seems like a fine value for us.
+    <dimen name="sodk_editor_drag_slop">8dp</dimen>
+
+    <dimen name="sodk_editor_after_back_button">15dp</dimen>
+    <dimen name="sodk_editor_after_back_button_phone">3dp</dimen>
+
+</resources>
