@@ -33,10 +33,14 @@ android {
     }
 
     lintOptions { abortOnError false }
+
     sourceSets {
         main {
             jni.srcDirs = []
             jniLibs.srcDirs = ['libs']
+            java {
+                srcDirs "src/main/java"
+            }
         }
     }
     externalNativeBuild {
@@ -51,5 +55,5 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
-    api project(':mupdf-android-fitz')
+    api project(path: ':mupdf-android-fitz')
 }

@@ -174,39 +174,10 @@ android {
         }
     }
 
-    flavorDimensions "one-dimension"
-
-    productFlavors {
-        regular {
-        }
-        mupdf {
-        }
-        project {
-            dimension = 'one-dimension'
-        }
-    }
-
     sourceSets {
         main {
-            java {
-            }
             jni.srcDirs = []
-        }
-        regular {
             java {
-                /*
-                 * Include all files from the main sourceset in this
-                 * release.
-                 */
-                srcDirs "src/main/java", "src/smartoffice/java", "src/mupdf/java"
-            }
-        }
-        mupdf {
-            java {
-                /*
-                 * Include all files from the main sourceset in this
-                 * release.
-                 */
                 srcDirs "src/main/java", "src/mupdf/java", "src/mupdf2/java"
                 jni.srcDirs = []
             }
@@ -223,8 +194,7 @@ android {
     }
 
     libraryVariants.all { variant ->
-        task("${variant.name}Javadoc",
-              type: Javadoc) {
+        task("${variant.name}Javadoc", type: Javadoc) {
 
             def javaCompileTask
             if (variant.hasProperty('javaCompileProvider')) {
@@ -262,8 +232,7 @@ android {
 
     // Generate the javadoc archive for the project.
     libraryVariants.all { variant ->
-        task("${variant.name}JavadocJar",
-             type: Jar, dependsOn: "${variant.name}Javadoc") {
+        task("${variant.name}JavadocJar", type: Jar, dependsOn: "${variant.name}Javadoc") {
 
             classifier = 'javadoc'
             from tasks["${variant.name}Javadoc"].destinationDir

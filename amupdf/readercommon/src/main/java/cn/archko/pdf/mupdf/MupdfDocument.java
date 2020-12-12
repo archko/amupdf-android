@@ -17,7 +17,6 @@ import com.artifex.mupdf.fitz.Quad;
 import com.artifex.mupdf.fitz.Rect;
 import com.artifex.mupdf.fitz.RectI;
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice;
-import com.artifex.mupdf.viewer.OutlineActivity;
 
 import org.ebookdroid.core.crop.PageCropper;
 
@@ -238,7 +237,7 @@ public class MupdfDocument {
         return outline != null;
     }
 
-    private void flattenOutlineNodes(ArrayList<OutlineActivity.Item> result, Outline list[], String indent) {
+    /*private void flattenOutlineNodes(ArrayList<OutlineActivity.Item> result, Outline list[], String indent) {
         for (Outline node : list) {
             if (node.title != null) {
                 int page = document.pageNumberFromLocation(document.resolveLink(node));
@@ -253,7 +252,7 @@ public class MupdfDocument {
         ArrayList<OutlineActivity.Item> result = new ArrayList<OutlineActivity.Item>();
         flattenOutlineNodes(result, outline, "");
         return result;
-    }
+    }*/
 
     public boolean needsPassword() {
         return document.needsPassword();

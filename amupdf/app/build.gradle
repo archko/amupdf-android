@@ -71,11 +71,14 @@ android {
     }
 
     lintOptions { abortOnError false }
+
     sourceSets {
         main {
             jni.srcDirs = []
             jniLibs.srcDirs = ['libs']
-            main.java.srcDirs += 'src/main/kotlin'
+            java{
+                srcDirs 'src/main/kotlin'
+            }
         }
     }
 }

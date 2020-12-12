@@ -1,6 +1,3 @@
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-
 apply plugin: 'com.android.library'
 
 def filters = project.getProperties().get("abiFilters")
@@ -53,34 +50,9 @@ android {
 		}
 	}
 
-	sourceSets {
-		regular {
-			manifest.srcFile 'AndroidManifest.xml'
-			java.srcDirs 'libmupdf/platform/java/src'
-		}
-		mupdf {
-			manifest.srcFile 'AndroidManifest.xml'
-			java.srcDirs 'libmupdf/platform/java/src'
-		}
-	}
-
 	externalNativeBuild {
 		ndkBuild.path 'libmupdf/platform/java/Android.mk'
 	}
-
-	flavorDimensions "one-dimension"
-
-	productFlavors {
-		regular {
-			/* Not including vectorDrawables{} here since this library has no resources. */
-		}
-		mupdf {
-			/* Not including vectorDrawables{} here since this library has no resources. */
-		}
-        project {
-            dimension = 'one-dimension'
-        }
-    }
 
 	buildTypes {
 		release {

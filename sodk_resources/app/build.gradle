@@ -26,19 +26,6 @@ android {
         }
     }
 
-    flavorDimensions "one-dimension"
-
-    productFlavors {
-        regular {
-        }
-        mupdf {
-            matchingFallbacks = ['regular']
-        }
-        project {
-            dimension = 'one-dimension'
-        }
-    }
-
     sourceSets {
         main {
             java {
