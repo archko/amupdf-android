@@ -282,9 +282,9 @@ public class NUIDocViewPdf extends NUIDocView
         mRedactApplyButton.setEnabled(!markAreaMode && pdfDoc.hasRedactionsToApply());
 
         //  history buttons
-        History history = docView.getHistory();
-        mPreviousLinkButton.setEnabled(history.canPrevious());
-        mNextLinkButton.setEnabled(history.canNext());
+        //History history = docView.getHistory();
+        //mPreviousLinkButton.setEnabled(history.canPrevious());
+        //mNextLinkButton.setEnabled(history.canNext());
 
         getPdfDocView().onSelectionChanged();
 
@@ -421,11 +421,11 @@ public class NUIDocViewPdf extends NUIDocView
                     {
                         //  Add a history entry for the spot we're leaving.
                         DocView dv = getDocView();
-                        dv.addHistory(dv.getScrollX(), dv.getScrollY(), dv.getScale(), true);
+                        //dv.addHistory(dv.getScrollX(), dv.getScrollY(), dv.getScale(), true);
 
                         //  add history for where we're going
-                        int dy = dv.scrollBoxToTopAmount(linkData.page, linkData.box);
-                        dv.addHistory(dv.getScrollX(), dv.getScrollY()-dy, dv.getScale(), false);
+                        //int dy = dv.scrollBoxToTopAmount(linkData.page, linkData.box);
+                        //dv.addHistory(dv.getScrollX(), dv.getScrollY()-dy, dv.getScale(), false);
 
                         //  scroll to the new page and box
                         dv.scrollBoxToTop(linkData.page, linkData.box);
@@ -445,20 +445,20 @@ public class NUIDocViewPdf extends NUIDocView
 
     private void onPreviousLinkButton(View v )
     {
-        DocView dv = getDocView();
+        /*DocView dv = getDocView();
         History.HistoryItem item = dv.getHistory().previous();
         if (item!=null) {
             onHistoryItem(item);
-        }
+        }*/
     }
 
     private void onNextLinkButton(View v )
     {
-        DocView dv = getDocView();
+        /*DocView dv = getDocView();
         History.HistoryItem item = dv.getHistory().next();
         if (item!=null) {
             onHistoryItem(item);
-        }
+        }*/
     }
 
     @Override

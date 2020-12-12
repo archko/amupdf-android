@@ -202,8 +202,8 @@ public class DocView
     public float mLastReflowWidth = 0;
 
     //  history
-    private History mHistory;
-    public History getHistory() {return mHistory;}
+    /*private History mHistory;
+    public History getHistory() {return mHistory;}*/
 
     public void setDoc(ArDkDoc doc)
     {
@@ -240,7 +240,7 @@ public class DocView
         mSmoother = new Smoother(3);
 
         //  create the history object
-        mHistory = new History();
+        //mHistory = new History();
 
         //  this doesn't prevent scrolling, but it may prevent
         //  the entire activity from being pushed out of place when the Note Editor gains focus.
@@ -865,11 +865,11 @@ public class DocView
             public void handleExternalLink(int pageNum, Rect bbox)
             {
                 //  Add a history entry for the spot we're leaving.
-                addHistory(getScrollX(), getScrollY(), mScale, true);
+                //addHistory(getScrollX(), getScrollY(), mScale, true);
 
                 //  add a history entry for the destination.
-                int dy = scrollBoxToTopAmount(pageNum, new RectF(bbox.left, bbox.top, bbox.right, bbox.bottom));
-                addHistory(getScrollX(), getScrollY()-dy, mScale, false);
+                //int dy = scrollBoxToTopAmount(pageNum, new RectF(bbox.left, bbox.top, bbox.right, bbox.bottom));
+                //addHistory(getScrollX(), getScrollY()-dy, mScale, false);
 
                 //  go there
                 RectF bboxf = new RectF(bbox.left, bbox.top, bbox.right, bbox.bottom);
@@ -928,7 +928,7 @@ public class DocView
         }
     }
 
-    protected void addHistory(int scrollX, int scrollY, float scale, boolean check)
+    /*protected void addHistory(int scrollX, int scrollY, float scale, boolean check)
     {
         boolean add = true;
         if (check && !shouldAddHistory(scrollX, scrollY, scale))
@@ -939,9 +939,9 @@ public class DocView
 
         //  get the outer view to update its UI
         mHostActivity.updateUI();
-    }
+    }*/
 
-    protected boolean shouldAddHistory(int scrollX, int scrollY, float scale)
+    /*protected boolean shouldAddHistory(int scrollX, int scrollY, float scale)
     {
         //  get the current item
         //  if there is none, it's ok to add
@@ -963,7 +963,7 @@ public class DocView
             return false;
 
         return true;
-    }
+    }*/
 
     protected boolean tapToFocus() {return true;}
 
@@ -2282,7 +2282,7 @@ public class DocView
         this.post(this);
     }
 
-    protected void addPageHistory(int pageNumber)
+    /*protected void addPageHistory(int pageNumber)
     {
         //  add history for where we're leaving (here)
         addHistory(getScrollX(), getScrollY(), getScale(), true);
@@ -2293,7 +2293,7 @@ public class DocView
         Point pnew = scrollToPageAmounts(newPage);
         if (pnew.y != 0)
             addHistory(getScrollX(), getScrollY()-pnew.y, getScale(), false);
-    }
+    }*/
 
     //  holds the go-to page number, used at the end of onLayout.
     private int goToThisPage = -1;

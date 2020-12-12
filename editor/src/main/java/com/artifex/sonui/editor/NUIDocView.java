@@ -4961,7 +4961,7 @@ public class NUIDocView
 
     public void onFirstPageButton(View v)
     {
-        mDocView.addPageHistory(0);
+        //mDocView.addPageHistory(0);
         mDocView.goToFirstPage();
         if (usePagesView())
             mDocPageListView.goToFirstPage();
@@ -4970,7 +4970,7 @@ public class NUIDocView
 
     public void onLastPageButton(View v)
     {
-        mDocView.addPageHistory(getPageCount()-1);
+        //mDocView.addPageHistory(getPageCount()-1);
         mDocView.goToLastPage();
         if (usePagesView())
             mDocPageListView.goToLastPage();
@@ -5550,11 +5550,11 @@ public class NUIDocView
     {
         //  Add a history entry for the spot we're leaving.
         DocView dv = getDocView();
-        dv.addHistory(dv.getScrollX(), dv.getScrollY(), dv.getScale(), true);
+        //dv.addHistory(dv.getScrollX(), dv.getScrollY(), dv.getScale(), true);
 
         //  add history for where we're going
-        int dy = dv.scrollBoxToTopAmount(page, box);
-        dv.addHistory(dv.getScrollX(), dv.getScrollY()-dy, dv.getScale(), false);
+        //int dy = dv.scrollBoxToTopAmount(page, box);
+        //dv.addHistory(dv.getScrollX(), dv.getScrollY()-dy, dv.getScale(), false);
 
         //  scroll to the new page and box
         dv.scrollBoxToTop(page, box);
@@ -5793,7 +5793,7 @@ public class NUIDocView
     //  for no-UI API
     private void gotoPage(int pageNumber)
     {
-        mDocView.addPageHistory(pageNumber);
+        //mDocView.addPageHistory(pageNumber);
         mDocView.scrollToPage(pageNumber, true);
         if (usePagesView())
             mDocPageListView.scrollToPage(pageNumber, true);
@@ -5818,22 +5818,22 @@ public class NUIDocView
     //  for no-UI API
     public boolean hasPreviousHistory()
     {
-        History history = getDocView().getHistory();
+        /*History history = getDocView().getHistory();
         if (history!=null)
         {
             return history.canPrevious();
-        }
+        }*/
         return false;
     }
 
     //  for no-UI API
     public boolean hasNextHistory()
     {
-        History history = getDocView().getHistory();
+        /*History history = getDocView().getHistory();
         if (history!=null)
         {
             return history.canNext();
-        }
+        }*/
         return false;
     }
 

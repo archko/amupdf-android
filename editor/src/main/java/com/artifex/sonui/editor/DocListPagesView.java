@@ -74,14 +74,14 @@ public class DocListPagesView extends DocView
         if (v != null)
         {
             //  add history for where we're leaving (here)
-            mMainView.addHistory(mMainView.getScrollX(), mMainView.getScrollY(), mMainView.getScale(), true);
+            //mMainView.addHistory(mMainView.getScrollX(), mMainView.getScrollY(), mMainView.getScale(), true);
 
             //  add history for where we're going
             //  unless the distance is zero.
             int newPage = v.getPageNumber();
-            Point pnew = mMainView.scrollToPageAmounts(newPage);
+            /*Point pnew = mMainView.scrollToPageAmounts(newPage);
             if (pnew.y != 0)
-                mMainView.addHistory(mMainView.getScrollX(), mMainView.getScrollY()-pnew.y, mMainView.getScale(), false);
+                mMainView.addHistory(mMainView.getScrollX(), mMainView.getScrollY()-pnew.y, mMainView.getScale(), false);*/
 
             //  change the current page
             setCurrentPage(newPage);
