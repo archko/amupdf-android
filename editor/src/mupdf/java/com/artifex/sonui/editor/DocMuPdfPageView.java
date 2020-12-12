@@ -513,31 +513,6 @@ public class DocMuPdfPageView extends DocPdfPageView
         String currentVal = widget.getValue();
         if (options!=null && options.length>0)
         {
-            ListWheelDialog.show(getContext(), options, currentVal, new ListWheelDialog.ListWheelDialogListener() {
-                @Override
-                public void update(String val) {
-                    widget.setValue(val);
-                    ((MuPDFDoc)getDoc()).update(getPageNumber());
-                    invalidate();
-                    if (!ListWheelDialog.wasDismissedWithButton())
-                    {
-                        boolean stopped = stopPreviousEditor();
-                        if (stopped)
-                            nextWidget();
-                    }
-                }
-
-                @Override
-                public void cancel() {
-                    invalidate();
-                    if (!ListWheelDialog.wasDismissedWithButton())
-                    {
-                        boolean stopped = stopPreviousEditor();
-                        if (stopped)
-                            nextWidget();
-                    }
-                }
-            });
             if (isKeyboardvisible())
                 scrollCurrentWidgetIntoView();
             invalidate();

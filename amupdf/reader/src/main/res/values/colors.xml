@@ -24,4 +24,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="red">#FFFF0000</color>
     <color name="black">#FF000000</color>
+
+    <color name="page_indicator">#C0202020</color>
+    <color name="toolbar">#C0202020</color>
 </resources>

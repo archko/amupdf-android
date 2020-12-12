@@ -70,7 +70,6 @@
 -keep, includedescriptorclasses class com.artifex.sonui.editor.AnimationLayerView { void render(...); }
 -keep, includedescriptorclasses class com.artifex.sonui.editor.DocPageView { void render(...); }
 -keep, includedescriptorclasses class com.artifex.sonui.editor.DocView { void setShowKeyboardListener(...); }
--keep, includedescriptorclasses class com.artifex.sonui.editor.ListWheelDialog { void show(...); }
 -keep, includedescriptorclasses class com.artifex.sonui.editor.PDFFormCheckboxEditor { void start(...); }
 -keep, includedescriptorclasses class com.artifex.sonui.editor.PDFFormCheckboxEditor { void start(...); }
 -keep, includedescriptorclasses class com.artifex.sonui.editor.PDFFormEditor { void start(...); }

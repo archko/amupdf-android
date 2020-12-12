@@ -8,6 +8,12 @@ import java.io.Serializable
  */
 class OutlineItem(var id: Int, private var pid: Int, private var title: String) : RvTree,
     Serializable {
+
+    constructor(title: String, page: Int) : this(0, 0, title) {
+        this.title = title
+        this.page = page
+    }
+
     var page = 0
     var resId = 0
     override fun getNid(): Long {

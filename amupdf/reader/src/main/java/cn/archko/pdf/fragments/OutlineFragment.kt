@@ -16,16 +16,15 @@ import cn.archko.pdf.adapters.BaseViewHolder
 import cn.archko.pdf.entity.OutlineItem
 import cn.archko.pdf.listeners.OnItemClickListener
 import cn.archko.pdf.listeners.OutlineListener
-import com.artifex.mupdf.viewer.OutlineActivity
 
 /**
  * @author: archko 2019/7/11 :17:55
  */
 open class OutlineFragment : Fragment() {
 
-    private lateinit var adapter: BaseRecyclerAdapter<OutlineActivity.Item>
+    private lateinit var adapter: BaseRecyclerAdapter<OutlineItem>
     private lateinit var listView: RecyclerView
-    private var outline: ArrayList<OutlineActivity.Item>? = null
+    private var outline: ArrayList<OutlineItem>? = null
     private var outlineItems: ArrayList<OutlineItem>? = null
     private var currentPage: Int = 0
 
@@ -35,7 +34,7 @@ open class OutlineFragment : Fragment() {
         arguments?.let {
             currentPage = arguments!!.getInt("POSITION", 0)
             if (arguments!!.getSerializable("OUTLINE") != null) {
-                outline = arguments!!.getSerializable("OUTLINE") as ArrayList<OutlineActivity.Item>
+                outline = arguments!!.getSerializable("OUTLINE") as ArrayList<OutlineItem>
             }
 
             if (arguments!!.getSerializable("out") != null) {
@@ -73,12 +72,12 @@ open class OutlineFragment : Fragment() {
             return view
         }
 
-        adapter = object : BaseRecyclerAdapter<OutlineActivity.Item>(activity, outline!!) {
+        adapter = object : BaseRecyclerAdapter<OutlineItem>(activity, outline!!) {
 
             override fun onCreateViewHolder(
                 parent: ViewGroup,
                 viewType: Int
-            ): BaseViewHolder<OutlineActivity.Item> {
+            ): BaseViewHolder<OutlineItem> {
                 val itemView = mInflater.inflate(R.layout.item_outline, parent, false)
                 return ViewHolder(itemView)
             }
@@ -117,17 +116,17 @@ open class OutlineFragment : Fragment() {
         }
     }
 
-    protected fun onListItemClick(item: OutlineActivity.Item) {
+    protected fun onListItemClick(item: OutlineItem) {
         val ac = activity as OutlineListener
         ac.onSelectedOutline(item.page)
     }
 
-    inner class ViewHolder(itemView: View) : BaseViewHolder<OutlineActivity.Item>(itemView) {
+    inner class ViewHolder(itemView: View) : BaseViewHolder<OutlineItem>(itemView) {
 
         var title: TextView = itemView.findViewById(R.id.title)
         var page: TextView = itemView.findViewById(R.id.page)
 
-        override fun onBind(data: OutlineActivity.Item, position: Int) {
+        override fun onBind(data: OutlineItem, position: Int) {
             title.text = data.title
             page.text = (data.page.plus(1)).toString()
             itemView.setOnClickListener { onListItemClick(data) }

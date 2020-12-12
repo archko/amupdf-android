@@ -30,4 +30,8 @@
 
     <string name="dialog_title_backup">选择备份</string>
     <string name="dialog_sub_title_backup">选择备份文件恢复</string>
+
+    <string name="search">查找&#x2026;</string>
+    <string name="searching_">查找中&#x2026;</string>
+    <string name="text_not_found">未找到</string>
 </resources>

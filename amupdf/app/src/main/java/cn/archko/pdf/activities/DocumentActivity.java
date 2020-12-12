@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import cn.archko.mupdf.R;
 import cn.archko.pdf.common.PDFBookmarkManager;
 import cn.archko.pdf.common.SensorHelper;
 
@@ -269,7 +270,7 @@ public class DocumentActivity extends AppCompatActivity {
                     if (mFlatOutline == null)
                         mFlatOutline = core.getOutline();
                     if (mFlatOutline != null) {
-                        Intent intent = new Intent(com.artifex.mupdf.viewer.DocumentActivity.this, OutlineActivity.class);
+                        Intent intent = new Intent(DocumentActivity.this, OutlineActivity.class);
                         Bundle bundle = new Bundle();
                         bundle.putInt("POSITION", mDocView.getDisplayedViewIndex());
                         bundle.putSerializable("OUTLINE", mFlatOutline);
@@ -295,19 +296,19 @@ public class DocumentActivity extends AppCompatActivity {
     }
 
     private void makeButtonsView() {
-        mButtonsView = getLayoutInflater().inflate(com.artifex.mupdf.viewer.R.layout.document_activity, null);
-        mFilenameView = (TextView) mButtonsView.findViewById(com.artifex.mupdf.viewer.R.id.docNameText);
-        mPageSlider = (SeekBar) mButtonsView.findViewById(com.artifex.mupdf.viewer.R.id.pageSlider);
-        mPageNumberView = (TextView) mButtonsView.findViewById(com.artifex.mupdf.viewer.R.id.pageNumber);
-        mSearchButton = (ImageButton) mButtonsView.findViewById(com.artifex.mupdf.viewer.R.id.searchButton);
-        mOutlineButton = (ImageButton) mButtonsView.findViewById(com.artifex.mupdf.viewer.R.id.outlineButton);
-        mTopBarSwitcher = (ViewAnimator) mButtonsView.findViewById(com.artifex.mupdf.viewer.R.id.switcher);
-        mSearchBack = (ImageButton) mButtonsView.findViewById(com.artifex.mupdf.viewer.R.id.searchBack);
-        mSearchFwd = (ImageButton) mButtonsView.findViewById(com.artifex.mupdf.viewer.R.id.searchForward);
-        mSearchClose = (ImageButton) mButtonsView.findViewById(com.artifex.mupdf.viewer.R.id.searchClose);
-        mSearchText = (EditText) mButtonsView.findViewById(com.artifex.mupdf.viewer.R.id.searchText);
-        mLinkButton = (ImageButton) mButtonsView.findViewById(com.artifex.mupdf.viewer.R.id.linkButton);
-        mLayoutButton = mButtonsView.findViewById(com.artifex.mupdf.viewer.R.id.layoutButton);
+        mButtonsView = getLayoutInflater().inflate(R.layout.document_activity, null);
+        mFilenameView = (TextView) mButtonsView.findViewById(R.id.docNameText);
+        mPageSlider = (SeekBar) mButtonsView.findViewById(R.id.pageSlider);
+        mPageNumberView = (TextView) mButtonsView.findViewById(R.id.pageNumber);
+        mSearchButton = (ImageButton) mButtonsView.findViewById(R.id.searchButton);
+        mOutlineButton = (ImageButton) mButtonsView.findViewById(R.id.outlineButton);
+        mTopBarSwitcher = (ViewAnimator) mButtonsView.findViewById(R.id.switcher);
+        mSearchBack = (ImageButton) mButtonsView.findViewById(R.id.searchBack);
+        mSearchFwd = (ImageButton) mButtonsView.findViewById(R.id.searchForward);
+        mSearchClose = (ImageButton) mButtonsView.findViewById(R.id.searchClose);
+        mSearchText = (EditText) mButtonsView.findViewById(R.id.searchText);
+        mLinkButton = (ImageButton) mButtonsView.findViewById(R.id.linkButton);
+        mLayoutButton = mButtonsView.findViewById(R.id.layoutButton);
         mTopBarSwitcher.setVisibility(View.INVISIBLE);
         mPageNumberView.setVisibility(View.INVISIBLE);
 

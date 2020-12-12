@@ -89,4 +89,6 @@ dependencies {
     api deps.constraintlayout_solver
 
     api project(':reader')
+    api project(':editor')
+    api project(':library')
 }
