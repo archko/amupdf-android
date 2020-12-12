@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -16,20 +15,18 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.*;
+import android.widget.RelativeLayout;
 
 import com.artifex.solib.ArDkLib;
 import com.artifex.solib.ConfigOptions;
 import com.artifex.solib.SOClipboardHandler;
 import com.artifex.sonui.editor.DocumentListener;
 import com.artifex.sonui.editor.DocumentView;
-import com.artifex.sonui.editor.ViewingState;
 
 import org.jetbrains.annotations.NotNull;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import cn.archko.mupdf.R;
 import cn.archko.pdf.common.PDFBookmarkManager;
 import cn.archko.pdf.common.SensorHelper;
 
@@ -43,23 +40,6 @@ public class DocumentActivity extends AppCompatActivity {
 
     String path;
     Uri mUri;
-
-    private View mButtonsView;
-    private boolean mButtonsVisible;
-    private EditText mPasswordView;
-    private TextView mFilenameView;
-    private SeekBar mPageSlider;
-    private int mPageSliderRes;
-    private TextView mPageNumberView;
-    private ImageButton mSearchButton;
-    private ImageButton mOutlineButton;
-    private ViewAnimator mTopBarSwitcher;
-    private ImageButton mLinkButton;
-    private ImageButton mSearchBack;
-    private ImageButton mSearchFwd;
-    private ImageButton mSearchClose;
-    private EditText mSearchText;
-    protected View mLayoutButton;
 
     private PDFBookmarkManager pdfBookmarkManager;
 
@@ -185,161 +165,10 @@ public class DocumentActivity extends AppCompatActivity {
         ArDkLib.setAppConfigOptions(cfg);
         mDocView.setDocConfigOptions(cfg);
 
-        // Make the buttons overlay, and store all its
-        // controls in variables
-        makeButtonsView();
-
-        // Set up the page slider
-        //int smax = Math.max(core.countPages()-1,1);
-        //mPageSliderRes = ((10 + smax - 1)/smax) * 2;
-
-        // Set the file-name text
-        //String docTitle = core.getTitle();
-        //if (docTitle != null)
-        //    mFilenameView.setText(docTitle);
-        //else
-        //    mFilenameView.setText(mFileName);
-
-        // Activate the seekbar
-        mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                //mDocView.setDisplayedViewIndex((seekBar.getProgress()+mPageSliderRes/2)/mPageSliderRes);
-            }
-
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            public void onProgressChanged(SeekBar seekBar, int progress,
-                                          boolean fromUser) {
-                //updatePageNumView((progress+mPageSliderRes/2)/mPageSliderRes);
-            }
-        });
-
-        // Activate the search-preparing button
-        mSearchButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                //searchModeOn();
-            }
-        });
-
-        mSearchClose.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                //searchModeOff();
-            }
-        });
-
-        // Search invoking buttons are disabled while there is no text specified
-        mSearchBack.setEnabled(false);
-        mSearchFwd.setEnabled(false);
-        mSearchBack.setColorFilter(Color.argb(255, 128, 128, 128));
-        mSearchFwd.setColorFilter(Color.argb(255, 128, 128, 128));
-
-        // React to interaction with the text widget
-        /*mSearchText.addTextChangedListener(new TextWatcher() {
-
-            public void afterTextChanged(Editable s) {
-                boolean haveText = s.toString().length() > 0;
-                setButtonEnabled(mSearchBack, haveText);
-                setButtonEnabled(mSearchFwd, haveText);
-
-                // Remove any previous search results
-                if (SearchTaskResult.get() != null && !mSearchText.getText().toString().equals(SearchTaskResult.get().txt)) {
-                    SearchTaskResult.set(null);
-                    mDocView.resetupChildren();
-                }
-            }
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {}
-            public void onTextChanged(CharSequence s, int start, int before,
-                                      int count) {}
-        });*/
-
-        //React to Done button on keyboard
-        /*mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    //search(1);
-                }
-                return false;
-            }
-        });*/
-
-        /*mSearchText.setOnKeyListener(new View.OnKeyListener() {
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                    //search(1);
-                }
-                return false;
-            }
-        });*/
-
-        // Activate search invoking buttons
-        /*mSearchBack.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                //search(-1);
-            }
-        });
-        mSearchFwd.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                //search(1);
-            }
-        });
-
-        mLinkButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                //setLinkHighlight(!mLinkHighlight);
-            }
-        });*/
-
-        /*if (core.hasOutline()) {
-            mOutlineButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    if (mFlatOutline == null)
-                        mFlatOutline = core.getOutline();
-                    if (mFlatOutline != null) {
-                        Intent intent = new Intent(DocumentActivity.this, OutlineActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putInt("POSITION", mDocView.getDisplayedViewIndex());
-                        bundle.putSerializable("OUTLINE", mFlatOutline);
-                        intent.putExtras(bundle);
-                        startActivityForResult(intent, OUTLINE_REQUEST);
-                    }
-                }
-            });
-        } else {
-            mOutlineButton.setVisibility(View.GONE);
-        }*/
-
-        // Reenstate last state if it was recorded
-        SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
-        //mDocView.setDisplayedViewIndex(prefs.getInt("page"+mFileKey, 0));
-
-        // Stick the document view and the buttons overlay into a parent view
         RelativeLayout layout = new RelativeLayout(this);
         layout.setBackgroundColor(Color.DKGRAY);
         layout.addView(mDocView);
-        layout.addView(mButtonsView);
         setContentView(layout);
-    }
-
-    private void makeButtonsView() {
-        mButtonsView = getLayoutInflater().inflate(R.layout.document_activity, null);
-        mFilenameView = (TextView) mButtonsView.findViewById(R.id.docNameText);
-        mPageSlider = (SeekBar) mButtonsView.findViewById(R.id.pageSlider);
-        mPageNumberView = (TextView) mButtonsView.findViewById(R.id.pageNumber);
-        mSearchButton = (ImageButton) mButtonsView.findViewById(R.id.searchButton);
-        mOutlineButton = (ImageButton) mButtonsView.findViewById(R.id.outlineButton);
-        mTopBarSwitcher = (ViewAnimator) mButtonsView.findViewById(R.id.switcher);
-        mSearchBack = (ImageButton) mButtonsView.findViewById(R.id.searchBack);
-        mSearchFwd = (ImageButton) mButtonsView.findViewById(R.id.searchForward);
-        mSearchClose = (ImageButton) mButtonsView.findViewById(R.id.searchClose);
-        mSearchText = (EditText) mButtonsView.findViewById(R.id.searchText);
-        mLinkButton = (ImageButton) mButtonsView.findViewById(R.id.linkButton);
-        mLayoutButton = mButtonsView.findViewById(R.id.layoutButton);
-        mTopBarSwitcher.setVisibility(View.INVISIBLE);
-        mPageNumberView.setVisibility(View.INVISIBLE);
-
-        mPageSlider.setVisibility(View.INVISIBLE);
     }
 
     private void initIntent() {

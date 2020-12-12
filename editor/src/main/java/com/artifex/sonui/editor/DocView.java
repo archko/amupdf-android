@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.animation.BounceInterpolator;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -39,7 +40,7 @@ public class DocView
         DragHandleListener
 {
     private static final String TAG          = "DocView";
-    protected static final int    UNSCALED_GAP = 20;
+    protected static final int    UNSCALED_GAP = 1;
 
     protected float minScale() {return .15f;}
     protected float maxScale() {return 5.0f;}
@@ -235,7 +236,7 @@ public class DocView
 
         mGestureDetector = new GestureDetector(context, this);
         mScaleGestureDetector = new ScaleGestureDetector(context, this);
-        mScroller = new Scroller(context);
+        mScroller = new Scroller(context, new BounceInterpolator());
         mSmoother = new Smoother(3);
 
         //  create the history object

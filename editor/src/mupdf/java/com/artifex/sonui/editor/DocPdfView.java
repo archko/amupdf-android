@@ -7,10 +7,14 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import androidx.core.content.ContextCompat;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.artifex.solib.ArDkSelectionLimits;
 import com.artifex.solib.MuPDFDoc;
@@ -21,17 +25,28 @@ import java.util.ArrayList;
 public class DocPdfView extends DocView
 {
     private static final String  TAG           = "DocPdfView";
+    protected static final int    SCROLL_GAP = 5;
+    private int tapPageMargin;
 
     public DocPdfView(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public DocPdfView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
     }
 
     public DocPdfView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+
+        DisplayMetrics dm = new DisplayMetrics();
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        wm.getDefaultDisplay().getMetrics(dm);
+        tapPageMargin = (int)dm.xdpi;
+        if (tapPageMargin < 100)
+            tapPageMargin = 100;
+        if (tapPageMargin > dm.widthPixels/5)
+            tapPageMargin = dm.widthPixels/5;
     }
 
     //  drag handles
@@ -284,7 +299,21 @@ public class DocPdfView extends DocView
             return true;
         }
 
-        return false;
+        final Rect viewport = new Rect();
+        getGlobalVisibleRect(viewport);
+        if (y < tapPageMargin) {
+            smoothScrollBy(getScrollX(), viewport.height() - SCROLL_GAP, 0);
+            return true;
+        } else if (y > super.getHeight() - tapPageMargin) {
+            smoothScrollBy(getScrollX(), -viewport.height() + SCROLL_GAP, 0);
+            return true;
+        } else {
+            Toast pageNumberToast=  Toast.makeText(getContext(), String.format("%s/%s", dpv.getPageNumber() + 1, getPageCount()), Toast.LENGTH_SHORT);
+
+            pageNumberToast.setGravity(Gravity.BOTTOM | Gravity.START, Utilities.convertDpToPixel(15f), 0);
+            pageNumberToast.show();
+            return false;
+        }
     }
 
     protected void setDeletingPage(DocPdfPageView dpv)
