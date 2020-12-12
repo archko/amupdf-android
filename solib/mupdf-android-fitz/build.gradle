@@ -1,5 +1,7 @@
 apply plugin: 'com.android.library'
 
+apply from: '../../amupdf/shared.gradle'
+
 def filters = project.getProperties().get("abiFilters")
 if (filters==null)
 	filters = "armeabi-v7a"
@@ -7,10 +9,11 @@ if (filters==null)
 def ndkArgs
 
 android {
-	compileSdkVersion rootProject.ext.compileSdkVersion
+	compileSdkVersion build_versions.compile_sdk
+	buildToolsVersion build_versions.build_tools
 	defaultConfig {
-		minSdkVersion rootProject.ext.minSdkVersion
-		targetSdkVersion rootProject.ext.targetSdkVersion
+		minSdkVersion build_versions.min_sdk
+		targetSdkVersion build_versions.target_sdk
 
 		ndk.abiFilters filters.split()
 

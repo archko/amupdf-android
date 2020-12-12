@@ -623,10 +623,10 @@ public class NUIDocViewPdf extends NUIDocView
         String author = mSession.getDoc().getAuthor();
         if (author==null)
         {
-            String defaultAuthor = Utilities.getApplicationName(activity());
+            /*String defaultAuthor = Utilities.getApplicationName(activity());
             Object store = Utilities.getPreferencesObject(activity(), Utilities.generalStore);
             author = Utilities.getStringPreference(store, "DocAuthKey", defaultAuthor);
-            mSession.getDoc().setAuthor(author);
+            mSession.getDoc().setAuthor(author);*/
         }
     }
 

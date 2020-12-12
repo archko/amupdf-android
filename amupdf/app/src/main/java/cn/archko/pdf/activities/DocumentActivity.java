@@ -1,6 +1,7 @@
 package cn.archko.pdf.activities;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,7 +18,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.*;
 
+import com.artifex.solib.ArDkLib;
 import com.artifex.solib.ConfigOptions;
+import com.artifex.solib.SOClipboardHandler;
 import com.artifex.sonui.editor.DocumentListener;
 import com.artifex.sonui.editor.DocumentView;
 import com.artifex.sonui.editor.ViewingState;
@@ -83,6 +86,28 @@ public class DocumentActivity extends AppCompatActivity {
         if (!TextUtils.isEmpty(path)) {
             pdfBookmarkManager = new PDFBookmarkManager();
             pdfBookmarkManager.setStartBookmark(path, 0);
+
+            ArDkLib.setClipboardHandler(new SOClipboardHandler() {
+                @Override
+                public void putPlainTextToClipboard(String text) {
+
+                }
+
+                @Override
+                public String getPlainTextFromClipoard() {
+                    return null;
+                }
+
+                @Override
+                public boolean clipboardHasPlaintext() {
+                    return false;
+                }
+
+                @Override
+                public void initClipboardHandler(Activity activity) {
+
+                }
+            });
 
             int page = pdfBookmarkManager.getBookmark();
             mDocView.setDocumentListener(new DocumentListener() {

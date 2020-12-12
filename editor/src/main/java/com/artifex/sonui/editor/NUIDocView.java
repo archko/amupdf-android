@@ -1563,7 +1563,7 @@ public class NUIDocView
         if (ArDkUtils.isTrackChangesEnabled(activity()))
         {
             // Each time we open a document, set the author for change tracking
-            Object store =
+            /*Object store =
                     Utilities.getPreferencesObject(activity(), Utilities.generalStore);
 
             String author =
@@ -1572,7 +1572,7 @@ public class NUIDocView
                             "DocAuthKey",
                             Utilities.getApplicationName(activity()));
 
-            mSession.getDoc().setAuthor(author);
+            mSession.getDoc().setAuthor(author);*/
         }
     }
 
@@ -5392,11 +5392,11 @@ public class NUIDocView
                 //  set the author in the document
                 doc.setAuthor(author);
                 //  ... and save it as a preference.
-                Object store =
+                /*Object store =
                         Utilities.getPreferencesObject(activity(),
                                 Utilities.generalStore);
 
-                Utilities.setStringPreference(store, "DocAuthKey", author);
+                Utilities.setStringPreference(store, "DocAuthKey", author);*/
             }
             @Override
             public void onCancel() {
@@ -5475,24 +5475,24 @@ public class NUIDocView
     private static final String STORE_NAME = Utilities.generalStore;
     private boolean wasAnimated()
     {
-        Object store = Utilities.getPreferencesObject(getContext(), STORE_NAME);
+        /*Object store = Utilities.getPreferencesObject(getContext(), STORE_NAME);
         if (store != null) {
             String value = Utilities.getStringPreference(store, WAS_ANIM_KEY, "TRUE");
             if (value != null) {
                 if (!value.equals("TRUE"))
                     return false;
             }
-        }
+        }*/
 
         return true;
     }
 
     private void setWasAnimated()
     {
-        Object store = Utilities.getPreferencesObject(getContext(), STORE_NAME);
+        /*Object store = Utilities.getPreferencesObject(getContext(), STORE_NAME);
         if (store != null) {
             Utilities.setStringPreference(store, WAS_ANIM_KEY, "TRUE");
-        }
+        }*/
     }
 
     private void onNewTabShown(String id)

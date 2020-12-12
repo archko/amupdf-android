@@ -542,7 +542,7 @@ public class Utilities
          * All apps are required to provide an SOPersistentStorage
          * implementation.
          */
-        if (mPersistentStorage == null)
+        /*if (mPersistentStorage == null)
         {
             Log.d(mDebugTag, "No implementation of the SOPersistentStorage " +
                              "interface found");
@@ -550,7 +550,8 @@ public class Utilities
             throw new RuntimeException();
         }
 
-        return mPersistentStorage.getStorageObject(context, storeName);
+        return mPersistentStorage.getStorageObject(context, storeName);*/
+        return null;
     }
 
     public static void setStringPreference(Object storageObject,
@@ -561,7 +562,7 @@ public class Utilities
          * All apps are required to provide an SOPersistentStorage
          * implementation.
          */
-        if (mPersistentStorage == null)
+        /*if (mPersistentStorage == null)
         {
             Log.d(mDebugTag, "No implementation of the SOPersistentStorage " +
                              "interface found");
@@ -569,7 +570,7 @@ public class Utilities
             throw new RuntimeException();
         }
 
-        mPersistentStorage.setStringPreference(storageObject, key, value);
+        mPersistentStorage.setStringPreference(storageObject, key, value);*/
         return;
     }
 

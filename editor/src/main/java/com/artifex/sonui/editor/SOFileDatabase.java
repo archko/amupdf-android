@@ -67,29 +67,29 @@ public class SOFileDatabase {
         return mDatabase;
     }
 
-    private Object getPrefs()
+    /*private Object getPrefs()
     {
         return mSharedPrefs;
-    }
+    }*/
 
     //  store an SOFileState object.
     public void setValue(String key, SOFileState state)
     {
-        Utilities.setStringPreference(getPrefs(),
+        /*Utilities.setStringPreference(getPrefs(),
                                       key,
-                                      SOFileState.toString(state));
+                                      SOFileState.toString(state));*/
     }
 
     //  delete an SOFileState object.
     private void deleteValue(String key)
     {
-        Utilities.removePreference(getPrefs(), key);
+        //Utilities.removePreference(getPrefs(), key);
     }
 
     //  get an SOFileState object.
     public SOFileState getValue(String key)
     {
-        String str = Utilities.getStringPreference(getPrefs(), key, "");
+        String str = "";//Utilities.getStringPreference(getPrefs(), key, "");
         return SOFileState.fromString(str, this);
     }
 
@@ -187,7 +187,7 @@ public class SOFileDatabase {
     public ArrayList<StateAndKey> getStatesAndKeys()
     {
         ArrayList<StateAndKey> entries = new ArrayList<StateAndKey>();
-        Map<String,?> keys = Utilities.getAllStringPreferences(getPrefs());
+        Map<String,?> keys = null;//Utilities.getAllStringPreferences(getPrefs());
 
         if (keys == null)
             return entries;
@@ -216,7 +216,7 @@ public class SOFileDatabase {
         //  WARNING: this function deletes the file database entries,
         //  internal copies and thumbnails.
 
-        Map<String,?> keys = Utilities.getAllStringPreferences(getPrefs());
+        /*Map<String,?> keys = Utilities.getAllStringPreferences(getPrefs());
         for(Map.Entry<String,?> entry : keys.entrySet())
         {
             String key = entry.getKey();
@@ -234,6 +234,6 @@ public class SOFileDatabase {
                 //  delete the entry
                 deleteValue(entry.getKey());
             }
-        }
+        }*/
     }
 }

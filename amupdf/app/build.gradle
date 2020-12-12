@@ -30,6 +30,7 @@ android {
         targetSdkVersion build_versions.target_sdk
         versionCode VERSION_CODE as int
         versionName VERSION_NAME
+        multiDexEnabled true
         signingConfig signingConfigs.release
         ndk.abiFilters 'armeabi-v7a', 'arm64-v8a'
 

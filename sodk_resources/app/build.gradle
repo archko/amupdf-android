@@ -1,10 +1,13 @@
 apply plugin: 'com.android.library'
 
+apply from: '../../amupdf/shared.gradle'
+
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdkVersion build_versions.compile_sdk
+    buildToolsVersion build_versions.build_tools
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
         versionCode 1
         versionName "1.0"
 

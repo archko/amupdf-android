@@ -224,13 +224,13 @@ public class NUIActivity extends BaseActivity
                 {
                     //  make a thumbnail for the Recent file list, if the first page
                     //  is available, AND if directed to by the extra CREATE_THUMBNAIL.
-                    if (pageNum>=1 && !thumbnailCreated && createThumbnail)
+                    /*if (pageNum>=1 && !thumbnailCreated && createThumbnail)
                     {
                         thumbnailCreated = true;
                         SOFileState state = SOFileDatabase.getDatabase().stateForPath(session.getUserPath(), false);
                         if (state != null)
                             session.createThumbnail(state);
-                    }
+                    }*/
                 }
 
                 @Override

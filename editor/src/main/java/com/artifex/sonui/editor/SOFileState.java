@@ -391,33 +391,34 @@ public class SOFileState
         {
             String val = SOFileState.toString(state);
 
-            Object store =
+            /*Object store =
                 Utilities.getPreferencesObject(context,
                                                Utilities.generalStore);
 
-            Utilities.setStringPreference(store, AUTO_OPEN_KEY, val);
+            Utilities.setStringPreference(store, AUTO_OPEN_KEY, val);*/
         }
     }
 
     //  get the currently-saved auto-open state.
     public static SOFileState getAutoOpen(Context context)
     {
-        Object store = Utilities.getPreferencesObject(context,
+        /*Object store = Utilities.getPreferencesObject(context,
                                                       Utilities.generalStore);
 
         String val = Utilities.getStringPreference(store, AUTO_OPEN_KEY, "");
         if (val==null || val.isEmpty())
             return null;
-        return SOFileState.fromString(val, SOFileDatabase.getDatabase());
+        return SOFileState.fromString(val, SOFileDatabase.getDatabase());*/
+        return null;
     }
 
     //  remove any currently-saved auto-open state.
     public static void clearAutoOpen(Context context)
     {
-        Object store = Utilities.getPreferencesObject(context,
+        /*Object store = Utilities.getPreferencesObject(context,
                                                       Utilities.generalStore);
 
-        Utilities.setStringPreference(store, AUTO_OPEN_KEY, "");
+        Utilities.setStringPreference(store, AUTO_OPEN_KEY, "");*/
     }
 
 }

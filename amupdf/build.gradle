@@ -24,12 +24,6 @@ allprojects {
             dir dirs
         }
     }
-
-    project.ext {
-        minSdkVersion=16
-        targetSdkVersion=28
-        compileSdkVersion=29
-    }
 }
 
 task clean(type: Delete) {
