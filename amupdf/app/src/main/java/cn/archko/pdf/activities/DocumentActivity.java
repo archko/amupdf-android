@@ -181,7 +181,9 @@ public class DocumentActivity extends AppCompatActivity {
     private void createUI() {
         mDocView = new DocumentView(this);
         //setContentView(mDocView);
-        mDocView.setDocConfigOptions(new ConfigOptions());
+        ConfigOptions cfg = new ConfigOptions();
+        ArDkLib.setAppConfigOptions(cfg);
+        mDocView.setDocConfigOptions(cfg);
 
         // Make the buttons overlay, and store all its
         // controls in variables
