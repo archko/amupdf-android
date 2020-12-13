@@ -1802,15 +1802,15 @@ public class NUIDocView
         scaleToolbar(R.id.annotate_toolbar, factor);
         scaleToolbar(R.id.doc_pages_toolbar, factor);
         scaleToolbar(R.id.edit_toolbar, factor);
-        scaleToolbar(R.id.excel_edit_toolbar, factor);
+        //scaleToolbar(R.id.excel_edit_toolbar, factor);
         scaleToolbar(R.id.file_toolbar, factor);
-        scaleToolbar(R.id.format_toolbar, factor);
-        scaleToolbar(R.id.formulas_toolbar, factor);
+        //scaleToolbar(R.id.format_toolbar, factor);
+        //scaleToolbar(R.id.formulas_toolbar, factor);
         scaleToolbar(R.id.insert_toolbar, factor);
         scaleToolbar(R.id.pdf_pages_toolbar, factor);
-        scaleToolbar(R.id.ppt_format_toolbar, factor);
-        scaleToolbar(R.id.ppt_insert_toolbar, factor);
-        scaleToolbar(R.id.ppt_slides_toolbar, factor);
+        //scaleToolbar(R.id.ppt_format_toolbar, factor);
+        //scaleToolbar(R.id.ppt_insert_toolbar, factor);
+        //scaleToolbar(R.id.ppt_slides_toolbar, factor);
         scaleToolbar(R.id.review_toolbar, factor);
         scaleSearchToolbar(factor);
 
