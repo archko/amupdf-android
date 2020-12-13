@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Color Palette -->
+    <color name="sodk_wheel_item_highlight">#000000</color>
+    <color name="sodk_wheel_item_bg">#ffffff</color>
+</resources>

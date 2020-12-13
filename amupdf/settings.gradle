@@ -5,10 +5,12 @@ include ':vudroid'
 
 include ':library'
 include ':editor'
+include ':wheel'
 include ':mupdf-android-fitz'
 include ':sodk_resources'
 
 project(':library').projectDir = new File('../solib/library')
 project(':editor').projectDir = new File('../editor')
+project(':wheel').projectDir = new File('../wheel')
 project(':mupdf-android-fitz').projectDir = new File('../solib/mupdf-android-fitz')
 project(':sodk_resources').projectDir = new File('../sodk_resources/app')

@@ -353,7 +353,15 @@ public class NUIDocViewPdf extends NUIDocView
         if (docView.getDrawMode())
         {
             float val = docView.getInkLineThickness();
-
+            InkLineWidthDialog.show(activity(), mLineThicknessButton, val,
+                    new InkLineWidthDialog.WidthChangedListener()
+                    {
+                        @Override
+                        public void onWidthChanged(float value)
+                        {
+                            docView.setInkLineThickness(value);
+                        }
+                    });
         }
     }
 
