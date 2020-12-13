@@ -3,6 +3,8 @@ package cn.archko.pdf.activities;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -39,6 +41,7 @@ import java.io.File;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import cn.archko.mupdf.R;
 import cn.archko.pdf.common.PDFBookmarkManager;
 import cn.archko.pdf.common.SensorHelper;
@@ -61,6 +64,103 @@ public class DocumentActivity extends AppCompatActivity {
         context.startActivity(new Intent(context, DocumentActivity.class));
     }
 
+    static class ClipboardHandler implements SOClipboardHandler {
+        private static final String mDebugTag = "ClipboardHandler";
+        private static boolean mEnableDebug = false;
+
+        private Activity mActivity;       // The current activity.
+        private ClipboardManager mClipboard;      // System clipboard.
+
+        //////////////////////////////////////////////////////////////////////////
+        // Methods Required By Interface.
+        //////////////////////////////////////////////////////////////////////////
+
+        /**
+         * This method passes a string, cut or copied from the document, to be
+         * stored in the clipboard.
+         *
+         * @param text The text to be stored in the clipboard.
+         */
+        @Override
+        public void putPlainTextToClipboard(String text) {
+            if (mEnableDebug) {
+                Log.d(mDebugTag, "putPlainTextToClipboard: '" + text + "'");
+            }
+
+            if (text != null) {
+                ClipData clip;
+                clip = ClipData.newPlainText("text", text);
+                mClipboard.setPrimaryClip(clip);
+            }
+        }
+
+        /**
+         * This method returns the contents of the clipboard.
+         *
+         * @return The text read from the clipboard.
+         */
+        @Override
+        public String getPlainTextFromClipoard() {
+            String text = "";
+
+            if (clipboardHasPlaintext()) {
+                ClipData clip = mClipboard.getPrimaryClip();
+                ClipData.Item item = clip.getItemAt(0);
+
+                text = item.coerceToText(mActivity).toString();
+                text = text;
+
+                if (mEnableDebug) {
+                    Log.d(mDebugTag, "getPlainTextFromClipoard: '" + text + "'");
+                }
+            }
+
+            return text;
+        }
+
+        /**
+         * This method ascertains whether the clipboard has any data.
+         *
+         * @return True if it has. False otherwise.
+         */
+        @Override
+        public boolean clipboardHasPlaintext() {
+            return mClipboard.hasPrimaryClip();
+        }
+
+        /**
+         * Initialise the class, installing the example system clipboard listener
+         * if available.<br><br>
+         *
+         * @param activity The current activity.
+         */
+        public void initClipboardHandler(Activity activity) {
+            mActivity = activity;
+
+            // Get the system clipboard.
+            mClipboard =
+                    (ClipboardManager) mActivity.getSystemService(
+                            Context.CLIPBOARD_SERVICE);
+        }
+    }
+
+    private static boolean isSetup = false;
+
+    public static void setupApplicationSpecifics(Context ctx) {
+        //  create/register handlers (but only once)
+        if (!isSetup) {
+            ConfigOptions cfg = new ConfigOptions();
+            ArDkLib.setAppConfigOptions(cfg);
+            //Utilities.setDataLeakHandlers(new DataLeakHandlers());
+            //Utilities.setPersistentStorage(new PersistentStorage());
+            ArDkLib.setClipboardHandler(new ClipboardHandler());
+            //ArDkLib.setSecureFS(new SecureFS());
+            FileUtils.init(ctx);
+
+            isSetup = true;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,40 +173,17 @@ public class DocumentActivity extends AppCompatActivity {
             path = savedInstanceState.getString("path", null);
         }
 
+        setupApplicationSpecifics(this);
         sensorHelper = new SensorHelper(this);
         initIntent();
         load();
-        useCustomUI();
+        useDefaultUI();
     }
 
     private void load() {
-        ConfigOptions cfg = new ConfigOptions();
-        ArDkLib.setAppConfigOptions(cfg);
         if (!TextUtils.isEmpty(path)) {
             pdfBookmarkManager = new PDFBookmarkManager();
             pdfBookmarkManager.setStartBookmark(path, 0);
-
-            ArDkLib.setClipboardHandler(new SOClipboardHandler() {
-                @Override
-                public void putPlainTextToClipboard(String text) {
-
-                }
-
-                @Override
-                public String getPlainTextFromClipoard() {
-                    return null;
-                }
-
-                @Override
-                public boolean clipboardHasPlaintext() {
-                    return false;
-                }
-
-                @Override
-                public void initClipboardHandler(Activity activity) {
-
-                }
-            });
         }
     }
 
@@ -193,7 +270,6 @@ public class DocumentActivity extends AppCompatActivity {
 
     private void createUI() {
         mDocumentView = new DocumentView(this);
-        //setContentView(mDocView);
         mDocumentView.setDocConfigOptions(ArDkLib.getAppConfigOptions());
 
         RelativeLayout layout = new RelativeLayout(this);
@@ -241,6 +317,54 @@ public class DocumentActivity extends AppCompatActivity {
                 mUri = Uri.parse(path);
             }
         }
+    }
+
+    private void useDefaultUI() {
+        //  set up UI
+        setContentView(com.artifex.sonui.editor.R.layout.sodk_editor_doc_view_activity);
+
+        //  find the DocumentView component
+        mDocumentView = findViewById(com.artifex.sonui.editor.R.id.doc_view);
+
+        mDocumentView.setDocConfigOptions(ArDkLib.getAppConfigOptions());
+
+        //  set an optional listener for document events
+        mDocumentView.setDocumentListener(new DocumentListener() {
+            @Override
+            public void onPageLoaded(int pagesLoaded) {
+                //  called when another page is loaded from the document.
+            }
+
+            @Override
+            public void onDocCompleted() {
+                //  called when the document is done loading.
+            }
+
+            @Override
+            public void onPasswordRequired() {
+                //  called when a password is required.
+            }
+
+            @Override
+            public void onViewChanged(float scale, int scrollX, int scrollY, Rect selectionRect) {
+                //  called when the scale, scroll, or selection in the document changes.
+            }
+        });
+
+        //  set a listener for when the document view is closed.
+        //  typically you'll use it to close your activity.
+        mDocumentView.setOnDoneListener(new DocumentView.OnDoneListener() {
+            @Override
+            public void done() {
+                DocumentActivity.super.finish();
+            }
+        });
+
+        //  get the URI for the document
+        //mUri = getIntent().getData();
+
+        //  open it, specifying showUI = true;
+        mDocumentView.start(mUri, 0, true);
     }
 
     private void useCustomUI() {

@@ -4,10 +4,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.artifex.sonui.editor.NUIView
+    <com.artifex.sonui.editor.DocumentView
         android:id="@+id/doc_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </com.artifex.sonui.editor.NUIView>
+    </com.artifex.sonui.editor.DocumentView>
 
 </LinearLayout>
