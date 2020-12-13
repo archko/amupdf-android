@@ -133,7 +133,7 @@
     <string name="sodk_editor_open_in">打开于</string>
     <string name="sodk_editor_open_pdf_in_upper">PDF打开方式</string>
     <string name="sodk_editor_open_pdf_in">打开PDF于</string>
-    <string name="sodk_editor_page_d_of_d" formatted="false">第%d页，共%d页</string>
+    <string name="sodk_editor_page_d_of_d" formatted="false">%d/%d</string>
     <string name="sodk_editor_page_zd_of_d" formatted="false">第%1$zd页，第%d页</string>
     <string name="sodk_editor_pages_n_thru_n_of_n" formatted="false">%d-%d页，共%d页</string>
     <string name="sodk_editor_password_for_document">请输入本文档的密码</string>

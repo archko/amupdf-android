@@ -134,7 +134,7 @@ public class NUIDocView
     private ToolbarButton mSearchNextButton;
     private ToolbarButton mSearchPreviousButton;
     private SOTextView mFooterText;
-    private View mFooterLead;
+    //private View mFooterLead;
 
     protected ToolbarButton mCopyButton2; // copy button in file menu,
     // this is enabled when editing is disabled.
@@ -648,7 +648,8 @@ public class NUIDocView
         mSearchText = (SOEditText) findViewById(R.id.search_text_input);
 
         mFooterText = (SOTextView)findViewById(R.id.footer_page_text);
-        mFooterLead = findViewById(R.id.footer_lead);
+        mFooterText.setTextSize(10);
+        //mFooterLead = findViewById(R.id.footer_lead);
 
         mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener()
         {
@@ -852,6 +853,7 @@ public class NUIDocView
 
         //  footer
         mFooter = (SOTextView) findViewById(R.id.footer_text);
+        mFooter.setTextSize(10);
 
         //  check if we need to modify tabhost background colour
         LinearLayout headertop = findViewById(R.id.header_top);
@@ -1522,9 +1524,9 @@ public class NUIDocView
 
                 //  making the leading space the same size will
                 //  effectively center the name.
-                mFooterText.measure(0,0);
-                mFooterLead.getLayoutParams().width = mFooterText.getMeasuredWidth();
-                mFooterLead.getLayoutParams().height = mFooterText.getMeasuredHeight();
+                //mFooterText.measure(0,0);
+                //mFooterLead.getLayoutParams().width = mFooterText.getMeasuredWidth();
+                //mFooterLead.getLayoutParams().height = mFooterText.getMeasuredHeight();
 
                 //  send  notification
                 doUpdateCustomUI();

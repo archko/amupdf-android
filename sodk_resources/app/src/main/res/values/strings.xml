@@ -137,7 +137,7 @@
     <string name="sodk_editor_open_in">Open In</string>
     <string name="sodk_editor_open_pdf_in_upper">OPEN PDF IN</string>
     <string name="sodk_editor_open_pdf_in">Open PDF In</string>
-    <string name="sodk_editor_page_d_of_d" formatted="false">PAGE %d OF %d</string>
+    <string name="sodk_editor_page_d_of_d" formatted="false">%d/%d</string>
     <string name="sodk_editor_page_zd_of_d" formatted="false">PAGE %1$zd OF %d</string>
     <string name="sodk_editor_pages_n_thru_n_of_n" formatted="false">PAGES %d-%d OF %d</string>
     <string name="sodk_editor_password_for_document">Password for document:</string>
