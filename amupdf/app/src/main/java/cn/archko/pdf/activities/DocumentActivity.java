@@ -151,7 +151,7 @@ public class DocumentActivity extends AppCompatActivity {
         if (!isSetup) {
             ConfigOptions cfg = new ConfigOptions();
             ArDkLib.setAppConfigOptions(cfg);
-            //Utilities.setDataLeakHandlers(new DataLeakHandlers());
+            Utilities.setDataLeakHandlers(new DataLeakHandlers());
             //Utilities.setPersistentStorage(new PersistentStorage());
             ArDkLib.setClipboardHandler(new ClipboardHandler());
             //ArDkLib.setSecureFS(new SecureFS());
@@ -327,6 +327,7 @@ public class DocumentActivity extends AppCompatActivity {
         mDocumentView = findViewById(com.artifex.sonui.editor.R.id.doc_view);
 
         mDocumentView.setDocConfigOptions(ArDkLib.getAppConfigOptions());
+        mDocumentView.setDocDataLeakHandler(Utilities.getDataLeakHandlers());
 
         //  set an optional listener for document events
         mDocumentView.setDocumentListener(new DocumentListener() {
