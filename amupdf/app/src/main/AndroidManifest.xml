@@ -99,8 +99,9 @@
             android:screenOrientation="portrait"></activity>
         <activity
             android:name="cn.archko.pdf.activities.DocumentActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="test"
+            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
+            android:windowSoftInputMode="adjustResize"
+            android:label="Document"
             android:screenOrientation="sensor"
             android:theme="@style/AppFullscreen"></activity>
 

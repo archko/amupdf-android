@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/ui_layout"
+        android:layout_marginLeft="5dip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- tab buttons -->
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/file_tab_button"
+                    android:background="@drawable/tab_button_drawable"
+                    android:text="File"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/pages_tab_button"
+                    android:background="@drawable/tab_button_drawable"
+                    android:text="Pages"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/annotate_tab_button"
+                    android:background="@drawable/tab_button_drawable"
+                    android:text="Annotate"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/redact_tab_button"
+                    android:background="@drawable/tab_button_drawable"
+                    android:text="Redact"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/other_tab_button"
+                    android:background="@drawable/tab_button_drawable"
+                    android:text="Other"/>
+
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/scale_tab_button"
+                    android:background="@drawable/tab_button_drawable"
+                    android:text="Scale"/>
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+        <!-- file tab -->
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/file_tab">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/save"
+                    android:text="Save"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/save_as"
+                    android:text="Save As"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/print"
+                    android:text="Print"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/share"
+                    android:text="Share"/>
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- pages tab -->
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/pages_tab">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/toggle_pages"/>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:id="@+id/first_page"
+                        android:text="First"/>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:id="@+id/last_page"
+                        android:text="Last"/>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:id="@+id/goto_page"
+                        android:text="Go to:"/>
+
+                    <EditText
+                        android:id="@+id/page_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:inputType="number"
+                        android:minWidth="40dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="5dp"
+                        android:gravity="center_vertical"
+                        android:id="@+id/page_display"/>
+
+                </LinearLayout>
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- annotations tab -->
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/annotate_tab">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/highlight_selection"
+                    android:text="Highlight"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/toggle_draw"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/delete_selection"
+                    android:text="Delete Selection"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/line_color"
+                    android:text="Line Color"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/line_thickness"
+                    android:text="Line Thickness"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/toggle_note"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/author"
+                    android:text="Author"/>
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- redaction tab -->
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/redact_tab">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/redact_mark"
+                    android:text="Mark Text"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/redact_mark_area"
+                    android:text="Mark Area"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/redact_remove"
+                    android:text="Remove"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/redact_apply"
+                    android:text="Apply"/>
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- other tab -->
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/other_tab">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/full_screen"
+                    android:text="Full"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/table_of_contents"
+                    android:text="TOC"/>
+
+                <!-- Dummy item to prevent the EditText from receiving focus -->
+                <LinearLayout
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:layout_width="0px"
+                    android:layout_height="0px"/>
+
+                <EditText
+                    android:id="@+id/search_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:singleLine="true"
+                    android:minWidth="80dp"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/search_previous"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/search_next"/>
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- scaling tab -->
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/scale_tab">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/scale_up"
+                    android:text="Scale up"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/scale_down"
+                    android:text="Scale Down"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/scroll_up"
+                    android:text="Scroll up"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/scroll_down"
+                    android:text="Scroll down"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/reset"
+                    android:text="Reset"/>
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+
+    </LinearLayout>
+
+    <com.artifex.sonui.editor.DocumentView
+        android:id="@+id/doc_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+    </com.artifex.sonui.editor.DocumentView>
+
+</LinearLayout>
