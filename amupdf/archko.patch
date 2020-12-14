@@ -1,11 +1,11 @@
 diff --git a/platform/java/jni/page.c b/platform/java/jni/page.c
-index dcdcac1..6b1e369 100644
+index dcdcac1b2..6b1e369ea 100644
 --- a/platform/java/jni/page.c
 +++ b/platform/java/jni/page.c
 @@ -378,6 +378,316 @@ FUN(Page_textAsHtml)(JNIEnv *env, jobject self)
  	return arr;
  }
- 
+
 +JNIEXPORT jbyteArray JNICALL
 +FUN(Page_textAsHtml2)(JNIEnv *env, jobject self, jstring joptions)
 +{
@@ -320,54 +320,46 @@ index dcdcac1..6b1e369 100644
  FUN(Page_createLink)(JNIEnv *env, jobject self, jobject jrect, jstring juri)
  {
 diff --git a/platform/java/src/com/artifex/mupdf/fitz/PDFPage.java b/platform/java/src/com/artifex/mupdf/fitz/PDFPage.java
-index fca988d..82b6077 100644
+index fca988d26..ba0c87114 100644
 --- a/platform/java/src/com/artifex/mupdf/fitz/PDFPage.java
 +++ b/platform/java/src/com/artifex/mupdf/fitz/PDFPage.java
-@@ -23,8 +23,17 @@ public class PDFPage extends Page
- 	}
- 
+@@ -24,7 +24,11 @@ public class PDFPage extends Page
+
  	public native boolean update();
-+	private PDFWidget[] widgets;
- 
+
 -	public native PDFWidget[] getWidgets();
-+	private native PDFWidget[] getWidgetsNative();
++	public native PDFWidget[] getWidgetsNative();
 +
 +	public PDFWidget[] getWidgets() {
-+		if (this.widgets == null) {
-+			this.widgets = this.getWidgetsNative();
-+		}
-+
-+		return this.widgets;
++		return getWidgetsNative();
 +	}
- 
+
  	public PDFWidget activateWidgetAt(float pageX, float pageY) {
  		for (PDFWidget widget : getWidgets()) {
 diff --git a/platform/java/src/com/artifex/mupdf/fitz/Page.java b/platform/java/src/com/artifex/mupdf/fitz/Page.java
-index 1ab85fe..52857e0 100644
+index 1ab85fe1a..52857e00a 100644
 --- a/platform/java/src/com/artifex/mupdf/fitz/Page.java
 +++ b/platform/java/src/com/artifex/mupdf/fitz/Page.java
 @@ -49,6 +49,9 @@ public class Page
  	public native Quad[] search(String needle);
- 
+
  	public native byte[] textAsHtml();
 +	public native byte[] textAsHtml2(String options);
 +	public native byte[] textAsXHtml(String options);
 +	public native byte[] textAsText(String options);
- 
+
  	public native Link createLink(Rect bbox, String uri);
  }
 diff --git a/source/fitz/stext-output.c b/source/fitz/stext-output.c
-index d0b80d8..6750c08 100644
+index d0b80d8aa..d9c665320 100644
 --- a/source/fitz/stext-output.c
 +++ b/source/fitz/stext-output.c
-@@ -559,7 +559,9 @@ fz_print_stext_page_as_text(fz_context *ctx, fz_output *out, fz_stext_page *page
+@@ -559,6 +559,8 @@ fz_print_stext_page_as_text(fz_context *ctx, fz_output *out, fz_stext_page *page
  				fz_write_string(ctx, out, "\n");
  			}
  			fz_write_string(ctx, out, "\n");
--		}
 +		} else {
-+   			fz_print_stext_image_as_xhtml(ctx, out, block);
-+   		}
++			fz_print_stext_image_as_xhtml(ctx, out, block);
+ 		}
  	}
  }
- 
