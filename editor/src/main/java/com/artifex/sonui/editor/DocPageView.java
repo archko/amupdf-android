@@ -77,7 +77,7 @@ public class DocPageView extends View implements SOPageListener
     private final Rect mDstRect = new Rect();
     private final Paint mBlankPainter;
     private final Paint mSelectedBorderPainter;
-    private final Paint mPagePainter;
+    //private final Paint mPagePainter;
     private final Paint mBorderPainter;
     private final Rect mBorderRect = new Rect();
 
@@ -137,12 +137,12 @@ public class DocPageView extends View implements SOPageListener
         mSelectedBorderPainter.setStyle(Paint.Style.STROKE);
         mSelectedBorderPainter.setStrokeWidth(Utilities.convertDpToPixel(context.getResources().getInteger(R.integer.sodk_editor_selected_page_border_width)));
 
-        mPagePainter = new Paint();
+        /*mPagePainter = new Paint();
         mPagePainter.setColor(ContextCompat.getColor(getContext(), R.color.sodk_editor_palette_grey));
         //mPagePainter.setAntiAlias(true);
         mPagePainter.setTextSize(Utilities.convertDpToPixel(30));
         mPagePainter.setTextAlign(Paint.Align.CENTER);
-        mPagePainter.setStrokeWidth(Utilities.convertDpToPixel(2));
+        mPagePainter.setStrokeWidth(Utilities.convertDpToPixel(2));*/
 
         //  create the low res bitmap painter
         if (lowResPainter==null) {
@@ -715,7 +715,7 @@ public class DocPageView extends View implements SOPageListener
         //  get bitmap to draw
         ArDkBitmap bitmap = mBitmapDraw;
         if (bitmap==null || bitmap.getBitmap().isRecycled()) {
-            canvas.drawText(String.format("Page %s", (mPageNum+1)), rBlank.centerX(), rBlank.centerY(), mPagePainter);
+            //canvas.drawText(String.format("Page %s", (mPageNum+1)), rBlank.centerX(), rBlank.centerY(), mPagePainter);
             return;  //  not yet rendered, or recycled
         }
 
