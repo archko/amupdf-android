@@ -8,6 +8,14 @@ if (filters==null)
 
 def ndkArgs
 
+def aar_pkg_exist() {
+    if (file('./libs/mupdf_c-release.aar').exists()) {
+        return true
+    } else {
+        return false
+    }
+}
+
 android {
 	compileSdkVersion build_versions.compile_sdk
 	buildToolsVersion build_versions.build_tools
@@ -38,12 +46,14 @@ android {
 			 ndkArgs = noClosingQUote + ' -fsanitize=address -fsanitize-recover=address -fno-omit-frame-pointer" MUDPF_EXTRA_LDFLAGS="-fsanitize=address"'
 		}
 
-		externalNativeBuild {
-			ndkBuild {
-				abiFilters filters.split()
-				arguments ndkArgs
-			}
-		}
+		if (!aar_pkg_exist()) {
+            externalNativeBuild {
+                ndkBuild {
+                    abiFilters filters.split()
+                    arguments ndkArgs
+                }
+            }
+        }
 	}
 
 	sourceSets {
@@ -53,9 +63,11 @@ android {
 		}
 	}
 
-	externalNativeBuild {
-		ndkBuild.path 'libmupdf/platform/java/Android.mk'
-	}
+    if (!aar_pkg_exist()) {
+        externalNativeBuild {
+            ndkBuild.path 'libmupdf/platform/java/Android.mk'
+        }
+    }
 
 	buildTypes {
 		release {
@@ -66,4 +78,7 @@ android {
 }
 
 dependencies {
+    if (file('./libs/mupdf_c-release.aar').exists()) {
+	    api(name: 'mupdf_c-release', ext: 'aar')
+    }
 }
