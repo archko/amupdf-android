@@ -10,5 +10,6 @@
 /captures
 /.externalNativeBuild
 .cxx
+*.jks
 
 
