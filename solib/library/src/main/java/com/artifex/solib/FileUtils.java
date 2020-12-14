@@ -473,7 +473,7 @@ public class FileUtils
         }
         else
         {
-            return context.getFilesDir().toString();
+            return context.getExternalCacheDir().toString();
         }
     }
 
