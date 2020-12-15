@@ -280,7 +280,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         val width = mRecyclerView.width
         var start = SystemClock.uptimeMillis()
         var pageSizeBean: APageSizeLoader.PageSizeBean? = null
-        /*if (pdfBookmarkManager != null && pdfBookmarkManager!!.bookmarkToRestore != null) {
+        if (pdfBookmarkManager != null && pdfBookmarkManager!!.bookmarkToRestore != null) {
             pageSizeBean = APageSizeLoader.loadPageSizeFromFile(
                 width,
                 pdfBookmarkManager!!.bookmarkToRestore!!.pageCount,
@@ -291,7 +291,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                 )
             )
         }
-        Logcat.d("open3:" + (SystemClock.uptimeMillis() - start))*/
+        Logcat.d("open3:" + (SystemClock.uptimeMillis() - start))
 
         var pageSizes: SparseArray<APage>? = null
         if (pageSizeBean != null) {
