@@ -347,7 +347,7 @@ public class Utilities
 
     public static int iconForDocExt(String ext)
     {
-        if (FileUtils.matchFileExtension(ext, ArDkUtils.DOC_TYPES))
+        /*if (FileUtils.matchFileExtension(ext, ArDkUtils.DOC_TYPES))
             return R.drawable.sodk_editor_icon_doc;
         if (FileUtils.matchFileExtension(ext, ArDkUtils.DOCX_TYPES))
             return R.drawable.sodk_editor_icon_docx;
@@ -358,7 +358,7 @@ public class Utilities
         if (FileUtils.matchFileExtension(ext, ArDkUtils.PPT_TYPES))
             return R.drawable.sodk_editor_icon_ppt;
         if (FileUtils.matchFileExtension(ext, ArDkUtils.PPTX_TYPES))
-            return R.drawable.sodk_editor_icon_pptx;
+            return R.drawable.sodk_editor_icon_pptx;*/
         if (FileUtils.matchFileExtension(ext, ArDkUtils.IMG_TYPES))
             return R.drawable.sodk_editor_icon_image;
         if (FileUtils.matchFileExtension(ext, ArDkUtils.SO_IMG_TYPES))

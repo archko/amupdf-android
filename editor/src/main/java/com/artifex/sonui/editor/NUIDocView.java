@@ -1813,7 +1813,7 @@ public class NUIDocView
         //scaleToolbar(R.id.ppt_format_toolbar, factor);
         //scaleToolbar(R.id.ppt_insert_toolbar, factor);
         //scaleToolbar(R.id.ppt_slides_toolbar, factor);
-        scaleToolbar(R.id.review_toolbar, factor);
+        //scaleToolbar(R.id.review_toolbar, factor);
         scaleSearchToolbar(factor);
 
         //  now the tab area
@@ -2042,10 +2042,6 @@ public class NUIDocView
                 mTabs[1] = new NUIDocView.TabData(getContext().getString(R.string.sodk_editor_tab_edit),   R.id.editTab,   R.layout.sodk_editor_tab, View.VISIBLE);
                 mTabs[2] = new NUIDocView.TabData(getContext().getString(R.string.sodk_editor_tab_insert), R.id.insertTab, R.layout.sodk_editor_tab, View.VISIBLE);
                 mTabs[3] = new NUIDocView.TabData(getContext().getString(R.string.sodk_editor_tab_pages),  R.id.pagesTab,  R.layout.sodk_editor_tab, View.VISIBLE);
-
-                //  this tab is visible, but will be "blocked" by IAP until the Pro package is purchased.
-                //  Clicking on the tab's buttons will redirect the user to upgrade.
-                mTabs[4] = new NUIDocView.TabData(getContext().getString(R.string.sodk_editor_tab_review), R.id.reviewTab, R.layout.sodk_editor_tab_right, View.VISIBLE);
             }
             else
             {
@@ -2053,7 +2049,6 @@ public class NUIDocView
                 mTabs[1] = new NUIDocView.TabData(getContext().getString(R.string.sodk_editor_tab_edit),   R.id.editTab,   R.layout.sodk_editor_tab, View.GONE);
                 mTabs[2] = new NUIDocView.TabData(getContext().getString(R.string.sodk_editor_tab_insert), R.id.insertTab, R.layout.sodk_editor_tab, View.GONE);
                 mTabs[3] = new NUIDocView.TabData(getContext().getString(R.string.sodk_editor_tab_pages),  R.id.pagesTab,  R.layout.sodk_editor_tab_right, View.VISIBLE);
-                mTabs[4] = new NUIDocView.TabData(getContext().getString(R.string.sodk_editor_tab_review), R.id.reviewTab, R.layout.sodk_editor_tab_right, View.GONE);
             }
         }
 
