@@ -362,19 +362,26 @@
 
                 </LinearLayout>
 
-                <RelativeLayout
-                    android:orientation="vertical"
-                    android:layout_width="0dip"
-                    android:layout_weight="@integer/sodk_editor_pagelist_width_percentage"
-                    android:layout_height="match_parent"
-                    android:background="@color/sodk_editor_pdf_pages_bg"
-                    android:visibility="gone"
-                    android:id="@+id/pages_container"
-                    android:paddingLeft="6dp"
-                    android:paddingRight="6dp">
-                </RelativeLayout>
-
             </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/sodk_editor_transparent_02"
+                android:visibility="gone"
+                android:id="@+id/pages_container"
+                android:paddingLeft="0dp"
+                android:paddingRight="0dp">
+
+                <SeekBar
+                    android:id="@+id/seek_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
+                    android:progressDrawable="@drawable/seek_line"
+                    android:thumb="@drawable/seek_thumb"/>
+            </RelativeLayout>
 
         </RelativeLayout>
 

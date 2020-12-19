@@ -45,7 +45,7 @@ dependencies {
     implementation project(path: ':library')
     implementation project(path: ':mupdf-android-fitz')
     implementation project(path: ':wheel')
-    implementation project(path: ':readercommon')
+    implementation project(path: ':reader')
 
     implementation project(path: ':sodk_resources')
 

@@ -59,6 +59,7 @@
 
     <color name="sodk_editor_transparent">#00000000</color>
     <color name="sodk_editor_transparent_01">#01000000</color>
+    <color name="sodk_editor_transparent_02">#55000000</color>
 
     <!-- Resource Colors -->
 
