@@ -26,7 +26,7 @@ object Versions {
     val atsl_runner = "1.2.0"
 
     val kotlin = "1.4.10"
-    val coroutines = "1.4.10"
+    val coroutines = "1.4.0"
 
     val fragment = "1.2.1"
     val lifecycle = "2.2.0"
