@@ -1,11 +1,10 @@
 apply plugin: 'com.android.application'
+import cn.archko.plugin.*
 
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-allopen'
-
-apply from: '../shared.gradle'
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
@@ -22,14 +21,15 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
-    compileSdkVersion build_versions.compile_sdk
-    buildToolsVersion build_versions.build_tools
+    compileSdkVersion BuildConfig.compileSdkVersion
+    buildToolsVersion BuildConfig.buildToolsVersion
+
     defaultConfig {
         applicationId 'cn.archko.mupdf'
-        minSdkVersion build_versions.min_sdk
-        targetSdkVersion build_versions.target_sdk
-        versionCode VERSION_CODE as int
-        versionName VERSION_NAME
+        minSdkVersion BuildConfig.minSdkVersion
+        targetSdkVersion BuildConfig.targetSdkVersion
+        versionCode BuildConfig.versionCode
+        versionName BuildConfig.versionName
         multiDexEnabled true
         signingConfig signingConfigs.release
         ndk.abiFilters 'armeabi-v7a', 'arm64-v8a'
@@ -77,7 +77,7 @@ android {
         main {
             jni.srcDirs = []
             jniLibs.srcDirs = ['libs']
-            java{
+            java {
                 srcDirs 'src/main/kotlin'
             }
         }
@@ -85,9 +85,27 @@ android {
 }
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
-    api deps.multidex
-    api deps.constraint_layout
-    api deps.constraintlayout_solver
+    api Arch.runtime
+    api AndroidX.activityKtx
+    api AndroidX.appCompat
+    api AndroidX.coreKtx
+    api Fragment.runtime
+    api Fragment.runtimeKtx
+    api Lifecycle.viewmodel
+    api Lifecycle.viewmodelKtx
+    api Lifecycle.livedataKtx
+    api Lifecycle.extensions
+    api Coroutines.android
+
+    api Kotlin.stdlibJdk8
+
+    api Dependency.liveEventBusX
+
+    api Umeng.analytics
+    api Umeng.umengCommon
+    api AndroidX.multidex
+    api AndroidX.constraintLayout
+    api AndroidX.constraintLayoutSolver
 
     api project(':reader')
     api project(':editor')

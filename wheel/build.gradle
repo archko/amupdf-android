@@ -1,12 +1,13 @@
+import cn.archko.plugin.BuildConfig
+
 apply plugin: 'com.android.library'
-apply from: '../amupdf/shared.gradle'
 
 android {
-    compileSdkVersion build_versions.compile_sdk
-    buildToolsVersion build_versions.build_tools
+    compileSdkVersion BuildConfig.compileSdkVersion
+    buildToolsVersion BuildConfig.buildToolsVersion
     defaultConfig {
-        minSdkVersion build_versions.min_sdk
-        targetSdkVersion build_versions.target_sdk
+        minSdkVersion BuildConfig.minSdkVersion
+        targetSdkVersion BuildConfig.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
