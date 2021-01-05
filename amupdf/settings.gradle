@@ -3,6 +3,8 @@ include ':reader'
 include ':readercommon'
 include ':vudroid'
 
+includeBuild("../VersionPlugin")
+
 include ':library'
 include ':editor'
 include ':wheel'

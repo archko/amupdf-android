@@ -482,11 +482,11 @@ public class DocPageView extends View implements SOPageListener
         //  limit the right or left edge is the page list is showing.
         if (pagesShowing())
         {
-            boolean isThumb = (getParent() instanceof DocListPagesView);
+            /*boolean isThumb = (getParent() instanceof DocListPagesView);
             if (isThumb)
                 leftMargin = Math.min(Math.max(mRenderToRect.left - mPageRect.left, 0), 0);
             else
-                rightMargin = Math.min(Math.max(mPageRect.right - mRenderToRect.right, 0), 0);
+                rightMargin = Math.min(Math.max(mPageRect.right - mRenderToRect.right, 0), 0);*/
         }
 
         mRenderToRect.top    -= topMargin;

@@ -1,26 +1,21 @@
 apply plugin: 'com.android.library'
-
-apply from: '../../amupdf/shared.gradle'
+import cn.archko.plugin.AndroidX
+import cn.archko.plugin.BuildConfig
 
 android {
-    compileSdkVersion build_versions.compile_sdk
-    buildToolsVersion build_versions.build_tools
+    compileSdkVersion BuildConfig.compileSdkVersion
+    buildToolsVersion BuildConfig.buildToolsVersion
     defaultConfig {
-        minSdkVersion build_versions.min_sdk
-        targetSdkVersion build_versions.target_sdk
-        versionCode  1
-        versionName  "1.0"
+        minSdkVersion BuildConfig.minSdkVersion
+        targetSdkVersion BuildConfig.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
 
-        if (project.hasProperty('SCREENS_ARE_R8G8B8X8'))
-        {
+        if (project.hasProperty('SCREENS_ARE_R8G8B8X8')) {
             buildConfigField("String", "SCREENS_ARE", "\"R8G8B8X8\"")
-        }
-        else if (project.hasProperty('SCREENS_ARE_B5G6R5'))
-        {
+        } else if (project.hasProperty('SCREENS_ARE_B5G6R5')) {
             buildConfigField("String", "SCREENS_ARE", "\"B5G6R5\"")
-        }
-        else
-        {
+        } else {
             println "Default to B5G6R5"
             buildConfigField("String", "SCREENS_ARE", "\"B5G6R5\"")
         }
@@ -57,7 +52,7 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation AndroidX.appCompat
 
     implementation project(':mupdf-android-fitz')
 }

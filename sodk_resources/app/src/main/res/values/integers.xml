@@ -5,7 +5,7 @@
     <integer name="sodk_editor_ui_doc_tabbar_color_from_doctype">1</integer>
 
     <integer name="sodk_editor_page_width_percentage">85</integer>
-    <integer name="sodk_editor_pagelist_width_percentage">15</integer>
+    <integer name="sodk_editor_pagelist_width_percentage">0</integer>
 
     <!-- in dp, smallest width -->
     <integer name="sodk_editor_minimum_tablet_width">600</integer>

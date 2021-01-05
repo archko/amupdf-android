@@ -56,6 +56,7 @@ import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListPopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 
@@ -106,7 +107,8 @@ public class NUIDocView
     private boolean mProgressStarted = false;
     protected int mPageCount;
     private DocView mDocView;
-    private DocListPagesView mDocPageListView;
+    //private DocListPagesView mDocPageListView;
+    private SeekBar verticalSeekBar;
     private String mCustomDocdata;
     private String mDocUserPath;
     protected PageAdapter mAdapter;
@@ -828,12 +830,36 @@ public class NUIDocView
 
         if (usePagesView())
         {
-            mDocPageListView = new DocListPagesView(activity());
+            /*mDocPageListView = new DocListPagesView(activity());
             mDocPageListView.setHost(this);
             mDocPageListView.setAdapter(mAdapter);
             mDocPageListView.setMainView(mDocView);
             mDocPageListView.setBorderColor(mDocView.getBorderColor());
-            mDocPageListView.setDocSpecifics(mDocCfgOptions, mDataLeakHandlers);
+            mDocPageListView.setDocSpecifics(mDocCfgOptions, mDataLeakHandlers);*/
+            //verticalSeekBar = new VerticalSeekBar(activity());
+            //verticalSeekBar.setProgressDrawable(getResources().getDrawable(R.drawable.seek_line));
+            //verticalSeekBar.setThumb(getResources().getDrawable(R.drawable.seek_thumb));
+            //RelativeLayout layout2 = (RelativeLayout) findViewById(R.id.pages_container);
+            //layout2.addView(verticalSeekBar);
+            verticalSeekBar = findViewById(R.id.seek_bar);
+            verticalSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if(fromUser) {
+                        gotoPage(progress);
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                }
+            });
         }
 
         //  add the view to the layout
@@ -845,10 +871,10 @@ public class NUIDocView
         if (usePagesView())
         {
             //  pages container
-            RelativeLayout layout2 = (RelativeLayout) findViewById(R.id.pages_container);
+            /*RelativeLayout layout2 = (RelativeLayout) findViewById(R.id.pages_container);
             layout2.addView(mDocPageListView);
             mDocPageListView.setup(layout2);
-            mDocPageListView.setCanManipulatePages(canCanManipulatePages());
+            mDocPageListView.setCanManipulatePages(canCanManipulatePages());*/
         }
 
         //  footer
@@ -992,8 +1018,10 @@ public class NUIDocView
 
                     //  give the open doc to the adapter and views
                     mDocView.setDoc(mSession.getDoc());
-                    if (usePagesView())
-                        mDocPageListView.setDoc(mSession.getDoc());
+                    if (usePagesView()) {
+                        //mDocPageListView.setDoc(mSession.getDoc());
+                        verticalSeekBar.setMax(mSession.getDoc().getNumPages()-1);
+                    }
                     mAdapter.setDoc(mSession.getDoc());
 
                     //  if we have an optional document listener,
@@ -1060,9 +1088,9 @@ public class NUIDocView
 
                     if (usePagesView())
                     {
-                        int pagelist_width_percentage = getResources().getInteger(R.integer.sodk_editor_pagelist_width_percentage);
-                        float scale = ((float) pagelist_width_percentage) / 100f;
-                        mDocPageListView.setScale(scale);
+                        //int pagelist_width_percentage = getResources().getInteger(R.integer.sodk_editor_pagelist_width_percentage);
+                        //float scale = ((float) pagelist_width_percentage) / 100f;
+                        //mDocPageListView.setScale(scale);
                     }
 
                 }
@@ -1162,12 +1190,15 @@ public class NUIDocView
 
                     //  give the open doc to the adapter and views
                     mDocView.setDoc(mSession.getDoc());
-                    if (usePagesView())
-                        mDocPageListView.setDoc(mSession.getDoc());
+                    if (usePagesView()) {
+                        //mDocPageListView.setDoc(mSession.getDoc());
+                        verticalSeekBar.setMax(mSession.getDoc().getNumPages()-1);
+                    }
                     mAdapter.setDoc(mSession.getDoc());
 
-                    if (usePagesView())
-                        mDocPageListView.setScale(0.20f);
+                    if (usePagesView()) {
+                        //mDocPageListView.setScale(0.20f);
+                    }
                 }
                 else
                 {
@@ -1324,12 +1355,15 @@ public class NUIDocView
 
                     //  give the open doc to the adapter and views
                     mDocView.setDoc(mSession.getDoc());
-                    if (usePagesView())
-                        mDocPageListView.setDoc(mSession.getDoc());
+                    if (usePagesView()) {
+                        //mDocPageListView.setDoc(mSession.getDoc());
+                        verticalSeekBar.setMax(mSession.getDoc().getNumPages()-1);
+                    }
                     mAdapter.setDoc(mSession.getDoc());
 
-                    if (usePagesView())
-                        mDocPageListView.setScale(0.20f);
+                    if (usePagesView()) {
+                        //mDocPageListView.setScale(0.20f);
+                    }
                 }
 
                 //  create an InputView and add it to the layout.
@@ -1421,8 +1455,9 @@ public class NUIDocView
     {
         mDocView.onOrientationChange();
 
-        if (usePagesView())
-            mDocPageListView.onOrientationChange();
+        if (usePagesView()) {
+            //mDocPageListView.onOrientationChange();
+        }
 
         if (!isFullScreen())
             showUI(!keyboardShown);
@@ -1448,8 +1483,9 @@ public class NUIDocView
             mDocView.onConfigurationChange();
 
         //  ,,, and the page list
-        if (usePagesView() && mDocPageListView!=null)
+        /*if (usePagesView() && mDocPageListView!=null) {
             mDocPageListView.onConfigurationChange();
+        }*/
     }
 
     protected DocView createMainView(Activity activity)
@@ -1499,8 +1535,10 @@ public class NUIDocView
         if (usePagesView())
         {
             //  set the new current page and scroll there.
-            mDocPageListView.setCurrentPage(pageNumber);
-            mDocPageListView.scrollToPage(pageNumber, false);
+            //mDocPageListView.setCurrentPage(pageNumber);
+            //mDocPageListView.scrollToPage(pageNumber, false);
+            verticalSeekBar.setMax(getPageCount()-1);
+            verticalSeekBar.setProgress(pageNumber);
         }
 
         //  keep track of the "current" page number
@@ -1591,8 +1629,9 @@ public class NUIDocView
     {
         mDocView.requestLayout();
 
-        if (usePagesView() && isPageListVisible())
-            mDocPageListView.requestLayout();
+        if (usePagesView() && isPageListVisible()) {
+            //mDocPageListView.requestLayout();
+        }
     }
 
     public void layoutNow()
@@ -1600,8 +1639,9 @@ public class NUIDocView
         //  cause the main and page list views to re-layout
         if (mDocView!=null)
             mDocView.layoutNow();
-        if (mDocPageListView!=null && usePagesView() && isPageListVisible())
+        /*if (mDocPageListView!=null && usePagesView() && isPageListVisible()) {
             mDocPageListView.layoutNow();
+        }*/
     }
 
     public void selectionupdated()
@@ -1638,8 +1678,11 @@ public class NUIDocView
             //  The correct number of them will be re-inserted at the next layout.
             //  this fixes 698220 - Two identical editing lines appear on two pages
             mDocView.removeAllViewsInLayout();
-            if (usePagesView())
-                mDocPageListView.removeAllViewsInLayout();
+            if (usePagesView()) {
+                //mDocPageListView.removeAllViewsInLayout();
+                verticalSeekBar.setMax(getPageCount()-1);
+                verticalSeekBar.setProgress(getPageNumber());
+            }
         }
         mAdapter.setCount(mPageCount);
 
@@ -1813,7 +1856,7 @@ public class NUIDocView
         //scaleToolbar(R.id.ppt_format_toolbar, factor);
         //scaleToolbar(R.id.ppt_insert_toolbar, factor);
         //scaleToolbar(R.id.ppt_slides_toolbar, factor);
-        scaleToolbar(R.id.review_toolbar, factor);
+        //scaleToolbar(R.id.review_toolbar, factor);
         scaleSearchToolbar(factor);
 
         //  now the tab area
@@ -2042,10 +2085,6 @@ public class NUIDocView
                 mTabs[1] = new NUIDocView.TabData(getContext().getString(R.string.sodk_editor_tab_edit),   R.id.editTab,   R.layout.sodk_editor_tab, View.VISIBLE);
                 mTabs[2] = new NUIDocView.TabData(getContext().getString(R.string.sodk_editor_tab_insert), R.id.insertTab, R.layout.sodk_editor_tab, View.VISIBLE);
                 mTabs[3] = new NUIDocView.TabData(getContext().getString(R.string.sodk_editor_tab_pages),  R.id.pagesTab,  R.layout.sodk_editor_tab, View.VISIBLE);
-
-                //  this tab is visible, but will be "blocked" by IAP until the Pro package is purchased.
-                //  Clicking on the tab's buttons will redirect the user to upgrade.
-                mTabs[4] = new NUIDocView.TabData(getContext().getString(R.string.sodk_editor_tab_review), R.id.reviewTab, R.layout.sodk_editor_tab_right, View.VISIBLE);
             }
             else
             {
@@ -2053,7 +2092,6 @@ public class NUIDocView
                 mTabs[1] = new NUIDocView.TabData(getContext().getString(R.string.sodk_editor_tab_edit),   R.id.editTab,   R.layout.sodk_editor_tab, View.GONE);
                 mTabs[2] = new NUIDocView.TabData(getContext().getString(R.string.sodk_editor_tab_insert), R.id.insertTab, R.layout.sodk_editor_tab, View.GONE);
                 mTabs[3] = new NUIDocView.TabData(getContext().getString(R.string.sodk_editor_tab_pages),  R.id.pagesTab,  R.layout.sodk_editor_tab_right, View.VISIBLE);
-                mTabs[4] = new NUIDocView.TabData(getContext().getString(R.string.sodk_editor_tab_review), R.id.reviewTab, R.layout.sodk_editor_tab_right, View.GONE);
             }
         }
 
@@ -2393,7 +2431,7 @@ public class NUIDocView
 
     public DocView getDocView() {return mDocView;}
 
-    public DocListPagesView getDocListPagesView() {return mDocPageListView;}
+    /*public DocListPagesView getDocListPagesView() {return mDocPageListView;}*/
 
     public ArDkDoc getDoc() {
         if (mSession==null)
@@ -2428,7 +2466,7 @@ public class NUIDocView
             if (vis != View.VISIBLE)
             {
                 pages.setVisibility(View.VISIBLE);
-                mDocPageListView.setVisibility(View.VISIBLE);
+                //mDocPageListView.setVisibility(View.VISIBLE);
                 mDocView.onShowPages();
             }
 
@@ -2446,10 +2484,12 @@ public class NUIDocView
                     else
                         page = pageNumber;
 
-                    mDocPageListView.setCurrentPage(page);
-                    mDocPageListView.scrollToPage(page, false);
-                    mDocPageListView.fitToColumns();
-                    mDocPageListView.layoutNow();
+                    //mDocPageListView.setCurrentPage(page);
+                    //mDocPageListView.scrollToPage(page, false);
+                    //mDocPageListView.fitToColumns();
+                    //mDocPageListView.layoutNow();
+                    verticalSeekBar.setMax(getPageCount()-1);
+                    verticalSeekBar.setProgress(page);
 
                     //  send update UI notification
                     doUpdateCustomUI();
@@ -2713,11 +2753,11 @@ public class NUIDocView
 
         if (usePagesView())
         {
-            if (mDocPageListView !=null)
+            /*if (mDocPageListView !=null)
             {
                 mDocPageListView.finish();
                 mDocPageListView = null;
-            }
+            }*/
         }
 
         //  stop any loading
@@ -2799,10 +2839,10 @@ public class NUIDocView
 
         if (usePagesView())
         {
-            if (mDocPageListView !=null)
+            /*if (mDocPageListView !=null)
             {
                 mDocPageListView.finish();
-            }
+            }*/
         }
 
         if (mSession!=null)
@@ -2987,8 +3027,8 @@ public class NUIDocView
         //  tell doc and pagelist views to dereference
         if (mDocView != null)
             mDocView.releaseBitmaps();
-        if (usePagesView() && (mDocPageListView != null))
-            mDocPageListView.releaseBitmaps();
+        /*if (usePagesView() && (mDocPageListView != null))
+            mDocPageListView.releaseBitmaps();*/
 
         for (int i=0; i<bitmaps.length; i++) {
             if (bitmaps[i]!=null) {
@@ -3343,8 +3383,9 @@ public class NUIDocView
                 //  within the document before and after the mode change.  So we'll just scroll
                 //  to the top.
                 mDocView.scrollTo(mDocView.getScrollX(), 0);
-                if (usePagesView())
-                    mDocPageListView.scrollTo(mDocPageListView.getScrollX(), 0);
+                if (usePagesView()) {
+                    //mDocPageListView.scrollTo(mDocPageListView.getScrollX(), 0);
+                }
                 setCurrentPage(0);
 
                 //  initial "fit to width"
@@ -3362,8 +3403,9 @@ public class NUIDocView
                     mDocView.scaleChildren();
                 }
 
-                if (usePagesView())
-                    mDocPageListView.fitToColumns();
+                if (usePagesView()) {
+                    //mDocPageListView.fitToColumns();
+                }
 
                 //  redo the layout
                 layoutNow();
@@ -3384,16 +3426,18 @@ public class NUIDocView
         SODoc doc = (SODoc)getDoc();
 
         if (doc.getFlowMode()==SODoc.FLOW_MODE_NORMAL) {
-            if (usePagesView())
-                mDocPageListView.setReflowMode(true);
+            if (usePagesView()) {
+                //mDocPageListView.setReflowMode(true);
+            }
             mDocView.setReflowMode(true);
             doc.setFlowMode(SODoc.FLOW_MODE_REFLOW, getDocView().getReflowWidth(), getDocView().getReflowHeight());
             mDocView.mLastReflowWidth = getDocView().getReflowWidth();
         }
         else {
             mDocView.setReflowMode(false);
-            if (usePagesView())
-                mDocPageListView.setReflowMode(false);
+            if (usePagesView()) {
+                //mDocPageListView.setReflowMode(false);
+            }
             doc.setFlowMode(SODoc.FLOW_MODE_NORMAL, getDocView().getReflowWidth(), 0);
         }
     }
@@ -3412,15 +3456,17 @@ public class NUIDocView
         if (mode==SODoc.FLOW_MODE_NORMAL)
         {
             mDocView.setReflowMode(false);
-            if (usePagesView())
-                mDocPageListView.setReflowMode(false);
+            if (usePagesView()) {
+                //mDocPageListView.setReflowMode(false);
+            }
             doc.setFlowMode(SODoc.FLOW_MODE_NORMAL, getDocView().getReflowWidth(), 0);
         }
 
         if (mode==SODoc.FLOW_MODE_REFLOW)
         {
-            if (usePagesView())
-                mDocPageListView.setReflowMode(true);
+            if (usePagesView()) {
+                //mDocPageListView.setReflowMode(true);
+            }
             mDocView.setReflowMode(true);
             doc.setFlowMode(SODoc.FLOW_MODE_REFLOW, getDocView().getReflowWidth(), getDocView().getReflowHeight());
             mDocView.mLastReflowWidth = getDocView().getReflowWidth();
@@ -3428,8 +3474,9 @@ public class NUIDocView
 
         if (mode==SODoc.FLOW_MODE_RESIZE)
         {
-            if (usePagesView())
-                mDocPageListView.setReflowMode(true);
+            if (usePagesView()) {
+                //mDocPageListView.setReflowMode(true);
+            }
             mDocView.setReflowMode(true);
             doc.setFlowMode(SODoc.FLOW_MODE_RESIZE, getDocView().getReflowWidth(), getDocView().getReflowHeight());
             mDocView.mLastReflowWidth = getDocView().getReflowWidth();
@@ -3748,8 +3795,9 @@ public class NUIDocView
         }
 
         mDocView.onSelectionChanged();
-        if (usePagesView() && isPageListVisible())
-            mDocPageListView.onSelectionChanged();
+        if (usePagesView() && isPageListVisible()) {
+            //mDocPageListView.onSelectionChanged();
+        }
 
         updateUIAppearance();
 
@@ -3760,8 +3808,8 @@ public class NUIDocView
     {
         if (mDocView!=null)
             mDocView.triggerRender();
-        if (mDocPageListView!=null && usePagesView() && isPageListVisible())
-            mDocPageListView.triggerRender();
+        /*if (mDocPageListView!=null && usePagesView() && isPageListVisible())
+            mDocPageListView.triggerRender();*/
     }
 
     private long lastTypingTime = 0;
@@ -4397,9 +4445,10 @@ public class NUIDocView
     {
         if (mDocView!=null)
             mDocView.setValid(val);
-        if (usePagesView())
-            if (mDocPageListView!=null)
-                mDocPageListView.setValid(val);
+        if (usePagesView()) {
+            /*if (mDocPageListView != null)
+                mDocPageListView.setValid(val);*/
+        }
     }
 
     private void setBitmapsInViews()
@@ -4408,9 +4457,10 @@ public class NUIDocView
         //  these might be null.
         if (mDocView!=null)
             mDocView.setBitmaps(bitmaps);
-        if (usePagesView())
-            if (mDocPageListView!=null)
-                mDocPageListView.setBitmaps(bitmaps);
+        if (usePagesView()) {
+            /*if (mDocPageListView!=null)
+                mDocPageListView.setBitmaps(bitmaps);*/
+        }
     }
 
     protected void onResumeCommon()
@@ -4453,9 +4503,9 @@ public class NUIDocView
         //  don't forget the page list (bug 699304)
         if (usePagesView())
         {
-            DocListPagesView pagesView = getDocListPagesView();
+            /*DocListPagesView pagesView = getDocListPagesView();
             if (pagesView != null)
-                pagesView.forceLayout();
+                pagesView.forceLayout();*/
         }
     }
 
@@ -4829,9 +4879,9 @@ public class NUIDocView
 
         if (usePagesView())
         {
-            DocListPagesView pagesView = getDocListPagesView();
+            /*DocListPagesView pagesView = getDocListPagesView();
             if (pagesView != null)
-                pagesView.onShowKeyboard(bShow);
+                pagesView.onShowKeyboard(bShow);*/
         }
 
         //  delay the rest so the layout can settle first
@@ -4952,8 +5002,10 @@ public class NUIDocView
         mDocView.scrollToPage(page, fast);
         if (usePagesView()) {
             //  ask the page list to highlight this as the current page
-            mDocPageListView.setCurrentPage(page);
-            mDocPageListView.scrollToPage(page, fast);
+            //mDocPageListView.setCurrentPage(page);
+            //mDocPageListView.scrollToPage(page, fast);
+            verticalSeekBar.setMax(getPageCount()-1);
+            verticalSeekBar.setProgress(page);
         }
 
         //  update the current page
@@ -4965,8 +5017,10 @@ public class NUIDocView
     {
         //mDocView.addPageHistory(0);
         mDocView.goToFirstPage();
-        if (usePagesView())
-            mDocPageListView.goToFirstPage();
+        if (usePagesView()) {
+            //mDocPageListView.goToFirstPage();
+            verticalSeekBar.setProgress(0);
+        }
         setCurrentPage(0);
     }
 
@@ -4974,8 +5028,11 @@ public class NUIDocView
     {
         //mDocView.addPageHistory(getPageCount()-1);
         mDocView.goToLastPage();
-        if (usePagesView())
-            mDocPageListView.goToLastPage();
+        if (usePagesView()) {
+            //mDocPageListView.goToLastPage();
+            verticalSeekBar.setMax(getPageCount()-1);
+            verticalSeekBar.setProgress(verticalSeekBar.getMax());
+        }
         setCurrentPage(getPageCount()-1);
     }
 
@@ -5363,8 +5420,9 @@ public class NUIDocView
     {
         //  handle possible appearance of new pages
         mDocView.onReflowScale();
-        if (usePagesView())
-            mDocPageListView.onReflowScale();
+        if (usePagesView()) {
+            //mDocPageListView.onReflowScale();
+        }
     }
 
     public void reloadFile()
@@ -5797,8 +5855,11 @@ public class NUIDocView
     {
         //mDocView.addPageHistory(pageNumber);
         mDocView.scrollToPage(pageNumber, true);
-        if (usePagesView())
-            mDocPageListView.scrollToPage(pageNumber, true);
+        if (usePagesView()) {
+            //mDocPageListView.scrollToPage(pageNumber, true);
+            verticalSeekBar.setMax(getPageCount()-1);
+            verticalSeekBar.setProgress(pageNumber);
+        }
         setCurrentPage(pageNumber);
     }
 

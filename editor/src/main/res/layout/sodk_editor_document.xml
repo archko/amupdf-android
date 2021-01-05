@@ -181,17 +181,6 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/reviewTab"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/sodk_editor_toolbar"
-                    android:orientation="vertical">
-
-                    <include layout="@layout/sodk_editor_review_toolbar"/>
-
-                </LinearLayout>
-
-                <LinearLayout
                     android:id="@+id/searchTab"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

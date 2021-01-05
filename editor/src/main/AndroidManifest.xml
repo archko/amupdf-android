@@ -7,13 +7,6 @@
     <application>
 
         <activity
-            android:name="com.artifex.sonui.editor.SlideShowActivity"
-            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout"
-            android:windowSoftInputMode="stateHidden"
-            >
-        </activity>
-
-        <activity
             android:name=".NUICertificateViewer"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="stateHidden"

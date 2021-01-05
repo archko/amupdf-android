@@ -1,18 +1,17 @@
 apply plugin: 'com.android.library'
+import cn.archko.plugin.*
 
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-allopen'
 
-apply from: '../shared.gradle'
-
 android {
-    compileSdkVersion build_versions.compile_sdk
-    buildToolsVersion build_versions.build_tools
+    compileSdkVersion BuildConfig.compileSdkVersion
+    buildToolsVersion BuildConfig.buildToolsVersion
     defaultConfig {
-        minSdkVersion build_versions.min_sdk
-        targetSdkVersion build_versions.target_sdk
+        minSdkVersion BuildConfig.minSdkVersion
+        targetSdkVersion BuildConfig.targetSdkVersion
         // jni cropper
         ndk.abiFilters 'armeabi-v7a', 'arm64-v8a'
         externalNativeBuild {

@@ -1,17 +1,16 @@
 apply plugin: 'com.android.library'
+import cn.archko.plugin.*
 
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-allopen'
 
-apply from: '../shared.gradle'
-
 android {
-    compileSdkVersion build_versions.compile_sdk
-    buildToolsVersion build_versions.build_tools
+    compileSdkVersion BuildConfig.compileSdkVersion
+    buildToolsVersion BuildConfig.buildToolsVersion
     defaultConfig {
-        minSdkVersion build_versions.min_sdk
-        targetSdkVersion build_versions.target_sdk
+        minSdkVersion BuildConfig.minSdkVersion
+        targetSdkVersion BuildConfig.targetSdkVersion
     }
 
     compileOptions {
@@ -37,15 +36,15 @@ android {
     }
 }
 dependencies {
-    api fileTree(include: ['*.jar'], dir: 'libs')
-    api deps.vectordrawable
-    api deps.swiperefreshlayout
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation AndroidX.vectordrawable
+    implementation AndroidX.swiperefreshlayout
 
-    api(deps.viewpager2) {
+    implementation(AndroidX.viewpager2) {
         exclude group: 'androidx.recyclerview'
     }
 
-    api(deps.material) {
+    implementation(Dependency.material) {
         exclude group: 'androidx.recyclerview'
     }
 

@@ -707,9 +707,10 @@ public class NUIDocViewPdf extends NUIDocView
                 //  they will in turn tell their page views about it.
                 if (getDocView() != null)
                     getDocView().onReloadFile();
-                if (usePagesView())
-                    if (getDocListPagesView() != null)
-                        getDocListPagesView().onReloadFile();
+                if (usePagesView()) {
+                    /*if (getDocListPagesView() != null)
+                        getDocListPagesView().onReloadFile();*/
+                }
 
                 spinner.dismiss();
             }

@@ -1,6 +1,6 @@
-apply plugin: 'com.android.library'
+import cn.archko.plugin.BuildConfig
 
-apply from: '../../amupdf/shared.gradle'
+apply plugin: 'com.android.library'
 
 def filters = project.getProperties().get("abiFilters")
 if (filters==null)
@@ -17,11 +17,11 @@ def aar_pkg_exist() {
 }
 
 android {
-	compileSdkVersion build_versions.compile_sdk
-	buildToolsVersion build_versions.build_tools
+	compileSdkVersion BuildConfig.compileSdkVersion
+	buildToolsVersion BuildConfig.buildToolsVersion
 	defaultConfig {
-		minSdkVersion build_versions.min_sdk
-		targetSdkVersion build_versions.target_sdk
+		minSdkVersion BuildConfig.minSdkVersion
+		targetSdkVersion BuildConfig.targetSdkVersion
 
 		ndk.abiFilters filters.split()
 
