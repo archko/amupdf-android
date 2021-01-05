@@ -15,7 +15,7 @@ import cn.archko.pdf.common.BitmapCache;
 import cn.archko.pdf.common.BitmapPool;
 
 class PageTreeNode {
-    private static final int SLICE_SIZE = 256 * 256 * 2;
+    private static final int SLICE_SIZE = 256 * 256 * 8;
     private Bitmap bitmap;
     private SoftReference<Bitmap> bitmapWeakReference;
     private boolean decodingNow;
