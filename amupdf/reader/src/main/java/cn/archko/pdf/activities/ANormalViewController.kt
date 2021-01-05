@@ -185,6 +185,21 @@ class ANormalViewController(
         documentView.goToPage(page)
     }
 
+    override fun scrollPage(y: Int, top: Int, bottom: Int, margin: Int): Boolean {
+        if (y < top) {
+            var scrollY = documentView.scrollY
+            scrollY -= documentView.height
+            documentView.scrollBy(0, scrollY + margin)
+            return true
+        } else if (y > bottom) {
+            var scrollY = documentView.scrollY
+            scrollY += documentView.height
+            documentView.scrollBy(0, scrollY - margin)
+            return true
+        }
+        return false;
+    }
+
     override fun onSingleTap() {
         //if (mPageSeekBarControls?.visibility == View.VISIBLE) {
         //    mPageSeekBarControls?.hide()

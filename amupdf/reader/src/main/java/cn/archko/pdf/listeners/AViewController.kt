@@ -21,6 +21,7 @@ interface AViewController {
     fun getCurrentPos(): Int
     fun onSelectedOutline(resultCode: Int)
     fun scrollToPosition(page: Int)
+    fun scrollPage(y: Int, top: Int, bottom: Int, margin: Int): Boolean
 
     fun onResume()
     fun onPause()

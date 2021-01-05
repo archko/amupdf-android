@@ -132,6 +132,21 @@ class ACropViewController(
         mRecyclerView.layoutManager?.scrollToPosition(page)
     }
 
+    override fun scrollPage(y: Int, top: Int, bottom: Int, margin: Int): Boolean {
+        if (y < top) {
+            var scrollY = mRecyclerView.scrollY
+            scrollY -= mRecyclerView.height
+            mRecyclerView.scrollBy(0, scrollY + margin)
+            return true
+        } else if (y > bottom) {
+            var scrollY = mRecyclerView.scrollY
+            scrollY += mRecyclerView.height
+            mRecyclerView.scrollBy(0, scrollY - margin)
+            return true
+        }
+        return false;
+    }
+
     override fun onSingleTap() {
         //if (mPageSeekBarControls?.visibility == View.VISIBLE) {
         //    mPageSeekBarControls?.hide()
