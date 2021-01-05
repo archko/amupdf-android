@@ -55,4 +55,8 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
     api project(path: ':mupdf-android-fitz')
+
+    api Dependency.liveEventBusX
+    api Umeng.analytics
+    api Umeng.umengCommon
 }
