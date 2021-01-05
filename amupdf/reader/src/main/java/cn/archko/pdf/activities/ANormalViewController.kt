@@ -33,15 +33,15 @@ import org.vudroid.pdfdroid.codec.PdfDocument
  * @author: archko 2020/5/15 :12:43
  */
 class ANormalViewController(
-    private var context: Context,
-    private var contentView: View,
-    private val mControllerLayout: RelativeLayout,
-    private var pdfBookmarkManager: PDFBookmarkManager,
-    private var mPath: String,
-    private var mPageSeekBarControls: APageSeekBarControls?,
-    private var gestureDetector: GestureDetector?
+        private var context: Context,
+        private var contentView: View,
+        private val mControllerLayout: RelativeLayout,
+        private var pdfBookmarkManager: PDFBookmarkManager,
+        private var mPath: String,
+        private var mPageSeekBarControls: APageSeekBarControls?,
+        private var gestureDetector: GestureDetector?
 ) :
-    OutlineListener, AViewController {
+        OutlineListener, AViewController {
 
     private lateinit var documentView: DocumentView
     private lateinit var frameLayout: FrameLayout
@@ -70,13 +70,13 @@ class ANormalViewController(
         currentPageModel = CurrentPageModel()
         currentPageModel.addEventListener(this)
         documentView =
-            DocumentView(context, zoomModel, progressModel, currentPageModel, simpleGestureListener)
+                DocumentView(context, zoomModel, progressModel, currentPageModel, simpleGestureListener)
         zoomModel.addEventListener(documentView)
         documentView.setLayoutParams(
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
+                ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                )
         )
         decodeService?.setContainerView(documentView)
         documentView.setDecodeService(decodeService)
@@ -88,8 +88,8 @@ class ANormalViewController(
         zoomModel.addEventListener(this)
 
         val lp = RelativeLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
         )
         lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
         mControllerLayout.addView(mPageControls, lp)
@@ -164,9 +164,9 @@ class ANormalViewController(
         (decodeService as AKDecodeService).document = document
         if (pos > 0) {
             documentView.goToPage(
-                pos,
-                pdfBookmarkManager.bookmarkToRestore!!.offsetX,
-                pdfBookmarkManager.bookmarkToRestore!!.offsetY
+                    pos,
+                    pdfBookmarkManager.bookmarkToRestore!!.offsetX,
+                    pdfBookmarkManager.bookmarkToRestore!!.offsetY
             )
         }
         documentView.showDocument()
@@ -187,14 +187,10 @@ class ANormalViewController(
 
     override fun scrollPage(y: Int, top: Int, bottom: Int, margin: Int): Boolean {
         if (y < top) {
-            var scrollY = documentView.scrollY
-            scrollY -= documentView.height
-            documentView.scrollBy(0, scrollY + margin)
+            //documentView.scrollPage(-frameLayout.height + margin);
             return true
         } else if (y > bottom) {
-            var scrollY = documentView.scrollY
-            scrollY += documentView.height
-            documentView.scrollBy(0, scrollY - margin)
+            //documentView.scrollPage(frameLayout.height - margin);
             return true
         }
         return false;
@@ -242,8 +238,8 @@ class ANormalViewController(
 
     override fun onPause() {
         pdfBookmarkManager.saveCurrentPage(
-            mPath, mMupdfDocument!!.countPages(), documentView.currentPage,
-            documentView.zoomModel.zoom * 1000f, documentView.scrollX, documentView.scrollY
+                mPath, mMupdfDocument!!.countPages(), documentView.currentPage,
+                documentView.zoomModel.zoom * 1000f, documentView.scrollX, documentView.scrollY
         )
     }
 

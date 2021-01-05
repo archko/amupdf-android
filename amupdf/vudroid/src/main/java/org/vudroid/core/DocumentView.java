@@ -424,6 +424,13 @@ public class DocumentView extends View implements ZoomListener {
         preDecodePage = decodePage;
     }
 
+    public void scrollPage(int height) {
+        mCurrentFlingRunnable = new FlingRunnable(getContext());
+        mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), 0, height, 0);
+        post(mCurrentFlingRunnable);
+        Log.d(VIEW_LOG_TAG, "height:" + height);
+    }
+
     class MySimpleOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         @Override
@@ -431,17 +438,13 @@ public class DocumentView extends View implements ZoomListener {
             int height = getHeight();
             int top = height / 4;
             int bottom = height * 3 / 4;
-            //Log.d(VIEW_LOG_TAG, "height:"+height+" y:"+e.getY()+" mMargin:"+mMargin);
+            Log.d(VIEW_LOG_TAG, "height:" + height + " y:" + e.getY() + " mMargin:" + mMargin);
 
             height = height - mMargin;
             if ((int) e.getY() < top) {
-                mCurrentFlingRunnable = new FlingRunnable(getContext());
-                mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), 0, -height, 0);
-                post(mCurrentFlingRunnable);
+                scrollPage(-height);
             } else if ((int) e.getY() > bottom) {
-                mCurrentFlingRunnable = new FlingRunnable(getContext());
-                mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), 0, height, 0);
-                post(mCurrentFlingRunnable);
+                scrollPage(height);
             } else {
                 //currentPageModel.dispatch(new CurrentPageListener.CurrentPageChangedEvent(getCurrentPage()));
                 if (null != simpleGestureListener) {
