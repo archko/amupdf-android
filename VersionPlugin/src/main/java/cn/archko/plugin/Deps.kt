@@ -6,7 +6,7 @@ package cn.archko.plugin
 object BuildConfig {
     val compileSdkVersion = 29
     val buildToolsVersion = "30.0.3"
-    val minSdkVersion = 26
+    val minSdkVersion = 21
     val targetSdkVersion = 29
     val versionCode = 230
     val versionName = "5.0.0"
