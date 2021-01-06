@@ -37,8 +37,8 @@ android {
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation AndroidX.vectordrawable
-    implementation AndroidX.swiperefreshlayout
+    api AndroidX.vectordrawable
+    api AndroidX.swiperefreshlayout
     api AndroidX.activityKtx
     api AndroidX.appCompat
     api AndroidX.coreKtx
