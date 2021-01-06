@@ -39,6 +39,10 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation AndroidX.vectordrawable
     implementation AndroidX.swiperefreshlayout
+    api Lifecycle.runtime
+    api Lifecycle.viewmodel
+    api Lifecycle.viewmodelKtx
+    api Lifecycle.livedataKtx
 
     implementation(AndroidX.viewpager2) {
         exclude group: 'androidx.recyclerview'

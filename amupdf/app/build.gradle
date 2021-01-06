@@ -91,6 +91,7 @@ dependencies {
     api AndroidX.coreKtx
     api Fragment.runtime
     api Fragment.runtimeKtx
+    api Lifecycle.runtime
     api Lifecycle.viewmodel
     api Lifecycle.viewmodelKtx
     api Lifecycle.livedataKtx
