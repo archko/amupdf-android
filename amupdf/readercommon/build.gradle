@@ -57,6 +57,7 @@ dependencies {
     api project(path: ':mupdf-android-fitz')
 
     api Dependency.liveEventBusX
+    api AndroidX.appCompat
     api Umeng.analytics
     api Umeng.umengCommon
 }

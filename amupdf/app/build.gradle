@@ -106,6 +106,7 @@ dependencies {
     api AndroidX.multidex
     api AndroidX.constraintLayout
     api AndroidX.constraintLayoutSolver
+    api Dependency.material
 
     api project(':reader')
     api project(':editor')
