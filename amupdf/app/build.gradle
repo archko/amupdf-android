@@ -107,7 +107,9 @@ dependencies {
     api AndroidX.multidex
     api AndroidX.constraintLayout
     api AndroidX.constraintLayoutSolver
-    api Dependency.material
+    implementation(Dependency.material) {
+        exclude group: 'androidx.recyclerview'
+    }
 
     api project(':reader')
     api project(':editor')
