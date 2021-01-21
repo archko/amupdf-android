@@ -11,10 +11,10 @@ import com.artifex.mupdf.fitz.Document;
 import com.artifex.mupdf.fitz.Page;
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice;
 
+import org.vudroid.core.codec.CodecPage;
+
 import cn.archko.pdf.common.BitmapPool;
 import cn.archko.pdf.common.Logcat;
-
-import org.vudroid.core.codec.CodecPage;
 
 public class PdfPage implements CodecPage {
 
@@ -119,7 +119,9 @@ public class PdfPage implements CodecPage {
     public synchronized void recycle() {
         if (pageHandle >= 0) {
             pageHandle = -1;
-            page.destroy();
+            if (page != null) {
+                page.destroy();
+            }
         }
     }
 
