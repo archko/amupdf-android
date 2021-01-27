@@ -130,9 +130,12 @@ class APage {
         return Point((scaleZoom * pageSize!!.x).toInt(), (scaleZoom * pageSize!!.y).toInt())
     }
 
-    fun setCropBounds(cropBounds: RectF, cropScale: Float) {
+    fun setCropBounds(cropBounds: RectF?, cropScale: Float) {
         this.cropBounds = cropBounds
         this.cropScale = cropScale
+        if (null == cropBounds) {
+            return
+        }
         initSourceBounds(cropScale)
         setCropWidth(cropBounds.width().toInt())
         setCropHeight(cropBounds.height().toInt())
@@ -169,7 +172,7 @@ class APage {
                 return cropBounds!!.width().toInt()
             }
             if (cropWidth == 0) {
-                cropWidth = effectivePagesWidth
+                return effectivePagesWidth
             }
             return cropWidth
         }
@@ -179,7 +182,7 @@ class APage {
                 return cropBounds!!.height().toInt()
             }
             if (cropHeight == 0) {
-                cropHeight = effectivePagesHeight
+                return effectivePagesHeight
             }
             return cropHeight
         }
