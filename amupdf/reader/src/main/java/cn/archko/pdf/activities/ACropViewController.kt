@@ -11,13 +11,14 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFBookmarkManager
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.mupdf.MupdfDocument
-import cn.archko.pdf.widgets.APDFView
+import cn.archko.pdf.widgets.APDFPageView
 import cn.archko.pdf.widgets.APageSeekBarControls
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
 
@@ -168,6 +169,7 @@ class ACropViewController(
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
+        BitmapCache.getInstance().clear()
         mRecyclerView.stopScroll()
         mRecyclerView.adapter?.notifyDataSetChanged()
     }
@@ -223,19 +225,28 @@ class ACropViewController(
             if (mPageSizes.size() > pos) {
                 pageSize = mPageSizes.get(pos)
                 if (pageSize.getTargetWidth() <= 0) {
-                    Logcat.d(String.format("create:%s", mRecyclerView.measuredWidth))
+                    //Logcat.d(String.format("create:%s", mRecyclerView.measuredWidth))
                     pageSize.setTargetWidth(parent.width)
                 }
             }
-            val view = APDFView(context, mMupdfDocument, pageSize!!, true)
-            var lp: RecyclerView.LayoutParams? = view.layoutParams as RecyclerView.LayoutParams?
             var width: Int = ViewGroup.LayoutParams.MATCH_PARENT
             var height: Int = ViewGroup.LayoutParams.MATCH_PARENT
-            pageSize.let {
+            pageSize?.let {
                 width = it.effectivePagesWidth
                 height = it.effectivePagesHeight
             }
-            //Logcat.d("create width:" + width + "==>" + mRecyclerView.measuredWidth + "==>" + pageSize!!.targetWidth)
+
+            val view = APDFPageView(context, mMupdfDocument, pageSize!!, true)
+            var lp: RecyclerView.LayoutParams? = view.layoutParams as RecyclerView.LayoutParams?
+
+            Logcat.d(
+                String.format(
+                    "create width:%s,measuredWidth:%s,targetWidth:%s",
+                    width,
+                    mRecyclerView.measuredWidth,
+                    pageSize.getTargetWidth()
+                )
+            )
             if (null == lp) {
                 lp = RecyclerView.LayoutParams(width, height)
                 view.layoutParams = lp
@@ -243,8 +254,7 @@ class ACropViewController(
                 lp.width = width
                 lp.height = height
             }
-            val holder = PdfHolder(view)
-            return holder
+            return PdfHolder(view)
         }
 
         override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
@@ -265,13 +275,20 @@ class ACropViewController(
             return mMupdfDocument!!.countPages()
         }
 
-        inner class PdfHolder(internal var view: APDFView) : RecyclerView.ViewHolder(view) {
+        inner class PdfHolder(internal var view: APDFPageView) : RecyclerView.ViewHolder(view) {
             fun onBind(position: Int) {
                 val pageSize = mPageSizes.get(position)
-                //Logcat.d(String.format("bind:position:%s,width:%s,%s", position, pageSize.targetWidth, mRecyclerView.measuredWidth))
                 if (pageSize.getTargetWidth() != mRecyclerView.measuredWidth) {
                     pageSize.setTargetWidth(mRecyclerView.measuredWidth)
                 }
+                Logcat.d(
+                    String.format(
+                        "bind:position:%s,targetWidth:%s, measuredWidth:%s",
+                        position,
+                        pageSize.getTargetWidth(),
+                        mRecyclerView.measuredWidth
+                    )
+                )
                 if (pageSize.getTargetWidth() <= 0) {
                     return
                 }
