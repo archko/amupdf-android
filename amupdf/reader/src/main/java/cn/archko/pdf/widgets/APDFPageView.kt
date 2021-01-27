@@ -31,13 +31,11 @@ class APDFPageView(
 
     private fun initPdfPage(crop: Boolean) {
         pdfPage = APDFPage(this, pageSize, mupdfDocument, crop)
-        pdfPage.setBounds(
-            RectF(
-                0f,
-                0f,
-                this.pageSize.cropScaleWidth.toFloat(),
-                this.pageSize.cropScaleHeight.toFloat()
-            )
+        pdfPage.bounds = RectF(
+            0f,
+            0f,
+            this.pageSize.effectivePagesWidth.toFloat(),
+            this.pageSize.effectivePagesHeight.toFloat()
         )
     }
 
@@ -50,13 +48,14 @@ class APDFPageView(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        var width = pageSize.cropScaleWidth
-        var height = pageSize.cropScaleHeight
+        var width = pageSize.effectivePagesWidth
+        var height = pageSize.effectivePagesHeight
 
         val viewWidth = pageSize.getTargetWidth()
         Logcat.d(
             String.format(
-                "onMeasure,width:%s,height:%s, viewWidth:%s, page:%s-%s, mZoom: %s, aPage:%s",
+                "onMeasure,index:%s, width:%s,height:%s, viewWidth:%s, page:%s-%s, mZoom: %s, aPage:%s",
+                pageSize.index,
                 width,
                 height,
                 viewWidth,
@@ -67,8 +66,8 @@ class APDFPageView(
             )
         )
         if (viewWidth != width && viewWidth > 0) {
-            width = viewWidth
             height = (viewWidth.toFloat() / width * height).toInt()
+            width = viewWidth
         }
 
         setMeasuredDimension(width, height)
@@ -80,31 +79,34 @@ class APDFPageView(
     }
 
     fun updatePage(pageSize: APage, newZoom: Float, crop: Boolean) {
-        var isNew = false
-        if (this.pageSize != pageSize) {
-            this.pageSize = pageSize
-            isNew = true
-            pdfPage.setBounds(
-                RectF(
-                    0f,
-                    0f,
-                    pageSize.cropScaleWidth.toFloat(),
-                    pageSize.cropScaleHeight.toFloat()
-                )
-            )
-            pdfPage.update(this, pageSize)
-            requestLayout()
-        }
         mZoom = newZoom
         this.pageSize.zoom = newZoom
+        var isNew = false
+        if (this.pageSize.index != pageSize.index || pdfPage.bounds.width().toInt() != pageSize.effectivePagesWidth) {
+            this.pageSize = pageSize
+            isNew = true
+            pdfPage.bounds = RectF(
+                0f,
+                0f,
+                pageSize.effectivePagesWidth.toFloat(),
+                pageSize.effectivePagesHeight.toFloat()
+            )
+            pdfPage.update(this, pageSize)
+        }
 
         val zoomSize = this.pageSize.zoomPoint
         val xOrigin = (zoomSize.x - this.pageSize.getTargetWidth()) / 2
 
         Logcat.d(
             String.format(
-                "updatePage:isNew:%s,width-height:%s-%s, mZoom: %s, aPage:%s",
-                isNew, pageSize.cropScaleWidth, pageSize.cropScaleHeight, mZoom, pageSize
+                "updatePage:index:%s, isNew:%s, width-height:%s-%s, mZoom:%s, bounds:%s, aPage:%s",
+                pageSize.index,
+                isNew,
+                pageSize.cropScaleWidth,
+                pageSize.cropScaleHeight,
+                mZoom,
+                pdfPage.bounds,
+                pageSize
             )
         )
         pdfPage.updateVisibility(crop, xOrigin)
