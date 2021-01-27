@@ -134,6 +134,8 @@ class APage {
         this.cropBounds = cropBounds
         this.cropScale = cropScale
         if (null == cropBounds) {
+            cropWidth = 0
+            cropHeight = 0
             return
         }
         initSourceBounds(cropScale)

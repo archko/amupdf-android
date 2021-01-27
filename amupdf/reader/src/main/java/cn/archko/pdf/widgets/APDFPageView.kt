@@ -34,8 +34,8 @@ class APDFPageView(
         pdfPage.bounds = RectF(
             0f,
             0f,
-            this.pageSize.effectivePagesWidth.toFloat(),
-            this.pageSize.effectivePagesHeight.toFloat()
+            this.pageSize.cropScaleWidth.toFloat(),
+            this.pageSize.cropScaleHeight.toFloat()
         )
     }
 
@@ -48,8 +48,8 @@ class APDFPageView(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        var width = pageSize.effectivePagesWidth
-        var height = pageSize.effectivePagesHeight
+        var width = pageSize.cropScaleWidth
+        var height = pageSize.cropScaleHeight
 
         val viewWidth = pageSize.getTargetWidth()
         Logcat.d(
@@ -82,7 +82,13 @@ class APDFPageView(
         mZoom = newZoom
         this.pageSize.zoom = newZoom
         var isNew = false
-        if (this.pageSize.index != pageSize.index || pdfPage.bounds.width().toInt() != pageSize.effectivePagesWidth) {
+        if (pdfPage.bounds.width()
+                .toInt() != pageSize.effectivePagesWidth || pdfPage.bounds.height().toInt() != pageSize.effectivePagesHeight
+        ) {
+            pageSize.setCropBounds(null, 1.0f)
+            isNew = true
+        }
+        if (this.pageSize.index != pageSize.index || isNew) {
             this.pageSize = pageSize
             isNew = true
             pdfPage.bounds = RectF(
