@@ -293,7 +293,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             MobclickAgent.onEvent(activity, AnalysticsHelper.A_FILE, map)
 
             currentBean = clickedEntry
-            PDFViewerHelper.openWithDefaultViewer(Uri.fromFile(clickedFile), activity!!)
+            PDFViewerHelper.openWithDefaultViewer(Uri.fromFile(clickedFile), requireActivity())
         }
     }
 
@@ -446,7 +446,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
                 }
 
                 currentBean = entry
-                PDFViewerHelper.openViewer(clickedFile, item, activity!!)
+                PDFViewerHelper.openViewer(clickedFile, item, requireActivity())
             }
         }
         return false

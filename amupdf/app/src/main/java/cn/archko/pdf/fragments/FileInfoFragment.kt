@@ -50,19 +50,19 @@ class FileInfoFragment : DialogFragment() {
         super.onCreate(savedInstanceState)
         var themeId = android.R.style.Theme_Holo_Light_Dialog
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            themeId = android.R.style.Theme_Material_Light_Dialog;
+            themeId = android.R.style.Theme_Material_Light_Dialog
         }
         setStyle(DialogFragment.STYLE_NORMAL, themeId)
     }
 
     override fun onResume() {
         super.onResume()
-        MobclickAgent.onPageStart(TAG);
+        MobclickAgent.onPageStart(TAG)
     }
 
     override fun onPause() {
         super.onPause()
-        MobclickAgent.onPageEnd(TAG);
+        MobclickAgent.onPageEnd(TAG)
     }
 
     override fun setArguments(args: Bundle?) {
@@ -106,8 +106,8 @@ class FileInfoFragment : DialogFragment() {
         mDataListener?.onSuccess(mEntry)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         if (null == mEntry || mEntry!!.file == null) {
             Toast.makeText(activity, "file is null.", Toast.LENGTH_LONG).show()
             dismiss()
@@ -139,7 +139,7 @@ class FileInfoFragment : DialogFragment() {
     }
 
     private fun showIcon(path: String) {
-        ImageLoader.getInstance().loadImage(path, 0, 1.0f, App.instance!!.screenWidth, mIcon);
+        ImageLoader.getInstance().loadImage(path, 0, 1.0f, App.instance!!.screenWidth, mIcon)
     }
 
     private fun updatePageCount() {

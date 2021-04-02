@@ -10,12 +10,12 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
-import cn.archko.pdf.tree.TreeAdapter
 import cn.archko.pdf.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.adapters.BaseViewHolder
 import cn.archko.pdf.entity.OutlineItem
 import cn.archko.pdf.listeners.OnItemClickListener
 import cn.archko.pdf.listeners.OutlineListener
+import cn.archko.pdf.tree.TreeAdapter
 
 /**
  * @author: archko 2019/7/11 :17:55
@@ -32,13 +32,13 @@ open class OutlineFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.let {
-            currentPage = arguments!!.getInt("POSITION", 0)
-            if (arguments!!.getSerializable("OUTLINE") != null) {
-                outline = arguments!!.getSerializable("OUTLINE") as ArrayList<OutlineItem>
+            currentPage = it.getInt("POSITION", 0)
+            if (it.getSerializable("OUTLINE") != null) {
+                outline = it.getSerializable("OUTLINE") as ArrayList<OutlineItem>
             }
 
-            if (arguments!!.getSerializable("out") != null) {
-                outlineItems = arguments!!.getSerializable("out") as ArrayList<OutlineItem>
+            if (it.getSerializable("out") != null) {
+                outlineItems = it.getSerializable("out") as ArrayList<OutlineItem>
             }
         }
 
@@ -93,7 +93,7 @@ open class OutlineFragment : Fragment() {
         if (currentPage < 0) {
             return
         }
-        this.currentPage = currentPage;
+        this.currentPage = currentPage
         if (!isResumed) {
             return
         }
@@ -109,7 +109,7 @@ open class OutlineFragment : Fragment() {
             listView.viewTreeObserver.addOnGlobalLayoutListener(object :
                 ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    listView.viewTreeObserver.removeGlobalOnLayoutListener(this)
+                    listView.viewTreeObserver.removeOnGlobalLayoutListener(this)
                     listView.scrollToPosition(finalFound)
                 }
             })

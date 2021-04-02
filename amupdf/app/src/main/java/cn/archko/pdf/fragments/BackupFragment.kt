@@ -30,7 +30,7 @@ open class BackupFragment : DialogFragment() {
     var mDataListener: DataListener? = null
     private lateinit var backupViewModel: BackupViewModel
 
-    public fun setListener(dataListener: DataListener?) {
+    fun setListener(dataListener: DataListener?) {
         mDataListener = dataListener
     }
 
@@ -38,7 +38,7 @@ open class BackupFragment : DialogFragment() {
         super.onCreate(savedInstanceState)
         var themeId = android.R.style.Theme_Holo_Dialog
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            themeId = android.R.style.Theme_Material_Dialog;
+            themeId = android.R.style.Theme_Material_Dialog
         }
         setStyle(DialogFragment.STYLE_NO_FRAME, themeId)
         backupViewModel = BackupViewModel()
@@ -46,12 +46,12 @@ open class BackupFragment : DialogFragment() {
 
     override fun onResume() {
         super.onResume()
-        MobclickAgent.onPageStart(TAG);
+        MobclickAgent.onPageStart(TAG)
     }
 
     override fun onPause() {
         super.onPause()
-        MobclickAgent.onPageEnd(TAG);
+        MobclickAgent.onPageEnd(TAG)
     }
 
     override fun onCreateView(
@@ -83,8 +83,8 @@ open class BackupFragment : DialogFragment() {
         return view
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         adapter = object : BaseRecyclerAdapter<File>(activity) {
 
@@ -95,7 +95,7 @@ open class BackupFragment : DialogFragment() {
         }
         recyclerView.adapter = adapter
 
-        loadBackups();
+        loadBackups()
     }
 
     private fun loadBackups() {

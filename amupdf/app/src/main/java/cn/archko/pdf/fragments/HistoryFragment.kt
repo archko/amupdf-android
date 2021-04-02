@@ -269,7 +269,7 @@ class HistoryFragment : BrowserFragment() {
         } else {
             Logcat.d("fileListAdapter!!.normalCount <= 0")
             mListMoreView.onLoadingStateChanged(IMoreView.STATE_NO_MORE)
-            val sp = context!!.getSharedPreferences(PREF_BROWSER, Context.MODE_PRIVATE)
+            val sp = requireContext().getSharedPreferences(PREF_BROWSER, Context.MODE_PRIVATE)
             val isFirst = sp.getBoolean(PREF_BROWSER_KEY_FIRST, true)
             if (isFirst) {
                 LiveEventBus.get(Event.ACTION_ISFIRST)

@@ -39,23 +39,19 @@ open class FontsFragment : DialogFragment() {
     var selectedFontName: String? = null
     private lateinit var fontsViewModel: FontsViewModel
 
-    public fun setStyleHelper(styleHelper: StyleHelper?) {
+    fun setStyleHelper(styleHelper: StyleHelper?) {
         this.mStyleHelper = styleHelper
     }
 
-    public fun setListener(dataListener: DataListener?) {
+    fun setListener(dataListener: DataListener?) {
         mDataListener = dataListener
-    }
-
-    override fun setArguments(args: Bundle?) {
-        super.setArguments(args)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var themeId = android.R.style.Theme_Holo_Dialog
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            themeId = android.R.style.Theme_Material_Dialog;
+            themeId = android.R.style.Theme_Material_Dialog
         }
         setStyle(DialogFragment.STYLE_NO_FRAME, themeId)
 
@@ -68,12 +64,12 @@ open class FontsFragment : DialogFragment() {
 
     override fun onResume() {
         super.onResume()
-        MobclickAgent.onPageStart(TAG);
+        MobclickAgent.onPageStart(TAG)
     }
 
     override fun onPause() {
         super.onPause()
-        MobclickAgent.onPageEnd(TAG);
+        MobclickAgent.onPageEnd(TAG)
     }
 
     override fun onCreateView(
@@ -84,7 +80,7 @@ open class FontsFragment : DialogFragment() {
         val view = inflater.inflate(R.layout.item_font, container, false)
         view.findViewById<View>(R.id.layout_search).visibility = View.GONE
         val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
-        toolbar.setNavigationOnClickListener(View.OnClickListener { dismiss() })
+        toolbar.setNavigationOnClickListener { dismiss() }
 
         toolbar?.setTitle(R.string.dialog_title_font)
         toolbar?.setSubtitle(R.string.dialog_sub_title_font)
@@ -111,14 +107,14 @@ open class FontsFragment : DialogFragment() {
         return view
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         adapter = object : BaseRecyclerAdapter<FontBean>(activity) {
 
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<*> {
-                val view = mInflater.inflate(cn.archko.pdf.R.layout.item_outline, parent, false)
-                return FontHolder(view)
+                val v = mInflater.inflate(R.layout.item_outline, parent, false)
+                return FontHolder(v)
             }
         }
         recyclerView.adapter = adapter

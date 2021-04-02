@@ -38,10 +38,6 @@ open class SearchFragment : DialogFragment() {
     private val fileFilter: FileFilter? = null
     protected var fileListAdapter: BookAdapter? = null
 
-    override fun setArguments(args: Bundle?) {
-        super.setArguments(args)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val themeId = R.style.AppDialogTheme
@@ -53,12 +49,12 @@ open class SearchFragment : DialogFragment() {
 
     override fun onResume() {
         super.onResume()
-        MobclickAgent.onPageStart(TAG);
+        MobclickAgent.onPageStart(TAG)
     }
 
     override fun onPause() {
         super.onPause()
-        MobclickAgent.onPageEnd(TAG);
+        MobclickAgent.onPageEnd(TAG)
     }
 
     override fun onCreateView(
@@ -68,7 +64,7 @@ open class SearchFragment : DialogFragment() {
     ): View? {
         val view = inflater.inflate(R.layout.list_book_search, container, false)
         val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
-        toolbar.setNavigationOnClickListener(View.OnClickListener { dismiss() })
+        toolbar.setNavigationOnClickListener { dismiss() }
 
         dialog?.setTitle(R.string.menu_search)
         editView = view.findViewById(R.id.searchEdit)
@@ -118,8 +114,8 @@ open class SearchFragment : DialogFragment() {
         clearList()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         if (null == fileListAdapter) {
             fileListAdapter = BookAdapter(activity as Context, itemClickListener)
             this.fileListAdapter!!.setMode(BookAdapter.TYPE_SEARCH)
