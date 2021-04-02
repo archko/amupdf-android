@@ -2,7 +2,6 @@ apply plugin: 'com.android.library'
 import cn.archko.plugin.*
 
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-allopen'
 
