@@ -82,8 +82,8 @@ class APDFPageView(
         mZoom = newZoom
         this.pageSize.zoom = newZoom
         var isNew = false
-        if (pdfPage.bounds.width()
-                .toInt() != pageSize.effectivePagesWidth || pdfPage.bounds.height().toInt() != pageSize.effectivePagesHeight
+        if (pdfPage.bounds.width().toInt() != pageSize.effectivePagesWidth
+            || pdfPage.bounds.height().toInt() != pageSize.effectivePagesHeight
         ) {
             pageSize.setCropBounds(null, 1.0f)
             isNew = true
@@ -91,6 +91,7 @@ class APDFPageView(
         if (this.pageSize.index != pageSize.index || isNew) {
             this.pageSize = pageSize
             isNew = true
+            pageSize.setCropBounds(null, 1.0f)
             pdfPage.bounds = RectF(
                 0f,
                 0f,
