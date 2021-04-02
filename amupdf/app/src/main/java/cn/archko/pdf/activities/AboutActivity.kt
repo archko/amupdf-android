@@ -109,8 +109,10 @@ class AboutActivity : AnalysticActivity() {
         }
 
         override fun getGroupView(
-            groupPosition: Int, isExpanded: Boolean, convertView: View,
-            parent: ViewGroup
+            groupPosition: Int,
+            isExpanded: Boolean,
+            convertView: View?,
+            parent: ViewGroup?
         ): View {
             var container: View? = null
             var view: TextView? = null
@@ -123,8 +125,11 @@ class AboutActivity : AnalysticActivity() {
         }
 
         override fun getChildView(
-            groupPosition: Int, childPosition: Int, isLastChild: Boolean,
-            convertView: View, parent: ViewGroup
+            groupPosition: Int,
+            childPosition: Int,
+            isLastChild: Boolean,
+            convertView: View?,
+            parent: ViewGroup?
         ): View {
             var view: WebView? = null
             view = if (convertView !is WebView) {
