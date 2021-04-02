@@ -149,8 +149,11 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         loadData()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
 
         this.filesListView.adapter = this.fileListAdapter
         mHandler.postDelayed({ loadData() }, 80L)
