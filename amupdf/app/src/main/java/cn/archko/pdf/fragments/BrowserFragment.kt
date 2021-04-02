@@ -142,21 +142,14 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         }
 
         addObserver()
+
+        this.filesListView.adapter = this.fileListAdapter
+        mHandler.postDelayed({ loadData() }, 80L)
         return view
     }
 
     override fun onRefresh() {
         loadData()
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        this.filesListView.adapter = this.fileListAdapter
-        mHandler.postDelayed({ loadData() }, 80L)
     }
 
     private fun addObserver() {
