@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.archko.pdf.App
 import cn.archko.pdf.common.Logcat
+import cn.archko.pdf.common.RecentManager
+import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.paging.ResourceState
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +28,10 @@ import java.util.*
  * @author: archko 2021/4/11 :8:14 上午
  */
 class FileViewModel() : ViewModel() {
+    companion object {
+
+        const val PAGE_SIZE = 21
+    }
 
     private val _dataLoading = MutableStateFlow(ResourceState())
     val dataLoading: StateFlow<ResourceState>
@@ -172,6 +178,37 @@ class FileViewModel() : ViewModel() {
         }
         return ""
     }
+
+    fun loadFileBeanFromDB(curPage: Int, showExtension: Boolean = true) =
+        viewModelScope.launch {
+            flow {
+                val recent = RecentManager.instance
+                var totalCount = recent.progressCount
+                val progresses: ArrayList<BookProgress>? = recent.readRecentFromDb(
+                    PAGE_SIZE * (curPage),
+                    PAGE_SIZE
+                )
+
+                val entryList = ArrayList<FileBean>()
+
+                var entry: FileBean
+                var file: File
+                val path = home
+                progresses?.map {
+                    file = File(path + "/" + it.path)
+                    entry = FileBean(FileBean.RECENT, file, showExtension)
+                    entry.bookProgress = it
+                    entryList.add(entry)
+                }
+                emit(entryList)
+            }.catch { e ->
+                Logcat.d("Exception:$e")
+                emit(mutableListOf())
+            }.flowOn(Dispatchers.IO)
+                .collect { list ->
+                    _uiFileHistoryModel.value = list
+                }
+        }
 
     fun update(fb: FileBean) {
         Logcat.d("$fb")

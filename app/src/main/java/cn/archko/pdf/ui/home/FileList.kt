@@ -48,9 +48,6 @@ fun FileList(
     }
 
     val response by viewModel.uiFileModel.collectAsState()
-    val loadMore: (Int) -> Unit = { index: Int ->
-        Logcat.d("loadMore,$index")
-    }
     val onClick: (FileBean) -> Unit = { it ->
         if (it.file != null) {
             viewModel.loadFiles(it.file!!.path)
@@ -66,7 +63,6 @@ fun FileList(
         FileList(
             response,
             resourceState,
-            loadMore,
             modifier,
             menuOpt,
             onClick,
@@ -79,7 +75,6 @@ fun FileList(
 private fun FileList(
     list: MutableList<FileBean>,
     resourceState: ResourceState,
-    loadMore: (Int) -> Unit,
     modifier: Modifier = Modifier,
     menuOpt: (MenuItemType, FileBean) -> Unit,
     onClick: (FileBean) -> Unit,
@@ -90,7 +85,7 @@ private fun FileList(
     } else {
         JetsnackSurface(modifier = modifier.fillMaxSize()) {
             Box {
-                ItemList(list, resourceState, loadMore, modifier, menuOpt, onClick, viewModel)
+                ItemList(list, modifier, menuOpt, onClick, viewModel)
             }
         }
     }
@@ -100,15 +95,11 @@ private fun FileList(
 @Composable
 private fun ItemList(
     list: MutableList<FileBean>,
-    resourceState: ResourceState,
-    loadMore: (Int) -> Unit,
     modifier: Modifier = Modifier,
     menuOpt: (MenuItemType, FileBean) -> Unit,
     onClick: (FileBean) -> Unit,
     viewModel: FileViewModel
 ) {
-    val scroll = rememberScrollState(0)
-    val size = list.size
     val showUserDialog = remember { mutableStateOf(false) }
     var fileIndex = remember { mutableStateOf(0) }
     val onOptClick: (Int) -> Unit = { it ->
@@ -135,21 +126,6 @@ private fun ItemList(
                 onClick = onClick,
                 viewModel = viewModel
             )
-            //Log.d("ItemList", "$index")
-            if (index == size - 1) {
-                LoadingFooter(
-                    resourceState = resourceState,
-                    onClick = { loadMore(size) },
-                    total = size, visible = false
-                )
-                Logcat.d("scroll.index:$index, ${scroll.isScrollInProgress}, resourceState:${resourceState.value}")
-                //if (!scroll.isScrollInProgress) {
-                //    if (resourceState.value == ResourceState.LOADING || resourceState.value == ResourceState.ERROR) {
-                //    } else {
-                //        loadMore(size)
-                //    }
-                //}
-            }
         }
     }
 }
