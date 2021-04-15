@@ -28,7 +28,7 @@ android {
 
         main {
             java {
-                srcDirs "src/main/java", "src/mupdf/java", "src/mupdf2/java", "src/nativeSigning/java"
+                srcDirs "src/main/java", "src/mupdf/java", "src/mupdf2/java", "src/nativeSigning/java", "src/resource/java", "src/resource2/java"
             }
         }
     }
@@ -64,8 +64,6 @@ dependencies {
     implementation project(path: ':mupdf-android-fitz')
     implementation project(path: ':wheel')
     implementation project(path: ':reader')
-
-    implementation project(path: ':sodk_resources')
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
