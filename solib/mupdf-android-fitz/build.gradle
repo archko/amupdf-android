@@ -10,14 +10,6 @@ if (filters==null)
 
 def ndkArgs
 
-def aar_pkg_exist() {
-    if (file('./libs/mupdf_c-release.aar').exists()) {
-        return true
-    } else {
-        return false
-    }
-}
-
 android {
 	compileSdkVersion BuildConfig.compileSdkVersion
 	buildToolsVersion BuildConfig.buildToolsVersion
@@ -28,48 +20,14 @@ android {
 		ndk.abiFilters filters.split()
 
 		consumerProguardFiles 'proguard-rules.pro'
-
-		//  enable all formats.
-		ndkArgs = 'MUPDF_EXTRA_CFLAGS="-DHAVE_LCMS2MT -UTOFU_NOTO -DTOFU -DTOFU_CJK"'
-
-		if (project.hasProperty('addressSanitizer'))
-		{
-			// Remove the closing double quote from 'ndkArgs'
-			def length         = ndkArgs.length() - 2
-			def noClosingQUote = ndkArgs.getAt(0..length)
-
-			/*
-			 * Add the CFLAGS/LDFLAGS required for the address
-			 * sanitizer
-			 *
-			 * NB. MUDPF_EXTRA_LDFLAGS is mispelt  to match
-			 *     'libmupdf; Android.mk
-			 */
-			 ndkArgs = noClosingQUote + ' -fsanitize=address -fsanitize-recover=address -fno-omit-frame-pointer" MUDPF_EXTRA_LDFLAGS="-fsanitize=address"'
-		}
-
-		if (!aar_pkg_exist()) {
-            externalNativeBuild {
-                ndkBuild {
-                    abiFilters filters.split()
-                    arguments ndkArgs
-                }
-            }
-        }
 	}
 
 	sourceSets {
 		main {
-			manifest.srcFile 'AndroidManifest.xml'
+			manifest.srcFile 'src/main/AndroidManifest.xml'
 			java.srcDirs 'libmupdf/platform/java/src'
 		}
 	}
-
-    if (!aar_pkg_exist()) {
-        externalNativeBuild {
-            ndkBuild.path 'libmupdf/platform/java/Android.mk'
-        }
-    }
 
 	buildTypes {
 		release {
@@ -81,6 +39,6 @@ android {
 
 dependencies {
     if (file('./libs/mupdf_c-release.aar').exists()) {
-	    api(name: 'mupdf_c-release', ext: 'aar')
+	    api(name: 'mupdf_c_release', ext: 'aar')
     }
 }

@@ -2,10 +2,10 @@ import cn.archko.mupdf.buildsrc.Libs
 
 buildscript {
     repositories {
-        maven { url 'https://dl.bintray.com/umsdk/release' }
         google()
         maven {url "https://maven.aliyun.com/repository/jcenter"}
         maven {url "https://maven.aliyun.com/repository/google"}
+        maven { url 'https://dl.bintray.com/umsdk/release' }
         jcenter()
     }
     dependencies {
@@ -20,10 +20,10 @@ plugins {
 
 subprojects {
     repositories {
+        google()
         maven {url "https://maven.aliyun.com/repository/jcenter"}
         maven {url "https://maven.aliyun.com/repository/google"}
         maven { url 'https://dl.bintray.com/umsdk/release' }
-        google()
         jcenter()
 
         if (!Libs.AndroidX.Compose.snapshot.isEmpty()) {
