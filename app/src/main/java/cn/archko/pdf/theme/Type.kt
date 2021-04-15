@@ -22,7 +22,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import cn.archko.sunflower.R
+import cn.archko.mupdf.R
 
 private val Montserrat = FontFamily(
     Font(R.font.montserrat_light, FontWeight.Light),

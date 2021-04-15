@@ -7,9 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
-import cn.archko.pdf.ui.home.GankDetail
 import cn.archko.pdf.ui.home.HomePager
-import cn.archko.pdf.utils.Screen
 
 /**
  * Models the screens in the app and any arguments they require.
@@ -40,11 +38,8 @@ fun NavGraph(startDestination: String = Destination.HOME) {
             "${Destination.GANKDETAIL}/{gankStr}"
             //arguments = listOf(navArgument(COURSE_DETAIL_ID_KEY) { type = NavType.LongType })
         ) {
-            val arguments = it.arguments!!.getString("gankStr") ?: ""
-            GankDetail(
-                gankStr = arguments,
-                upPress = navController::navigateUp
-            )
+            //val arguments = it.arguments!!.getString("gankStr") ?: ""
+
         }
     }
 }
