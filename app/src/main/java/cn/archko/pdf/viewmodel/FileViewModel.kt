@@ -147,7 +147,8 @@ class FileViewModel() : ViewModel() {
     private suspend fun loadFileBeans(): MutableList<FileBean> {
         val path = "$home/amupdf/mupdf_2021-04-12-07-30-02"
         val content = readStringFromInputStream(FileInputStream(path))
-        return JsonUtils.parseFileBeanFromJson(content)
+        //return JsonUtils.parseFileBeanFromJson(content)
+        return null
     }
 
     private fun readStringFromInputStream(input: InputStream?): String {

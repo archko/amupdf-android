@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
 import cn.archko.pdf.ui.home.HomePager
+import com.google.accompanist.pager.ExperimentalPagerApi
 
 /**
  * Models the screens in the app and any arguments they require.
@@ -21,6 +22,7 @@ object Destination {
     const val GANKDETAIL = "GankDetail"
 }
 
+@ExperimentalPagerApi
 @ExperimentalMaterialApi
 @Composable
 fun NavGraph(startDestination: String = Destination.HOME) {
@@ -41,24 +43,5 @@ fun NavGraph(startDestination: String = Destination.HOME) {
             //val arguments = it.arguments!!.getString("gankStr") ?: ""
 
         }
-    }
-}
-
-/**
- * Models the navigation actions in the app.
- */
-class MainActions(navController: NavHostController) {
-    val homeAction: (Screen) -> Unit = {
-        navController.navigate(Destination.HOME)
-    }
-    val gankDetailAction: (Screen) -> Unit = {
-        navController.navigate(Destination.GANKDETAIL)
-    }
-
-    //val VideoCategory: (Screen) -> Unit = { courseId: Long ->
-    //    navController.navigate("${Destination.VideoCategory}/$courseId")
-    //}
-    val upPress: () -> Unit = {
-        navController.navigateUp()
     }
 }

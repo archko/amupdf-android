@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.BackPressHandler
+import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.paging.ResourceState
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.components.JetsnackSurface
@@ -51,7 +52,7 @@ fun FileHistoryList(
     }
     //val refresh: () -> Unit = { ->
     //}
-    VLog.d("FileList,${response} $navigateTo,")
+    Logcat.d("FileList,${response} $navigateTo,")
     val menuOpt: (MenuItemType, FileBean) -> Unit = { _, fb ->
         viewModel.update(fb)
     }
@@ -105,7 +106,7 @@ private fun ItemList(
         }
         showUserDialog.value = true
     }
-    VLog.d("item:${showUserDialog.value}, file:${fileIndex.value}")
+    Logcat.d("item:${showUserDialog.value}, file:${fileIndex.value}")
     UserOptDialog(showUserDialog, list, fileIndex, menuOpt, FileBeanType.History)
     LazyColumn(modifier) {
         //item {

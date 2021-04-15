@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.BackPressHandler
+import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.paging.ResourceState
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.components.JetsnackSurface
@@ -48,7 +49,7 @@ fun FileList(
 
     val response by viewModel.uiFileModel.collectAsState()
     val loadMore: (Int) -> Unit = { index: Int ->
-        VLog.d("loadMore,$index")
+        Logcat.d("loadMore,$index")
     }
     val onClick: (FileBean) -> Unit = { it ->
         if (it.file != null) {
@@ -57,7 +58,7 @@ fun FileList(
     }
     //val refresh: () -> Unit = { ->
     //}
-    VLog.d("FileList,${response} $navigateTo,")
+    Logcat.d("FileList,${response} $navigateTo,")
     val menuOpt: (MenuItemType, FileBean) -> Unit = { _, fb ->
         viewModel.update(fb)
     }
@@ -117,7 +118,7 @@ private fun ItemList(
         }
         showUserDialog.value = true
     }
-    VLog.d("item:${showUserDialog.value}, file:${fileIndex.value}")
+    Logcat.d("item:${showUserDialog.value}, file:${fileIndex.value}")
     UserOptDialog(showUserDialog, list, fileIndex, menuOpt)
     LazyColumn(modifier) {
         //item {
@@ -141,7 +142,7 @@ private fun ItemList(
                     onClick = { loadMore(size) },
                     total = size, visible = false
                 )
-                VLog.d("scroll.index:$index, ${scroll.isScrollInProgress}, resourceState:${resourceState.value}")
+                Logcat.d("scroll.index:$index, ${scroll.isScrollInProgress}, resourceState:${resourceState.value}")
                 //if (!scroll.isScrollInProgress) {
                 //    if (resourceState.value == ResourceState.LOADING || resourceState.value == ResourceState.ERROR) {
                 //    } else {

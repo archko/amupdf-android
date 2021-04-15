@@ -33,12 +33,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cn.archko.pdf.entity.FileBean
 import cn.archko.mupdf.R
+import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.components.BookComponents
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.components.JetsnackSurface
 import cn.archko.pdf.theme.JetsnackTheme
 import cn.archko.pdf.theme.Neutral8
-import cn.archko.pdf.utils.VLog
 import cn.archko.pdf.utils.getIcon
 import cn.archko.pdf.viewmodel.FileViewModel
 
@@ -84,7 +84,7 @@ fun FileItem(
     viewModel: FileViewModel,
     modifier: Modifier = Modifier
 ) {
-    VLog.v("FileItem:$index")
+    Logcat.d("FileItem:$index")
     Box(
         modifier = modifier.fillMaxWidth()
     ) {
@@ -181,7 +181,7 @@ fun UserOptDialog(
     fileBeanType: FileBeanType = FileBeanType.SysFile
 ) {
     val background = Color.White
-    VLog.d("$menuOpt,$background")
+    Logcat.d("$menuOpt,$background")
 
     if (showUserDialog.value && (fileIndex.value < fileBeans.size)) {
         val fileBean = fileBeans[fileIndex.value]
