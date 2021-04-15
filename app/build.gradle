@@ -78,21 +78,21 @@ android {
             java {
                 srcDirs 'src/main/kotlin'
             }
-
-            buildFeatures {
-                compose true
-                // Disable unused AGP features
-                buildConfig false
-                aidl false
-                renderScript false
-                resValues false
-                shaders false
-            }
-
-            composeOptions {
-                kotlinCompilerExtensionVersion Libs.AndroidX.Compose.version
-            }
         }
+    }
+
+    buildFeatures {
+        compose true
+        // Disable unused AGP features
+        buildConfig false
+        aidl false
+        renderScript false
+        resValues false
+        shaders false
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion Libs.AndroidX.Compose.version
     }
 }
 

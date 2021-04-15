@@ -1,67 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Copyright 2020 The Android Open Source Project
-
-  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
-  in compliance with the License. You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software distributed under the License
-  is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
-  or implied. See the License for the specific language governing permissions and limitations under
-  the License.
-  -->
 <resources>
-    <string name="app_name">JetDemo</string>
-    <string name="label_back">Back</string>
+    <string name="app_name">AMuPDF</string>
+    <string name="outline_title">Table of Contents</string>
+    <string name="auto_crop">auto crop bound</string>
 
-    <!-- Home Tabs -->
-    <string name="home_feed_list">List</string>
-    <string name="home_video">Video</string>
-    <string name="home_gank">Gank</string>
-    <string name="home_file_history">History</string>
-    <string name="home_file">File</string>
-    <string name="home_feed">Home</string>
-    <string name="home_search">Search</string>
-    <string name="home_cart">My Cart</string>
-    <string name="home_profile">Profile</string>
+    <string name="toast_set_as_home">Please Set Book Directory</string>
 
-    <!-- Home -->
-    <string name="label_filters">Filters</string>
-    <string name="label_select_delivery">Select delivery address</string>
+    <string name="about_title">About AMupdf</string>
+    <string name="about_commmon_title">"Application info"</string>
+    <string name="about_3dparty_title">"3rd party software"</string>
+    <string name="about_changelog_title">"3rd party software"</string>
 
-    <!-- Search -->
-    <string name="search_jetsnack">Search Jetsnack</string>
-    <string name="search_no_matches">No matches for “%1s”</string>
-    <string name="search_no_matches_retry">Try broadening your search</string>
-    <string name="search_count">%1d items</string>
-    <string name="label_add">Add to cart</string>
-    <string name="label_search">Perform search</string>
+    <string name="label_filename">FileName:</string>
+    <string name="label_filesize">FileSize:</string>
+    <string name="label_read">LastRead:</string>
+    <string name="label_lastmodified">LastModified:</string>
+    <string name="label_pagecount">read page:</string>
+    <string name="label_location">Location:</string>
+    <string name="label_read_count">Read Counts:</string>
 
-    <!-- Snack Detail -->
-    <string name="detail_header">Details</string>
-    <string name="detail_placeholder">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud...</string>
-    <string name="ingredients">Ingredients</string>
-    <string name="ingredients_list">Vanilla, Almond Flour, Eggs, Butter, Cream, Sugar</string>
-    <string name="quantity">Qty</string>
-    <string name="add_to_cart">ADD TO CART</string>
+    <string name="menu_vudroid">Open with Vudroid</string>
+    <string name="menu_mupdf">Open with AMupdf</string>
+    <string name="menu_other">Open with Other App</string>
+    <string name="menu_info">View File Info</string>
+    <string name="menu_remove_from_recent">Remove from recent</string>
+    <string name="menu_delete">Delete</string>
+    <string name="menu_add_to_fav">Add To Favorites</string>
+    <string name="menu_remove_from_fav">Remove from Favorites</string>
 
-    <!-- Cart -->
-    <string name="cart_order_header">Order (%1s)</string>
-    <plurals name="cart_order_count">
-        <item quantity="one">%1d item</item>
-        <item quantity="other">%1d items</item>
-    </plurals>
-    <string name="cart_summary_header">Summary</string>
-    <string name="cart_subtotal_label">Subtotal</string>
-    <string name="cart_shipping_label">Shipping &amp; Handling</string>
-    <string name="cart_total_label">Total</string>
-    <string name="cart_checkout">Checkout</string>
-    <string name="label_remove">Remove item</string>
+    <string name="dialog_title_backup">Select Backup</string>
+    <string name="dialog_sub_title_backup">Select Backup file to restore</string>
 
-    <!-- Quantity Selector -->
-    <string name="label_increase">Increase</string>
-    <string name="label_decrease">Decrease</string>
-
+    <string name="search">Search&#x2026;</string>
+    <string name="searching_">Searching&#x2026;</string>
+    <string name="text_not_found">Text not found</string>
 </resources>
