@@ -1,8 +1,8 @@
-import cn.archko.plugin.AndroidX
-import cn.archko.plugin.Arch
-import cn.archko.plugin.BuildConfig
-
 apply plugin: 'com.android.library'
+import cn.archko.mupdf.buildsrc.*
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion BuildConfig.compileSdkVersion
@@ -39,15 +39,26 @@ android {
         }
     }
 
+    compileOptions {
+        encoding "UTF-8"
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
     lintOptions {
+        abortOnError false
         disable 'MissingTranslation'
     }
 }
 
 dependencies {
-    implementation Arch.runtime
-    implementation AndroidX.appCompat
-    implementation AndroidX.coreKtx
+    implementation Libs.Arch.runtime
+    implementation Libs.AndroidX.Activity.appCompat
+    implementation Libs.AndroidX.coreKtx
 
     implementation project(path: ':library')
     implementation project(path: ':mupdf-android-fitz')

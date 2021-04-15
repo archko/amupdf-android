@@ -1,0 +1,61 @@
+apply plugin: 'com.android.library'
+import cn.archko.mupdf.buildsrc.*
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion BuildConfig.compileSdkVersion
+    buildToolsVersion BuildConfig.buildToolsVersion
+    defaultConfig {
+        minSdkVersion BuildConfig.minSdkVersion
+        targetSdkVersion BuildConfig.targetSdkVersion
+        // jni cropper
+        ndk.abiFilters 'armeabi-v7a', 'arm64-v8a'
+        externalNativeBuild {
+            cmake {
+                cppFlags ""
+            }
+        }
+    }
+
+    compileOptions {
+        encoding "UTF-8"
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    lintOptions { abortOnError false }
+
+    sourceSets {
+        main {
+            jni.srcDirs = []
+            jniLibs.srcDirs = ['libs']
+            java {
+                srcDirs "src/main/java"
+            }
+        }
+    }
+    //externalNativeBuild {
+    //    cmake {
+    //        path "src/main/cpp/CMakeLists.txt"
+    //    }
+    //}
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+}
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    api project(path: ':mupdf-android-fitz')
+
+    api Libs.Dependency.liveEventBusX
+    api Libs.AndroidX.Activity.appCompat
+    api Libs.Umeng.analytics
+    api Libs.Umeng.umengCommon
+}

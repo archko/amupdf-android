@@ -1,6 +1,8 @@
-import cn.archko.plugin.BuildConfig
-
 apply plugin: 'com.android.library'
+import cn.archko.mupdf.buildsrc.*
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion BuildConfig.compileSdkVersion

@@ -1,6 +1,8 @@
 apply plugin: 'com.android.library'
-import cn.archko.plugin.AndroidX
-import cn.archko.plugin.BuildConfig
+import cn.archko.mupdf.buildsrc.*
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion BuildConfig.compileSdkVersion
@@ -52,7 +54,7 @@ android {
 }
 
 dependencies {
-    implementation AndroidX.appCompat
+    implementation Libs.AndroidX.Activity.appCompat
 
     implementation project(':mupdf-android-fitz')
 }

@@ -1,0 +1,56 @@
+import cn.archko.mupdf.buildsrc.Libs
+
+buildscript {
+    repositories {
+        maven { url 'https://dl.bintray.com/umsdk/release' }
+        google()
+        maven {url "https://maven.aliyun.com/repository/jcenter"}
+        maven {url "https://maven.aliyun.com/repository/google"}
+        jcenter()
+    }
+    dependencies {
+        classpath Libs.androidGradlePlugin
+        classpath Libs.Kotlin.gradlePlugin
+    }
+}
+
+plugins {
+    id 'com.diffplug.spotless' version '5.10.0'
+}
+
+subprojects {
+    repositories {
+        maven {url "https://maven.aliyun.com/repository/jcenter"}
+        maven {url "https://maven.aliyun.com/repository/google"}
+        maven { url 'https://dl.bintray.com/umsdk/release' }
+        google()
+        jcenter()
+
+        if (!Libs.AndroidX.Compose.snapshot.isEmpty()) {
+            maven { url "https://androidx.dev/snapshots/builds/${Libs.AndroidX.Compose.snapshot}/artifacts/repository/" }
+            maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        }
+    }
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = '1.8'
+            allWarningsAsErrors = true
+            // Opt-in to experimental compose APIs
+            freeCompilerArgs += '-Xopt-in=kotlin.RequiresOptIn'
+            // Enable experimental coroutines APIs, including collectAsState()
+            freeCompilerArgs += '-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi'
+        }
+    }
+
+    //apply plugin: 'com.diffplug.spotless'
+    //spotless {
+    //    kotlin {
+    //        target '**/*.kt'
+    //        targetExclude("$buildDir/**/*.kt")
+    //        targetExclude('bin/**/*.kt')
+    //        ktlint(Versions.ktlint).userData([android: "true"])
+    //        licenseHeaderFile rootProject.file('spotless/copyright.kt')
+    //    }
+    //}
+}

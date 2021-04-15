@@ -1,3 +1,0 @@
-[submodule "solib/mupdf-android-fitz/libmupdf"]
-	path = solib/mupdf-android-fitz/libmupdf
-	url = git://git.ghostscript.com/mupdf.git

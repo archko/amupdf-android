@@ -1,0 +1,161 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
+apply plugin: 'kotlin-kapt'
+
+import cn.archko.mupdf.buildsrc.BuildConfig
+import cn.archko.mupdf.buildsrc.Libs
+
+
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+android {
+    signingConfigs {
+        release {
+            v1SigningEnabled true
+            v2SigningEnabled true
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+    compileSdkVersion BuildConfig.compileSdkVersion
+    buildToolsVersion BuildConfig.buildToolsVersion
+
+    defaultConfig {
+        applicationId 'cn.archko.mupdf'
+        minSdkVersion BuildConfig.minSdkVersion
+        targetSdkVersion BuildConfig.targetSdkVersion
+        versionCode BuildConfig.versionCode
+        versionName BuildConfig.versionName
+        multiDexEnabled true
+        signingConfig signingConfigs.release
+        ndk.abiFilters 'armeabi-v7a', 'arm64-v8a'
+
+        vectorDrawables {
+            /*
+             *  Do not generate pngs from vector drawable resources.
+             *
+             *  The vector drawables  can now be used directly on all
+             *  platforms we support.
+             */
+            useSupportLibrary = true
+        }
+    }
+
+    compileOptions {
+        encoding "UTF-8"
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            jniDebuggable true
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    lintOptions { abortOnError false }
+
+    sourceSets {
+        main {
+            jni.srcDirs = []
+            jniLibs.srcDirs = ['libs']
+            java {
+                srcDirs 'src/main/kotlin'
+            }
+
+            buildFeatures {
+                compose true
+                // Disable unused AGP features
+                buildConfig false
+                aidl false
+                renderScript false
+                resValues false
+                shaders false
+            }
+
+            composeOptions {
+                kotlinCompilerExtensionVersion Libs.AndroidX.Compose.version
+            }
+        }
+    }
+}
+
+dependencies {
+    api fileTree(include: ['*.jar'], dir: 'libs')
+    implementation Libs.Kotlin.stdlib
+    implementation Libs.Coroutines.android
+    implementation Libs.Coroutines.core
+
+    implementation Libs.AndroidX.coreKtx
+    implementation Libs.AndroidX.Activity.appCompat
+    implementation Libs.AndroidX.Activity.activityCompose
+    implementation Libs.AndroidX.Lifecycle.viewModelCompose
+    implementation Libs.AndroidX.ConstraintLayout.constraintLayoutCompose
+
+    implementation Libs.AndroidX.Lifecycle.lifecycleLivedataKtx
+    implementation Libs.AndroidX.Lifecycle.lifecycleViewmodelKtx
+
+    implementation Libs.AndroidX.navigation
+
+    implementation Libs.AndroidX.Paging.pagingRuntime
+    implementation Libs.AndroidX.Paging.pagingCompose
+
+    implementation Libs.AndroidX.Compose.runtime
+    implementation Libs.AndroidX.Compose.foundation
+    implementation Libs.AndroidX.Compose.layout
+    implementation Libs.AndroidX.Compose.ui
+    implementation Libs.AndroidX.Compose.uiUtil
+    implementation Libs.AndroidX.Compose.material
+    implementation Libs.AndroidX.Compose.animation
+    implementation Libs.AndroidX.Compose.iconsExtended
+    implementation Libs.AndroidX.Compose.tooling
+
+    implementation Libs.Accompanist.coil
+    implementation Libs.Accompanist.pager
+    implementation Libs.Accompanist.pagerIndicators
+    implementation Libs.Accompanist.insets
+
+    api Libs.Arch.runtime
+    api Libs.AndroidX.Activity.activityKtx
+    api Libs.AndroidX.Activity.appCompat
+    api Libs.AndroidX.coreKtx
+    api Libs.Fragment.runtime
+    api Libs.Fragment.runtimeKtx
+    api Libs.AndroidX.Lifecycle.runtime
+    api Libs.AndroidX.Lifecycle.viewmodel
+    api Libs.AndroidX.Lifecycle.viewmodelKtx
+    api Libs.AndroidX.Lifecycle.livedataKtx
+    api Libs.AndroidX.Lifecycle.extensions
+    api Libs.Coroutines.android
+
+    api Libs.Dependency.liveEventBusX
+
+    api Libs.Umeng.analytics
+    api Libs.Umeng.umengCommon
+    api Libs.Dependency.multidex
+    api Libs.AndroidX.ConstraintLayout.constraintLayout
+    api Libs.AndroidX.ConstraintLayout.constraintLayoutSolver
+    implementation(Libs.Dependency.material) {
+        exclude group: 'androidx.recyclerview'
+    }
+
+    api project(':reader')
+    api project(':editor')
+    api project(':library')
+}

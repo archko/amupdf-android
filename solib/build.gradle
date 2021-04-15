@@ -1,16 +1,15 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import cn.archko.mupdf.buildsrc.Libs
 
 buildscript {
     repositories {
         google()
+        maven { url "https://maven.aliyun.com/repository/jcenter" }
+        maven { url "https://maven.aliyun.com/repository/google" }
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.0'
-        
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        classpath Libs.androidGradlePlugin
+        classpath Libs.Kotlin.gradlePlugin
     }
 }
 
@@ -22,22 +21,19 @@ allprojects {
 
     project.ext {
 
-        if (project.hasProperty("addressSanitizer"))
-        {
+        if (project.hasProperty("addressSanitizer")) {
             /*
              *  To use the clang address sanitizer a minimum of SDK 27
              *  is required.
              */
-            minSdkVersion=27
-            targetSdkVersion=27
-        } 
-        else
-        {
-            minSdkVersion=21
-            targetSdkVersion=26
+            minSdkVersion = 27
+            targetSdkVersion = 27
+        } else {
+            minSdkVersion = 21
+            targetSdkVersion = 26
         }
 
-        compileSdkVersion=29
+        compileSdkVersion = 29
     }
 }
 
