@@ -4,41 +4,31 @@ import cn.archko.mupdf.buildsrc.*
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
-def filters = project.getProperties().get("abiFilters")
-if (filters==null)
-	filters = "armeabi-v7a"
-
-def ndkArgs
-
 android {
-	compileSdkVersion BuildConfig.compileSdkVersion
-	buildToolsVersion BuildConfig.buildToolsVersion
-	defaultConfig {
-		minSdkVersion BuildConfig.minSdkVersion
-		targetSdkVersion BuildConfig.targetSdkVersion
+    compileSdkVersion BuildConfig.compileSdkVersion
+    buildToolsVersion BuildConfig.buildToolsVersion
+    defaultConfig {
+        minSdkVersion BuildConfig.minSdkVersion
+        targetSdkVersion BuildConfig.targetSdkVersion
 
-		ndk.abiFilters filters.split()
+        consumerProguardFiles 'proguard-rules.pro'
+    }
 
-		consumerProguardFiles 'proguard-rules.pro'
-	}
+    sourceSets {
+        main {
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+            java.srcDirs 'libmupdf/platform/java/src'
+        }
+    }
 
-	sourceSets {
-		main {
-			manifest.srcFile 'src/main/AndroidManifest.xml'
-			java.srcDirs 'libmupdf/platform/java/src'
-		}
-	}
-
-	buildTypes {
-		release {
-		}
-		debug {
-		}
-	}
+    buildTypes {
+        release {
+        }
+        debug {
+        }
+    }
 }
 
 dependencies {
-    if (file('./libs/mupdf_c-release.aar').exists()) {
-	    api(name: 'mupdf_c_release', ext: 'aar')
-    }
+    api files('libs/mupdf_c_release.aar')
 }
