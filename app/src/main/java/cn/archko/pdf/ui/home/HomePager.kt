@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -55,7 +56,7 @@ fun HomePager(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Tab",
+                        text = stringResource(id = R.string.app_name),
                         overflow = TextOverflow.Ellipsis,
                         color = JetsnackTheme.colors.uiFloated,
                     )
@@ -65,22 +66,58 @@ fun HomePager(
                 navigationIcon = {
                     IconButton(onClick = { }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_explorer_fldr),
+                            painter = painterResource(id = R.drawable.icon),
                             contentDescription = null
                         )
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = null
+                    Button(onClick = { }) {
+                        Text(
+                            text = stringResource(id = R.string.menu_search)
                         )
                     }
                     if (currentSection == 0) {
+                        Button(onClick = { }) {
+                            Text(
+                                text = stringResource(id = R.string.options)
+                            )
+                        }
+                        Button(onClick = { }) {
+                            Text(
+                                text = stringResource(id = R.string.menu_backup)
+                            )
+                        }
+                        Button(onClick = { }) {
+                            Text(
+                                text = stringResource(id = R.string.menu_restore)
+                            )
+                        }
                         IconButton(onClick = { showMenu.value = !showMenu.value }) {
                             Icon(imageVector = Icons.Default.Palette, contentDescription = null)
                         }
+                    } else if (currentSection == 1) {
+                        Button(onClick = { }) {
+                            Text(
+                                text = stringResource(id = R.string.menu_set_as_home)
+                            )
+                        }
+                        Button(onClick = { }) {
+                            Text(
+                                text = stringResource(id = R.string.options)
+                            )
+                        }
+                    } else {
+                        Button(onClick = { }) {
+                            Text(
+                                text = stringResource(id = R.string.options)
+                            )
+                        }
+                    }
+                    Button(onClick = { }) {
+                        Text(
+                            text = stringResource(id = R.string.menu_about)
+                        )
                     }
                 }
             )

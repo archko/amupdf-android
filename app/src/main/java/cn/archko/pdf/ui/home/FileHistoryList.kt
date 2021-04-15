@@ -44,7 +44,6 @@ fun FileHistoryList(
     //}
     Logcat.d("FileList,${response} $navigateTo,")
     val menuOpt: (MenuItemType, FileBean) -> Unit = { _, fb ->
-        viewModel.update(fb)
     }
     Box(modifier = Modifier.fillMaxSize()) {
         FileList(

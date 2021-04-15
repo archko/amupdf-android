@@ -1,5 +1,7 @@
 package cn.archko.pdf.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.archko.pdf.App
@@ -9,6 +11,7 @@ import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.paging.ResourceState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -17,11 +20,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileInputStream
-import java.io.InputStream
-import java.nio.charset.Charset
 import java.util.*
 
 /**
@@ -44,6 +43,14 @@ class FileViewModel() : ViewModel() {
     private val _uiFileHistoryModel = MutableStateFlow<MutableList<FileBean>>(mutableListOf())
     val uiFileHistoryModel: StateFlow<MutableList<FileBean>>
         get() = _uiFileHistoryModel
+
+    private val _uiBackupModel = MutableLiveData<String>()
+    val uiBackupModel: LiveData<String>
+        get() = _uiBackupModel
+
+    private val _uiRestorepModel = MutableLiveData<Boolean>()
+    val uiRestorepModel: LiveData<Boolean>
+        get() = _uiRestorepModel
 
     var home: String = "/sdcard/"
     var selectionIndex = 0
@@ -134,51 +141,6 @@ class FileViewModel() : ViewModel() {
         }
     }
 
-    fun loadFileBeanfromJson(currentPath: String?) {
-        Logcat.d("$currentPath")
-        viewModelScope.launch {
-            flow {
-                val fileBeans = loadFileBeans()
-                emit(fileBeans)
-            }.catch { e ->
-                Logcat.d("Exception:$e")
-                emit(mutableListOf())
-            }.flowOn(Dispatchers.IO)
-                .collect { list ->
-                    _uiFileHistoryModel.value = list
-                }
-        }
-    }
-
-    private suspend fun loadFileBeans(): MutableList<FileBean> {
-        val path = "$home/amupdf/mupdf_2021-04-12-07-30-02"
-        val content = readStringFromInputStream(FileInputStream(path))
-        //return JsonUtils.parseFileBeanFromJson(content)
-        return null
-    }
-
-    private fun readStringFromInputStream(input: InputStream?): String {
-        if (input == null) {
-            return ""
-        }
-        var bos: ByteArrayOutputStream? = null
-        try {
-            bos = ByteArrayOutputStream()
-            val buffer = ByteArray(512)
-            var len: Int
-            while (input.read(buffer).also { len = it } != -1) {
-                bos.write(buffer, 0, len)
-            }
-            return String(bos.toByteArray(), Charset.forName("UTF-8"))
-        } catch (e: Exception) {
-        } finally {
-            if (null != bos) {
-                bos.close()
-            }
-        }
-        return ""
-    }
-
     fun loadFileBeanFromDB(curPage: Int, showExtension: Boolean = true) =
         viewModelScope.launch {
             flow {
@@ -210,10 +172,46 @@ class FileViewModel() : ViewModel() {
                 }
         }
 
-    fun update(fb: FileBean) {
-        Logcat.d("$fb")
-        val fileList: ArrayList<FileBean> = ArrayList()
-        fileList.add(fb)
-        _uiFileModel.value = fileList
+    fun backupFromDb() {
+        val now = System.currentTimeMillis()
+        viewModelScope.launch {
+            val filepath = withContext(Dispatchers.IO) {
+                val filepath = RecentManager.instance.backupFromDb()
+                var newTime = System.currentTimeMillis() - now
+                if (newTime < 1500L) {
+                    newTime = 1500L - newTime
+                } else {
+                    newTime = 0
+                }
+
+                delay(newTime)
+                return@withContext filepath
+            }
+
+            withContext(Dispatchers.Main) {
+                _uiBackupModel.value = filepath
+            }
+        }
+    }
+
+    fun restoreToDb(file: File) {
+        val now = System.currentTimeMillis()
+        viewModelScope.launch {
+            val flag = withContext(Dispatchers.IO) {
+                val flag: Boolean = RecentManager.instance.restoreToDb(file)
+                var newTime = System.currentTimeMillis() - now
+                if (newTime < 1300L) {
+                    newTime = 1300L - newTime
+                } else {
+                    newTime = 0
+                }
+
+                delay(newTime)
+                return@withContext flag
+            }
+            withContext(Dispatchers.Main) {
+                _uiRestorepModel.value = flag
+            }
+        }
     }
 }
