@@ -30,7 +30,9 @@ android {
             java {
                 srcDirs "src/main/java", "src/mupdf/java", "src/mupdf2/java", "src/nativeSigning/java"
             }
-            res.srcDirs = ["src/resource/res", "src/resource2/res"]
+            res.srcDirs = ["src/resource/res"
+                           //, "src/resource2/res"
+            ]
         }
     }
 
