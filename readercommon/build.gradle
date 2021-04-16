@@ -40,11 +40,11 @@ android {
             }
         }
     }
-    //externalNativeBuild {
-    //    cmake {
-    //        path "src/main/cpp/CMakeLists.txt"
-    //    }
-    //}
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+        }
+    }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
