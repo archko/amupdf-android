@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,18 +26,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import cn.archko.pdf.entity.FileBean
 import cn.archko.mupdf.R
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.components.BookComponents
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.components.JetsnackSurface
+import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.theme.JetsnackTheme
 import cn.archko.pdf.theme.Neutral8
 import cn.archko.pdf.utils.getIcon
@@ -153,6 +153,7 @@ fun FileItem(
                     .clickable(onClick = {
                         onOptClick(index)
                     })
+                    .padding(paddingValues = PaddingValues(start = 2.dp))
             )
         }
     }
@@ -172,6 +173,7 @@ sealed class MenuItemType {
 sealed class FileBeanType {
     object SysFile : FileBeanType()
     object History : FileBeanType()
+    object Favorite : FileBeanType()
 }
 
 @Composable
@@ -207,28 +209,45 @@ fun UserOptDialog(
                     )
                     Divider(thickness = 1.dp)
                     DialogItem(
-                        txt = "View Book",
-                        navigateTo = { menuOpt(MenuItemType.ViewBookWithAMupdf, fileBean) }
+                        txt = stringResource(id = R.string.menu_mupdf),
+                        onClick = { menuOpt(MenuItemType.ViewBookWithAMupdf, fileBean) }
                     )
                     DialogItem(
-                        txt = "View Book Info",
-                        navigateTo = { menuOpt(MenuItemType.ViewBookInfo, fileBean) }
+                        txt = "Mupdf new Viewer",
+                        onClick = { menuOpt(MenuItemType.ViewBookWithMupdf, fileBean) }
+                    )
+                    DialogItem(
+                        txt = stringResource(id = R.string.menu_other),
+                        onClick = { menuOpt(MenuItemType.OpenWithOther, fileBean) }
                     )
                     if (fileBeanType == FileBeanType.SysFile) {
                         DialogItem(
-                            txt = "delete file",
-                            navigateTo = { menuOpt(MenuItemType.DeleteFile, fileBean) }
+                            txt = stringResource(id = R.string.menu_delete),
+                            onClick = { menuOpt(MenuItemType.DeleteFile, fileBean) }
                         )
                     }
                     if (fileBeanType == FileBeanType.History) {
                         DialogItem(
-                            txt = "delete history",
-                            navigateTo = { menuOpt(MenuItemType.DeleteHistory, fileBean) }
+                            txt = stringResource(id = R.string.menu_remove_from_recent),
+                            onClick = { menuOpt(MenuItemType.DeleteHistory, fileBean) }
                         )
                     }
+                    if (fileBeanType == FileBeanType.Favorite) {
+                        if (fileBean.bookProgress!!.isFavorited == 0) {
+                            DialogItem(
+                                txt = stringResource(id = R.string.menu_add_to_fav),
+                                onClick = { menuOpt(MenuItemType.AddToFav, fileBean) }
+                            )
+                        } else {
+                            DialogItem(
+                                txt = stringResource(id = R.string.menu_remove_from_fav),
+                                onClick = { menuOpt(MenuItemType.DeleteFav, fileBean) }
+                            )
+                        }
+                    }
                     DialogItem(
-                        txt = "View Book Info",
-                        navigateTo = { menuOpt(MenuItemType.ViewBookInfo, fileBean) }
+                        txt = stringResource(id = R.string.menu_info),
+                        onClick = { menuOpt(MenuItemType.ViewBookInfo, fileBean) }
                     )
                 }
             }
@@ -280,16 +299,18 @@ fun LoadingDialog(
 @Composable
 private fun DialogItem(
     txt: String?,
-    navigateTo: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier
-            .clickable(onClick = navigateTo)
+            .clickable(onClick = onClick)
             .padding(horizontal = 8.dp, vertical = 2.dp)
+            .height(40.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            painter = painterResource(id = R.drawable.empty_state_search),
+            painter = painterResource(id = R.drawable.icon),
             contentDescription = null,
             modifier = Modifier
                 .size(36.dp)
@@ -298,14 +319,7 @@ private fun DialogItem(
             modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(
-                    paddingValues = PaddingValues(
-                        top = 4.dp,
-                        start = 8.dp,
-                        end = 8.dp,
-                    )
-                )
-                .height(38.dp)
+                .padding(4.dp)
         ) {
             if (txt != null) {
                 Text(
