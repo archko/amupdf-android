@@ -1,6 +1,7 @@
 package cn.archko.pdf.viewmodel
 
 import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,6 +14,7 @@ import cn.archko.pdf.common.RecentManager
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.paging.ResourceState
+import cn.archko.pdf.utils.LengthUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,8 +50,8 @@ class FileViewModel() : ViewModel() {
     val uiFileHistoryModel: StateFlow<MutableList<FileBean>>
         get() = _uiFileHistoryModel
 
-    private val _uiBackupModel = MutableLiveData<String>()
-    val uiBackupModel: LiveData<String>
+    private val _uiBackupModel = MutableStateFlow(ResourceState())
+    val uiBackupModel: StateFlow<ResourceState>
         get() = _uiBackupModel
 
     private val _uiRestorepModel = MutableLiveData<Boolean>()
@@ -233,6 +235,7 @@ class FileViewModel() : ViewModel() {
     }
 
     fun backupFromDb() {
+        _uiBackupModel.value = ResourceState(ResourceState.LOADING)
         val now = System.currentTimeMillis()
         viewModelScope.launch {
             val filepath = withContext(Dispatchers.IO) {
@@ -249,7 +252,13 @@ class FileViewModel() : ViewModel() {
             }
 
             withContext(Dispatchers.Main) {
-                _uiBackupModel.value = filepath!!
+                if (!LengthUtils.isEmpty(filepath)) {
+                    Logcat.d("", "file:$filepath")
+                    Toast.makeText(App.instance, "备份成功:$filepath", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(App.instance, "备份失败", Toast.LENGTH_LONG).show()
+                }
+                _uiBackupModel.value = ResourceState(ResourceState.FINISHED)
             }
         }
     }

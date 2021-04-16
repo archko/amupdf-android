@@ -12,6 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -30,6 +32,7 @@ import cn.archko.mupdf.R
 import cn.archko.pdf.activities.AboutActivity
 import cn.archko.pdf.activities.PdfOptionsActivity
 import cn.archko.pdf.common.Logcat
+import cn.archko.pdf.paging.ResourceState
 import cn.archko.pdf.theme.JetsnackTheme
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.google.accompanist.insets.navigationBarsPadding
@@ -47,10 +50,14 @@ fun HomePager(
     navController: NavHostController
 ) {
     val context = LocalContext.current
+    val showLoadingDialog = remember { mutableStateOf(false) }
+
     val viewModel: FileViewModel = viewModel()
+    val uiBackup by viewModel.uiBackupModel.collectAsState()
     val showMenu = remember { mutableStateOf(false) }
 
-    val showLoadingDialog = remember { mutableStateOf(false) }
+    showLoadingDialog.value = (uiBackup.value == ResourceState.LOADING)
+
     val navItems = listOf("History", "File")
     val (currentSection, setCurrentSection) = rememberSaveable {
         mutableStateOf(0)
@@ -72,7 +79,7 @@ fun HomePager(
                     }
                     MenuItem(stringResource(id = R.string.menu_backup)) {
                         onPalletChange()
-                        backup(showLoadingDialog)
+                        backup(showLoadingDialog, viewModel)
                     }
                     MenuItem(stringResource(id = R.string.menu_restore)) {
                         onPalletChange()
@@ -149,8 +156,9 @@ fun HomePager(
     }
 }
 
-fun backup(showLoadingDialog: MutableState<Boolean>) {
+fun backup(showLoadingDialog: MutableState<Boolean>, viewModel: FileViewModel) {
     showLoadingDialog.value = true
+    viewModel.backupFromDb()
 }
 
 fun restore(showLoadingDialog: MutableState<Boolean>) {
