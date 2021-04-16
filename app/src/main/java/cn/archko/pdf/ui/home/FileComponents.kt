@@ -4,7 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -100,12 +103,22 @@ fun UserOptDialog(
                 color = background,
             ) {
                 Column(modifier = Modifier.padding(2.dp)) {
-                    Text(
-                        "File Operation",
-                        style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-                        color = Color.Black,
-                        modifier = Modifier.padding(8.dp)
-                    )
+                    Row {
+                        Image(
+                            painter = painterResource(id = R.drawable.icon),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                        Text(
+                            "File Operation",
+                            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                            color = Color.Black,
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                        )
+                    }
                     Divider(thickness = 1.dp)
                     DialogItem(
                         txt = stringResource(id = R.string.menu_mupdf),
@@ -213,16 +226,10 @@ private fun DialogItem(
     Row(
         modifier
             .clickable(onClick = onClick)
-            .padding(horizontal = 8.dp, vertical = 2.dp)
-            .height(40.dp),
+            .padding(horizontal = 12.dp, vertical = 2.dp)
+            .height(44.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.icon),
-            contentDescription = null,
-            modifier = Modifier
-                .size(36.dp)
-        )
         Box(
             modifier
                 .fillMaxWidth()
