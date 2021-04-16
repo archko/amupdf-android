@@ -1,7 +1,6 @@
 package cn.archko.pdf.ui.home
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.LinearProgressIndicator
@@ -13,11 +12,11 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,12 +26,40 @@ import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.components.JetsnackSurface
 import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.theme.Neutral8
+import cn.archko.pdf.theme.Typography
 
 @Composable
 fun EmptyView(modifier: Modifier) {
     JetsnackSurface(modifier = modifier.fillMaxSize()) {
-        Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .absolutePadding(top = 80.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.loading),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(48.dp)
+                    .absolutePadding(bottom = 8.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+            Text(
+                text = "Waiting...",
+                style = Typography.h5,
+                modifier = Modifier
+                    .padding(12.dp)
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "Loading...",
+                style = Typography.subtitle2,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        /*Box(modifier = modifier.fillMaxSize()) {
             Row(
                 modifier = Modifier
                     .padding(horizontal = 10.dp, vertical = 10.dp)
@@ -58,7 +85,7 @@ fun EmptyView(modifier: Modifier) {
                         .padding(horizontal = 5.dp)
                 )
             }
-        }
+        }*/
     }
 }
 
