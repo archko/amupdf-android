@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -228,6 +229,40 @@ fun UserOptDialog(
                         txt = "View Book Info",
                         navigateTo = { menuOpt(MenuItemType.ViewBookInfo, fileBean) }
                     )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun LoadingDialog(
+    showLoadingDialog: MutableState<Boolean>,
+    text: String = "Please Waiting"
+) {
+    val background = Color.White
+    Logcat.d("$background")
+
+    if (showLoadingDialog.value) {
+        Dialog(
+            onDismissRequest = {
+                showLoadingDialog.value = false
+            }
+        ) {
+            Surface(
+                modifier = Modifier,
+                shape = MaterialTheme.shapes.large,
+                color = background,
+                contentColor = MaterialTheme.colors.onSurface
+            ) {
+                Column(modifier = Modifier.padding(2.dp)) {
+                    Text(
+                        text,
+                        style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                        color = Color.Black,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                    CircularProgressIndicator(strokeWidth = 2.dp)
                 }
             }
         }

@@ -1,6 +1,7 @@
 package cn.archko.pdf.activities
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.TextUtils
@@ -23,6 +24,7 @@ import com.umeng.analytics.MobclickAgent
  * @author: archko 2018/12/16 :9:43
  */
 class AboutActivity : AnalysticActivity() {
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             finish()
@@ -183,5 +185,9 @@ class AboutActivity : AnalysticActivity() {
             Part(R.string.about_3dparty_title, Format.HTML, "about_3rdparty.html"),
             Part(R.string.about_changelog_title, Format.HTML, "about_changelog.html")
         )
+
+        fun start(context: Context) {
+            context.startActivity(Intent(context, AboutActivity::class.java))
+        }
     }
 }

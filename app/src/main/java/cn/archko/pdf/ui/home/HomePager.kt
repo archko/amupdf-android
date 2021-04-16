@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FiberManualRecord
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -21,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -29,6 +30,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import cn.archko.pdf.common.Logcat
 import cn.archko.mupdf.R
+import cn.archko.pdf.activities.AboutActivity
+import cn.archko.pdf.activities.PdfOptionsActivity
 import cn.archko.pdf.theme.JetsnackTheme
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.google.accompanist.insets.navigationBarsPadding
@@ -46,7 +49,9 @@ fun HomePager(
     navController: NavHostController
 ) {
     val showMenu = remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
+    val showLoadingDialog = remember { mutableStateOf(false) }
     val navItems = listOf("History", "File")
     val (currentSection, setCurrentSection) = rememberSaveable {
         mutableStateOf(0)
@@ -72,53 +77,61 @@ fun HomePager(
                     }
                 },
                 actions = {
-                    Button(onClick = { }) {
-                        Text(
-                            text = stringResource(id = R.string.menu_search)
-                        )
-                    }
+                    Text(
+                        text = stringResource(id = R.string.menu_search),
+                        modifier = Modifier.clickable(onClick = { })
+                    )
                     if (currentSection == 0) {
-                        Button(onClick = { }) {
-                            Text(
-                                text = stringResource(id = R.string.options)
-                            )
-                        }
-                        Button(onClick = { }) {
-                            Text(
-                                text = stringResource(id = R.string.menu_backup)
-                            )
-                        }
-                        Button(onClick = { }) {
-                            Text(
-                                text = stringResource(id = R.string.menu_restore)
-                            )
-                        }
+                        Text(
+                            text = stringResource(id = R.string.options),
+                            modifier = Modifier.clickable(onClick = {
+                                PdfOptionsActivity.start(
+                                    context
+                                )
+                            })
+                        )
+                        Text(
+                            text = stringResource(id = R.string.menu_backup),
+                            modifier = Modifier.clickable(onClick = {
+                                backup(showLoadingDialog)
+                            })
+                        )
+                        Text(
+                            text = stringResource(id = R.string.menu_restore),
+                            modifier = Modifier.clickable(onClick = {
+                                restore(showLoadingDialog)
+                            })
+                        )
                         IconButton(onClick = { showMenu.value = !showMenu.value }) {
                             Icon(imageVector = Icons.Default.Palette, contentDescription = null)
                         }
                     } else if (currentSection == 1) {
-                        Button(onClick = { }) {
-                            Text(
-                                text = stringResource(id = R.string.menu_set_as_home)
-                            )
-                        }
-                        Button(onClick = { }) {
-                            Text(
-                                text = stringResource(id = R.string.options)
-                            )
-                        }
-                    } else {
-                        Button(onClick = { }) {
-                            Text(
-                                text = stringResource(id = R.string.options)
-                            )
-                        }
-                    }
-                    Button(onClick = { }) {
                         Text(
-                            text = stringResource(id = R.string.menu_about)
+                            text = stringResource(id = R.string.menu_set_as_home),
+                            modifier = Modifier.clickable(onClick = {
+                                setAsHome()
+                            })
+                        )
+                        Text(
+                            text = stringResource(id = R.string.options),
+                            modifier = Modifier.clickable(onClick = {
+                                PdfOptionsActivity.start(context)
+                            })
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(id = R.string.options),
+                            modifier = Modifier.clickable(onClick = {
+                                PdfOptionsActivity.start(context)
+                            })
                         )
                     }
+                    Text(
+                        text = stringResource(id = R.string.menu_about),
+                        modifier = Modifier.clickable(onClick = {
+                            AboutActivity.start(context)
+                        })
+                    )
                 }
             )
         }
@@ -134,7 +147,20 @@ fun HomePager(
                 onPalletChange
             )
         }
+        LoadingDialog(showLoadingDialog)
     }
+}
+
+fun backup(showLoadingDialog: MutableState<Boolean>) {
+    showLoadingDialog.value = true
+}
+
+fun restore(showLoadingDialog: MutableState<Boolean>) {
+    showLoadingDialog.value = true
+}
+
+fun setAsHome() {
+
 }
 
 val green500 = Color(0xff4caf50)
@@ -195,6 +221,7 @@ private fun TabContent(
     navItems: List<String>,
     setCurrentSection: (Int) -> Unit,
 ) {
+    Logcat.d("$navController")
     val viewModel: FileViewModel = viewModel()
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = navItems.size)

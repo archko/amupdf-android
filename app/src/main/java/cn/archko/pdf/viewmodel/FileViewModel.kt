@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * @author: archko 2021/4/11 :8:14 上午
@@ -165,7 +166,7 @@ class FileViewModel() : ViewModel() {
                 emit(entryList)
             }.catch { e ->
                 Logcat.d("Exception:$e")
-                emit(mutableListOf())
+                emit(ArrayList<FileBean>())
             }.flowOn(Dispatchers.IO)
                 .collect { list ->
                     _uiFileHistoryModel.value = list
@@ -189,7 +190,7 @@ class FileViewModel() : ViewModel() {
             }
 
             withContext(Dispatchers.Main) {
-                _uiBackupModel.value = filepath
+                _uiBackupModel.value = filepath!!
             }
         }
     }
