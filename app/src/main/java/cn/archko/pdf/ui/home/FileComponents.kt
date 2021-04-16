@@ -3,18 +3,8 @@ package cn.archko.pdf.ui.home
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -106,9 +96,8 @@ fun UserOptDialog(
         ) {
             Surface(
                 modifier = Modifier,
-                shape = MaterialTheme.shapes.large,
+                shape = MaterialTheme.shapes.medium,
                 color = background,
-                contentColor = MaterialTheme.colors.onSurface
             ) {
                 Column(modifier = Modifier.padding(2.dp)) {
                     Text(
@@ -183,22 +172,31 @@ fun LoadingDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(160.dp),
-                shape = MaterialTheme.shapes.large,
+                shape = MaterialTheme.shapes.medium,
                 color = background,
-                contentColor = MaterialTheme.colors.onSurface
             ) {
-                Column(modifier = Modifier.padding(2.dp)) {
+                Column(
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .fillMaxWidth()
+                ) {
                     Text(
                         text,
                         style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                         color = Color.Black,
                         modifier = Modifier.padding(8.dp)
                     )
-                    CircularProgressIndicator(
+                    /*CircularProgressIndicator(
                         strokeWidth = 2.dp,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .padding(20.dp)
+                    )*/
+                    Spacer(modifier = Modifier.height(40.dp))
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .height(18.dp)
+                            .align(alignment = Alignment.CenterHorizontally)
                     )
                 }
             }
