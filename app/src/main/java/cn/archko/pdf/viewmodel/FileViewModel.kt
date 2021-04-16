@@ -177,7 +177,7 @@ class FileViewModel() : ViewModel() {
                         entry = FileBean(FileBean.NORMAL, file, showExtension)
                         fileList.add(entry)
                     }
-                    fileList = mScanner.startScan(fileList)
+                    mScanner.startScan(fileList)
                 }
                 withContext(Dispatchers.Main) {
                     _uiFileModel.value = fileList
