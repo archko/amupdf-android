@@ -21,7 +21,7 @@ class PDFViewerHelper {
 
     companion object {
 
-        fun openWithDefaultViewer(f: File, activity: Activity) {
+        fun openWithDefaultViewer(f: File, activity: Context) {
             Logcat.i(Logcat.TAG, "post intent to open file $f")
             if (f.absolutePath.endsWith("txt", true)) {
                 Toast.makeText(activity, "can't load f:${f.absolutePath}", Toast.LENGTH_SHORT)
@@ -111,6 +111,61 @@ class PDFViewerHelper {
                     activity.startActivity(intent)
                 }
             }
+        }
+
+        fun openViewerMupdf(clickedFile: File, activity: Context) {
+            val uri = Uri.fromFile(clickedFile)
+            val intent = Intent()
+            intent.action = Intent.ACTION_VIEW
+            intent.data = uri
+
+            val map = mapOf("type" to "Document", "name" to clickedFile.name)
+            MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
+
+            intent.setClass(activity, cn.archko.pdf.activities.DocumentActivity::class.java)
+            // API>=21: intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT); /* launch as a new document */
+            activity.startActivity(intent)
+        }
+
+        fun openViewerOther(clickedFile: File, activity: Context) {
+            val uri = Uri.fromFile(clickedFile)
+            val intent = Intent()
+            intent.action = Intent.ACTION_VIEW
+            intent.data = uri
+
+            val map = mapOf("type" to "other", "name" to clickedFile.name)
+            MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
+            var mimeType = "application/pdf"
+            val name = clickedFile.absolutePath;
+            if (name.endsWith("pdf", true)) {
+                mimeType = "application/pdf";
+            } else if (name.endsWith("epub", true)) {
+                mimeType = "application/epub+zip";
+            } else if (name.endsWith("cbz", true)) {
+                mimeType = "application/x-cbz";
+            } else if (name.endsWith("fb2", true)) {
+                mimeType = "application/fb2";
+            } else if (name.endsWith("txt", true)) {
+                mimeType = "text/plain";
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                //val mimeType = this@BrowserFragment.activity?.contentResolver?.getType(FileProvider.getUriForFile(getContext()!!, "cn.archko.mupdf.fileProvider", clickedFile))
+                intent.setDataAndType(
+                    FileProvider.getUriForFile(
+                        activity,
+                        "cn.archko.mupdf.fileProvider",
+                        clickedFile
+                    ), mimeType
+                );
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                intent.addCategory(Intent.CATEGORY_DEFAULT);
+            } else {
+                //val mimeType = activity.contentResolver?.getType(uri)
+                intent.setDataAndType(uri, mimeType)
+            }
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            activity.startActivity(intent)
         }
     }
 }

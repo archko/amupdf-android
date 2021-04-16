@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -82,13 +83,31 @@ fun FileList(
     //val refresh: () -> Unit = { ->
     //}
     Logcat.d("FileList,${response} $navigateTo,")
-    val menuOpt: (MenuItemType, FileBean) -> Unit = { _, fb ->
+    val showUserDialog = remember { mutableStateOf(false) }
+    val menuOpt: (MenuItemType, FileBean) -> Unit = { menuType, fb ->
+        showUserDialog.value = false
+        when (menuType) {
+            MenuItemType.ViewBookWithAMupdf -> {
+                PDFViewerHelper.openWithDefaultViewer(fb.file!!, context)
+            }
+            MenuItemType.ViewBookWithMupdf -> {
+                PDFViewerHelper.openViewerMupdf(fb.file!!, context)
+            }
+            MenuItemType.OpenWithOther -> {
+                PDFViewerHelper.openViewerOther(fb.file!!, context)
+            }
+            MenuItemType.ViewBookInfo -> {
+            }
+            MenuItemType.DeleteFile -> {
+            }
+        }
     }
     Box(modifier = Modifier.fillMaxSize()) {
         FileList(
             response,
             resourceState,
             modifier,
+            showUserDialog,
             menuOpt,
             onClick,
             viewModel
@@ -101,6 +120,7 @@ private fun FileList(
     list: MutableList<FileBean>,
     resourceState: ResourceState,
     modifier: Modifier = Modifier,
+    showUserDialog: MutableState<Boolean>,
     menuOpt: (MenuItemType, FileBean) -> Unit,
     onClick: (FileBean) -> Unit,
     viewModel: FileViewModel
@@ -110,7 +130,7 @@ private fun FileList(
     } else {
         JetsnackSurface(modifier = modifier.fillMaxSize()) {
             Box {
-                ItemList(list, modifier, menuOpt, onClick, viewModel)
+                ItemList(list, modifier, showUserDialog, menuOpt, onClick, viewModel)
             }
         }
     }
@@ -121,11 +141,11 @@ private fun FileList(
 private fun ItemList(
     list: MutableList<FileBean>,
     modifier: Modifier = Modifier,
+    showUserDialog: MutableState<Boolean>,
     menuOpt: (MenuItemType, FileBean) -> Unit,
     onClick: (FileBean) -> Unit,
     viewModel: FileViewModel
 ) {
-    val showUserDialog = remember { mutableStateOf(false) }
     var fileIndex = remember { mutableStateOf(0) }
     val onOptClick: (Int) -> Unit = { it ->
         fileIndex.value = it

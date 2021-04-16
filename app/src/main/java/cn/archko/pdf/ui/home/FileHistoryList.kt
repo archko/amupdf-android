@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFViewerHelper
+import cn.archko.pdf.common.RecentManager
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.components.JetsnackSurface
 import cn.archko.pdf.components.LoadingFooter
@@ -60,7 +62,27 @@ fun FileHistoryList(
     //val refresh: () -> Unit = { ->
     //}
     Logcat.d("FileList,${response} $navigateTo,")
-    val menuOpt: (MenuItemType, FileBean) -> Unit = { _, fb ->
+    val showUserDialog = remember { mutableStateOf(false) }
+    val menuOpt: (MenuItemType, FileBean) -> Unit = { menuType, fb ->
+        showUserDialog.value = false
+        when (menuType) {
+            MenuItemType.ViewBookWithAMupdf -> {
+                PDFViewerHelper.openWithDefaultViewer(fb.file!!, context)
+            }
+            MenuItemType.ViewBookWithMupdf -> {
+                PDFViewerHelper.openViewerMupdf(fb.file!!, context)
+            }
+            MenuItemType.OpenWithOther -> {
+                PDFViewerHelper.openViewerOther(fb.file!!, context)
+            }
+            MenuItemType.ViewBookInfo -> {
+            }
+            MenuItemType.DeleteHistory -> {
+                MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, "remove")
+                RecentManager.instance.removeRecentFromDb(fb.file!!.absolutePath)
+                viewModel.loadFileBeanFromDB(0)
+            }
+        }
     }
     Box(modifier = Modifier.fillMaxSize()) {
         FileList(
@@ -68,6 +90,7 @@ fun FileHistoryList(
             resourceState,
             loadMore,
             modifier,
+            showUserDialog,
             menuOpt,
             onClick,
             viewModel
@@ -81,6 +104,7 @@ private fun FileList(
     resourceState: ResourceState,
     loadMore: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    showUserDialog: MutableState<Boolean>,
     menuOpt: (MenuItemType, FileBean) -> Unit,
     onClick: (FileBean) -> Unit,
     viewModel: FileViewModel
@@ -90,7 +114,16 @@ private fun FileList(
     } else {
         JetsnackSurface(modifier = modifier.fillMaxSize()) {
             Box {
-                ItemList(list, resourceState, loadMore, modifier, menuOpt, onClick, viewModel)
+                ItemList(
+                    list,
+                    resourceState,
+                    loadMore,
+                    modifier,
+                    showUserDialog,
+                    menuOpt,
+                    onClick,
+                    viewModel
+                )
             }
         }
     }
@@ -103,13 +136,13 @@ private fun ItemList(
     resourceState: ResourceState,
     loadMore: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    showUserDialog: MutableState<Boolean>,
     menuOpt: (MenuItemType, FileBean) -> Unit,
     onClick: (FileBean) -> Unit,
     viewModel: FileViewModel
 ) {
     val scroll = rememberScrollState(0)
     val size = list.size
-    val showUserDialog = remember { mutableStateOf(false) }
     var fileIndex = remember { mutableStateOf(0) }
     val onOptClick: (Int) -> Unit = { it ->
         fileIndex.value = it
