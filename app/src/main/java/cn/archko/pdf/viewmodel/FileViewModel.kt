@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import cn.archko.pdf.App
 import cn.archko.pdf.activities.ChooseFileFragmentActivity
 import cn.archko.pdf.common.Logcat
+import cn.archko.pdf.common.ProgressScaner
 import cn.archko.pdf.common.RecentManager
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
@@ -54,6 +55,8 @@ class FileViewModel() : ViewModel() {
     private val _uiRestorepModel = MutableLiveData<Boolean>()
     val uiRestorepModel: LiveData<Boolean>
         get() = _uiRestorepModel
+
+    private var mScanner: ProgressScaner = ProgressScaner()
 
     var home: String = "/sdcard/"
     var selectionIndex = 0
@@ -135,7 +138,7 @@ class FileViewModel() : ViewModel() {
         Logcat.d("loadFiles, path:$mCurrentPath")
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val fileList: ArrayList<FileBean> = ArrayList()
+                var fileList: ArrayList<FileBean> = ArrayList()
                 var entry: FileBean
 
                 entry = FileBean(FileBean.HOME, home)
@@ -174,6 +177,7 @@ class FileViewModel() : ViewModel() {
                         entry = FileBean(FileBean.NORMAL, file, showExtension)
                         fileList.add(entry)
                     }
+                    fileList = mScanner.startScan(fileList)
                 }
                 withContext(Dispatchers.Main) {
                     _uiFileModel.value = fileList

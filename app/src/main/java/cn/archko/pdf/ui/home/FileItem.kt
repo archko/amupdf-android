@@ -39,7 +39,6 @@ fun FileItem(
     viewModel: FileViewModel,
     modifier: Modifier = Modifier
 ) {
-    Logcat.d("FileItem:$index")
     Box(
         modifier = modifier.fillMaxWidth()
     ) {
@@ -69,7 +68,7 @@ fun FileItem(
                     )
                     .height(48.dp)
             ) {
-                val progress=fileBean.getProgress()
+                val progress = fileBean.getProgress()
                 BookProgressBar(
                     progress = progress,
                     color = Color(0xFFC9E9CE),
