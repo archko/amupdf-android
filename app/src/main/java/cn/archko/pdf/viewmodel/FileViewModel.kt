@@ -60,6 +60,7 @@ class FileViewModel() : ViewModel() {
 
     var home: String = "/sdcard/"
     var selectionIndex = 0
+    var totalCount = 0
 
     init {
         var externalFileRootDir: File? = App.instance!!.getExternalFilesDir(null)
@@ -193,11 +194,12 @@ class FileViewModel() : ViewModel() {
     fun loadHistoryFileBean(curPage: Int, showExtension: Boolean = true) =
         loadFileBeanFromDB(PAGE_SIZE * (curPage), showExtension)
 
-    fun loadFileBeanFromDB(startIndex: Int, showExtension: Boolean = true) =
+    fun loadFileBeanFromDB(startIndex: Int, showExtension: Boolean = true) {
+        var count = 0
         viewModelScope.launch {
             flow {
                 val recent = RecentManager.instance
-                var totalCount = recent.progressCount
+                count = recent.progressCount
                 val progresses: ArrayList<BookProgress>? = recent.readRecentFromDb(
                     startIndex,
                     PAGE_SIZE
@@ -225,8 +227,10 @@ class FileViewModel() : ViewModel() {
                     nList.addAll(oldList)
                     nList.addAll(list)
                     _uiFileHistoryModel.value = nList
+                    totalCount = count
                 }
         }
+    }
 
     fun backupFromDb() {
         val now = System.currentTimeMillis()

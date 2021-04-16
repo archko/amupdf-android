@@ -51,7 +51,7 @@ fun EmptyView(modifier: Modifier) {
                     .align(Alignment.Center)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.empty_state_search),
+                    painter = painterResource(id = R.drawable.loading),
                     contentDescription = null,
                     modifier = Modifier
                         .size(48.dp)

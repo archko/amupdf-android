@@ -14,7 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cn.archko.pdf.paging.ResourceState
 import cn.archko.mupdf.R
 import cn.archko.pdf.theme.JetsnackTheme
@@ -23,7 +25,7 @@ import cn.archko.pdf.theme.JetsnackTheme
 fun LoadingFooter(
     resourceState: ResourceState = ResourceState(initial = ResourceState.LOADING),
     text: String? = "Loading",
-    total: Int = 0,
+    hasMore: Boolean,
     onClick: () -> Unit,
     visible: Boolean = true,
     modifier: Modifier = Modifier
@@ -32,14 +34,16 @@ fun LoadingFooter(
     } else {
         var txt = text
         txt?.let {
-            if (resourceState.value == ResourceState.ERROR) {
-                txt = "Error"
+            txt = if (resourceState.value == ResourceState.ERROR) {
+                "Error"
             } else if (resourceState.value == ResourceState.FINISHED || resourceState.value == ResourceState.IDLE) {
-                if (total == 0) {
-                    txt = "NO MORE"
+                if (!hasMore) {
+                    "NO MORE"
                 } else {
-                    txt = "IDLE"
+                    "IDLE"
                 }
+            } else {
+                "Loading"
             }
         }
         Row(
@@ -56,7 +60,7 @@ fun LoadingFooter(
                 )
         ) {
             Image(
-                painter = painterResource(id = R.drawable.empty_state_search),
+                painter = painterResource(id = R.drawable.loading),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = modifier
@@ -67,7 +71,7 @@ fun LoadingFooter(
             txt?.let {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.h5,
+                    style = TextStyle(fontSize = 20.sp),
                     color = JetsnackTheme.colors.textSecondary,
                     modifier = modifier
                         .align(Alignment.CenterVertically)

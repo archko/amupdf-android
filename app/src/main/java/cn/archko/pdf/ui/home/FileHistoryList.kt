@@ -46,6 +46,7 @@ fun FileHistoryList(
     }
 
     val response by viewModel.uiFileHistoryModel.collectAsState()
+    val totalCount = viewModel.totalCount
     val loadMore: (Int) -> Unit = { index: Int ->
         Logcat.d("loadMore,$index")
         viewModel.loadMoreFileBeanFromDB(index)
@@ -88,6 +89,7 @@ fun FileHistoryList(
     Box(modifier = Modifier.fillMaxSize()) {
         FileList(
             response,
+            totalCount,
             resourceState,
             loadMore,
             modifier,
@@ -102,6 +104,7 @@ fun FileHistoryList(
 @Composable
 private fun FileList(
     list: MutableList<FileBean>,
+    totalCount: Int,
     resourceState: ResourceState,
     loadMore: (Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -117,6 +120,7 @@ private fun FileList(
             Box {
                 ItemList(
                     list,
+                    totalCount,
                     resourceState,
                     loadMore,
                     modifier,
@@ -134,6 +138,7 @@ private fun FileList(
 @Composable
 private fun ItemList(
     list: MutableList<FileBean>,
+    totalCount: Int,
     resourceState: ResourceState,
     loadMore: (Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -171,13 +176,15 @@ private fun ItemList(
             )
             //Log.d("ItemList", "$index")
             if (index == size - 1) {
+                val hasMore = totalCount > size
                 LoadingFooter(
                     resourceState = resourceState,
                     onClick = { loadMore(size) },
-                    total = size, visible = false
+                    hasMore = hasMore,
+                    visible = true
                 )
-                Logcat.d("scroll.index:$index, ${scroll.isScrollInProgress}, resourceState:${resourceState.value}")
-                if (!scroll.isScrollInProgress) {
+                Logcat.d("scroll.totalCount:$totalCount.index:$index, ${scroll.isScrollInProgress}, resourceState:${resourceState.value}")
+                if (!scroll.isScrollInProgress && hasMore) {
                     if (resourceState.value == ResourceState.LOADING || resourceState.value == ResourceState.ERROR) {
                     } else {
                         loadMore(size)
