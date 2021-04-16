@@ -1,17 +1,12 @@
 package cn.archko.pdf.ui.home
 
-import android.content.Context
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -51,6 +46,7 @@ import java.util.*
 fun HomePager(
     navController: NavHostController
 ) {
+    val context = LocalContext.current
     val viewModel: FileViewModel = viewModel()
     val showMenu = remember { mutableStateOf(false) }
 
@@ -59,6 +55,54 @@ fun HomePager(
     val (currentSection, setCurrentSection) = rememberSaveable {
         mutableStateOf(0)
     }
+    val onPalletChange: () -> Unit = { ->
+        showMenu.value = false
+    }
+
+    val content: @Composable BoxScope.() -> Unit = {
+        Column(
+            horizontalAlignment = Alignment.Start
+        ) {
+
+            when (currentSection) {
+                0 -> {
+                    MenuItem(stringResource(id = R.string.options)) {
+                        onPalletChange()
+                        PdfOptionsActivity.start(context)
+                    }
+                    MenuItem(stringResource(id = R.string.menu_backup)) {
+                        onPalletChange()
+                        backup(showLoadingDialog)
+                    }
+                    MenuItem(stringResource(id = R.string.menu_restore)) {
+                        onPalletChange()
+                        restore(showLoadingDialog)
+                    }
+                }
+                1 -> {
+                    MenuItem(stringResource(id = R.string.options)) {
+                        onPalletChange()
+                        PdfOptionsActivity.start(context)
+                    }
+                    MenuItem(stringResource(id = R.string.menu_set_as_home)) {
+                        onPalletChange()
+                        viewModel.setAsHome(context)
+                    }
+                }
+                else -> {
+                    MenuItem(stringResource(id = R.string.options)) {
+                        onPalletChange()
+                        PdfOptionsActivity.start(context)
+                    }
+                }
+            }
+            MenuItem(stringResource(id = R.string.menu_about)) {
+                onPalletChange()
+                AboutActivity.start(context)
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -93,18 +137,12 @@ fun HomePager(
             )
         }
     ) {
-        val onPalletChange: () -> Unit = { ->
-            showMenu.value = false
-        }
         Box(modifier = Modifier.fillMaxSize()) {
             TabContent(viewModel, navController, navItems, setCurrentSection)
-            PalletMenu(
-                viewModel,
-                currentSection,
-                showLoadingDialog,
+            PopupMenu(
                 modifier = Modifier.align(Alignment.TopEnd),
-                showMenu.value,
-                onPalletChange
+                showMenu,
+                content
             )
         }
         LoadingDialog(showLoadingDialog)
@@ -117,97 +155,6 @@ fun backup(showLoadingDialog: MutableState<Boolean>) {
 
 fun restore(showLoadingDialog: MutableState<Boolean>) {
     showLoadingDialog.value = true
-}
-
-@Composable
-fun PalletMenu(
-    viewModel: FileViewModel,
-    currentSection: Int,
-    showLoadingDialog: MutableState<Boolean>,
-    modifier: Modifier,
-    showMenu: Boolean,
-    onPalletChange: () -> Unit
-) {
-    if (showMenu) {
-        val context = LocalContext.current
-        Box(
-            contentAlignment = Alignment.TopEnd,
-            modifier = modifier
-                .fillMaxSize()
-                .clickable(
-                    onClick = onPalletChange,
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ),
-        ) {
-            Card(
-                modifier = modifier
-                    .width(120.dp)
-                    .padding(8.dp)
-                    .animateContentSize(),
-                elevation = 8.dp,
-                shape = RoundedCornerShape(2.dp),
-                backgroundColor = JetsnackTheme.colors.uiBackground,
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.Start
-                ) {
-
-                    when (currentSection) {
-                        0 -> {
-                            MenuItem(stringResource(id = R.string.options)) {
-                                onPalletChange()
-                                PdfOptionsActivity.start(context)
-                            }
-                            MenuItem(stringResource(id = R.string.menu_backup)) {
-                                onPalletChange()
-                                backup(showLoadingDialog)
-                            }
-                            MenuItem(stringResource(id = R.string.menu_restore)) {
-                                onPalletChange()
-                                restore(showLoadingDialog)
-                            }
-                        }
-                        1 -> {
-                            MenuItem(stringResource(id = R.string.options)) {
-                                onPalletChange()
-                                PdfOptionsActivity.start(context)
-                            }
-                            MenuItem(stringResource(id = R.string.menu_set_as_home)) {
-                                onPalletChange()
-                                viewModel.setAsHome(context)
-                            }
-                        }
-                        else -> {
-                            MenuItem(stringResource(id = R.string.options)) {
-                                onPalletChange()
-                                PdfOptionsActivity.start(context)
-                            }
-                        }
-                    }
-                    MenuItem(stringResource(id = R.string.menu_about)) {
-                        onPalletChange()
-                        AboutActivity.start(context)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun MenuItem(name: String, onPalletChange: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .clickable(onClick = onPalletChange)
-            .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        //Icon(imageVector = Icons.Filled.FiberManualRecord, tint = color, contentDescription = null)
-        Text(
-            text = name, color = Color.Black, modifier = Modifier.padding(2.dp)
-        )
-    }
 }
 
 @ExperimentalPagerApi
