@@ -45,8 +45,8 @@ fun FileBean.getProgress(): Float {
 }
 
 fun FileBean.getSize(): String {
-    if (null != bookProgress) {
+    if (!isDirectory && null != bookProgress) {
         return Utils.getFileSize(bookProgress!!.size)
     }
-    return "0"
+    return ""
 }

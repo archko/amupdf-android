@@ -58,7 +58,8 @@ fun HomePager(
 
     showLoadingDialog.value = (uiBackup.value == ResourceState.LOADING)
 
-    val navItems = listOf("History", "File")
+    val navItems =
+        listOf(stringResource(id = R.string.tab_history), stringResource(id = R.string.tab_browser))
     val (currentSection, setCurrentSection) = rememberSaveable {
         mutableStateOf(0)
     }
@@ -110,47 +111,49 @@ fun HomePager(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.app_name),
-                        overflow = TextOverflow.Ellipsis,
-                        color = JetsnackTheme.colors.uiFloated,
-                    )
-                },
-                elevation = 0.dp,
-                backgroundColor = JetsnackTheme.colors.uiBorder,
-                navigationIcon = {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.icon),
-                            contentDescription = null
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(id = R.string.app_name),
+                            overflow = TextOverflow.Ellipsis,
+                            color = JetsnackTheme.colors.uiFloated,
                         )
+                    },
+                    elevation = 0.dp,
+                    backgroundColor = JetsnackTheme.colors.uiBorder,
+                    navigationIcon = {
+                        IconButton(onClick = { }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.icon),
+                                contentDescription = null
+                            )
+                        }
+                    },
+                    actions = {
+                        Text(
+                            text = stringResource(id = R.string.menu_search),
+                            modifier = Modifier
+                                .clickable(onClick = { })
+                                .padding(10.dp)
+                        )
+                        IconButton(onClick = { showMenu.value = !showMenu.value }) {
+                            Icon(imageVector = Icons.Default.MoreVert, contentDescription = null)
+                        }
                     }
-                },
-                actions = {
-                    Text(
-                        text = stringResource(id = R.string.menu_search),
-                        modifier = Modifier
-                            .clickable(onClick = { })
-                            .padding(10.dp)
-                    )
-                    IconButton(onClick = { showMenu.value = !showMenu.value }) {
-                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = null)
-                    }
-                }
-            )
-        }
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            TabContent(viewModel, navController, navItems, setCurrentSection)
-            PopupMenu(
-                modifier = Modifier.align(Alignment.TopEnd),
-                showMenu,
-                content
-            )
+                )
+            }
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                TabContent(viewModel, navController, navItems, setCurrentSection)
+                PopupMenu(
+                    modifier = Modifier.align(Alignment.TopEnd),
+                    showMenu,
+                    content
+                )
+            }
         }
         LoadingDialog(showLoadingDialog)
     }
