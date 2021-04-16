@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -250,7 +251,9 @@ fun LoadingDialog(
             }
         ) {
             Surface(
-                modifier = Modifier,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp),
                 shape = MaterialTheme.shapes.large,
                 color = background,
                 contentColor = MaterialTheme.colors.onSurface
@@ -262,7 +265,12 @@ fun LoadingDialog(
                         color = Color.Black,
                         modifier = Modifier.padding(8.dp)
                     )
-                    CircularProgressIndicator(strokeWidth = 2.dp)
+                    CircularProgressIndicator(
+                        strokeWidth = 2.dp,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(20.dp)
+                    )
                 }
             }
         }
