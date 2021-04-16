@@ -19,42 +19,54 @@ object Logcat {
     var loggable = true
     fun v(tag: String?, msg: String?) {
         if (loggable) {
-            Log.v(tag, msg)
+            if (msg != null) {
+                Log.v(tag, msg)
+            }
         }
     }
 
     @JvmStatic
     fun d(msg: String?) {
         if (loggable) {
-            Log.d(TAG, msg)
+            if (msg != null) {
+                Log.d(TAG, msg)
+            }
         }
     }
 
     @JvmStatic
     fun d(tag: String?, msg: String?) {
         if (loggable) {
-            Log.d(tag, msg)
+            if (msg != null) {
+                Log.d(tag, msg)
+            }
         }
     }
 
     @JvmStatic
     fun i(tag: String?, msg: String?) {
         if (loggable) {
-            Log.i(tag, msg)
+            if (msg != null) {
+                Log.i(tag, msg)
+            }
         }
     }
 
     @JvmStatic
     fun w(tag: String?, msg: String?) {
         if (loggable) {
-            Log.w(tag, msg)
+            if (msg != null) {
+                Log.w(tag, msg)
+            }
         }
     }
 
     @JvmStatic
     fun e(tag: String?, msg: String?) {
         if (loggable) {
-            Log.e(tag, msg)
+            if (msg != null) {
+                Log.e(tag, msg)
+            }
         }
     }
 
