@@ -17,18 +17,18 @@
 package cn.archko.pdf.components
 
 import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import cn.archko.pdf.theme.JetsnackTheme
 
 @Composable
 fun Divider(
     modifier: Modifier = Modifier,
-    color: Color = JetsnackTheme.colors.uiBorder.copy(alpha = DividerAlpha),
-    thickness: Dp = 1.dp,
+    color: Color = MaterialTheme.colors.secondaryVariant.copy(alpha = DividerAlpha),
+    thickness: Dp = 0.5.dp,
     startIndent: Dp = 0.dp
 ) {
     Divider(

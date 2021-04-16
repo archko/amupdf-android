@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cn.archko.pdf.paging.ResourceState
 import cn.archko.mupdf.R
-import cn.archko.pdf.theme.JetsnackTheme
 
 @Composable
 fun LoadingFooter(
@@ -72,7 +71,7 @@ fun LoadingFooter(
                 Text(
                     text = it,
                     style = TextStyle(fontSize = 20.sp),
-                    color = JetsnackTheme.colors.textSecondary,
+                    color = MaterialTheme.colors.onSecondary,
                     modifier = modifier
                         .align(Alignment.CenterVertically)
                 )

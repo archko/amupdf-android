@@ -8,13 +8,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
 import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.NavGraph
 import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.theme.JetsnackTheme
+import cn.archko.pdf.theme.*
 import cn.archko.pdf.utils.LocalSysUiController
 import cn.archko.pdf.utils.SystemUiController
 import com.google.accompanist.insets.ProvideWindowInsets
@@ -36,12 +37,27 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
 
         setContent {
             val systemUiController = remember { SystemUiController(window) }
+            val appTheme = remember { mutableStateOf(AppThemeState()) }
+            val color = when (appTheme.value.pallet) {
+                ColorPallet.GREEN -> green700
+                ColorPallet.BLUE -> blue700
+                ColorPallet.ORANGE -> orange700
+                ColorPallet.PURPLE -> purple700
+            }
+            systemUiController.setStatusBarColor(
+                color = color,
+                darkIcons = appTheme.value.darkTheme
+            )
+
             CompositionLocalProvider(
                 LocalSysUiController provides systemUiController,
                 LocalBackPressedDispatcher provides this.onBackPressedDispatcher
             ) {
                 ProvideWindowInsets {
-                    JetsnackTheme {
+                    ComposeCookBookTheme(
+                        darkTheme = appTheme.value.darkTheme,
+                        colorPallet = appTheme.value.pallet
+                    ) {
                         NavGraph()
                     }
                 }

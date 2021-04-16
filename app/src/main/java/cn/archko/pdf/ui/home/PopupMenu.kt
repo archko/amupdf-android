@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -20,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import cn.archko.pdf.theme.JetsnackTheme
 
 @Composable
 fun PopupMenu(
@@ -46,7 +46,7 @@ fun PopupMenu(
                     .animateContentSize(),
                 elevation = 8.dp,
                 shape = RoundedCornerShape(2.dp),
-                backgroundColor = JetsnackTheme.colors.uiBackground,
+                backgroundColor = MaterialTheme.colors.background,
             ) {
                 content()
             }

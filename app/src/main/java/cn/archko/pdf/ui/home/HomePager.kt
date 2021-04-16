@@ -1,5 +1,6 @@
 package cn.archko.pdf.ui.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -33,7 +34,6 @@ import cn.archko.pdf.activities.AboutActivity
 import cn.archko.pdf.activities.PdfOptionsActivity
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.paging.ResourceState
-import cn.archko.pdf.theme.JetsnackTheme
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -119,18 +119,14 @@ fun HomePager(
                         Text(
                             text = stringResource(id = R.string.app_name),
                             overflow = TextOverflow.Ellipsis,
-                            color = JetsnackTheme.colors.uiFloated,
                         )
                     },
                     elevation = 0.dp,
-                    backgroundColor = JetsnackTheme.colors.uiBorder,
                     navigationIcon = {
-                        IconButton(onClick = { }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.icon),
-                                contentDescription = null
-                            )
-                        }
+                        Image(
+                            painter = painterResource(id = R.drawable.icon),
+                            contentDescription = null
+                        )
                     },
                     actions = {
                         Text(
@@ -192,7 +188,6 @@ private fun TabContent(
                     Modifier
                         .pagerTabIndicatorOffset(pagerState, tabPositions)
                         .height(4.dp),
-                    color = Color.Blue
                 )
             }
         ) {
@@ -208,12 +203,9 @@ private fun TabContent(
                     text = {
                         Text(
                             text = title.toUpperCase(Locale.getDefault()),
-                            color = if (pagerState.currentPage == index) Color.White else Color(
-                                0x61000000
-                            ),
                         )
                     },
-                    //unselectedContentColor = MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.medium)
+                    unselectedContentColor = MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.medium)
                 )
             }
         }

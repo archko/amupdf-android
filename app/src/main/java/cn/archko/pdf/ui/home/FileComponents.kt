@@ -34,7 +34,6 @@ import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.components.JetsnackSurface
 import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.theme.JetsnackTheme
 import cn.archko.pdf.theme.Neutral8
 
 @Composable
@@ -60,7 +59,7 @@ fun EmptyView(modifier: Modifier) {
                 Text(
                     text = "Refresh",
                     style = MaterialTheme.typography.h5,
-                    color = JetsnackTheme.colors.textSecondary,
+                    color = MaterialTheme.colors.primary,
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                         .padding(horizontal = 5.dp)

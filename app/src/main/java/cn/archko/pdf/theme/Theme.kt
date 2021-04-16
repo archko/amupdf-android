@@ -1,37 +1,14 @@
-/*
- * Copyright 2020 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package cn.archko.pdf.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import cn.archko.pdf.utils.LocalSysUiController
 
-private val LightColorPalette = JetsnackColors(
+/*private val LightColorPalette = JetsnackColors(
     brand = Shadow5,
     uiBackground = Neutral0,
     uiBorder = Neutral4,
@@ -105,12 +82,12 @@ object JetsnackTheme {
     val colors: JetsnackColors
         @Composable
         get() = LocalJetsnackColors.current
-}
+}*/
 
 /**
  * Jetsnack custom Color Palette
  */
-@Stable
+/*@Stable
 class JetsnackColors(
     gradient6_1: List<Color>,
     gradient6_2: List<Color>,
@@ -230,7 +207,7 @@ fun ProvideJetsnackColors(
 
 private val LocalJetsnackColors = staticCompositionLocalOf<JetsnackColors> {
     error("No JetsnackColorPalette provided")
-}
+}*/
 
 /**
  * A Material [Colors] implementation which sets all colors to [debugColor] to discourage usage of
@@ -254,3 +231,130 @@ fun debugColors(
     onError = debugColor,
     isLight = !darkTheme
 )
+
+// dark palettes
+private val DarkGreenColorPalette = darkColors(
+    primary = green200,
+    primaryVariant = green700,
+    secondary = teal200,
+    background = Color.Black,
+    surface = Color.Black,
+    onPrimary = Color.Black,
+    onSecondary = Color.White,
+    onBackground = Color.White,
+    onSurface = Color.White,
+    error = Color.Red,
+)
+
+private val DarkPurpleColorPalette = darkColors(
+    primary = purple200,
+    primaryVariant = purple700,
+    secondary = teal200,
+    background = Color.Black,
+    surface = Color.Black,
+    onPrimary = Color.Black,
+    onSecondary = Color.White,
+    onBackground = Color.White,
+    onSurface = Color.White,
+    error = Color.Red,
+)
+
+private val DarkBlueColorPalette = darkColors(
+    primary = blue200,
+    primaryVariant = blue700,
+    secondary = teal200,
+    background = Color.Black,
+    surface = Color.Black,
+    onPrimary = Color.Black,
+    onSecondary = Color.White,
+    onBackground = Color.White,
+    onSurface = Color.White,
+    error = Color.Red,
+)
+
+private val DarkOrangeColorPalette = darkColors(
+    primary = orange200,
+    primaryVariant = orange700,
+    secondary = teal200,
+    background = Color.Black,
+    surface = Color.Black,
+    onPrimary = Color.Black,
+    onSecondary = Color.White,
+    onBackground = Color.White,
+    onSurface = Color.White,
+    error = Color.Red,
+)
+
+// Light pallets
+private val LightGreenColorPalette = lightColors(
+    primary = green500,
+    primaryVariant = green700,
+    secondary = teal200,
+    background = Color.White,
+    surface = Color.White,
+    onPrimary = Color.White,
+    onSecondary = Color.Black,
+    onBackground = Color.Black,
+    onSurface = Color.Black
+)
+
+private val LightPurpleColorPalette = lightColors(
+    primary = purple,
+    primaryVariant = purple700,
+    secondary = teal200,
+    background = Color.White,
+    surface = Color.White,
+    onPrimary = Color.White,
+    onSecondary = Color.Black,
+    onBackground = Color.Black,
+    onSurface = Color.Black
+)
+
+private val LightBlueColorPalette = lightColors(
+    primary = blue500,
+    primaryVariant = blue700,
+    secondary = teal200,
+    background = Color.White,
+    surface = Color.White,
+    onPrimary = Color.White,
+    onSecondary = Color.Black,
+    onBackground = Color.Black,
+    onSurface = Color.Black
+)
+
+private val LightOrangeColorPalette = lightColors(
+    primary = orange500,
+    primaryVariant = orange700,
+    secondary = teal200,
+    background = Color.White,
+    surface = Color.White,
+    onPrimary = Color.White,
+    onSecondary = Color.Black,
+    onBackground = Color.Black,
+    onSurface = Color.Black
+)
+
+enum class ColorPallet {
+    PURPLE, GREEN, ORANGE, BLUE
+}
+
+@Composable
+fun ComposeCookBookTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    colorPallet: ColorPallet = ColorPallet.GREEN,
+    content: @Composable() () -> Unit,
+) {
+    val colors = when (colorPallet) {
+        ColorPallet.GREEN -> if (darkTheme) DarkGreenColorPalette else LightGreenColorPalette
+        ColorPallet.PURPLE -> if (darkTheme) DarkPurpleColorPalette else LightPurpleColorPalette
+        ColorPallet.ORANGE -> if (darkTheme) DarkOrangeColorPalette else LightOrangeColorPalette
+        ColorPallet.BLUE -> if (darkTheme) DarkBlueColorPalette else LightBlueColorPalette
+    }
+
+    MaterialTheme(
+        colors = colors,
+        typography = Typography,
+        shapes = Shapes,
+        content = content
+    )
+}
