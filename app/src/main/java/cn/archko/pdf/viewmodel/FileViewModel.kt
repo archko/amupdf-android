@@ -186,13 +186,20 @@ class FileViewModel() : ViewModel() {
         }
     }
 
-    fun loadFileBeanFromDB(curPage: Int, showExtension: Boolean = true) =
+    fun loadMoreFileBeanFromDB(count: Int, showExtension: Boolean = true) {
+        loadFileBeanFromDB(count, showExtension)
+    }
+
+    fun loadHistoryFileBean(curPage: Int, showExtension: Boolean = true) =
+        loadFileBeanFromDB(PAGE_SIZE * (curPage), showExtension)
+
+    fun loadFileBeanFromDB(startIndex: Int, showExtension: Boolean = true) =
         viewModelScope.launch {
             flow {
                 val recent = RecentManager.instance
                 var totalCount = recent.progressCount
                 val progresses: ArrayList<BookProgress>? = recent.readRecentFromDb(
-                    PAGE_SIZE * (curPage),
+                    startIndex,
                     PAGE_SIZE
                 )
 
@@ -213,7 +220,11 @@ class FileViewModel() : ViewModel() {
                 emit(ArrayList<FileBean>())
             }.flowOn(Dispatchers.IO)
                 .collect { list ->
-                    _uiFileHistoryModel.value = list
+                    val oldList = _uiFileHistoryModel.value
+                    val nList = ArrayList<FileBean>()
+                    nList.addAll(oldList)
+                    nList.addAll(list)
+                    _uiFileHistoryModel.value = nList
                 }
         }
 

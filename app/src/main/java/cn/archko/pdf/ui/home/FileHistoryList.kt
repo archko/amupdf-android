@@ -42,12 +42,13 @@ fun FileHistoryList(
         && resourceState.value != ResourceState.ERROR
         && resourceState.value != ResourceState.LOADING
     ) {
-        viewModel.loadFileBeanFromDB(0)
+        viewModel.loadHistoryFileBean(0)
     }
 
     val response by viewModel.uiFileHistoryModel.collectAsState()
     val loadMore: (Int) -> Unit = { index: Int ->
         Logcat.d("loadMore,$index")
+        viewModel.loadMoreFileBeanFromDB(index)
     }
     val onClick: (FileBean) -> Unit = { it ->
         val clickedFile: File? = it.file
@@ -61,7 +62,7 @@ fun FileHistoryList(
     }
     //val refresh: () -> Unit = { ->
     //}
-    Logcat.d("FileList,${response} $navigateTo,")
+    Logcat.d("FileList,${response.isEmpty()} $navigateTo,")
     val showUserDialog = remember { mutableStateOf(false) }
     val menuOpt: (MenuItemType, FileBean) -> Unit = { menuType, fb ->
         showUserDialog.value = false
@@ -176,12 +177,12 @@ private fun ItemList(
                     total = size, visible = false
                 )
                 Logcat.d("scroll.index:$index, ${scroll.isScrollInProgress}, resourceState:${resourceState.value}")
-                //if (!scroll.isScrollInProgress) {
-                //    if (resourceState.value == ResourceState.LOADING || resourceState.value == ResourceState.ERROR) {
-                //    } else {
-                //        loadMore(size)
-                //    }
-                //}
+                if (!scroll.isScrollInProgress) {
+                    if (resourceState.value == ResourceState.LOADING || resourceState.value == ResourceState.ERROR) {
+                    } else {
+                        loadMore(size)
+                    }
+                }
             }
         }
     }
