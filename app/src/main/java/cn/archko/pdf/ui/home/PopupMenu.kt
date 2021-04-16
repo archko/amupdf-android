@@ -45,8 +45,7 @@ fun PopupMenu(
                     .padding(8.dp)
                     .animateContentSize(),
                 elevation = 8.dp,
-                shape = RoundedCornerShape(2.dp),
-                backgroundColor = MaterialTheme.colors.background,
+                shape = RoundedCornerShape(4.dp),
             ) {
                 content()
             }

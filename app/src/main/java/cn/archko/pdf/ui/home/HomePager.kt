@@ -180,14 +180,13 @@ private fun TabContent(
         ScrollableTabRow(
             selectedTabIndex = pagerState.currentPage,
             modifier = Modifier.navigationBarsPadding(bottom = false),
-            backgroundColor = MaterialTheme.colors.background,
             edgePadding = 2.dp,
-            contentColor = MaterialTheme.colors.primary,
             indicator = { tabPositions ->
                 TabRowDefaults.Indicator(
                     Modifier
                         .pagerTabIndicatorOffset(pagerState, tabPositions)
                         .height(4.dp),
+                    color = MaterialTheme.colors.secondary,
                 )
             }
         ) {
