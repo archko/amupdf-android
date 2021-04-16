@@ -2,6 +2,7 @@ package cn.archko.pdf.ui.home
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -30,10 +30,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import cn.archko.pdf.common.Logcat
 import cn.archko.mupdf.R
 import cn.archko.pdf.activities.AboutActivity
 import cn.archko.pdf.activities.PdfOptionsActivity
+import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.theme.JetsnackTheme
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.google.accompanist.insets.navigationBarsPadding
@@ -128,61 +128,67 @@ fun PalletMenu(
     showMenu: Boolean,
     onPalletChange: () -> Unit
 ) {
-    val context = LocalContext.current
-    Card(
-        modifier = modifier
-            .width(120.dp)
-            .padding(8.dp)
-            .animateContentSize(),
-        elevation = 8.dp,
-        shape = MaterialTheme.shapes.large,
-        backgroundColor = JetsnackTheme.colors.uiBackground,
-    ) {
-        Column(
-            horizontalAlignment = Alignment.Start
+    if (showMenu) {
+        val context = LocalContext.current
+        Box(
+            contentAlignment = Alignment.TopEnd,
+            modifier = modifier
+                .fillMaxSize()
+                .clickable(
+                    onClick = onPalletChange,
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ),
         ) {
-            if (showMenu) {
-                when (currentSection) {
-                    0 -> {
-                        MenuItem(stringResource(id = R.string.options)) {
-                            onPalletChange()
-                            PdfOptionsActivity.start(
-                                context
-                            )
+            Card(
+                modifier = modifier
+                    .width(120.dp)
+                    .padding(8.dp)
+                    .animateContentSize(),
+                elevation = 8.dp,
+                shape = RoundedCornerShape(2.dp),
+                backgroundColor = JetsnackTheme.colors.uiBackground,
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.Start
+                ) {
+
+                    when (currentSection) {
+                        0 -> {
+                            MenuItem(stringResource(id = R.string.options)) {
+                                onPalletChange()
+                                PdfOptionsActivity.start(context)
+                            }
+                            MenuItem(stringResource(id = R.string.menu_backup)) {
+                                onPalletChange()
+                                backup(showLoadingDialog)
+                            }
+                            MenuItem(stringResource(id = R.string.menu_restore)) {
+                                onPalletChange()
+                                restore(showLoadingDialog)
+                            }
                         }
-                        MenuItem(stringResource(id = R.string.menu_backup)) {
-                            onPalletChange()
-                            backup(showLoadingDialog)
+                        1 -> {
+                            MenuItem(stringResource(id = R.string.options)) {
+                                onPalletChange()
+                                PdfOptionsActivity.start(context)
+                            }
+                            MenuItem(stringResource(id = R.string.menu_set_as_home)) {
+                                onPalletChange()
+                                setAsHome()
+                            }
                         }
-                        MenuItem(stringResource(id = R.string.menu_restore)) {
-                            onPalletChange()
-                            restore(showLoadingDialog)
+                        else -> {
+                            MenuItem(stringResource(id = R.string.options)) {
+                                onPalletChange()
+                                PdfOptionsActivity.start(context)
+                            }
                         }
                     }
-                    1 -> {
-                        MenuItem(stringResource(id = R.string.options)) {
-                            onPalletChange()
-                            PdfOptionsActivity.start(
-                                context
-                            )
-                        }
-                        MenuItem(stringResource(id = R.string.menu_set_as_home)) {
-                            onPalletChange()
-                            setAsHome()
-                        }
+                    MenuItem(stringResource(id = R.string.menu_about)) {
+                        onPalletChange()
+                        AboutActivity.start(context)
                     }
-                    else -> {
-                        MenuItem(stringResource(id = R.string.options)) {
-                            onPalletChange()
-                            PdfOptionsActivity.start(
-                                context
-                            )
-                        }
-                    }
-                }
-                MenuItem(stringResource(id = R.string.menu_about)) {
-                    onPalletChange()
-                    AboutActivity.start(context)
                 }
             }
         }
@@ -193,12 +199,14 @@ fun PalletMenu(
 fun MenuItem(name: String, onPalletChange: () -> Unit) {
     Row(
         modifier = Modifier
-            .padding(8.dp)
-            .clickable(onClick = onPalletChange),
+            .clickable(onClick = onPalletChange)
+            .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         //Icon(imageVector = Icons.Filled.FiberManualRecord, tint = color, contentDescription = null)
-        Text(text = name, color = Color.Black, modifier = Modifier.padding(4.dp))
+        Text(
+            text = name, color = Color.Black, modifier = Modifier.padding(2.dp)
+        )
     }
 }
 
