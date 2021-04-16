@@ -1,6 +1,7 @@
 package cn.archko.pdf.common
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -30,7 +31,7 @@ class PDFViewerHelper {
             openWithDefaultViewer(Uri.fromFile(f), activity)
         }
 
-        fun openWithDefaultViewer(uri: Uri, activity: Activity) {
+        fun openWithDefaultViewer(uri: Uri, activity: Context) {
             Logcat.i(Logcat.TAG, "post intent to open file $uri")
             val intent = Intent()
             intent.setDataAndType(uri, "application/pdf")
