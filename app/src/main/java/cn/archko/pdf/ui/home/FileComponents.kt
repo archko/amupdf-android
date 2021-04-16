@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,12 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -35,14 +31,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cn.archko.mupdf.R
 import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.components.BookComponents
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.components.JetsnackSurface
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.theme.JetsnackTheme
 import cn.archko.pdf.theme.Neutral8
-import cn.archko.pdf.utils.getIcon
-import cn.archko.pdf.viewmodel.FileViewModel
 
 @Composable
 fun EmptyView(modifier: Modifier) {
@@ -73,88 +66,6 @@ fun EmptyView(modifier: Modifier) {
                         .padding(horizontal = 5.dp)
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun FileItem(
-    fileBean: FileBean,
-    index: Int,
-    onOptClick: (Int) -> Unit,
-    onClick: (FileBean) -> Unit,
-    viewModel: FileViewModel,
-    modifier: Modifier = Modifier
-) {
-    Logcat.d("FileItem:$index")
-    Box(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier
-                .clickable(onClick = {
-                    onClick(fileBean)
-                })
-                .padding(horizontal = 8.dp, vertical = 4.dp)
-        ) {
-            Image(
-                painter = painterResource(id = fileBean.getIcon(viewModel)),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(36.dp)
-            )
-            Box(
-                modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(
-                        paddingValues = PaddingValues(
-                            top = 2.dp,
-                            start = 4.dp,
-                            end = 4.dp,
-                        )
-                    )
-                    .height(48.dp)
-            ) {
-                BookComponents(
-                    progress = 10F,
-                    color = Color(0xFFC9E9CE),
-                    modifier = Modifier.fillMaxSize()
-                )
-                fileBean.label?.let {
-                    Text(
-                        text = it,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        fontSize = 18.sp,
-                        color = Color.Black,
-                        modifier = Modifier
-                    )
-                }
-            }
-            Text(
-                text = fileBean.fileSize.toString(),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 14.sp,
-                color = Color(0xFF444444),
-                modifier = Modifier
-                    .padding(
-                        paddingValues = PaddingValues(
-                            start = 4.dp,
-                        )
-                    )
-                    .align(Alignment.CenterVertically)
-            )
-            Icon(
-                imageVector = Icons.Default.MoreVert, contentDescription = null,
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .clickable(onClick = {
-                        onOptClick(index)
-                    })
-                    .padding(paddingValues = PaddingValues(start = 2.dp))
-            )
         }
     }
 }

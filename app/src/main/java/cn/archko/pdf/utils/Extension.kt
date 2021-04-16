@@ -1,25 +1,52 @@
 package cn.archko.pdf.utils
 
+import androidx.compose.ui.text.toLowerCase
 import cn.archko.mupdf.R
 import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.viewmodel.FileViewModel
+import java.util.*
 
 /**
  * @author: archko 2021/4/14 :16:25
  */
-fun FileBean.getIcon(viewModel: FileViewModel): Int {
+fun FileBean.getIcon(): Int {
     var iconId = R.drawable.ic_explorer_fldr
-    if (isDirectory) {
+    if (type == FileBean.HOME) {
+    } else if (type == FileBean.NORMAL && isDirectory && !isUpFolder) {
+    } else if (isUpFolder) {
     } else {
-        if (label?.endsWith("pdf") == true) {
-            iconId = R.drawable.ic_item_book
-        } else {
-            if (viewModel.isHome(label!!)) {
-                iconId = R.drawable.ic_explorer_fldr
-            } else {
-                iconId = R.drawable.ic_explorer_any
+        bookProgress?.let {
+            if (null != bookProgress!!.ext) {
+                val ext: String = bookProgress!!.ext!!.toLowerCase(Locale.ROOT)
+
+                if (ext.contains("pdf")) {
+                    iconId = R.drawable.ic_item_book
+                } else if (ext.contains("epub")) {
+                    iconId = R.drawable.ic_item_book
+                } else if (ext.contains("txt")) {
+                    iconId = R.drawable.ic_item_book
+                } else {
+                    iconId = R.drawable.ic_explorer_any
+                }
             }
         }
     }
+
     return iconId
+}
+
+fun FileBean.getProgress(): Float {
+    val bookProgress = bookProgress
+    if (null != bookProgress) {
+        if (bookProgress.page > 0) {
+            return bookProgress.page * 100F / bookProgress.pageCount
+        }
+    }
+    return 0f
+}
+
+fun FileBean.getSize(): String {
+    if (null != bookProgress) {
+        return Utils.getFileSize(bookProgress!!.size)
+    }
+    return "0"
 }

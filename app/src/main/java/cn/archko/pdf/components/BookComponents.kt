@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 
 @Composable
-fun BookComponents(
+fun BookProgressBar(
     progress: Float,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.primary,
