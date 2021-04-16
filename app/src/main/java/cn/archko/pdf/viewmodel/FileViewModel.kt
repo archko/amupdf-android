@@ -1,10 +1,12 @@
 package cn.archko.pdf.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.archko.pdf.App
+import cn.archko.pdf.activities.ChooseFileFragmentActivity
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.RecentManager
 import cn.archko.pdf.entity.BookProgress
@@ -21,6 +23,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileFilter
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -81,7 +84,46 @@ class FileViewModel() : ViewModel() {
         return top == home
     }
 
-    fun loadFiles(currentPath: String?, dirsFirst: Boolean = true, showExtension: Boolean = true) {
+    private val fileFilter: FileFilter = FileFilter { file ->
+        //return (file.isDirectory() || file.getName().toLowerCase().endsWith(".pdf"));
+        if (file.isDirectory)
+            return@FileFilter true
+        val fname = file.name.toLowerCase(Locale.ROOT)
+
+        if (fname.endsWith(".pdf"))
+            return@FileFilter true
+        if (fname.endsWith(".xps"))
+            return@FileFilter true
+        if (fname.endsWith(".cbz"))
+            return@FileFilter true
+        if (fname.endsWith(".png"))
+            return@FileFilter true
+        if (fname.endsWith(".jpe"))
+            return@FileFilter true
+        if (fname.endsWith(".jpeg"))
+            return@FileFilter true
+        if (fname.endsWith(".jpg"))
+            return@FileFilter true
+        if (fname.endsWith(".jfif"))
+            return@FileFilter true
+        if (fname.endsWith(".jfif-tbnl"))
+            return@FileFilter true
+        if (fname.endsWith(".tif"))
+            return@FileFilter true
+        if (fname.endsWith(".tiff"))
+            return@FileFilter true
+        if (fname.endsWith(".epub"))
+            return@FileFilter true
+        if (fname.endsWith(".txt"))
+            return@FileFilter true
+        false
+    }
+
+    fun loadFiles(
+        currentPath: String?,
+        dirsFirst: Boolean = true,
+        showExtension: Boolean = true
+    ) {
         val path = currentPath ?: home
         val f = File(path)
         if (!f.exists() || !f.isDirectory) {
@@ -104,8 +146,7 @@ class FileViewModel() : ViewModel() {
                     entry = FileBean(FileBean.NORMAL, upFolder!!, "..")
                     fileList.add(entry)
                 }
-                val files = File(mCurrentPath!!).listFiles()
-                Logcat.d("$dirsFirst, path:$mCurrentPath, files:$files")
+                val files = File(mCurrentPath).listFiles(fileFilter)
                 if (files != null) {
                     try {
                         Arrays.sort(files, Comparator<File> { f1, f2 ->
@@ -125,7 +166,7 @@ class FileViewModel() : ViewModel() {
                         })
                     } catch (e: NullPointerException) {
                         throw RuntimeException(
-                            "failed to sort file list $files for path $mCurrentPath",
+                            "failed to sort file list " + files + " for path " + mCurrentPath,
                             e
                         )
                     }
@@ -214,5 +255,11 @@ class FileViewModel() : ViewModel() {
                 _uiRestorepModel.value = flag
             }
         }
+    }
+
+    fun setAsHome(activity: Context) {
+        val edit = activity.getSharedPreferences(ChooseFileFragmentActivity.PREF_TAG, 0)?.edit()
+        edit?.putString(ChooseFileFragmentActivity.PREF_HOME, mCurrentPath)
+        edit?.apply()
     }
 }

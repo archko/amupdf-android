@@ -1,5 +1,6 @@
 package cn.archko.pdf.ui.home
 
+import android.content.Context
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -50,6 +51,7 @@ import java.util.*
 fun HomePager(
     navController: NavHostController
 ) {
+    val viewModel: FileViewModel = viewModel()
     val showMenu = remember { mutableStateOf(false) }
 
     val showLoadingDialog = remember { mutableStateOf(false) }
@@ -95,8 +97,9 @@ fun HomePager(
             showMenu.value = false
         }
         Box(modifier = Modifier.fillMaxSize()) {
-            TabContent(navController, navItems, setCurrentSection)
+            TabContent(viewModel, navController, navItems, setCurrentSection)
             PalletMenu(
+                viewModel,
                 currentSection,
                 showLoadingDialog,
                 modifier = Modifier.align(Alignment.TopEnd),
@@ -116,12 +119,9 @@ fun restore(showLoadingDialog: MutableState<Boolean>) {
     showLoadingDialog.value = true
 }
 
-fun setAsHome() {
-
-}
-
 @Composable
 fun PalletMenu(
+    viewModel: FileViewModel,
     currentSection: Int,
     showLoadingDialog: MutableState<Boolean>,
     modifier: Modifier,
@@ -175,7 +175,7 @@ fun PalletMenu(
                             }
                             MenuItem(stringResource(id = R.string.menu_set_as_home)) {
                                 onPalletChange()
-                                setAsHome()
+                                viewModel.setAsHome(context)
                             }
                         }
                         else -> {
@@ -214,12 +214,12 @@ fun MenuItem(name: String, onPalletChange: () -> Unit) {
 @ExperimentalMaterialApi
 @Composable
 private fun TabContent(
+    viewModel: FileViewModel,
     navController: NavHostController,
     navItems: List<String>,
     setCurrentSection: (Int) -> Unit,
 ) {
     Logcat.d("$navController")
-    val viewModel: FileViewModel = viewModel()
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = navItems.size)
     Column(Modifier.fillMaxSize()) {
