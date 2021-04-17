@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cn.archko.mupdf.R
-import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.components.JetsnackSurface
 import cn.archko.pdf.entity.BookProgress
