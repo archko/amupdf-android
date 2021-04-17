@@ -75,17 +75,15 @@ object Libs {
             const val viewModelCompose =
                 "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha04"
 
-            const val lifecycleLivedataKtx = "androidx.lifecycle:lifecycle-livedata-ktx:2.3.1"
-            const val lifecycleViewmodelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
-
-            const val lifecycle = "2.2.0"
+            const val lifecycle = "2.3.1"
             const val runtime = "androidx.lifecycle:lifecycle-runtime:${lifecycle}"
             const val java8 = "androidx.lifecycle:lifecycle-common-java8:${lifecycle}"
             const val compiler = "androidx.lifecycle:lifecycle-compiler:${lifecycle}"
-            const val viewmodel = "androidx.lifecycle:lifecycle-viewmodel:${lifecycle}"
-            const val viewmodelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:${lifecycle}"
-            const val livedataKtx = "androidx.lifecycle:lifecycle-livedata-ktx:${lifecycle}"
-            const val extensions = "androidx.lifecycle:lifecycle-extensions:${lifecycle}"
+            const val viewModel = "androidx.lifecycle:lifecycle-viewmodel:${lifecycle}"
+            const val viewModelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:${lifecycle}"
+            const val liveDataKtx = "androidx.lifecycle:lifecycle-livedata-ktx:${lifecycle}"
+
+            const val extensions = "androidx.lifecycle:lifecycle-extensions:2.2.0"
         }
 
         object ConstraintLayout {

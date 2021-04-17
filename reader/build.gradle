@@ -44,9 +44,9 @@ dependencies {
     api Libs.Fragment.runtime
     api Libs.Fragment.runtimeKtx
     api Libs.AndroidX.Lifecycle.runtime
-    api Libs.AndroidX.Lifecycle.viewmodel
-    api Libs.AndroidX.Lifecycle.viewmodelKtx
-    api Libs.AndroidX.Lifecycle.livedataKtx
+    api Libs.AndroidX.Lifecycle.viewModel
+    api Libs.AndroidX.Lifecycle.viewModelKtx
+    api Libs.AndroidX.Lifecycle.liveDataKtx
 
     implementation(Libs.Dependency.viewpager2) {
         exclude group: 'androidx.recyclerview'
