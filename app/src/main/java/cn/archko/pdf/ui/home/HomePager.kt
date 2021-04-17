@@ -49,7 +49,11 @@ fun HomePager(
     showLoadingDialog.value = (uiBackup.value == ResourceState.LOADING)
 
     val navItems =
-        listOf(stringResource(id = R.string.tab_history), stringResource(id = R.string.tab_browser))
+        listOf(
+            stringResource(id = R.string.tab_history),
+            stringResource(id = R.string.tab_browser),
+            stringResource(id = R.string.tab_favorite)
+        )
 
     val (currentSection, setCurrentSection) = rememberSaveable {
         mutableStateOf(0)
@@ -218,6 +222,10 @@ private fun TabContent(
                         navigateTo = { Logcat.d("file.navigateTo") },
                     )
                     1 -> FileList(
+                        viewModel,
+                        navigateTo = { Logcat.d("file.navigateTo") },
+                    )
+                    2 -> FileFavoritiesList(
                         viewModel,
                         navigateTo = { Logcat.d("file.navigateTo") },
                     )

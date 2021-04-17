@@ -53,6 +53,10 @@ class FileViewModel() : ViewModel() {
     val uiFileHistoryModel: StateFlow<MutableList<FileBean>>
         get() = _uiFileHistoryModel
 
+    private val _uiFavoritiesModel = MutableStateFlow<MutableList<FileBean>>(mutableListOf())
+    val uiFavoritiesModel: StateFlow<MutableList<FileBean>>
+        get() = _uiFavoritiesModel
+
     private val _uiBackupModel = MutableStateFlow(ResourceState())
     val uiBackupModel: StateFlow<ResourceState>
         get() = _uiBackupModel
@@ -70,6 +74,7 @@ class FileViewModel() : ViewModel() {
     var home: String = "/sdcard/"
     var selectionIndex = 0
     var totalCount = 0
+    var totalFavCount = 0
 
     init {
         var externalFileRootDir: File? = App.instance!!.getExternalFilesDir(null)
@@ -237,6 +242,44 @@ class FileViewModel() : ViewModel() {
                     nList.addAll(list)
                     _uiFileHistoryModel.value = nList
                     totalCount = count
+                }
+        }
+    }
+
+    fun loadFavoritiesFromDB(startIndex: Int, showExtension: Boolean = true) {
+        var count = 0
+        viewModelScope.launch {
+            flow {
+                val recent = RecentManager.instance
+                count = recent.favoriteProgressCount
+                val progresses: ArrayList<BookProgress>? = recent.readFavoriteFromDb(
+                    startIndex,
+                    PAGE_SIZE
+                )
+
+                val entryList = ArrayList<FileBean>()
+
+                var entry: FileBean
+                var file: File
+                val path = home
+                progresses?.map {
+                    file = File(path + "/" + it.path)
+                    entry = FileBean(FileBean.FAVORITE, file, showExtension)
+                    entry.bookProgress = it
+                    entryList.add(entry)
+                }
+                emit(entryList)
+            }.catch { e ->
+                Logcat.d("Exception:$e")
+                emit(ArrayList<FileBean>())
+            }.flowOn(Dispatchers.IO)
+                .collect { list ->
+                    val oldList = _uiFavoritiesModel.value
+                    val nList = ArrayList<FileBean>()
+                    nList.addAll(oldList)
+                    nList.addAll(list)
+                    _uiFavoritiesModel.value = nList
+                    totalFavCount = count
                 }
         }
     }

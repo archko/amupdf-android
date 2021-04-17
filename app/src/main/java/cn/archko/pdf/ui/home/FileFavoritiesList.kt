@@ -24,25 +24,25 @@ import com.umeng.analytics.MobclickAgent
 import java.util.*
 
 @Composable
-fun FileHistoryList(
+fun FileFavoritiesList(
     viewModel: FileViewModel,
     navigateTo: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val resourceState by viewModel.dataLoading.collectAsState()
-    if (viewModel.uiFileHistoryModel.value.isEmpty()
+    if (viewModel.uiFavoritiesModel.value.isEmpty()
         && resourceState.value != ResourceState.ERROR
         && resourceState.value != ResourceState.LOADING
     ) {
-        viewModel.loadHistoryFileBean(0)
+        viewModel.loadFavoritiesFromDB(0)
     }
 
-    val response by viewModel.uiFileHistoryModel.collectAsState()
-    val totalCount = viewModel.totalCount
+    val response by viewModel.uiFavoritiesModel.collectAsState()
+    val totalCount = viewModel.totalFavCount
     val loadMore: (Int) -> Unit = { index: Int ->
         Logcat.d("loadMore,$index")
-        viewModel.loadMoreFileBeanFromDB(index)
+        viewModel.loadFavoritiesFromDB(index)
     }
     val onClick: (FileBean) -> Unit = { it ->
         PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
@@ -70,11 +70,6 @@ fun FileHistoryList(
                 map.put("name", fb.file!!.name)
                 MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
                 showInfoDialog.value = true
-            }
-            MenuItemType.DeleteHistory -> {
-                MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, "remove")
-                RecentManager.instance.removeRecentFromDb(fb.file!!.absolutePath)
-                viewModel.loadFileBeanFromDB(0)
             }
             MenuItemType.AddToFav -> {
                 val map = HashMap<String, String>()
