@@ -14,7 +14,7 @@ import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.components.Divider
-import cn.archko.pdf.components.JetsnackSurface
+import cn.archko.pdf.components.Surface
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.paging.ResourceState
 import cn.archko.pdf.viewmodel.FileViewModel
@@ -145,7 +145,7 @@ private fun FileList(
     if (resourceState.value == ResourceState.INIT || list.isEmpty()) {
         EmptyView(modifier)
     } else {
-        JetsnackSurface(modifier = modifier.fillMaxSize()) {
+        Surface(modifier = modifier.fillMaxSize()) {
             Box {
                 ItemList(
                     list,

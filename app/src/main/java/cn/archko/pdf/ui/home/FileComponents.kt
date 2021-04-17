@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cn.archko.mupdf.R
 import cn.archko.pdf.components.Divider
-import cn.archko.pdf.components.JetsnackSurface
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.theme.Typography
@@ -31,7 +30,7 @@ import cn.archko.pdf.utils.FileUtils
 
 @Composable
 fun EmptyView(modifier: Modifier) {
-    JetsnackSurface(modifier = modifier.fillMaxSize()) {
+    Surface(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
