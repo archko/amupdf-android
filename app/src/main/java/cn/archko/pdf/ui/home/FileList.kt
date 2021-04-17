@@ -99,6 +99,22 @@ fun FileList(
                     viewModel.loadFiles(null)
                 }
             }
+            MenuItemType.AddToFav -> {
+                val map = HashMap<String, String>()
+                map.put("type", "addToFavorite")
+                map.put("name", fb.file!!.name)
+                MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
+
+                viewModel.favorite(fb, 1)
+            }
+            MenuItemType.DeleteFav -> {
+                val map = HashMap<String, String>()
+                map.put("type", "removeFromFavorite")
+                map.put("name", fb.file!!.name)
+                MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
+
+                viewModel.favorite(fb, 0)
+            }
         }
     }
     Box(modifier = Modifier.fillMaxSize()) {

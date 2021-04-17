@@ -6,13 +6,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.archko.pdf.App
 import cn.archko.pdf.activities.ChooseFileFragmentActivity
+import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.ProgressScaner
 import cn.archko.pdf.common.RecentManager
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
+import cn.archko.pdf.fragments.BrowserFragment
 import cn.archko.pdf.paging.ResourceState
+import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
+import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -321,4 +325,50 @@ class FileViewModel() : ViewModel() {
                     }
                 }
         }
+
+    fun favorite(entry: FileBean, isFavorited: Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val recentManager = RecentManager.instance.recentTableManager
+                    val filepath = FileUtils.getStoragePath(entry.bookProgress!!.path)
+                    val file = File(filepath)
+                    var bookProgress = recentManager.getProgress(file.name, BookProgress.ALL)
+                    if (null == bookProgress) {
+                        if (isFavorited == 0) {
+                            Logcat.w(BrowserFragment.TAG, "some error:$entry")
+                            return@withContext
+                        }
+                        bookProgress = BookProgress(FileUtils.getRealPath(file.absolutePath))
+                        entry.bookProgress = bookProgress
+                        entry.bookProgress!!.inRecent = BookProgress.NOT_IN_RECENT
+                        entry.bookProgress!!.isFavorited = isFavorited
+                        Logcat.d(BrowserFragment.TAG, "add favorite entry:${entry.bookProgress}")
+                        recentManager.addProgress(entry.bookProgress!!)
+                    } else {
+                        entry.bookProgress = bookProgress
+                        entry.bookProgress!!.isFavorited = isFavorited
+                        Logcat.d(BrowserFragment.TAG, "update favorite entry:${entry.bookProgress}")
+                        recentManager.updateProgress(entry.bookProgress!!)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+            postFavoriteEvent(entry, isFavorited)
+        }
+    }
+
+    private fun postFavoriteEvent(entry: FileBean, isFavorited: Int) {
+        if (isFavorited == 1) {
+            LiveEventBus
+                .get(Event.ACTION_FAVORITED)
+                .post(entry)
+        } else {
+            LiveEventBus
+                .get(Event.ACTION_UNFAVORITED)
+                .post(entry)
+        }
+    }
 }

@@ -22,10 +22,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cn.archko.mupdf.R
+import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.components.JetsnackSurface
+import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.theme.Typography
+import cn.archko.pdf.utils.FileUtils
 
 @Composable
 fun EmptyView(modifier: Modifier) {
@@ -169,8 +172,13 @@ fun UserOptDialog(
                         )
                         Divider(thickness = 0.5.dp)
                     }
-                    if (fileBeanType == FileBeanType.Favorite) {
-                        if (fileBean.bookProgress!!.isFavorited == 0) {
+                    if (null != fileBean.file) {
+                        var bookProgress = fileBean.bookProgress
+                        if (null == bookProgress) {
+                            bookProgress =
+                                BookProgress(FileUtils.getRealPath(fileBean.file!!.absolutePath))
+                        }
+                        if (bookProgress.isFavorited == 0) {
                             DialogItem(
                                 txt = stringResource(id = R.string.menu_add_to_fav),
                                 onClick = { menuOpt(MenuItemType.AddToFav, fileBean) }
