@@ -73,6 +73,7 @@ fun FileList(
     //}
     Logcat.d("FileList,${response.isEmpty()} $navigateTo,")
     val showUserDialog = remember { mutableStateOf(false) }
+    val showInfoDialog = remember { mutableStateOf(false) }
     val menuOpt: (MenuItemType, FileBean) -> Unit = { menuType, fb ->
         showUserDialog.value = false
         when (menuType) {
@@ -90,6 +91,7 @@ fun FileList(
                 map.put("type", "info")
                 map.put("name", fb.file!!.name)
                 MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
+                showInfoDialog.value = true
             }
             MenuItemType.DeleteFile -> {
                 if (fb.type == FileBean.NORMAL && !fb.isDirectory) {
@@ -105,6 +107,7 @@ fun FileList(
             resourceState,
             modifier,
             showUserDialog,
+            showInfoDialog,
             menuOpt,
             onClick,
             viewModel
@@ -118,6 +121,7 @@ private fun FileList(
     resourceState: ResourceState,
     modifier: Modifier = Modifier,
     showUserDialog: MutableState<Boolean>,
+    showInfoDialog: MutableState<Boolean>,
     menuOpt: (MenuItemType, FileBean) -> Unit,
     onClick: (FileBean) -> Unit,
     viewModel: FileViewModel
@@ -127,7 +131,15 @@ private fun FileList(
     } else {
         JetsnackSurface(modifier = modifier.fillMaxSize()) {
             Box {
-                ItemList(list, modifier, showUserDialog, menuOpt, onClick, viewModel)
+                ItemList(
+                    list,
+                    modifier,
+                    showUserDialog,
+                    showInfoDialog,
+                    menuOpt,
+                    onClick,
+                    viewModel
+                )
             }
         }
     }
@@ -139,6 +151,7 @@ private fun ItemList(
     list: MutableList<FileBean>,
     modifier: Modifier = Modifier,
     showUserDialog: MutableState<Boolean>,
+    showInfoDialog: MutableState<Boolean>,
     menuOpt: (MenuItemType, FileBean) -> Unit,
     onClick: (FileBean) -> Unit,
     viewModel: FileViewModel
@@ -153,6 +166,7 @@ private fun ItemList(
     }
     Logcat.d("showUserDialog:${showUserDialog.value}, file.fileIndex:${fileIndex.value}")
     UserOptDialog(showUserDialog, list, fileIndex, menuOpt)
+    FileInfoDialog(showInfoDialog, list, fileIndex)
     LazyColumn(modifier) {
         //item {
         //    Spacer(Modifier.statusBarsHeight(additional = 56.dp))

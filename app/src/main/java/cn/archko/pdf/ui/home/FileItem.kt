@@ -101,15 +101,20 @@ fun FileItem(
                     )
                     .align(Alignment.CenterVertically)
             )
-            Icon(
-                imageVector = Icons.Default.MoreVert, contentDescription = null,
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .clickable(onClick = {
-                        onOptClick(index)
-                    })
-                    .padding(paddingValues = PaddingValues(start = 2.dp))
-            )
+            if (!fileBean.isDirectory) {
+                val file = fileBean.file
+                if (file != null) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert, contentDescription = null,
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .clickable(onClick = {
+                                onOptClick(index)
+                            })
+                            .padding(paddingValues = PaddingValues(start = 2.dp))
+                    )
+                }
+            }
         }
     }
 }
