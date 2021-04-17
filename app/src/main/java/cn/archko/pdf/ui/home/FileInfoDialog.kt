@@ -1,5 +1,6 @@
 package cn.archko.pdf.ui.home
 
+import android.widget.ImageView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -8,8 +9,10 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -17,8 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import cn.archko.mupdf.R
+import cn.archko.pdf.App
+import cn.archko.pdf.common.ImageLoader
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.utils.DateUtils
@@ -32,6 +38,7 @@ fun FileInfoDialog(
     fileBeans: MutableList<FileBean>,
     fileIndex: MutableState<Int>,
 ) {
+    val context = LocalContext.current
     if (showInfoDialog.value && (fileIndex.value < fileBeans.size)) {
         val fileBean = fileBeans[fileIndex.value]
         val file = fileBean.file
@@ -208,6 +215,25 @@ fun FileInfoDialog(
                                 "Read",
                             )
                         }
+                    }
+
+                    val androidImageView = remember {
+                        ImageView(context).apply {
+                            ImageLoader.getInstance().loadImage(
+                                fileBean.file?.path,
+                                0,
+                                1.0f,
+                                App.instance!!.screenWidth,
+                                this
+                            )
+                        }
+                    }
+                    AndroidView(
+                        { androidImageView },
+                        modifier = Modifier
+                            .padding(bottom = 8.dp)
+                            .align(Alignment.CenterHorizontally)
+                    ) {
                     }
                 }
             }
