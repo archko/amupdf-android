@@ -2,8 +2,6 @@ package cn.archko.pdf.viewmodel
 
 import android.content.Context
 import android.widget.Toast
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.archko.pdf.App
@@ -36,6 +34,7 @@ class FileViewModel() : ViewModel() {
     companion object {
 
         const val PAGE_SIZE = 21
+        const val MAX_TIME = 1300L
     }
 
     private val _dataLoading = MutableStateFlow(ResourceState())
@@ -54,9 +53,13 @@ class FileViewModel() : ViewModel() {
     val uiBackupModel: StateFlow<ResourceState>
         get() = _uiBackupModel
 
-    private val _uiRestorepModel = MutableLiveData<Boolean>()
-    val uiRestorepModel: LiveData<Boolean>
-        get() = _uiRestorepModel
+    /*private val _uiRestoreModel = MutableStateFlow(ResourceState())
+    val uiRestoreModel: StateFlow<ResourceState>
+        get() = _uiRestoreModel*/
+
+    private val _uiBackupFileModel = MutableStateFlow<List<File>>(mutableListOf())
+    val uiBackupFileModel: StateFlow<List<File>>
+        get() = _uiBackupFileModel
 
     private var mScanner: ProgressScaner = ProgressScaner()
 
@@ -236,51 +239,62 @@ class FileViewModel() : ViewModel() {
 
     fun backupFromDb() {
         _uiBackupModel.value = ResourceState(ResourceState.LOADING)
-        val now = System.currentTimeMillis()
         viewModelScope.launch {
-            val filepath = withContext(Dispatchers.IO) {
+            val now = System.currentTimeMillis()
+            flow {
                 val filepath = RecentManager.instance.backupFromDb()
                 var newTime = System.currentTimeMillis() - now
-                if (newTime < 1500L) {
-                    newTime = 1500L - newTime
+                if (newTime < MAX_TIME) {
+                    newTime = MAX_TIME - newTime
                 } else {
                     newTime = 0
                 }
 
                 delay(newTime)
-                return@withContext filepath
-            }
-
-            withContext(Dispatchers.Main) {
-                if (!LengthUtils.isEmpty(filepath)) {
-                    Logcat.d("", "file:$filepath")
-                    Toast.makeText(App.instance, "备份成功:$filepath", Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(App.instance, "备份失败", Toast.LENGTH_LONG).show()
+                emit(filepath)
+            }.catch { e ->
+                Logcat.d("restoreToDb error:$e")
+                emit(null)
+            }.flowOn(Dispatchers.IO)
+                .collect { filepath ->
+                    if (!LengthUtils.isEmpty(filepath)) {
+                        Logcat.d("", "file:$filepath")
+                        Toast.makeText(App.instance, "备份成功:$filepath", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(App.instance, "备份失败", Toast.LENGTH_LONG).show()
+                    }
+                    _uiBackupModel.value = ResourceState(ResourceState.FINISHED)
                 }
-                _uiBackupModel.value = ResourceState(ResourceState.FINISHED)
-            }
         }
     }
 
     fun restoreToDb(file: File) {
-        val now = System.currentTimeMillis()
+        _uiBackupModel.value = ResourceState(ResourceState.LOADING)
         viewModelScope.launch {
-            val flag = withContext(Dispatchers.IO) {
+            val now = System.currentTimeMillis()
+            flow {
                 val flag: Boolean = RecentManager.instance.restoreToDb(file)
                 var newTime = System.currentTimeMillis() - now
-                if (newTime < 1300L) {
-                    newTime = 1300L - newTime
+                if (newTime < MAX_TIME) {
+                    newTime = MAX_TIME - newTime
                 } else {
                     newTime = 0
                 }
 
                 delay(newTime)
-                return@withContext flag
-            }
-            withContext(Dispatchers.Main) {
-                _uiRestorepModel.value = flag
-            }
+                emit(flag)
+            }.catch { e ->
+                Logcat.d("restoreToDb error:$e")
+                emit(false)
+            }.flowOn(Dispatchers.IO)
+                .collect { flag ->
+                    if (flag) {
+                        Toast.makeText(App.instance, "恢复成功:$flag", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(App.instance, "恢复失败", Toast.LENGTH_LONG).show()
+                    }
+                    _uiBackupModel.value = ResourceState(ResourceState.FINISHED)
+                }
         }
     }
 
@@ -289,4 +303,22 @@ class FileViewModel() : ViewModel() {
         edit?.putString(ChooseFileFragmentActivity.PREF_HOME, mCurrentPath)
         edit?.apply()
     }
+
+    fun loadBackupFiles() =
+        viewModelScope.launch {
+            flow {
+                val files: List<File>? = RecentManager.instance.backupFiles
+                emit(files)
+            }.catch { e ->
+                Logcat.d("backupFiles error:$e")
+                emit(ArrayList<File>())
+            }.flowOn(Dispatchers.IO)
+                .collect { list ->
+                    if (list != null) {
+                        _uiBackupFileModel.value = list
+                    } else {
+                        _uiBackupFileModel.value = ArrayList<File>()
+                    }
+                }
+        }
 }

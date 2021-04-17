@@ -2,26 +2,14 @@ package cn.archko.pdf.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -41,6 +29,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.*
 
 @ExperimentalPagerApi
@@ -51,6 +40,7 @@ fun HomePager(
 ) {
     val context = LocalContext.current
     val showLoadingDialog = remember { mutableStateOf(false) }
+    val showRestoreDialog = remember { mutableStateOf(false) }
 
     val viewModel: FileViewModel = viewModel()
     val uiBackup by viewModel.uiBackupModel.collectAsState()
@@ -60,18 +50,24 @@ fun HomePager(
 
     val navItems =
         listOf(stringResource(id = R.string.tab_history), stringResource(id = R.string.tab_browser))
+
     val (currentSection, setCurrentSection) = rememberSaveable {
         mutableStateOf(0)
     }
+
     val onPalletChange: () -> Unit = { ->
         showMenu.value = false
     }
 
-    val content: @Composable BoxScope.() -> Unit = {
+    val onSelectFile: (File) -> Unit = { it ->
+        showRestoreDialog.value = false
+        viewModel.restoreToDb(it)
+    }
+
+    val menuContent: @Composable BoxScope.() -> Unit = {
         Column(
             horizontalAlignment = Alignment.Start
         ) {
-
             when (currentSection) {
                 0 -> {
                     MenuItem(stringResource(id = R.string.options)) {
@@ -84,7 +80,7 @@ fun HomePager(
                     }
                     MenuItem(stringResource(id = R.string.menu_restore)) {
                         onPalletChange()
-                        restore(showLoadingDialog)
+                        restore(showRestoreDialog)
                     }
                 }
                 1 -> {
@@ -147,21 +143,22 @@ fun HomePager(
                 PopupMenu(
                     modifier = Modifier.align(Alignment.TopEnd),
                     showMenu,
-                    content
+                    menuContent
                 )
             }
         }
+        RestoreDialog(showRestoreDialog, viewModel, onSelectFile)
         LoadingDialog(showLoadingDialog)
     }
 }
 
-fun backup(showLoadingDialog: MutableState<Boolean>, viewModel: FileViewModel) {
+private fun backup(showLoadingDialog: MutableState<Boolean>, viewModel: FileViewModel) {
     showLoadingDialog.value = true
     viewModel.backupFromDb()
 }
 
-fun restore(showLoadingDialog: MutableState<Boolean>) {
-    showLoadingDialog.value = true
+private fun restore(showRestoreDialog: MutableState<Boolean>) {
+    showRestoreDialog.value = true
 }
 
 @ExperimentalPagerApi

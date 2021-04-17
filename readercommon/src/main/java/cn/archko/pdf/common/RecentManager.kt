@@ -208,32 +208,6 @@ class RecentManager private constructor() {
         return flag
     }
 
-    val backupFile: File?
-        get() {
-            val dir = FileUtils.getStorageDir("amupdf")
-            if (!dir.exists()) {
-                return null
-            }
-            var file: File? = null
-            try {
-                val files = dir.listFiles { pathname -> pathname.name.startsWith("mupdf_") }
-                if (files.size > 0) {
-                    Arrays.sort(files) { f1: File?, f2: File? ->
-                        if (f1 == null) throw RuntimeException("f1 is null inside sort")
-                        if (f2 == null) throw RuntimeException("f2 is null inside sort")
-                        try {
-                            return@sort (f2.lastModified() - f1.lastModified()).toInt()
-                        } catch (e: NullPointerException) {
-                            throw RuntimeException("failed to compare $f1 and $f2", e)
-                        }
-                    }
-                    file = files[0]
-                }
-            } catch (e: NullPointerException) {
-                throw RuntimeException("failed to sort file list " + " for path ", e)
-            }
-            return file
-        }
     val backupFiles: List<File>?
         get() {
             val dir = FileUtils.getStorageDir("amupdf")
@@ -245,7 +219,7 @@ class RecentManager private constructor() {
                 if (f1 == null) throw RuntimeException("f1 is null inside sort")
                 if (f2 == null) throw RuntimeException("f2 is null inside sort")
                 try {
-                    return@sort (f2.lastModified() - f1.lastModified()).toInt()
+                    return@sort f2.lastModified().compareTo(f1.lastModified())
                 } catch (e: NullPointerException) {
                     throw RuntimeException("failed to compare $f1 and $f2", e)
                 }

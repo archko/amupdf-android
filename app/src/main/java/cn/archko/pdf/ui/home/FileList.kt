@@ -82,7 +82,7 @@ fun FileList(
     }
     //val refresh: () -> Unit = { ->
     //}
-    Logcat.d("FileList,${response} $navigateTo,")
+    Logcat.d("FileList,${response.isEmpty()} $navigateTo,")
     val showUserDialog = remember { mutableStateOf(false) }
     val menuOpt: (MenuItemType, FileBean) -> Unit = { menuType, fb ->
         showUserDialog.value = false
@@ -154,18 +154,18 @@ private fun ItemList(
         }
         showUserDialog.value = true
     }
-    Logcat.d("item:${showUserDialog.value}, file:${fileIndex.value}")
+    Logcat.d("showUserDialog:${showUserDialog.value}, file.fileIndex:${fileIndex.value}")
     UserOptDialog(showUserDialog, list, fileIndex, menuOpt)
     LazyColumn(modifier) {
         //item {
         //    Spacer(Modifier.statusBarsHeight(additional = 56.dp))
         //}
-        itemsIndexed(list) { index, gankBean ->
+        itemsIndexed(list) { index, fileBean ->
             if (index > 0) {
                 Divider(thickness = 1.dp)
             }
             FileItem(
-                fileBean = gankBean,
+                fileBean = fileBean,
                 index = index,
                 onOptClick = onOptClick,
                 onClick = onClick,
