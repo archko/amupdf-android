@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFViewerHelper
-import cn.archko.pdf.common.RecentManager
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.components.JetsnackSurface
 import cn.archko.pdf.components.LoadingFooter
@@ -165,7 +164,7 @@ private fun ItemList(
         showUserDialog.value = true
     }
     Logcat.d("showUserDialog:${showUserDialog.value}, file.fileIndex:${fileIndex.value}")
-    UserOptDialog(showUserDialog, list, fileIndex, menuOpt, FileBeanType.History)
+    UserOptDialog(showUserDialog, list, fileIndex, menuOpt, FileBeanType.Favorite)
     FileInfoDialog(showInfoDialog, list, fileIndex)
     LazyColumn(modifier) {
         //item {
