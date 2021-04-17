@@ -11,13 +11,13 @@
     <string name="about_3dparty_title">"第三方软件"</string>
     <string name="about_changelog_title">"版本变化"</string>
 
-    <string name="label_filename">文件名:</string>
-    <string name="label_filesize">大小:</string>
-    <string name="label_read">上次阅读:</string>
-    <string name="label_lastmodified">上次更新:</string>
-    <string name="label_pagecount">阅读页数:</string>
-    <string name="label_location">位置:</string>
-    <string name="label_read_count">阅读次数:</string>
+    <string name="label_filename">文件名：</string>
+    <string name="label_filesize">大小：</string>
+    <string name="label_read">上次阅读：</string>
+    <string name="label_lastmodified">上次更新：</string>
+    <string name="label_pagecount">阅读页数：</string>
+    <string name="label_location">位置：</string>
+    <string name="label_read_count">阅读次数：</string>
 
     <string name="menu_vudroid">用Vudroid方式打开</string>
     <string name="menu_mupdf">用AMupdf方式打开</string>

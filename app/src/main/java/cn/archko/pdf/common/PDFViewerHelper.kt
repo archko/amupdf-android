@@ -13,6 +13,7 @@ import cn.archko.pdf.activities.AMuPDFRecyclerViewActivity
 import com.umeng.analytics.MobclickAgent
 import org.vudroid.pdfdroid.PdfViewerActivity
 import java.io.File
+import java.util.*
 
 /**
  * @author: archko 2020/1/4 :2:06 下午
@@ -36,6 +37,10 @@ class PDFViewerHelper {
         //protected const val bartekscViewContextMenuItem = Menu.FIRST + 118
 
         fun openWithDefaultViewer(f: File, activity: Context) {
+            val map = HashMap<String, String>()
+            map.put("type", "vudroid")
+            map.put("name", f.name)
+            MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
             Logcat.i(Logcat.TAG, "post intent to open file $f")
             if (f.absolutePath.endsWith("txt", true)) {
                 Toast.makeText(activity, "can't load f:${f.absolutePath}", Toast.LENGTH_SHORT)

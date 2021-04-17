@@ -1,18 +1,12 @@
 package cn.archko.pdf.ui.home
 
-import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -27,7 +21,6 @@ import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.paging.ResourceState
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.umeng.analytics.MobclickAgent
-import java.io.File
 import java.util.*
 
 @Composable
@@ -52,19 +45,13 @@ fun FileHistoryList(
         viewModel.loadMoreFileBeanFromDB(index)
     }
     val onClick: (FileBean) -> Unit = { it ->
-        val clickedFile: File? = it.file
-
-        val map = HashMap<String, String>()
-        map.put("type", "file")
-        map.put("name", clickedFile!!.name)
-        MobclickAgent.onEvent(context, AnalysticsHelper.A_FILE, map)
-
-        PDFViewerHelper.openWithDefaultViewer(Uri.fromFile(clickedFile), context)
+        PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
     }
     //val refresh: () -> Unit = { ->
     //}
     Logcat.d("FileList,${response.isEmpty()} $navigateTo,")
     val showUserDialog = remember { mutableStateOf(false) }
+    val showInfoDialog = remember { mutableStateOf(false) }
     val menuOpt: (MenuItemType, FileBean) -> Unit = { menuType, fb ->
         showUserDialog.value = false
         when (menuType) {
@@ -78,6 +65,11 @@ fun FileHistoryList(
                 PDFViewerHelper.openViewerOther(fb.file!!, context)
             }
             MenuItemType.ViewBookInfo -> {
+                val map = HashMap<String, String>()
+                map.put("type", "info")
+                map.put("name", fb.file!!.name)
+                MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
+                showInfoDialog.value = true
             }
             MenuItemType.DeleteHistory -> {
                 MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, "remove")
@@ -94,6 +86,7 @@ fun FileHistoryList(
             loadMore,
             modifier,
             showUserDialog,
+            showInfoDialog,
             menuOpt,
             onClick,
             viewModel
@@ -109,6 +102,7 @@ private fun FileList(
     loadMore: (Int) -> Unit,
     modifier: Modifier = Modifier,
     showUserDialog: MutableState<Boolean>,
+    showInfoDialog: MutableState<Boolean>,
     menuOpt: (MenuItemType, FileBean) -> Unit,
     onClick: (FileBean) -> Unit,
     viewModel: FileViewModel
@@ -125,6 +119,7 @@ private fun FileList(
                     loadMore,
                     modifier,
                     showUserDialog,
+                    showInfoDialog,
                     menuOpt,
                     onClick,
                     viewModel
@@ -143,13 +138,14 @@ private fun ItemList(
     loadMore: (Int) -> Unit,
     modifier: Modifier = Modifier,
     showUserDialog: MutableState<Boolean>,
+    showInfoDialog: MutableState<Boolean>,
     menuOpt: (MenuItemType, FileBean) -> Unit,
     onClick: (FileBean) -> Unit,
     viewModel: FileViewModel
 ) {
     val scroll = rememberScrollState(0)
     val size = list.size
-    var fileIndex = remember { mutableStateOf(0) }
+    val fileIndex = remember { mutableStateOf(0) }
     val onOptClick: (Int) -> Unit = { it ->
         fileIndex.value = it
         if (it > list.size) {
@@ -159,6 +155,7 @@ private fun ItemList(
     }
     Logcat.d("showUserDialog:${showUserDialog.value}, file.fileIndex:${fileIndex.value}")
     UserOptDialog(showUserDialog, list, fileIndex, menuOpt, FileBeanType.History)
+    FileInfoDialog(showInfoDialog, list, fileIndex)
     LazyColumn(modifier) {
         //item {
         //    Spacer(Modifier.statusBarsHeight(additional = 56.dp))
