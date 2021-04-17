@@ -73,7 +73,6 @@ fun FileItem(
                 val progress = fileBean.getProgress()
                 BookProgressBar(
                     progress = progress,
-                    color = Color(0xFFC9E9CE),
                     modifier = Modifier.fillMaxSize()
                 )
                 fileBean.label?.let {
@@ -82,7 +81,6 @@ fun FileItem(
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                         fontSize = 18.sp,
-                        color = Color.Black,
                         modifier = Modifier
                     )
                 }
@@ -92,7 +90,6 @@ fun FileItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 14.sp,
-                color = Color(0xFF444444),
                 modifier = Modifier
                     .padding(
                         paddingValues = PaddingValues(

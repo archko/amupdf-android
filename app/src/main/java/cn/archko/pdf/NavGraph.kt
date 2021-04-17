@@ -2,9 +2,11 @@ package cn.archko.pdf
 
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import cn.archko.pdf.theme.AppThemeState
 import cn.archko.pdf.ui.home.HomePager
 import com.google.accompanist.pager.ExperimentalPagerApi
 
@@ -16,7 +18,10 @@ object Destination {
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
 @Composable
-fun NavGraph(startDestination: String = Destination.HOME) {
+fun NavGraph(
+    appThemeState: MutableState<AppThemeState>,
+    startDestination: String = Destination.HOME
+) {
     val navController = rememberNavController()
 
     NavHost(
@@ -24,7 +29,7 @@ fun NavGraph(startDestination: String = Destination.HOME) {
         startDestination = startDestination
     ) {
         composable(Destination.HOME) {
-            HomePager(navController)
+            HomePager(appThemeState, navController)
         }
         composable(
             "${Destination.GANKDETAIL}/{gankStr}"

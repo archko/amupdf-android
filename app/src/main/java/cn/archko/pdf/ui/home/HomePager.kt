@@ -22,6 +22,7 @@ import cn.archko.pdf.activities.AboutActivity
 import cn.archko.pdf.activities.PdfOptionsActivity
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.paging.ResourceState
+import cn.archko.pdf.theme.AppThemeState
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -36,6 +37,7 @@ import java.util.*
 @ExperimentalMaterialApi
 @Composable
 fun HomePager(
+    appThemeState: MutableState<AppThemeState>,
     navController: NavHostController
 ) {
     val context = LocalContext.current
@@ -129,6 +131,15 @@ fun HomePager(
                         )
                     },
                     actions = {
+                        IconButton(onClick = {
+                            appThemeState.value = appThemeState
+                                .value.copy(darkTheme = !appThemeState.value.darkTheme)
+                        }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_sleep),
+                                contentDescription = null
+                            )
+                        }
                         Text(
                             text = stringResource(id = R.string.menu_search),
                             modifier = Modifier
