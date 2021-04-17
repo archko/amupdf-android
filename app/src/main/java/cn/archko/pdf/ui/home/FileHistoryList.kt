@@ -171,7 +171,7 @@ private fun ItemList(
     }
     Logcat.d("showUserDialog:${showUserDialog.value}, file.fileIndex:${fileIndex.value}")
     UserOptDialog(showUserDialog, list, fileIndex, menuOpt, FileBeanType.History)
-    FileInfoDialog(showInfoDialog, list, fileIndex)
+    FileInfoDialog(showInfoDialog, list, fileIndex, menuOpt)
     LazyColumn(modifier) {
         //item {
         //    Spacer(Modifier.statusBarsHeight(additional = 56.dp))

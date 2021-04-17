@@ -172,7 +172,7 @@ private fun ItemList(
     onClick: (FileBean) -> Unit,
     viewModel: FileViewModel
 ) {
-    var fileIndex = remember { mutableStateOf(0) }
+    val fileIndex = remember { mutableStateOf(0) }
     val onOptClick: (Int) -> Unit = { it ->
         fileIndex.value = it
         if (it > list.size) {
@@ -182,7 +182,7 @@ private fun ItemList(
     }
     Logcat.d("showUserDialog:${showUserDialog.value}, file.fileIndex:${fileIndex.value}")
     UserOptDialog(showUserDialog, list, fileIndex, menuOpt)
-    FileInfoDialog(showInfoDialog, list, fileIndex)
+    FileInfoDialog(showInfoDialog, list, fileIndex, menuOpt)
     LazyColumn(modifier) {
         //item {
         //    Spacer(Modifier.statusBarsHeight(additional = 56.dp))

@@ -37,6 +37,7 @@ fun FileInfoDialog(
     showInfoDialog: MutableState<Boolean>,
     fileBeans: MutableList<FileBean>,
     fileIndex: MutableState<Int>,
+    menuOpt: (MenuItemType, FileBean) -> Unit,
 ) {
     val context = LocalContext.current
     if (showInfoDialog.value && (fileIndex.value < fileBeans.size)) {
@@ -205,7 +206,10 @@ fun FileInfoDialog(
                         }
 
                         Button(
-                            onClick = { showInfoDialog.value = false },
+                            onClick = {
+                                showInfoDialog.value = false
+                                menuOpt(MenuItemType.ViewBookWithAMupdf, fileBean)
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
