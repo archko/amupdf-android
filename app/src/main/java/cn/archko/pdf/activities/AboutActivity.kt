@@ -2,28 +2,26 @@ package cn.archko.pdf.activities
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.text.TextUtils
-import android.view.LayoutInflater
 import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.webkit.WebView
-import android.widget.BaseExpandableListAdapter
-import android.widget.ExpandableListView
-import android.widget.TextView
-import cn.archko.mupdf.R
-import cn.archko.pdf.activities.AboutActivity
-import cn.archko.pdf.utils.FileUtils
-import cn.archko.pdf.utils.LengthUtils
-import com.google.android.material.appbar.MaterialToolbar
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.core.view.WindowCompat
+import cn.archko.pdf.LocalBackPressedDispatcher
+import cn.archko.pdf.theme.*
+import cn.archko.pdf.ui.home.AboutScreen
+import cn.archko.pdf.utils.LocalSysUiController
+import cn.archko.pdf.utils.SystemUiController
+import com.google.accompanist.insets.ProvideWindowInsets
 import com.umeng.analytics.MobclickAgent
 
 /**
  * @author: archko 2018/12/16 :9:43
  */
-class AboutActivity : AnalysticActivity() {
+class AboutActivity : ComponentActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
@@ -35,24 +33,37 @@ class AboutActivity : AnalysticActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.about)
-        var name = "AMuPDF"
-        var version = ""
-        try {
-            val packageInfo = packageManager.getPackageInfo(packageName, 0)
-            version = packageInfo.versionName
-            name = resources.getString(packageInfo.applicationInfo.labelRes)
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
+        WindowCompat.setDecorFitsSystemWindows(window, true)
+
+        setContent {
+            val systemUiController = remember { SystemUiController(window) }
+            val appTheme = remember { mutableStateOf(AppThemeState()) }
+            val color = when (appTheme.value.pallet) {
+                ColorPallet.GREEN -> green700
+                ColorPallet.BLUE -> blue700
+                ColorPallet.ORANGE -> orange700
+                ColorPallet.PURPLE -> purple700
+            }
+            systemUiController.setStatusBarColor(
+                color = color,
+                darkIcons = appTheme.value.darkTheme
+            )
+            CompositionLocalProvider(
+                LocalSysUiController provides systemUiController,
+                LocalBackPressedDispatcher provides this.onBackPressedDispatcher
+            ) {
+                ProvideWindowInsets {
+                    ComposeCookBookTheme(
+                        darkTheme = appTheme.value.darkTheme,
+                        colorPallet = appTheme.value.pallet
+                    ) {
+                        AboutScreen() {
+                            onBackPressed()
+                        }
+                    }
+                }
+            }
         }
-        val text = name + if (LengthUtils.isNotEmpty(version)) " v$version" else ""
-        val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
-        toolbar.setNavigationOnClickListener { finish() }
-        toolbar.title = text
-        setSupportActionBar(toolbar)
-        val view = findViewById<View>(R.id.about_parts) as ExpandableListView
-        view.setAdapter(PartsAdapter())
-        view.expandGroup(0)
     }
 
     override fun onPause() {
@@ -65,126 +76,7 @@ class AboutActivity : AnalysticActivity() {
         MobclickAgent.onPageStart("about")
     }
 
-    class Part(val labelId: Int, val format: Format, val fileName: String) {
-        var content: CharSequence? = null
-        fun getContent(context: Context?): CharSequence? {
-            if (TextUtils.isEmpty(content)) {
-                content = try {
-                    val text = FileUtils.readAssetAsString(fileName)
-                    format.format(text)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    ""
-                }
-            }
-            return content
-        }
-    }
-
-    inner class PartsAdapter : BaseExpandableListAdapter() {
-        override fun getGroupCount(): Int {
-            return PARTS.size
-        }
-
-        override fun getChildrenCount(groupPosition: Int): Int {
-            return 1
-        }
-
-        override fun getGroup(groupPosition: Int): Part {
-            return PARTS[groupPosition]
-        }
-
-        override fun getChild(groupPosition: Int, childPosition: Int): Part {
-            return PARTS[groupPosition]
-        }
-
-        override fun getGroupId(groupPosition: Int): Long {
-            return groupPosition.toLong()
-        }
-
-        override fun getChildId(groupPosition: Int, childPosition: Int): Long {
-            return childPosition.toLong()
-        }
-
-        override fun hasStableIds(): Boolean {
-            return true
-        }
-
-        override fun getGroupView(
-            groupPosition: Int,
-            isExpanded: Boolean,
-            convertView: View?,
-            parent: ViewGroup?
-        ): View {
-            var container: View? = null
-            var view: TextView? = null
-            container = convertView
-                ?: LayoutInflater.from(this@AboutActivity)
-                    .inflate(R.layout.about_part, parent, false)
-            view = container!!.findViewById<View>(R.id.about_partText) as TextView
-            view.setText(getGroup(groupPosition).labelId)
-            return container
-        }
-
-        override fun getChildView(
-            groupPosition: Int,
-            childPosition: Int,
-            isLastChild: Boolean,
-            convertView: View?,
-            parent: ViewGroup?
-        ): View {
-            var view: WebView? = null
-            view = if (convertView !is WebView) {
-                WebView(this@AboutActivity)
-            } else {
-                convertView
-            }
-            val content = getChild(groupPosition, childPosition).getContent(this@AboutActivity)
-            view.loadData(content.toString(), "text/html", "UTF-8")
-            //view.setBackgroundColor(Color.GRAY);
-            return view
-        }
-
-        override fun isChildSelectable(groupPosition: Int, childPosition: Int): Boolean {
-            return false
-        }
-    }
-
-    enum class Format {
-        /**
-         *
-         */
-        TEXT,
-
-        /**
-         *
-         */
-        HTML;
-
-        /**
-         *
-         */
-        /*WIKI {
-            @Override
-            public CharSequence format(final String text) {
-                return Wiki.fromWiki(text);
-            }
-        };*/
-        fun format(text: String): CharSequence {
-            return text
-        }
-    }
-
     companion object {
-        private val PARTS = arrayOf( // Start
-            Part(
-                R.string.about_commmon_title,
-                Format.HTML,
-                "about_common.html"
-            ),  //new Part(R.string.about_license_title, Format.HTML, "about_license.html"),
-            Part(R.string.about_3dparty_title, Format.HTML, "about_3rdparty.html"),
-            Part(R.string.about_changelog_title, Format.HTML, "about_changelog.html")
-        )
 
         fun start(context: Context) {
             context.startActivity(Intent(context, AboutActivity::class.java))

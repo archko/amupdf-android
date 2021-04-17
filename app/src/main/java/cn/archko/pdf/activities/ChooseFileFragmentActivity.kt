@@ -63,27 +63,6 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
                 }
             }
         }
-        /*toolbar.setOnMenuItemClickListener { item ->
-            val id = item.itemId
-            when (id) {
-                R.id.action_about -> startActivity(
-                    Intent(
-                        this@ChooseFileFragmentActivity,
-                        AboutActivity::class.java
-                    )
-                )
-                R.id.action_options -> PdfOptionsActivity.start(this@ChooseFileFragmentActivity)
-                R.id.action_search -> {
-                    showSearchDialog()
-                }
-                else -> {
-                    val fragment: Fragment? = mPagerAdapter.getItemFragment(mViewPager.currentItem)
-                    Logcat.d("menu:" + id + " fragment:" + fragment + " index:" + mViewPager.currentItem)
-                    fragment?.onOptionsItemSelected(item)
-                }
-            }
-            false
-        }*/
 
         checkSdcardPermission()
 
@@ -171,7 +150,6 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
     private fun loadView() {
 
     }
-
 
     companion object {
 
