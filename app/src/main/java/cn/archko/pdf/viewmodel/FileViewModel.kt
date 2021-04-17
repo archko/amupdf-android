@@ -2,6 +2,7 @@ package cn.archko.pdf.viewmodel
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.ui.text.toLowerCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.archko.pdf.App
@@ -12,7 +13,6 @@ import cn.archko.pdf.common.ProgressScaner
 import cn.archko.pdf.common.RecentManager
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.fragments.BrowserFragment
 import cn.archko.pdf.paging.ResourceState
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
@@ -379,19 +379,19 @@ class FileViewModel() : ViewModel() {
                     var bookProgress = recentManager.getProgress(file.name, BookProgress.ALL)
                     if (null == bookProgress) {
                         if (isFavorited == 0) {
-                            Logcat.w(BrowserFragment.TAG, "some error:$entry")
+                            Logcat.w("", "some error:$entry")
                             return@withContext
                         }
                         bookProgress = BookProgress(FileUtils.getRealPath(file.absolutePath))
                         entry.bookProgress = bookProgress
                         entry.bookProgress!!.inRecent = BookProgress.NOT_IN_RECENT
                         entry.bookProgress!!.isFavorited = isFavorited
-                        Logcat.d(BrowserFragment.TAG, "add favorite entry:${entry.bookProgress}")
+                        Logcat.d("add favorite entry:${entry.bookProgress}")
                         recentManager.addProgress(entry.bookProgress!!)
                     } else {
                         entry.bookProgress = bookProgress
                         entry.bookProgress!!.isFavorited = isFavorited
-                        Logcat.d(BrowserFragment.TAG, "update favorite entry:${entry.bookProgress}")
+                        Logcat.d("update favorite entry:${entry.bookProgress}")
                         recentManager.updateProgress(entry.bookProgress!!)
                     }
                 } catch (e: Exception) {
