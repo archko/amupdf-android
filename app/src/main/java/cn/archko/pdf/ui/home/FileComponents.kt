@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cn.archko.mupdf.R
-import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.components.JetsnackSurface
 import cn.archko.pdf.entity.FileBean
@@ -114,9 +113,6 @@ fun UserOptDialog(
     menuOpt: (MenuItemType, FileBean) -> Unit,
     fileBeanType: FileBeanType = FileBeanType.SysFile
 ) {
-    val background = Color.White
-    Logcat.d("$menuOpt,$background")
-
     if (showUserDialog.value && (fileIndex.value < fileBeans.size)) {
         val fileBean = fileBeans[fileIndex.value]
         Dialog(
@@ -127,7 +123,6 @@ fun UserOptDialog(
             Surface(
                 modifier = Modifier,
                 shape = MaterialTheme.shapes.medium,
-                color = background,
             ) {
                 Column(modifier = Modifier.padding(2.dp)) {
                     Row {
@@ -141,7 +136,6 @@ fun UserOptDialog(
                         Text(
                             "File Operation",
                             style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-                            color = Color.Black,
                             modifier = Modifier
                                 .align(Alignment.CenterVertically)
                         )
@@ -151,10 +145,12 @@ fun UserOptDialog(
                         txt = stringResource(id = R.string.menu_mupdf),
                         onClick = { menuOpt(MenuItemType.ViewBookWithAMupdf, fileBean) }
                     )
+                    Divider(thickness = 0.5.dp)
                     DialogItem(
                         txt = "Mupdf new Viewer",
                         onClick = { menuOpt(MenuItemType.ViewBookWithMupdf, fileBean) }
                     )
+                    Divider(thickness = 0.5.dp)
                     DialogItem(
                         txt = stringResource(id = R.string.menu_other),
                         onClick = { menuOpt(MenuItemType.OpenWithOther, fileBean) }
@@ -164,12 +160,14 @@ fun UserOptDialog(
                             txt = stringResource(id = R.string.menu_delete),
                             onClick = { menuOpt(MenuItemType.DeleteFile, fileBean) }
                         )
+                        Divider(thickness = 0.5.dp)
                     }
                     if (fileBeanType == FileBeanType.History) {
                         DialogItem(
                             txt = stringResource(id = R.string.menu_remove_from_recent),
                             onClick = { menuOpt(MenuItemType.DeleteHistory, fileBean) }
                         )
+                        Divider(thickness = 0.5.dp)
                     }
                     if (fileBeanType == FileBeanType.Favorite) {
                         if (fileBean.bookProgress!!.isFavorited == 0) {
@@ -177,11 +175,13 @@ fun UserOptDialog(
                                 txt = stringResource(id = R.string.menu_add_to_fav),
                                 onClick = { menuOpt(MenuItemType.AddToFav, fileBean) }
                             )
+                            Divider(thickness = 0.5.dp)
                         } else {
                             DialogItem(
                                 txt = stringResource(id = R.string.menu_remove_from_fav),
                                 onClick = { menuOpt(MenuItemType.DeleteFav, fileBean) }
                             )
+                            Divider(thickness = 0.5.dp)
                         }
                     }
                     DialogItem(
@@ -199,9 +199,6 @@ fun LoadingDialog(
     showLoadingDialog: MutableState<Boolean>,
     text: String = "Please Waiting"
 ) {
-    val background = Color.White
-    Logcat.d("$background")
-
     if (showLoadingDialog.value) {
         Dialog(
             onDismissRequest = {
@@ -213,7 +210,6 @@ fun LoadingDialog(
                     .fillMaxWidth()
                     .height(160.dp),
                 shape = MaterialTheme.shapes.medium,
-                color = background,
             ) {
                 Column(
                     modifier = Modifier
@@ -223,7 +219,6 @@ fun LoadingDialog(
                     Text(
                         text,
                         style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-                        color = Color.Black,
                         modifier = Modifier.padding(8.dp)
                     )
                     /*CircularProgressIndicator(

@@ -1,5 +1,6 @@
 package cn.archko.pdf.ui.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,11 +14,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import cn.archko.mupdf.R
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.viewmodel.FileViewModel
 import java.io.File
@@ -28,7 +32,6 @@ fun RestoreDialog(
     viewModel: FileViewModel,
     onSelectFile: (File) -> Unit,
 ) {
-    val background = Color.White
     val uiBackupFiles by viewModel.uiBackupFileModel.collectAsState()
     viewModel.loadBackupFiles()
 
@@ -41,17 +44,38 @@ fun RestoreDialog(
             Surface(
                 modifier = Modifier,
                 shape = MaterialTheme.shapes.medium,
-                color = background,
             ) {
-                LazyColumn() {
-                    itemsIndexed(uiBackupFiles) { index, file ->
-                        if (index > 0) {
-                            Divider(thickness = 1.dp)
-                        }
-                        DialogItem(
-                            file = file,
-                            onSelectFile = onSelectFile,
+                Column(
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .fillMaxWidth()
+                ) {
+                    Row {
+                        Image(
+                            painter = painterResource(id = R.drawable.icon),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .align(Alignment.CenterVertically)
                         )
+                        Text(
+                            "History Backups",
+                            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                        )
+                    }
+                    Divider(thickness = 1.dp)
+                    LazyColumn() {
+                        itemsIndexed(uiBackupFiles) { index, file ->
+                            if (index > 0) {
+                                Divider(thickness = 0.5.dp)
+                            }
+                            DialogItem(
+                                file = file,
+                                onSelectFile = onSelectFile,
+                            )
+                        }
                     }
                 }
             }
