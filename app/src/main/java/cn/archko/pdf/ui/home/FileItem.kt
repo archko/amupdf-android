@@ -2,14 +2,7 @@ package cn.archko.pdf.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -17,13 +10,10 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.components.BookProgressBar
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.utils.getIcon
@@ -62,11 +52,10 @@ fun FileItem(
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(
-                        paddingValues = PaddingValues(
-                            top = 2.dp,
-                            start = 4.dp,
-                            end = 4.dp,
-                        )
+                        top = 1.dp,
+                        start = 4.dp,
+                        end = 4.dp,
+                        bottom = 1.dp,
                     )
                     .height(48.dp)
             ) {
@@ -81,7 +70,6 @@ fun FileItem(
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                         fontSize = 18.sp,
-                        modifier = Modifier
                     )
                 }
             }
@@ -91,11 +79,7 @@ fun FileItem(
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 14.sp,
                 modifier = Modifier
-                    .padding(
-                        paddingValues = PaddingValues(
-                            start = 4.dp,
-                        )
-                    )
+                    .padding(start = 4.dp)
                     .align(Alignment.CenterVertically)
             )
             if (!fileBean.isDirectory) {
@@ -108,7 +92,7 @@ fun FileItem(
                             .clickable(onClick = {
                                 onOptClick(index)
                             })
-                            .padding(paddingValues = PaddingValues(start = 2.dp))
+                            .padding(start = 2.dp)
                     )
                 }
             }

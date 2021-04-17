@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 fun BookProgressBar(
     progress: Float,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colors.primary.copy(alpha = 0.35f),
+    color: Color = MaterialTheme.colors.secondary.copy(alpha = 0.3f),
 ) {
     Canvas(
         modifier.focusable()
