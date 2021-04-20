@@ -60,16 +60,18 @@ fun FileItem(
                     .height(48.dp)
             ) {
                 val progress = fileBean.getProgress()
-                BookProgressBar(
-                    progress = progress,
-                    modifier = Modifier.fillMaxSize()
-                )
+                if (progress > 0) {
+                    BookProgressBar(
+                        progress = progress,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
                 fileBean.label?.let {
                     Text(
                         text = it,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = 18.sp,
+                        fontSize = 17.sp,
                     )
                 }
             }

@@ -1,24 +1,22 @@
 package cn.archko.pdf.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cn.archko.pdf.paging.ResourceState
-import cn.archko.mupdf.R
 
 @Composable
 fun LoadingFooter(
@@ -58,19 +56,25 @@ fun LoadingFooter(
                     )
                 )
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.loading),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = modifier
-                    .size(48.dp)
-                    .padding(paddingValues = PaddingValues(end = 8.dp))
-                    .align(Alignment.CenterVertically)
-            )
+            if (resourceState.value == ResourceState.FINISHED) {
+                CircularProgressIndicator(
+                    modifier = modifier
+                        .size(36.dp)
+                        .padding(paddingValues = PaddingValues(end = 8.dp))
+                        .align(Alignment.CenterVertically)
+                )
+            } else {
+                Spacer(
+                    modifier = modifier
+                        .size(36.dp)
+                        .padding(paddingValues = PaddingValues(end = 8.dp))
+                        .align(Alignment.CenterVertically)
+                )
+            }
             txt?.let {
                 Text(
                     text = it,
-                    style = TextStyle(fontSize = 20.sp),
+                    style = TextStyle(fontSize = 18.sp),
                     color = MaterialTheme.colors.onSecondary,
                     modifier = modifier
                         .align(Alignment.CenterVertically)

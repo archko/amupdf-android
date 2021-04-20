@@ -2,9 +2,9 @@ package cn.archko.pdf.viewmodel
 
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.ui.text.toLowerCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cn.archko.mupdf.R
 import cn.archko.pdf.App
 import cn.archko.pdf.activities.ChooseFileFragmentActivity
 import cn.archko.pdf.common.Event
@@ -13,6 +13,7 @@ import cn.archko.pdf.common.ProgressScaner
 import cn.archko.pdf.common.RecentManager
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
+import cn.archko.pdf.model.SearchSuggestionGroup
 import cn.archko.pdf.paging.ResourceState
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
@@ -61,17 +62,14 @@ class FileViewModel() : ViewModel() {
     val uiBackupModel: StateFlow<ResourceState>
         get() = _uiBackupModel
 
-    /*private val _uiRestoreModel = MutableStateFlow(ResourceState())
-    val uiRestoreModel: StateFlow<ResourceState>
-        get() = _uiRestoreModel*/
-
     private val _uiBackupFileModel = MutableStateFlow<List<File>>(mutableListOf())
     val uiBackupFileModel: StateFlow<List<File>>
         get() = _uiBackupFileModel
 
     private var mScanner: ProgressScaner = ProgressScaner()
 
-    var home: String = "/sdcard/"
+    var sdcardRoot: String = "/sdcard/"
+    var homePath: String
     var selectionIndex = 0
     var totalCount = 0
     var totalFavCount = 0
@@ -82,12 +80,38 @@ class FileViewModel() : ViewModel() {
             externalFileRootDir = Objects.requireNonNull(externalFileRootDir)?.parentFile
         } while (Objects.requireNonNull(externalFileRootDir)?.absolutePath?.contains("/Android") == true
         )
-        home = externalFileRootDir?.path!!
-        Logcat.d("home:$home")
+        sdcardRoot = externalFileRootDir?.path!!
+        Logcat.d("sdcardRoot:$sdcardRoot")
+
+        homePath = initHomePath()
+    }
+
+    private fun initHomePath(): String {
+        var path: String? =
+            App.instance!!.getSharedPreferences(ChooseFileFragmentActivity.PREF_TAG, 0)!!
+                .getString(ChooseFileFragmentActivity.PREF_HOME, null)
+        if (null == path) {
+            Toast.makeText(
+                App.instance,
+                App.instance!!.getString(R.string.toast_set_as_home),
+                Toast.LENGTH_SHORT
+            )
+            path = sdcardRoot
+        }
+        if (path!!.length > 1 && path.endsWith("/")) {
+            path = path.substring(0, path.length - 2)
+        }
+
+        val pathFile = File(path)
+
+        if (pathFile.exists() && pathFile.isDirectory)
+            return path
+        else
+            return sdcardRoot
     }
 
     fun isHome(path: String): Boolean {
-        return path == home
+        return path == homePath
     }
 
     var mCurrentPath: String? = null
@@ -98,7 +122,7 @@ class FileViewModel() : ViewModel() {
             return true
         }
         val top = stack.peek()
-        return top == home
+        return top == homePath
     }
 
     private val fileFilter: FileFilter = FileFilter { file ->
@@ -141,7 +165,7 @@ class FileViewModel() : ViewModel() {
         dirsFirst: Boolean = true,
         showExtension: Boolean = true
     ) {
-        val path = currentPath ?: home
+        val path = currentPath ?: homePath
         val f = File(path)
         if (!f.exists() || !f.isDirectory) {
             return
@@ -156,7 +180,7 @@ class FileViewModel() : ViewModel() {
                 var fileList: ArrayList<FileBean> = ArrayList()
                 var entry: FileBean
 
-                entry = FileBean(FileBean.HOME, home)
+                entry = FileBean(FileBean.HOME, homePath)
                 fileList.add(entry)
                 if (mCurrentPath != "/") {
                     val upFolder = File(mCurrentPath!!).parentFile
@@ -223,7 +247,7 @@ class FileViewModel() : ViewModel() {
 
                 var entry: FileBean
                 var file: File
-                val path = home
+                val path = sdcardRoot
                 progresses?.map {
                     file = File(path + "/" + it.path)
                     entry = FileBean(FileBean.RECENT, file, showExtension)
@@ -261,7 +285,7 @@ class FileViewModel() : ViewModel() {
 
                 var entry: FileBean
                 var file: File
-                val path = home
+                val path = sdcardRoot
                 progresses?.map {
                     file = File(path + "/" + it.path)
                     entry = FileBean(FileBean.FAVORITE, file, showExtension)
@@ -412,6 +436,48 @@ class FileViewModel() : ViewModel() {
             LiveEventBus
                 .get(Event.ACTION_UNFAVORITED)
                 .post(entry)
+        }
+    }
+
+    // ============================ search ==========================
+
+    fun getSuggestions(): List<SearchSuggestionGroup> = searchSuggestions
+
+    private val searchSuggestions = listOf(
+        SearchSuggestionGroup(
+            id = 0L,
+            name = "Recent searches",
+            suggestions = listOf(
+                "",
+            )
+        )
+    )
+
+    suspend fun search(query: String): MutableList<FileBean> = withContext(Dispatchers.Default) {
+        val fileList = ArrayList<FileBean>()
+        doSearch(fileList, query, File(homePath))
+        fileList
+    }
+
+    private fun doSearch(fileList: ArrayList<FileBean>, keyword: String, dir: File) {
+        if (dir.isDirectory) {
+            val files = dir.listFiles(this.fileFilter)
+
+            if (files != null && files.size > 0) {
+                for (f in files) {
+                    if (f.isFile) {
+                        if (f.name.toLowerCase().contains(keyword)) {
+                            fileList.add(FileBean(FileBean.NORMAL, f, true))
+                        }
+                    } else {
+                        doSearch(fileList, keyword, f)
+                    }
+                }
+            }
+        } else {
+            if (dir.name.contains(keyword)) {
+                fileList.add(FileBean(FileBean.NORMAL, dir, true))
+            }
         }
     }
 }

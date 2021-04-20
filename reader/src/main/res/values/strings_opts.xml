@@ -104,6 +104,7 @@
     <string name="tab_history">History</string>
     <string name="tab_browser">Browser</string>
     <string name="tab_favorite">Fravorite</string>
+    <string name="tab_search">Search</string>
 
     <string name="menu_font_size">Font Size</string>
     <string name="menu_font_face">Font Face</string>

@@ -54,7 +54,8 @@ fun HomePager(
         listOf(
             stringResource(id = R.string.tab_history),
             stringResource(id = R.string.tab_browser),
-            stringResource(id = R.string.tab_favorite)
+            stringResource(id = R.string.tab_favorite),
+            stringResource(id = R.string.tab_search)
         )
 
     val (currentSection, setCurrentSection) = rememberSaveable {
@@ -239,6 +240,10 @@ private fun TabContent(
                     2 -> FileFavoritiesList(
                         viewModel,
                         navigateTo = { Logcat.d("file.navigateTo") },
+                    )
+                    3 -> FileSearchList(
+                        viewModel,
+                        navController
                     )
                 }
             }

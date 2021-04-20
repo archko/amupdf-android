@@ -36,15 +36,15 @@ fun EmptyView(modifier: Modifier) {
                 .absolutePadding(top = 80.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.loading),
+                painter = painterResource(id = R.drawable.icon),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(64.dp)
                     .absolutePadding(bottom = 8.dp)
                     .align(Alignment.CenterHorizontally)
             )
             Text(
-                text = "Waiting...",
+                text = stringResource(id = R.string.empty_title),
                 style = Typography.h5,
                 modifier = Modifier
                     .padding(12.dp)
@@ -52,8 +52,8 @@ fun EmptyView(modifier: Modifier) {
                 textAlign = TextAlign.Center
             )
             Text(
-                text = "Loading...",
-                style = Typography.subtitle2,
+                text = stringResource(id = R.string.empty_subtitle),
+                style = Typography.subtitle1,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )

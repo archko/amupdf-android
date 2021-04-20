@@ -53,7 +53,7 @@ fun FileList(
         val clickedFile: File?
 
         if (it.type == FileBean.HOME) {
-            clickedFile = File(viewModel.home)
+            clickedFile = File(viewModel.sdcardRoot)
         } else {
             clickedFile = it.file
         }
@@ -66,7 +66,9 @@ fun FileList(
             map.put("name", clickedFile!!.name)
             MobclickAgent.onEvent(context, AnalysticsHelper.A_FILE, map)
         } else {
-            PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
+            if (it.file != null) {
+                PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
+            }
         }
     }
     //val refresh: () -> Unit = { ->

@@ -56,7 +56,9 @@ fun FileHistoryList(
         showUserDialog.value = false
         when (menuType) {
             MenuItemType.ViewBookWithAMupdf -> {
-                PDFViewerHelper.openWithDefaultViewer(fb.file!!, context)
+                if (fb.file != null) {
+                    PDFViewerHelper.openWithDefaultViewer(fb.file!!, context)
+                }
             }
             MenuItemType.ViewBookWithMupdf -> {
                 PDFViewerHelper.openViewerMupdf(fb.file!!, context)
