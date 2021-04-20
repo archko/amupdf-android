@@ -1,12 +1,32 @@
 package cn.archko.pdf.ui.home
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.ScrollableTabRow
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRowDefaults
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,10 +72,10 @@ fun HomePager(
 
     val navItems =
         listOf(
+            stringResource(id = R.string.tab_search),
             stringResource(id = R.string.tab_history),
             stringResource(id = R.string.tab_browser),
             stringResource(id = R.string.tab_favorite),
-            stringResource(id = R.string.tab_search)
         )
 
     val (currentSection, setCurrentSection) = rememberSaveable {
@@ -76,7 +96,7 @@ fun HomePager(
             horizontalAlignment = Alignment.Start
         ) {
             when (currentSection) {
-                0 -> {
+                1 -> {
                     MenuItem(stringResource(id = R.string.options)) {
                         onPalletChange()
                         PdfOptionsActivity.start(context)
@@ -90,7 +110,7 @@ fun HomePager(
                         restore(showRestoreDialog)
                     }
                 }
-                1 -> {
+                2 -> {
                     MenuItem(stringResource(id = R.string.options)) {
                         onPalletChange()
                         PdfOptionsActivity.start(context)
@@ -100,7 +120,7 @@ fun HomePager(
                         viewModel.setAsHome(context)
                     }
                 }
-                else -> {
+                0, 3 -> {
                     MenuItem(stringResource(id = R.string.options)) {
                         onPalletChange()
                         PdfOptionsActivity.start(context)
@@ -141,12 +161,11 @@ fun HomePager(
                                 contentDescription = null
                             )
                         }
-                        Text(
-                            text = stringResource(id = R.string.menu_search),
-                            modifier = Modifier
-                                .clickable(onClick = { })
-                                .padding(10.dp)
-                        )
+                        IconButton(onClick = { PdfOptionsActivity.start(context) }) {
+                            Icon(
+                                imageVector = Icons.Default.Settings, contentDescription = null,
+                            )
+                        }
                         IconButton(onClick = { showMenu.value = !showMenu.value }) {
                             Icon(imageVector = Icons.Default.MoreVert, contentDescription = null)
                         }
@@ -188,7 +207,7 @@ private fun TabContent(
 ) {
     Logcat.d("$navController")
     val coroutineScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(pageCount = navItems.size)
+    val pagerState = rememberPagerState(initialPage = 1, pageCount = navItems.size)
     Column(Modifier.fillMaxSize()) {
         ScrollableTabRow(
             selectedTabIndex = pagerState.currentPage,
@@ -229,21 +248,20 @@ private fun TabContent(
             content = { page ->
                 setCurrentSection(pagerState.currentPage)
                 when (page) {
-                    0 -> FileHistoryList(
+                    0 -> FileSearchList(
+                        viewModel,
+                    )
+                    1 -> FileHistoryList(
                         viewModel,
                         navigateTo = { Logcat.d("file.navigateTo") },
                     )
-                    1 -> FileList(
+                    2 -> FileList(
                         viewModel,
                         navigateTo = { Logcat.d("file.navigateTo") },
                     )
-                    2 -> FileFavoritiesList(
+                    3 -> FileFavoritiesList(
                         viewModel,
                         navigateTo = { Logcat.d("file.navigateTo") },
-                    )
-                    3 -> FileSearchList(
-                        viewModel,
-                        navController
                     )
                 }
             }

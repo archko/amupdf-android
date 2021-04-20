@@ -38,8 +38,8 @@ import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFViewerHelper
@@ -47,6 +47,7 @@ import cn.archko.pdf.components.Divider
 import cn.archko.pdf.components.Surface
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.model.SearchSuggestionGroup
+import cn.archko.pdf.theme.Typography
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.google.accompanist.insets.statusBarsPadding
 import com.umeng.analytics.MobclickAgent
@@ -56,9 +57,8 @@ import java.util.*
 @Composable
 fun FileSearchList(
     viewModel: FileViewModel,
-    navHostController: NavHostController,
-    modifier: Modifier = Modifier,
-    state: SearchState = rememberSearchState(viewModel)
+    state: SearchState = rememberSearchState(viewModel),
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val onClick: (FileBean) -> Unit = { it ->
@@ -144,7 +144,14 @@ fun FileSearchList(
             state.searching = false
         }
         when (state.searchDisplay) {
-            SearchDisplay.Categories -> Text("Search")
+            SearchDisplay.Categories -> {
+                Text(
+                    text = "",
+                    style = Typography.subtitle1,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
             SearchDisplay.Suggestions -> SearchSuggestions(
                 suggestions = state.suggestions,
                 onSuggestionSelect = { suggestion -> state.query = TextFieldValue(suggestion) }
@@ -244,6 +251,8 @@ private fun SearchBar(
                             contentDescription = null
                         )
                     }
+                } else {
+                    Spacer(Modifier.width(16.dp))
                 }
                 BasicTextField(
                     value = query,
@@ -261,7 +270,7 @@ private fun SearchBar(
                             .size(36.dp)
                     )
                 } else {
-                    Spacer(Modifier.width(48.dp)) // balance arrow icon
+                    Spacer(Modifier.width(36.dp)) // balance arrow icon
                 }
             }
         }
@@ -278,11 +287,13 @@ private fun SearchHint() {
     ) {
         Icon(
             imageVector = Icons.Outlined.Search,
-            contentDescription = null
+            contentDescription = null,
+            tint = MaterialTheme.colors.primary.copy(alpha = 0.6f)
         )
         Spacer(Modifier.width(8.dp))
         Text(
             text = "Search",
+            color = MaterialTheme.colors.primary.copy(alpha = 0.6f)
         )
     }
 }
