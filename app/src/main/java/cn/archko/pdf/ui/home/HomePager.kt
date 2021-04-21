@@ -255,7 +255,7 @@ private fun TabContent(
                         viewModel,
                         navigateTo = { Logcat.d("file.navigateTo") },
                     )
-                    2 -> FileList(
+                    2 -> FileBrowserList(
                         viewModel,
                         navigateTo = { Logcat.d("file.navigateTo") },
                     )

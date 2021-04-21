@@ -81,13 +81,11 @@ sealed class FileBeanType {
 @Composable
 fun UserOptDialog(
     showUserDialog: MutableState<Boolean>,
-    fileBeans: MutableList<FileBean>,
-    fileIndex: MutableState<Int>,
+    fileBean: FileBean?,
     menuOpt: (MenuItemType, FileBean) -> Unit,
     fileBeanType: FileBeanType = FileBeanType.SysFile
 ) {
-    if (showUserDialog.value && (fileIndex.value < fileBeans.size)) {
-        val fileBean = fileBeans[fileIndex.value]
+    if (showUserDialog.value && fileBean != null) {
         Dialog(
             onDismissRequest = {
                 showUserDialog.value = false

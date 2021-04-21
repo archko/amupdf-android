@@ -35,13 +35,11 @@ import java.math.BigDecimal
 @Composable
 fun FileInfoDialog(
     showInfoDialog: MutableState<Boolean>,
-    fileBeans: MutableList<FileBean>,
-    fileIndex: MutableState<Int>,
+    fileBean: FileBean?,
     menuOpt: (MenuItemType, FileBean) -> Unit,
 ) {
     val context = LocalContext.current
-    if (showInfoDialog.value && (fileIndex.value < fileBeans.size)) {
-        val fileBean = fileBeans[fileIndex.value]
+    if (showInfoDialog.value && fileBean != null) {
         val file = fileBean.file
         Dialog(
             onDismissRequest = {

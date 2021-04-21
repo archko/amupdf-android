@@ -318,8 +318,12 @@ private fun ItemList(
         showUserDialog.value = true
     }
     Logcat.d("showUserDialog:${showUserDialog.value}, file.fileIndex:${fileIndex.value}")
-    UserOptDialog(showUserDialog, list, fileIndex, menuOpt)
-    FileInfoDialog(showInfoDialog, list, fileIndex, menuOpt)
+    if (fileIndex.value < list.size) {
+        showUserDialog.value = false
+    }
+    val fileBean = if (fileIndex.value >= list.size) null else list[fileIndex.value]
+    UserOptDialog(showUserDialog, fileBean, menuOpt)
+    FileInfoDialog(showInfoDialog, fileBean, menuOpt)
     LazyColumn(modifier) {
         itemsIndexed(list) { index, fileBean ->
             if (index > 0) {
