@@ -37,7 +37,7 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     api Libs.Dependency.vectordrawable
-    api Libs.Dependency.swiperefreshlayout
+    //api Libs.Dependency.swiperefreshlayout
     api Libs.AndroidX.Activity.activityKtx
     api Libs.AndroidX.Activity.appCompat
     api Libs.AndroidX.coreKtx
@@ -48,9 +48,9 @@ dependencies {
     api Libs.AndroidX.Lifecycle.viewModelKtx
     api Libs.AndroidX.Lifecycle.liveDataKtx
 
-    implementation(Libs.Dependency.viewpager2) {
-        exclude group: 'androidx.recyclerview'
-    }
+    //implementation(Libs.Dependency.viewpager2) {
+    //    exclude group: 'androidx.recyclerview'
+    //}
 
     implementation(Libs.Dependency.material) {
         exclude group: 'androidx.recyclerview'
