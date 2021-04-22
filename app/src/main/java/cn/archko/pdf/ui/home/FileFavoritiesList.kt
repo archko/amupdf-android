@@ -28,13 +28,13 @@ fun FileFavoritiesList(
     val context = LocalContext.current
     val result by viewModel.uiFavoritiesModel.collectAsState()
     if (result.state == State.INIT) {
-        viewModel.loadFavoritiesFromDB()
+        viewModel.loadFavorities()
     }
     Logcat.d("FileFavoritiesList:${result.list}")
 
     val loadMore: (Int) -> Unit = { index: Int ->
         Logcat.d("loadMore,$index")
-        viewModel.loadFavoritiesFromDB()
+        viewModel.loadFavorities()
     }
     val onClick: (FileBean) -> Unit = { it ->
         PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
@@ -70,7 +70,7 @@ fun FileFavoritiesList(
                 map.put("name", fb.file!!.name)
                 MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
 
-                viewModel.favorite(fb, 1)
+                viewModel.favorite(fb, 1, true)
             }
             MenuItemType.DeleteFav -> {
                 val map = HashMap<String, String>()
@@ -78,7 +78,7 @@ fun FileFavoritiesList(
                 map.put("name", fb.file!!.name)
                 MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
 
-                viewModel.favorite(fb, 0)
+                viewModel.favorite(fb, 0, true)
             }
         }
     }

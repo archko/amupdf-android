@@ -67,8 +67,7 @@ fun FileHistoryList(
             }
             MenuItemType.DeleteHistory -> {
                 MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, "remove")
-                RecentManager.instance.removeRecentFromDb(fb.file!!.absolutePath)
-                viewModel.loadHistories()
+                viewModel.deleteHistory(fb.file!!)
             }
             MenuItemType.AddToFav -> {
                 val map = HashMap<String, String>()

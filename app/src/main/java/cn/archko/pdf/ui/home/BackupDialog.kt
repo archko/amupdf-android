@@ -35,11 +35,8 @@ fun RestoreDialog(
 ) {
     val uiBackupFiles by viewModel.uiBackupFileModel.collectAsState()
 
-    if (uiBackupFiles.state == State.INIT) {
-        viewModel.loadBackupFiles()
-    }
-
     if (showRestoreDialog.value) {
+        viewModel.loadBackupFiles()
         Dialog(
             onDismissRequest = {
                 showRestoreDialog.value = false

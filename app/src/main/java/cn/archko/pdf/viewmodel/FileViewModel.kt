@@ -68,6 +68,7 @@ class FileViewModel() : ViewModel() {
 
     private var mScanner: ProgressScaner = ProgressScaner()
     private var dirsFirst: Boolean = true
+    private var showExtension: Boolean = true
 
     var sdcardRoot: String = "/sdcard/"
     var homePath: String
@@ -177,7 +178,7 @@ class FileViewModel() : ViewModel() {
 
     fun loadFiles(
         currentPath: String?,
-        showExtension: Boolean = true
+        refresh: Boolean = false
     ) {
         val path = currentPath ?: homePath
         val f = File(path)
@@ -237,13 +238,16 @@ class FileViewModel() : ViewModel() {
         }
     }
 
-    fun loadHistories() {
+    fun loadHistories(refresh: Boolean = false) {
         _historyFileModel.value = _historyFileModel.value.copy(State.LOADING)
         viewModelScope.launch {
             flow {
                 val recent = RecentManager.instance
                 val count = recent.progressCount
-                val nKey = _historyFileModel.value.nextKey ?: 0
+                var nKey = _historyFileModel.value.nextKey ?: 0
+                if (refresh) {
+                    nKey = 0
+                }
                 val progresses: ArrayList<BookProgress>? = recent.readRecentFromDb(
                     PAGE_SIZE * nKey,
                     PAGE_SIZE
@@ -275,7 +279,7 @@ class FileViewModel() : ViewModel() {
                 }
                 Logcat.d("loadHistories, nKey:$nKey,count:$count, hasMore:$hasMore .value:${_historyFileModel.value.nextKey}")
 
-                val oldList = _historyFileModel.value.list
+                val oldList = if (refresh) ArrayList<FileBean>() else _historyFileModel.value.list
                 val nList = ArrayList(oldList)
                 nList.addAll(entryList)
                 emit(nList)
@@ -292,13 +296,16 @@ class FileViewModel() : ViewModel() {
         }
     }
 
-    fun loadFavoritiesFromDB(showExtension: Boolean = true) {
+    fun loadFavorities(refresh: Boolean = false) {
         _uiFavoritiesModel.value = _uiFavoritiesModel.value.copy(State.LOADING)
         viewModelScope.launch {
             flow {
                 val recent = RecentManager.instance
                 val count = recent.favoriteProgressCount
-                val nKey = _uiFavoritiesModel.value.nextKey ?: 0
+                var nKey = _uiFavoritiesModel.value.nextKey ?: 0
+                if (refresh) {
+                    nKey = 0
+                }
                 val progresses: ArrayList<BookProgress>? = recent.readFavoriteFromDb(
                     PAGE_SIZE * nKey,
                     PAGE_SIZE
@@ -328,8 +335,8 @@ class FileViewModel() : ViewModel() {
                 } else {
                     _uiFavoritiesModel.value.nextKey = null
                 }
-                Logcat.d("loadFavoritiesFromDB, nKey:$nKey,count:$count, hasMore:$hasMore .value:${_uiFavoritiesModel.value.nextKey}")
-                val oldList = _uiFavoritiesModel.value.list
+                Logcat.d("loadFavorities, nKey:$nKey,count:$count, hasMore:$hasMore .value:${_uiFavoritiesModel.value.nextKey}")
+                val oldList = if (refresh) ArrayList<FileBean>() else _uiFavoritiesModel.value.list
                 val nList = ArrayList(oldList)
                 nList.addAll(entryList)
                 emit(nList)
@@ -346,6 +353,15 @@ class FileViewModel() : ViewModel() {
                             nextKey = _uiFavoritiesModel.value.nextKey
                         )
                 }
+        }
+    }
+
+    fun deleteHistory(file: File) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                RecentManager.instance.removeRecentFromDb(file.absolutePath)
+            }
+            loadHistories(true)
         }
     }
 
@@ -427,15 +443,10 @@ class FileViewModel() : ViewModel() {
                 emit(ArrayList<File>())
             }.flowOn(Dispatchers.IO)
                 .collect { list ->
-                    val oldList = _uiBackupFileModel.value.list
-                    val nList = ArrayList(oldList)
-                    if (list != null) {
-                        nList.addAll(list)
-                    }
                     _uiBackupFileModel.value =
                         LoadResult(
                             State.FINISHED,
-                            list = nList,
+                            list = list,
                             prevKey = null,
                             nextKey = null
                         )
@@ -443,7 +454,7 @@ class FileViewModel() : ViewModel() {
         }
     }
 
-    fun favorite(entry: FileBean, isFavorited: Int) {
+    fun favorite(entry: FileBean, isFavorited: Int, isCurrentTab: Boolean = false) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
@@ -474,6 +485,9 @@ class FileViewModel() : ViewModel() {
             }
 
             postFavoriteEvent(entry, isFavorited)
+            if (isCurrentTab) {
+                loadFavorities(true)
+            }
         }
     }
 
