@@ -317,7 +317,7 @@ private fun ItemList(
         }
         showUserDialog.value = true
     }
-    Logcat.d("showUserDialog:${showUserDialog.value}, file.fileIndex:${fileIndex.value}")
+    //Logcat.d("showUserDialog:${showUserDialog.value}, file.fileIndex:${fileIndex.value}")
     if (fileIndex.value < list.size) {
         showUserDialog.value = false
     }

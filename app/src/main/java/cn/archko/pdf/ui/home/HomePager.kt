@@ -41,7 +41,7 @@ import cn.archko.mupdf.R
 import cn.archko.pdf.activities.AboutActivity
 import cn.archko.pdf.activities.PdfOptionsActivity
 import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.paging.ResourceState
+import cn.archko.pdf.paging.State
 import cn.archko.pdf.theme.AppThemeState
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.google.accompanist.insets.navigationBarsPadding
@@ -68,7 +68,7 @@ fun HomePager(
     val uiBackup by viewModel.uiBackupModel.collectAsState()
     val showMenu = remember { mutableStateOf(false) }
 
-    showLoadingDialog.value = (uiBackup.value == ResourceState.LOADING)
+    showLoadingDialog.value = (uiBackup.state == State.LOADING)
 
     val navItems =
         listOf(

@@ -15,7 +15,7 @@ import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.paging.ResourceState
+import cn.archko.pdf.paging.State
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.umeng.analytics.MobclickAgent
 import java.io.File
@@ -28,15 +28,11 @@ fun FileBrowserList(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    //这里会导致每次都加载，只要重新组合。所以加载更多是正常，但会重复加载第一页
-    val resourceState by viewModel.dataLoading.collectAsState()
-    val totalCount = viewModel.totalFavCount
-    if (viewModel.uiFileModel.value.isEmpty()
-        && resourceState.value != ResourceState.ERROR
-        && resourceState.value != ResourceState.LOADING
-    ) {
+    val result by viewModel.uiFileModel.collectAsState()
+    if (result.state == State.INIT) {
         viewModel.loadFiles(null)
     }
+    Logcat.d("FileBrowserList：${result.list}")
 
     if (!viewModel.isTop()) {
         BackPressHandler(onBackPressed = {
@@ -48,7 +44,6 @@ fun FileBrowserList(
         })
     }
 
-    val response by viewModel.uiFileModel.collectAsState()
     val onClick: (FileBean) -> Unit = { it ->
         val clickedFile: File?
 
@@ -73,7 +68,6 @@ fun FileBrowserList(
     }
     //val refresh: () -> Unit = { ->
     //}
-    Logcat.d("FileList,${response.isEmpty()} $navigateTo,")
     val showUserDialog = remember { mutableStateOf(false) }
     val showInfoDialog = remember { mutableStateOf(false) }
     val menuOpt: (MenuItemType, FileBean) -> Unit = { menuType, fb ->
@@ -123,9 +117,7 @@ fun FileBrowserList(
     }
     Box(modifier = Modifier.fillMaxSize()) {
         FileList(
-            response,
-            totalCount,
-            resourceState,
+            result,
             FileBeanType.SysFile,
             loadMore = { },
             showUserDialog,

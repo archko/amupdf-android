@@ -2,7 +2,13 @@ package cn.archko.pdf.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -101,3 +107,93 @@ fun FileItem(
         }
     }
 }
+
+/*
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ItemBeanList(
+    result: LoadResult<Any, FileBean>,
+    fileBeanType: FileBeanType,
+    loadMore: (Int) -> Unit,
+    showUserDialog: MutableState<Boolean>,
+    showInfoDialog: MutableState<Boolean>,
+    menuOpt: (MenuItemType, FileBean) -> Unit,
+    onClick: (FileBean) -> Unit,
+    viewModel: FileViewModel,
+    modifier: Modifier = Modifier,
+) {
+    val list = result.list!!
+    val scroll = rememberScrollState(0)
+    val size = list.size
+    val fileIndex = remember { mutableStateOf(0) }
+    val onOptClick: (Int) -> Unit = { it ->
+        fileIndex.value = it
+        if (it > list.size) {
+            fileIndex.value = 0
+        }
+        showUserDialog.value = true
+    }
+    Logcat.d("showUserDialog:${showUserDialog.value}, file.fileIndex:${fileIndex.value}")
+    if (fileIndex.value < size) {
+        showUserDialog.value = false
+    }
+    val fileBean = if (fileIndex.value >= size) null else list[fileIndex.value]
+    UserOptDialog(showUserDialog, fileBean, menuOpt, fileBeanType)
+    FileInfoDialog(showInfoDialog, fileBean, menuOpt)
+    LazyColumn(modifier) {
+        val hasMore = result.nextKey != null
+        itemsIndexed(list) { index, fileBean ->
+            if (index > 0) {
+                Divider(thickness = 1.dp)
+            }
+            fileBean?.let {
+                FileItem(
+                    fileBean = fileBean,
+                    index = index,
+                    onOptClick = onOptClick,
+                    onClick = onClick,
+                    viewModel = viewModel
+                )
+            }
+            //Logcat.d("hasMore:$hasMore,prevKey:${result.prevKey},nextKey:${result.nextKey}")
+            if (hasMore && index == size - 1 && result.state != State.LOADING) {
+                loadMore(size)
+            }
+        }
+
+        Logcat.d("hasMore:$hasMore，state:${result.state}")
+        result.apply {
+            when {
+                result.state is State.LOADING -> {
+                    item {
+                        LoadingFooter(
+                            state = State.LOADING,
+                            onClick = { },
+                            hasMore = hasMore
+                        )
+                    }
+                }
+                result.state is State.FINISHED -> {
+                    item {
+                        LoadingFooter(
+                            state = State.FINISHED,
+                            onClick = { loadMore(0) },
+                            hasMore = hasMore
+                        )
+                    }
+                }
+                result.state is State.ERROR -> {
+                    item {
+                        LoadingFooter(
+                            state = State.ERROR,
+                            onClick = { */
+/*result.retry()*//*
+ },
+                            hasMore = hasMore
+                        )
+                    }
+                }
+            }
+        }
+    }
+}*/

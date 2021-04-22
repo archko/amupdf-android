@@ -15,7 +15,7 @@ import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.common.RecentManager
 import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.paging.ResourceState
+import cn.archko.pdf.paging.State
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.umeng.analytics.MobclickAgent
 import java.util.*
@@ -27,19 +27,15 @@ fun FileHistoryList(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val resourceState by viewModel.dataLoading.collectAsState()
-    if (viewModel.uiFileHistoryModel.value.isEmpty()
-        && resourceState.value != ResourceState.ERROR
-        && resourceState.value != ResourceState.LOADING
-    ) {
-        viewModel.loadHistoryFileBean(0)
+    val result by viewModel.historyFileModel.collectAsState()
+    if (result.state == State.INIT) {
+        viewModel.loadHistories()
     }
+    Logcat.d("FileHistoryList:${result.list}")
 
-    val response by viewModel.uiFileHistoryModel.collectAsState()
-    val totalCount = viewModel.totalCount
     val loadMore: (Int) -> Unit = { index: Int ->
         Logcat.d("loadMore,$index")
-        viewModel.loadMoreFileBeanFromDB(index)
+        viewModel.loadHistories()
     }
     val onClick: (FileBean) -> Unit = { it ->
         PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
@@ -72,7 +68,7 @@ fun FileHistoryList(
             MenuItemType.DeleteHistory -> {
                 MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, "remove")
                 RecentManager.instance.removeRecentFromDb(fb.file!!.absolutePath)
-                viewModel.loadFileBeanFromDB(0)
+                viewModel.loadHistories()
             }
             MenuItemType.AddToFav -> {
                 val map = HashMap<String, String>()
@@ -94,9 +90,7 @@ fun FileHistoryList(
     }
     Box(modifier = Modifier.fillMaxSize()) {
         FileList(
-            response,
-            totalCount,
-            resourceState,
+            result,
             FileBeanType.History,
             loadMore,
             showUserDialog,

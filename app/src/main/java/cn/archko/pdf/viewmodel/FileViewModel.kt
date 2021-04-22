@@ -14,7 +14,8 @@ import cn.archko.pdf.common.RecentManager
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.model.SearchSuggestionGroup
-import cn.archko.pdf.paging.ResourceState
+import cn.archko.pdf.paging.LoadResult
+import cn.archko.pdf.paging.State
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -31,6 +32,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileFilter
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * @author: archko 2021/4/11 :8:14 上午
@@ -38,41 +40,89 @@ import java.util.*
 class FileViewModel() : ViewModel() {
     companion object {
 
-        const val PAGE_SIZE = 21
+        const val PAGE_SIZE = 20
         const val MAX_TIME = 1300L
     }
 
-    private val _dataLoading = MutableStateFlow(ResourceState())
-    val dataLoading: StateFlow<ResourceState>
-        get() = _dataLoading
-
-    private val _uiFileModel = MutableStateFlow<MutableList<FileBean>>(mutableListOf())
-    val uiFileModel: StateFlow<MutableList<FileBean>>
+    private val _uiFileModel = MutableStateFlow<LoadResult<Any, FileBean>>(LoadResult(State.INIT))
+    val uiFileModel: StateFlow<LoadResult<Any, FileBean>>
         get() = _uiFileModel
 
-    private val _uiFileHistoryModel = MutableStateFlow<MutableList<FileBean>>(mutableListOf())
-    val uiFileHistoryModel: StateFlow<MutableList<FileBean>>
-        get() = _uiFileHistoryModel
+    private var _historyFileModel =
+        MutableStateFlow<LoadResult<Any, FileBean>>(LoadResult(State.INIT))
+    val historyFileModel: StateFlow<LoadResult<Any, FileBean>>
+        get() = _historyFileModel
 
-    private val _uiFavoritiesModel = MutableStateFlow<MutableList<FileBean>>(mutableListOf())
-    val uiFavoritiesModel: StateFlow<MutableList<FileBean>>
+    private val _uiFavoritiesModel =
+        MutableStateFlow<LoadResult<Any, FileBean>>(LoadResult(State.INIT))
+    val uiFavoritiesModel: StateFlow<LoadResult<Any, FileBean>>
         get() = _uiFavoritiesModel
 
-    private val _uiBackupModel = MutableStateFlow(ResourceState())
-    val uiBackupModel: StateFlow<ResourceState>
+    private val _uiBackupModel = MutableStateFlow<LoadResult<Any, Any>>(LoadResult(State.INIT))
+    val uiBackupModel: StateFlow<LoadResult<Any, Any>>
         get() = _uiBackupModel
 
-    private val _uiBackupFileModel = MutableStateFlow<List<File>>(mutableListOf())
-    val uiBackupFileModel: StateFlow<List<File>>
+    private val _uiBackupFileModel = MutableStateFlow<LoadResult<Any, File>>(LoadResult(State.INIT))
+    val uiBackupFileModel: StateFlow<LoadResult<Any, File>>
         get() = _uiBackupFileModel
 
     private var mScanner: ProgressScaner = ProgressScaner()
+    private var dirsFirst: Boolean = true
 
     var sdcardRoot: String = "/sdcard/"
     var homePath: String
     var selectionIndex = 0
-    var totalCount = 0
-    var totalFavCount = 0
+
+    private val fileComparator = Comparator<File> { f1, f2 ->
+        if (f1 == null) throw RuntimeException("f1 is null inside sort")
+        if (f2 == null) throw RuntimeException("f2 is null inside sort")
+        try {
+            if (dirsFirst && f1.isDirectory != f2.isDirectory) {
+                if (f1.isDirectory)
+                    return@Comparator -1
+                else
+                    return@Comparator 1
+            }
+            return@Comparator f2.lastModified().compareTo(f1.lastModified())
+        } catch (e: NullPointerException) {
+            throw RuntimeException("failed to compare $f1 and $f2", e)
+        }
+    }
+
+    private val fileFilter: FileFilter = FileFilter { file ->
+        //return (file.isDirectory() || file.getName().toLowerCase().endsWith(".pdf"));
+        if (file.isDirectory)
+            return@FileFilter true
+        val fname = file.name.toLowerCase(Locale.ROOT)
+
+        if (fname.endsWith(".pdf"))
+            return@FileFilter true
+        if (fname.endsWith(".xps"))
+            return@FileFilter true
+        if (fname.endsWith(".cbz"))
+            return@FileFilter true
+        if (fname.endsWith(".png"))
+            return@FileFilter true
+        if (fname.endsWith(".jpe"))
+            return@FileFilter true
+        if (fname.endsWith(".jpeg"))
+            return@FileFilter true
+        if (fname.endsWith(".jpg"))
+            return@FileFilter true
+        if (fname.endsWith(".jfif"))
+            return@FileFilter true
+        if (fname.endsWith(".jfif-tbnl"))
+            return@FileFilter true
+        if (fname.endsWith(".tif"))
+            return@FileFilter true
+        if (fname.endsWith(".tiff"))
+            return@FileFilter true
+        if (fname.endsWith(".epub"))
+            return@FileFilter true
+        if (fname.endsWith(".txt"))
+            return@FileFilter true
+        false
+    }
 
     init {
         var externalFileRootDir: File? = App.instance!!.getExternalFilesDir(null)
@@ -125,44 +175,8 @@ class FileViewModel() : ViewModel() {
         return top == homePath
     }
 
-    private val fileFilter: FileFilter = FileFilter { file ->
-        //return (file.isDirectory() || file.getName().toLowerCase().endsWith(".pdf"));
-        if (file.isDirectory)
-            return@FileFilter true
-        val fname = file.name.toLowerCase(Locale.ROOT)
-
-        if (fname.endsWith(".pdf"))
-            return@FileFilter true
-        if (fname.endsWith(".xps"))
-            return@FileFilter true
-        if (fname.endsWith(".cbz"))
-            return@FileFilter true
-        if (fname.endsWith(".png"))
-            return@FileFilter true
-        if (fname.endsWith(".jpe"))
-            return@FileFilter true
-        if (fname.endsWith(".jpeg"))
-            return@FileFilter true
-        if (fname.endsWith(".jpg"))
-            return@FileFilter true
-        if (fname.endsWith(".jfif"))
-            return@FileFilter true
-        if (fname.endsWith(".jfif-tbnl"))
-            return@FileFilter true
-        if (fname.endsWith(".tif"))
-            return@FileFilter true
-        if (fname.endsWith(".tiff"))
-            return@FileFilter true
-        if (fname.endsWith(".epub"))
-            return@FileFilter true
-        if (fname.endsWith(".txt"))
-            return@FileFilter true
-        false
-    }
-
     fun loadFiles(
         currentPath: String?,
-        dirsFirst: Boolean = true,
         showExtension: Boolean = true
     ) {
         val path = currentPath ?: homePath
@@ -175,9 +189,10 @@ class FileViewModel() : ViewModel() {
             stack.push(mCurrentPath)
         }
         Logcat.d("loadFiles, path:$mCurrentPath")
+        _uiFileModel.value = _uiFileModel.value.copy(State.LOADING)
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                var fileList: ArrayList<FileBean> = ArrayList()
+            flow {
+                val fileList: ArrayList<FileBean> = ArrayList()
                 var entry: FileBean
 
                 entry = FileBean(FileBean.HOME, homePath)
@@ -187,27 +202,14 @@ class FileViewModel() : ViewModel() {
                     entry = FileBean(FileBean.NORMAL, upFolder!!, "..")
                     fileList.add(entry)
                 }
+                Logcat.d("loadFiles, path:$mCurrentPath")
                 val files = File(mCurrentPath).listFiles(fileFilter)
                 if (files != null) {
                     try {
-                        Arrays.sort(files, Comparator<File> { f1, f2 ->
-                            if (f1 == null) throw RuntimeException("f1 is null inside sort")
-                            if (f2 == null) throw RuntimeException("f2 is null inside sort")
-                            try {
-                                if (dirsFirst && f1.isDirectory != f2.isDirectory) {
-                                    if (f1.isDirectory)
-                                        return@Comparator -1
-                                    else
-                                        return@Comparator 1
-                                }
-                                return@Comparator f2.lastModified().compareTo(f1.lastModified())
-                            } catch (e: NullPointerException) {
-                                throw RuntimeException("failed to compare $f1 and $f2", e)
-                            }
-                        })
+                        Arrays.sort(files, fileComparator)
                     } catch (e: NullPointerException) {
                         throw RuntimeException(
-                            "failed to sort file list " + files + " for path " + mCurrentPath,
+                            "failed to sort file list $files for path $mCurrentPath",
                             e
                         )
                     }
@@ -218,28 +220,32 @@ class FileViewModel() : ViewModel() {
                     }
                     mScanner.startScan(fileList)
                 }
-                withContext(Dispatchers.Main) {
-                    _uiFileModel.value = fileList
+                emit(fileList)
+            }.catch { e ->
+                Logcat.d("Exception:$e")
+                emit(ArrayList())
+            }.flowOn(Dispatchers.IO)
+                .collect { list ->
+                    _uiFileModel.value =
+                        LoadResult(
+                            State.FINISHED,
+                            list = list,
+                            prevKey = null,
+                            nextKey = null
+                        )
                 }
-            }
         }
     }
 
-    fun loadMoreFileBeanFromDB(count: Int, showExtension: Boolean = true) {
-        loadFileBeanFromDB(count, showExtension)
-    }
-
-    fun loadHistoryFileBean(curPage: Int, showExtension: Boolean = true) =
-        loadFileBeanFromDB(PAGE_SIZE * (curPage), showExtension)
-
-    fun loadFileBeanFromDB(startIndex: Int, showExtension: Boolean = true) {
-        var count = 0
+    fun loadHistories() {
+        _historyFileModel.value = _historyFileModel.value.copy(State.LOADING)
         viewModelScope.launch {
             flow {
                 val recent = RecentManager.instance
-                count = recent.progressCount
+                val count = recent.progressCount
+                val nKey = _historyFileModel.value.nextKey ?: 0
                 val progresses: ArrayList<BookProgress>? = recent.readRecentFromDb(
-                    startIndex,
+                    PAGE_SIZE * nKey,
                     PAGE_SIZE
                 )
 
@@ -250,34 +256,51 @@ class FileViewModel() : ViewModel() {
                 val path = sdcardRoot
                 progresses?.map {
                     file = File(path + "/" + it.path)
-                    entry = FileBean(FileBean.RECENT, file, showExtension)
+                    entry = FileBean(FileBean.RECENT, file, true)
                     entry.bookProgress = it
                     entryList.add(entry)
                 }
-                emit(entryList)
+
+                var hasMore = false
+                val oldSize = _historyFileModel.value.list?.size
+                if (entryList.size > 0 && oldSize != null) {
+                    if (count > (oldSize + entryList.size)) {
+                        hasMore = true
+                    }
+                }
+                if (hasMore) {
+                    _historyFileModel.value.nextKey = nKey.plus(1)
+                } else {
+                    _historyFileModel.value.nextKey = null
+                }
+                Logcat.d("loadHistories, nKey:$nKey,count:$count, hasMore:$hasMore .value:${_historyFileModel.value.nextKey}")
+
+                val oldList = _historyFileModel.value.list
+                val nList = ArrayList(oldList)
+                nList.addAll(entryList)
+                emit(nList)
             }.catch { e ->
                 Logcat.d("Exception:$e")
-                emit(ArrayList<FileBean>())
+                emit(ArrayList())
             }.flowOn(Dispatchers.IO)
                 .collect { list ->
-                    val oldList = _uiFileHistoryModel.value
-                    val nList = ArrayList<FileBean>()
-                    nList.addAll(oldList)
-                    nList.addAll(list)
-                    _uiFileHistoryModel.value = nList
-                    totalCount = count
+                    _historyFileModel.value = _historyFileModel.value.copy(
+                        State.FINISHED,
+                        list = list,
+                    )
                 }
         }
     }
 
-    fun loadFavoritiesFromDB(startIndex: Int, showExtension: Boolean = true) {
-        var count = 0
+    fun loadFavoritiesFromDB(showExtension: Boolean = true) {
+        _uiFavoritiesModel.value = _uiFavoritiesModel.value.copy(State.LOADING)
         viewModelScope.launch {
             flow {
                 val recent = RecentManager.instance
-                count = recent.favoriteProgressCount
+                val count = recent.favoriteProgressCount
+                val nKey = _uiFavoritiesModel.value.nextKey ?: 0
                 val progresses: ArrayList<BookProgress>? = recent.readFavoriteFromDb(
-                    startIndex,
+                    PAGE_SIZE * nKey,
                     PAGE_SIZE
                 )
 
@@ -292,24 +315,42 @@ class FileViewModel() : ViewModel() {
                     entry.bookProgress = it
                     entryList.add(entry)
                 }
-                emit(entryList)
+
+                var hasMore = false
+                val oldSize = _uiFavoritiesModel.value.list?.size
+                if (entryList.size > 0 && oldSize != null) {
+                    if (count > (oldSize + entryList.size)) {
+                        hasMore = true
+                    }
+                }
+                if (hasMore) {
+                    _uiFavoritiesModel.value.nextKey = nKey.plus(1)
+                } else {
+                    _uiFavoritiesModel.value.nextKey = null
+                }
+                Logcat.d("loadFavoritiesFromDB, nKey:$nKey,count:$count, hasMore:$hasMore .value:${_uiFavoritiesModel.value.nextKey}")
+                val oldList = _uiFavoritiesModel.value.list
+                val nList = ArrayList(oldList)
+                nList.addAll(entryList)
+                emit(nList)
             }.catch { e ->
                 Logcat.d("Exception:$e")
                 emit(ArrayList<FileBean>())
             }.flowOn(Dispatchers.IO)
                 .collect { list ->
-                    val oldList = _uiFavoritiesModel.value
-                    val nList = ArrayList<FileBean>()
-                    nList.addAll(oldList)
-                    nList.addAll(list)
-                    _uiFavoritiesModel.value = nList
-                    totalFavCount = count
+                    _uiFavoritiesModel.value =
+                        LoadResult(
+                            State.FINISHED,
+                            list = list,
+                            prevKey = _uiFavoritiesModel.value.prevKey,
+                            nextKey = _uiFavoritiesModel.value.nextKey
+                        )
                 }
         }
     }
 
     fun backupFromDb() {
-        _uiBackupModel.value = ResourceState(ResourceState.LOADING)
+        _uiBackupModel.value = _uiBackupModel.value.copy(State.LOADING)
         viewModelScope.launch {
             val now = System.currentTimeMillis()
             flow {
@@ -334,13 +375,14 @@ class FileViewModel() : ViewModel() {
                     } else {
                         Toast.makeText(App.instance, "备份失败", Toast.LENGTH_LONG).show()
                     }
-                    _uiBackupModel.value = ResourceState(ResourceState.FINISHED)
+
+                    _uiBackupModel.value = LoadResult(State.FINISHED)
                 }
         }
     }
 
     fun restoreToDb(file: File) {
-        _uiBackupModel.value = ResourceState(ResourceState.LOADING)
+        _uiBackupModel.value = _uiBackupModel.value.copy(State.LOADING)
         viewModelScope.launch {
             val now = System.currentTimeMillis()
             flow {
@@ -364,7 +406,7 @@ class FileViewModel() : ViewModel() {
                     } else {
                         Toast.makeText(App.instance, "恢复失败", Toast.LENGTH_LONG).show()
                     }
-                    _uiBackupModel.value = ResourceState(ResourceState.FINISHED)
+                    _uiBackupModel.value = LoadResult(State.FINISHED)
                 }
         }
     }
@@ -375,7 +417,7 @@ class FileViewModel() : ViewModel() {
         edit?.apply()
     }
 
-    fun loadBackupFiles() =
+    fun loadBackupFiles() {
         viewModelScope.launch {
             flow {
                 val files: List<File>? = RecentManager.instance.backupFiles
@@ -385,13 +427,21 @@ class FileViewModel() : ViewModel() {
                 emit(ArrayList<File>())
             }.flowOn(Dispatchers.IO)
                 .collect { list ->
+                    val oldList = _uiBackupFileModel.value.list
+                    val nList = ArrayList(oldList)
                     if (list != null) {
-                        _uiBackupFileModel.value = list
-                    } else {
-                        _uiBackupFileModel.value = ArrayList<File>()
+                        nList.addAll(list)
                     }
+                    _uiBackupFileModel.value =
+                        LoadResult(
+                            State.FINISHED,
+                            list = nList,
+                            prevKey = null,
+                            nextKey = null
+                        )
                 }
         }
+    }
 
     fun favorite(entry: FileBean, isFavorited: Int) {
         viewModelScope.launch {

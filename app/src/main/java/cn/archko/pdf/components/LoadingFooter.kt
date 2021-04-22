@@ -16,11 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cn.archko.pdf.paging.ResourceState
+import cn.archko.pdf.paging.State
 
 @Composable
 fun LoadingFooter(
-    resourceState: ResourceState = ResourceState(initial = ResourceState.LOADING),
+    state: State = State.LOADING,
     text: String? = "Loading",
     hasMore: Boolean,
     onClick: () -> Unit,
@@ -31,9 +31,9 @@ fun LoadingFooter(
     } else {
         var txt = text
         txt?.let {
-            txt = if (resourceState.value == ResourceState.ERROR) {
+            txt = if (state == State.ERROR) {
                 "Error"
-            } else if (resourceState.value == ResourceState.FINISHED || resourceState.value == ResourceState.IDLE) {
+            } else if (state == State.FINISHED || state == State.INIT) {
                 if (!hasMore) {
                     "NO MORE"
                 } else {
@@ -56,7 +56,7 @@ fun LoadingFooter(
                     )
                 )
         ) {
-            if (resourceState.value == ResourceState.FINISHED) {
+            if (state == State.LOADING) {
                 CircularProgressIndicator(
                     modifier = modifier
                         .size(36.dp)

@@ -14,7 +14,7 @@ import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.paging.ResourceState
+import cn.archko.pdf.paging.State
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.umeng.analytics.MobclickAgent
 import java.util.*
@@ -26,19 +26,15 @@ fun FileFavoritiesList(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val resourceState by viewModel.dataLoading.collectAsState()
-    if (viewModel.uiFavoritiesModel.value.isEmpty()
-        && resourceState.value != ResourceState.ERROR
-        && resourceState.value != ResourceState.LOADING
-    ) {
-        viewModel.loadFavoritiesFromDB(0)
+    val result by viewModel.uiFavoritiesModel.collectAsState()
+    if (result.state == State.INIT) {
+        viewModel.loadFavoritiesFromDB()
     }
+    Logcat.d("FileFavoritiesList:${result.list}")
 
-    val response by viewModel.uiFavoritiesModel.collectAsState()
-    val totalCount = viewModel.totalFavCount
     val loadMore: (Int) -> Unit = { index: Int ->
         Logcat.d("loadMore,$index")
-        viewModel.loadFavoritiesFromDB(index)
+        viewModel.loadFavoritiesFromDB()
     }
     val onClick: (FileBean) -> Unit = { it ->
         PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
@@ -88,9 +84,7 @@ fun FileFavoritiesList(
     }
     Box(modifier = Modifier.fillMaxSize()) {
         FileList(
-            response,
-            totalCount,
-            resourceState,
+            result,
             FileBeanType.Favorite,
             loadMore,
             showUserDialog,

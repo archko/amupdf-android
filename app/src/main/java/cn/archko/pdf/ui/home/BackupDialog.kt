@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cn.archko.mupdf.R
 import cn.archko.pdf.components.Divider
+import cn.archko.pdf.paging.State
 import cn.archko.pdf.viewmodel.FileViewModel
 import java.io.File
 
@@ -33,7 +34,10 @@ fun RestoreDialog(
     onSelectFile: (File) -> Unit,
 ) {
     val uiBackupFiles by viewModel.uiBackupFileModel.collectAsState()
-    viewModel.loadBackupFiles()
+
+    if (uiBackupFiles.state == State.INIT) {
+        viewModel.loadBackupFiles()
+    }
 
     if (showRestoreDialog.value) {
         Dialog(
@@ -67,7 +71,7 @@ fun RestoreDialog(
                     }
                     Divider(thickness = 1.dp)
                     LazyColumn() {
-                        itemsIndexed(uiBackupFiles) { index, file ->
+                        itemsIndexed(uiBackupFiles.list!!) { index, file ->
                             if (index > 0) {
                                 Divider(thickness = 0.5.dp)
                             }
