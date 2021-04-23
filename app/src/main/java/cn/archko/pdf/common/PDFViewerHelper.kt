@@ -38,8 +38,8 @@ class PDFViewerHelper {
 
         fun openWithDefaultViewer(f: File, activity: Context) {
             val map = HashMap<String, String>()
-            map.put("type", "vudroid")
-            map.put("name", f.name)
+            map["type"] = "vudroid"
+            map["name"] = f.name
             MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
             Logcat.i(Logcat.TAG, "post intent to open file $f")
             if (f.absolutePath.endsWith("txt", true)) {

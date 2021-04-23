@@ -13,7 +13,6 @@ import androidx.compose.ui.platform.LocalContext
 import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFViewerHelper
-import cn.archko.pdf.common.RecentManager
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.paging.State
 import cn.archko.pdf.viewmodel.FileViewModel
@@ -60,8 +59,8 @@ fun FileHistoryList(
             }
             MenuItemType.ViewBookInfo -> {
                 val map = HashMap<String, String>()
-                map.put("type", "info")
-                map.put("name", fb.file!!.name)
+                map["type"] = "info"
+                map["name"] = fb.file!!.name
                 MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
                 showInfoDialog.value = true
             }
@@ -70,20 +69,10 @@ fun FileHistoryList(
                 viewModel.deleteHistory(fb.file!!)
             }
             MenuItemType.AddToFav -> {
-                val map = HashMap<String, String>()
-                map.put("type", "addToFavorite")
-                map.put("name", fb.file!!.name)
-                MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
-
-                viewModel.favorite(fb, 1)
+                viewModel.favorite(context, fb, 1)
             }
             MenuItemType.DeleteFav -> {
-                val map = HashMap<String, String>()
-                map.put("type", "removeFromFavorite")
-                map.put("name", fb.file!!.name)
-                MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
-
-                viewModel.favorite(fb, 0)
+                viewModel.favorite(context, fb, 0)
             }
         }
     }

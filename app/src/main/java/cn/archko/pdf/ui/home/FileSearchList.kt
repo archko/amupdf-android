@@ -41,7 +41,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cn.archko.pdf.common.AnalysticsHelper
-import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.components.Surface
@@ -74,8 +73,8 @@ fun FileSearchList(
                 viewModel.loadFiles(it.file!!.path)
             }
             val map = HashMap<String, String>()
-            map.put("type", "dir")
-            map.put("name", clickedFile!!.name)
+            map["type"] = "dir"
+            map["name"] = clickedFile!!.name
             MobclickAgent.onEvent(context, AnalysticsHelper.A_FILE, map)
         } else {
             PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
@@ -97,32 +96,19 @@ fun FileSearchList(
             }
             MenuItemType.ViewBookInfo -> {
                 val map = HashMap<String, String>()
-                map.put("type", "info")
-                map.put("name", fb.file!!.name)
+                map["type"] = "info"
+                map["name"] = fb.file!!.name
                 MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
                 showInfoDialog.value = true
             }
             MenuItemType.DeleteFile -> {
-                if (fb.type == FileBean.NORMAL && !fb.isDirectory) {
-                    fb.file?.delete()
-                    viewModel.loadFiles(null)
-                }
+                viewModel.deleteFile(fb)
             }
             MenuItemType.AddToFav -> {
-                val map = HashMap<String, String>()
-                map.put("type", "addToFavorite")
-                map.put("name", fb.file!!.name)
-                MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
-
-                viewModel.favorite(fb, 1)
+                viewModel.favorite(context, fb, 1)
             }
             MenuItemType.DeleteFav -> {
-                val map = HashMap<String, String>()
-                map.put("type", "removeFromFavorite")
-                map.put("name", fb.file!!.name)
-                MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
-
-                viewModel.favorite(fb, 0)
+                viewModel.favorite(context, fb, 0)
             }
         }
     }

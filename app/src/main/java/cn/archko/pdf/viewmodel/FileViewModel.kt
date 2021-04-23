@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import cn.archko.mupdf.R
 import cn.archko.pdf.App
 import cn.archko.pdf.activities.ChooseFileFragmentActivity
+import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.ProgressScaner
@@ -19,6 +20,7 @@ import cn.archko.pdf.paging.State
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.umeng.analytics.MobclickAgent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -356,6 +358,13 @@ class FileViewModel() : ViewModel() {
         }
     }
 
+    fun deleteFile(fb: FileBean) {
+        if (fb.type == FileBean.NORMAL && !fb.isDirectory) {
+            fb.file?.delete()
+            loadFiles(null)
+        }
+    }
+
     fun deleteHistory(file: File) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -454,7 +463,20 @@ class FileViewModel() : ViewModel() {
         }
     }
 
-    fun favorite(entry: FileBean, isFavorited: Int, isCurrentTab: Boolean = false) {
+    fun favorite(
+        context: Context,
+        entry: FileBean,
+        isFavorited: Int,
+        isCurrentTab: Boolean = false
+    ) {
+        val map = HashMap<String, String>()
+        if (isFavorited == 1) {
+            map["type"] = "addToFavorite"
+        } else {
+            map["type"] = "removeFromFavorite"
+        }
+        map["name"] = entry.file!!.name
+        MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
@@ -484,10 +506,10 @@ class FileViewModel() : ViewModel() {
                 }
             }
 
-            postFavoriteEvent(entry, isFavorited)
+            //postFavoriteEvent(entry, isFavorited)
             if (isCurrentTab) {
-                loadFavorities(true)
             }
+            loadFavorities(true)
         }
     }
 

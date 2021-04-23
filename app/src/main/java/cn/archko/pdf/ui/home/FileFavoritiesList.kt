@@ -59,26 +59,16 @@ fun FileFavoritiesList(
             }
             MenuItemType.ViewBookInfo -> {
                 val map = HashMap<String, String>()
-                map.put("type", "info")
-                map.put("name", fb.file!!.name)
+                map["type"] = "info"
+                map["name"] = fb.file!!.name
                 MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
                 showInfoDialog.value = true
             }
             MenuItemType.AddToFav -> {
-                val map = HashMap<String, String>()
-                map.put("type", "addToFavorite")
-                map.put("name", fb.file!!.name)
-                MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
-
-                viewModel.favorite(fb, 1, true)
+                viewModel.favorite(context, fb, 1, true)
             }
             MenuItemType.DeleteFav -> {
-                val map = HashMap<String, String>()
-                map.put("type", "removeFromFavorite")
-                map.put("name", fb.file!!.name)
-                MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
-
-                viewModel.favorite(fb, 0, true)
+                viewModel.favorite(context, fb, 0, true)
             }
         }
     }
