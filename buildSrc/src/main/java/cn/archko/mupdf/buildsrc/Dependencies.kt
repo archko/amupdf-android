@@ -14,9 +14,10 @@ object BuildConfig {
 
 object Libs {
     const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0-alpha14"
+    const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.0.9"
 
     object Accompanist {
-        private const val version = "0.7.1"
+        const val version = "0.8.0"
         const val coil = "com.google.accompanist:accompanist-coil:$version"
         const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
@@ -39,9 +40,8 @@ object Libs {
 
     object OkHttp {
         private const val version = "4.9.1"
-        const val okhttp = "OkHttp:okhttp:$version"
+        const val okhttp = "com.squareup.okhttp3:okhttp:$version"
         const val logging = "com.squareup.okhttp3:logging-interceptor:$version"
-        const val okhttpLoggingInterceptor = "com.squareup.okhttp3:logging-interceptor:${version}"
     }
 
     object AndroidX {
@@ -49,23 +49,30 @@ object Libs {
         const val navigation = "androidx.navigation:navigation-compose:1.0.0-alpha08"
 
         object Compose {
-            const val snapshot = ""
-            const val version = "1.0.0-beta04"
+            private const val snapshot = ""
+            private const val version = "1.0.0-beta05"
 
+            @get:JvmStatic
+            val snapshotUrl: String
+                get() = "https://androidx.dev/snapshots/builds/$snapshot/artifacts/repository/"
+
+            const val runtime = "androidx.compose.runtime:runtime:$version"
             const val animation = "androidx.compose.animation:animation:$version"
             const val foundation = "androidx.compose.foundation:foundation:$version"
             const val layout = "androidx.compose.foundation:foundation-layout:$version"
-            const val iconsExtended = "androidx.compose.material:material-icons-extended:$version"
-            const val material = "androidx.compose.material:material:$version"
-            const val runtime = "androidx.compose.runtime:runtime:$version"
-            const val tooling = "androidx.compose.ui:ui-tooling:$version"
+
             const val ui = "androidx.compose.ui:ui:$version"
+            const val material = "androidx.compose.material:material:$version"
+            const val iconsExtended = "androidx.compose.material:material-icons-extended:$version"
+
+            const val tooling = "androidx.compose.ui:ui-tooling:$version"
+
             const val uiUtil = "androidx.compose.ui:ui-util:$version"
             const val uiTest = "androidx.compose.ui:ui-test-junit4:$version"
         }
 
         object Activity {
-            const val activityCompose = "androidx.activity:activity-compose:1.3.0-alpha06"
+            const val activityCompose = "androidx.activity:activity-compose:1.3.0-alpha07"
             const val activityKtx = "androidx.activity:activity-ktx:1.2.0-alpha08"
             const val appCompat = "androidx.appcompat:appcompat:1.3.0-rc01"
             const val annotations = "androidx.annotation:annotation:1.2.0"
