@@ -175,7 +175,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         isDocLoaded = false
         LiveEventBus
             .get(Event.ACTION_STOPPED)
-            .post(null)
+            .post(mPath)
         mMupdfDocument?.destroy()
         progressDialog.dismiss()
         BitmapCache.getInstance().clear()

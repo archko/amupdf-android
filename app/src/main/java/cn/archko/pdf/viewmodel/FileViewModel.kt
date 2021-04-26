@@ -137,6 +137,7 @@ class FileViewModel() : ViewModel() {
         Logcat.d("sdcardRoot:$sdcardRoot")
 
         homePath = initHomePath()
+
     }
 
     private fun initHomePath(): String {
@@ -432,6 +433,8 @@ class FileViewModel() : ViewModel() {
                         Toast.makeText(App.instance, "恢复失败", Toast.LENGTH_LONG).show()
                     }
                     _uiBackupModel.value = LoadResult(State.FINISHED)
+
+                    loadHistories(true)
                 }
         }
     }
@@ -564,6 +567,82 @@ class FileViewModel() : ViewModel() {
             if (dir.name.contains(keyword)) {
                 fileList.add(FileBean(FileBean.NORMAL, dir, true))
             }
+        }
+    }
+
+    /**
+     * currentSection 1->history, 2->favorite
+     */
+    fun onReadBook(path: String?, currentSection: Int) {
+        if (path == null) {
+            return
+        }
+        if (currentSection == 1) {
+            val result = _historyFileModel.value
+            var findBean: FileBean? = null
+
+            if (result.list != null) {
+                for (fb in result.list!!) {
+                    if (fb.file?.path.equals(path)) {
+                        findBean = fb
+                        break
+                    }
+                }
+            }
+
+            Logcat.d("onReadBook:currentSection:$currentSection,path:$path $findBean")
+            if (findBean != null) {
+                updateHistory(findBean, path)
+            } else {
+                updateHistory(null, path)
+            }
+        } else if (currentSection == 2) {
+            loadFiles(null, refresh = true)
+        } else if (currentSection == 3) {
+            loadFavorities(true)
+        }
+    }
+
+    private val beanComparator = Comparator<FileBean> { f1, f2 ->
+        if (f1 == null || f2 == null) return@Comparator 0
+
+        return@Comparator f1.bookProgress?.lastTimestampe?.let {
+            f2.bookProgress?.lastTimestampe?.compareTo(
+                it
+            )
+        }!!
+    }
+
+    private fun updateHistory(findBean: FileBean?, path: String) {
+        _historyFileModel.value = _historyFileModel.value.copy(
+            State.LOADING,
+        )
+        viewModelScope.launch {
+            flow {
+                val nList = ArrayList<FileBean>(_historyFileModel.value.list)
+                if (null == findBean) {
+                    val fb = FileBean(FileBean.RECENT, File(path), true)
+                    fb.bookProgress = RecentManager.instance.readRecentFromDb(path)
+                    nList.add(0, fb)
+                    Logcat.d("onReadBook insert:$fb")
+                } else {
+                    findBean.bookProgress = RecentManager.instance.readRecentFromDb(path)
+                    Logcat.d("onReadBook update:$findBean")
+                }
+
+
+                Collections.sort(nList, beanComparator)
+                emit(nList)
+            }.catch { e ->
+                Logcat.d("Exception:$e")
+                emit(ArrayList())
+            }.flowOn(Dispatchers.IO)
+                .collect { list ->
+                    _historyFileModel.value = _historyFileModel.value.copy(
+                        State.FINISHED,
+                        list = list,
+                    )
+                }
         }
     }
 }
