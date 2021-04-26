@@ -17,6 +17,8 @@ import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.paging.State
 import cn.archko.pdf.viewmodel.FileViewModel
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.umeng.analytics.MobclickAgent
 import java.io.File
 import java.util.*
@@ -66,8 +68,10 @@ fun FileBrowserList(
             }
         }
     }
-    //val refresh: () -> Unit = { ->
-    //}
+    val refresh: () -> Unit = { ->
+        viewModel.loadHistories(true)
+    }
+    val loading = result.state == State.LOADING
     val showUserDialog = remember { mutableStateOf(false) }
     val showInfoDialog = remember { mutableStateOf(false) }
     val menuOpt: (MenuItemType, FileBean) -> Unit = { menuType, fb ->
@@ -103,16 +107,21 @@ fun FileBrowserList(
         }
     }
     Box(modifier = Modifier.fillMaxSize()) {
-        FileList(
-            result,
-            FileBeanType.SysFile,
-            loadMore = { },
-            showUserDialog,
-            showInfoDialog,
-            menuOpt,
-            onClick,
-            viewModel,
-            modifier,
-        )
+        SwipeRefresh(
+            state = rememberSwipeRefreshState(loading),
+            onRefresh = refresh,
+        ) {
+            FileList(
+                result,
+                FileBeanType.SysFile,
+                loadMore = { },
+                showUserDialog,
+                showInfoDialog,
+                menuOpt,
+                onClick,
+                viewModel,
+                modifier,
+            )
+        }
     }
 }

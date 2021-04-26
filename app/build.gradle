@@ -130,6 +130,7 @@ dependencies {
     implementation Libs.Accompanist.pager
     implementation Libs.Accompanist.pagerIndicators
     implementation Libs.Accompanist.insets
+    implementation Libs.Accompanist.swiperefresh
 
     api Libs.Arch.runtime
     api Libs.AndroidX.Activity.activityKtx

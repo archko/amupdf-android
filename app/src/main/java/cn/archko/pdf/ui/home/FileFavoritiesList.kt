@@ -16,6 +16,8 @@ import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.paging.State
 import cn.archko.pdf.viewmodel.FileViewModel
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.umeng.analytics.MobclickAgent
 import java.util.*
 
@@ -39,8 +41,10 @@ fun FileFavoritiesList(
     val onClick: (FileBean) -> Unit = { it ->
         PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
     }
-    //val refresh: () -> Unit = { ->
-    //}
+    val refresh: () -> Unit = { ->
+        viewModel.loadHistories(true)
+    }
+    val loading = result.state == State.LOADING
     val showUserDialog = remember { mutableStateOf(false) }
     val showInfoDialog = remember { mutableStateOf(false) }
     val menuOpt: (MenuItemType, FileBean) -> Unit = { menuType, fb ->
@@ -73,6 +77,10 @@ fun FileFavoritiesList(
         }
     }
     Box(modifier = Modifier.fillMaxSize()) {
+        SwipeRefresh(
+            state = rememberSwipeRefreshState(loading),
+            onRefresh = refresh,
+        ) {
         FileList(
             result,
             FileBeanType.Favorite,
@@ -85,4 +93,5 @@ fun FileFavoritiesList(
             modifier,
         )
     }
+}
 }
