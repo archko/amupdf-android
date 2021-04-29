@@ -692,13 +692,14 @@ class FileViewModel() : ViewModel() {
         viewModelScope.launch {
             flow {
                 val nList = ArrayList<FileBean>(_historyFileModel.value.list)
+                val file = File(path)
                 if (null == findBean) {
-                    val fb = FileBean(FileBean.RECENT, File(path), true)
-                    fb.bookProgress = progressDao.getProgress(path, BookProgress.IN_RECENT)
+                    val fb = FileBean(FileBean.RECENT, file, true)
+                    fb.bookProgress = progressDao.getProgress(file.name, BookProgress.IN_RECENT)
                     nList.add(0, fb)
                     Logcat.d("onReadBook insert:$fb")
                 } else {
-                    findBean.bookProgress = progressDao.getProgress(path)
+                    findBean.bookProgress = progressDao.getProgress(file.name)
                     Logcat.d("onReadBook update:$findBean")
                 }
 

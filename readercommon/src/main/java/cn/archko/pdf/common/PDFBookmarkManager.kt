@@ -14,7 +14,8 @@ class PDFBookmarkManager {
         private set
 
     fun setStartBookmark(absolutePath: String?, autoCrop: Int) {
-        val progress = Graph.database.progressDao().getProgress(absolutePath!!)
+        val file = File(absolutePath)
+        val progress = Graph.database.progressDao().getProgress(file.name)
         bookmarkToRestore = progress
         if (null == bookmarkToRestore) {
             bookmarkToRestore = BookProgress(FileUtils.getRealPath(absolutePath))
