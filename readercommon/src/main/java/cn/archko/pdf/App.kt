@@ -2,6 +2,7 @@ package cn.archko.pdf
 
 import android.app.Application
 import cn.archko.pdf.common.CrashHandler
+import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.RecentManager
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.umeng.commonsdk.UMConfigure
@@ -14,7 +15,8 @@ class App : Application() {
         super.onCreate()
         instance = this
         uiThread = Thread.currentThread()
-        RecentManager.instance.recentTableManager.open()
+        Graph.provide(this)
+
         Thread.setDefaultUncaughtExceptionHandler(CrashHandler())
         val displayMetrics = resources.displayMetrics
         screenHeight = displayMetrics.heightPixels

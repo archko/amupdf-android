@@ -1,5 +1,8 @@
 package cn.archko.pdf.entity
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import cn.archko.pdf.utils.FileUtils
 import java.io.File
 import java.io.Serializable
@@ -8,87 +11,111 @@ import java.util.*
 /**
  * @author: archko 2014/4/17 :16:27
  */
+@Entity(
+    tableName = "progress",
+)
 class BookProgress : Serializable, Comparator<BookProgress> {
-    var _id //db id
-            = 0
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "_id")
+    var _id: Int = 0
 
     /**
      * 索引
      */
     @JvmField
-    var index = 0
+    @ColumnInfo(name = "index")
+    var index: Int = 0
 
     /**
      * 文件路径,不是全路径,是除去/sdcard/这部分的路径.
      */
     @JvmField
+    @ColumnInfo(name = "path")
     var path: String? = null
 
     /**
      * 文件名.包含扩展名
      */
     @JvmField
+    @ColumnInfo(name = "name")
     var name: String? = null
 
     @JvmField
+    @ColumnInfo(name = "ext")
     var ext: String? = null
 
     @JvmField
+    @ColumnInfo(name = "md5")
     var md5: String? = null
 
     @JvmField
-    var pageCount = 0
+    @ColumnInfo(name = "pageCount")
+    var pageCount: Int = 0
 
     @JvmField
+    @ColumnInfo(name = "size")
     var size: Long = 0
 
     @JvmField
+    @ColumnInfo(name = "firstTimestampe")
     var firstTimestampe: Long = 0
 
     @JvmField
+    @ColumnInfo(name = "lastTimestampe")
     var lastTimestampe: Long = 0
 
     @JvmField
-    var readTimes = 0
+    @ColumnInfo(name = "readTimes")
+    var readTimes: Int = 0
 
     /**
      * 进度0-100,not used
      */
     @JvmField
-    var progress = 0
+    @ColumnInfo(name = "progress")
+    var progress: Int = 0
 
     @JvmField
-    var page = 0
+    @ColumnInfo(name = "page")
+    var page: Int = 0
 
     @JvmField
+    @ColumnInfo(name = "zoomLevel")
     var zoomLevel = 1000f
 
     @JvmField
-    var rotation = 0
+    @ColumnInfo(name = "rotation")
+    var rotation: Int = 0
 
     @JvmField
-    var offsetX = 0
+    @ColumnInfo(name = "offsetX")
+    var offsetX: Int = 0
 
     @JvmField
-    var offsetY = 0
+    @ColumnInfo(name = "offsetY")
+    var offsetY: Int = 0
 
     /**
      * 2.5.9 add auto crop,0:autocrop,1:no crop, 2:manunal crop
      */
     @JvmField
-    var autoCrop = 0
+    @ColumnInfo(name = "autoCrop")
+    var autoCrop: Int = 0
 
     /**
      * 3.2.0 add textreflow:0,no reflow mode,1,reflow mode
      */
     @JvmField
-    var reflow = 0
+    @ColumnInfo(name = "reflow")
+    var reflow: Int = 0
 
     //3.4.0 add isFavorited: 0,not in favorities,1,is in favorities
     @JvmField
+    @ColumnInfo(name = "isFavorited")
     var isFavorited = 0
 
     @JvmField
+    @ColumnInfo(name = "inRecent")
     var inRecent = 0 //0:in recent,-1:not in recent,-2:all
 
     constructor() {}

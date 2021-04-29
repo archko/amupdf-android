@@ -12,15 +12,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.NavGraph
+import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.Logcat
+import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.theme.*
 import cn.archko.pdf.utils.LocalSysUiController
 import cn.archko.pdf.utils.SystemUiController
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.umeng.analytics.MobclickAgent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.ArrayList
 
 /**
  * @author archko
@@ -35,7 +42,7 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
         // This app draws behind the system bars, so we want to handle fitting system windows
         WindowCompat.setDecorFitsSystemWindows(window, true)
 
-        setContent {
+        /*setContent {
             val systemUiController = remember { SystemUiController(window) }
             val appTheme = remember { mutableStateOf(AppThemeState()) }
             val color = when (appTheme.value.pallet) {
@@ -62,12 +69,19 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
                     }
                 }
             }
-        }
+        }*/
 
         checkSdcardPermission()
 
         // 设置为U-APP场景
         MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
+
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                val process = Graph.database.progressDao().getProgresses(0, 10)
+                Logcat.d("progress:$process")
+            }
+        }
     }
 
     public override fun onResume() {

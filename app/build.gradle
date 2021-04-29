@@ -44,6 +44,15 @@ android {
              */
             useSupportLibrary = true
         }
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        "room.incremental"     : "true",
+                        "room.expandProjection": "true"
+                ]
+            }
+        }
     }
 
     compileOptions {
@@ -155,6 +164,11 @@ dependencies {
     implementation(Libs.Dependency.material) {
         exclude group: 'androidx.recyclerview'
     }
+
+    implementation Libs.AndroidX.Room.runtime
+    implementation Libs.AndroidX.Room.ktx
+
+    kapt Libs.AndroidX.Room.compiler
 
     api project(':reader')
     api project(':editor')

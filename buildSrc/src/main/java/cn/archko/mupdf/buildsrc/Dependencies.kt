@@ -119,6 +119,13 @@ object Libs {
             // Jetpack Compose Integration
             const val pagingCompose = "androidx.paging:paging-compose:1.0.0-alpha08"
         }
+
+        object Room {
+            private const val version = "2.2.6"
+            const val runtime = "androidx.room:room-runtime:${version}"
+            const val ktx = "androidx.room:room-ktx:${version}"
+            const val compiler = "androidx.room:room-compiler:${version}"
+        }
     }
 
     object Retrofit {

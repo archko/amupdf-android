@@ -4,6 +4,11 @@ import cn.archko.mupdf.buildsrc.*
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
+kapt {
+    correctErrorTypes = true
+    useBuildCache = true
+}
+
 android {
     compileSdkVersion BuildConfig.compileSdkVersion
     buildToolsVersion BuildConfig.buildToolsVersion
@@ -15,6 +20,15 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags ""
+            }
+        }
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        "room.incremental"     : "true",
+                        "room.expandProjection": "true"
+                ]
             }
         }
     }
@@ -56,6 +70,12 @@ dependencies {
 
     api Libs.Dependency.liveEventBusX
     api Libs.AndroidX.Activity.appCompat
+
+    implementation Libs.AndroidX.Room.runtime
+    implementation Libs.AndroidX.Room.ktx
+
+    kapt Libs.AndroidX.Room.compiler
+
     api Libs.Umeng.analytics
     api Libs.Umeng.umengCommon
 }
