@@ -2,6 +2,7 @@ package cn.archko.pdf.common
 
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
+import java.io.File
 import java.util.*
 
 /**
@@ -9,27 +10,26 @@ import java.util.*
  */
 class ProgressScaner {
 
-    fun startScan(fileListEntries: List<FileBean>, currentPath: String): Array<Any?> {
-        val entries: MutableList<FileBean> = ArrayList()
-        val recent = RecentManager.instance
-        for (entry in fileListEntries) {
-            val listEntry = entry.clone()
-            entries.add(listEntry)
-            if (!listEntry.isDirectory && entry.file != null) {
-                val progress = recent.readRecentFromDb(entry.file!!.absolutePath, BookProgress.ALL)
-                if (null != progress) {
-                    listEntry.bookProgress = progress
-                }
-            }
-        }
-        return arrayOf(currentPath, entries)
-    }
+    //fun startScan(fileListEntries: List<FileBean>, currentPath: String): Array<Any?> {
+    //    val entries: MutableList<FileBean> = ArrayList()
+    //    val recent = RecentManager.instance
+    //    for (entry in fileListEntries) {
+    //        val listEntry = entry.clone()
+    //        entries.add(listEntry)
+    //        if (!listEntry.isDirectory && entry.file != null) {
+    //            val progress = recent.readRecentFromDb(entry.file!!.absolutePath, BookProgress.ALL)
+    //            if (null != progress) {
+    //                listEntry.bookProgress = progress
+    //            }
+    //        }
+    //    }
+    //    return arrayOf(currentPath, entries)
+    //}
 
-    fun startScan(fileListEntries: List<FileBean>) {
-        val recent = RecentManager.instance
+    fun startScan(fileListEntries: List<FileBean>, progressDao: ProgressDao) {
         for (entry in fileListEntries) {
             if (!entry.isDirectory && entry.file != null) {
-                val progress = recent.readRecentFromDb(entry.file!!.absolutePath, BookProgress.ALL)
+                val progress = progressDao.getProgress(entry.file!!.name)
                 if (null != progress) {
                     entry.bookProgress = progress
                 }

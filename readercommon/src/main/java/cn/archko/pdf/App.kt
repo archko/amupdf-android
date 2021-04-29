@@ -3,7 +3,6 @@ package cn.archko.pdf
 import android.app.Application
 import cn.archko.pdf.common.CrashHandler
 import cn.archko.pdf.common.Graph
-import cn.archko.pdf.common.RecentManager
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.umeng.commonsdk.UMConfigure
 

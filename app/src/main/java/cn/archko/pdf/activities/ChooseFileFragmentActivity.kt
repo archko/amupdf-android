@@ -42,7 +42,7 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
         // This app draws behind the system bars, so we want to handle fitting system windows
         WindowCompat.setDecorFitsSystemWindows(window, true)
 
-        /*setContent {
+        setContent {
             val systemUiController = remember { SystemUiController(window) }
             val appTheme = remember { mutableStateOf(AppThemeState()) }
             val color = when (appTheme.value.pallet) {
@@ -69,7 +69,7 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
                     }
                 }
             }
-        }*/
+        }
 
         checkSdcardPermission()
 

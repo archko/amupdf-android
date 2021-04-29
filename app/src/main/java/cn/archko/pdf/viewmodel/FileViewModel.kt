@@ -8,17 +8,20 @@ import cn.archko.mupdf.R
 import cn.archko.pdf.App
 import cn.archko.pdf.activities.ChooseFileFragmentActivity
 import cn.archko.pdf.common.AnalysticsHelper
+import cn.archko.pdf.common.BookProgressParser
 import cn.archko.pdf.common.Event
+import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.ProgressScaner
-import cn.archko.pdf.common.RecentManager
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.model.SearchSuggestionGroup
 import cn.archko.pdf.paging.LoadResult
 import cn.archko.pdf.paging.State
+import cn.archko.pdf.utils.DateUtils
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
+import cn.archko.pdf.utils.StreamUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.umeng.analytics.MobclickAgent
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +34,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 import java.io.File
 import java.io.FileFilter
 import java.util.*
@@ -75,6 +81,7 @@ class FileViewModel() : ViewModel() {
     var sdcardRoot: String = "/sdcard/"
     var homePath: String
     var selectionIndex = 0
+    val progressDao by lazy { Graph.database.progressDao() }
 
     private val fileComparator = Comparator<File> { f1, f2 ->
         if (f1 == null) throw RuntimeException("f1 is null inside sort")
@@ -128,12 +135,7 @@ class FileViewModel() : ViewModel() {
     }
 
     init {
-        var externalFileRootDir: File? = App.instance!!.getExternalFilesDir(null)
-        do {
-            externalFileRootDir = Objects.requireNonNull(externalFileRootDir)?.parentFile
-        } while (Objects.requireNonNull(externalFileRootDir)?.absolutePath?.contains("/Android") == true
-        )
-        sdcardRoot = externalFileRootDir?.path!!
+        sdcardRoot = FileUtils.getStorageDirPath()
         Logcat.d("sdcardRoot:$sdcardRoot")
 
         homePath = initHomePath()
@@ -222,7 +224,7 @@ class FileViewModel() : ViewModel() {
                         entry = FileBean(FileBean.NORMAL, file, showExtension)
                         fileList.add(entry)
                     }
-                    mScanner.startScan(fileList)
+                    mScanner.startScan(fileList, progressDao)
                 }
                 emit(fileList)
             }.catch { e ->
@@ -245,15 +247,15 @@ class FileViewModel() : ViewModel() {
         _historyFileModel.value = _historyFileModel.value.copy(State.LOADING)
         viewModelScope.launch {
             flow {
-                val recent = RecentManager.instance
-                val count = recent.progressCount
+                val count = progressDao.progressCount()
                 var nKey = _historyFileModel.value.nextKey ?: 0
                 if (refresh) {
                     nKey = 0
                 }
-                val progresses: ArrayList<BookProgress>? = recent.readRecentFromDb(
+                val progresses: List<BookProgress>? = progressDao.getProgresses(
                     PAGE_SIZE * nKey,
-                    PAGE_SIZE
+                    PAGE_SIZE,
+                    BookProgress.IN_RECENT
                 )
 
                 val entryList = ArrayList<FileBean>()
@@ -303,15 +305,15 @@ class FileViewModel() : ViewModel() {
         _uiFavoritiesModel.value = _uiFavoritiesModel.value.copy(State.LOADING)
         viewModelScope.launch {
             flow {
-                val recent = RecentManager.instance
-                val count = recent.favoriteProgressCount
+                val count = progressDao.getFavoriteProgressCount(1)
                 var nKey = _uiFavoritiesModel.value.nextKey ?: 0
                 if (refresh) {
                     nKey = 0
                 }
-                val progresses: ArrayList<BookProgress>? = recent.readFavoriteFromDb(
+                val progresses: List<BookProgress>? = progressDao.getFavoriteProgresses(
                     PAGE_SIZE * nKey,
-                    PAGE_SIZE
+                    PAGE_SIZE,
+                    "1"
                 )
 
                 val entryList = ArrayList<FileBean>()
@@ -369,7 +371,19 @@ class FileViewModel() : ViewModel() {
     fun deleteHistory(file: File) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                RecentManager.instance.removeRecentFromDb(file.absolutePath)
+                val bookProgress = progressDao.getProgress(file.name)
+                Logcat.d("old:$bookProgress")
+
+                bookProgress?.run {
+                    firstTimestampe = 0
+                    page = 0
+                    progress = 0
+                    inRecent = -1
+                }
+                if (bookProgress != null) {
+                    progressDao.updateProgress(bookProgress)
+                    Logcat.d("new:$bookProgress")
+                }
             }
             loadHistories(true)
         }
@@ -380,7 +394,36 @@ class FileViewModel() : ViewModel() {
         viewModelScope.launch {
             val now = System.currentTimeMillis()
             flow {
-                val filepath = RecentManager.instance.backupFromDb()
+                val name =
+                    "mupdf_" + DateUtils.formatTime(
+                        System.currentTimeMillis(),
+                        "yyyy-MM-dd-HH-mm-ss"
+                    )
+                var filePath: String? = null
+
+                try {
+                    val list = progressDao.getAllProgress()
+                    val root = JSONObject()
+                    val ja = JSONArray()
+                    root.put("root", ja)
+                    root.put("name", name)
+                    list?.run {
+                        for (progress in list) {
+                            BookProgressParser.addProgressToJson(progress, ja)
+                        }
+                    }
+                    val dir = FileUtils.getStorageDir("amupdf")
+                    if (dir != null && dir.exists()) {
+                        filePath = dir.absolutePath + File.separator + name
+                        Logcat.d("backup.name:$filePath root:$root")
+                        StreamUtils.copyStringToFile(root.toString(), filePath)
+                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
                 var newTime = System.currentTimeMillis() - now
                 if (newTime < MAX_TIME) {
                     newTime = MAX_TIME - newTime
@@ -389,7 +432,7 @@ class FileViewModel() : ViewModel() {
                 }
 
                 delay(newTime)
-                emit(filepath)
+                emit(filePath)
             }.catch { e ->
                 Logcat.d("restoreToDb error:$e")
                 emit(null)
@@ -412,7 +455,23 @@ class FileViewModel() : ViewModel() {
         viewModelScope.launch {
             val now = System.currentTimeMillis()
             flow {
-                val flag: Boolean = RecentManager.instance.restoreToDb(file)
+                var flag = false
+                try {
+                    val content = StreamUtils.readStringFromFile(file)
+                    Logcat.longLog(
+                        Logcat.TAG,
+                        "restore.file:" + file.absolutePath + " content:" + content
+                    )
+                    val progresses = BookProgressParser.parseProgresses(content)
+                    Graph.database.runInTransaction {
+                        Graph.database.progressDao().deleteAllProgress()
+                        Graph.database.progressDao().addProgresses(progresses)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                flag = true
+
                 var newTime = System.currentTimeMillis() - now
                 if (newTime < MAX_TIME) {
                     newTime = MAX_TIME - newTime
@@ -448,8 +507,22 @@ class FileViewModel() : ViewModel() {
     fun loadBackupFiles() {
         viewModelScope.launch {
             flow {
-                val files: List<File>? = RecentManager.instance.backupFiles
-                emit(files)
+                var files: Array<File>? = null
+                val dir = FileUtils.getStorageDir("amupdf")
+                if (dir.exists()) {
+                    files = dir.listFiles { pathname: File -> pathname.name.startsWith("mupdf_") }
+                    Arrays.sort(files) { f1: File?, f2: File? ->
+                        if (f1 == null) throw RuntimeException("f1 is null inside sort")
+                        if (f2 == null) throw RuntimeException("f2 is null inside sort")
+                        try {
+                            return@sort f2.lastModified().compareTo(f1.lastModified())
+                        } catch (e: NullPointerException) {
+                            throw RuntimeException("failed to compare $f1 and $f2", e)
+                        }
+                    }
+                }
+
+                emit(Arrays.asList(files) as ArrayList<File>)
             }.catch { e ->
                 Logcat.d("backupFiles error:$e")
                 emit(ArrayList<File>())
@@ -483,10 +556,9 @@ class FileViewModel() : ViewModel() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    val recentManager = RecentManager.instance.recentTableManager
                     val filepath = FileUtils.getStoragePath(entry.bookProgress!!.path)
                     val file = File(filepath)
-                    var bookProgress = recentManager.getProgress(file.name, BookProgress.ALL)
+                    var bookProgress = progressDao.getProgress(file.name)
                     if (null == bookProgress) {
                         if (isFavorited == 0) {
                             Logcat.w("", "some error:$entry")
@@ -497,12 +569,12 @@ class FileViewModel() : ViewModel() {
                         entry.bookProgress!!.inRecent = BookProgress.NOT_IN_RECENT
                         entry.bookProgress!!.isFavorited = isFavorited
                         Logcat.d("add favorite entry:${entry.bookProgress}")
-                        recentManager.addProgress(entry.bookProgress!!)
+                        progressDao.addProgress(entry.bookProgress!!)
                     } else {
                         entry.bookProgress = bookProgress
                         entry.bookProgress!!.isFavorited = isFavorited
                         Logcat.d("update favorite entry:${entry.bookProgress}")
-                        recentManager.updateProgress(entry.bookProgress!!)
+                        progressDao.updateProgress(entry.bookProgress!!)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -622,11 +694,11 @@ class FileViewModel() : ViewModel() {
                 val nList = ArrayList<FileBean>(_historyFileModel.value.list)
                 if (null == findBean) {
                     val fb = FileBean(FileBean.RECENT, File(path), true)
-                    fb.bookProgress = RecentManager.instance.readRecentFromDb(path)
+                    fb.bookProgress = progressDao.getProgress(path, BookProgress.IN_RECENT)
                     nList.add(0, fb)
                     Logcat.d("onReadBook insert:$fb")
                 } else {
-                    findBean.bookProgress = RecentManager.instance.readRecentFromDb(path)
+                    findBean.bookProgress = progressDao.getProgress(path)
                     Logcat.d("onReadBook update:$findBean")
                 }
 

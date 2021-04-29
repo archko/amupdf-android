@@ -21,7 +21,9 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
+import androidx.annotation.NonNull;
 import cn.archko.pdf.App;
 
 public final class FileUtils {
@@ -70,12 +72,25 @@ public final class FileUtils {
     }
 
     public static final File getStorageDir(String dir) {
-        String path = Environment.getExternalStorageDirectory().getPath() + "/" + dir;
-        File file = new File(path);
+        //String path = Environment.getExternalStorageDirectory().getPath() + "/" + dir;
+        String sdcardRoot = getStorageDirPath();
+        File file = new File(sdcardRoot + "/" + dir);
         if (!file.exists()) {
             file.mkdirs();
         }
         return file;
+    }
+
+    public static final String getStorageDirPath() {
+        File externalFileRootDir = App.Companion.getInstance().getExternalFilesDir(null);
+        do {
+            externalFileRootDir = Objects.requireNonNull(externalFileRootDir).getParentFile();
+        } while (Objects.requireNonNull(externalFileRootDir).getAbsolutePath().contains("/Android"));
+        String sdcardRoot = null;
+        if (null != externalFileRootDir) {
+            sdcardRoot = externalFileRootDir.getPath();
+        }
+        return sdcardRoot;
     }
 
     public static final String getDir(File file) {

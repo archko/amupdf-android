@@ -10,7 +10,7 @@ object Graph {
     lateinit var database: AKDatabase
         private set
 
-    private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
+    /*private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("ALTER TABLE " + RecentTableManager.ProgressTbl.TABLE_NAME + " ADD " + RecentTableManager.ProgressTbl.KEY_RECORD_AUTOCROP + " integer")
         }
@@ -39,7 +39,7 @@ object Graph {
             sql.append("=0")
             database.execSQL(sql.toString())
         }
-    }
+    }*/
 
     fun provide(context: Context) {
         database = Room.databaseBuilder(context, AKDatabase::class.java, "abook_progress.db")

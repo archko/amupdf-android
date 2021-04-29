@@ -10,8 +10,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import cn.archko.mupdf.R
 import cn.archko.pdf.App
+import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.ImageLoader
-import cn.archko.pdf.common.RecentManager
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.listeners.DataListener
@@ -120,9 +120,9 @@ class FileInfoFragment : DialogFragment() {
         mFileSize.text = Utils.getFileSize(mEntry!!.fileSize)
 
         if (null == bookProgress || bookProgress?.pageCount == 0) {
-            val recentManager = RecentManager.instance.recentTableManager
             try {
-                bookProgress = recentManager.getProgress(file!!.name, BookProgress.ALL)
+                bookProgress =
+                    Graph.database.progressDao().getProgress(file!!.name, BookProgress.ALL)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

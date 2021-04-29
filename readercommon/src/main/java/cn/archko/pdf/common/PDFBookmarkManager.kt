@@ -1,9 +1,10 @@
 package cn.archko.pdf.common
 
-import android.util.Log
+import android.text.TextUtils
+import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.entity.BookProgress
-import cn.archko.pdf.listeners.DataListener
 import cn.archko.pdf.utils.FileUtils
+import java.io.File
 
 /**
  * @author: archko 2018/7/22 :12:43
@@ -13,7 +14,7 @@ class PDFBookmarkManager {
         private set
 
     fun setStartBookmark(absolutePath: String?, autoCrop: Int) {
-        val progress = RecentManager.instance.readRecentFromDb(absolutePath, BookProgress.ALL)
+        val progress = Graph.database.progressDao().getProgress(absolutePath!!)
         bookmarkToRestore = progress
         if (null == bookmarkToRestore) {
             bookmarkToRestore = BookProgress(FileUtils.getRealPath(absolutePath))
@@ -77,19 +78,39 @@ class PDFBookmarkManager {
         }
         bookmarkToRestore!!.offsetY = scrollY
         bookmarkToRestore!!.progress = currentPage * 100 / pageCount
-        Log.i(
-            RecentManager.TAG,
+        Logcat.i(
+            Logcat.TAG,
             String.format("last page saved for currentPage:%s, :%s", currentPage, bookmarkToRestore)
         )
-        RecentManager.instance.addAsyncToDB(bookmarkToRestore,
-            object : DataListener {
-                override fun onSuccess(vararg args: Any) {
-                    Log.i(RecentManager.TAG, "onSuccess")
-                }
 
-                override fun onFailed(vararg args: Any) {
-                    Log.i(RecentManager.TAG, "onFailed")
-                }
-            })
+        AppExecutors.instance.diskIO().execute(Runnable {
+            addToDb(bookmarkToRestore)
+        })
+    }
+
+    fun addToDb(progress: BookProgress?) {
+        if (null == progress || TextUtils.isEmpty(progress.path) || TextUtils.isEmpty(progress.name)) {
+            Logcat.d("", "path is null.$progress")
+            return
+        }
+        try {
+            val progressDao = Graph.database.progressDao()
+            val filepath = FileUtils.getStoragePath(progress.path)
+            val file = File(filepath)
+            var old = progressDao.getProgress(file.name)
+            if (old == null) {
+                old = progress
+                old.lastTimestampe = System.currentTimeMillis()
+                progressDao.addProgress(old)
+            } else {
+                progress.lastTimestampe = System.currentTimeMillis()
+                progress.isFavorited = old.isFavorited
+                progressDao.updateProgress(progress)
+            }
+            Logcat.i(Logcat.TAG, "onSuccess")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Logcat.i(Logcat.TAG, "onFailed:$e")
+        }
     }
 }
