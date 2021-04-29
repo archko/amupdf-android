@@ -49,10 +49,10 @@ object BookProgressParser {
         if (null == jsonobject) {
             return null
         }
-        val bean = BookProgress()
+        var bean: BookProgress? = null
         try {
+            bean = BookProgress(URLDecoder.decode(jsonobject.optString("path")))
             bean.index = jsonobject.optInt("index")
-            bean.path = URLDecoder.decode(jsonobject.optString("path"))
             bean.name = jsonobject.optString("name")
             bean.ext = jsonobject.optString("ext")
             bean.md5 = jsonobject.optString("md5")

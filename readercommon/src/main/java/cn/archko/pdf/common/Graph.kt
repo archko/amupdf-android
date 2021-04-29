@@ -42,11 +42,11 @@ object Graph {
     }
 
     fun provide(context: Context) {
-        database = Room.databaseBuilder(context, AKDatabase::class.java, "book_progress.db")
+        database = Room.databaseBuilder(context, AKDatabase::class.java, "abook_progress.db")
             // This is not recommended for normal apps, but the goal of this sample isn't to
             // showcase all of Room.
-            //.fallbackToDestructiveMigration()
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+            .fallbackToDestructiveMigration()
+            //.addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
             .build()
     }
 }

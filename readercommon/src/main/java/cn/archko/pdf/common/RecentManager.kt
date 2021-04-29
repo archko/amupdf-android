@@ -186,7 +186,7 @@ class RecentManager private constructor() {
             val content = StreamUtils.readStringFromFile(file)
             longLog(TAG, "restore.file:" + file.absolutePath + " content:" + content)
             val progresses = parseProgresses(content)
-            try {
+            /*try {
                 recentTableManager.db?.beginTransaction()
                 recentTableManager.db?.delete(RecentTableManager.ProgressTbl.TABLE_NAME, null, null)
                 for (progress in progresses) {
@@ -201,6 +201,10 @@ class RecentManager private constructor() {
                 e.printStackTrace()
             } finally {
                 recentTableManager.db?.endTransaction()
+            }*/
+            Graph.database.runInTransaction {
+                Graph.database.progressDao().deleteAllProgress()
+                Graph.database.progressDao().addProgresses(progresses)
             }
         } catch (e: Exception) {
             e.printStackTrace()

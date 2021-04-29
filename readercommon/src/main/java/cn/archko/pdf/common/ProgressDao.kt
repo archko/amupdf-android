@@ -14,6 +14,9 @@ interface ProgressDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addProgress(progress: BookProgress): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun addProgresses(progress: List<BookProgress>)
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateProgress(progress: BookProgress)
 
@@ -35,6 +38,10 @@ interface ProgressDao {
     //@Delete
     @Query("Delete FROM progress where name=:name")
     suspend fun deleteProgress(name: String)
+
+    //@Delete
+    @Query("Delete FROM progress")
+    fun deleteAllProgress()
 
     @Delete
     suspend fun deleteProgress(progress: BookProgress)

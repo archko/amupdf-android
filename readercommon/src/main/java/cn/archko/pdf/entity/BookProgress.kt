@@ -49,7 +49,7 @@ class BookProgress : Serializable, Comparator<BookProgress> {
     var md5: String? = null
 
     @JvmField
-    @ColumnInfo(name = "pageCount")
+    @ColumnInfo(name = "page_count")
     var pageCount: Int = 0
 
     @JvmField
@@ -57,68 +57,67 @@ class BookProgress : Serializable, Comparator<BookProgress> {
     var size: Long = 0
 
     @JvmField
-    @ColumnInfo(name = "firstTimestampe")
+    @ColumnInfo(name = "record_first_timestamp")
     var firstTimestampe: Long = 0
 
     @JvmField
-    @ColumnInfo(name = "lastTimestampe")
+    @ColumnInfo(name = "record_last_timestamp")
     var lastTimestampe: Long = 0
 
     @JvmField
-    @ColumnInfo(name = "readTimes")
+    @ColumnInfo(name = "record_read_times")
     var readTimes: Int = 0
 
     /**
      * 进度0-100,not used
      */
     @JvmField
-    @ColumnInfo(name = "progress")
+    @ColumnInfo(name = "record_progress")
     var progress: Int = 0
 
     @JvmField
-    @ColumnInfo(name = "page")
+    @ColumnInfo(name = "record_page")
     var page: Int = 0
 
     @JvmField
-    @ColumnInfo(name = "zoomLevel")
+    @ColumnInfo(name = "record_absolute_zoom_level")
     var zoomLevel = 1000f
 
     @JvmField
-    @ColumnInfo(name = "rotation")
+    @ColumnInfo(name = "record_rotation")
     var rotation: Int = 0
 
     @JvmField
-    @ColumnInfo(name = "offsetX")
+    @ColumnInfo(name = "record_offsetX")
     var offsetX: Int = 0
 
     @JvmField
-    @ColumnInfo(name = "offsetY")
+    @ColumnInfo(name = "record_offsety")
     var offsetY: Int = 0
 
     /**
      * 2.5.9 add auto crop,0:autocrop,1:no crop, 2:manunal crop
      */
     @JvmField
-    @ColumnInfo(name = "autoCrop")
+    @ColumnInfo(name = "record_autocrop")
     var autoCrop: Int = 0
 
     /**
      * 3.2.0 add textreflow:0,no reflow mode,1,reflow mode
      */
     @JvmField
-    @ColumnInfo(name = "reflow")
+    @ColumnInfo(name = "record_reflow")
     var reflow: Int = 0
 
     //3.4.0 add isFavorited: 0,not in favorities,1,is in favorities
     @JvmField
-    @ColumnInfo(name = "isFavorited")
+    @ColumnInfo(name = "is_favorited")
     var isFavorited = 0
 
     @JvmField
-    @ColumnInfo(name = "inRecent")
+    @ColumnInfo(name = "is_in_recent")
     var inRecent = 0 //0:in recent,-1:not in recent,-2:all
 
-    constructor() {}
     constructor(path: String?) {
         index = 0
         this.path = path
