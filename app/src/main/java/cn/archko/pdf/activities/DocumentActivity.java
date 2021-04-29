@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import cn.archko.pdf.AppExecutors;
 import cn.archko.pdf.common.PDFBookmarkManager;
 import cn.archko.pdf.common.SensorHelper;
 
@@ -160,7 +161,13 @@ public class DocumentActivity extends AppCompatActivity {
     private void loadBookmark() {
         if (!TextUtils.isEmpty(path)) {
             pdfBookmarkManager = new PDFBookmarkManager();
-            pdfBookmarkManager.setStartBookmark(path, 0);
+
+            AppExecutors.Companion.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    pdfBookmarkManager.setStartBookmark(path, 0);
+                }
+            });
         }
     }
 

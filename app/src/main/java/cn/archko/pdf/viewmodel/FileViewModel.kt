@@ -521,8 +521,13 @@ class FileViewModel() : ViewModel() {
                         }
                     }
                 }
-
-                emit(Arrays.asList(files) as ArrayList<File>)
+                val list = ArrayList<File>()
+                if (files != null) {
+                    for (f in files) {
+                        list.add(f)
+                    }
+                }
+                emit(list)
             }.catch { e ->
                 Logcat.d("backupFiles error:$e")
                 emit(ArrayList<File>())

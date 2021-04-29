@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.fragment.app.FragmentActivity;
 
+import cn.archko.pdf.AppExecutors;
 import cn.archko.pdf.activities.PdfOptionsActivity;
 import cn.archko.pdf.common.BitmapCache;
 import cn.archko.pdf.common.PDFBookmarkManager;
@@ -76,10 +77,16 @@ public abstract class BaseViewerActivity extends FragmentActivity implements Dec
 
         Uri uri = getIntent().getData();
         String absolutePath = Uri.decode(uri.getEncodedPath());
-        pdfBookmarkManager.setStartBookmark(absolutePath, 0);
-        if (null != pdfBookmarkManager.getBookmarkToRestore()) {
-            zoomModel.setZoom(pdfBookmarkManager.getBookmarkToRestore().zoomLevel / 1000);
-        }
+        AppExecutors.Companion.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                pdfBookmarkManager.setStartBookmark(absolutePath, 0);
+                if (null != pdfBookmarkManager.getBookmarkToRestore()) {
+                    zoomModel.setZoom(pdfBookmarkManager.getBookmarkToRestore().zoomLevel / 1000);
+                }
+            }
+        });
+
         final DecodingProgressModel progressModel = new DecodingProgressModel();
         progressModel.addEventListener(this);
         currentPageModel = new CurrentPageModel();

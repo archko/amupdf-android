@@ -99,11 +99,15 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         if (!mCrop) {
             autoCrop = 1
         }
-        pdfBookmarkManager!!.setStartBookmark(mPath, autoCrop)
-        val bookmark = pdfBookmarkManager?.bookmarkToRestore
-        bookmark?.let {
-            mCrop = it.autoCrop == 0
-            mReflow = it.reflow == 1
+        lifecycleScope.launch() {
+            withContext(Dispatchers.IO) {
+                pdfBookmarkManager!!.setStartBookmark(mPath, autoCrop)
+                val bookmark = pdfBookmarkManager?.bookmarkToRestore
+                bookmark?.let {
+                    mCrop = it.autoCrop == 0
+                    mReflow = it.reflow == 1
+                }
+            }
         }
     }
 
