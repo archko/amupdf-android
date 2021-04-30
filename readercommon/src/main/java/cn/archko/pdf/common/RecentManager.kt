@@ -8,6 +8,7 @@ import cn.archko.pdf.common.BookProgressParser.parseProgresses
 import cn.archko.pdf.common.Logcat.d
 import cn.archko.pdf.common.Logcat.longLog
 import cn.archko.pdf.entity.BookProgress
+import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.listeners.DataListener
 import cn.archko.pdf.utils.DateUtils
 import cn.archko.pdf.utils.FileUtils
@@ -240,6 +241,30 @@ class RecentManager private constructor() {
             e.printStackTrace()
         }
         return list
+    }
+
+    fun searchHistory(keyword: String): ArrayList<FileBean> {
+        val progresses = recentTableManager.searchHistory(keyword)
+        val fileBeans = ArrayList<FileBean>()
+        progresses?.run {
+            for (progress in progresses) {
+                val fileBean = FileBean(progress, FileBean.RECENT)
+                fileBeans.add(fileBean)
+            }
+        }
+        return fileBeans
+    }
+
+    fun searchFavorite(keyword: String): ArrayList<FileBean> {
+        val progresses = recentTableManager.searchFavorite(keyword)
+        val fileBeans = ArrayList<FileBean>()
+        progresses?.run {
+            for (progress in progresses) {
+                val fileBean = FileBean(progress, FileBean.NORMAL)
+                fileBeans.add(fileBean)
+            }
+        }
+        return fileBeans
     }
 
     val favoriteProgressCount: Int

@@ -17,6 +17,9 @@ import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.model.SearchSuggestionGroup
 import cn.archko.pdf.paging.LoadResult
 import cn.archko.pdf.paging.State
+import cn.archko.pdf.ui.home.searchTypeFavorite
+import cn.archko.pdf.ui.home.searchTypeFile
+import cn.archko.pdf.ui.home.searchTypeHistory
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -176,7 +179,7 @@ class FileViewModel() : ViewModel() {
             return true
         }
         val top = stack.peek()
-        return top == homePath
+        return top == sdcardRoot
     }
 
     fun loadFiles(
@@ -188,9 +191,11 @@ class FileViewModel() : ViewModel() {
         if (!f.exists() || !f.isDirectory) {
             return
         }
-        mCurrentPath = path
-        if (!stack.contains(mCurrentPath)) {
-            stack.push(mCurrentPath)
+        if (!refresh) {
+            mCurrentPath = path
+            if (!stack.contains(mCurrentPath)) {
+                stack.push(mCurrentPath)
+            }
         }
         Logcat.d("loadFiles, path:$mCurrentPath")
         _uiFileModel.value = _uiFileModel.value.copy(State.LOADING)
@@ -362,7 +367,7 @@ class FileViewModel() : ViewModel() {
     fun deleteFile(fb: FileBean) {
         if (fb.type == FileBean.NORMAL && !fb.isDirectory) {
             fb.file?.delete()
-            loadFiles(null)
+            loadFiles(null, true)
         }
     }
 
@@ -542,13 +547,25 @@ class FileViewModel() : ViewModel() {
         )
     )
 
-    suspend fun search(query: String): MutableList<FileBean> = withContext(Dispatchers.Default) {
-        val fileList = ArrayList<FileBean>()
-        doSearch(fileList, query, File(homePath))
-        fileList
-    }
+    suspend fun search(query: String, searchType: Int): MutableList<FileBean> =
+        withContext(Dispatchers.Default) {
+            Logcat.d("search:$searchType,query:$query")
+            var fileList = ArrayList<FileBean>()
+            when (searchType) {
+                searchTypeFile -> {
+                    doSearchFile(fileList, query, File(homePath))
+                }
+                searchTypeHistory -> {
+                    fileList = doSearchHistory(query)
+                }
+                searchTypeFavorite -> {
+                    fileList = doSearchFavorite(query)
+                }
+            }
+            fileList
+        }
 
-    private fun doSearch(fileList: ArrayList<FileBean>, keyword: String, dir: File) {
+    private fun doSearchFile(fileList: ArrayList<FileBean>, keyword: String, dir: File) {
         if (dir.isDirectory) {
             val files = dir.listFiles(this.fileFilter)
 
@@ -559,7 +576,7 @@ class FileViewModel() : ViewModel() {
                             fileList.add(FileBean(FileBean.NORMAL, f, true))
                         }
                     } else {
-                        doSearch(fileList, keyword, f)
+                        doSearchFile(fileList, keyword, f)
                     }
                 }
             }
@@ -568,6 +585,14 @@ class FileViewModel() : ViewModel() {
                 fileList.add(FileBean(FileBean.NORMAL, dir, true))
             }
         }
+    }
+
+    private fun doSearchHistory(keyword: String): ArrayList<FileBean> {
+        return RecentManager.instance.searchHistory(keyword)
+    }
+
+    private fun doSearchFavorite(keyword: String): ArrayList<FileBean> {
+        return RecentManager.instance.searchFavorite(keyword)
     }
 
     /**
