@@ -8,6 +8,7 @@
 //import cn.archko.pdf.common.Logcat.d
 //import cn.archko.pdf.common.Logcat.longLog
 //import cn.archko.pdf.entity.BookProgress
+//import cn.archko.pdf.entity.FileBean
 //import cn.archko.pdf.listeners.DataListener
 //import cn.archko.pdf.utils.DateUtils
 //import cn.archko.pdf.utils.FileUtils
@@ -186,7 +187,7 @@
 //            val content = StreamUtils.readStringFromFile(file)
 //            longLog(TAG, "restore.file:" + file.absolutePath + " content:" + content)
 //            val progresses = parseProgresses(content)
-//            /*try {
+//            try {
 //                recentTableManager.db?.beginTransaction()
 //                recentTableManager.db?.delete(RecentTableManager.ProgressTbl.TABLE_NAME, null, null)
 //                for (progress in progresses) {
@@ -201,10 +202,6 @@
 //                e.printStackTrace()
 //            } finally {
 //                recentTableManager.db?.endTransaction()
-//            }*/
-//            Graph.database.runInTransaction {
-//                Graph.database.progressDao().deleteAllProgress()
-//                Graph.database.progressDao().addProgresses(progresses)
 //            }
 //        } catch (e: Exception) {
 //            e.printStackTrace()
@@ -244,6 +241,30 @@
 //            e.printStackTrace()
 //        }
 //        return list
+//    }
+//
+//    fun searchHistory(keyword: String): ArrayList<FileBean> {
+//        val progresses = recentTableManager.searchHistory(keyword)
+//        val fileBeans = ArrayList<FileBean>()
+//        progresses?.run {
+//            for (progress in progresses) {
+//                val fileBean = FileBean(progress, FileBean.RECENT)
+//                fileBeans.add(fileBean)
+//            }
+//        }
+//        return fileBeans
+//    }
+//
+//    fun searchFavorite(keyword: String): ArrayList<FileBean> {
+//        val progresses = recentTableManager.searchFavorite(keyword)
+//        val fileBeans = ArrayList<FileBean>()
+//        progresses?.run {
+//            for (progress in progresses) {
+//                val fileBean = FileBean(progress, FileBean.NORMAL)
+//                fileBeans.add(fileBean)
+//            }
+//        }
+//        return fileBeans
 //    }
 //
 //    val favoriteProgressCount: Int

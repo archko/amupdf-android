@@ -69,7 +69,7 @@ fun FileBrowserList(
         }
     }
     val refresh: () -> Unit = { ->
-        viewModel.loadHistories(true)
+        viewModel.loadFiles(null, true)
     }
     val loading = result.state == State.LOADING
     val showUserDialog = remember { mutableStateOf(false) }

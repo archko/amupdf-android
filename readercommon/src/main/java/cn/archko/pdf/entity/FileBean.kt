@@ -1,5 +1,6 @@
 package cn.archko.pdf.entity
 
+import android.text.TextUtils
 import cn.archko.pdf.utils.FileUtils
 import java.io.File
 import java.io.Serializable
@@ -36,7 +37,18 @@ class FileBean : Serializable, Cloneable {
         type,
         file,
         getLabel(file, showPDFExtension)
-    ) {
+    )
+
+    constructor(bookProgress: BookProgress, type: Int) {
+        this.bookProgress = bookProgress
+        this.type = type
+        isDirectory = false
+        if (!TextUtils.isEmpty(bookProgress.path)) {
+            file = File(bookProgress.path)
+            if (file!!.exists()) {
+                label = file!!.name
+            }
+        }
     }
 
     constructor(type: Int, label: String?) {

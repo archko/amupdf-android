@@ -34,6 +34,9 @@
     <string name="search">Search&#x2026;</string>
     <string name="searching_">Searching&#x2026;</string>
     <string name="text_not_found">Text not found</string>
+    <string name="search_file">Files</string>
+    <string name="search_history">History</string>
+    <string name="search_favorite">Favorite</string>
 
     <string name="empty_title">NO History</string>
     <string name="empty_subtitle">Start Reading some book</string>

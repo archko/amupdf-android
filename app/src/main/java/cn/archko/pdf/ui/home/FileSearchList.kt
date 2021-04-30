@@ -1,6 +1,7 @@
 package cn.archko.pdf.ui.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
@@ -33,13 +35,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import cn.archko.mupdf.R
 import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.components.Divider
@@ -50,7 +55,6 @@ import cn.archko.pdf.theme.Typography
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.google.accompanist.insets.statusBarsPadding
 import com.umeng.analytics.MobclickAgent
-import java.io.File
 import java.util.*
 
 @Composable
@@ -61,27 +65,15 @@ fun FileSearchList(
 ) {
     val context = LocalContext.current
     val onClick: (FileBean) -> Unit = { it ->
-        val clickedFile: File?
-
-        if (it.type == FileBean.HOME) {
-            clickedFile = File(viewModel.sdcardRoot)
-        } else {
-            clickedFile = it.file
-        }
         if (it.isDirectory) {
-            if (it.file != null) {
-                viewModel.loadFiles(it.file!!.path)
-            }
-            val map = HashMap<String, String>()
-            map["type"] = "dir"
-            map["name"] = clickedFile!!.name
-            MobclickAgent.onEvent(context, AnalysticsHelper.A_FILE, map)
         } else {
             PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
         }
     }
     val showUserDialog = remember { mutableStateOf(false) }
     val showInfoDialog = remember { mutableStateOf(false) }
+    var selected by remember { mutableStateOf(searchTypeFile) }
+
     val menuOpt: (MenuItemType, FileBean) -> Unit = { menuType, fb ->
         showUserDialog.value = false
         when (menuType) {
@@ -112,8 +104,44 @@ fun FileSearchList(
             }
         }
     }
+
     Column {
         Spacer(modifier = Modifier.statusBarsPadding())
+        Row(
+            modifier = Modifier
+                .padding(4.dp)
+                .align(alignment = CenterHorizontally)
+        ) {
+            RadioButton(
+                selected = selected == searchTypeFile,
+                onClick = { selected = searchTypeFile })
+            Text(
+                text = stringResource(id = R.string.search_file),
+                modifier = Modifier
+                    .clickable(onClick = { selected = searchTypeFile })
+                    .padding(start = 4.dp)
+            )
+            Spacer(modifier = Modifier.size(4.dp))
+            RadioButton(
+                selected = selected == searchTypeHistory,
+                onClick = { selected = searchTypeHistory })
+            Text(
+                text = stringResource(id = R.string.search_history),
+                modifier = Modifier
+                    .clickable(onClick = { selected = searchTypeHistory })
+                    .padding(start = 4.dp)
+            )
+            Spacer(modifier = Modifier.size(4.dp))
+            RadioButton(
+                selected = selected == searchTypeFavorite,
+                onClick = { selected = searchTypeFavorite })
+            Text(
+                text = stringResource(id = R.string.search_favorite),
+                modifier = Modifier
+                    .clickable(onClick = { selected = searchTypeFavorite })
+                    .padding(start = 4.dp)
+            )
+        }
         SearchBar(
             query = state.query,
             onQueryChange = { state.query = it },
@@ -126,7 +154,7 @@ fun FileSearchList(
 
         LaunchedEffect(state.query.text) {
             state.searching = true
-            state.searchResults = viewModel.search(state.query.text)
+            state.searchResults = viewModel.search(state.query.text, selected)
             state.searching = false
         }
         when (state.searchDisplay) {
