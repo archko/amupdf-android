@@ -665,11 +665,27 @@ class FileViewModel() : ViewModel() {
     }
 
     private fun doSearchHistory(keyword: String): ArrayList<FileBean> {
-        return progressDao.searchHistory(keyword)
+        val progresses = progressDao.searchHistory(keyword)
+        val fileBeans = ArrayList<FileBean>()
+        progresses?.run {
+            for (progress in progresses) {
+                val fileBean = FileBean(progress, FileBean.NORMAL)
+                fileBeans.add(fileBean)
+            }
+        }
+        return fileBeans
     }
 
     private fun doSearchFavorite(keyword: String): ArrayList<FileBean> {
-        return progressDao.searchFavorite(keyword)
+        val progresses = progressDao.searchFavorite(keyword)
+        val fileBeans = ArrayList<FileBean>()
+        progresses?.run {
+            for (progress in progresses) {
+                val fileBean = FileBean(progress, FileBean.NORMAL)
+                fileBeans.add(fileBean)
+            }
+        }
+        return fileBeans
     }
 
     /**

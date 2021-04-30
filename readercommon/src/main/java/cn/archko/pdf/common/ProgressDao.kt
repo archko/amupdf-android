@@ -7,8 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import cn.archko.pdf.entity.BookProgress
-import cn.archko.pdf.entity.FileBean
-import java.util.ArrayList
+import java.util.*
 
 @Dao
 interface ProgressDao {
@@ -63,9 +62,9 @@ interface ProgressDao {
     fun getFavoriteProgressCount(isFavorited: Int): Int
 
     @Query("SELECT * FROM progress where is_in_recent='0' and name like '%' || :keyword || '%' order by record_last_timestamp desc ")
-    fun searchHistory(keyword: String): ArrayList<FileBean>
+    fun searchHistory(keyword: String): ArrayList<BookProgress>?
 
     @Query("SELECT * FROM progress where is_favorited='1' and name like '%' || :keyword || '%' order by record_last_timestamp desc ")
-    fun searchFavorite(keyword: String): ArrayList<FileBean>
+    fun searchFavorite(keyword: String): ArrayList<BookProgress>?
 
 }
