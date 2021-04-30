@@ -665,11 +665,11 @@ class FileViewModel() : ViewModel() {
     }
 
     private fun doSearchHistory(keyword: String): ArrayList<FileBean> {
-        return RecentManager.instance.searchHistory(keyword)
+        return progressDao.searchHistory(keyword)
     }
 
     private fun doSearchFavorite(keyword: String): ArrayList<FileBean> {
-        return RecentManager.instance.searchFavorite(keyword)
+        return progressDao.searchFavorite(keyword)
     }
 
     /**
