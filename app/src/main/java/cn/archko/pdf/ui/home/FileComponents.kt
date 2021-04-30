@@ -78,6 +78,10 @@ sealed class FileBeanType {
     object Favorite : FileBeanType()
 }
 
+val searchTypeFile = 0
+val searchTypeHistory = 1
+val searchTypeFavorite = 2
+
 @Composable
 fun UserOptDialog(
     showUserDialog: MutableState<Boolean>,

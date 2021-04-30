@@ -42,7 +42,7 @@ fun FileFavoritiesList(
         PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
     }
     val refresh: () -> Unit = { ->
-        viewModel.loadHistories(true)
+        viewModel.loadFavorities(true)
     }
     val loading = result.state == State.LOADING
     val showUserDialog = remember { mutableStateOf(false) }

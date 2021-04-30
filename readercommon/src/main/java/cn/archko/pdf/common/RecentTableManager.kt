@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
 import cn.archko.pdf.entity.BookProgress
+import cn.archko.pdf.entity.FileBean
 import java.util.*
 
 /**
@@ -343,6 +344,70 @@ class RecentTableManager(private val context: Context) {
             cur?.close()
         }
         return 0
+    }
+
+    fun searchHistory(keyword: String): ArrayList<BookProgress>? {
+        var list: ArrayList<BookProgress>? = null
+        var cur: Cursor? = null
+        try {
+            var selection = (ProgressTbl.KEY_NAME + " like? and "
+                    + ProgressTbl.KEY_RECORD_IS_IN_RECENT + "='" + BookProgress.IN_RECENT + "'")
+            cur = db!!.query(
+                ProgressTbl.TABLE_NAME,
+                null,
+                selection,
+                arrayOf(keyword),
+                null,
+                null,
+                ProgressTbl.KEY_RECORD_LAST_TIMESTAMP + " desc",
+            )
+            if (cur != null) {
+                list = ArrayList()
+                if (cur.moveToFirst()) {
+                    do {
+                        list.add(fillProgress(cur))
+                    } while (cur.moveToNext())
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            cur?.close()
+        }
+
+        return list
+    }
+
+    fun searchFavorite(keyword: String): ArrayList<BookProgress>? {
+        var list: ArrayList<BookProgress>? = null
+        var cur: Cursor? = null
+        try {
+            var selection = (ProgressTbl.KEY_NAME + " like? and "
+                    + ProgressTbl.KEY_RECORD_IS_FAVORITED + "='1'")
+            cur = db!!.query(
+                ProgressTbl.TABLE_NAME,
+                null,
+                selection,
+                arrayOf(keyword),
+                null,
+                null,
+                ProgressTbl.KEY_RECORD_LAST_TIMESTAMP + " desc",
+            )
+            if (cur != null) {
+                list = ArrayList()
+                if (cur.moveToFirst()) {
+                    do {
+                        list.add(fillProgress(cur))
+                    } while (cur.moveToNext())
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            cur?.close()
+        }
+
+        return list
     }
 
     companion object {

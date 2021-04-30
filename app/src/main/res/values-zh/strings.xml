@@ -34,6 +34,9 @@
     <string name="search">查找&#x2026;</string>
     <string name="searching_">查找中&#x2026;</string>
     <string name="text_not_found">未找到</string>
+    <string name="search_file">文件</string>
+    <string name="search_history">历史</string>
+    <string name="search_favorite">收藏</string>
 
     <string name="empty_title">你还没有阅读记录</string>
     <string name="empty_subtitle">开始读书吧</string>
