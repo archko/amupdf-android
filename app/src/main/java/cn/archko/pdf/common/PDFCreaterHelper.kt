@@ -52,21 +52,11 @@ object PDFCreaterHelper {
         return@FileFilter fname.startsWith("Peter")
     }
 
-    fun getSdcard(): String {
-        var externalFileRootDir: File? = App.instance!!.getExternalFilesDir(null)
-        do {
-            externalFileRootDir = Objects.requireNonNull(externalFileRootDir)?.parentFile
-        } while (Objects.requireNonNull(externalFileRootDir)?.absolutePath?.contains("/Android") == true
-        )
-        val sdcardRoot = externalFileRootDir?.path!!
-        return sdcardRoot
-    }
-
     fun saveBooksToHtml(context: Context) {
-        val sdcardRoot = getSdcard()
+        val sdcardRoot = FileUtils.getStorageDirPath()
         val dir = "$sdcardRoot/book/股票"
 
-        val files = File(dir).listFiles()
+        val files = File(dir).listFiles(fileFilter)
         Logcat.d("saveBooksToHtml:$dir,${files.size}")
         if (files != null) {
             for (file in files) {
