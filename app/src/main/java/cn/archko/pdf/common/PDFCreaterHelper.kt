@@ -56,7 +56,7 @@ object PDFCreaterHelper {
         val sdcardRoot = FileUtils.getStorageDirPath()
         val dir = "$sdcardRoot/book/股票"
 
-        val files = File(dir).listFiles(fileFilter)
+        val files = File(dir).listFiles()
         Logcat.d("saveBooksToHtml:$dir,${files.size}")
         if (files != null) {
             for (file in files) {
