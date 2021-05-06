@@ -1,7 +1,7 @@
 package cn.archko.mupdf.buildsrc
 
 object Versions {
-    const val ktlint = "0.40.0"
+    const val ktlint = "0.41.0"
 }
 
 object BuildConfig {
@@ -23,7 +23,7 @@ object Libs {
         const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
         const val pagerIndicators = "com.google.accompanist:accompanist-pager-indicators:$version"
-        const val swiperefresh = "com.google.accompanist:accompanist-swiperefresh:0.8.0"
+        const val swiperefresh = "com.google.accompanist:accompanist-swiperefresh:$version"
     }
 
     object Kotlin {
@@ -52,7 +52,7 @@ object Libs {
 
         object Compose {
             private const val snapshot = ""
-            private const val version = "1.0.0-beta05"
+            private const val version = "1.0.0-beta06"
 
             @get:JvmStatic
             val snapshotUrl: String
