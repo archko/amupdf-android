@@ -8,8 +8,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
@@ -65,6 +67,12 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
                         darkTheme = appTheme.value.darkTheme,
                         colorPallet = appTheme.value.pallet
                     ) {
+                        SideEffect {
+                            systemUiController.setSystemBarsColor(
+                                Color.Transparent,
+                                darkIcons = false
+                            )
+                        }
                         NavGraph(appTheme)
                     }
                 }
