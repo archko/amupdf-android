@@ -255,7 +255,6 @@ private fun TabContent(
 
         HorizontalPager(
             state = pagerState,
-            offscreenLimit = 2,
             modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.Top,
             content = { page ->
