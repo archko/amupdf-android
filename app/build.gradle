@@ -122,7 +122,9 @@ dependencies {
 
     implementation Libs.AndroidX.navigation
 
-    implementation Libs.AndroidX.Paging.pagingRuntime
+    implementation(Libs.AndroidX.Paging.pagingRuntime) {
+        exclude group: 'androidx.recyclerview'
+    }
     implementation Libs.AndroidX.Paging.pagingCompose
 
     implementation Libs.AndroidX.Compose.runtime
