@@ -61,7 +61,10 @@ object PDFCreaterHelper {
         if (files != null) {
             for (file in files) {
                 Logcat.d("saveBooksToHtml:$file")
-                if (file.isFile && file.name.startsWith("Peter")) {
+                if (file.isFile &&
+                    (file.name.startsWith("Peter") && !FileUtils.getExtension(file.name)
+                        .equals("html"))
+                ) {
                     instance.diskIO().execute {
                         kotlin.run { saveBookToHtml(context, sdcardRoot, file) }
                     }

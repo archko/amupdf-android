@@ -3,6 +3,7 @@ package cn.archko.pdf.utils;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Environment;
+import android.text.TextUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -181,6 +182,17 @@ public final class FileUtils {
             return "";
         }
         final String name = file.getName();
+        final int index = name.lastIndexOf(".");
+        if (index == -1) {
+            return "";
+        }
+        return name.substring(index + 1);
+    }
+
+    public static final String getExtension(String name) {
+        if (TextUtils.isEmpty(name)) {
+            return name;
+        }
         final int index = name.lastIndexOf(".");
         if (index == -1) {
             return "";
