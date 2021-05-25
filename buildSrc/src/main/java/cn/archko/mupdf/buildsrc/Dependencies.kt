@@ -18,7 +18,7 @@ object Libs {
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.0.9"
 
     object Accompanist {
-        const val version = "0.8.0"
+        const val version = "0.10.0"
         const val coil = "com.google.accompanist:accompanist-coil:$version"
         const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
@@ -47,12 +47,12 @@ object Libs {
     }
 
     object AndroidX {
-        const val coreKtx = "androidx.core:core-ktx:1.6.0-alpha01"
-        const val navigation = "androidx.navigation:navigation-compose:1.0.0-alpha08"
+        const val coreKtx = "androidx.core:core-ktx:1.6.0-alpha03"
+        const val navigation = "androidx.navigation:navigation-compose:2.4.0-alpha01"
 
         object Compose {
             const val snapshot = ""
-            const val version = "1.0.0-beta06"
+            const val version = "1.0.0-beta07"
 
             @get:JvmStatic
             val snapshotUrl: String
@@ -74,15 +74,15 @@ object Libs {
         }
 
         object Activity {
-            const val activityCompose = "androidx.activity:activity-compose:1.3.0-alpha07"
-            const val activityKtx = "androidx.activity:activity-ktx:1.2.0-alpha08"
+            const val activityCompose = "androidx.activity:activity-compose:1.3.0-alpha08"
+            const val activityKtx = "androidx.activity:activity-ktx:1.3.0-alpha08"
             const val appCompat = "androidx.appcompat:appcompat:1.3.0-rc01"
             const val annotations = "androidx.annotation:annotation:1.2.0"
         }
 
         object Lifecycle {
             const val viewModelCompose =
-                "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha04"
+                "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha05"
 
             const val lifecycle = "2.3.1"
             const val runtime = "androidx.lifecycle:lifecycle-runtime:${lifecycle}"
@@ -97,7 +97,7 @@ object Libs {
 
         object ConstraintLayout {
             const val constraintLayoutCompose =
-                "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha05"
+                "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha07"
 
             const val constraintLayout =
                 "androidx.constraintlayout:constraintlayout:2.0.0-beta3"
@@ -106,18 +106,18 @@ object Libs {
         }
 
         object Navigation {
-            private const val version = "2.3.4"
+            private const val version = "2.4.0-alpha01"
             const val fragment = "androidx.navigation:navigation-fragment-ktx:$version"
             const val uiKtx = "androidx.navigation:navigation-ui-ktx:$version"
             const val runtime = "androidx.navigation:navigation-runtime:$version"
         }
 
         object Paging {
-            private const val version = "3.0.0-beta03"
+            private const val version = "3.0.0"
             const val pagingRuntime = "androidx.paging:paging-runtime:$version"
 
             // Jetpack Compose Integration
-            const val pagingCompose = "androidx.paging:paging-compose:1.0.0-alpha08"
+            const val pagingCompose = "androidx.paging:paging-compose:1.0.0-alpha09"
         }
 
         object Room {
