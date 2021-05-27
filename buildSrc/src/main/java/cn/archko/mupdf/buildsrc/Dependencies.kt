@@ -151,9 +151,7 @@ object Libs {
     }
 
     object Umeng {
-        const val umeng_analytics = "8.1.4"
-        const val umeng_common = "2.1.8"
-        const val analytics = "com.umeng.umsdk:analytics:${umeng_analytics}"
+        const val umeng_common = "9.3.8"
         const val umengCommon = "com.umeng.umsdk:common:${umeng_common}"
     }
 

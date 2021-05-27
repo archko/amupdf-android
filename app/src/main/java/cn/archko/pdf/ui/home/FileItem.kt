@@ -55,12 +55,10 @@ fun FileItem(
             )
             Box(
                 modifier
-                    .fillMaxWidth()
-                    .weight(1f)
                     .padding(
                         top = 1.dp,
                         start = 4.dp,
-                        end = 4.dp,
+                        end = 72.dp,
                         bottom = 1.dp,
                     )
                     .height(48.dp)
@@ -81,6 +79,16 @@ fun FileItem(
                     )
                 }
             }
+        }
+        Row(
+            modifier = Modifier
+                .clickable(onClick = {
+                    onOptClick(index)
+                })
+                .height(44.dp)
+                .align(alignment = Alignment.CenterEnd)
+                .padding(end = 2.dp)
+        ) {
             Text(
                 text = fileBean.getSize(),
                 maxLines = 1,
@@ -96,11 +104,8 @@ fun FileItem(
                     Icon(
                         imageVector = Icons.Default.MoreVert, contentDescription = null,
                         modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .clickable(onClick = {
-                                onOptClick(index)
-                            })
                             .padding(start = 2.dp)
+                            .align(Alignment.CenterVertically)
                     )
                 }
             }

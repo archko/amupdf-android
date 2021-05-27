@@ -158,7 +158,6 @@ dependencies {
 
     implementation Libs.Dependency.liveEventBusX
 
-    implementation Libs.Umeng.analytics
     implementation Libs.Umeng.umengCommon
     implementation Libs.Dependency.multidex
     implementation Libs.AndroidX.ConstraintLayout.constraintLayout

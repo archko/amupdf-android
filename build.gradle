@@ -3,9 +3,9 @@ import cn.archko.mupdf.buildsrc.Libs
 buildscript {
     repositories {
         google()
-        maven {url "https://maven.aliyun.com/repository/jcenter"}
-        maven {url "https://maven.aliyun.com/repository/google"}
-        maven { url 'https://dl.bintray.com/umsdk/release' }
+        maven { url "https://maven.aliyun.com/repository/jcenter" }
+        maven { url "https://maven.aliyun.com/repository/google" }
+        maven { url 'https://repo1.maven.org/maven2/' }
         jcenter()
         maven { url "https://jitpack.io" }
     }
@@ -22,7 +22,7 @@ buildscript {
 subprojects {
     repositories {
         google()
-        maven { url 'https://dl.bintray.com/umsdk/release' }
+        maven { url 'https://repo1.maven.org/maven2/' }
         jcenter()
         maven { url "https://jitpack.io" }
 
