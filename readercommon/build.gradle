@@ -80,5 +80,6 @@ dependencies {
 
     kapt Libs.AndroidX.Room.compiler
 
+    api Libs.Umeng.asms
     api Libs.Umeng.umengCommon
 }

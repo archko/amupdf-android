@@ -41,6 +41,7 @@ fun FileItem(
     ) {
         Row(
             modifier
+                .fillMaxWidth()
                 .clickable(onClick = {
                     onClick(fileBean)
                 })
@@ -80,25 +81,26 @@ fun FileItem(
                 }
             }
         }
-        Row(
-            modifier = Modifier
-                .clickable(onClick = {
-                    onOptClick(index)
-                })
-                .height(44.dp)
-                .align(alignment = Alignment.CenterEnd)
-                .padding(end = 2.dp)
-        ) {
-            Text(
-                text = fileBean.getSize(),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 14.sp,
+
+        if (!fileBean.isDirectory) {
+            Row(
                 modifier = Modifier
-                    .padding(start = 4.dp)
-                    .align(Alignment.CenterVertically)
-            )
-            if (!fileBean.isDirectory) {
+                    .clickable(onClick = {
+                        onOptClick(index)
+                    })
+                    .height(44.dp)
+                    .align(alignment = Alignment.CenterEnd)
+                    .padding(end = 2.dp)
+            ) {
+                Text(
+                    text = fileBean.getSize(),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 14.sp,
+                    modifier = Modifier
+                        .padding(start = 4.dp)
+                        .align(Alignment.CenterVertically)
+                )
                 val file = fileBean.file
                 if (file != null) {
                     Icon(

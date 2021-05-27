@@ -152,7 +152,9 @@ object Libs {
 
     object Umeng {
         const val umeng_common = "9.3.8"
+        const val asms_version = "1.2.2"
         const val umengCommon = "com.umeng.umsdk:common:${umeng_common}"
+        const val asms = "com.umeng.umsdk:asms:${asms_version}"// 必选
     }
 
     object Dependency {
