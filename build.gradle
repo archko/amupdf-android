@@ -7,6 +7,7 @@ buildscript {
         maven {url "https://maven.aliyun.com/repository/google"}
         maven { url 'https://dl.bintray.com/umsdk/release' }
         jcenter()
+        maven { url "https://jitpack.io" }
     }
     dependencies {
         classpath Libs.androidGradlePlugin
@@ -23,6 +24,7 @@ subprojects {
         google()
         maven { url 'https://dl.bintray.com/umsdk/release' }
         jcenter()
+        maven { url "https://jitpack.io" }
 
         if (!Libs.AndroidX.Compose.snapshot.isEmpty()) {
             maven { url "https://androidx.dev/snapshots/builds/${Libs.AndroidX.Compose.snapshot}/artifacts/repository/" }

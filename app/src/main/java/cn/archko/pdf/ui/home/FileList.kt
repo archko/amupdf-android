@@ -24,6 +24,7 @@ import cn.archko.pdf.ui.home.FileItem
 import cn.archko.pdf.ui.home.MenuItemType
 import cn.archko.pdf.ui.home.UserOptDialog
 import cn.archko.pdf.viewmodel.FileViewModel
+import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
 
 @Composable
 fun FileList(
@@ -89,7 +90,10 @@ private fun ItemList(
     val fileBean = if (fileIndex.value >= size) null else list[fileIndex.value]
     UserOptDialog(showUserDialog, fileBean, menuOpt, fileBeanType)
     FileInfoDialog(showInfoDialog, fileBean, menuOpt)
-    LazyColumn(modifier) {
+    LazyColumn(
+        flingBehavior = StockFlingBehaviours.smoothScroll(),
+        modifier
+    ) {
         val hasMore = result.nextKey != null
         itemsIndexed(list) { index, fileBean ->
             if (index > 0) {

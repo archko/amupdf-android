@@ -143,26 +143,26 @@ dependencies {
     implementation Libs.Accompanist.insets
     implementation Libs.Accompanist.swiperefresh
 
-    api Libs.Arch.runtime
-    api Libs.AndroidX.Activity.activityKtx
-    api Libs.AndroidX.Activity.appCompat
-    api Libs.AndroidX.coreKtx
-    api Libs.Fragment.runtime
-    api Libs.Fragment.runtimeKtx
-    api Libs.AndroidX.Lifecycle.runtime
-    api Libs.AndroidX.Lifecycle.viewModel
-    api Libs.AndroidX.Lifecycle.viewModelKtx
-    api Libs.AndroidX.Lifecycle.liveDataKtx
-    api Libs.AndroidX.Lifecycle.extensions
-    api Libs.Coroutines.android
+    implementation Libs.Arch.runtime
+    implementation Libs.AndroidX.Activity.activityKtx
+    implementation Libs.AndroidX.Activity.appCompat
+    implementation Libs.AndroidX.coreKtx
+    implementation Libs.Fragment.runtime
+    implementation Libs.Fragment.runtimeKtx
+    implementation Libs.AndroidX.Lifecycle.runtime
+    implementation Libs.AndroidX.Lifecycle.viewModel
+    implementation Libs.AndroidX.Lifecycle.viewModelKtx
+    implementation Libs.AndroidX.Lifecycle.liveDataKtx
+    implementation Libs.AndroidX.Lifecycle.extensions
+    implementation Libs.Coroutines.android
 
-    api Libs.Dependency.liveEventBusX
+    implementation Libs.Dependency.liveEventBusX
 
-    api Libs.Umeng.analytics
-    api Libs.Umeng.umengCommon
-    api Libs.Dependency.multidex
-    api Libs.AndroidX.ConstraintLayout.constraintLayout
-    api Libs.AndroidX.ConstraintLayout.constraintLayoutSolver
+    implementation Libs.Umeng.analytics
+    implementation Libs.Umeng.umengCommon
+    implementation Libs.Dependency.multidex
+    implementation Libs.AndroidX.ConstraintLayout.constraintLayout
+    implementation Libs.AndroidX.ConstraintLayout.constraintLayoutSolver
     implementation(Libs.Dependency.material) {
         exclude group: 'androidx.recyclerview'
     }
@@ -172,7 +172,9 @@ dependencies {
 
     kapt Libs.AndroidX.Room.compiler
 
-    api project(':reader')
-    api project(':editor')
-    api project(':library')
+    implementation Libs.flinger
+
+    implementation project(':reader')
+    implementation project(':editor')
+    implementation project(':library')
 }
