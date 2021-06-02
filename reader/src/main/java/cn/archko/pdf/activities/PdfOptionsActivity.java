@@ -34,6 +34,7 @@ public class PdfOptionsActivity extends PreferenceActivity implements OnSharedPr
     public final static String PREF_TOP_MARGIN = "topMargin";
     public final static String PREF_KEEP_ON = "keepOn";
     public final static String PREF_LIST_STYLE = "list_style";
+    public final static String PREF_DART_THEME = "pref_dart_theme";
 
     private Resources resources;
 

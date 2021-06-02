@@ -19,6 +19,7 @@ object Destination {
 @ExperimentalMaterialApi
 @Composable
 fun NavGraph(
+    changeTheme: (Boolean) -> Unit,
     appThemeState: MutableState<AppThemeState>,
     startDestination: String = Destination.HOME
 ) {
@@ -29,7 +30,7 @@ fun NavGraph(
         startDestination = startDestination
     ) {
         composable(Destination.HOME) {
-            HomePager(appThemeState, navController)
+            HomePager(changeTheme, appThemeState, navController)
         }
         composable(
             "${Destination.GANKDETAIL}/{gankStr}"

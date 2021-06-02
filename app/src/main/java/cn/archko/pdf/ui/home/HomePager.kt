@@ -61,6 +61,7 @@ import java.util.*
 @ExperimentalMaterialApi
 @Composable
 fun HomePager(
+    changeTheme: (Boolean) -> Unit,
     appThemeState: MutableState<AppThemeState>,
     navController: NavHostController
 ) {
@@ -167,6 +168,7 @@ fun HomePager(
                         IconButton(onClick = {
                             appThemeState.value = appThemeState
                                 .value.copy(darkTheme = !appThemeState.value.darkTheme)
+                            changeTheme(appThemeState.value.darkTheme)
                         }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_sleep),

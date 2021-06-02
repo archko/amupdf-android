@@ -3,15 +3,14 @@ package cn.archko.pdf.activities
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
 import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
@@ -19,8 +18,13 @@ import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.NavGraph
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.entity.BookProgress
-import cn.archko.pdf.theme.*
+import cn.archko.pdf.theme.AppThemeState
+import cn.archko.pdf.theme.ColorPallet
+import cn.archko.pdf.theme.ComposeCookBookTheme
+import cn.archko.pdf.theme.blue700
+import cn.archko.pdf.theme.green700
+import cn.archko.pdf.theme.orange700
+import cn.archko.pdf.theme.purple700
 import cn.archko.pdf.utils.LocalSysUiController
 import cn.archko.pdf.utils.SystemUiController
 import com.google.accompanist.insets.ProvideWindowInsets
@@ -29,7 +33,6 @@ import com.umeng.analytics.MobclickAgent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.ArrayList
 
 /**
  * @author archko
@@ -44,9 +47,20 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
         // This app draws behind the system bars, so we want to handle fitting system windows
         WindowCompat.setDecorFitsSystemWindows(window, true)
 
+        val options = PreferenceManager.getDefaultSharedPreferences(this)
+
         setContent {
             val systemUiController = remember { SystemUiController(window) }
-            val appTheme = remember { mutableStateOf(AppThemeState()) }
+            val appTheme = remember {
+                mutableStateOf(
+                    AppThemeState(
+                        darkTheme = options.getBoolean(
+                            PdfOptionsActivity.PREF_DART_THEME,
+                            false
+                        )
+                    )
+                )
+            }
             val color = when (appTheme.value.pallet) {
                 ColorPallet.GREEN -> green700
                 ColorPallet.BLUE -> blue700
@@ -57,7 +71,9 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
                 color = color,
                 darkIcons = appTheme.value.darkTheme
             )
-
+            val changeTheme: (Boolean) -> Unit = { it ->
+                options.edit().putBoolean(PdfOptionsActivity.PREF_DART_THEME, it).apply()
+            }
             CompositionLocalProvider(
                 LocalSysUiController provides systemUiController,
                 LocalBackPressedDispatcher provides this.onBackPressedDispatcher
@@ -67,7 +83,7 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
                         darkTheme = appTheme.value.darkTheme,
                         colorPallet = appTheme.value.pallet
                     ) {
-                        NavGraph(appTheme)
+                        NavGraph(changeTheme, appTheme)
                     }
                 }
             }
