@@ -148,9 +148,9 @@ class AReflowViewController(
         }
         if (null == mRecyclerView.adapter) {
 
-            mRecyclerView.adapter = MuPDFReflowAdapter(context, mMupdfDocument, mStyleHelper, scope)
+            mRecyclerView.adapter = MuPDFReflowAdapter(context, mMupdfDocument, mStyleHelper)
         } else {
-            (mRecyclerView.adapter as MuPDFReflowAdapter).setScope(scope)
+            //(mRecyclerView.adapter as MuPDFReflowAdapter).setScope(scope)
         }
 
         if (pos > 0) {
