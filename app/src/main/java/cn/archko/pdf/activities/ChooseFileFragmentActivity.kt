@@ -83,7 +83,7 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
                         darkTheme = appTheme.value.darkTheme,
                         colorPallet = appTheme.value.pallet
                     ) {
-                        NavGraph(changeTheme, appTheme)
+                        NavGraph(changeTheme, appTheme, up = { finish() })
                     }
                 }
             }

@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavHostController
 import cn.archko.pdf.BackPressHandler
 import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.Logcat
@@ -26,7 +27,7 @@ import java.util.*
 @Composable
 fun FileBrowserList(
     viewModel: FileViewModel,
-    navigateTo: (String) -> Unit,
+    up: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -44,6 +45,8 @@ fun FileBrowserList(
             if (!viewModel.stack.isEmpty()) {
                 val path = viewModel.stack.peek()
                 viewModel.loadFiles(path)
+            } else {
+                up()
             }
         })
     }

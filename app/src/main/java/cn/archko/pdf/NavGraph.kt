@@ -21,6 +21,7 @@ object Destination {
 fun NavGraph(
     changeTheme: (Boolean) -> Unit,
     appThemeState: MutableState<AppThemeState>,
+    up: () -> Unit,
     startDestination: String = Destination.HOME
 ) {
     val navController = rememberNavController()
@@ -30,7 +31,7 @@ fun NavGraph(
         startDestination = startDestination
     ) {
         composable(Destination.HOME) {
-            HomePager(changeTheme, appThemeState, navController)
+            HomePager(changeTheme, appThemeState, up, navController)
         }
         composable(
             "${Destination.GANKDETAIL}/{gankStr}"
