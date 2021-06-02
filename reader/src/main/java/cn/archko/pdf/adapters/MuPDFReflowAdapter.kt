@@ -1,8 +1,6 @@
 package cn.archko.pdf.adapters
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.os.AsyncTask
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.App
@@ -13,6 +11,10 @@ import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.utils.Utils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * @author: archko 2016/5/13 :11:03
@@ -20,7 +22,8 @@ import cn.archko.pdf.utils.Utils
 class MuPDFReflowAdapter(
     private val mContext: Context,
     private val mupdfDocument: MupdfDocument?,
-    private var styleHelper: StyleHelper?
+    private var styleHelper: StyleHelper?,
+    private var scope: CoroutineScope?
 ) : BaseRecyclerAdapter<Any>(mContext) {
 
     private var screenHeight = 720
@@ -54,26 +57,26 @@ class MuPDFReflowAdapter(
         return holder
     }
 
+    fun decode(pos: Int): List<ReflowBean>? {
+        try {
+            val result = mupdfDocument?.loadPage(pos)
+                ?.textAsText("preserve-whitespace,inhibit-spaces,preserve-images")
+            val list = result?.let { ParseTextMain.instance.parseAsList(it, pos) }
+            return list
+        } catch (e: Exception) {
+        }
+        return null
+    }
+
     override fun onBindViewHolder(holder: BaseViewHolder<Any>, pos: Int) {
         /*val result = mCore?.loadPage(pos)?.textAsText("preserve-whitespace,inhibit-spaces,preserve-images")
 
         (holder as ReflowTextViewHolder).bindAsList(result, screenHeight, screenWidth, systemScale)*/
 
-        @SuppressLint("StaticFieldLeak")
-        val task = object : AsyncTask<Void, Void, List<ReflowBean>?>() {
-            override fun doInBackground(vararg arg0: Void): List<ReflowBean>? {
-                try {
-                    val result = mupdfDocument?.loadPage(pos)
-                        ?.textAsText("preserve-whitespace,inhibit-spaces,preserve-images")
-                    val list = result?.let { ParseTextMain.instance.parseAsList(it, pos) }
-                    return list
-                } catch (e: Exception) {
-                }
-                return null
-            }
-
-            override fun onPostExecute(result: List<ReflowBean>?) {
-                if (null != result) {
+        scope!!.launch {
+            val result = decode(pos)
+            withContext(Dispatchers.Main) {
+                result?.run {
                     (holder as ReflowTextViewHolder).bindAsList(
                         result,
                         screenHeight,
@@ -84,8 +87,6 @@ class MuPDFReflowAdapter(
                 }
             }
         }
-
-        Utils.execute(true, task)
     }
 
     override fun onViewRecycled(holder: BaseViewHolder<*>) {
@@ -99,6 +100,10 @@ class MuPDFReflowAdapter(
 
     fun clearCacheViews() {
         reflowCache.clear()
+    }
+
+    fun setScope(scope: CoroutineScope?) {
+        this.scope = scope
     }
 
     companion object {

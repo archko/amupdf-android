@@ -207,13 +207,15 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     private fun changeViewMode() {
+        viewController?.onDestroy()
+
         val aViewController = ViewControllerFactory.getOrCreateViewController(
-                viewControllerCache,
-                viewMode,
-                this@AMuPDFRecyclerViewActivity,
-                mContentView,
-                mControllerLayout, pdfBookmarkManager!!, mPath!!,
-                mPageSeekBarControls!!, gestureDetector
+            viewControllerCache,
+            viewMode,
+            this@AMuPDFRecyclerViewActivity,
+            mContentView,
+            mControllerLayout, pdfBookmarkManager!!, mPath!!,
+            mPageSeekBarControls!!, gestureDetector
         )
         viewController = aViewController
         Logcat.d("changeViewMode:$viewMode,controller:$viewController")
@@ -263,6 +265,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
     override fun onDestroy() {
         super.onDestroy()
+        viewController?.onDestroy()
         mPageSizes.let {
             if (it.size() < 0 || it.size() < APageSizeLoader.PAGE_COUNT) {
                 return

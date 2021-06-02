@@ -25,6 +25,7 @@ interface AViewController {
 
     fun onResume()
     fun onPause()
+    fun onDestroy()
     fun onConfigurationChanged(newConfig: Configuration)
 
     fun showController()

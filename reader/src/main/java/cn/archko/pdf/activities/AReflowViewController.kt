@@ -30,6 +30,11 @@ import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.widgets.APageSeekBarControls
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
 
 /**
  * @author: archko 2020/5/15 :12:43
@@ -65,6 +70,7 @@ class AReflowViewController(
     private var mMupdfDocument: MupdfDocument? = null
     private val START_PROGRESS = 15
     private lateinit var mPageSizes: SparseArray<APage>
+    private var scope: CoroutineScope? = null
 
     init {
         initView()
@@ -94,6 +100,9 @@ class AReflowViewController(
 
     override fun init(pageSizes: SparseArray<APage>, mupdfDocument: MupdfDocument?, pos: Int) {
         try {
+            if (scope == null || !scope!!.isActive) {
+                scope = CoroutineScope(Job() + Dispatchers.IO)
+            }
             Logcat.d("init:$this")
             if (null != mupdfDocument) {
                 this.mPageSizes = pageSizes
@@ -138,7 +147,10 @@ class AReflowViewController(
             mStyleHelper = StyleHelper()
         }
         if (null == mRecyclerView.adapter) {
-            mRecyclerView.adapter = MuPDFReflowAdapter(context, mMupdfDocument, mStyleHelper)
+
+            mRecyclerView.adapter = MuPDFReflowAdapter(context, mMupdfDocument, mStyleHelper, scope)
+        } else {
+            (mRecyclerView.adapter as MuPDFReflowAdapter).setScope(scope)
         }
 
         if (pos > 0) {
@@ -243,6 +255,12 @@ class AReflowViewController(
         )
         if (null != mRecyclerView.adapter && mRecyclerView.adapter is MuPDFReflowAdapter) {
             (mRecyclerView.adapter as MuPDFReflowAdapter).clearCacheViews()
+        }
+    }
+
+    override fun onDestroy() {
+        scope?.let {
+            scope!!.cancel()
         }
     }
 

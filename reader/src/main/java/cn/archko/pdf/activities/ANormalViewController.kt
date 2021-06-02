@@ -238,9 +238,12 @@ class ANormalViewController(
 
     override fun onPause() {
         pdfBookmarkManager.saveCurrentPage(
-                mPath, mMupdfDocument!!.countPages(), documentView.currentPage,
-                documentView.zoomModel.zoom * 1000f, documentView.scrollX, documentView.scrollY
+            mPath, mMupdfDocument!!.countPages(), documentView.currentPage,
+            documentView.zoomModel.zoom * 1000f, documentView.scrollX, documentView.scrollY
         )
+    }
+
+    override fun onDestroy() {
     }
 
     //===========================================

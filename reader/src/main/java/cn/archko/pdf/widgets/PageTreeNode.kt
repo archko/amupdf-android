@@ -1,9 +1,5 @@
 package cn.archko.pdf.widgets
 
-import cn.archko.pdf.common.Logcat.d
-import android.graphics.RectF
-import android.os.AsyncTask
-import cn.archko.pdf.common.BitmapCache
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -11,9 +7,12 @@ import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Rect
-import cn.archko.pdf.entity.APage
-import cn.archko.pdf.common.Logcat
+import android.graphics.RectF
+import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.BitmapPool
+import cn.archko.pdf.common.Logcat
+import cn.archko.pdf.common.Logcat.d
+import cn.archko.pdf.entity.APage
 import cn.archko.pdf.mupdf.MupdfDocument
 import com.artifex.mupdf.fitz.RectI
 import kotlinx.coroutines.CoroutineScope
@@ -37,10 +36,8 @@ internal class PageTreeNode(localPageSliceBounds: RectF, page: APDFPage?, pageTy
     private var targetRect: Rect? = null
     private var cropTargetRect: Rect? = null
 
-    //private var bitmapAsyncTask: AsyncTask<String, String, Bitmap>? = null
     private var isRecycle = false
 
-    //private var boundsAsyncTask: AsyncTask<String, String, RectF>? = null
     fun updateVisibility() {
         if (isVisible) {
             if (bitmap != null) {

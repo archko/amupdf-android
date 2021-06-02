@@ -213,6 +213,9 @@ class ACropViewController(
         }
     }
 
+    override fun onDestroy() {
+    }
+
     //===========================================
     override fun showController() {
     }
