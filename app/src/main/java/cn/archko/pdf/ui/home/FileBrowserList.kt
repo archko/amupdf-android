@@ -41,8 +41,10 @@ fun FileBrowserList(
             if (!viewModel.isTop()) {
                 viewModel.stack.pop()
             }
-            val path = viewModel.stack.peek()
-            viewModel.loadFiles(path)
+            if (!viewModel.stack.isEmpty()) {
+                val path = viewModel.stack.peek()
+                viewModel.loadFiles(path)
+            }
         })
     }
 
