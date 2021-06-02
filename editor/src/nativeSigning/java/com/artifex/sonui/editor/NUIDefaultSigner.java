@@ -6,7 +6,7 @@ import android.security.KeyChainAliasCallback;
 import android.util.Log;
 
 import com.artifex.mupdf.fitz.FitzInputStream;
-import com.artifex.mupdf.fitz.PKCS7DesignatedName;
+import com.artifex.mupdf.fitz.PKCS7DistinguishedName;
 
 import org.spongycastle.asn1.DEROutputStream;
 import org.spongycastle.cert.jcajce.JcaCertStore;
@@ -36,7 +36,7 @@ public class NUIDefaultSigner extends NUIPKCS7Signer {
     private Activity mActivity;
     protected String mAlias;
     protected NUICertificate mCert;
-    protected PKCS7DesignatedName mDesignatedName;
+    protected PKCS7DistinguishedName mDesignatedName;
 
     private static final int BUF_SIZE = 16384;
 
@@ -52,8 +52,7 @@ public class NUIDefaultSigner extends NUIPKCS7Signer {
 
     // Get the signers designated name
     @Override
-    public PKCS7DesignatedName name()
-    {
+    public PKCS7DistinguishedName name() {
         return mDesignatedName;
     }
 

@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.artifex.mupdf.fitz.PKCS7DesignatedName;
+import com.artifex.mupdf.fitz.PKCS7DistinguishedName;
 import com.artifex.mupdf.fitz.PKCS7Verifier;
 import com.artifex.sonui.editor.SOTextView;
 
@@ -22,7 +22,7 @@ public class NUICertificateViewer extends AppCompatActivity {
     protected HashMap<String, String> mDetails;
     protected int mResult = -1;
     protected int mUpdatedSinceSigning = 0;
-    protected PKCS7DesignatedName mPKCS7DesignatedName;
+    protected PKCS7DistinguishedName mPKCS7DesignatedName;
 
     protected static NUICertificateViewerListener mListener;
 

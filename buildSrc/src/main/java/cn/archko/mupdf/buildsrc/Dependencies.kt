@@ -14,7 +14,7 @@ object BuildConfig {
 }
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0-beta02"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0-beta03"
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.0.9"
     const val flinger = "com.github.iamjosephmj:flinger:1.0.0"
 

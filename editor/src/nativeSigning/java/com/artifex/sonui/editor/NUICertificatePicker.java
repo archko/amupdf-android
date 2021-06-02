@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.artifex.mupdf.fitz.PKCS7DesignatedName;
+import com.artifex.mupdf.fitz.PKCS7DistinguishedName;
 import com.artifex.solib.ArDkLib;
 import com.artifex.solib.ConfigOptions;
 
@@ -27,7 +27,7 @@ public class NUICertificatePicker extends AppCompatActivity implements NUICertif
     protected HashMap<String, String> mDetails;
     protected HashMap<String, String> mV3ExtensionsDetails;
     protected HashMap<String, String> mValidityDetails;
-    protected PKCS7DesignatedName     mPKCS7DesignatedName;
+    protected PKCS7DistinguishedName mPKCS7DesignatedName;
 
     protected static NUICertificatePickerListener mListener;
 
@@ -208,7 +208,8 @@ public class NUICertificatePicker extends AppCompatActivity implements NUICertif
 
     public interface NUICertificatePickerListener
     {
-        void onOK(String serial, PKCS7DesignatedName designatedName);
+        void onOK(String serial, PKCS7DistinguishedName designatedName);
+
         void onCancel();
     }
 }

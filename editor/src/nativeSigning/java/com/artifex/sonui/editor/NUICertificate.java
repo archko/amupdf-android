@@ -5,7 +5,7 @@ import android.security.KeyChain;
 import android.security.KeyChainException;
 import android.util.Log;
 
-import com.artifex.mupdf.fitz.PKCS7DesignatedName;
+import com.artifex.mupdf.fitz.PKCS7DistinguishedName;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -246,9 +246,8 @@ public class NUICertificate {
     }
 
 
-    public PKCS7DesignatedName pkcs7DesignatedName()
-    {
-        PKCS7DesignatedName name = new PKCS7DesignatedName();
+    public PKCS7DistinguishedName pkcs7DesignatedName() {
+        PKCS7DistinguishedName name = new PKCS7DistinguishedName();
 
         HashMap<String, String> detailsMap = designatedName();
 
