@@ -146,3 +146,5 @@
 -keep public class cn.archko.mupdf.R$*{
 public static final int *;
 }
+-keep class **.R.* { *; }
+-keep class **.R$* { *; }
