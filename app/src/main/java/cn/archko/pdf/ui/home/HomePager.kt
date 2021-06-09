@@ -63,6 +63,7 @@ import java.util.*
 fun HomePager(
     changeTheme: (Boolean) -> Unit,
     appThemeState: MutableState<AppThemeState>,
+    up: () -> Unit,
     navController: NavHostController
 ) {
     val context = LocalContext.current
@@ -188,7 +189,9 @@ fun HomePager(
             }
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
-                TabContent(viewModel, navController, navItems, setCurrentSection)
+                TabContent(
+                    viewModel, up, navController, navItems, setCurrentSection
+                )
                 PopupMenu(
                     modifier = Modifier.align(Alignment.TopEnd),
                     showMenu,
@@ -215,6 +218,7 @@ private fun restore(showRestoreDialog: MutableState<Boolean>) {
 @Composable
 private fun TabContent(
     viewModel: FileViewModel,
+    up: () -> Unit,
     navController: NavHostController,
     navItems: List<String>,
     setCurrentSection: (Int) -> Unit,
@@ -271,7 +275,7 @@ private fun TabContent(
                     )
                     2 -> FileBrowserList(
                         viewModel,
-                        navigateTo = { Logcat.d("file.navigateTo") },
+                        up,
                     )
                     3 -> FileFavoritiesList(
                         viewModel,
