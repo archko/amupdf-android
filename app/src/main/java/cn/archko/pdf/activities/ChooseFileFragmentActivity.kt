@@ -61,11 +61,20 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
                     )
                 )
             }
-            val color = when (appTheme.value.pallet) {
-                ColorPallet.GREEN -> green700
-                ColorPallet.BLUE -> blue700
-                ColorPallet.ORANGE -> orange700
-                ColorPallet.PURPLE -> purple700
+            val color = if (appTheme.value.darkTheme) {
+                when (appTheme.value.pallet) {
+                    ColorPallet.GREEN -> green700.copy(alpha = 0.3f)
+                    ColorPallet.BLUE -> blue700.copy(alpha = 0.3f)
+                    ColorPallet.ORANGE -> orange700.copy(alpha = 0.3f)
+                    ColorPallet.PURPLE -> purple700.copy(alpha = 0.3f)
+                }
+            } else {
+                when (appTheme.value.pallet) {
+                    ColorPallet.GREEN -> green700
+                    ColorPallet.BLUE -> blue700
+                    ColorPallet.ORANGE -> orange700
+                    ColorPallet.PURPLE -> purple700
+                }
             }
             systemUiController.setStatusBarColor(
                 color = color,
@@ -93,13 +102,6 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
 
         // 设置为U-APP场景
         MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
-
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                val process = Graph.database.progressDao().getProgresses(0, 10)
-                Logcat.d("progress:$process")
-            }
-        }
     }
 
     public override fun onResume() {
