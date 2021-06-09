@@ -57,8 +57,8 @@ class MenuHelper public constructor(
             outlineFragment = OutlineFragment()
             val bundle = Bundle()
             if (outlineHelper!!.hasOutline()) {
-                //bundle.putSerializable("OUTLINE", outlineHelper?.getOutline())
-                bundle.putSerializable("out", outlineHelper?.getOutlineItems())
+                bundle.putSerializable("OUTLINE", outlineHelper?.getOutline())
+                ///bundle.putSerializable("out", outlineHelper?.getOutlineItems())
             }
             bundle.putSerializable("POSITION", currentPos)
             outlineFragment?.arguments = bundle
