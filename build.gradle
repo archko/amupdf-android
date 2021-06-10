@@ -2,6 +2,7 @@ import cn.archko.mupdf.buildsrc.Libs
 
 buildscript {
     repositories {
+        mavenCentral()
         google()
         maven { url "https://maven.aliyun.com/repository/jcenter" }
         maven { url "https://maven.aliyun.com/repository/google" }
@@ -21,7 +22,10 @@ buildscript {
 
 subprojects {
     repositories {
+        mavenCentral()
         google()
+        maven { url "https://maven.aliyun.com/repository/jcenter" }
+        maven { url "https://maven.aliyun.com/repository/google" }
         maven { url 'https://repo1.maven.org/maven2/' }
         jcenter()
         maven { url "https://jitpack.io" }

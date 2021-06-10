@@ -28,7 +28,7 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.4.32"
+        private const val version = "1.5.10"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
@@ -53,7 +53,7 @@ object Libs {
 
         object Compose {
             const val snapshot = ""
-            const val version = "1.0.0-beta07"
+            const val version = "1.0.0-beta08"
 
             @get:JvmStatic
             val snapshotUrl: String
@@ -107,7 +107,7 @@ object Libs {
         }
 
         object Navigation {
-            private const val version = "2.4.0-alpha01"
+            private const val version = "2.4.0-alpha02"
             const val fragment = "androidx.navigation:navigation-fragment-ktx:$version"
             const val uiKtx = "androidx.navigation:navigation-ui-ktx:$version"
             const val runtime = "androidx.navigation:navigation-runtime:$version"
