@@ -19,7 +19,7 @@ object Libs {
     const val flinger = "com.github.iamjosephmj:flinger:1.0.0"
 
     object Accompanist {
-        const val version = "0.10.0"
+        const val version = "0.11.0"
         const val coil = "com.google.accompanist:accompanist-coil:$version"
         const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
