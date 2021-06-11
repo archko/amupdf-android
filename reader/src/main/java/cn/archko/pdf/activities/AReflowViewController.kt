@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFReflowAdapter
 import cn.archko.pdf.colorpicker.ColorPickerDialog
@@ -33,6 +34,7 @@ import cn.archko.pdf.widgets.ViewerDividerItemDecoration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 
@@ -101,7 +103,8 @@ class AReflowViewController(
     override fun init(pageSizes: SparseArray<APage>, mupdfDocument: MupdfDocument?, pos: Int) {
         try {
             if (scope == null || !scope!!.isActive) {
-                scope = CoroutineScope(Job() + Dispatchers.IO)
+                scope =
+                    CoroutineScope(Job() + AppExecutors.instance.diskIO().asCoroutineDispatcher())
             }
             Logcat.d("init:$this")
             if (null != mupdfDocument) {
@@ -148,9 +151,9 @@ class AReflowViewController(
         }
         if (null == mRecyclerView.adapter) {
 
-            mRecyclerView.adapter = MuPDFReflowAdapter(context, mMupdfDocument, mStyleHelper)
+            mRecyclerView.adapter = MuPDFReflowAdapter(context, mMupdfDocument, mStyleHelper, scope)
         } else {
-            //(mRecyclerView.adapter as MuPDFReflowAdapter).setScope(scope)
+            (mRecyclerView.adapter as MuPDFReflowAdapter).setScope(scope)
         }
 
         if (pos > 0) {

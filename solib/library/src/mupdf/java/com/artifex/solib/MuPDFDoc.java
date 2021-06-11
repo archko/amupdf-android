@@ -338,22 +338,22 @@ public class MuPDFDoc extends ArDkDoc
                     return (numBytes == 0) ? -1 : numBytes;
                 }
 
-                public void write(byte[] b, int off, int len) throws IOException
-                {
+                public void write(byte[] b, int off, int len) throws IOException {
                     if (off == 0 && len == b.length)
                         secureFS.writeToFile(handle, b);
                     else
                         secureFS.writeToFile(handle, Arrays.copyOfRange(b, off, len));
                 }
 
-                public long seek(long offset, int whence) throws IOException
-                {
+                public void truncate() throws IOException {
+                }
+
+                public long seek(long offset, int whence) throws IOException {
                     long current = secureFS.getFileOffset(handle);
                     long length = secureFS.getFileLength(handle);
                     long pos = 0;
 
-                    switch (whence)
-                    {
+                    switch (whence) {
                         case SEEK_SET:
                             pos = offset;
                             break;
