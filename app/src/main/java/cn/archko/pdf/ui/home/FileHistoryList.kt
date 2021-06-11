@@ -3,6 +3,7 @@ package cn.archko.pdf.ui.home
 import FileList
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -17,6 +18,7 @@ import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.paging.State
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.umeng.analytics.MobclickAgent
 import java.util.*
@@ -84,6 +86,18 @@ fun FileHistoryList(
         SwipeRefresh(
             state = rememberSwipeRefreshState(loading),
             onRefresh = refresh,
+            indicator = { state, trigger ->
+                SwipeRefreshIndicator(
+                    // Pass the SwipeRefreshState + trigger through
+                    state = state,
+                    refreshTriggerDistance = trigger,
+                    // Enable the scale animation
+                    scale = true,
+                    // Change the color and shape
+                    backgroundColor = MaterialTheme.colors.primary,
+                    shape = MaterialTheme.shapes.small,
+                )
+            }
         ) {
             FileList(
                 result,
