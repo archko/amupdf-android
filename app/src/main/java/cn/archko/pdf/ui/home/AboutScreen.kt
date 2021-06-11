@@ -13,6 +13,7 @@ import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -23,9 +24,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import cn.archko.mupdf.R
+import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun AboutScreen(
@@ -73,6 +79,7 @@ fun AboutScreen(
                     itemsIndexed(PARTS) { index, part ->
                         Divider(thickness = 1.dp)
                         PartItem(context, part, modifier)
+                        Divider(thickness = 1.dp)
                     }
                 }
             }
@@ -86,6 +93,7 @@ fun PartItem(
     part: Part,
     modifier: Modifier = Modifier
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val expanded = remember { mutableStateOf(false) }
     Column(
         modifier
@@ -108,13 +116,17 @@ fun PartItem(
             Divider(thickness = 1.dp)
             val androidImageView = remember {
                 WebView(context).apply {
-                    loadData(part.getContent(context).toString(), "text/html", "UTF-8")
+                    coroutineScope.launch(Dispatchers.IO) {
+                        val content = part.getContent(context).toString()
+                        withContext(Dispatchers.Main){
+                            loadData(content, "text/html", "UTF-8")
+                        }
+                    }
                 }
             }
             AndroidView(
                 { androidImageView },
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
             }
         }
