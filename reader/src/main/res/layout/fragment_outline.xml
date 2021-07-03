@@ -17,7 +17,7 @@
         android:textSize="18sp"
         android:text="no outline"
         android:gravity="center"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
