@@ -60,26 +60,30 @@ open class OutlineFragment : Fragment() {
         //            val ac = activity as OutlineListener
         //            ac.onSelectedOutline((data as OutlineItem).page)
         //        }
-//
         //        override fun onItemClick2(view: View, data: Any?, position: Int) {}
         //    })
         //    recyclerView.adapter = treeAdapter
         //    return view
         //}
 
-        adapter = object : BaseRecyclerAdapter<OutlineItem>(activity, outlineItems!!) {
+        if (outlineItems == null) {
+            val textView = view.findViewById<TextView>(R.id.no_data)
+            textView.visibility = View.VISIBLE
+        } else {
+            adapter = object : BaseRecyclerAdapter<OutlineItem>(activity, outlineItems!!) {
 
-            override fun onCreateViewHolder(
-                parent: ViewGroup,
-                viewType: Int
-            ): BaseViewHolder<OutlineItem> {
-                val itemView = mInflater.inflate(R.layout.item_outline, parent, false)
-                return ViewHolder(itemView)
+                override fun onCreateViewHolder(
+                    parent: ViewGroup,
+                    viewType: Int
+                ): BaseViewHolder<OutlineItem> {
+                    val itemView = mInflater.inflate(R.layout.item_outline, parent, false)
+                    return ViewHolder(itemView)
+                }
             }
-        }
-        recyclerView.adapter = adapter
-        if (adapter.itemCount > 0) {
-            updateSelection(currentPage)
+            recyclerView.adapter = adapter
+            if (adapter.itemCount > 0) {
+                updateSelection(currentPage)
+            }
         }
         return view
     }

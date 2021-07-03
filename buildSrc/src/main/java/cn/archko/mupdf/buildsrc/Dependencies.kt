@@ -14,12 +14,12 @@ object BuildConfig {
 }
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0-beta04"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0-beta05"
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.0.9"
     const val flinger = "com.github.iamjosephmj:flinger:1.0.0"
 
     object Accompanist {
-        const val version = "0.12.0"
+        const val version = "0.13.0"
         const val coil = "com.google.accompanist:accompanist-coil:$version"
         const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
@@ -48,16 +48,12 @@ object Libs {
     }
 
     object AndroidX {
-        const val coreKtx = "androidx.core:core-ktx:1.6.0-beta02"
+        const val coreKtx = "androidx.core:core-ktx:1.6.0-rc01"
         const val navigation = "androidx.navigation:navigation-compose:2.4.0-alpha01"
 
         object Compose {
             const val snapshot = ""
-            const val version = "1.0.0-beta09"
-
-            @get:JvmStatic
-            val snapshotUrl: String
-                get() = "https://androidx.dev/snapshots/builds/$snapshot/artifacts/repository/"
+            const val version = "1.0.0-rc01"
 
             const val runtime = "androidx.compose.runtime:runtime:$version"
             const val animation = "androidx.compose.animation:animation:$version"

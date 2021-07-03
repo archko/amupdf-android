@@ -12,4 +12,13 @@
         android:divider="@color/tab_divider_color"
         android:dividerHeight="1px"/>
 
+    <TextView
+        android:id="@+id/no_data"
+        android:textSize="18sp"
+        android:text="no outline"
+        android:gravity="center"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
 </LinearLayout>
