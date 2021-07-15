@@ -19,12 +19,15 @@ object Libs {
     const val flinger = "com.github.iamjosephmj:flinger:1.0.0"
 
     object Accompanist {
-        const val version = "0.13.0"
-        const val coil = "com.google.accompanist:accompanist-coil:$version"
+        const val version = "0.14.0"
         const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
         const val pagerIndicators = "com.google.accompanist:accompanist-pager-indicators:$version"
         const val swiperefresh = "com.google.accompanist:accompanist-swiperefresh:$version"
+    }
+
+    object Coil {
+        const val coilCompose = "io.coil-kt:coil-compose:1.3.0"
     }
 
     object Kotlin {
@@ -53,7 +56,7 @@ object Libs {
 
         object Compose {
             const val snapshot = ""
-            const val version = "1.0.0-rc01"
+            const val version = "1.0.0-rc02"
 
             @get:JvmStatic
             val snapshotUrl: String
@@ -77,13 +80,13 @@ object Libs {
         object Activity {
             const val activityCompose = "androidx.activity:activity-compose:1.3.0-rc01"
             const val activityKtx = "androidx.activity:activity-ktx:1.3.0-alpha08"
-            const val appCompat = "androidx.appcompat:appcompat:1.3.0-rc01"
+            const val appCompat = "androidx.appcompat:appcompat:1.3.0"
             const val annotations = "androidx.annotation:annotation:1.2.0"
         }
 
         object Lifecycle {
             const val viewModelCompose =
-                "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha05"
+                "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07"
 
             const val lifecycle = "2.3.1"
             const val runtime = "androidx.lifecycle:lifecycle-runtime:${lifecycle}"
@@ -98,7 +101,7 @@ object Libs {
 
         object ConstraintLayout {
             const val constraintLayoutCompose =
-                "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha07"
+                "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha08"
 
             const val constraintLayout =
                 "androidx.constraintlayout:constraintlayout:2.0.0-beta3"
