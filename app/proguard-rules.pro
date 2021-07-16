@@ -62,6 +62,10 @@
 -keep class androidx.versionedparcelable.** { *; }
 
 -keep class androidx.room.**{*;}
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class *
+-dontwarn androidx.room.paging.**
+
 -keep class androidx.compose.**{*;}
 -keep class androidx.compose.ui.**{*;}
 -keep class androidx.compose.runtime.**{*;}
@@ -79,7 +83,8 @@
 -keep class androidx.drawerlayout.**{*;}
 -keep class androidx.interpolator.**{*;}
 -keep class androidx.loader.**{*;}
--keep class androidx.sqlite.**{*;}
+-keep class androidx.sqlite.db.**{*;}
+-keep class androidx.sqlite.db.framework.**{*;}
 -keep class androidx.vectordrawable.**{*;}
 -keep class androidx.viewpager.**{*;}
 -keep class androidx.viewpager2.**{*;}
@@ -98,6 +103,7 @@
 -keep class androidx.annotation.**{*;}
 -keep class androidx.activity.**{*;}
 -keep class androidx.appcompat.**{*;}
+-keep class androidx.annotation.**{*;}
 
 -keep class com.google.android.material.internal.** { *; }
 
@@ -158,10 +164,23 @@
 -keep class org.intellij.lang.annotations.** { *; }
 
 -keep class com.artifex.mupdf.fitz.** { *; }
+-keep class com.artifex.mupdf.fitz.android.** { *; }
+-keep class com.artifex.solib.** { *; }
+-keep class com.artifex.sonui.editor.** { *; }
+-keep class kankan.wheel.widget.** { *; }
 
 #======================== =======================
 -keep class cn.archko.pdf.entity.**{*;}
 -keep class cn.archko.pdf.widgets.**{*;}
+-keep class org.vudroid.core.**{*;}
+-keep class org.vudroid.core.codec.**{*;}
+-keep class org.vudroid.core.events.**{*;}
+-keep class org.vudroid.core.models.**{*;}
+-keep class org.vudroid.core.multitouch.**{*;}
+-keep class org.vudroid.core.utils.**{*;}
+-keep class org.vudroid.core.views.**{*;}
+-keep class org.vudroid.djvudroid.**{*;}
+-keep class org.vudroid.pdfdroid.**{*;}
 
 -keep class com.umeng.** {*;}
 
@@ -181,9 +200,16 @@
 -keep class a.**{*;}
 -keep class com.vivo.**{*;}
 
--keep public class cn.archko.mupdf.R$*{
+-keep class cn.archko.mupdf.R$*{
 public static final int *;
 }
 -keep class **.R.* { *; }
 -keep class **.R$* { *; }
--keep public class cn.archko.pdf.**{*;}
+-keep class cn.archko.pdf.**{*;}
+
+-keep class io.iamjosephmj.flinger.**{*;}
+-keep class com.google.accompanist.insets.**{*;}
+-keep class com.google.accompanist.pager.**{*;}
+-keep class com.google.accompanist.swiperefresh.**{*;}
+-keep class com.jeremyliao.liveeventbus.**{*;}
+-keep class com.jeremyliao.liveeventbus.ipc.**{*;}
