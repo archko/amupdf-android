@@ -61,6 +61,44 @@
 -keep class androidx.core.internal.** { *; }
 -keep class androidx.versionedparcelable.** { *; }
 
+-keep class androidx.room.**{*;}
+-keep class androidx.compose.**{*;}
+-keep class androidx.compose.ui.**{*;}
+-keep class androidx.compose.runtime.**{*;}
+-keep class androidx.compose.material.**{*;}
+-keep class androidx.compose.foundation.**{*;}
+-keep class androidx.compose.animation.**{*;}
+-keep class androidx.paging.**{*;}
+-keep class androidx.navigation.**{*;}
+-keep class androidx.lifecycle.**{*;}
+-keep class androidx.lifecycle.livedata.**{*;}
+-keep class androidx.lifecycle.livedata.core**{*;}
+-keep class androidx.lifecycle.livedata.**{*;}
+-keep class androidx.fragment.**{*;}
+-keep class androidx.dynamicanimation.**{*;}
+-keep class androidx.drawerlayout.**{*;}
+-keep class androidx.interpolator.**{*;}
+-keep class androidx.loader.**{*;}
+-keep class androidx.sqlite.**{*;}
+-keep class androidx.vectordrawable.**{*;}
+-keep class androidx.viewpager.**{*;}
+-keep class androidx.viewpager2.**{*;}
+-keep class androidx.versionedparcelable.**{*;}
+-keep class androidx.savedstate.**{*;}
+-keep class androidx.multidex.**{*;}
+-keep class androidx.legacy.**{*;}
+-keep class androidx.documentfile.**{*;}
+-keep class androidx.core.**{*;}
+-keep class androidx.cursoradapter.**{*;}
+-keep class androidx.customview.**{*;}
+-keep class androidx.constraintlayout.**{*;}
+-keep class androidx.arch.core.**{*;}
+-keep class androidx.collection.**{*;}
+-keep class androidx.cardview.**{*;}
+-keep class androidx.annotation.**{*;}
+-keep class androidx.activity.**{*;}
+-keep class androidx.appcompat.**{*;}
+
 -keep class com.google.android.material.internal.** { *; }
 
 
@@ -148,3 +186,4 @@ public static final int *;
 }
 -keep class **.R.* { *; }
 -keep class **.R$* { *; }
+-keep public class cn.archko.pdf.**{*;}
