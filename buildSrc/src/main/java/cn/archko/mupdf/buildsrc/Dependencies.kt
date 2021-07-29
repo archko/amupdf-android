@@ -14,12 +14,12 @@ object BuildConfig {
 }
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0-beta05"
-    const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.0.9"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0"
+    const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.1.5"
     const val flinger = "com.github.iamjosephmj:flinger:1.0.0"
 
     object Accompanist {
-        const val version = "0.14.0"
+        const val version = "0.15.0"
         const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
         const val pagerIndicators = "com.google.accompanist:accompanist-pager-indicators:$version"
@@ -38,7 +38,7 @@ object Libs {
     }
 
     object Coroutines {
-        private const val version = "1.4.2"
+        private const val version = "1.5.1"
         const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
         const val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version"
         const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
@@ -51,12 +51,12 @@ object Libs {
     }
 
     object AndroidX {
-        const val coreKtx = "androidx.core:core-ktx:1.6.0-rc01"
-        const val navigation = "androidx.navigation:navigation-compose:2.4.0-alpha04"
+        const val coreKtx = "androidx.core:core-ktx:1.6.0"
+        const val navigation = "androidx.navigation:navigation-compose:2.4.0-alpha05"
 
         object Compose {
             const val snapshot = ""
-            const val version = "1.0.0-rc02"
+            const val version = "1.0.0"
 
             const val runtime = "androidx.compose.runtime:runtime:$version"
             const val animation = "androidx.compose.animation:animation:$version"
@@ -74,7 +74,7 @@ object Libs {
         }
 
         object Activity {
-            const val activityCompose = "androidx.activity:activity-compose:1.3.0-rc01"
+            const val activityCompose = "androidx.activity:activity-compose:1.3.0"
             const val activityKtx = "androidx.activity:activity-ktx:1.3.0-alpha08"
             const val appCompat = "androidx.appcompat:appcompat:1.3.0"
             const val annotations = "androidx.annotation:annotation:1.2.0"
