@@ -739,6 +739,7 @@ class FileViewModel() : ViewModel() {
             flow {
                 val nList = ArrayList<FileBean>(_historyFileModel.value.list)
                 val file = File(path)
+                delay(250L)
                 if (null == findBean) {
                     val fb = FileBean(FileBean.RECENT, file, true)
                     fb.bookProgress = progressDao.getProgress(file.name, BookProgress.IN_RECENT)

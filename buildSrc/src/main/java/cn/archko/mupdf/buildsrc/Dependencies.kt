@@ -19,7 +19,7 @@ object Libs {
     const val flinger = "com.github.iamjosephmj:flinger:1.0.5"
 
     object Accompanist {
-        const val version = "0.15.0"
+        const val version = "0.16.0"
         const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
         const val pagerIndicators = "com.google.accompanist:accompanist-pager-indicators:$version"
@@ -31,7 +31,7 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.5.10"
+        private const val version = "1.5.21"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
@@ -52,11 +52,11 @@ object Libs {
 
     object AndroidX {
         const val coreKtx = "androidx.core:core-ktx:1.6.0"
-        const val navigation = "androidx.navigation:navigation-compose:2.4.0-alpha05"
+        const val navigation = "androidx.navigation:navigation-compose:2.4.0-alpha06"
 
         object Compose {
             const val snapshot = ""
-            const val version = "1.0.0"
+            const val version = "1.0.1"
 
             const val runtime = "androidx.compose.runtime:runtime:$version"
             const val animation = "androidx.compose.animation:animation:$version"
@@ -97,7 +97,7 @@ object Libs {
 
         object ConstraintLayout {
             const val constraintLayoutCompose =
-                "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha08"
+                "androidx.constraintlayout:constraintlayout-compose:1.0.0-beta02"
 
             const val constraintLayout =
                 "androidx.constraintlayout:constraintlayout:2.0.0-beta3"
