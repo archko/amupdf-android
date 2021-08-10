@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cn.archko.mupdf.R
+import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.viewmodel.FileViewModel
 import java.io.File
@@ -38,9 +39,13 @@ fun RestoreDialog(
     onSelectFile: (File) -> Unit,
 ) {
     val uiBackupFiles by viewModel.uiBackupFileModel.collectAsState()
+    Logcat.d("RestoreDialog list:${showRestoreDialog.value}, ${uiBackupFiles.list?.size}")
+
+    if (uiBackupFiles.list?.size == 0) {
+        viewModel.loadBackupFiles()
+    }
 
     if (showRestoreDialog.value) {
-        viewModel.loadBackupFiles()
         Dialog(
             onDismissRequest = {
                 showRestoreDialog.value = false
