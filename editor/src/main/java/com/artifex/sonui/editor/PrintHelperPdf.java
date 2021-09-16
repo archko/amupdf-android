@@ -70,10 +70,31 @@ public class PrintHelperPdf
         printing = value;
     }
 
-    public void print(final Context context, ArDkDoc doc)
+    public void printPDF(final Context context, final String printPath, final Runnable onDone)
     {
-        if (printing)
+        //  one at a time, please.
+        if (printing) {
+            onDone.run();
             return;
+        }
+        printing = true;
+
+        printPath(context, printPath, false, new Runnable() {
+            @Override
+            public void run() {
+                printing = false;
+            }
+        });
+    }
+
+    public void print(final Context context, ArDkDoc doc, final Runnable onDone)
+    {
+        //  one at a time, please.
+        if (printing) {
+            if (onDone!=null)
+                onDone.run();
+            return;
+        }
         printing = true;
 
         //  make a temp path
@@ -93,89 +114,106 @@ public class PrintHelperPdf
 
                 if (result == SODocSave_Succeeded)
                 {
-                    PrintDocumentAdapter pda = new PrintDocumentAdapter()
-                    {
+                    printPath(context, printPath, true, new Runnable() {
                         @Override
-                        public void onWrite(PageRange[] pages, ParcelFileDescriptor destination, CancellationSignal cancellationSignal, WriteResultCallback callback)
-                        {
-                            Object       input  = null;
-                            OutputStream output = null;
-
-                            try
-                            {
-                                input = FileUtils.getFileHandleForReading(printPath);
-                                output = new FileOutputStream(destination.getFileDescriptor());
-
-                                byte[] buf = new byte[1024];
-                                int bytesRead;
-
-                                while ((bytesRead =
-                                        FileUtils.readFromFile(input, buf)) > 0)
-                                {
-                                    output.write(buf, 0, bytesRead);
-                                }
-
-                                callback.onWriteFinished(new PageRange[]{PageRange.ALL_PAGES});
-
-                            } catch (FileNotFoundException ee)
-                            {
-                                //Catch exception
-                            }
-                            catch (Exception e)
-                            {
-                                //Catch exception
-                            }
-                            finally
-                            {
-                                try
-                                {
-                                    //  in bug 698315, input was null
-                                    if (input!=null)
-                                        FileUtils.closeFile(input);
-                                    if (output!=null)
-                                        output.close();
-                                }
-                                catch (IOException e)
-                                {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onLayout(PrintAttributes oldAttributes, PrintAttributes newAttributes, CancellationSignal cancellationSignal, LayoutResultCallback callback, Bundle extras)
-                        {
-                            if (cancellationSignal.isCanceled())
-                            {
-                                callback.onLayoutCancelled();
-                                return;
-                            }
-
-                            PrintDocumentInfo pdi = new PrintDocumentInfo.Builder("Name of file").setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).build();
-                            callback.onLayoutFinished(pdi, true);
-                        }
-
-                        @Override
-                        public void onFinish()
-                        {
-                            // Remove the temporary file when the printing system is finished.
-                            FileUtils.deleteFile(printPath);
-
+                        public void run() {
                             printing = false;
+                            if (onDone!=null)
+                                onDone.run();
                         }
-                    };
-
-                    PrintManager printManager = (PrintManager) context.getSystemService(Context.PRINT_SERVICE);
-                    String jobName = Utilities.getApplicationName(context) + " Document";
-                    printManager.print(jobName, pda, null);
+                    });
                 }
                 else
                 {
                     String message = String.format(context.getString(com.artifex.sonui.editor.R.string.sodk_editor_error_saving_document_code), err);
                     Utilities.showMessage((Activity)context, context.getString(com.artifex.sonui.editor.R.string.sodk_editor_error), message);
                     printing = false;
+                    if (onDone!=null)
+                        onDone.run();
                 }
             }
         });
+    }
+
+    private void printPath(final Context context, final String printPath, final boolean deleteWhenDone, final Runnable onDone)
+    {
+        PrintDocumentAdapter pda = new PrintDocumentAdapter()
+        {
+            @Override
+            public void onWrite(PageRange[] pages, ParcelFileDescriptor destination, CancellationSignal cancellationSignal, WriteResultCallback callback)
+            {
+                Object       input  = null;
+                OutputStream output = null;
+
+                try
+                {
+                    input = FileUtils.getFileHandleForReading(printPath);
+                    output = new FileOutputStream(destination.getFileDescriptor());
+
+                    byte[] buf = new byte[1024];
+                    int bytesRead;
+
+                    while ((bytesRead =
+                            FileUtils.readFromFile(input, buf)) > 0)
+                    {
+                        output.write(buf, 0, bytesRead);
+                    }
+
+                    callback.onWriteFinished(new PageRange[]{PageRange.ALL_PAGES});
+
+                } catch (FileNotFoundException ee)
+                {
+                    //Catch exception
+                }
+                catch (Exception e)
+                {
+                    //Catch exception
+                }
+                finally
+                {
+                    try
+                    {
+                        //  in bug 698315, input was null
+                        if (input!=null)
+                            FileUtils.closeFile(input);
+                        if (output!=null)
+                            output.close();
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onLayout(PrintAttributes oldAttributes, PrintAttributes newAttributes, CancellationSignal cancellationSignal, LayoutResultCallback callback, Bundle extras)
+            {
+                if (cancellationSignal.isCanceled())
+                {
+                    callback.onLayoutCancelled();
+                    return;
+                }
+
+                PrintDocumentInfo pdi = new PrintDocumentInfo.Builder("Name of file").setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).build();
+                callback.onLayoutFinished(pdi, true);
+            }
+
+            @Override
+            public void onFinish()
+            {
+                // Remove the temporary file when the printing system is finished.
+                if (deleteWhenDone)
+                    FileUtils.deleteFile(printPath);
+
+                printing = false;
+                if (onDone!=null)
+                    onDone.run();
+            }
+        };
+
+        PrintManager printManager = (PrintManager) context.getSystemService(Context.PRINT_SERVICE);
+        String jobName = Utilities.getApplicationName(context) + " Document";
+        printManager.print(jobName, pda, null);
     }
 }

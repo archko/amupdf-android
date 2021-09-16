@@ -191,7 +191,7 @@
             android:background="@color/sodk_editor_footer"
             android:textColor="@color/sodk_editor_footer_text"
             android:paddingRight="5dp"
-            android:singleLine="true"
+            android:maxLines="1"
             android:ellipsize="middle"
             android:paddingLeft="5dp"
             android:gravity="center_horizontal"
@@ -203,7 +203,7 @@
             android:layout_height="wrap_content"
             android:paddingRight="5dp"
             android:paddingLeft="5dp"
-            android:singleLine="true"
+            android:maxLines="1"
             android:background="@color/sodk_editor_footer"
             android:textColor="@color/sodk_editor_footer_page_text"
             android:id="@+id/footer_page_text"/>

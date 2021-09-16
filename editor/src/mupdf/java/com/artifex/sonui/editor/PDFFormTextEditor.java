@@ -41,6 +41,7 @@ public class PDFFormTextEditor extends PDFFormEditor
     private boolean mDragging = false;
     private TextWatcher mWatcher = null;
     private boolean messageDisplayed = false;
+    private boolean scrollIntoViewRequested = false;
 
     public PDFFormTextEditor(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -81,7 +82,7 @@ public class PDFFormTextEditor extends PDFFormEditor
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event)
             {
-                if (actionId == EditorInfo.IME_ACTION_DONE)
+                if (actionId == EditorInfo.IME_ACTION_NEXT)
                 {
                     boolean stopped = stop();
                     if (!stopped)
@@ -115,6 +116,37 @@ public class PDFFormTextEditor extends PDFFormEditor
                     }
                 }
                 return false;
+            }
+        });
+
+        //  set a listener for messages that mupdf's Javascript might emit.
+        MuPDFDoc.JsEventListener listener = new MuPDFDoc.JsEventListener() {
+            @Override
+            public void onAlert(String message) {
+                //  display a message if it's not yet been done
+                if (!messageDisplayed) {
+                    messageDisplayed = true;
+                    Utilities.showMessageAndWait((Activity) getContext(), "", message, new Runnable() {
+                        @Override
+                        public void run() {
+                            //  we can display another message now.
+                            messageDisplayed = false;
+                            Utilities.showKeyboard(getContext());
+                        }
+                    });
+                }
+                mEditText.requestFocus();
+            }
+        };
+        mDoc.setJsEventListener(listener);
+
+        //  focus our EditText and the underlying widget
+        mEditText.requestFocus();
+        mDoc.getWorker().add(new Worker.Task() {
+            public void work() {
+                widget.focus();
+            }
+            public void run() {
             }
         });
 
@@ -308,6 +340,12 @@ public class PDFFormTextEditor extends PDFFormEditor
     @Override
     protected void scrollIntoView()
     {
+        //  defer this until text rects are available
+        scrollIntoViewRequested = true;
+    }
+
+    private void scrollIntoViewInternal()
+    {
         if (mSelStart == mSelEnd)
             scrollCaretIntoView();
         else
@@ -332,7 +370,9 @@ public class PDFFormTextEditor extends PDFFormEditor
                 break;
 
             case MuPDFWidget.CONTENT_NUMBER:
-                inputType = InputType.TYPE_CLASS_NUMBER;
+                inputType = InputType.TYPE_CLASS_NUMBER
+                        |InputType.TYPE_NUMBER_FLAG_DECIMAL
+                        |InputType.TYPE_NUMBER_FLAG_SIGNED;
                 break;
 
             case MuPDFWidget.CONTENT_DATE:
@@ -352,7 +392,7 @@ public class PDFFormTextEditor extends PDFFormEditor
 
         int imeOpt = EditorInfo.IME_ACTION_NONE;
         if (!isMultiline)
-            imeOpt = EditorInfo.IME_ACTION_DONE;
+            imeOpt = EditorInfo.IME_ACTION_NEXT;
 
         imeOpt |= EditorInfo.IME_FLAG_NO_EXTRACT_UI;
         imeOpt |= EditorInfo.IME_FLAG_NO_FULLSCREEN;
@@ -380,6 +420,22 @@ public class PDFFormTextEditor extends PDFFormEditor
 
         //  get the widget's current value and set it in the edit field
         String str = mWidget.getValue().trim();
+        mOriginalValue = str;
+        mEditText.setText(str);
+        setWidgetText(str);
+        mWaitingForRender = true;
+        mSetInitialSelection = true;
+    }
+
+    @Override
+    protected void setNewValue(String val)
+    {
+        //  start in the editing state
+        mWidget.setEditingState(true);
+
+        //  get the widget's current value and set it in the edit field
+        String str = val;
+        mOriginalValue = str;
         mEditText.setText(str);
         setWidgetText(str);
         mWaitingForRender = true;
@@ -599,6 +655,13 @@ public class PDFFormTextEditor extends PDFFormEditor
                         setEditTextSelection(selStart, selStart);
                     }
                 }
+
+                //  scroll ourselves into view if requested
+                //  text rects are available, sso crolling the caret
+                //  into view will work correctly.
+                if (scrollIntoViewRequested)
+                    scrollIntoViewInternal();
+                scrollIntoViewRequested = false;
             }
         });
     }
@@ -737,27 +800,6 @@ public class PDFFormTextEditor extends PDFFormEditor
         mWidget.setEditingState(false);
 
         //  reassert the value, without the trailing ' '
-        //  set a listener for messages that mupdf's Javascript might emit.
-        MuPDFDoc.JsEventListener listener = new MuPDFDoc.JsEventListener() {
-            @Override
-            public void onAlert(String message) {
-                //  display a message if it's not yet been done
-                if (!messageDisplayed) {
-                    messageDisplayed = true;
-                    Utilities.showMessageAndWait((Activity) getContext(), "", message, new Runnable() {
-                        @Override
-                        public void run() {
-                            //  we can display another message now.
-                            messageDisplayed = false;
-                            Utilities.showKeyboard(getContext());
-                        }
-                    });
-                }
-                mEditText.requestFocus();
-            }
-        };
-        mDoc.setJsEventListener(listener);
-
         String str = mEditText.getText().toString();
         boolean accepted = mWidget.setValue(str);
         if (!accepted)
@@ -766,6 +808,22 @@ public class PDFFormTextEditor extends PDFFormEditor
             mDoc.update(mPageNumber);
         }
         return accepted;
+    }
+
+    @Override
+    public boolean cancel()
+    {
+        //  when cancelling an edit, we first restore the starting value,
+        //  and dismiss the validation alert that may be showing
+        //  before proceeding with the stop().
+        //
+        //  the assumptioon here is that the starting value was
+        //  valid, and won't result in another validation error.
+
+        Utilities.dismissCurrentAlert();
+        messageDisplayed = false;
+        mEditText.setText(mOriginalValue);
+        return stop();
     }
 
     @Override

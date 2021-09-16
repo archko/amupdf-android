@@ -1134,6 +1134,14 @@ public class DocView
             cv.setNewScale(mScale);
         }
     }
+    protected void pauseChildren()
+    {
+        //  pause children
+        for (int i=0; i<getPageCount(); i++) {
+            DocPageView cv = (DocPageView)getOrCreateChild(i);
+            cv.onPause();
+        }
+    }
 
     public void setScale(float val)
     {
@@ -1212,7 +1220,7 @@ public class DocView
         getGlobalVisibleRect(viewport);
 
         //  if we're at one column and wider than the viewport, leave it alone.
-        if (!mReflowMode && mLastLayoutColumns==0 && mAllPagesRect.width()>=viewport.width())
+        if (!mReflowMode && mLastLayoutColumns<=1 && mAllPagesRect.width()>=viewport.width())
         {
             mScaling = false;
             return;

@@ -22,6 +22,7 @@ import com.artifex.solib.ArDkDoc;
 import com.artifex.solib.ArDkLib;
 import com.artifex.solib.ArDkSelectionLimits;
 import com.artifex.solib.ConfigOptions;
+import com.artifex.solib.SODoc;
 import com.artifex.solib.SOHyperlink;
 import com.artifex.solib.ArDkPage;
 import com.artifex.solib.SOPageListener;
@@ -77,7 +78,6 @@ public class DocPageView extends View implements SOPageListener
     private final Rect mDstRect = new Rect();
     private final Paint mBlankPainter;
     private final Paint mSelectedBorderPainter;
-    //private final Paint mPagePainter;
     private final Paint mBorderPainter;
     private final Rect mBorderRect = new Rect();
 
@@ -136,13 +136,6 @@ public class DocPageView extends View implements SOPageListener
         setSelectedBorderColor(ContextCompat.getColor(getContext(), R.color.sodk_editor_selected_page_border_color));
         mSelectedBorderPainter.setStyle(Paint.Style.STROKE);
         mSelectedBorderPainter.setStrokeWidth(Utilities.convertDpToPixel(context.getResources().getInteger(R.integer.sodk_editor_selected_page_border_width)));
-
-        /*mPagePainter = new Paint();
-        mPagePainter.setColor(ContextCompat.getColor(getContext(), R.color.sodk_editor_palette_grey));
-        //mPagePainter.setAntiAlias(true);
-        mPagePainter.setTextSize(Utilities.convertDpToPixel(30));
-        mPagePainter.setTextAlign(Paint.Align.CENTER);
-        mPagePainter.setStrokeWidth(Utilities.convertDpToPixel(2));*/
 
         //  create the low res bitmap painter
         if (lowResPainter==null) {
@@ -714,10 +707,8 @@ public class DocPageView extends View implements SOPageListener
 
         //  get bitmap to draw
         ArDkBitmap bitmap = mBitmapDraw;
-        if (bitmap==null || bitmap.getBitmap().isRecycled()) {
-            //canvas.drawText(String.format("Page %s", (mPageNum+1)), rBlank.centerX(), rBlank.centerY(), mPagePainter);
+        if (bitmap==null || bitmap.getBitmap().isRecycled())
             return;  //  not yet rendered, or recycled
-        }
 
         //  set rectangles for drawing
         mSrcRect.set(bitmap.getRect());
@@ -829,7 +820,9 @@ public class DocPageView extends View implements SOPageListener
 
         if (canEditText)
         {
-            getDoc().clearSelection();
+            SODoc doc = (SODoc)getDoc();
+            if ( !doc.selectionIsAutoshapeOrImage() )
+                doc.clearSelection();
             mPage.select(ArDkPage.SOSelectMode_Caret, pPage.x, pPage.y);
         }
 
@@ -857,7 +850,9 @@ public class DocPageView extends View implements SOPageListener
     public void onDoubleTap(int x, int y)
     {
         Point p = screenToPage(x, y);
-        mPage.select(ArDkPage.SOSelectMode_DefaultUnit, p.x, p.y);
+        SODoc doc = (SODoc)getDoc();
+        if ( !doc.selectionIsAutoshapeOrImage() )
+            mPage.select(ArDkPage.SOSelectMode_DefaultUnit, p.x, p.y);
         NUIDocView.currentNUIDocView().showUI(true);
     }
 
@@ -1154,5 +1149,9 @@ public class DocPageView extends View implements SOPageListener
         Point p1 = screenToPage(r.left, r.top);
         Point p2 = screenToPage(r.right, r.bottom);
         return new Rect(p1.x, p1.y, p2.x, p2.y);
+    }
+
+    protected void onPause()
+    {
     }
 }

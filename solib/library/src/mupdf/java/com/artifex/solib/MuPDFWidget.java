@@ -31,6 +31,12 @@ public class MuPDFWidget
     protected PDFWidget mWidget;
     protected long mTimeSigned = -1;
 
+    //  if a widget is created during this session, it will be marked as such
+    //  by calling setCreatedInThisSession().
+    private boolean mCreatedInThisSession = false;
+    public boolean getCreatedInThisSession() {return mCreatedInThisSession;}
+    public void setCreatedInThisSession(boolean val) {mCreatedInThisSession=val;}
+
     MuPDFWidget(PDFWidget widget)
     {
         mWidget = widget;
@@ -214,4 +220,13 @@ public class MuPDFWidget
         return (PDFAnnotation)mWidget;
     }
 
+    public void focus()
+    {
+        //  give focus to the underlying PDFWidget
+        if (mWidget!=null) {
+            mWidget.eventFocus();
+            mWidget.eventDown();
+            mWidget.eventUp();
+        }
+    }
 }

@@ -126,7 +126,8 @@ public class NUIView extends FrameLayout
             mDocView.onPause(new Runnable() {
                 @Override
                 public void run() {
-                    whenDone.run();
+                    if (whenDone!=null)
+                        whenDone.run();
                 }
             });
         }

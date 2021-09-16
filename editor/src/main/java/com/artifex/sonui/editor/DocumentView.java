@@ -9,11 +9,23 @@
 
 package com.artifex.sonui.editor;
 
+import android.content.ComponentCallbacks2;
 import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.util.AttributeSet;
+
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.OnLifecycleEvent;
 
 import com.artifex.solib.ArDkLib;
 import com.artifex.solib.SODoc;
@@ -898,5 +910,95 @@ public class DocumentView extends NUIView {
     {
         if (mDocView != null)
             mDocView.setScaleAndScroll(newScale, newX, newY);
+    }
+
+    //  get the LifecycleOwner for our view, by walking up the hierarchy
+    //  until we find the LifecycleOwner.
+    //  typically this will be an AppCompatActivity,
+    //  but could be a FragmentActivity.
+    private LifecycleOwner getLifecycleOwner() {
+        //  should be called after we're attached to the window.
+        if (!isAttachedToWindow())
+            return null;  //  maybe this should throw instead?
+        Context context = getContext();
+        while (context instanceof ContextWrapper) {
+            if (context instanceof LifecycleOwner) {
+                return (LifecycleOwner) context;
+            }
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+        return null;
+    }
+
+    //  this is an observer class for intercepting
+    //  specific lifecycle events.
+    private class MyLifecycleObserver implements LifecycleObserver {
+        public MyLifecycleObserver(DocumentView v) {
+            mDocumentView = v;
+        }
+        private DocumentView mDocumentView;
+
+        @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        void onDestroy() {
+            mDocumentView.onDestroy();
+        }
+
+        @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+        void onPause() {
+            mDocumentView.onPause(null);
+        }
+
+        @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+        void onResume() {
+            mDocumentView.onResume();
+        }
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
+        //  get the LifecycleOwner
+        LifecycleOwner owner = getLifecycleOwner();
+
+        if (owner != null) {
+
+            //  who are we?
+            final DocumentView documentView = this;
+
+            //  add the lifecycle observer
+            owner.getLifecycle().addObserver(new MyLifecycleObserver(this));
+
+            //  register to get component callbacks.
+            //  we'll use this to find out about configuration changes
+            ((Context) owner).registerComponentCallbacks(new ComponentCallbacks2() {
+                @Override
+                public void onTrimMemory(int level) {
+                }
+
+                @Override
+                public void onConfigurationChanged(@NonNull Configuration newConfig) {
+                    documentView.onConfigurationChange(newConfig);
+                }
+
+                @Override
+                public void onLowMemory() {
+                }
+            });
+
+            //  register a callback for OnBackPressed
+            if (owner instanceof FragmentActivity) {
+                OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        documentView.onBackPressed();
+                    }
+                };
+                ((AppCompatActivity) owner).getOnBackPressedDispatcher().addCallback(
+                        owner, // LifecycleOwner
+                        callback);
+            }
+
+        }
     }
 }

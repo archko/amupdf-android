@@ -675,6 +675,11 @@ public class FileUtils
     {
         String extension = "";
 
+        if (uri == null)
+        {
+            return extension;
+        }
+
         String filename = new File(uri.getPath()).getName();
         int i = filename.lastIndexOf('.');
         if (i>0)

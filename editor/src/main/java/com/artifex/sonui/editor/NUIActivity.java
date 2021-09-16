@@ -50,14 +50,7 @@ public class NUIActivity extends BaseActivity
     private ConfigOptions duplicateAppConfigurations()
     {
         ConfigOptions cfg = null;
-        try
-        {
-            cfg = ArDkLib.getAppConfigOptions().clone();
-        }
-        catch(CloneNotSupportedException ex)
-        {
-            ex.printStackTrace();
-        }
+        cfg = ArDkLib.getAppConfigOptions();//.clone();
 
         return cfg;
     }
@@ -107,8 +100,8 @@ public class NUIActivity extends BaseActivity
     }
 
     @Override
-    public void onNewIntent (final Intent intent)
-    {
+    public void onNewIntent (final Intent intent) {
+        super.onNewIntent(intent);
         //  this activity uses android:launchMode="singleTask"
         //  if no activity exists when launched, we'll go through onCreate().
         //  if one exists, we'll instead land here, with new intent data.
@@ -117,8 +110,7 @@ public class NUIActivity extends BaseActivity
         //  if that's the case we give the user a choice of staying with the
         //  existing doc, or losing those changes and going with the new doc.
 
-        if (isDocModified())
-        {
+        if (isDocModified()) {
             //  the current doc is modified, so ask what to do.
             Utilities.yesNoMessage(this, getString(R.string.sodk_editor_new_intent_title),
                     getString(R.string.sodk_editor_new_intent_body),
@@ -147,11 +139,10 @@ public class NUIActivity extends BaseActivity
 
                             // Cancel any pending edit session
                             SODocSession.SODocSessionLoadListenerCustom
-                                sessionLoadListener =
+                                    sessionLoadListener =
                                     Utilities.getSessionLoadListener();
 
-                            if (sessionLoadListener != null)
-                            {
+                            if (sessionLoadListener != null) {
                                 sessionLoadListener.onSessionReject();
                             }
 
@@ -160,9 +151,7 @@ public class NUIActivity extends BaseActivity
                         }
                     });
 
-        }
-        else
-        {
+        } else {
             // End the current document session before moving to the next.
             if (mNUIView != null)
                 mNUIView.endDocSession(true);

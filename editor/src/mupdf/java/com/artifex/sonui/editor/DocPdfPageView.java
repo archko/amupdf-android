@@ -5,12 +5,15 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
 
 import com.artifex.solib.ArDkDoc;
+import com.artifex.solib.ArDkPage;
 import com.artifex.solib.MuPDFWidget;
+import com.artifex.solib.SODoc;
 import com.artifex.solib.SOPoint;
 
 import java.util.ArrayList;
@@ -351,5 +354,13 @@ public class DocPdfPageView extends DocPageView
                     }
                 });
 
+    }
+
+    @Override
+    public void onDoubleTap(int x, int y)
+    {
+        Point p = screenToPage(x, y);
+        mPage.select(ArDkPage.SOSelectMode_DefaultUnit, p.x, p.y);
+        NUIDocView.currentNUIDocView().showUI(true);
     }
 }

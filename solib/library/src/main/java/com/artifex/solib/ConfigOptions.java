@@ -1,13 +1,16 @@
 package com.artifex.solib;
 
+import android.graphics.Point;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.graphics.Point;
-import android.os.Parcel;
-import android.os.Parcelable;
 
-public class ConfigOptions implements Cloneable, Parcelable
+public class ConfigOptions
 {
+    // Enable/Disable Logging.
+    protected static final boolean mDebugLog = false;
+    private String mDebugTag = "ConfigOptions";
+
     /** Notify when the document viewer has loaded a disabled feature **/
     public interface FeatureTracker{
         void hasLoadedDisabledFeature(View featureView);
@@ -15,339 +18,284 @@ public class ConfigOptions implements Cloneable, Parcelable
     }
     public FeatureTracker featureTracker;
 
-    private String mDebugTag = "ConfigOptions";
+    // Config bundle keys
+    public static final String ClassNameKey =                 "ClassNameKey";
 
-    private boolean           mShowUI;
-    private boolean           mUsePersistentFileState;
-    private boolean           mAllowAutoOpen;
-    private boolean           mEditingEnabled;
-    private boolean           mSaveAsEnabled;
-    private boolean           mSaveAsPdfEnabled;
-    private boolean           mOpenInEnabled;
-    private boolean           mOpenPdfInEnabled;
-    private boolean           mShareEnabled;
-    private boolean           mExtClipboardInEnabled;
-    private boolean           mExtClipboardOutEnabled;
-    private boolean           mImageInsertEnabled;
-    private boolean           mPhotoInsertEnabled;
-    private boolean           mPrintingEnabled;
-    private boolean           mSecurePrintingEnabled;
-    private boolean           mNonRepudiationCertsOnly;
-    private boolean           mLaunchUrlEnabled;
-    private boolean           mDocAuthEntryEnabled;
-    private boolean           mAppAuthEnabled;
-    private int               mAppAuthTimeout;
+    private static final String ShowUIKey =                      "ShowUIKey";
+    private static final String UsePersistentFileStateKey =
+                                                 "UsePersistentFileStateKey";
+    private static final String AllowAutoOpenKey =        "AllowAutoOpenKey";
+    private static final String EditingEnabledKey =      "EditingEnabledKey";
+    private static final String SaveAsEnabledKey =        "SaveAsEnabledKey";
+    private static final String SaveAsPdfEnabledKey =  "SaveAsPdfEnabledKey";
+    private static final String OpenInEnabledKey =        "OpenInEnabledKey";
+    private static final String OpenPdfInEnabledKey =  "OpenPdfInEnabledKey";
+    private static final String ShareEnabledKey =          "ShareEnabledKey";
+    private static final String ExtClipboardInEnabledKey =
+                                                  "ExtClipboardInEnabledKey";
+    private static final String ExtClipboardOutEnabledKey =
+                                                 "ExtClipboardOutEnabledKey";
+    private static final String ImageInsertEnabledKey =
+                                                     "ImageInsertEnabledKey";
+    private static final String PhotoInsertEnabledKey =
+                                                     "PhotoInsertEnabledKey";
+    private static final String PrintingEnabledKey =    "PrintingEnabledKey";
+    private static final String SecurePrintingEnabledKey =
+                                                  "SecurePrintingEnabledKey";
+    private static final String NonRepudiationCertsOnlyKey =
+                                                "NonRepudiationCertsOnlyKey";
+    private static final String LaunchUrlEnabledKey =  "LaunchUrlEnabledKey";
+    private static final String DocAuthEntryEnabledKey =
+                                                    "DocAuthEntryEnabledKey";
+    private static final String AppAuthEnabledKey =      "AppAuthEnabledKey";
+    private static final String AppAuthTimeoutKey =      "AppAuthTimeoutKey";
 
-    private boolean           mSaveEnabled;
-    private boolean           mCustomSaveEnabled;
+    private static final String SaveEnabledKey =            "SaveEnabledKey";
+    private static final String CustomSaveEnabledKey =
+                                                      "CustomSaveEnabledKey";
 
-    private boolean           mTrackChangesFeatureEnabled;
+    private static final String TrackChangesFeatureEnabledKey =
+                                             "TrackChangesFeatureEnabledKey";
 
-    private boolean           mFormFillingEnabled;
-    private boolean           mFormSigningFeatureEnabled;
+    private static final String FormFillingEnabledKey =
+                                                     "FormFillingEnabledKey";
+    private static final String FormSigningFeatureEnabledKey =
+                                              "FormSigningFeatureEnabledKey";
 
-    private boolean           mRedactionsEnabled;
-    private boolean           mFullscreenEnabled;
+    private static final String RedactionsEnabledKey =
+                                                      "RedactionsEnabledKey";
+    private static final String FullscreenEnabledKey =
+                                                      "FullscreenEnabledKey";
 
-    private boolean           mAnimationFeatureEnabled;
+    private static final String AnimationFeatureEnabledKey =
+                                                "AnimationFeatureEnabledKey";
 
-    private float             mDefaultInkAnnotationLineThickness;
-    private int               mDefaultInkAnnotationLineColor;
+    private static final String DefaultInkAnnotationLineThicknessKey =
+                                      "DefaultInkAnnotationLineThicknessKey";
+    private static final String DefaultInkAnnotationLineColorKey =
+                                          "DefaultInkAnnotationLineColorKey";
 
-    private boolean           mInvertContentInDarkMode;
+    private static final String InvertContentInDarkModeKey =
+                                                "InvertContentInDarkModeKey";
 
-    private boolean           mPDFAnnotationEnabled;
+    private static final String PDFAnnotationEnabledKey =
+                                                   "PDFAnnotationEnabledKey";
+
+    protected Bundle mSettingsBundle;
 
     public ConfigOptions()
     {
-        mShowUI                  = true;
-        mEditingEnabled          = true;
-        mSaveAsEnabled           = true;
-        mSaveAsPdfEnabled        = true;
-        mOpenInEnabled           = true;
-        mOpenPdfInEnabled        = true;
-        mShareEnabled            = true;
-        mExtClipboardInEnabled   = true;
-        mExtClipboardOutEnabled  = true;
-        mImageInsertEnabled      = true;
-        mPhotoInsertEnabled      = true;
-        mPrintingEnabled         = true;
-        mSecurePrintingEnabled   = false;
-        mNonRepudiationCertsOnly = false;
-        mLaunchUrlEnabled        = true;
-        mUsePersistentFileState  = true;
-        mAllowAutoOpen           = true;
-        mDocAuthEntryEnabled     = true;
-        mAppAuthEnabled          = false;
-        mAppAuthTimeout          = 30;
+        /*
+         * Create the config bundle.
+         *
+         * Entries are added in the set* functions,
+         * Defaults are defined in the get* functions,
+         */
+        mSettingsBundle = new Bundle();
 
-        mSaveEnabled            = true;
-        mCustomSaveEnabled      = false;
-
-        mTrackChangesFeatureEnabled = false;
-
-        mFormFillingEnabled        = false;
-        mFormSigningFeatureEnabled = false;
-
-        mRedactionsEnabled      = false;
-
-        mFullscreenEnabled = false;
-        mAnimationFeatureEnabled = false;
-
-        mInvertContentInDarkMode = false;
-
-        mPDFAnnotationEnabled = true;
+        /*
+         * Store the, fully qualified, class name.
+         *
+         * This will be used when loading an instance of this class
+         * received via intent.
+         */
+        mSettingsBundle.putString("ClassNameKey", this.getClass().getName());
     }
 
-    public ConfigOptions clone() throws
-                   CloneNotSupportedException
+    // Copy constructor
+    public ConfigOptions(ConfigOptions co)
     {
-        // shallow copy should be enough, as we have only primitives and immutables.
-        // note: featureTracker is copied shallow, but it is ok as its configuration
-        // is updated whenever it is created. see iAPBinder constructor.
-        return (ConfigOptions)super.clone();
+        /*
+         * Create the config bundle.
+         *
+         * Entries are added in the set* functions,
+         * Defaults are defined in the get* functions,
+         */
+        mSettingsBundle = new Bundle(co.mSettingsBundle);
+
+        /*
+         * Store the, fully qualified, class name.
+         *
+         * This will be used when loading an instance of this class
+         * received via intent.
+         */
+        mSettingsBundle.putString("ClassNameKey", this.getClass().getName());
     }
 
-    protected ConfigOptions(Parcel in)
+    // Construct from a bundle.
+    public ConfigOptions(Bundle bundle)
     {
-        // featureTracker is not transfered.
-        // But it is ok as its concrete class iAPBinder is
-        // created whenever it is needed. see onCreate@AppNUIActivity.java
-        featureTracker = null;
+        /*
+         * Create the config bundle.
+         *
+         * Entries are added in the set* functions,
+         * Defaults are defined in the get* functions,
+         */
+        mSettingsBundle = new Bundle(bundle);
 
-        // parcel primitives.
-        mDebugTag = in.readString();
-        mShowUI = in.readByte() != 0x00;
-        mUsePersistentFileState = in.readByte() != 0x00;
-        mAllowAutoOpen = in.readByte() != 0x00;
-        mEditingEnabled = in.readByte() != 0x00;
-        mSaveAsEnabled = in.readByte() != 0x00;
-        mSaveAsPdfEnabled = in.readByte() != 0x00;
-        mOpenInEnabled = in.readByte() != 0x00;
-        mOpenPdfInEnabled = in.readByte() != 0x00;
-        mShareEnabled = in.readByte() != 0x00;
-        mExtClipboardInEnabled = in.readByte() != 0x00;
-        mExtClipboardOutEnabled = in.readByte() != 0x00;
-        mImageInsertEnabled = in.readByte() != 0x00;
-        mPhotoInsertEnabled = in.readByte() != 0x00;
-        mPrintingEnabled = in.readByte() != 0x00;
-        mSecurePrintingEnabled = in.readByte() != 0x00;
-        mNonRepudiationCertsOnly = in.readByte() != 0x00;
-        mLaunchUrlEnabled = in.readByte() != 0x00;
-        mDocAuthEntryEnabled = in.readByte() != 0x00;
-        mAppAuthEnabled = in.readByte() != 0x00;
-        mAppAuthTimeout = in.readInt();
-        mSaveEnabled = in.readByte() != 0x00;
-        mCustomSaveEnabled = in.readByte() != 0x00;
-        mTrackChangesFeatureEnabled = in.readByte() != 0x00;
-        mFormFillingEnabled = in.readByte() != 0x00;
-        mFormSigningFeatureEnabled = in.readByte() != 0x00;
-        mRedactionsEnabled = in.readByte() != 0x00;
-        mFullscreenEnabled = in.readByte() != 0x00;
-        mAnimationFeatureEnabled = in.readByte() != 0x00;
-        mDefaultInkAnnotationLineThickness = in.readFloat();
-        mDefaultInkAnnotationLineColor = in.readInt();
-        mInvertContentInDarkMode = in.readByte() != 0x00;
-        mPDFAnnotationEnabled = in.readByte() != 0x00;
+        /*
+         * Store the, fully qualified, class name.
+         *
+         * This will be used when loading an instance of this class
+         * received via intent.
+         */
+        mSettingsBundle.putString("ClassNameKey", this.getClass().getName());
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags)
+    /*
+     * Copy the mappings contained in 'bundle' into the settings
+     * bundle, overwriting any existing matching mappings.
+     */
+    public void applyBundle(Bundle bundle)
     {
-        // featureTracker is ignored.
-
-        // parcels
-        dest.writeString(mDebugTag);
-        dest.writeByte((byte) (mShowUI ? 0x01 : 0x00));
-        dest.writeByte((byte) (mUsePersistentFileState ? 0x01 : 0x00));
-        dest.writeByte((byte) (mAllowAutoOpen ? 0x01 : 0x00));
-        dest.writeByte((byte) (mEditingEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mSaveAsEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mSaveAsPdfEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mOpenInEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mOpenPdfInEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mShareEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mExtClipboardInEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mExtClipboardOutEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mImageInsertEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mPhotoInsertEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mPrintingEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mSecurePrintingEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mNonRepudiationCertsOnly ? 0x01 : 0x00));
-        dest.writeByte((byte) (mLaunchUrlEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mDocAuthEntryEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mAppAuthEnabled ? 0x01 : 0x00));
-        dest.writeInt(mAppAuthTimeout);
-        dest.writeByte((byte) (mSaveEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mCustomSaveEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mTrackChangesFeatureEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mFormFillingEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mFormSigningFeatureEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mRedactionsEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mFullscreenEnabled ? 0x01 : 0x00));
-        dest.writeByte((byte) (mAnimationFeatureEnabled ? 0x01 : 0x00));
-        dest.writeFloat(mDefaultInkAnnotationLineThickness);
-        dest.writeInt(mDefaultInkAnnotationLineColor);
-        dest.writeByte((byte) (mInvertContentInDarkMode ? 0x01 : 0x00));
-        dest.writeByte((byte) (mPDFAnnotationEnabled ? 0x01 : 0x00));
+        mSettingsBundle.putAll(bundle);
     }
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<ConfigOptions> CREATOR = new Parcelable.Creator<ConfigOptions>() {
-        @Override
-        public ConfigOptions createFromParcel(Parcel in) {
-            return new ConfigOptions(in);
-        }
-
-        @Override
-        public ConfigOptions[] newArray(int size) {
-            return new ConfigOptions[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
+    public Bundle getSettingsBundle()
+    {
+        return mSettingsBundle;
     }
 
+    // Getters
     public boolean showUI()
     {
-        return mShowUI;
+        return mSettingsBundle.getBoolean(ShowUIKey, true);
     }
 
     public boolean isEditingEnabled()
     {
-        return mEditingEnabled;
+        return mSettingsBundle.getBoolean(EditingEnabledKey, true);
     }
 
     public boolean isSaveAsEnabled()
     {
-        return mSaveAsEnabled;
+        return mSettingsBundle.getBoolean(SaveAsEnabledKey, true);
     }
 
     public boolean isSaveAsPdfEnabled()
     {
-        return mSaveAsPdfEnabled;
+        return mSettingsBundle.getBoolean(SaveAsPdfEnabledKey, true);
     }
 
     public boolean isOpenInEnabled()
     {
-        return mOpenInEnabled;
+        return mSettingsBundle.getBoolean(OpenInEnabledKey, true);
     }
 
     public boolean isOpenPdfInEnabled()
     {
-        return mOpenPdfInEnabled;
+        return mSettingsBundle.getBoolean(OpenPdfInEnabledKey, true);
     }
 
     public boolean isShareEnabled()
     {
-        return mShareEnabled;
+        return mSettingsBundle.getBoolean(ShareEnabledKey, true);
     }
 
     public boolean isExtClipboardInEnabled()
     {
-        return mExtClipboardInEnabled;
+        return mSettingsBundle.getBoolean(ExtClipboardInEnabledKey, true);
     }
 
     public boolean isExtClipboardOutEnabled()
     {
-        return mExtClipboardOutEnabled;
+        return mSettingsBundle.getBoolean(ExtClipboardOutEnabledKey, true);
     }
 
     public boolean isImageInsertEnabled()
     {
-        return mImageInsertEnabled;
+        return mSettingsBundle.getBoolean(ImageInsertEnabledKey, true);
     }
 
     public boolean isPhotoInsertEnabled()
     {
-        return mPhotoInsertEnabled;
+        return mSettingsBundle.getBoolean(PhotoInsertEnabledKey, true);
     }
 
     public boolean isPrintingEnabled()
     {
-        return mPrintingEnabled;
+        return mSettingsBundle.getBoolean(PrintingEnabledKey, true);
     }
 
     public boolean isSecurePrintingEnabled()
     {
-        return mSecurePrintingEnabled;
+        return mSettingsBundle.getBoolean(SecurePrintingEnabledKey, false);
     }
 
     public boolean isNonRepudiationCertFilterEnabled()
     {
-        return mNonRepudiationCertsOnly;
+        return mSettingsBundle.getBoolean(NonRepudiationCertsOnlyKey, false);
     }
 
     public boolean isLaunchUrlEnabled()
     {
-        return mLaunchUrlEnabled;
+        return mSettingsBundle.getBoolean(LaunchUrlEnabledKey, true);
     }
 
     public boolean isSaveEnabled()
     {
-        return mSaveEnabled;
+        return mSettingsBundle.getBoolean(SaveEnabledKey, true);
     }
 
     public boolean isCustomSaveEnabled()
     {
-        return mCustomSaveEnabled;
+        return mSettingsBundle.getBoolean(CustomSaveEnabledKey, false);
     }
 
     public boolean usePersistentFileState()
     {
-        return mUsePersistentFileState;
+        return mSettingsBundle.getBoolean(UsePersistentFileStateKey, true);
     }
 
     public boolean allowAutoOpen()
     {
-        return mAllowAutoOpen;
+        return mSettingsBundle.getBoolean(AllowAutoOpenKey, true);
     }
 
     public boolean isDocAuthEntryEnabled()
     {
-        return mDocAuthEntryEnabled;
+        return mSettingsBundle.getBoolean(DocAuthEntryEnabledKey, true);
     }
 
     public boolean isAppAuthEnabled()
     {
-        return mAppAuthEnabled;
+        return mSettingsBundle.getBoolean(AppAuthEnabledKey, false);
     }
 
     public int getAppAuthTimeout()
     {
-        return mAppAuthTimeout;
+        return mSettingsBundle.getInt(AppAuthTimeoutKey, 30);
     }
 
     public boolean isTrackChangesFeatureEnabled()
     {
-        return mTrackChangesFeatureEnabled;
+        return mSettingsBundle.getBoolean(TrackChangesFeatureEnabledKey,
+                                          false);
     }
 
     public boolean isFormFillingEnabled()
     {
-        return mFormFillingEnabled;
+        return mSettingsBundle.getBoolean(FormFillingEnabledKey, false);
     }
 
     public boolean isFormSigningFeatureEnabled()
     {
-        return mFormSigningFeatureEnabled;
+        return mSettingsBundle.getBoolean(FormSigningFeatureEnabledKey, false);
     }
 
     public boolean isRedactionsEnabled()
     {
-        return mRedactionsEnabled;
+        return mSettingsBundle.getBoolean(RedactionsEnabledKey, false);
     }
 
     public boolean isFullscreenEnabled()
     {
-        return mFullscreenEnabled;
+        return mSettingsBundle.getBoolean(FullscreenEnabledKey, false);
     }
 
     public boolean isAnimationFeatureEnabled()
     {
-        return mAnimationFeatureEnabled;
+        return mSettingsBundle.getBoolean(AnimationFeatureEnabledKey, false);
     }
 
     public boolean isDocExpired()
@@ -360,199 +308,277 @@ public class ConfigOptions implements Cloneable, Parcelable
         return true;
     }
 
-    public int getDefaultPdfInkAnnotationDefaultLineColor() { return mDefaultInkAnnotationLineColor; }
+    public int getDefaultPdfInkAnnotationDefaultLineColor()
+    {
+        return mSettingsBundle.getInt(DefaultInkAnnotationLineColorKey, 0);
+    }
 
-    public float getDefaultPdfInkAnnotationDefaultLineThickness() { return mDefaultInkAnnotationLineThickness; }
+    public float getDefaultPdfInkAnnotationDefaultLineThickness()
+    {
+        return mSettingsBundle.getFloat(DefaultInkAnnotationLineThicknessKey,
+                                        0.0f);
+    }
 
     public boolean isInvertContentInDarkModeEnabled()
     {
-        return mInvertContentInDarkMode;
+        return mSettingsBundle.getBoolean(InvertContentInDarkModeKey, false);
     }
 
-    public boolean isPDFAnnotationEnabled() {return mPDFAnnotationEnabled;}
+    public boolean isPDFAnnotationEnabled()
+    {
+        return mSettingsBundle.getBoolean(PDFAnnotationEnabledKey, true);
+    }
 
+    // Setters
     public void setShowUI(boolean showUI)
     {
-        mShowUI = showUI;
+        mSettingsBundle.putBoolean(ShowUIKey, showUI);
 
-        Log.i(mDebugTag, "mShowUI set to " +
-                         String.valueOf(mShowUI));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "ShowUI set to " + String.valueOf(showUI));
+        }
     }
 
     public void setEditingEnabled(boolean isEnabled)
     {
-        mEditingEnabled = isEnabled;
+        mSettingsBundle.putBoolean(EditingEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mEditingEnabled set to " +
-                         String.valueOf(mEditingEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "EditingEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setSaveAsEnabled(boolean isEnabled)
     {
-        mSaveAsEnabled = isEnabled;
+        mSettingsBundle.putBoolean(SaveAsEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mSaveAsEnabled set to " +
-                         String.valueOf(mSaveAsEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "SaveAsEnabled set to " +
+                              String.valueOf(isEnabled));
+        }
     }
 
     public void setSaveAsPdfEnabled(boolean isEnabled)
     {
-        mSaveAsPdfEnabled = isEnabled;
+        mSettingsBundle.putBoolean(SaveAsPdfEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mSaveAsPdfEnabled set to " +
-                         String.valueOf(mSaveAsPdfEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "SaveAsPdfEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setOpenInEnabled(boolean isEnabled)
     {
-        mOpenInEnabled = isEnabled;
+        mSettingsBundle.putBoolean(OpenInEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mOpenInEnabled set to " +
-                         String.valueOf(mOpenInEnabled));
-
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "OpenInEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
+
     public void setOpenPdfInEnabled(boolean isEnabled)
     {
-        mOpenPdfInEnabled = isEnabled;
+        mSettingsBundle.putBoolean(OpenPdfInEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "OpenPdfInEnabled set to " +
-                         String.valueOf(mOpenPdfInEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "OpenPdfInEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setShareEnabled(boolean isEnabled)
     {
-        mShareEnabled = isEnabled;
+        mSettingsBundle.putBoolean(ShareEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mShareEnabled set to " +
-                         String.valueOf(mShareEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "ShareEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setExtClipboardInEnabled(boolean isEnabled)
     {
-        mExtClipboardInEnabled = isEnabled;
+        mSettingsBundle.putBoolean(ExtClipboardInEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mExtClipboardInEnabled set to " +
-                         String.valueOf(mExtClipboardInEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "ExtClipboardInEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setExtClipboardOutEnabled(boolean isEnabled)
     {
-        mExtClipboardOutEnabled = isEnabled;
+        mSettingsBundle.putBoolean(ExtClipboardOutEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mExtClipboardOutEnabled set to " +
-                         String.valueOf(mExtClipboardOutEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "ExtClipboardOutEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setImageInsertEnabled(boolean isEnabled)
     {
-        mImageInsertEnabled = isEnabled;
+        mSettingsBundle.putBoolean(ImageInsertEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mImageInsertEnabled set to " +
-                         String.valueOf(mImageInsertEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "ImageInsertEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setPhotoInsertEnabled(boolean isEnabled)
     {
-        mPhotoInsertEnabled = isEnabled;
+        mSettingsBundle.putBoolean(PhotoInsertEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mPhotoInsertEnabled set to " +
-                         String.valueOf(mPhotoInsertEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "PhotoInsertEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setPrintingEnabled(boolean isEnabled)
     {
-        mPrintingEnabled = isEnabled;
+        mSettingsBundle.putBoolean(PrintingEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mPrintingEnabled set to " +
-                         String.valueOf(mPrintingEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "PrintingEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setSecurePrintingEnabled(boolean isEnabled)
     {
-        mSecurePrintingEnabled = isEnabled;
+        mSettingsBundle.putBoolean(SecurePrintingEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mSecurePrintingEnabled set to " +
-                         String.valueOf(mSecurePrintingEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "SecurePrintingEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setNonRepudiationCertOnlyFilterEnabled(boolean isEnabled)
     {
-        mNonRepudiationCertsOnly = isEnabled;
+        mSettingsBundle.putBoolean(NonRepudiationCertsOnlyKey, isEnabled);
 
-        Log.i(mDebugTag, "mNonRepudiationCertsOnly set to " +
-                         String.valueOf(mNonRepudiationCertsOnly));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "NonRepudiationCertsOnly set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setLaunchUrlEnabled(boolean isEnabled)
     {
-        mLaunchUrlEnabled = isEnabled;
+        mSettingsBundle.putBoolean(LaunchUrlEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mLaunchUrlEnabled set to " +
-                         String.valueOf(mLaunchUrlEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "LaunchUrlEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setSaveEnabled(boolean isEnabled)
     {
-        mSaveEnabled = isEnabled;
+        mSettingsBundle.putBoolean(SaveEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mSaveEnabled set to " +
-                         String.valueOf(mSaveEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "SaveEnabled set to " + String.valueOf(isEnabled));
+        }
     }
 
     public void setCustomSaveEnabled(boolean isEnabled)
     {
-        mCustomSaveEnabled = isEnabled;
+        mSettingsBundle.putBoolean(CustomSaveEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mCustomSaveEnabled set to " +
-                         String.valueOf(mCustomSaveEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "CustomSaveEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setUsePersistentFileState(boolean isEnabled)
     {
-        mUsePersistentFileState = isEnabled;
+        mSettingsBundle.putBoolean(UsePersistentFileStateKey, isEnabled);
 
-        Log.i(mDebugTag, "mUsePersistentFileState set to " +
-                         String.valueOf(mUsePersistentFileState));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "UsePersistentFileState set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setAllowAutoOpen(boolean isEnabled)
     {
-        mAllowAutoOpen = isEnabled;
+        mSettingsBundle.putBoolean(AllowAutoOpenKey, isEnabled);
 
-        Log.i(mDebugTag, "mAllowAutoOpen set to " +
-                         String.valueOf(mAllowAutoOpen));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "AllowAutoOpen set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setDocAuthEntryEnabled(boolean isEnabled)
     {
-        mDocAuthEntryEnabled = isEnabled;
+        mSettingsBundle.putBoolean(DocAuthEntryEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mDocAuthEntryEnabled set to " +
-                         String.valueOf(mDocAuthEntryEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "DocAuthEntryEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setAppAuthEnabled(boolean isEnabled)
     {
-        mAppAuthEnabled = isEnabled;
+        mSettingsBundle.putBoolean(AppAuthEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mAppAuthEnabled set to " +
-                         String.valueOf(mAppAuthEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "AppAuthEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setAppAuthTimeout(int timeout)
     {
-        mAppAuthTimeout = timeout;
+        mSettingsBundle.putInt(AppAuthTimeoutKey, timeout);
 
-        Log.i(mDebugTag, "mAppAuthTimeout set to " +
-                         String.valueOf(mAppAuthTimeout));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "AppAuthTimeout set to " +
+                             String.valueOf(timeout));
+        }
     }
 
     public void setTrackChangesFeatureEnabled(boolean isEnabled)
     {
-        mTrackChangesFeatureEnabled = isEnabled;
+        mSettingsBundle.putBoolean(TrackChangesFeatureEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mTrackChangesFeatureEnabled set to " +
-                         String.valueOf(mTrackChangesFeatureEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "TrackChangesFeatureEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setFeatureTracker(FeatureTracker featureTracker) {
@@ -561,73 +587,111 @@ public class ConfigOptions implements Cloneable, Parcelable
 
     public void setFormFillingEnabled(boolean isEnabled)
     {
-        mFormFillingEnabled = isEnabled;
+        mSettingsBundle.putBoolean(FormFillingEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mFormFillingEnabled set to " +
-                String.valueOf(mFormFillingEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "FormFillingEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setFormSigningFeatureEnabled(boolean isEnabled)
     {
-        mFormSigningFeatureEnabled = isEnabled;
+        mSettingsBundle.putBoolean(FormSigningFeatureEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mFormSigningFeatureEnabled set to " +
-                String.valueOf(mFormSigningFeatureEnabled));
-	}
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "FormSigningFeatureEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
+    }
 
     public void setRedactionsEnabled(boolean isEnabled)
     {
-        mRedactionsEnabled = isEnabled;
+        mSettingsBundle.putBoolean(RedactionsEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mRedactionsEnabled set to " +
-                String.valueOf(mRedactionsEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "RedactionsEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setFullscreenEnabled(boolean isEnabled)
     {
-        mFullscreenEnabled = isEnabled;
+        mSettingsBundle.putBoolean(FullscreenEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mFullscreenEnabled set to " +
-                String.valueOf(mFullscreenEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "FullscreenEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setAnimationFeatureEnabled(boolean isEnabled)
     {
-        mAnimationFeatureEnabled = isEnabled;
+        mSettingsBundle.putBoolean(AnimationFeatureEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mAnimationFeatureEnabled set to " +
-                         String.valueOf(mAnimationFeatureEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "AnimationFeatureEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
     public void setDefaultPdfInkAnnotationDefaultLineColor(int color)
     {
-        mDefaultInkAnnotationLineColor = color;
+        mSettingsBundle.putInt(DefaultInkAnnotationLineColorKey, color);
 
-        Log.i(mDebugTag, "mDefaultInkAnnotationLineColor set to " +
-                String.valueOf(mDefaultInkAnnotationLineColor));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "DefaultInkAnnotationLineColor set to " +
+                             String.valueOf(color));
+        }
     }
 
     public void setDefaultPdfInkAnnotationDefaultLineThickness(float thickness)
     {
-        mDefaultInkAnnotationLineThickness = thickness;
+        mSettingsBundle.putFloat(DefaultInkAnnotationLineThicknessKey,
+                                 thickness);
 
-        Log.i(mDebugTag, "mDefaultInkAnnotationLineThickness set to " +
-                String.valueOf(mDefaultInkAnnotationLineThickness));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "DefaultInkAnnotationLineThickness set to " +
+                             String.valueOf(thickness));
+        }
     }
 
     public void setInvertContentInDarkModeEnabled(boolean isEnabled)
     {
-        mInvertContentInDarkMode = isEnabled;
+        mSettingsBundle.putBoolean(InvertContentInDarkModeKey, isEnabled);
 
-        Log.i(mDebugTag, "mInvertContentInDarkMode set to " +
-                String.valueOf(mInvertContentInDarkMode));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "InvertContentInDarkMode set to " +
+                             String.valueOf(isEnabled));
+        }
     }
 
-    public void setPDFAnnotationEnabled(boolean enable)
+    public void setPDFAnnotationEnabled(boolean isEnabled)
     {
-        mPDFAnnotationEnabled = enable;
+        mSettingsBundle.putBoolean(PDFAnnotationEnabledKey, isEnabled);
 
-        Log.i(mDebugTag, "mPDFAnnotationEnabled set to " +
-                String.valueOf(mPDFAnnotationEnabled));
+        if (mDebugLog)
+        {
+            Log.i(mDebugTag, "PDFAnnotationEnabled set to " +
+                             String.valueOf(isEnabled));
+        }
+    }
+
+    // For debugging purposed only.
+    public void dumpOptionsBundle()
+    {
+        if (mDebugLog)
+        {
+            Log.d(mDebugTag, "Dumping Option Bundle");
+            Log.d(mDebugTag, mSettingsBundle.toString());
+        }
     }
 }

@@ -1070,6 +1070,7 @@ public class NUIDocView
                         {
                             //  loading was cancelled
                             endProgress();
+                            disableUI();
                         }
 
                         @Override
@@ -4398,21 +4399,36 @@ public class NUIDocView
         mIsActivityActive = false;
 
         resetInputView();
+
+        //  restore the view to its original size,
+        //  since the keyboard gets hidden when pausing.
+        onShowKeyboardPreventPush(false);
     }
+
+    //  this is set to true while pausing is underway.
+    private boolean pausing = false;
 
     public void onPause(final Runnable whenDone)
     {
+        //  don't do this again.
+        if (pausing)
+            return;
+        //  we're pausing now.
+        pausing = true;
+
         onPauseCommon();
 
         //  not if we've been finished
         if (mDocView!=null && mDocView.finished()) {
             whenDone.run();
+            pausing = false;  //  done pausing
             return;
         }
 
         //  not if we've not been opened
         if (mFileState == null || mDocView == null || mDocView.getDoc()==null) {
             whenDone.run();
+            pausing = false;  //  done pausing
             return;
         }
 
@@ -4424,12 +4440,14 @@ public class NUIDocView
                 @Override
                 public void run() {
                     whenDone.run();
+                    pausing = false;  //  done pausing
                 }
             });
         }
         else
         {
             whenDone.run();
+            pausing = false;  //  done pausing
         }
     }
 
@@ -5800,7 +5818,7 @@ public class NUIDocView
              * The temporary file will be saved using the SecureFS API's for
              * secure builds.
              */
-            new PrintHelperPdf().print(getContext(), getDoc());
+            //new PrintHelperPdf().print(getContext(), getDoc());
         }
         else
         {

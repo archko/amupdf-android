@@ -113,6 +113,9 @@ public class SODocSession {
     private Runnable mPasswordHandler = null;
     public void setPasswordHandler(Runnable r) {mPasswordHandler=r;}
 
+    private boolean mIsPasswordProtected = false;
+    public boolean isPasswordProtected() { return mIsPasswordProtected; }
+
     public void open(String path, ConfigOptions cfg)
     {
         mUserPath = path;
@@ -162,6 +165,8 @@ public class SODocSession {
             {
                 if (error == ArDkLib.SmartOfficeDocErrorType_PasswordRequest)
                 {
+                    mIsPasswordProtected = true;
+
                     //  if an optional password runnable has been specified, use it
                     //  instead of handling it below.
                     if (mPasswordHandler!=null)

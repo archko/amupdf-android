@@ -47,8 +47,6 @@ public class DocMuPdfPageView extends DocPdfPageView
 
     //  if a text field is being edited, this will be non-null
     private PDFFormEditor mFormEditor = null;
-    //  the page view that holds the text field being edited
-    public static DocMuPdfPageView mFormEditorPage = null;
 
     //  keep track of the currently-being-edited widget.
     private MuPDFWidget mEditingWidget = null;
@@ -156,7 +154,7 @@ public class DocMuPdfPageView extends DocPdfPageView
                 {
                     for (int i = 0; i< mFormFields.length; i++)
                     {
-                        if (!mFormFields[i].equals(mEditingWidget))
+                        if (mEditingWidget==null || !mFormFields[i].equals(mEditingWidget))
                         {
                             Rect wr = mFormFieldBounds[i];
                             mHighlightingRect.set(wr);
@@ -207,6 +205,34 @@ public class DocMuPdfPageView extends DocPdfPageView
         }
 
         doc.update(getPageNumber());
+
+        //  if there are saved values for a previous form editor,
+        //  and they are for this page, apply them now.
+
+        if (getPageNumber() == ((DocPdfView)getDocView()).mPausedPageIndex)
+        {
+            final int pageIndex = ((DocPdfView)getDocView()).mPausedPageIndex;
+            final int editorIndex = ((DocPdfView)getDocView()).mPausedEditorIndex;
+            final String editorValue = ((DocPdfView)getDocView()).mPausedEditorValue;
+
+            ((DocPdfView)getDocView()).mPausedEditorIndex = -1;
+            ((DocPdfView)getDocView()).mPausedPageIndex = -1;
+            ((DocPdfView)getDocView()).mPausedEditorValue = null;
+
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    if (getPageNumber() == pageIndex)
+                    {
+                        MuPDFWidget widget = mFormFields[editorIndex];
+                        editWidgetAsText(widget);
+                        mEditingWidget = widget;
+                        mEditingWidgetIndex = editorIndex;
+                        mFormEditor.setNewValue(editorValue);
+                    }
+                }
+            });
+        }
     }
 
     public void collectFormFields()
@@ -218,17 +244,33 @@ public class DocMuPdfPageView extends DocPdfPageView
 
         //  collect up the form fields and their bounds.
         mFormFields = page.findFormFields();
+
+        //  set the initial number of form fields for this page
+        if (numInitialFormFields==-1) {
+            if (mFormFields!=null)
+                numInitialFormFields = mFormFields.length;
+            else
+                numInitialFormFields = 0;
+        }
+
         if (mFormFields !=null && mFormFields.length>0)
         {
             mFormFieldBounds = new Rect[mFormFields.length];
             int i=0;
             for (MuPDFWidget mw : mFormFields)
             {
+                //  track which form fields were created in this session
+                if (numInitialFormFields!=-1 && i>numInitialFormFields-1)
+                    mFormFields[i].setCreatedInThisSession(true);
+
                 mFormFieldBounds[i] = mw.getBounds();
                 i++;
             }
         }
     }
+
+    //  this value represents how many form fields we saw when the session began.
+    private int numInitialFormFields = -1;
 
     public MuPDFWidget getNewestWidget()
     {
@@ -248,8 +290,11 @@ public class DocMuPdfPageView extends DocPdfPageView
         mEditingWidgetIndex = -1;
         if (mFormFields !=null && mFormFields.length>0)
         {
-            for (int i=0; i<mFormFields.length ;i++)
+            for (int j=0; j<mFormFields.length ;j++)
             {
+                //  go from front to back.
+                int i = mFormFields.length - j - 1;
+
                 MuPDFWidget mw = mFormFields[i];
                 if (mFormFieldBounds[i].contains(x, y))
                 {
@@ -267,19 +312,41 @@ public class DocMuPdfPageView extends DocPdfPageView
 
     protected boolean stopPreviousEditor()
     {
+        //  normal stop (not a cancel)
+        return stopPreviousEditor(false);
+    }
+
+    protected boolean stopPreviousEditor(boolean cancel)
+    {
         //  mFormEditor might be on another page view.
         //  so we reference it through that page view.
+        DocMuPdfPageView mFormEditorPage = null;
+        DocPdfView       dv = (DocPdfView)getDocView();
+
+        if (dv != null)
+        {
+            mFormEditorPage = dv.mFormEditorPage;
+        }
 
         if (mFormEditorPage !=null && mFormEditorPage.mFormEditor != null)
         {
-            boolean stopped = mFormEditorPage.mFormEditor.stop();
+            //  stop or cancel
+            boolean stopped;
+            if (cancel)
+                stopped = mFormEditorPage.mFormEditor.cancel();
+            else
+                stopped = mFormEditorPage.mFormEditor.stop();
             if (stopped)
             {
                 mFormEditorPage.mFormEditor = null;
-                mFormEditorPage.mEditingWidgetIndex = -1;
-                mFormEditorPage.mEditingWidget = null;
                 mFormEditorPage.invalidate();
-                mFormEditorPage = null;
+
+                if (mFormEditorPage != this) {
+                    //  if we've switched to a new page,
+                    //  reset these values on the page we're leaving.
+                    mFormEditorPage.mEditingWidgetIndex = -1;
+                    mFormEditorPage.mEditingWidget = null;
+                }
             }
             return stopped;
         }
@@ -304,6 +371,19 @@ public class DocMuPdfPageView extends DocPdfPageView
 
     @Override
     public boolean onSingleTap(int x, int y, boolean canEditText, ExternalLinkListener listener)
+    {
+        boolean result = onSingleTapInternal(x, y, canEditText, listener);
+
+        //  if at this point, if there's no active form field editor,
+        //  then it's safe to remove the keyboard.
+        //  this is a preferable fix for #703126
+        if (mEditingWidget==null)
+            Utilities.hideKeyboard(getContext());
+
+        return result;
+    }
+
+    private boolean onSingleTapInternal(int x, int y, boolean canEditText, ExternalLinkListener listener)
     {
         ConfigOptions docCfgOpts = getDocView().getDocConfigOptions();
 
@@ -365,6 +445,18 @@ public class DocMuPdfPageView extends DocPdfPageView
             else {
                 Utilities.hideKeyboard(getContext());
             }
+        }
+
+        //  prevent signatures from being edited if signing is not enabled.
+        MuPDFWidget widget = findTappedWidget(pPage.x, pPage.y);
+        if (widget!=null && widget.getKind()==MuPDFWidget.TYPE_SIGNATURE)
+        {
+            if (docCfgOpts.isFormSigningFeatureEnabled()) {
+                editWidget(widget, true, pPage);
+                return true;
+            }
+            else
+                return false;
         }
 
         //  Notify ignored interaction if user tapped on a widget
@@ -546,50 +638,97 @@ public class DocMuPdfPageView extends DocPdfPageView
 
                 //  the widget's not yet been signed, so
 
-                final DocPdfPageView pageView = this;
+                if (widget.getCreatedInThisSession())
+                {
+                    //  created this session, so show the full signature dialog
 
-                ContextThemeWrapper ctw = new ContextThemeWrapper(getContext(), R.style.sodk_editor_alert_dialog_style);
-                final AlertDialog alert = new AlertDialog.Builder(ctw).create();
-                LayoutInflater inflater = LayoutInflater.from(getContext());
-                View view = inflater.inflate(R.layout.sodk_editor_signature_dialog, null);
-                alert.setView(view);
+                    final DocPdfPageView pageView = this;
 
-                view.findViewById(R.id.sign_button).setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        alert.dismiss();
-                        doSign(widget);
-                    }
-                });
+                    ContextThemeWrapper ctw = new ContextThemeWrapper(getContext(), R.style.sodk_editor_alert_dialog_style);
+                    final AlertDialog alert = new AlertDialog.Builder(ctw).create();
+                    LayoutInflater inflater = LayoutInflater.from(getContext());
+                    View view = inflater.inflate(R.layout.sodk_editor_signature_dialog, null);
+                    alert.setView(view);
 
-                view.findViewById(R.id.reposition_button).setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        alert.dismiss();
-                        DocPdfView dpv = (DocPdfView)getDocView();
-                        dpv.doReposition(pageView, widget);
-                    }
-                });
+                    view.findViewById(R.id.sign_button).setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alert.dismiss();
 
-                view.findViewById(R.id.delete_button).setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        alert.dismiss();
-                        DocPdfView dpv = (DocPdfView)getDocView();
-                        dpv.setDeletingPage((DocPdfPageView)DocMuPdfPageView.this);
-                        MuPDFDoc doc = (MuPDFDoc) getDoc();
-                        doc.deleteWidget(getPageNumber(), widget);
-                    }
-                });
+                            /*
+                             * Execute signing via the document
+                             * worker thread to ensure data integrity.
+                             */
+                            Worker worker = ((MuPDFDoc)getDoc()).getWorker();
+                            worker.add(new Worker.Task() {
+                                public void work() {
+                                    doSign(widget);
+                                }
+                                public void run() {
+                                }
+                            });
+                        }
+                    });
 
-                view.findViewById(R.id.cancel_button).setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        alert.dismiss();
-                    }
-                });
+                    view.findViewById(R.id.reposition_button).setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alert.dismiss();
+                            DocPdfView dpv = (DocPdfView)getDocView();
+                            dpv.doReposition(pageView, widget);
+                        }
+                    });
 
-                alert.show();
+                    view.findViewById(R.id.delete_button).setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alert.dismiss();
+                            DocPdfView dpv = (DocPdfView)getDocView();
+                            dpv.setDeletingPage((DocPdfPageView)DocMuPdfPageView.this);
+                            MuPDFDoc doc = (MuPDFDoc) getDoc();
+                            doc.deleteWidget(getPageNumber(), widget);
+                        }
+                    });
+
+                    view.findViewById(R.id.cancel_button).setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alert.dismiss();
+                        }
+                    });
+
+                    alert.show();
+                }
+                else
+                {
+                    //  NOT created this session, so show the short signature dialog
+
+                    /*final DocPdfPageView pageView = this;
+
+                    ContextThemeWrapper ctw = new ContextThemeWrapper(getContext(), R.style.sodk_editor_alert_dialog_style);
+                    final AlertDialog alert = new AlertDialog.Builder(ctw).create();
+                    LayoutInflater inflater = LayoutInflater.from(getContext());
+                    View view = inflater.inflate(R.layout.sodk_editor_signature_dialog_short, null);
+                    alert.setView(view);
+
+                    view.findViewById(R.id.sign_button).setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alert.dismiss();
+                            doSign(widget);
+                        }
+                    });
+
+                    view.findViewById(R.id.cancel_button).setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alert.dismiss();
+                        }
+                    });
+
+                    alert.show();*/
+
+                }
 
             } else {
                 // create a verifier
@@ -717,7 +856,7 @@ public class DocMuPdfPageView extends DocPdfPageView
             }
         });
 
-        mFormEditorPage = this;
+        ((DocPdfView)getDocView()).mFormEditorPage = this;
         mFormEditor = ((Activity)getContext()).findViewById(R.id.pdf_form_checkbox_editor_layout);
         mFormEditor.start(this, getPageNumber(), ((MuPDFDoc)getDoc()),
                 docView, widget, mFormFieldBounds[mEditingWidgetIndex],
@@ -754,7 +893,7 @@ public class DocMuPdfPageView extends DocPdfPageView
             }
         });
 
-        mFormEditorPage = this;
+        ((DocPdfView)getDocView()).mFormEditorPage = this;
         mFormEditor = ((Activity)getContext()).findViewById(R.id.pdf_form_text_editor_layout);
         mFormEditor.start(this, getPageNumber(), ((MuPDFDoc)getDoc()),
                 docView, widget, mFormFieldBounds[mEditingWidgetIndex],
@@ -775,16 +914,19 @@ public class DocMuPdfPageView extends DocPdfPageView
     @Override
     public boolean dispatchTouchEvent(MotionEvent event)
     {
-        //  see if the active editor wants to handle this event
-        if (mFormEditor !=null) {
-            if (mFormEditor.dispatchTouchEvent(event)) {
-                return true;
+        if (getDocView() instanceof DocPdfView)
+        {
+            //  see if the active editor wants to handle this event
+            if (mFormEditor != null) {
+                if (mFormEditor.dispatchTouchEvent(event)) {
+                    return true;
+                }
             }
-        }
 
-        stopPreviousEditor();
-        mEditingWidget = null;
-        mEditingWidgetIndex = -1;
+            stopPreviousEditor();
+            mEditingWidget = null;
+            mEditingWidgetIndex = -1;
+        }
 
         return super.dispatchTouchEvent(event);
     }
@@ -826,5 +968,26 @@ public class DocMuPdfPageView extends DocPdfPageView
 
         //  assume that the new one is last in the list
         return count;
+    }
+
+    @Override
+    protected void onPause()
+    {
+        if (mEditingWidgetIndex>=0 && mFormEditor!=null && mFormEditor instanceof PDFFormTextEditor)
+        {
+            //  save values for the current form editor.
+            //  we save them to our DocView, which should still be valid
+            //  upon resume.
+            ((DocPdfView)getDocView()).mPausedEditorIndex = mEditingWidgetIndex;
+            ((DocPdfView)getDocView()).mPausedPageIndex = getPageNumber();
+            ((DocPdfView)getDocView()).mPausedEditorValue = mFormEditor.getValue();
+
+            //  leave the form field blank while we're paused.
+            //  it will get filled again upon resume.
+            mFormEditor.setNewValue("");
+        }
+
+        //  cancel any form editing
+        stopPreviousEditor(true);
     }
 }

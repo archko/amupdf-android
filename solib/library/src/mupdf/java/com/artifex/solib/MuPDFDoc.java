@@ -60,6 +60,13 @@ public class MuPDFDoc extends ArDkDoc
         }
     };
 
+    public PDFDocument.JsEventListener jsNullEventListener = new PDFDocument.JsEventListener() {
+        @Override
+        public void onAlert(String message)
+        {
+        }
+    };
+
     MuPDFDoc(Looper looper, SODocLoadListener listener, Context context, ConfigOptions cfg)
     {
         mListener = listener;
@@ -338,7 +345,8 @@ public class MuPDFDoc extends ArDkDoc
                     return (numBytes == 0) ? -1 : numBytes;
                 }
 
-                public void write(byte[] b, int off, int len) throws IOException {
+                public void write(byte[] b, int off, int len) throws IOException
+                {
                     if (off == 0 && len == b.length)
                         secureFS.writeToFile(handle, b);
                     else
@@ -346,14 +354,17 @@ public class MuPDFDoc extends ArDkDoc
                 }
 
                 public void truncate() throws IOException {
+
                 }
 
-                public long seek(long offset, int whence) throws IOException {
+                public long seek(long offset, int whence) throws IOException
+                {
                     long current = secureFS.getFileOffset(handle);
                     long length = secureFS.getFileLength(handle);
                     long pos = 0;
 
-                    switch (whence) {
+                    switch (whence)
+                    {
                         case SEEK_SET:
                             pos = offset;
                             break;
@@ -448,14 +459,8 @@ public class MuPDFDoc extends ArDkDoc
         {
             public void work()
             {
-                if (mDocument != null)
-                {
-                    PDFDocument pdfDoc = MuPDFDoc.getPDFDocument(mDocument);
-                    if (pdfDoc!=null) {
-                        //  disable javascript
-                        pdfDoc.setJsEventListener(null);
-                        pdfDoc.disableJs();
-                    }
+                if (mDocument != null) {
+                    disableJavascript(mDocument);
                 }
             }
 
@@ -563,7 +568,7 @@ public class MuPDFDoc extends ArDkDoc
         {
             MuPDFPage page = mPages.get(selectedAnnotPagenum);
             PDFAnnotation annot = page.getAnnotation(selectedAnnotIndex);
-            if (null != annot && annot.getType() == PDFAnnotation.TYPE_REDACT)
+            if (annot.getType()==PDFAnnotation.TYPE_REDACT)
                 return true;
         }
 
@@ -1126,15 +1131,8 @@ public class MuPDFDoc extends ArDkDoc
         mPageCount = mDocument.countPages();
 
         //  enable javascript
-        if (mDocCfgOpts.isFormFillingEnabled())
-        {
-            PDFDocument pdfDoc = MuPDFDoc.getPDFDocument(mDocument);
-            if (pdfDoc!=null) {
-
-                //  enable javascript and establish a listener
-                pdfDoc.enableJs();
-                pdfDoc.setJsEventListener(jsEventListener);
-            }
+        if (mDocCfgOpts.isFormFillingEnabled()) {
+            enableJavascript(mDocument);
         }
     }
 
@@ -1260,6 +1258,9 @@ public class MuPDFDoc extends ArDkDoc
 
             public void work()
             {
+                //  disable Javascript for the old doc
+                disableJavascript(mDocument);
+
                 //  this part takes place on the background thread
                 //  here we load the file and make a new page list.
                 //  we'll make them active on the foreground thread
@@ -1285,6 +1286,11 @@ public class MuPDFDoc extends ArDkDoc
                         mpage = new MuPDFPage(thisMupdfDoc, page, i);
                     }
                     newPages.add(mpage);
+                }
+
+                //  re-enable javascript for the new doc
+                if (mDocCfgOpts.isFormFillingEnabled()) {
+                    enableJavascript(newDoc);
                 }
             }
 
@@ -1317,6 +1323,24 @@ public class MuPDFDoc extends ArDkDoc
                 listener.onReload();
             }
         });
+    }
+
+    protected void enableJavascript(Document doc)
+    {
+        PDFDocument pdfDoc = MuPDFDoc.getPDFDocument(doc);
+        if (pdfDoc != null) {
+            pdfDoc.enableJs();
+            pdfDoc.setJsEventListener(jsEventListener);
+        }
+    }
+
+    protected void disableJavascript(Document doc)
+    {
+        PDFDocument pdfDoc = MuPDFDoc.getPDFDocument(doc);
+        if (pdfDoc != null) {
+            pdfDoc.setJsEventListener(jsNullEventListener);
+            pdfDoc.disableJs();
+        }
     }
 
     public static Document openFile(String path)

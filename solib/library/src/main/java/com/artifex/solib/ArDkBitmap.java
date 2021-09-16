@@ -36,6 +36,22 @@ public class ArDkBitmap implements Comparable<ArDkBitmap>
         this.rect   = new Rect(0, 0, w, h);
     }
 
+    public static Type defaultType()
+    {
+        if (BuildConfig.SCREENS_ARE.equals("R8G8B8X8"))
+            return Type.RGBA8888;
+        else
+            return Type.RGB565;
+    }
+
+    public static Bitmap.Config defaultConfig()
+    {
+        if (BuildConfig.SCREENS_ARE.equals("R8G8B8X8"))
+            return Bitmap.Config.ARGB_8888;
+        else
+            return Bitmap.Config.RGB_565;
+    }
+
     public ArDkBitmap(Bitmap bitmap)
     {
         //  create an ArDkBitmap from an Android Bitmap

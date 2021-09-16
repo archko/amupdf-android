@@ -29,6 +29,9 @@ public class PDFFormEditor extends RelativeLayout
     private ViewTreeObserver mDocViewTreeObserver;
     private ViewTreeObserver.OnGlobalLayoutListener mLayoutListener;
 
+    //  the value found in mEditText when we started
+    protected String mOriginalValue;
+
     public void onRenderComplete()
     {
         matchWidgetSizeAndPosition();
@@ -129,6 +132,15 @@ public class PDFFormEditor extends RelativeLayout
     {
     }
 
+    protected void setNewValue(String val)
+    {
+    }
+
+    protected String getValue()
+    {
+        return mEditText.getText().toString();
+    }
+
     private void matchWidgetSizeAndPosition()
     {
         //  this function changes our size and position to match that of the
@@ -155,6 +167,11 @@ public class PDFFormEditor extends RelativeLayout
         mEditText.setLayoutParams(lparams);
 
         invalidate();
+    }
+
+    public boolean cancel()
+    {
+        return true;
     }
 
     public boolean stop()

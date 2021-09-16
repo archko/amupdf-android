@@ -272,7 +272,7 @@ public class DataLeakHandlers implements SODataLeakHandlers
              * The temporary file will be saved using the SecureFS API's for
              * secure builds.
              */
-            new PrintHelperPdf().print(mActivity, doc);
+            //new PrintHelperPdf().print(mActivity, doc);
         }
         else
         {

@@ -256,6 +256,10 @@ public class NUIDocViewPdf extends NUIDocView
             mSignatureButton.setSelected(signatureMode);
             findViewById(R.id.signature_holder).setSelected(signatureMode);
 
+            //  don't show signature creation if signing is disabled.
+            if (!mDocCfgOptions.isFormSigningFeatureEnabled())
+                findViewById(R.id.signature_holder).setVisibility(View.GONE);
+
             boolean drawMode = docView.getDrawMode();
 
             //  always show the delete button in drawing mode (like iOS)

@@ -63,6 +63,17 @@ public class DocPdfView extends DocView
     private Point mResizingMovingPointAtStart;  //  where the moving point was at the start of resizing
     private boolean dragging = false;           //  true if we're dragging a handle
 
+    //  the page view that holds the widget being edited
+    //  put here instead fo using a static value in the page view class.
+    //  a fix for the crash in https://bugs.ghostscript.com/show_bug.cgi?id=703097
+    public DocMuPdfPageView mFormEditorPage = null;
+
+    //  if a form field is being edited, these values are stored here at Pause,
+    //  and restored when the file is reloaded.
+    public int mPausedEditorIndex=-1;
+    public int mPausedPageIndex=-1;
+    public String mPausedEditorValue=null;
+
     //  page on which we just created a signature.
     //  this is set when the signature is created,
     //  and used in onSelectionChanged()
@@ -152,13 +163,7 @@ public class DocPdfView extends DocView
             if (sigEditingWidget !=null)
             {
                 //  match the resizing rect to the widget being edited
-                Rect bounds = sigEditingWidget.getBounds();
-                mResizingRect = new Rect(mSelectionStartPage.pageToView((int) bounds.left),
-                        mSelectionStartPage.pageToView((int) bounds.top),
-                        mSelectionStartPage.pageToView((int) bounds.right),
-                        mSelectionStartPage.pageToView((int) bounds.bottom));
-                mResizingRect.offset(mSelectionStartPage.getLeft(), mSelectionStartPage.getTop());
-                mResizingRect.offset(-getScrollX(), -getScrollY());
+                matchResizeRectToSig();
             }
             else {
                 //  initial value for the resizing rect should match the selected object
@@ -330,14 +335,12 @@ public class DocPdfView extends DocView
         sigEditingWidget = widget;
         sigEditingPage = pageView;
 
-        //  find the widget's rect
-        Rect pageRect = sigEditingWidget.getBounds();
-        sigEditingPage.pageToView(pageRect, mResizingRect);
-        mResizingRect.offset(-getScrollX(), -getScrollY());
-
         //  set up and show the resizing view and handles
         mSelectionStartPage = mSelectionEndPage = mResizingPage = pageView;
         mResizingView.setVisibility(View.VISIBLE);
+
+        //  match the resizing rect to the widget being edited
+        matchResizeRectToSig();
         moveResizingView(mResizingRect.left, mResizingRect.top, mResizingRect.width(), mResizingRect.height());
         showHandles();
     }
@@ -379,7 +382,10 @@ public class DocPdfView extends DocView
             ArDkSelectionLimits limits = getSelectionLimits();
             mNoteEditor.show(limits, mSelectionStartPage);
             mNoteEditor.move();
-            mNoteEditor.setCommentEditable(true);
+            if (mDocCfgOptions!=null && mDocCfgOptions.isPDFAnnotationEnabled())
+                mNoteEditor.setCommentEditable(true);
+            else
+                mNoteEditor.setCommentEditable(false);
             requestLayout();
         }
         else
@@ -427,16 +433,15 @@ public class DocPdfView extends DocView
             sigEditingWidget = sigCreatedPage.getNewestWidget();
             if (sigEditingWidget !=null)
             {
+                //  this is the page on which we're editing the signature
                 sigEditingPage = sigCreatedPage;
+                mResizingPage = sigCreatedPage;
 
-                //  find the rect
-                Rect pageRect = sigEditingWidget.getBounds();
-                sigCreatedPage.pageToView(pageRect, mResizingRect);
-                mResizingRect.offset(-getScrollX(), -getScrollY());
-
-                //  move and show the resizing view
-                mSelectionStartPage = mSelectionEndPage = mResizingPage = sigCreatedPage;
+                //  show the resizing view
                 mResizingView.setVisibility(View.VISIBLE);
+
+                //  move it to match the signature
+                matchResizeRectToSig();
                 moveResizingView(mResizingRect.left, mResizingRect.top, mResizingRect.width(), mResizingRect.height());
                 showHandles();
             }
@@ -444,6 +449,19 @@ public class DocPdfView extends DocView
             //  do all of the above just once.
             sigCreatedPage = null;
         }
+    }
+
+    private void matchResizeRectToSig()
+    {
+        //  match the resizing rect to the signature being edited
+        Rect bounds = sigEditingWidget.getBounds();
+        mResizingRect = new Rect(sigEditingPage.pageToView((int) bounds.left),
+                sigEditingPage.pageToView((int) bounds.top),
+                sigEditingPage.pageToView((int) bounds.right),
+                sigEditingPage.pageToView((int) bounds.bottom));
+        mResizingRect.offset(sigEditingPage.getLeft(), sigEditingPage.getTop());
+        mResizingRect.offset(-getScrollX(), -getScrollY());
+
     }
 
     @Override
@@ -460,10 +478,9 @@ public class DocPdfView extends DocView
         if (sigEditingWidget !=null && !dragging)
         {
             //  this layout come from scrolling.
-            //  move the resizing view to match the signature widsget.
-            Rect pageRect = sigEditingWidget.getBounds();
-            mResizingPage.pageToView(pageRect, mResizingRect);
-            mResizingRect.offset(-getScrollX(), -getScrollY());
+
+            //  move the resizing view to match the signature widget.
+            matchResizeRectToSig();
             moveResizingView(mResizingRect.left, mResizingRect.top, mResizingRect.width(), mResizingRect.height());
         }
     }
@@ -897,8 +914,8 @@ public class DocPdfView extends DocView
         {
             //  move handles to match the signature widget
             Rect r = sigEditingWidget.getBounds();
-            positionHandle(mDragHandleTopLeft,     mSelectionStartPage, r.left, r.top);
-            positionHandle(mDragHandleBottomRight, mSelectionEndPage,   r.right, r.bottom);
+            positionHandle(mDragHandleTopLeft,     sigEditingPage, r.left, r.top);
+            positionHandle(mDragHandleBottomRight, sigEditingPage,   r.right, r.bottom);
         }
     }
 }

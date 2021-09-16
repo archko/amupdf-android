@@ -24,9 +24,12 @@ import com.artifex.solib.FileUtils;
 import com.artifex.solib.SOClipboardHandler;
 import com.artifex.sonui.editor.DocumentListener;
 import com.artifex.sonui.editor.DocumentView;
+import com.artifex.sonui.editor.SOPersistentStorage;
 import com.artifex.sonui.editor.Utilities;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -137,6 +140,32 @@ public class DocumentActivity extends AppCompatActivity {
             ArDkLib.setClipboardHandler(new ClipboardHandler());
             //ArDkLib.setSecureFS(new SecureFS());
             FileUtils.init(ctx);
+            Utilities.setPersistentStorage(new SOPersistentStorage() {
+                @Override
+                public Object getStorageObject(Context context, String storeName) {
+                    return null;
+                }
+
+                @Override
+                public void setStringPreference(Object storageObject, String key, String value) {
+
+                }
+
+                @Override
+                public String getStringPreference(Object storageObject, String key, String defaultValue) {
+                    return null;
+                }
+
+                @Override
+                public Map<String, ?> getAllStringPreferences(Object storageObject) {
+                    return null;
+                }
+
+                @Override
+                public void removePreference(Object storageObject, String key) {
+
+                }
+            });
 
             isSetup = true;
         }
