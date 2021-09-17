@@ -8,6 +8,8 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Handler;
 import androidx.core.content.ContextCompat;
+import cn.archko.pdf.widgets.Flinger;
+
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
@@ -79,7 +81,7 @@ public class DocView
 
     private static   final int SMOOTH_SCROLL_TIME = 400;
 
-    private Scroller          mScroller;
+    private Flinger mScroller;
     private int               mScrollerLastX;
     private int               mScrollerLastY;
     private Smoother          mSmoother;
@@ -236,7 +238,7 @@ public class DocView
 
         mGestureDetector = new GestureDetector(context, this);
         mScaleGestureDetector = new ScaleGestureDetector(context, this);
-        mScroller = new Scroller(context, new BounceInterpolator());
+        mScroller = new Flinger();
         mSmoother = new Smoother(3);
 
         //  create the history object
