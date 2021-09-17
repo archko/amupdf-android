@@ -290,7 +290,7 @@ public class ConfigOptions
 
     public boolean isFullscreenEnabled()
     {
-        return mSettingsBundle.getBoolean(FullscreenEnabledKey, false);
+        return mSettingsBundle.getBoolean(FullscreenEnabledKey, true);
     }
 
     public boolean isAnimationFeatureEnabled()
