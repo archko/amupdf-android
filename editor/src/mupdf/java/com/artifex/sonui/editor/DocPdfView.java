@@ -357,7 +357,14 @@ public class DocPdfView extends DocView
 
         //  not if we're in full-screen
         if (((NUIDocView)mHostActivity).isFullScreen())
-            return;
+            if (!handleFullscreenTap(fx, fy))
+            {
+                //  not otherwise handled, so exit full-screen
+                //  if config options allows
+                if (mDocCfgOptions.showUI())
+                    ((NUIDocView)mHostActivity).showUI(true);
+                return;
+            }
 
         doDoubleTap2(fx, fy);
     }

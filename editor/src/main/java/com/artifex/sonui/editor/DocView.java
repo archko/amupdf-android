@@ -802,7 +802,7 @@ public class DocView
     protected void doSingleTap(float fx, float fy)
     {
         //  see if we should exit full screen mode
-        if (((NUIDocView)mHostActivity).isFullScreen())
+        /*if (((NUIDocView)mHostActivity).isFullScreen())
         {
             if (!handleFullscreenTap(fx, fy))
             {
@@ -812,7 +812,7 @@ public class DocView
                     ((NUIDocView)mHostActivity).showUI(true);
                 return;
             }
-        }
+        }*/
 
         //  no single-tapping in non-office docs
         if (mHostActivity instanceof NUIDocViewOther)
