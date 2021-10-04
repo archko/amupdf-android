@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import cn.archko.pdf.common.Logcat
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -22,12 +22,12 @@ data class PdfPreferences(
     val fullscreen: Boolean = true,
     val autocrop: Boolean = true,
     val verticalScrollLock: Boolean = true,
-    val sideMargins2: Int = 0,
-    val topMargin: Int = 0,
+    val sideMargins2: String = "0",
+    val topMargin: String = "0",
     val keepOn: Boolean = false,
-    val listStyle: Int = 0,
+    val listStyle: String = "0",
     val dartTheme: Boolean = true,
-    val orientation: Int = 7,
+    val orientation: String = "7",
 ) {
     override fun toString(): String {
         return "PdfPreferences(showExtension=$showExtension, fullscreen=$fullscreen, autocrop=$autocrop, verticalScrollLock=$verticalScrollLock, sideMargins2=$sideMargins2, topMargin=$topMargin, keepOn=$keepOn, list_style=$listStyle, dartTheme=$dartTheme, orientation=$orientation)"
@@ -37,15 +37,15 @@ data class PdfPreferences(
 object PreferencesKeys {
     val PREF_SHOW_EXTENSION = booleanPreferencesKey("showExtension")
 
-    val PREF_ORIENTATION = intPreferencesKey("orientation")
+    val PREF_ORIENTATION = stringPreferencesKey("orientation")
     val PREF_FULLSCREEN = booleanPreferencesKey("fullscreen")
     val PREF_AUTOCROP = booleanPreferencesKey("autocrop")
     val PREF_VERTICAL_SCROLL_LOCK = booleanPreferencesKey("verticalScrollLock")
-    val PREF_SIDE_MARGINS = intPreferencesKey("sideMargins2") // sideMargins was boolean
+    val PREF_SIDE_MARGINS = stringPreferencesKey("sideMargins2") // sideMargins was boolean
 
-    val PREF_TOP_MARGIN = intPreferencesKey("topMargin")
+    val PREF_TOP_MARGIN = stringPreferencesKey("topMargin")
     val PREF_KEEP_ON = booleanPreferencesKey("keepOn")
-    val PREF_LIST_STYLE = intPreferencesKey("list_style")
+    val PREF_LIST_STYLE = stringPreferencesKey("list_style")
     val PREF_DART_THEME = booleanPreferencesKey("pref_dart_theme")
 }
 
@@ -67,12 +67,12 @@ class PdfPreferencesRepository(private val dataStore: DataStore<Preferences>) {
             val fullscreen = preferences[PreferencesKeys.PREF_FULLSCREEN] ?: true
             val autocrop = preferences[PreferencesKeys.PREF_AUTOCROP] ?: true
             val verticalScrollLock = preferences[PreferencesKeys.PREF_VERTICAL_SCROLL_LOCK] ?: true
-            val sideMargins2 = preferences[PreferencesKeys.PREF_SIDE_MARGINS] ?: 0
-            val topMargin = preferences[PreferencesKeys.PREF_TOP_MARGIN] ?: 0
+            val sideMargins2 = preferences[PreferencesKeys.PREF_SIDE_MARGINS] ?: "0"
+            val topMargin = preferences[PreferencesKeys.PREF_TOP_MARGIN] ?: "10"
             val keepOn = preferences[PreferencesKeys.PREF_KEEP_ON] ?: false
-            val listStyle = preferences[PreferencesKeys.PREF_LIST_STYLE] ?: 0
+            val listStyle = preferences[PreferencesKeys.PREF_LIST_STYLE] ?: "0"
             val dartTheme = preferences[PreferencesKeys.PREF_DART_THEME] ?: false
-            val orientation = preferences[PreferencesKeys.PREF_ORIENTATION] ?: 0
+            val orientation = preferences[PreferencesKeys.PREF_ORIENTATION] ?: "7"
             val pdfPreferences = PdfPreferences(
                 showExtension = showExtension,
                 fullscreen = fullscreen,
@@ -113,27 +113,9 @@ class PdfPreferencesRepository(private val dataStore: DataStore<Preferences>) {
         }
     }
 
-    suspend fun setSideMargins2(sideMargins2: Int) {
-        dataStore.edit { preferences ->
-            preferences[PreferencesKeys.PREF_SIDE_MARGINS] = sideMargins2
-        }
-    }
-
-    suspend fun setTopMargin(topMargin: Int) {
-        dataStore.edit { preferences ->
-            preferences[PreferencesKeys.PREF_TOP_MARGIN] = topMargin
-        }
-    }
-
     suspend fun setKeepOn(keepOn: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.PREF_KEEP_ON] = keepOn
-        }
-    }
-
-    suspend fun setListStyle(list_style: Int) {
-        dataStore.edit { preferences ->
-            preferences[PreferencesKeys.PREF_LIST_STYLE] = list_style
         }
     }
 
@@ -143,9 +125,4 @@ class PdfPreferencesRepository(private val dataStore: DataStore<Preferences>) {
         }
     }
 
-    suspend fun setOrientation(orientation: Int) {
-        dataStore.edit { preferences ->
-            preferences[PreferencesKeys.PREF_ORIENTATION] = orientation
-        }
-    }
 }

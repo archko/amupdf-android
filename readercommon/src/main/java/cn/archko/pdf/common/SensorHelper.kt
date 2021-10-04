@@ -7,12 +7,20 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Build
-import android.preference.PreferenceManager
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * @author: archko 2018/7/22 :13:03
  */
-class SensorHelper(private val activity: Activity) {
+class SensorHelper(private val activity: FragmentActivity) {
+
     private val sensorEventListener: SensorEventListener = object : SensorEventListener {
         /**
          * Called when accuracy changes.
@@ -57,33 +65,59 @@ class SensorHelper(private val activity: Activity) {
         if (sensorManager != null) {
             sensorManager!!.unregisterListener(sensorEventListener)
             sensorManager = null
-            val edit = PreferenceManager.getDefaultSharedPreferences(activity).edit()
-            edit.putInt(PREF_PREV_ORIENTATION, prevOrientation)
-            edit.apply()
+            activity.lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    Graph.dataStore.edit { preferences ->
+                        preferences[stringPreferencesKey(PREF_PREV_ORIENTATION)] =
+                            prevOrientation.toString()
+                    }
+                }
+            }
         }
     }
 
     fun onResume() {
-        val options = PreferenceManager.getDefaultSharedPreferences(activity)
-        if (null == sensorManager) {
-            sensorManager = activity.getSystemService(Activity.SENSOR_SERVICE) as SensorManager
-        }
-        if (setOrientation(activity)) {
-            if (sensorManager!!.getSensorList(Sensor.TYPE_ACCELEROMETER).size > 0) {
-                gravity[0] = 0f
-                gravity[1] = -9.81f
-                gravity[2] = 0f
-                gravityAge = 0
-                sensorManager!!.registerListener(
-                    sensorEventListener,
-                    sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                    SensorManager.SENSOR_DELAY_NORMAL
-                )
-                prevOrientation =
-                    options.getInt(PREF_PREV_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-                activity.requestedOrientation = prevOrientation
-            } else {
-                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        activity.lifecycleScope.launch {
+            prevOrientation = withContext(Dispatchers.IO) {
+                val str: String? = Graph.dataStore.data.first()[stringPreferencesKey(
+                    PREF_PREV_ORIENTATION
+                )]
+                if (null != str) {
+                    return@withContext str.toInt()
+                } else {
+                    return@withContext ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+            }
+            if (null == sensorManager) {
+                sensorManager = activity.getSystemService(Activity.SENSOR_SERVICE) as SensorManager
+            }
+
+            val orientation = withContext(Dispatchers.IO) {
+                val str: String? = Graph.dataStore.data.first()[stringPreferencesKey(
+                    PREF_ORIENTATION
+                )]
+                if (null != str) {
+                    return@withContext str.toInt()
+                } else {
+                    return@withContext ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+            }
+
+            if (setOrientation(activity, orientation, prevOrientation)) {
+                if (sensorManager!!.getSensorList(Sensor.TYPE_ACCELEROMETER).size > 0) {
+                    gravity[0] = 0f
+                    gravity[1] = -9.81f
+                    gravity[2] = 0f
+                    gravityAge = 0
+                    sensorManager!!.registerListener(
+                        sensorEventListener,
+                        sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                        SensorManager.SENSOR_DELAY_NORMAL
+                    )
+                    activity.requestedOrientation = prevOrientation
+                } else {
+                    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
             }
         }
     }
@@ -91,18 +125,12 @@ class SensorHelper(private val activity: Activity) {
     companion object {
         const val PREF_ORIENTATION = "orientation"
         const val PREF_PREV_ORIENTATION = "prevOrientation"
-        fun setOrientation(activity: Activity): Boolean {
-            val options = PreferenceManager.getDefaultSharedPreferences(activity)
-            val orientation = options.getString(PREF_ORIENTATION, "7")!!.toInt()
+        fun setOrientation(activity: FragmentActivity, orientation: Int, prev: Int): Boolean {
             when (orientation) {
                 0 -> activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
                 1 -> activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 2 -> activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                 3 -> {
-                    val prev = options.getInt(
-                        PREF_PREV_ORIENTATION,
-                        ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    )
                     //Logcat.v(TAG, "restoring orientation: " + prev);
                     activity.requestedOrientation = prev
                     return true
