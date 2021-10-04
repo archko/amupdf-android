@@ -47,6 +47,8 @@ dependencies {
     api Libs.AndroidX.Lifecycle.viewModel
     api Libs.AndroidX.Lifecycle.viewModelKtx
     api Libs.AndroidX.Lifecycle.liveDataKtx
+    api Libs.AndroidX.DataStore.dataStore
+    api Libs.AndroidX.DataStore.preference_ktx
 
     //implementation(Libs.Dependency.viewpager2) {
     //    exclude group: 'androidx.recyclerview'

@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
-import android.preference.PreferenceManager
 import android.text.TextUtils
 import android.util.SparseArray
 import android.view.GestureDetector
@@ -23,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.Event
+import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFBookmarkManager
 import cn.archko.pdf.common.SensorHelper
@@ -33,6 +33,7 @@ import cn.archko.pdf.utils.Utils
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -60,9 +61,11 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
 
     protected var mDocumentView: FrameLayout? = null
     protected var viewController: AViewController? = null
+    val preferencesRepository = PdfPreferencesRepository(Graph.dataStore)
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         progressDialog = ProgressDialog(this)
 
@@ -91,16 +94,17 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     }
 
     open fun loadBookmark() {
-        mCrop = PreferenceManager.getDefaultSharedPreferences(this)
-            .getBoolean(PdfOptionsActivity.PREF_AUTOCROP, true)
-
         pdfBookmarkManager = PDFBookmarkManager()
-        var autoCrop = 0
-        if (!mCrop) {
-            autoCrop = 1
-        }
         lifecycleScope.launch() {
             withContext(Dispatchers.IO) {
+                preferencesRepository.pdfPreferencesFlow.collectLatest { data ->
+                    mCrop = data.autocrop == 0
+                }
+
+                var autoCrop = 0
+                if (!mCrop) {
+                    autoCrop = 1
+                }
                 pdfBookmarkManager!!.setStartBookmark(mPath, autoCrop)
                 val bookmark = pdfBookmarkManager?.bookmarkToRestore
                 bookmark?.let {
@@ -240,21 +244,32 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         super.onResume()
 
         sensorHelper?.onResume()
-        val options = PreferenceManager.getDefaultSharedPreferences(this)
-        if (options.getBoolean(PdfOptionsActivity.PREF_KEEP_ON, false)) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        } else {
-            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
 
-        if (options.getBoolean(PdfOptionsActivity.PREF_FULLSCREEN, true)) {
-            //getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            window.setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-            )
-        } else {
-            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        lifecycleScope.launch() {
+            var keepOn = false
+            var fullscreen = true
+            withContext(Dispatchers.IO) {
+                preferencesRepository.pdfPreferencesFlow.collectLatest { data ->
+                    keepOn = data.keepOn
+                    fullscreen = data.fullscreen
+                }
+            }
+
+            if (keepOn) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
+
+            if (fullscreen) {
+                //getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                window.setFlags(
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN
+                )
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            }
         }
         Logcat.d("onResume ")
     }

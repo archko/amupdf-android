@@ -225,7 +225,7 @@ private fun TabContent(
 ) {
     Logcat.d("$navController")
     val coroutineScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(initialPage = 1, pageCount = navItems.size)
+    val pagerState = rememberPagerState(initialPage = 1)
     Column(Modifier.fillMaxSize()) {
         ScrollableTabRow(
             selectedTabIndex = pagerState.currentPage,
@@ -260,6 +260,7 @@ private fun TabContent(
         }
 
         HorizontalPager(
+            count = 4,
             state = pagerState,
             modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.Top,

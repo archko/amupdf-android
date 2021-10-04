@@ -19,6 +19,8 @@ import cn.archko.pdf.mupdf.MupdfDocument;
 
 public class PdfViewerActivity extends BaseViewerActivity implements OutlineListener {
 
+    private static final int OUTLINE_REQUEST = 0;
+
     @Override
     protected DecodeService createDecodeService() {
         return new AKDecodeService(new PdfContext());

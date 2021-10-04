@@ -3,7 +3,6 @@ package cn.archko.pdf.activities
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -30,9 +29,9 @@ import cn.archko.pdf.utils.SystemUiController
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.umeng.analytics.MobclickAgent
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runBlocking
 
 /**
  * @author archko
@@ -47,17 +46,18 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
         // This app draws behind the system bars, so we want to handle fitting system windows
         WindowCompat.setDecorFitsSystemWindows(window, true)
 
-        val options = PreferenceManager.getDefaultSharedPreferences(this)
-
+        val preferencesRepository = PdfPreferencesRepository(Graph.dataStore)
         setContent {
             val systemUiController = remember { SystemUiController(window) }
+            val darkTheme = runBlocking {
+                preferencesRepository.pdfPreferencesFlow.first().dartTheme
+            }
+
+            Logcat.d("darkTheme:$darkTheme")
             val appTheme = remember {
                 mutableStateOf(
                     AppThemeState(
-                        darkTheme = options.getBoolean(
-                            PdfOptionsActivity.PREF_DART_THEME,
-                            false
-                        )
+                        darkTheme = darkTheme
                     )
                 )
             }
@@ -81,7 +81,9 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
                 darkIcons = appTheme.value.darkTheme
             )
             val changeTheme: (Boolean) -> Unit = { it ->
-                options.edit().putBoolean(PdfOptionsActivity.PREF_DART_THEME, it).apply()
+                lifecycleScope.launch {
+                    preferencesRepository.setDartTheme(it)
+                }
             }
             CompositionLocalProvider(
                 LocalSysUiController provides systemUiController,

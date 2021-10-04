@@ -1,6 +1,10 @@
 package cn.archko.pdf
 
 import android.app.Application
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import cn.archko.pdf.App.Companion.PDF_PREFERENCES_NAME
 import cn.archko.pdf.common.CrashHandler
 import cn.archko.pdf.common.Graph
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -34,5 +38,8 @@ class App : Application() {
 
         @JvmField
         var uiThread: Thread? = null
+
+        @JvmStatic
+        val PDF_PREFERENCES_NAME = "amupdf_preferences"
     }
 }
