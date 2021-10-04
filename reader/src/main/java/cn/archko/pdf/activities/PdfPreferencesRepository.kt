@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
+import cn.archko.pdf.common.Logcat
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -21,15 +22,15 @@ data class PdfPreferences(
     val fullscreen: Boolean = true,
     val autocrop: Boolean = true,
     val verticalScrollLock: Boolean = true,
-    val sideMargins2: Int = 10,
-    val topMargin: Int = 10,
+    val sideMargins2: Int = 0,
+    val topMargin: Int = 0,
     val keepOn: Boolean = false,
-    val list_style: Int = 0,
+    val listStyle: Int = 0,
     val dartTheme: Boolean = true,
     val orientation: Int = 7,
 ) {
     override fun toString(): String {
-        return "PdfPreferences(showExtension=$showExtension, fullscreen=$fullscreen, autocrop=$autocrop, verticalScrollLock=$verticalScrollLock, sideMargins2=$sideMargins2, topMargin=$topMargin, keepOn=$keepOn, list_style=$list_style, dartTheme=$dartTheme, orientation=$orientation)"
+        return "PdfPreferences(showExtension=$showExtension, fullscreen=$fullscreen, autocrop=$autocrop, verticalScrollLock=$verticalScrollLock, sideMargins2=$sideMargins2, topMargin=$topMargin, keepOn=$keepOn, list_style=$listStyle, dartTheme=$dartTheme, orientation=$orientation)"
     }
 }
 
@@ -69,10 +70,10 @@ class PdfPreferencesRepository(private val dataStore: DataStore<Preferences>) {
             val sideMargins2 = preferences[PreferencesKeys.PREF_SIDE_MARGINS] ?: 0
             val topMargin = preferences[PreferencesKeys.PREF_TOP_MARGIN] ?: 0
             val keepOn = preferences[PreferencesKeys.PREF_KEEP_ON] ?: false
-            val list_style = preferences[PreferencesKeys.PREF_LIST_STYLE] ?: 0
+            val listStyle = preferences[PreferencesKeys.PREF_LIST_STYLE] ?: 0
             val dartTheme = preferences[PreferencesKeys.PREF_DART_THEME] ?: false
             val orientation = preferences[PreferencesKeys.PREF_ORIENTATION] ?: 0
-            PdfPreferences(
+            val pdfPreferences = PdfPreferences(
                 showExtension = showExtension,
                 fullscreen = fullscreen,
                 autocrop = autocrop,
@@ -80,10 +81,12 @@ class PdfPreferencesRepository(private val dataStore: DataStore<Preferences>) {
                 sideMargins2 = sideMargins2,
                 topMargin = topMargin,
                 keepOn = keepOn,
-                list_style = list_style,
+                listStyle = listStyle,
                 dartTheme = dartTheme,
                 orientation = orientation,
             )
+            Logcat.d("pdfPreferences:$pdfPreferences ")
+            pdfPreferences
         }
 
     suspend fun setShowExtension(enable: Boolean) {

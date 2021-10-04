@@ -259,7 +259,6 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
             }
 
             if (fullscreen) {
-                //getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 window.setFlags(
                     WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN
