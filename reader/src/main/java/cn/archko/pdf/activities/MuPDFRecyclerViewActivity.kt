@@ -34,6 +34,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -61,7 +62,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
 
     protected var mDocumentView: FrameLayout? = null
     protected var viewController: AViewController? = null
-    val preferencesRepository = PdfPreferencesRepository(Graph.dataStore)
+    protected val preferencesRepository = PdfPreferencesRepository(Graph.dataStore)
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,11 +96,9 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
 
     open fun loadBookmark() {
         pdfBookmarkManager = PDFBookmarkManager()
-        lifecycleScope.launch() {
+        lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                preferencesRepository.pdfPreferencesFlow.collectLatest { data ->
-                    mCrop = data.autocrop == 0
-                }
+                mCrop = preferencesRepository.pdfPreferencesFlow.first().autocrop == 0
 
                 var autoCrop = 0
                 if (!mCrop) {
@@ -245,14 +244,13 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
 
         sensorHelper?.onResume()
 
-        lifecycleScope.launch() {
+        lifecycleScope.launch {
             var keepOn = false
             var fullscreen = true
             withContext(Dispatchers.IO) {
-                preferencesRepository.pdfPreferencesFlow.collectLatest { data ->
-                    keepOn = data.keepOn
-                    fullscreen = data.fullscreen
-                }
+                val data = preferencesRepository.pdfPreferencesFlow.first()
+                keepOn = data.keepOn
+                fullscreen = data.fullscreen
             }
 
             if (keepOn) {

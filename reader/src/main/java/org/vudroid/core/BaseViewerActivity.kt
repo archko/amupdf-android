@@ -28,6 +28,7 @@ import cn.archko.pdf.presenter.PageViewPresenter
 import cn.archko.pdf.widgets.APageSeekBarControls
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.vudroid.core.events.CurrentPageListener
@@ -294,11 +295,10 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
             var fullscreen = true
             var verticalScrollLock = true
             withContext(Dispatchers.IO) {
-                preferencesRepository.pdfPreferencesFlow.collectLatest { data ->
-                    keepOn = data.keepOn
-                    fullscreen = data.fullscreen
-                    verticalScrollLock = data.verticalScrollLock
-                }
+                val data = preferencesRepository.pdfPreferencesFlow.first()
+                keepOn = data.keepOn
+                fullscreen = data.fullscreen
+                verticalScrollLock = data.verticalScrollLock
             }
             if (keepOn) {
                 window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
