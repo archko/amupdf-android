@@ -97,7 +97,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         pdfBookmarkManager = PDFBookmarkManager()
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                mCrop = preferencesRepository.pdfPreferencesFlow.first().autocrop == 0
+                mCrop = preferencesRepository.pdfPreferencesFlow.first().autocrop
 
                 var autoCrop = 0
                 if (!mCrop) {
