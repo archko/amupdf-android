@@ -17,6 +17,7 @@ import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.NavGraph
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.Logcat
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.theme.AppThemeState
 import cn.archko.pdf.theme.ColorPallet
 import cn.archko.pdf.theme.ComposeCookBookTheme
@@ -46,11 +47,11 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
         // This app draws behind the system bars, so we want to handle fitting system windows
         WindowCompat.setDecorFitsSystemWindows(window, true)
 
-        val preferencesRepository = PdfPreferencesRepository(Graph.dataStore)
+        val preferencesRepository = PdfOptionRepository(Graph.dataStore)
         setContent {
             val systemUiController = remember { SystemUiController(window) }
             val darkTheme = runBlocking {
-                preferencesRepository.pdfPreferencesFlow.first().dartTheme
+                preferencesRepository.pdfOptionFlow.first().dartTheme
             }
 
             Logcat.d("darkTheme:$darkTheme")

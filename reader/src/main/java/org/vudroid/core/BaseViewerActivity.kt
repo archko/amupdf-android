@@ -18,7 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.AppExecutors.Companion.instance
 import cn.archko.pdf.R
 import cn.archko.pdf.activities.PdfOptionsActivity.Companion.start
-import cn.archko.pdf.activities.PdfPreferencesRepository
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.PDFBookmarkManager
@@ -54,7 +54,7 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
     var pageSeekBarControls: APageSeekBarControls? = null
     var pdfBookmarkManager: PDFBookmarkManager? = null
     var sensorHelper: SensorHelper? = null
-    val preferencesRepository = PdfPreferencesRepository(Graph.dataStore)
+    val preferencesRepository = PdfOptionRepository(Graph.dataStore)
 
     /**
      * Called when the activity is first created.
@@ -294,7 +294,7 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
             var fullscreen = true
             var verticalScrollLock = true
             withContext(Dispatchers.IO) {
-                val data = preferencesRepository.pdfPreferencesFlow.first()
+                val data = preferencesRepository.pdfOptionFlow.first()
                 keepOn = data.keepOn
                 fullscreen = data.fullscreen
                 verticalScrollLock = data.verticalScrollLock

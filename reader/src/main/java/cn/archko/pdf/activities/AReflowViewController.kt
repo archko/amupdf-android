@@ -2,7 +2,6 @@ package cn.archko.pdf.activities
 
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_FIRST_USER
-import android.content.Context
 import android.content.res.Configuration
 import android.util.SparseArray
 import android.view.GestureDetector
@@ -12,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.SeekBar
 import android.widget.TextView
+import androidx.core.app.ComponentActivity
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,6 +21,7 @@ import cn.archko.pdf.adapters.MuPDFReflowAdapter
 import cn.archko.pdf.colorpicker.ColorPickerDialog
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFBookmarkManager
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.FontBean
@@ -32,7 +33,6 @@ import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.widgets.APageSeekBarControls
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancel
@@ -42,13 +42,14 @@ import kotlinx.coroutines.isActive
  * @author: archko 2020/5/15 :12:43
  */
 class AReflowViewController(
-    private var context: Context,
+    private var context: ComponentActivity,
     private var contentView: View,
     private val mControllerLayout: RelativeLayout,
     private var pdfBookmarkManager: PDFBookmarkManager,
     private var mPath: String,
     private var mPageSeekBarControls: APageSeekBarControls?,
-    private var gestureDetector: GestureDetector?
+    private var gestureDetector: GestureDetector?,
+    private var optionRepository: PdfOptionRepository
 ) :
     OutlineListener, AViewController {
 
@@ -147,7 +148,7 @@ class AReflowViewController(
 
     private fun setReflowMode(pos: Int) {
         if (null == mStyleHelper) {
-            mStyleHelper = StyleHelper()
+            mStyleHelper = StyleHelper(context, optionRepository)
         }
         if (null == mRecyclerView.adapter) {
 

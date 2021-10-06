@@ -1,56 +1,26 @@
 package cn.archko.pdf.common
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.Typeface
-import cn.archko.pdf.App
+import androidx.core.app.ComponentActivity
+import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.entity.FontBean
-
-import java.io.File
-
 import cn.archko.pdf.utils.FileUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 
 /**
  * @author: archko 2019-06-19 :12:27
  */
-class FontHelper {
+class FontHelper(
+    private var context: ComponentActivity,
+    private var optionRepository: PdfOptionRepository
+) {
 
     init {
         loadFont()
-    }
-
-    companion object {
-
-        @JvmField
-        val FONT_DIR = "amupdf/fonts/"
-
-        @JvmField
-        val FONT_SP_FILE = "font_sp_file"
-
-        @JvmField
-        val FONT_KEY_TYPE = "font_key_type"
-
-        @JvmField
-        val FONT_KEY_NAME = "font_key_name"
-
-        @JvmField
-        val SYSTEM_FONT = "System Font"
-
-        @JvmField
-        val SYSTEM_FONT_SAN = "System Font SAN"
-
-        @JvmField
-        val SYSTEM_FONT_SERIF = "System Font SERIF"
-
-        @JvmField
-        val SYSTEM_FONT_MONO = "System Font MONO"
-
-        val DEFAULT = 0
-        val DEFAULT_BOLD = 1
-        val SANS_SERIF = 2
-        val SERIF = 3
-        val MONOSPACE = 4
-        val CUSTOM = 5
     }
 
     var fontBean: FontBean? = null
@@ -64,11 +34,16 @@ class FontHelper {
         }
 
     fun loadFont() {
-        val sp: SharedPreferences =
-            App.instance!!.getSharedPreferences(FONT_SP_FILE, Context.MODE_PRIVATE)
-        val fontType = sp.getInt(FONT_KEY_TYPE, DEFAULT)
-        val fontName = sp.getString(FONT_KEY_NAME, SYSTEM_FONT)
-        initFontBean(fontType, fontName)
+        context.lifecycleScope.launch {
+            var fontType = PdfOptionRepository.DEFAULT
+            var fontName = PdfOptionRepository.SYSTEM_FONT
+            withContext(Dispatchers.IO) {
+                val data = optionRepository.pdfOptionFlow.first()
+                fontType = data.fontType
+                fontName = data.fontName
+            }
+            initFontBean(fontType, fontName)
+        }
     }
 
     private fun initFontBean(fontType: Int, fontName: String?) {
@@ -78,35 +53,36 @@ class FontHelper {
         fontBean?.fontType = fontType
         fontBean?.fontName = fontName
 
-        if (fontType == CUSTOM) {
-            fontBean?.file = File(FileUtils.getStoragePath(FONT_DIR + fontName))
+        if (fontType == PdfOptionRepository.CUSTOM) {
+            fontBean?.file = File(FileUtils.getStoragePath(PdfOptionRepository.FONT_DIR + fontName))
             typeface = createFont(fontName)
         } else {
             when (fontType) {
-                DEFAULT -> typeface = Typeface.DEFAULT
-                SANS_SERIF -> typeface = Typeface.SANS_SERIF
-                SERIF -> typeface = Typeface.SERIF
-                MONOSPACE -> typeface = Typeface.MONOSPACE
+                PdfOptionRepository.DEFAULT -> typeface = Typeface.DEFAULT
+                PdfOptionRepository.SANS_SERIF -> typeface = Typeface.SANS_SERIF
+                PdfOptionRepository.SERIF -> typeface = Typeface.SERIF
+                PdfOptionRepository.MONOSPACE -> typeface = Typeface.MONOSPACE
             }
         }
     }
 
     fun saveFont(fBean: FontBean) {
-        if ((fontBean?.fontType == CUSTOM && !fBean.fontName.equals(fontBean?.fontName))
+        if ((fontBean?.fontType == PdfOptionRepository.CUSTOM && !fBean.fontName.equals(fontBean?.fontName))
             || fBean.fontType != fontBean?.fontType
         ) {
             initFontBean(fBean.fontType, fBean.fontName)
         }
-        val sp: SharedPreferences =
-            App.instance!!.getSharedPreferences(FONT_SP_FILE, Context.MODE_PRIVATE)
-        sp.edit()
-            .putInt(FONT_KEY_TYPE, fontBean?.fontType!!)
-            .putString(FONT_KEY_NAME, fontBean?.fontName)
-            .apply()
+
+        context.lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                optionRepository.setFontType(fontBean?.fontType!!)
+                optionRepository.setFontName(fontBean?.fontName!!)
+            }
+        }
     }
 
     fun createFont(fontName: String?): Typeface? {
-        val fontPath = FileUtils.getStoragePath(FONT_DIR + fontName)
+        val fontPath = FileUtils.getStoragePath(PdfOptionRepository.FONT_DIR + fontName)
         return if (!File(fontPath).exists()) {
             null
         } else Typeface.createFromFile(fontPath)

@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.Toast
+import androidx.core.app.ComponentActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,6 +26,7 @@ import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.MenuHelper
 import cn.archko.pdf.common.OutlineHelper
 import cn.archko.pdf.common.PDFBookmarkManager
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.MenuBean
 import cn.archko.pdf.listeners.AViewController
@@ -69,8 +71,8 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         mPageSeekBarControls = createSeekControls()
 
         val lp = RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
         lp.addRule(RelativeLayout.ALIGN_PARENT_TOP)
         mControllerLayout.addView(mPageSeekBarControls, lp)
@@ -79,15 +81,15 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
         with(mLeftDrawer) {
             layoutManager = LinearLayoutManager(
-                    this@AMuPDFRecyclerViewActivity,
-                    LinearLayoutManager.VERTICAL,
-                    false
+                this@AMuPDFRecyclerViewActivity,
+                LinearLayoutManager.VERTICAL,
+                false
             )
             addItemDecoration(
-                    ViewerDividerItemDecoration(
-                            this@AMuPDFRecyclerViewActivity,
-                            LinearLayoutManager.VERTICAL
-                    )
+                ViewerDividerItemDecoration(
+                    this@AMuPDFRecyclerViewActivity,
+                    LinearLayoutManager.VERTICAL
+                )
             )
         }
 
@@ -116,8 +118,8 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     private fun addDocumentView() {
         mDocumentView?.removeAllViews()
         val lap: FrameLayout.LayoutParams = FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
         )
         mDocumentView?.addView(viewController?.getDocumentView(), lap)
     }
@@ -145,10 +147,10 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             }
 
             override fun onScroll(
-                    e1: MotionEvent,
-                    e2: MotionEvent,
-                    distanceX: Float,
-                    distanceY: Float
+                e1: MotionEvent,
+                e2: MotionEvent,
+                distanceX: Float,
+                distanceY: Float
             ): Boolean {
                 return false
             }
@@ -158,10 +160,10 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             }
 
             override fun onFling(
-                    e1: MotionEvent,
-                    e2: MotionEvent,
-                    velocityX: Float,
-                    velocityY: Float
+                e1: MotionEvent,
+                e2: MotionEvent,
+                velocityX: Float,
+                velocityY: Float
             ): Boolean {
                 return false
             }
@@ -188,7 +190,8 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                 } else {
                     onSingleTap()
                 }*/
-                val rs: Boolean = viewController?.scrollPage(e.y.toInt(), top, bottom, finalMargin)!!
+                val rs: Boolean =
+                    viewController?.scrollPage(e.y.toInt(), top, bottom, finalMargin)!!
                 if (!rs) {
                     onSingleTap()
                 }
@@ -215,7 +218,9 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             this@AMuPDFRecyclerViewActivity,
             mContentView,
             mControllerLayout, pdfBookmarkManager!!, mPath!!,
-            mPageSeekBarControls!!, gestureDetector
+            mPageSeekBarControls!!,
+            gestureDetector,
+            optionRepository
         )
         viewController = aViewController
         Logcat.d("changeViewMode:$viewMode,controller:$viewController")
@@ -252,8 +257,8 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                 showOutline()
 
                 sp.edit()
-                        .putBoolean(PREF_READER_KEY_FIRST, false)
-                        .apply()
+                    .putBoolean(PREF_READER_KEY_FIRST, false)
+                    .apply()
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -271,13 +276,13 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                 return
             }
             APageSizeLoader.savePageSizeToFile(
-                    mCrop,
-                    pdfBookmarkManager!!.bookmarkToRestore!!.size,
-                    mPageSizes,
-                    FileUtils.getDiskCacheDir(
-                            this@AMuPDFRecyclerViewActivity,
-                            pdfBookmarkManager?.bookmarkToRestore?.name
-                    )
+                mCrop,
+                pdfBookmarkManager!!.bookmarkToRestore!!.size,
+                mPageSizes,
+                FileUtils.getDiskCacheDir(
+                    this@AMuPDFRecyclerViewActivity,
+                    pdfBookmarkManager?.bookmarkToRestore?.name
+                )
             )
         }
     }
@@ -289,13 +294,13 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         var pageSizeBean: APageSizeLoader.PageSizeBean? = null
         if (pdfBookmarkManager != null && pdfBookmarkManager!!.bookmarkToRestore != null) {
             pageSizeBean = APageSizeLoader.loadPageSizeFromFile(
-                    width,
-                    pdfBookmarkManager!!.bookmarkToRestore!!.pageCount,
-                    pdfBookmarkManager!!.bookmarkToRestore!!.size,
-                    FileUtils.getDiskCacheDir(
-                            this@AMuPDFRecyclerViewActivity,
-                            pdfBookmarkManager?.bookmarkToRestore?.name
-                    )
+                width,
+                pdfBookmarkManager!!.bookmarkToRestore!!.pageCount,
+                pdfBookmarkManager!!.bookmarkToRestore!!.size,
+                FileUtils.getDiskCacheDir(
+                    this@AMuPDFRecyclerViewActivity,
+                    pdfBookmarkManager?.bookmarkToRestore?.name
+                )
             )
         }
         Logcat.d("open3:" + (SystemClock.uptimeMillis() - start))
@@ -349,9 +354,9 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         setReflowButton(mReflow)
 
         Toast.makeText(
-                this,
-                if (mReflow) getString(R.string.entering_reflow_mode) else getString(R.string.leaving_reflow_mode),
-                Toast.LENGTH_SHORT
+            this,
+            if (mReflow) getString(R.string.entering_reflow_mode) else getString(R.string.leaving_reflow_mode),
+            Toast.LENGTH_SHORT
         ).show()
     }
 
@@ -571,70 +576,77 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
     internal object ViewControllerFactory {
         fun getOrCreateViewController(
-                viewControllerCache: SparseArray<AViewController>,
-                viewMode: ViewMode,
-                context: Context,
-                contentView: View,
-                controllerLayout: RelativeLayout,
-                pdfBookmarkManager: PDFBookmarkManager,
-                path: String,
-                pageSeekBarControls: APageSeekBarControls,
-                gestureDetector: GestureDetector?
+            viewControllerCache: SparseArray<AViewController>,
+            viewMode: ViewMode,
+            context: ComponentActivity,
+            contentView: View,
+            controllerLayout: RelativeLayout,
+            pdfBookmarkManager: PDFBookmarkManager,
+            path: String,
+            pageSeekBarControls: APageSeekBarControls,
+            gestureDetector: GestureDetector?,
+            optionRepository: PdfOptionRepository,
         ): AViewController {
             val aViewController = viewControllerCache.get(viewMode.ordinal)
             if (null != aViewController) {
                 return aViewController
             }
             return createViewController(
-                    viewMode,
+                viewMode,
+                context,
+                contentView,
+                controllerLayout,
+                pdfBookmarkManager,
+                path,
+                pageSeekBarControls,
+                gestureDetector,
+                optionRepository
+            )
+        }
+
+        fun createViewController(
+            viewMode: ViewMode,
+            context: ComponentActivity,
+            contentView: View,
+            controllerLayout: RelativeLayout,
+            pdfBookmarkManager: PDFBookmarkManager,
+            path: String,
+            pageSeekBarControls: APageSeekBarControls,
+            gestureDetector: GestureDetector?,
+            optionRepository: PdfOptionRepository,
+        ): AViewController {
+            if (viewMode == ViewMode.CROP) {
+                return ACropViewController(
                     context,
                     contentView,
                     controllerLayout,
                     pdfBookmarkManager,
                     path,
                     pageSeekBarControls,
-                    gestureDetector
-            )
-        }
-
-        fun createViewController(
-                viewMode: ViewMode, context: Context,
-                contentView: View,
-                controllerLayout: RelativeLayout,
-                pdfBookmarkManager: PDFBookmarkManager,
-                path: String,
-                pageSeekBarControls: APageSeekBarControls,
-                gestureDetector: GestureDetector?
-        ): AViewController {
-            if (viewMode == ViewMode.CROP) {
-                return ACropViewController(
-                        context,
-                        contentView,
-                        controllerLayout,
-                        pdfBookmarkManager,
-                        path,
-                        pageSeekBarControls,
-                        gestureDetector
+                    gestureDetector,
+                    optionRepository
                 )
             } else if (viewMode == ViewMode.REFLOW) {
                 return AReflowViewController(
-                        context,
-                        contentView,
-                        controllerLayout,
-                        pdfBookmarkManager,
-                        path,
-                        pageSeekBarControls,
-                        gestureDetector
+                    context,
+                    contentView,
+                    controllerLayout,
+                    pdfBookmarkManager,
+                    path,
+                    pageSeekBarControls,
+                    gestureDetector,
+                    optionRepository
                 )
             } else {
                 return ANormalViewController(
-                        context,
-                        contentView,
-                        controllerLayout,
-                        pdfBookmarkManager,
-                        path,
-                        pageSeekBarControls,
-                        gestureDetector
+                    context,
+                    contentView,
+                    controllerLayout,
+                    pdfBookmarkManager,
+                    path,
+                    pageSeekBarControls,
+                    gestureDetector,
+                    optionRepository
                 )
             }
         }

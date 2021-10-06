@@ -2,18 +2,19 @@ package cn.archko.pdf.activities
 
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_FIRST_USER
-import android.content.Context
 import android.content.res.Configuration
 import android.util.SparseArray
 import android.view.GestureDetector
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import androidx.core.app.ComponentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFBookmarkManager
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
@@ -26,13 +27,14 @@ import cn.archko.pdf.widgets.ViewerDividerItemDecoration
  * @author: archko 2020/5/15 :12:43
  */
 class ACropViewController(
-    private var context: Context,
+    private var context: ComponentActivity,
     private var contentView: View,
     private val mControllerLayout: RelativeLayout,
     private var pdfBookmarkManager: PDFBookmarkManager,
     private var mPath: String,
     private var mPageSeekBarControls: APageSeekBarControls?,
-    private var gestureDetector: GestureDetector?
+    private var gestureDetector: GestureDetector?,
+    private var optionRepository: PdfOptionRepository
 ) :
     OutlineListener, AViewController {
 

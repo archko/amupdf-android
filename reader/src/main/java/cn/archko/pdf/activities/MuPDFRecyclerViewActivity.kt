@@ -25,6 +25,7 @@ import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFBookmarkManager
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.listeners.AViewController
@@ -61,7 +62,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
 
     protected var mDocumentView: FrameLayout? = null
     protected var viewController: AViewController? = null
-    protected val preferencesRepository = PdfPreferencesRepository(Graph.dataStore)
+    protected val optionRepository = PdfOptionRepository(Graph.dataStore)
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,7 +98,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         pdfBookmarkManager = PDFBookmarkManager()
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                mCrop = preferencesRepository.pdfPreferencesFlow.first().autocrop
+                mCrop = optionRepository.pdfOptionFlow.first().autocrop
 
                 var autoCrop = 0
                 if (!mCrop) {
@@ -247,7 +248,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
             var keepOn = false
             var fullscreen = true
             withContext(Dispatchers.IO) {
-                val data = preferencesRepository.pdfPreferencesFlow.first()
+                val data = optionRepository.pdfOptionFlow.first()
                 keepOn = data.keepOn
                 fullscreen = data.fullscreen
             }

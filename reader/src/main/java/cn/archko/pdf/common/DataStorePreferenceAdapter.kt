@@ -1,4 +1,4 @@
-package cn.archko.pdf.activities
+package cn.archko.pdf.common
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

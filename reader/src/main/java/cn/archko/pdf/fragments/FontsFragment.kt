@@ -1,7 +1,5 @@
 package cn.archko.pdf.fragments
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
@@ -14,11 +12,11 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import cn.archko.pdf.App
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.adapters.BaseViewHolder
-import cn.archko.pdf.common.FontHelper
+import cn.archko.pdf.common.Graph
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.listeners.DataListener
@@ -36,8 +34,8 @@ open class FontsFragment : DialogFragment() {
     lateinit var adapter: BaseRecyclerAdapter<FontBean>
     var mStyleHelper: StyleHelper? = null
     var mDataListener: DataListener? = null
-    var selectedFontName: String? = null
     private lateinit var fontsViewModel: FontsViewModel
+    protected val optionRepository = PdfOptionRepository(Graph.dataStore)
 
     fun setStyleHelper(styleHelper: StyleHelper?) {
         this.mStyleHelper = styleHelper
@@ -55,11 +53,7 @@ open class FontsFragment : DialogFragment() {
         }
         setStyle(DialogFragment.STYLE_NO_FRAME, themeId)
 
-        val sp: SharedPreferences =
-            App.instance!!.getSharedPreferences(FontHelper.FONT_SP_FILE, Context.MODE_PRIVATE)
-        selectedFontName = sp.getString(FontHelper.FONT_KEY_NAME, FontHelper.SYSTEM_FONT)
-
-        fontsViewModel = FontsViewModel()
+        fontsViewModel = FontsViewModel(optionRepository)
     }
 
     override fun onResume() {
@@ -132,7 +126,7 @@ open class FontsFragment : DialogFragment() {
 
         override fun onBind(data: FontBean?, position: Int) {
             title.setText(String.format(getString(R.string.dialog_item_title_font), data?.fontName))
-            if (data?.fontType == FontHelper.CUSTOM) {
+            if (data?.fontType == PdfOptionRepository.CUSTOM) {
                 if (null != data.file) {
                     val typeface =
                         mStyleHelper?.fontHelper?.createFontByPath(data.file?.absolutePath!!)
@@ -140,14 +134,14 @@ open class FontsFragment : DialogFragment() {
                 }
             } else {
                 when (data?.fontType) {
-                    FontHelper.DEFAULT -> title.setTypeface(Typeface.DEFAULT)
-                    FontHelper.SANS_SERIF -> title.setTypeface(Typeface.SANS_SERIF)
-                    FontHelper.SERIF -> title.setTypeface(Typeface.SERIF)
-                    FontHelper.MONOSPACE -> title.setTypeface(Typeface.MONOSPACE)
+                    PdfOptionRepository.DEFAULT -> title.setTypeface(Typeface.DEFAULT)
+                    PdfOptionRepository.SANS_SERIF -> title.setTypeface(Typeface.SANS_SERIF)
+                    PdfOptionRepository.SERIF -> title.setTypeface(Typeface.SERIF)
+                    PdfOptionRepository.MONOSPACE -> title.setTypeface(Typeface.MONOSPACE)
                 }
             }
 
-            if (selectedFontName!!.equals(data?.fontName)) {
+            if (fontsViewModel.selectedFontName!! == data?.fontName) {
                 itemView.setBackgroundResource(R.color.button_pressed)
             } else {
                 itemView.setBackgroundResource(R.color.transparent)
