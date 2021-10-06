@@ -78,7 +78,9 @@ dependencies {
     implementation Libs.AndroidX.Room.runtime
     implementation Libs.AndroidX.Room.ktx
     api Libs.AndroidX.DataStore.dataStore
-    api Libs.AndroidX.DataStore.preference_ktx
+    api (Libs.AndroidX.DataStore.preference_ktx) {
+        exclude group: 'androidx.recyclerview'
+    }
 
     kapt Libs.AndroidX.Room.compiler
 
