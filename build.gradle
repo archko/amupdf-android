@@ -22,6 +22,9 @@ buildscript {
 
 subprojects {
     repositories {
+        maven {
+            url uri("file:///Users/archko/projects/PDF/mupdf_c/")
+        }
         mavenCentral()
         google()
         maven { url "https://maven.aliyun.com/repository/jcenter" }

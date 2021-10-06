@@ -30,5 +30,7 @@ android {
 }
 
 dependencies {
-    api files('libs/mupdf_c_release.aar')
+    //api files('libs/mupdf_c_release.aar')
+
+    api "com.artifex.mupdf:mupdf-fitz:1.0-SNAPSHOT"
 }
