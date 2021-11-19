@@ -4,11 +4,22 @@ buildscript {
     repositories {
         mavenCentral()
         google()
-        maven { url "https://maven.aliyun.com/repository/jcenter" }
-        maven { url "https://maven.aliyun.com/repository/google" }
-        maven { url 'https://repo1.maven.org/maven2/' }
-        jcenter()
-        maven { url "https://jitpack.io" }
+        maven {
+            allowInsecureProtocol = true
+            url "https://maven.aliyun.com/repository/jcenter"
+        }
+        maven {
+            allowInsecureProtocol = true
+            url "https://maven.aliyun.com/repository/google"
+        }
+        maven {
+            allowInsecureProtocol = true
+            url 'https://repo1.maven.org/maven2/'
+        }
+        maven {
+            allowInsecureProtocol = true
+            url "https://jitpack.io"
+        }
     }
     dependencies {
         classpath Libs.androidGradlePlugin
@@ -23,19 +34,26 @@ buildscript {
 subprojects {
     repositories {
         maven {
+            allowInsecureProtocol = true
             url uri("file:///Users/archko/projects/PDF/mupdf_c/")
         }
         mavenCentral()
         google()
-        maven { url "https://maven.aliyun.com/repository/jcenter" }
-        maven { url "https://maven.aliyun.com/repository/google" }
-        maven { url 'https://repo1.maven.org/maven2/' }
-        jcenter()
-        maven { url "https://jitpack.io" }
-
-        if (!Libs.AndroidX.Compose.snapshot.isEmpty()) {
-            maven { url "https://androidx.dev/snapshots/builds/${Libs.AndroidX.Compose.snapshot}/artifacts/repository/" }
-            maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        maven {
+            allowInsecureProtocol = true
+            url "https://maven.aliyun.com/repository/jcenter"
+        }
+        maven {
+            allowInsecureProtocol = true
+            url "https://maven.aliyun.com/repository/google"
+        }
+        maven {
+            allowInsecureProtocol = true
+            url 'https://repo1.maven.org/maven2/'
+        }
+        maven {
+            allowInsecureProtocol = true
+            url "https://jitpack.io"
         }
     }
 
