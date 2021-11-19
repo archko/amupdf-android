@@ -54,6 +54,7 @@ import cn.archko.pdf.theme.Typography
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.google.accompanist.insets.statusBarsPadding
 import com.umeng.analytics.MobclickAgent
+import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
 import java.util.*
 
 @Composable
@@ -342,7 +343,10 @@ private fun ItemList(
     val fileBean = if (fileIndex.value >= list.size) null else list[fileIndex.value]
     UserOptDialog(showUserDialog, fileBean, menuOpt)
     FileInfoDialog(showInfoDialog, fileBean, menuOpt)
-    LazyColumn(modifier) {
+    LazyColumn(
+        flingBehavior = StockFlingBehaviours.smoothScroll(),
+        modifier=modifier
+    ) {
         itemsIndexed(list) { index, fileBean ->
             if (index > 0) {
                 Divider(thickness = 1.dp)

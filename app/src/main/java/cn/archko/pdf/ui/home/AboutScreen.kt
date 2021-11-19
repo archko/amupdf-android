@@ -28,6 +28,7 @@ import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
+import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -75,7 +76,10 @@ fun AboutScreen(
                         style = TextStyle(fontSize = 18.sp)
                     )
                 }
-                LazyColumn(modifier) {
+                LazyColumn(
+                    flingBehavior = StockFlingBehaviours.smoothScroll(),
+                    modifier=modifier
+                ) {
                     itemsIndexed(PARTS) { index, part ->
                         Divider(thickness = 1.dp)
                         PartItem(context, part, modifier)
