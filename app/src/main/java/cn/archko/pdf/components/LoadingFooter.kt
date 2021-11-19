@@ -74,8 +74,8 @@ fun LoadingFooter(
             txt?.let {
                 Text(
                     text = it,
-                    style = TextStyle(fontSize = 18.sp),
-                    color = MaterialTheme.colors.onSecondary,
+                    style = TextStyle(fontSize = 15.sp),
+                    color = MaterialTheme.colors.onSecondary.copy(alpha = 0.6f),
                     modifier = modifier
                         .align(Alignment.CenterVertically)
                 )

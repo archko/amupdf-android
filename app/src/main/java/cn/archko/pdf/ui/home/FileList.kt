@@ -84,10 +84,10 @@ private fun ItemList(
         }
         showUserDialog.value = true
     }
-    //Logcat.d("showUserDialog:${showUserDialog.value}, file.fileIndex:${fileIndex.value}")
-    if (fileIndex.value < size) {
-        showUserDialog.value = false
-    }
+    Logcat.d("showUserDialog:${showUserDialog.value}, file.fileIndex:${fileIndex.value}")
+    //if (fileIndex.value < size) {
+    //    showUserDialog.value = false
+    //}
     val fileBean = if (fileIndex.value >= size) null else list[fileIndex.value]
     UserOptDialog(showUserDialog, fileBean, menuOpt, fileBeanType)
     FileInfoDialog(showInfoDialog, fileBean, menuOpt)

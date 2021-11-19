@@ -103,81 +103,86 @@ fun FileSearchList(
             }
         }
     }
-
-    Column {
-        Spacer(modifier = Modifier.statusBarsPadding())
-        Row(
-            modifier = Modifier
-                .padding(4.dp)
-                .align(alignment = CenterHorizontally)
-        ) {
-            RadioButton(
-                selected = selected == searchTypeFile,
-                onClick = { selected = searchTypeFile })
-            Text(
-                text = stringResource(id = R.string.search_file),
-                modifier = Modifier
-                    .clickable(onClick = { selected = searchTypeFile })
-                    .padding(start = 4.dp)
-            )
-            Spacer(modifier = Modifier.size(4.dp))
-            RadioButton(
-                selected = selected == searchTypeHistory,
-                onClick = { selected = searchTypeHistory })
-            Text(
-                text = stringResource(id = R.string.search_history),
-                modifier = Modifier
-                    .clickable(onClick = { selected = searchTypeHistory })
-                    .padding(start = 4.dp)
-            )
-            Spacer(modifier = Modifier.size(4.dp))
-            RadioButton(
-                selected = selected == searchTypeFavorite,
-                onClick = { selected = searchTypeFavorite })
-            Text(
-                text = stringResource(id = R.string.search_favorite),
-                modifier = Modifier
-                    .clickable(onClick = { selected = searchTypeFavorite })
-                    .padding(start = 4.dp)
-            )
-        }
-        SearchBar(
-            query = state.query,
-            onQueryChange = { state.query = it },
-            searchFocused = state.focused,
-            onSearchFocusChange = { state.focused = it },
-            onClearQuery = { state.query = TextFieldValue("") },
-            searching = state.searching
-        )
-        Divider()
-
-        LaunchedEffect(state.query.text) {
-            state.searching = true
-            state.searchResults = viewModel.search(state.query.text, selected)
-            state.searching = false
-        }
-        when (state.searchDisplay) {
-            SearchDisplay.Categories -> {
-                Text(
-                    text = "",
-                    style = Typography.subtitle1,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
+    Surface(modifier = modifier.fillMaxSize()) {
+        Box {
+            Column {
+                Spacer(modifier = Modifier.statusBarsPadding())
+                Row(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .align(alignment = CenterHorizontally)
+                ) {
+                    RadioButton(
+                        selected = selected == searchTypeFile,
+                        onClick = { selected = searchTypeFile })
+                    Text(
+                        text = stringResource(id = R.string.search_file),
+                        modifier = Modifier
+                            .clickable(onClick = { selected = searchTypeFile })
+                            .padding(start = 4.dp)
+                    )
+                    Spacer(modifier = Modifier.size(4.dp))
+                    RadioButton(
+                        selected = selected == searchTypeHistory,
+                        onClick = { selected = searchTypeHistory })
+                    Text(
+                        text = stringResource(id = R.string.search_history),
+                        modifier = Modifier
+                            .clickable(onClick = { selected = searchTypeHistory })
+                            .padding(start = 4.dp)
+                    )
+                    Spacer(modifier = Modifier.size(4.dp))
+                    RadioButton(
+                        selected = selected == searchTypeFavorite,
+                        onClick = { selected = searchTypeFavorite })
+                    Text(
+                        text = stringResource(id = R.string.search_favorite),
+                        modifier = Modifier
+                            .clickable(onClick = { selected = searchTypeFavorite })
+                            .padding(start = 4.dp)
+                    )
+                }
+                SearchBar(
+                    query = state.query,
+                    onQueryChange = { state.query = it },
+                    searchFocused = state.focused,
+                    onSearchFocusChange = { state.focused = it },
+                    onClearQuery = { state.query = TextFieldValue("") },
+                    searching = state.searching
                 )
+                Divider()
+
+                LaunchedEffect(state.query.text) {
+                    state.searching = true
+                    state.searchResults = viewModel.search(state.query.text, selected)
+                    state.searching = false
+                }
+                when (state.searchDisplay) {
+                    SearchDisplay.Categories -> {
+                        Text(
+                            text = "",
+                            style = Typography.subtitle1,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    SearchDisplay.Suggestions -> SearchSuggestions(
+                        suggestions = state.suggestions,
+                        onSuggestionSelect = { suggestion ->
+                            state.query = TextFieldValue(suggestion)
+                        }
+                    )
+                    SearchDisplay.NoResults -> Text("no results")
+                    SearchDisplay.Results -> ItemList(
+                        state.searchResults,
+                        showUserDialog,
+                        showInfoDialog,
+                        menuOpt,
+                        onClick,
+                        viewModel
+                    )
+                }
             }
-            SearchDisplay.Suggestions -> SearchSuggestions(
-                suggestions = state.suggestions,
-                onSuggestionSelect = { suggestion -> state.query = TextFieldValue(suggestion) }
-            )
-            SearchDisplay.NoResults -> Text("no results")
-            SearchDisplay.Results -> ItemList(
-                state.searchResults,
-                showUserDialog,
-                showInfoDialog,
-                menuOpt,
-                onClick,
-                viewModel
-            )
         }
     }
 }
@@ -331,9 +336,9 @@ private fun ItemList(
         showUserDialog.value = true
     }
     //Logcat.d("showUserDialog:${showUserDialog.value}, file.fileIndex:${fileIndex.value}")
-    if (fileIndex.value < list.size) {
-        showUserDialog.value = false
-    }
+    //if (fileIndex.value < list.size) {
+    //    showUserDialog.value = false
+    //}
     val fileBean = if (fileIndex.value >= list.size) null else list[fileIndex.value]
     UserOptDialog(showUserDialog, fileBean, menuOpt)
     FileInfoDialog(showInfoDialog, fileBean, menuOpt)
