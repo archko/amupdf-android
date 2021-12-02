@@ -8,18 +8,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRowDefaults
-import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -57,6 +58,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
 @Composable
@@ -236,7 +238,7 @@ private fun TabContent(
                     Modifier
                         .pagerTabIndicatorOffset(pagerState, tabPositions)
                         .height(4.dp),
-                    color = MaterialTheme.colors.secondary,
+                    color = MaterialTheme.colorScheme.secondary,
                 )
             }
         ) {
@@ -254,7 +256,7 @@ private fun TabContent(
                             text = title.toUpperCase(Locale.getDefault()),
                         )
                     },
-                    unselectedContentColor = MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.medium)
+                    unselectedContentColor = MaterialTheme.colorScheme.onBackground.copy(alpha = ContentAlpha.medium)
                 )
             }
         }

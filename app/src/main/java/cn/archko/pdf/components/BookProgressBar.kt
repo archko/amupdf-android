@@ -2,7 +2,7 @@ package cn.archko.pdf.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.focusable
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 fun BookProgressBar(
     progress: Float,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colors.secondary.copy(alpha = 0.3f),
+    color: Color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f),
 ) {
     Canvas(
         modifier.focusable()

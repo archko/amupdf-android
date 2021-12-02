@@ -18,11 +18,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.RadioButton
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Search
@@ -246,8 +246,7 @@ private fun SearchBar(
     modifier: Modifier = Modifier
 ) {
     Surface(
-        color = MaterialTheme.colors.secondary.copy(alpha = 0.3f),
-        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f),
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp)
@@ -307,12 +306,12 @@ private fun SearchHint() {
         Icon(
             imageVector = Icons.Outlined.Search,
             contentDescription = null,
-            tint = MaterialTheme.colors.primary.copy(alpha = 0.6f)
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
         )
         Spacer(Modifier.width(8.dp))
         Text(
             text = "Search",
-            color = MaterialTheme.colors.primary.copy(alpha = 0.6f)
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
         )
     }
 }

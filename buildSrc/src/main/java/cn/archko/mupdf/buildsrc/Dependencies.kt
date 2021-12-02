@@ -30,11 +30,11 @@ object Libs {
     }
 
     object Coil {
-        const val coilCompose = "io.coil-kt:coil-compose:1.3.0"
+        const val coilCompose = "io.coil-kt:coil-compose:1.3.1"
     }
 
     object Kotlin {
-        private const val version = "1.5.30"
+        private const val version = "1.5.31"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
@@ -55,11 +55,11 @@ object Libs {
 
     object AndroidX {
         const val coreKtx = "androidx.core:core-ktx:1.6.0"
-        const val navigation = "androidx.navigation:navigation-compose:2.4.0-alpha10"
+        const val navigation = "androidx.navigation:navigation-compose:2.4.0-beta01"
 
         object Compose {
             const val snapshot = ""
-            const val version = "1.0.3"
+            const val version = "1.1.0-beta01"
 
             const val runtime = "androidx.compose.runtime:runtime:$version"
             const val animation = "androidx.compose.animation:animation:$version"
@@ -68,6 +68,7 @@ object Libs {
 
             const val ui = "androidx.compose.ui:ui:$version"
             const val material = "androidx.compose.material:material:$version"
+            const val material3 = "androidx.compose.material3:material3:1.0.0-alpha01"
             const val iconsExtended = "androidx.compose.material:material-icons-extended:$version"
 
             const val tooling = "androidx.compose.ui:ui-tooling:$version"

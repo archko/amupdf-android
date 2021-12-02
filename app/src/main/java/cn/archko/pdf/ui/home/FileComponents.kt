@@ -2,11 +2,19 @@ package cn.archko.pdf.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absolutePadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -97,7 +105,6 @@ fun UserOptDialog(
         ) {
             Surface(
                 modifier = Modifier,
-                shape = MaterialTheme.shapes.medium,
             ) {
                 Column(modifier = Modifier.padding(2.dp)) {
                     Row {
@@ -189,7 +196,6 @@ fun LoadingDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(160.dp),
-                shape = MaterialTheme.shapes.medium,
             ) {
                 Column(
                     modifier = Modifier

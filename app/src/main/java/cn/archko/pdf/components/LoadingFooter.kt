@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,7 +75,7 @@ fun LoadingFooter(
                 Text(
                     text = it,
                     style = TextStyle(fontSize = 15.sp),
-                    color = MaterialTheme.colors.onSecondary.copy(alpha = 0.6f),
+                    color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.6f),
                     modifier = modifier
                         .align(Alignment.CenterVertically)
                 )

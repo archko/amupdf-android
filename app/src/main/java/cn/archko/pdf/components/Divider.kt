@@ -17,7 +17,7 @@
 package cn.archko.pdf.components
 
 import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun Divider(
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colors.secondaryVariant.copy(alpha = DividerAlpha),
+    color: Color = MaterialTheme.colorScheme.secondary.copy(alpha = DividerAlpha),
     thickness: Dp = 0.5.dp,
     startIndent: Dp = 0.dp
 ) {

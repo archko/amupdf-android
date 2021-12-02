@@ -3,7 +3,7 @@ package cn.archko.pdf.ui.home
 import FileList
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -94,8 +94,7 @@ fun FileHistoryList(
                     // Enable the scale animation
                     scale = true,
                     // Change the color and shape
-                    backgroundColor = MaterialTheme.colors.primary,
-                    shape = MaterialTheme.shapes.small,
+                    backgroundColor = MaterialTheme.colorScheme.primary,
                 )
             }
         ) {
