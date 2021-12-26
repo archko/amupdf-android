@@ -11,9 +11,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.core.view.WindowCompat
 import cn.archko.pdf.LocalBackPressedDispatcher
-import cn.archko.pdf.theme.*
+import cn.archko.pdf.theme.AppThemeState
+import cn.archko.pdf.theme.ColorPallet
+import cn.archko.pdf.theme.ComposeCookBookTheme
+import cn.archko.pdf.theme.blue700
+import cn.archko.pdf.theme.green700
+import cn.archko.pdf.theme.orange700
+import cn.archko.pdf.theme.purple700
 import cn.archko.pdf.ui.home.AboutScreen
-import cn.archko.pdf.utils.LocalSysUiController
+import cn.archko.pdf.utils.LocalSystemUiController
 import cn.archko.pdf.utils.SystemUiController
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.umeng.analytics.MobclickAgent
@@ -49,7 +55,7 @@ class AboutActivity : ComponentActivity() {
                 darkIcons = appTheme.value.darkTheme
             )
             CompositionLocalProvider(
-                LocalSysUiController provides systemUiController,
+                LocalSystemUiController provides systemUiController,
                 LocalBackPressedDispatcher provides this.onBackPressedDispatcher
             ) {
                 ProvideWindowInsets {

@@ -25,7 +25,7 @@ import cn.archko.pdf.theme.blue700
 import cn.archko.pdf.theme.green700
 import cn.archko.pdf.theme.orange700
 import cn.archko.pdf.theme.purple700
-import cn.archko.pdf.utils.LocalSysUiController
+import cn.archko.pdf.utils.LocalSystemUiController
 import cn.archko.pdf.utils.SystemUiController
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.umeng.analytics.MobclickAgent
@@ -85,7 +85,7 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
                 }
             }
             CompositionLocalProvider(
-                LocalSysUiController provides systemUiController,
+                LocalSystemUiController provides systemUiController,
                 LocalBackPressedDispatcher provides this.onBackPressedDispatcher
             ) {
                 ProvideWindowInsets {

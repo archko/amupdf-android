@@ -1,3 +1,8 @@
+package cn.archko.pdf.utils
+
+// Taken from
+// https://gist.github.com/chrisbanes/ab31bf7b67b77948157687af010f0667#file-systemui-kt
+// Thanks to chris for awesome helper class.
 /*
  * Copyright 2020 The Android Open Source Project
  *
@@ -5,7 +10,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     https://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,8 +18,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package cn.archko.pdf.utils
 
 import android.os.Build
 import android.view.View
@@ -25,35 +28,11 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 
-interface SystemUiController {
-    fun setStatusBarColor(
-        color: Color,
-        darkIcons: Boolean = color.luminance() > 0.5f,
-        transformColorForLightContent: (Color) -> Color = BlackScrimmed
-    )
-
-    fun setNavigationBarColor(
-        color: Color,
-        darkIcons: Boolean = color.luminance() > 0.5f,
-        transformColorForLightContent: (Color) -> Color = BlackScrimmed
-    )
-
-    fun setSystemBarsColor(
-        color: Color,
-        darkIcons: Boolean = color.luminance() > 0.5f,
-        transformColorForLightContent: (Color) -> Color = BlackScrimmed
-    )
-}
-
-fun SystemUiController(window: Window): SystemUiController {
-    return SystemUiControllerImpl(window)
-}
-
 /**
  * A helper class for setting the navigation and status bar colors for a [Window], gracefully
  * degrading behavior based upon API level.
  */
-private class SystemUiControllerImpl(private val window: Window) : SystemUiController {
+class SystemUiController(private val window: Window) {
 
     /**
      * Set the status bar color.
@@ -65,17 +44,16 @@ private class SystemUiControllerImpl(private val window: Window) : SystemUiContr
      * @param transformColorForLightContent A lambda which will be invoked to transform [color] if
      * dark icons were requested but are not available. Defaults to applying a black scrim.
      */
-    override fun setStatusBarColor(
+    fun setStatusBarColor(
         color: Color,
-        darkIcons: Boolean,
-        transformColorForLightContent: (Color) -> Color
+        darkIcons: Boolean = color.luminance() > 0.5f,
+        transformColorForLightContent: (Color) -> Color = BlackScrimmed
     ) {
         val statusBarColor = when {
             darkIcons && Build.VERSION.SDK_INT < 23 -> transformColorForLightContent(color)
             else -> color
         }
         window.statusBarColor = statusBarColor.toArgb()
-
         if (Build.VERSION.SDK_INT >= 23) {
             @Suppress("DEPRECATION")
             if (darkIcons) {
@@ -100,10 +78,10 @@ private class SystemUiControllerImpl(private val window: Window) : SystemUiContr
      * @param transformColorForLightContent A lambda which will be invoked to transform [color] if
      * dark icons were requested but are not available. Defaults to applying a black scrim.
      */
-    override fun setNavigationBarColor(
+    fun setNavigationBarColor(
         color: Color,
-        darkIcons: Boolean,
-        transformColorForLightContent: (Color) -> Color
+        darkIcons: Boolean = color.luminance() > 0.5f,
+        transformColorForLightContent: (Color) -> Color = BlackScrimmed
     ) {
         val navBarColor = when {
             Build.VERSION.SDK_INT >= 29 -> Color.Transparent // For gesture nav
@@ -111,7 +89,6 @@ private class SystemUiControllerImpl(private val window: Window) : SystemUiContr
             else -> color
         }
         window.navigationBarColor = navBarColor.toArgb()
-
         if (Build.VERSION.SDK_INT >= 26) {
             @Suppress("DEPRECATION")
             if (darkIcons) {
@@ -130,10 +107,10 @@ private class SystemUiControllerImpl(private val window: Window) : SystemUiContr
      * @see setStatusBarColor
      * @see setNavigationBarColor
      */
-    override fun setSystemBarsColor(
+    fun setSystemBarsColor(
         color: Color,
-        darkIcons: Boolean,
-        transformColorForLightContent: (Color) -> Color
+        darkIcons: Boolean = color.luminance() > 0.5f,
+        transformColorForLightContent: (Color) -> Color = BlackScrimmed
     ) {
         setStatusBarColor(color, darkIcons, transformColorForLightContent)
         setNavigationBarColor(color, darkIcons, transformColorForLightContent)
@@ -141,37 +118,14 @@ private class SystemUiControllerImpl(private val window: Window) : SystemUiContr
 }
 
 /**
- * An [androidx.compose.runtime.Ambient] holding the current [LocalSysUiController]. Defaults to a
- * no-op controller; consumers should [provide][androidx.compose.runtime.CompositionLocalProvider] a real one.
+ * An [androidx.compose.Local] holding the current [SystemUiController] or throws an error if none
+ * is [provided][androidx.compose.Providers].
  */
-val LocalSysUiController = staticCompositionLocalOf<SystemUiController> {
-    FakeSystemUiController
+val LocalSystemUiController = staticCompositionLocalOf<SystemUiController> {
+    error("No SystemUiController provided")
 }
 
 private val BlackScrim = Color(0f, 0f, 0f, 0.2f) // 20% opaque black
 private val BlackScrimmed: (Color) -> Color = { original ->
     BlackScrim.compositeOver(original)
-}
-
-/**
- * A fake implementation, useful as a default or used in Previews.
- */
-private object FakeSystemUiController : SystemUiController {
-    override fun setStatusBarColor(
-        color: Color,
-        darkIcons: Boolean,
-        transformColorForLightContent: (Color) -> Color
-    ) = Unit
-
-    override fun setNavigationBarColor(
-        color: Color,
-        darkIcons: Boolean,
-        transformColorForLightContent: (Color) -> Color
-    ) = Unit
-
-    override fun setSystemBarsColor(
-        color: Color,
-        darkIcons: Boolean,
-        transformColorForLightContent: (Color) -> Color
-    ) = Unit
 }
