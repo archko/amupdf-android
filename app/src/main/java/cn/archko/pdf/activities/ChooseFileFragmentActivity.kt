@@ -28,7 +28,6 @@ import cn.archko.pdf.theme.purple700
 import cn.archko.pdf.utils.LocalSysUiController
 import cn.archko.pdf.utils.SystemUiController
 import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.accompanist.pager.ExperimentalPagerApi
 import com.umeng.analytics.MobclickAgent
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -39,8 +38,7 @@ import kotlinx.coroutines.runBlocking
  */
 open class ChooseFileFragmentActivity : ComponentActivity() {
 
-    @ExperimentalPagerApi
-    @ExperimentalMaterialApi
+    @OptIn(ExperimentalMaterialApi::class, com.google.accompanist.pager.ExperimentalPagerApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

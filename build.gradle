@@ -62,7 +62,7 @@ subprojects {
             jvmTarget = '1.8'
             allWarningsAsErrors = false
             // Opt-in to experimental compose APIs
-            freeCompilerArgs += '-Xopt-in=kotlin.RequiresOptIn'
+            //freeCompilerArgs += '-Xopt-in=kotlin.RequiresOptIn'
             // Enable experimental coroutines APIs, including collectAsState()
             //freeCompilerArgs += '-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi'
         }
