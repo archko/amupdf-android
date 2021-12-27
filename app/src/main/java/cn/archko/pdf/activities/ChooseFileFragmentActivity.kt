@@ -20,7 +20,7 @@ import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.theme.AppThemeState
 import cn.archko.pdf.theme.ColorPallet
-import cn.archko.pdf.theme.ComposeCookBookTheme
+import cn.archko.pdf.theme.ComposeCookBookMaterialTheme
 import cn.archko.pdf.theme.blue700
 import cn.archko.pdf.theme.green700
 import cn.archko.pdf.theme.orange700
@@ -60,20 +60,12 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
                     )
                 )
             }
-            val color = if (appTheme.value.darkTheme) {
-                when (appTheme.value.pallet) {
-                    ColorPallet.GREEN -> green700.copy(alpha = 0.3f)
-                    ColorPallet.BLUE -> blue700.copy(alpha = 0.3f)
-                    ColorPallet.ORANGE -> orange700.copy(alpha = 0.3f)
-                    ColorPallet.PURPLE -> purple700.copy(alpha = 0.3f)
-                }
-            } else {
-                when (appTheme.value.pallet) {
-                    ColorPallet.GREEN -> green700
-                    ColorPallet.BLUE -> blue700
-                    ColorPallet.ORANGE -> orange700
-                    ColorPallet.PURPLE -> purple700
-                }
+            val color = when (appTheme.value.pallet) {
+                ColorPallet.GREEN -> green700
+                ColorPallet.BLUE -> blue700
+                ColorPallet.ORANGE -> orange700
+                ColorPallet.PURPLE -> purple700
+                else -> green700
             }
             systemUiController.setStatusBarColor(
                 color = color,
@@ -89,7 +81,7 @@ open class ChooseFileFragmentActivity : ComponentActivity() {
                 LocalBackPressedDispatcher provides this.onBackPressedDispatcher
             ) {
                 ProvideWindowInsets {
-                    ComposeCookBookTheme(
+                    ComposeCookBookMaterialTheme(
                         darkTheme = appTheme.value.darkTheme,
                         colorPallet = appTheme.value.pallet
                     ) {

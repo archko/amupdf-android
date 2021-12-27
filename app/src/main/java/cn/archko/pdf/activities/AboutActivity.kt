@@ -13,7 +13,7 @@ import androidx.core.view.WindowCompat
 import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.theme.AppThemeState
 import cn.archko.pdf.theme.ColorPallet
-import cn.archko.pdf.theme.ComposeCookBookTheme
+import cn.archko.pdf.theme.ComposeCookBookMaterialTheme
 import cn.archko.pdf.theme.blue700
 import cn.archko.pdf.theme.green700
 import cn.archko.pdf.theme.orange700
@@ -49,6 +49,7 @@ class AboutActivity : ComponentActivity() {
                 ColorPallet.BLUE -> blue700
                 ColorPallet.ORANGE -> orange700
                 ColorPallet.PURPLE -> purple700
+                else -> green700
             }
             systemUiController.setStatusBarColor(
                 color = color,
@@ -59,7 +60,7 @@ class AboutActivity : ComponentActivity() {
                 LocalBackPressedDispatcher provides this.onBackPressedDispatcher
             ) {
                 ProvideWindowInsets {
-                    ComposeCookBookTheme(
+                    ComposeCookBookMaterialTheme(
                         darkTheme = appTheme.value.darkTheme,
                         colorPallet = appTheme.value.pallet
                     ) {

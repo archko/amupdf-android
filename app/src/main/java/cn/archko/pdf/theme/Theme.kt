@@ -1,150 +1,117 @@
 package cn.archko.pdf.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import cn.archko.pdf.theme.*
 
 // dark palettes
-private val DarkGreenColorPalette = darkColorScheme(
+private val DarkGreenColorPalette = darkColors(
     primary = green200,
-    primaryContainer = green700,
+    primaryVariant = green700,
     secondary = teal200,
-    secondaryContainer = green700,
-    onSecondaryContainer = Color.Black,
     background = Color.Black,
     surface = Color.Black,
-    surfaceVariant = Color.Black,
     onPrimary = Color.Black,
     onSecondary = Color.White,
     onBackground = Color.White,
     onSurface = Color.White,
-    onSurfaceVariant = Color.White,
     error = Color.Red,
 )
 
-private val DarkPurpleColorPalette = darkColorScheme(
+private val DarkPurpleColorPalette = darkColors(
     primary = purple200,
-    primaryContainer = purple700,
+    primaryVariant = purple700,
     secondary = teal200,
-    secondaryContainer = purple700,
-    onSecondaryContainer = Color.White,
     background = Color.Black,
     surface = Color.Black,
-    surfaceVariant = Color.Black,
     onPrimary = Color.Black,
     onSecondary = Color.White,
     onBackground = Color.White,
     onSurface = Color.White,
-    onSurfaceVariant = Color.White,
     error = Color.Red,
 )
 
-private val DarkBlueColorPalette = darkColorScheme(
+private val DarkBlueColorPalette = darkColors(
     primary = blue200,
-    primaryContainer = blue700,
+    primaryVariant = blue700,
     secondary = teal200,
-    secondaryContainer = blue700,
-    onSecondaryContainer = Color.White,
     background = Color.Black,
     surface = Color.Black,
-    surfaceVariant = Color.Black,
     onPrimary = Color.Black,
     onSecondary = Color.White,
     onBackground = Color.White,
     onSurface = Color.White,
-    onSurfaceVariant = Color.White,
     error = Color.Red,
 )
 
-private val DarkOrangeColorPalette = darkColorScheme(
+private val DarkOrangeColorPalette = darkColors(
     primary = orange200,
-    primaryContainer = orange700,
+    primaryVariant = orange700,
     secondary = teal200,
-    secondaryContainer = orange700,
-    onSecondaryContainer = Color.White,
     background = Color.Black,
     surface = Color.Black,
-    surfaceVariant = Color.Black,
     onPrimary = Color.Black,
     onSecondary = Color.White,
     onBackground = Color.White,
     onSurface = Color.White,
-    onSurfaceVariant = Color.White,
     error = Color.Red,
 )
 
 // Light pallets
-private val LightGreenColorPalette = lightColorScheme(
+private val LightGreenColorPalette = lightColors(
     primary = green500,
-    primaryContainer = green700,
+    primaryVariant = green700,
     secondary = teal200,
-    secondaryContainer = green700,
-    onSecondaryContainer = Color.White,
     background = Color.White,
     surface = Color.White,
-    surfaceVariant = Color.White,
     onPrimary = Color.White,
     onSecondary = Color.Black,
     onBackground = Color.Black,
-    onSurface = Color.Black,
-    onSurfaceVariant = Color.Black
+    onSurface = Color.Black
 )
 
-private val LightPurpleColorPalette = lightColorScheme(
+private val LightPurpleColorPalette = lightColors(
     primary = purple,
-    primaryContainer = purple700,
+    primaryVariant = purple700,
     secondary = teal200,
-    secondaryContainer = purple700,
-    onSecondaryContainer = Color.White,
     background = Color.White,
     surface = Color.White,
-    surfaceVariant = Color.White,
     onPrimary = Color.White,
     onSecondary = Color.Black,
     onBackground = Color.Black,
-    onSurface = Color.Black,
-    onSurfaceVariant = Color.Black,
+    onSurface = Color.Black
 )
 
-private val LightBlueColorPalette = lightColorScheme(
+private val LightBlueColorPalette = lightColors(
     primary = blue500,
-    primaryContainer = blue700,
+    primaryVariant = blue700,
     secondary = teal200,
-    secondaryContainer = blue700,
-    onSecondaryContainer = Color.White,
     background = Color.White,
     surface = Color.White,
-    surfaceVariant = Color.White,
     onPrimary = Color.White,
     onSecondary = Color.Black,
     onBackground = Color.Black,
-    onSurface = Color.Black,
-    onSurfaceVariant = Color.Black,
+    onSurface = Color.Black
 )
 
-private val LightOrangeColorPalette = lightColorScheme(
+private val LightOrangeColorPalette = lightColors(
     primary = orange500,
-    primaryContainer = orange700,
+    primaryVariant = orange700,
     secondary = teal200,
-    secondaryContainer = orange700,
-    onSecondaryContainer = Color.White,
     background = Color.White,
     surface = Color.White,
-    surfaceVariant = Color.White,
     onPrimary = Color.White,
     onSecondary = Color.Black,
     onBackground = Color.Black,
-    onSurface = Color.Black,
-    onSurfaceVariant = Color.Black,
+    onSurface = Color.Black
 )
 
 enum class ColorPallet {
-    GREEN, PURPLE, ORANGE, BLUE
+    GREEN, PURPLE, ORANGE, BLUE, WALLPAPER
 }
 
 @Composable
@@ -158,10 +125,13 @@ fun ComposeCookBookTheme(
         ColorPallet.PURPLE -> if (darkTheme) DarkPurpleColorPalette else LightPurpleColorPalette
         ColorPallet.ORANGE -> if (darkTheme) DarkOrangeColorPalette else LightOrangeColorPalette
         ColorPallet.BLUE -> if (darkTheme) DarkBlueColorPalette else LightBlueColorPalette
+        else ->  if (darkTheme) DarkBlueColorPalette else LightBlueColorPalette
     }
 
     MaterialTheme(
-        colorScheme = colors,
+        colors = colors,
+        typography = Typography,
+        shapes = Shapes,
         content = content
     )
 }
