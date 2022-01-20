@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Tab
@@ -18,7 +17,6 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -238,7 +236,6 @@ private fun TabContent(
                     Modifier
                         .pagerTabIndicatorOffset(pagerState, tabPositions)
                         .height(4.dp),
-                    color = MaterialTheme.colorScheme.secondary,
                 )
             }
         ) {
@@ -256,7 +253,6 @@ private fun TabContent(
                             text = title.toUpperCase(Locale.getDefault()),
                         )
                     },
-                    unselectedContentColor = MaterialTheme.colorScheme.onBackground.copy(alpha = ContentAlpha.medium)
                 )
             }
         }
