@@ -32,16 +32,16 @@ public abstract class ArDkLib
     public abstract ArDkDoc openDocument(String path, SODocLoadListener listener, Context context, ConfigOptions cfg);
 
     public interface EnumeratePdfTocListener {
-        void nextTocEntry(int handle, int parentHandle, int page, String label, String url, float x, float y);
+        void nextTocEntry(int handle, int parentHandle, int page, String label, String url);
     }
 
     public static void enumeratePdfToc(final ArDkDoc doc, final EnumeratePdfTocListener listener)
     {
         ((MuPDFDoc)doc).enumerateToc(new MuPDFDoc.MuPDFEnumerateTocListener() {
             @Override
-            public void nextTocEntry(int handle, int parentHandle, int page, String label, String url, float x, float y)
+            public void nextTocEntry(int handle, int parentHandle, int page, String label, String url)
             {
-                listener.nextTocEntry(handle, parentHandle, page, label, url, x, y);
+                listener.nextTocEntry(handle, parentHandle, page, label, url);
             }
         });
     }

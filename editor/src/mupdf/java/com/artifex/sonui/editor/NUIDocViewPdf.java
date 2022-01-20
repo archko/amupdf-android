@@ -620,7 +620,7 @@ public class NUIDocViewPdf extends NUIDocView
         //  enumerate the TOC.  If there is at least one entry, enable the button
         ArDkLib.enumeratePdfToc(getDoc(), new ArDkLib.EnumeratePdfTocListener() {
             @Override
-            public void nextTocEntry(int handle, int parentHandle, int page, String label, String url, float x, float y)
+            public void nextTocEntry(int handle, int parentHandle, int page, String label, String url)
             {
                 //  enable the TOC button
                 mTocButton.setEnabled(true);

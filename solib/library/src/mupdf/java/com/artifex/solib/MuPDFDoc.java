@@ -1142,7 +1142,7 @@ public class MuPDFDoc extends ArDkDoc
     }
 
     public interface MuPDFEnumerateTocListener {
-        void nextTocEntry(int handle, int parentHandle, int page, String label, String url, float x, float y);
+        void nextTocEntry(int handle, int parentHandle, int page, String label, String url);
     }
 
     public int enumerateToc(MuPDFEnumerateTocListener listener)
@@ -1181,7 +1181,7 @@ public class MuPDFDoc extends ArDkDoc
                 }
 
                 handleCounter++;
-                listener.nextTocEntry(handleCounter, parent, page, outline.title, outline.uri, loc.x, loc.y);
+                listener.nextTocEntry(handleCounter, parent, page, outline.title, outline.uri);
 
                 Outline[] down = outline.down;
                 processOutline(down, handleCounter, listener);

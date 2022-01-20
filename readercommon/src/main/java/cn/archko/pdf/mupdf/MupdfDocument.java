@@ -221,7 +221,7 @@ public class MupdfDocument {
         return document.pageNumberFromLocation(document.resolveLink(link));
     }
 
-    public Quad[] searchPage(int pageNum, String text) {
+    public Quad[][] searchPage(int pageNum, String text) {
         gotoPage(pageNum);
         return page.search(text);
     }

@@ -68,10 +68,10 @@ class TocDialog implements PopupWindow.OnDismissListener
         //  populate the list
         ArDkLib.enumeratePdfToc(mDoc, new ArDkLib.EnumeratePdfTocListener() {
             @Override
-            public void nextTocEntry(int handle, int parentHandle, int page, String label, String url, float x, float y)
+            public void nextTocEntry(int handle, int parentHandle, int page, String label, String url)
             {
                 //  add to the list
-                adapter.addItem(new TocData(handle, parentHandle, page, label, url, x, y));
+                adapter.addItem(new TocData(handle, parentHandle, page, label, url));
             }
         });
 
@@ -86,7 +86,7 @@ class TocDialog implements PopupWindow.OnDismissListener
 
                 if (data.page>=0)
                 {
-                    RectF r = new RectF(data.x, data.y, data.x+1, data.y+1);
+                    RectF r = new RectF(0, 0, 1, 1);
                     SOLinkData linkData = new SOLinkData(data.page, r);
                     if (Utilities.isPhoneDevice(mContext))
                         dismiss();
@@ -189,16 +189,12 @@ class TocDialog implements PopupWindow.OnDismissListener
         String label;
         String url;
         int level;
-        float x;
-        float y;
         int page;
-        private TocData(int handle, int parentHandle, int page, String label, String url, float x, float y) {
+        private TocData(int handle, int parentHandle, int page, String label, String url) {
             this.handle = handle;
             this.parentHandle = parentHandle;
             this.label = label;
             this.url = url;
-            this.x = x;
-            this.y = y;
             this.page = page;
         }
     }

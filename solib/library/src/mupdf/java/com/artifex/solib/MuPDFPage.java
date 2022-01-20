@@ -38,7 +38,7 @@ public class MuPDFPage extends ArDkPage
     private DisplayList annotContents = null;
     private DisplayList widgetContents = null;
 
-    private Quad[] searchResults;
+    private Quad[][] searchResults;
     private int searchIndex;
     private String lastSearch = "";
 
@@ -124,7 +124,7 @@ public class MuPDFPage extends ArDkPage
     public android.graphics.Rect getSearchHighlight()
     {
         if (searchResults!=null && searchResults.length>0 && searchIndex>=0 && searchIndex<searchResults.length)
-            return toRect(searchResults[searchIndex].toRect());
+            return toRect(searchResults[searchIndex][0].toRect());
         return null;
     }
 
@@ -1112,7 +1112,7 @@ public class MuPDFPage extends ArDkPage
 
                 hyper.pageNum = page;
                 if (page >= 0) {
-                    hyper.bbox = new android.graphics.Rect((int) loc.x, (int) loc.y, (int) loc.x, (int) loc.y);
+                    hyper.bbox = new android.graphics.Rect(0, 0, 0, 0);
                     hyper.url = null;
                 } else {
                     hyper.bbox = null;

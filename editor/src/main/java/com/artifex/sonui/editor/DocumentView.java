@@ -486,7 +486,7 @@ public class DocumentView extends NUIView {
          * @param x             x - coordinate on the page.
          * @param y             y - coordinate on the page.
          */
-        void nextTocEntry(int handle, int parentHandle, int page, String label, String url, float x, float y);
+        void nextTocEntry(int handle, int parentHandle, int page, String label, String url);
     }
 
     /**
@@ -500,9 +500,9 @@ public class DocumentView extends NUIView {
         SODoc doc = (SODoc)mDocView.getDoc();
         ArDkLib.enumeratePdfToc(doc, new ArDkLib.EnumeratePdfTocListener() {
             @Override
-            public void nextTocEntry(int handle, int parentHandle, int page, String label, String url, float x, float y)
+            public void nextTocEntry(int handle, int parentHandle, int page, String label, String url)
             {
-                listener.nextTocEntry(handle, parentHandle, page, label, url, x, y);
+                listener.nextTocEntry(handle, parentHandle, page, label, url);
             }
         });
     }
