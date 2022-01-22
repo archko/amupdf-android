@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +30,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
@@ -152,10 +154,12 @@ fun HomePager(
         Scaffold(
             topBar = {
                 TopAppBar(
+                    backgroundColor = MaterialTheme.colorScheme.primaryContainer,
                     title = {
                         Text(
                             text = stringResource(id = R.string.app_name),
                             overflow = TextOverflow.Ellipsis,
+                            color = Color.White
                         )
                     },
                     elevation = 0.dp,
@@ -237,7 +241,8 @@ private fun TabContent(
                         .pagerTabIndicatorOffset(pagerState, tabPositions)
                         .height(4.dp),
                 )
-            }
+            },
+            backgroundColor = MaterialTheme.colorScheme.primaryContainer,
         ) {
             navItems.forEachIndexed { index, title ->
                 Tab(
@@ -251,6 +256,7 @@ private fun TabContent(
                     text = {
                         Text(
                             text = title.toUpperCase(Locale.getDefault()),
+                            color = Color.White
                         )
                     },
                 )
