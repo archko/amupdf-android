@@ -3,14 +3,7 @@ apply from: "../gradle/library_common.gradle"
 import cn.archko.mupdf.buildsrc.*
 
 android {
-    compileSdkVersion BuildConfig.compileSdkVersion
-    buildToolsVersion BuildConfig.buildToolsVersion
     defaultConfig {
-        minSdkVersion BuildConfig.minSdkVersion
-        targetSdkVersion BuildConfig.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
-
         vectorDrawables {
             /*
              *  Do not generate pngs from vector drawable resources.
@@ -40,21 +33,6 @@ android {
         release {
             consumerProguardFiles 'proguard-rules.pro'
         }
-    }
-
-    compileOptions {
-        encoding "UTF-8"
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-
-    lintOptions {
-        abortOnError false
-        disable 'MissingTranslation'
     }
 }
 
