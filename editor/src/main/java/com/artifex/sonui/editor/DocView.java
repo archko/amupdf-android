@@ -507,20 +507,20 @@ public class DocView
             return;
 
         //  start
-        Utilities.hideKeyboard(getContext());
+        /*Utilities.hideKeyboard(getContext());
         mPressing = true;
         mPressStartScale = mScale;
         mPressStartX = (int) e.getX();
         mPressStartY = (int) e.getY();
         mPressStartViewX = mPressStartX + getScrollX();
         mPressStartViewY = mPressStartY + getScrollY();
-        zoomWhilePressing(mScale, mScale * ZOOM_FACTOR, false);
+        zoomWhilePressing(mScale, mScale * ZOOM_FACTOR, false);*/
     }
 
     public void onLongPressMoving(MotionEvent e)
     {
         //  not if we can't edit text
-        if (!canEditText())
+        /*if (!canEditText())
             return;
 
         //  not while we're doing the zooming
@@ -559,13 +559,13 @@ public class DocView
 
             focusInputView();
             updateInputView();
-        }
+        }*/
     }
 
     public void onLongPressRelease()
     {
         //  we're done with the long press, so zoom back.
-        zoomWhilePressing(mScale, mPressStartScale, true);
+        //zoomWhilePressing(mScale, mPressStartScale, true);
     }
 
     public void onLongPressReleaseDone()

@@ -1,29 +1,8 @@
-apply plugin: 'com.android.library'
+apply from: "../gradle/library_common.gradle"
+
 import cn.archko.mupdf.buildsrc.*
 
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-
 android {
-    compileSdkVersion BuildConfig.compileSdkVersion
-    buildToolsVersion BuildConfig.buildToolsVersion
-    defaultConfig {
-        minSdkVersion BuildConfig.minSdkVersion
-        targetSdkVersion BuildConfig.targetSdkVersion
-    }
-
-    compileOptions {
-        encoding "UTF-8"
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-
-    lintOptions { abortOnError false }
-
     sourceSets {
         main {
             jni.srcDirs = []
