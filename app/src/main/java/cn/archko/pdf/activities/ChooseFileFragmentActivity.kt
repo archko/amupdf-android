@@ -36,10 +36,11 @@ import kotlinx.coroutines.runBlocking
 /**
  * @author archko
  */
-open class ChooseFileFragmentActivity : ComponentActivity() {
+open class ChooseFileFragmentActivity : AnalysticActivity() {
 
     @OptIn(ExperimentalMaterialApi::class, com.google.accompanist.pager.ExperimentalPagerApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        isLive = true
         super.onCreate(savedInstanceState)
 
         // This app draws behind the system bars, so we want to handle fitting system windows
