@@ -1,0 +1,224 @@
+@startuml pdfClass
+
+package artifex.sonui.editor {
+
+    class DocMuPdfPageView {
+        DocMuPdfPageView()
+    }
+
+    class DocPageView {
+        DocPageView()
+        mPageNum:int
+        mBitmapRender:ArDkBitmap
+        mBitmapDrawHold:ArDkBitmap
+        mBitmapDraw:ArDkBitmap
+        setupPage():void
+        changePage():void
+        dropPage():void
+        resize():void
+        sizeViewToPage():boolean
+        render():void
+        renderPage():void
+        onSingleTap():void
+        onDoubleTap():void
+    }
+
+    class DocPdfPageView{
+        DocPdfPageView()
+        onDraw():void
+    }
+
+    class DocPdfView{
+        DocPdfView()
+        onTouchEvent():void
+    }
+
+    class DocumentView {
+        DocumentView()
+        start():void
+        getPageCount():int
+        goToPage(pageNum:int):void
+        getPageNumber():int
+    }
+
+    class DocView {
+        DocView()
+        mAdapter:PageAdapter
+        mChildViews:ArrayList
+        mScale:float
+        mXScroll:int
+        mYScroll:int
+        bitmaps:ArDkBitmap
+        bitmapIndex:int
+        mChildRect:int
+        mDoc:ArDkDoc
+        mResizingBitmap:ArDkBitmap
+        onFling():boolean
+        findPageViewContainingPoint():DocPageView
+        onSingleTap():void
+        doSingleTap():void
+        doDoubleTap():void
+        scaleChildren():void
+        onLayout():void
+        handleStartPage():void
+        getOrCreateChild():void
+        renderPages():void
+    }
+
+    class NUIDocView {
+        NUIDocView()
+        mDocView:DocView
+        mAdapter:PageAdapter
+        initialize():void
+        startUI():void
+        start():void
+        createMainView():DocView
+        setCurrentPage(pageNumber:int):void
+        createAdapter():PageAdapter
+        getPageCount():int
+        setupTab():void
+        getDocView():DocView
+        showPages():void
+        hidePages():void
+    }
+
+    class NUIView {
+        NUIView()
+        mDocView:NUIDocView
+        initialize():void
+        makeNUIView():void
+        start():void
+        releaseBitmaps():void
+        onResume():void
+        onPause():void
+        onDestroy():void
+    }
+
+    class PageAdapter {
+        PageAdapter()
+        mDoc:ArDkDoc
+        mContext:Context
+        setDoc():void
+        getView():View
+    }
+}
+
+package artifex.solib {
+    class ArDkBitmap {
+        bitmap:Bitmap
+        rect:int
+    }
+    abstract class ArDkDoc {
+        getNumPages():int
+        getPage():int
+    }
+
+    class MuPDFDoc {
+        mDocument:Document
+        mPageNumber:int
+        mPages:ArrayList
+    }
+
+    class MuPDFPage {
+        mPageNumber:int
+        mDoc:MuPDFDoc
+        mPage:Page
+    }
+}
+
+package com.artifex.mupdf.fitz {
+    class Document {
+        destroy():void
+        openDocument():Document
+        loadPage():Page
+        countPages():int
+    }
+
+    class Page {
+        destroy():void
+        run():void
+    }
+
+    class PDFDocument {
+        PDFDocument()
+        finalize():void
+    }
+}
+
+package android.view {
+    class View {
+        onMeasure():void
+        onDraw():void
+    }
+    class ViewGroup {
+        onMeasure():void
+        onLayout():void
+    }
+}
+
+package android.widget {
+    class AdapterView {
+        AdapterView()
+    }
+    class FrameLayout {
+        onMeasure():void
+        onLayout():void
+    }
+    class BaseAdapter {
+        getDropDownView():View
+        getItemViewType():int
+        getViewTypeCount():int
+    }
+}
+
+package android.content {
+    class Context{
+        startActivity():void
+    }
+}
+
+package android.graphics {
+    class Bitmap {
+        Bitmap():void
+    }
+}
+
+View <|-- ViewGroup
+ViewGroup <|-- FrameLayout
+FrameLayout <|-- NUIView
+FrameLayout <|-- NUIDocView
+View <|-- DocPageView
+
+NUIView <|-- DocumentView
+NUIView <|-- NUIDocView
+
+NUIDocView --> DocView
+
+BaseAdapter <|-- PageAdapter
+PageAdapter --> DocPageView
+AdapterView <|-- DocView
+
+DocView -right--> DocPageView
+DocView <|-- DocPdfView
+DocView --> ArDkDoc
+
+DocPageView --> ArDkDoc
+DocPageView --> ArDkBitmap
+
+DocPdfPageView <|-- DocMuPdfPageView
+DocPageView <|-- DocPdfPageView
+
+DocPdfView --> MuPDFDoc
+DocPdfView -right--> DocPdfPageView
+DocPdfView --> DocMuPdfPageView
+
+DocMuPdfPageView --> MuPDFPage
+MuPDFPage --> MuPDFDoc
+MuPDFPage --> Page
+
+ArDkBitmap --> Bitmap
+ArDkDoc <|-- MuPDFDoc
+MuPDFDoc --> Document
+Document <|-- PDFDocument
+
+@enduml
