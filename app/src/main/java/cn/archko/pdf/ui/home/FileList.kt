@@ -1,12 +1,14 @@
+import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cn.archko.pdf.common.Logcat
@@ -24,8 +26,8 @@ import cn.archko.pdf.ui.home.FileItem
 import cn.archko.pdf.ui.home.MenuItemType
 import cn.archko.pdf.ui.home.UserOptDialog
 import cn.archko.pdf.viewmodel.FileViewModel
-import com.google.accompanist.insets.navigationBarsPadding
 import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
+import kotlinx.coroutines.launch
 
 @Composable
 fun FileList(
@@ -60,6 +62,7 @@ fun FileList(
     }
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ItemList(
@@ -74,7 +77,9 @@ private fun ItemList(
     modifier: Modifier = Modifier,
 ) {
     val list = result.list!!
-    val scroll = rememberScrollState(0)
+    val listState = rememberLazyListState(0)
+    val coroutineScope = rememberCoroutineScope()
+
     val size = list.size
     val fileIndex = remember { mutableStateOf(0) }
     val onOptClick: (Int) -> Unit = { it ->
@@ -85,13 +90,12 @@ private fun ItemList(
         showUserDialog.value = true
     }
     Logcat.d("showUserDialog:${showUserDialog.value}, file.fileIndex:${fileIndex.value}")
-    //if (fileIndex.value < size) {
-    //    showUserDialog.value = false
-    //}
+
     val fileBean = if (fileIndex.value >= size) null else list[fileIndex.value]
     UserOptDialog(showUserDialog, fileBean, menuOpt, fileBeanType)
     FileInfoDialog(showInfoDialog, fileBean, menuOpt)
     LazyColumn(
+        state = listState,
         flingBehavior = StockFlingBehaviours.smoothScroll(),
         modifier = modifier
     ) {
@@ -147,5 +151,8 @@ private fun ItemList(
                 }
             }
         }
+    }
+    coroutineScope.launch {
+        listState.scrollToItem(0)
     }
 }
