@@ -10,7 +10,7 @@ import java.util.*
  */
 fun FileBean.getIcon(): Int {
     var iconId = R.drawable.ic_explorer_fldr
-    if (type == FileBean.HOME) {
+    if (type == FileBean.HOME || type == FileBean.CURRENT) {
     } else if (type == FileBean.NORMAL && isDirectory && !isUpFolder) {
     } else if (isUpFolder) {
     } else {

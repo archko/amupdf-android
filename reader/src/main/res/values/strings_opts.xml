@@ -117,4 +117,7 @@
     <string name="dialog_sub_title_font">Put fonts into /sdcard/amupdf/fonts</string>
     <string name="dialog_item_title_font">%s:testing font</string>
 
+    <string name="title_home">Home:</string>
+    <string name="title_path">Path:</string>
+
 </resources>

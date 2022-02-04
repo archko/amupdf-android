@@ -86,6 +86,7 @@ class FileBean : Serializable, Cloneable {
         const val HOME = 1
         const val RECENT = 2
         const val FAVORITE = 3
+        const val CURRENT = 4
         private fun getLabel(file: File, showPDFExtension: Boolean): String {
             val label = file.name
             return if (!showPDFExtension && label.length > 4 && !file.isDirectory /*&& label.substring(label.length()-4, label.length()).equalsIgnoreCase(".pdf")*/) {

@@ -21,6 +21,7 @@ import cn.archko.pdf.paging.State
 import cn.archko.pdf.paging.itemsIndexed
 import cn.archko.pdf.ui.home.EmptyView
 import cn.archko.pdf.ui.home.FileBeanType
+import cn.archko.pdf.ui.home.FileHeaderItem
 import cn.archko.pdf.ui.home.FileInfoDialog
 import cn.archko.pdf.ui.home.FileItem
 import cn.archko.pdf.ui.home.MenuItemType
@@ -99,6 +100,14 @@ private fun ItemList(
         flingBehavior = StockFlingBehaviours.smoothScroll(),
         modifier = modifier
     ) {
+        if (fileBeanType == FileBeanType.SysFile) {
+            stickyHeader {
+                FileHeaderItem(
+                    onClick = onClick,
+                    viewModel = viewModel
+                )
+            }
+        }
         val hasMore = result.nextKey != null
         itemsIndexed(list) { index, fileBean ->
             if (index > 0) {

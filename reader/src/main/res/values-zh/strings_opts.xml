@@ -89,4 +89,7 @@
     <string name="dialog_title_font">选择字体</string>
     <string name="dialog_sub_title_font">请将字体放入 /sdcard/amupdf/fonts 目录</string>
     <string name="dialog_item_title_font">%s:测试字体</string>
+
+    <string name="title_home">主目录:</string>
+    <string name="title_path">路径:</string>
 </resources>

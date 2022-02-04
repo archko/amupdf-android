@@ -184,6 +184,18 @@ class FileViewModel() : ViewModel() {
         return top == sdcardRoot
     }
 
+    fun getCurrentItem(): FileBean? {
+        if (mCurrentPath == null) {
+            return null
+        } else {
+            return FileBean(FileBean.HOME, mCurrentPath)
+        }
+    }
+
+    fun getHomeItem(): FileBean {
+        return FileBean(FileBean.HOME, homePath)
+    }
+
     fun loadFiles(
         currentPath: String?,
         refresh: Boolean = false
@@ -206,7 +218,7 @@ class FileViewModel() : ViewModel() {
                 val fileList: ArrayList<FileBean> = ArrayList()
                 var entry: FileBean
 
-                entry = FileBean(FileBean.HOME, homePath)
+                entry = FileBean(FileBean.HOME, File(homePath), homePath)
                 fileList.add(entry)
                 if (mCurrentPath != "/") {
                     val upFolder = File(mCurrentPath!!).parentFile

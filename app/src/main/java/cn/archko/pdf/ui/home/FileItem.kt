@@ -17,9 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cn.archko.mupdf.R
 import cn.archko.pdf.components.BookProgressBar
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.utils.getIcon
@@ -110,6 +112,52 @@ fun FileItem(
                             .align(Alignment.CenterVertically)
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun FileHeaderItem(
+    onClick: (FileBean) -> Unit,
+    viewModel: FileViewModel,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        /*val home = viewModel.getHomeItem()
+        Row(
+            modifier
+                .fillMaxWidth()
+                .clickable(onClick = {
+                    onClick(home)
+                })
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
+            val path = stringResource(id = R.string.title_home) + home.label
+            Text(
+                text = path,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 15.sp,
+            )
+        }*/
+
+        val current = viewModel.getCurrentItem()
+        current?.let {
+            Row(
+                modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                val path = stringResource(id = R.string.title_path) + current.label
+                Text(
+                    text = path,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 15.sp,
+                )
             }
         }
     }
