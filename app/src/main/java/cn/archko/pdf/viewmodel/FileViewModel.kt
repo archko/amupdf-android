@@ -82,9 +82,28 @@ class FileViewModel() : ViewModel() {
     private var showExtension: Boolean = true
 
     var sdcardRoot: String = "/sdcard/"
-    var homePath: String
-    var selectionIndex = 0
-    val progressDao by lazy { Graph.database.progressDao() }
+    private var homePath: String
+
+    /**
+     * 存储文件目录对应当前列表显示第一个元素的位置,这样在进入下一级目录再返回可以定位到上次列表的位置.
+     */
+    private var mPathMap: MutableMap<String, Int> = HashMap()
+
+    fun getCurrentPos(): Int {
+        return mPathMap[mCurrentPath] ?: -1
+    }
+
+    fun setCurrentPos(pos: Int) {
+        Logcat.d("setCurrentPos:$mCurrentPath, pos:$pos")
+        mCurrentPath?.let { mPathMap[mCurrentPath!!] = pos }
+    }
+
+    fun setCurrentPos(path: String, pos: Int) {
+        Logcat.d("setCurrentPos.path:$path, pos:$pos")
+        mCurrentPath?.let { mPathMap[path] = pos }
+    }
+
+    private val progressDao by lazy { Graph.database.progressDao() }
 
     private val fileComparator = Comparator<File> { f1, f2 ->
         if (f1 == null) throw RuntimeException("f1 is null inside sort")
@@ -205,6 +224,10 @@ class FileViewModel() : ViewModel() {
         if (!f.exists() || !f.isDirectory) {
             return
         }
+        if (_uiFileModel.value.state == State.LOADING) {
+            return
+        }
+        _uiFileModel.value = _uiFileModel.value.copy(State.LOADING)
         if (!refresh) {
             mCurrentPath = path
             if (!stack.contains(mCurrentPath)) {
@@ -225,7 +248,6 @@ class FileViewModel() : ViewModel() {
                     entry = FileBean(FileBean.NORMAL, upFolder!!, "..")
                     fileList.add(entry)
                 }
-                Logcat.d("loadFiles, path:$mCurrentPath")
                 val files = File(mCurrentPath).listFiles(fileFilter)
                 if (files != null) {
                     try {

@@ -118,7 +118,10 @@ private fun ItemList(
                     fileBean = fileBean,
                     index = index,
                     onOptClick = onOptClick,
-                    onClick = onClick,
+                    onClick = {
+                        viewModel.setCurrentPos(listState.firstVisibleItemIndex)
+                        onClick(it)
+                    },
                     viewModel = viewModel
                 )
             }
@@ -161,7 +164,11 @@ private fun ItemList(
             }
         }
     }
-    coroutineScope.launch {
-        listState.scrollToItem(0)
+    val firstVisibleIndex = viewModel.getCurrentPos()
+    if (firstVisibleIndex >= 0) {
+        coroutineScope.launch {
+            listState.scrollToItem(firstVisibleIndex)
+            viewModel.setCurrentPos(-1)
+        }
     }
 }

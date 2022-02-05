@@ -61,6 +61,7 @@ fun FileBrowserList(
         }
         if (it.isDirectory) {
             if (it.file != null) {
+                viewModel.setCurrentPos(it.file!!.path, 0)
                 viewModel.loadFiles(it.file!!.path)
             }
             val map = HashMap<String, String>()
