@@ -134,7 +134,7 @@ dependencies {
     implementation Libs.AndroidX.Compose.ui
     implementation Libs.AndroidX.Compose.uiUtil
     implementation Libs.AndroidX.Compose.material
-    implementation Libs.AndroidX.Compose.material3
+    implementation Libs.AndroidX.Compose.Material3.material3
     implementation Libs.AndroidX.Compose.animation
     //implementation Libs.AndroidX.Compose.iconsExtended
     implementation Libs.AndroidX.Compose.tooling
@@ -164,7 +164,6 @@ dependencies {
     implementation Libs.Umeng.umengCommon
     implementation Libs.Dependency.multidex
     implementation Libs.AndroidX.ConstraintLayout.constraintLayout
-    implementation Libs.AndroidX.ConstraintLayout.constraintLayoutSolver
     implementation(Libs.Dependency.material) {
         exclude group: 'androidx.recyclerview'
     }
