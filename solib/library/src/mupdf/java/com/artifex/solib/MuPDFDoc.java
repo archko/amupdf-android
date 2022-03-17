@@ -53,17 +53,18 @@ public class MuPDFDoc extends ArDkDoc
     //  a listener passed to mupdf, which in turn calls the holder's listener.
     public PDFDocument.JsEventListener jsEventListener = new PDFDocument.JsEventListener() {
         @Override
-        public void onAlert(String message)
-        {
-            if (jsEventListener2!=null)
-                jsEventListener2.onAlert(message);
+        public AlertResult onAlert(PDFDocument pdfDocument, String s, String s1, int i, int i1, String s2, boolean b) {
+            if (jsEventListener2!=null) {
+                jsEventListener2.onAlert(s);
+            }
+            return new AlertResult();
         }
     };
 
     public PDFDocument.JsEventListener jsNullEventListener = new PDFDocument.JsEventListener() {
         @Override
-        public void onAlert(String message)
-        {
+        public AlertResult onAlert(PDFDocument pdfDocument, String s, String s1, int i, int i1, String s2, boolean b) {
+            return null;
         }
     };
 
