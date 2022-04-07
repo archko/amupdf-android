@@ -20,10 +20,10 @@ interface ProgressDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun updateProgress(progress: BookProgress)
 
-    @Query("SELECT * FROM progress WHERE name == :name")
+    @Query("SELECT * FROM progress WHERE name = :name")
     fun getProgress(name: String): BookProgress?
 
-    @Query("SELECT * FROM progress WHERE name == :name and is_in_recent=:inRecent")
+    @Query("SELECT * FROM progress WHERE name = :name and is_in_recent=:inRecent")
     fun getProgress(name: String, inRecent: Int): BookProgress?
 
     @Query("SELECT * FROM progress order by record_last_timestamp desc")
