@@ -23,6 +23,7 @@ import cn.archko.pdf.R
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Graph
+import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFBookmarkManager
 import cn.archko.pdf.common.PdfOptionRepository
@@ -132,31 +133,9 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
             val intent = intent
 
             if (Intent.ACTION_VIEW == intent.action) {
-                var uri = intent.data
-                Logcat.d("URI to open is: $uri")
-                if (uri.toString().startsWith("content://")) {
-                    var reason: String? = null
-                    var cursor: Cursor? = null
-                    try {
-                        cursor = contentResolver.query(uri!!, arrayOf("_data"), null, null, null)
-                        if (cursor!!.moveToFirst()) {
-                            val str = cursor.getString(0)
-                            if (str == null) {
-                                reason = "Couldn't parse data in intent"
-                            } else {
-                                uri = Uri.parse(str)
-                            }
-                        }
-                    } catch (e2: Exception) {
-                        Logcat.d("Exception in Transformer Prime file manager code: " + e2)
-                        reason = e2.toString()
-                    } finally {
-                        cursor?.close()
-                    }
-                }
-                var path: String? = Uri.decode(uri?.encodedPath)
-                if (path == null) {
-                    path = uri.toString()
+                var path: String? = IntentFile.getPath(this, intent.data)
+                if (path == null && intent.data != null) {
+                    path = intent.data.toString()
                 }
                 mPath = path
             } else {

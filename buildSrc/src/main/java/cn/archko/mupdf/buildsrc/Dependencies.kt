@@ -1,7 +1,7 @@
 package cn.archko.mupdf.buildsrc
 
 object Versions {
-    const val ktlint = "0.41.0"
+    const val ktlint = "0.45.1"
 }
 
 object BuildConfig {
@@ -16,10 +16,10 @@ object BuildConfig {
 object Libs {
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.1.5"
     const val flinger = "com.github.iamjosephmj:flinger:1.0.5"
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.2.0-beta02"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.2.0-rc01"
 
     object Accompanist {
-        const val version = "0.24.5-alpha"
+        const val version = "0.24.6-alpha"
         const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
         const val pagerIndicators = "com.google.accompanist:accompanist-pager-indicators:$version"
@@ -58,7 +58,7 @@ object Libs {
         const val navigation = "androidx.navigation:navigation-compose:2.5.0-alpha01"
 
         object Compose {
-            const val version = "1.2.0-alpha06"
+            const val version = "1.2.0-alpha07"
 
             const val runtime = "androidx.compose.runtime:runtime:$version"
             const val runtimeLivedata = "androidx.compose.runtime:runtime-livedata:$version"
