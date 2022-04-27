@@ -118,6 +118,10 @@ class BookProgress : Serializable, Comparator<BookProgress> {
     @ColumnInfo(name = "is_in_recent")
     var inRecent = 0 //0:in recent,-1:not in recent,-2:all
 
+    @JvmField
+    @ColumnInfo(name = "bookmark")
+    var bookmark: String? = null //pagenum1,pagenum2...
+
     constructor(path: String?) {
         index = 0
         this.path = path
@@ -162,7 +166,8 @@ class BookProgress : Serializable, Comparator<BookProgress> {
         autoCrop: Int,
         reflow: Int,
         isFavorited: Int,
-        inRecent: Int
+        inRecent: Int,
+        bookmark: String
     ) {
         this._id = _id
         this.index = index
@@ -185,6 +190,7 @@ class BookProgress : Serializable, Comparator<BookProgress> {
         this.reflow = reflow
         this.isFavorited = isFavorited
         this.inRecent = inRecent
+        this.bookmark = bookmark
     }
 
     override fun toString(): String {
@@ -205,6 +211,7 @@ class BookProgress : Serializable, Comparator<BookProgress> {
                 ", inRecent=" + inRecent +
                 ", ext='" + ext + '\'' +
                 ", md5='" + md5 + '\'' +
+                ", bookmark='" + bookmark + '\'' +
                 ", path='" + path + '\'' +
                 ", zoomLevel=" + zoomLevel +
                 ", rotation=" + rotation +

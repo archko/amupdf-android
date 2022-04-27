@@ -5,9 +5,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
-import androidx.sqlite.db.SupportSQLiteDatabase
-
 import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import cn.archko.pdf.App
 
 object Graph {
@@ -44,13 +43,16 @@ object Graph {
             database.execSQL(sql.toString())
         }
     }*/
+    private val MIGRATION_5_6: Migration = object : Migration(5, 6) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE progress ADD bookmark text")
+        }
+    }
 
     fun provide(context: Context) {
         database = Room.databaseBuilder(context, AKDatabase::class.java, "abook_progress.db")
-            // This is not recommended for normal apps, but the goal of this sample isn't to
-            // showcase all of Room.
             .fallbackToDestructiveMigration()
-            //.addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+            .addMigrations(MIGRATION_5_6)
             .build()
     }
 

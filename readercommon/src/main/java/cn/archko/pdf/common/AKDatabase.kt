@@ -8,7 +8,7 @@ import cn.archko.pdf.entity.BookProgress
     entities = [
         BookProgress::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 //@TypeConverters(DateTimeTypeConverters::class)
