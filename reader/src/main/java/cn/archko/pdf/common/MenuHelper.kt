@@ -80,7 +80,6 @@ class MenuHelper public constructor(
     }
 
     fun updateSelection(pos: Int) {
-        val fragment = supportFragmentManager.findFragmentById(R.id.layout_outline)
         supportFragmentManager.beginTransaction()
             .hide(bookmarkFragment!!)
             .show(outlineFragment!!)
@@ -89,7 +88,6 @@ class MenuHelper public constructor(
     }
 
     fun showBookmark(bookmark: String?) {
-        val fragment = supportFragmentManager.findFragmentById(R.id.layout_outline)
         supportFragmentManager.beginTransaction()
             .hide(outlineFragment!!)
             .show(bookmarkFragment!!)
