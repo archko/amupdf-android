@@ -20,4 +20,6 @@ public interface PageViewPresenter {
     void reflow();
 
     void autoCrop();
+
+    void showBookmark();
 }

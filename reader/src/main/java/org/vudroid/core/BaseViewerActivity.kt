@@ -153,6 +153,7 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
 
                 override fun reflow() {}
                 override fun autoCrop() {}
+                override fun showBookmark() {}
             })
         frameLayout.addView(pageSeekBarControls)
         pageSeekBarControls!!.hide()

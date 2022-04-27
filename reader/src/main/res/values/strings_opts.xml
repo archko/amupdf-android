@@ -6,6 +6,7 @@
     <string name="leaving_reflow_mode">Leaving reflow mode</string>
     <string name="toggle_reflow_mode">Toggle reflow mode</string>
     <string name="outline_title">Outline</string>
+    <string name="bookmark_title">Bookmark</string>
 
     <string name="menu_goto_page">Go to page…</string>
     <string name="menu_set_as_home">Set as home</string>

@@ -32,6 +32,7 @@ public class APageSeekBarControls extends LinearLayout implements View.OnClickLi
     private ImageButton mReflowButton;
     private ImageButton mOutlineButton;
     private ImageButton mAutoCropButton;
+    private ImageButton mBookmarkButton;
     private TextView mPath;
     private TextView mTitle;
     private ImageButton mBackButton;
@@ -53,6 +54,7 @@ public class APageSeekBarControls extends LinearLayout implements View.OnClickLi
         mReflowButton = findViewById(R.id.reflowButton);
         mOutlineButton = findViewById(R.id.outlineButton);
         mAutoCropButton = findViewById(R.id.autoCropButton);
+        mBookmarkButton = findViewById(R.id.bookmarkButton);
         mPath = findViewById(R.id.path);
         mTitle = findViewById(R.id.title);
         mBackButton = findViewById(R.id.back_button);
@@ -62,6 +64,7 @@ public class APageSeekBarControls extends LinearLayout implements View.OnClickLi
         mReflowButton.setOnClickListener(this);
         mOutlineButton.setOnClickListener(this);
         mAutoCropButton.setOnClickListener(this);
+        mBookmarkButton.setOnClickListener(this);
         mBackButton.setOnClickListener(this);
 
         mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -178,6 +181,8 @@ public class APageSeekBarControls extends LinearLayout implements View.OnClickLi
             mPageViewPresenter.reflow();
         } else if (R.id.autoCropButton == v.getId()) {
             mPageViewPresenter.autoCrop();
+        } else if (R.id.bookmarkButton == v.getId()) {
+            mPageViewPresenter.showBookmark();
         }
     }
 

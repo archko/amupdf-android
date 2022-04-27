@@ -6,6 +6,7 @@
     <string name="leaving_reflow_mode">正在离开重排模式</string>
     <string name="toggle_reflow_mode">切换重排模式</string>
     <string name="outline_title">目录</string>
+    <string name="bookmark_title">书签</string>
 
     <string name="menu_goto_page">跳转到页…</string>
     <string name="menu_set_as_home">设为主目录</string>

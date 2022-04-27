@@ -431,6 +431,10 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             override fun autoCrop() {
                 toggleCrop()
             }
+
+            override fun showBookmark() {
+
+            }
         })
         return mPageSeekBarControls!!
     }
