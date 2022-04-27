@@ -246,9 +246,9 @@ class AReflowViewController(
     }
 
     override fun onPause() {
-        pdfBookmarkManager.bookmarkToRestore?.reflow = 1
+        pdfBookmarkManager.bookProgress?.reflow = 1
         val position = getCurrentPos()
-        val zoomLevel = pdfBookmarkManager.bookmarkToRestore!!.zoomLevel;
+        val zoomLevel = pdfBookmarkManager.bookProgress!!.zoomLevel;
         pdfBookmarkManager.saveCurrentPage(
             mPath,
             mMupdfDocument!!.countPages(),

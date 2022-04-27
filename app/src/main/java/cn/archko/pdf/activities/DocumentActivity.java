@@ -165,7 +165,7 @@ public class DocumentActivity extends AppCompatActivity {
             AppExecutors.Companion.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
-                    pdfBookmarkManager.setStartBookmark(path, 0);
+                    pdfBookmarkManager.setReadProgress(path, 0);
                 }
             });
         }
@@ -278,7 +278,7 @@ public class DocumentActivity extends AppCompatActivity {
         mDocumentView.setDocDataLeakHandler(Utilities.getDataLeakHandlers());
 
         //  set an optional listener for document events
-        int page = pdfBookmarkManager.getBookmark();
+        int page = pdfBookmarkManager.getReadPage();
         mDocumentView.setDocumentListener(new DocumentListener() {
             @Override
             public void onPageLoaded(int pagesLoaded) {

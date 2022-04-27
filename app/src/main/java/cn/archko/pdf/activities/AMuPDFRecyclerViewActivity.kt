@@ -225,7 +225,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         viewController = aViewController
         Logcat.d("changeViewMode:$viewMode,controller:$viewController")
         addDocumentView()
-        val pos = pdfBookmarkManager?.bookmark!!
+        val pos = pdfBookmarkManager?.readPage!!
         viewController?.init(mPageSizes, mMupdfDocument, pos)
         viewController?.notifyDataSetChanged()
     }
@@ -237,7 +237,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             Logcat.d("doLoadDoc:mCrop:$mCrop,mReflow:$mReflow")
             setCropButton(mCrop)
 
-            val pos = pdfBookmarkManager?.restoreBookmark(mMupdfDocument!!.countPages())!!
+            val pos = pdfBookmarkManager?.restoreReadProgress(mMupdfDocument!!.countPages())!!
             viewController?.doLoadDoc(mPageSizes, mMupdfDocument!!, pos)
 
             mPageSeekBarControls?.showReflow(true)
@@ -277,11 +277,11 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             }
             APageSizeLoader.savePageSizeToFile(
                 mCrop,
-                pdfBookmarkManager!!.bookmarkToRestore!!.size,
+                pdfBookmarkManager!!.bookProgress!!.size,
                 mPageSizes,
                 FileUtils.getDiskCacheDir(
                     this@AMuPDFRecyclerViewActivity,
-                    pdfBookmarkManager?.bookmarkToRestore?.name
+                    pdfBookmarkManager?.bookProgress?.name
                 )
             )
         }
@@ -292,14 +292,14 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         val width = mRecyclerView.width
         var start = SystemClock.uptimeMillis()
         var pageSizeBean: APageSizeLoader.PageSizeBean? = null
-        if (pdfBookmarkManager != null && pdfBookmarkManager!!.bookmarkToRestore != null) {
+        if (pdfBookmarkManager != null && pdfBookmarkManager!!.bookProgress != null) {
             pageSizeBean = APageSizeLoader.loadPageSizeFromFile(
                 width,
-                pdfBookmarkManager!!.bookmarkToRestore!!.pageCount,
-                pdfBookmarkManager!!.bookmarkToRestore!!.size,
+                pdfBookmarkManager!!.bookProgress!!.pageCount,
+                pdfBookmarkManager!!.bookProgress!!.size,
                 FileUtils.getDiskCacheDir(
                     this@AMuPDFRecyclerViewActivity,
-                    pdfBookmarkManager?.bookmarkToRestore?.name
+                    pdfBookmarkManager?.bookProgress?.name
                 )
             )
         }
@@ -433,7 +433,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             }
 
             override fun showBookmark() {
-
+                this@AMuPDFRecyclerViewActivity.showBookmark()
             }
         })
         return mPageSeekBarControls!!
@@ -442,17 +442,42 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     private fun showOutline() {
         outlineHelper?.let {
             if (it.hasOutline()) {
-                val frameLayout = mPageSeekBarControls?.getLayoutOutline()
+                val frameLayout = mPageSeekBarControls?.layoutOutline
 
                 if (frameLayout?.visibility == View.GONE) {
                     frameLayout.visibility = View.VISIBLE
                     mMenuHelper?.updateSelection(getCurrentPos())
                 } else {
-                    frameLayout?.visibility = View.GONE
+                    if (mMenuHelper!!.isOutline()) {
+                        frameLayout?.visibility = View.GONE
+                    } else {
+                        mMenuHelper?.updateSelection(getCurrentPos())
+                    }
                 }
             } else {
-                mPageSeekBarControls?.getLayoutOutline()?.visibility = View.GONE
+                mPageSeekBarControls?.layoutOutline?.visibility = View.GONE
             }
+        }
+    }
+
+    private fun showBookmark() {
+        outlineHelper?.let {
+            //if (!TextUtils.isEmpty(pdfBookmarkManager?.bookProgress?.bookmark)) {
+            val frameLayout = mPageSeekBarControls?.layoutOutline
+
+            if (frameLayout?.visibility == View.GONE) {
+                frameLayout.visibility = View.VISIBLE
+                mMenuHelper?.showBookmark("2_6")
+            } else {
+                if (mMenuHelper!!.isOutline()) {
+                    mMenuHelper?.showBookmark("2_6")
+                } else {
+                    frameLayout?.visibility = View.GONE
+                }
+            }
+            //} else {
+            //    mPageSeekBarControls?.layoutOutline?.visibility = View.GONE
+            //}
         }
     }
 
@@ -529,14 +554,14 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     override fun onPause() {
         super.onPause()
         if (mCrop) {
-            pdfBookmarkManager?.bookmarkToRestore?.autoCrop = 0
+            pdfBookmarkManager?.bookProgress?.autoCrop = 0
         } else {
-            pdfBookmarkManager?.bookmarkToRestore?.autoCrop = 1
+            pdfBookmarkManager?.bookProgress?.autoCrop = 1
         }
         if (mReflow) {
-            pdfBookmarkManager?.bookmarkToRestore?.reflow = 1
+            pdfBookmarkManager?.bookProgress?.reflow = 1
         } else {
-            pdfBookmarkManager?.bookmarkToRestore?.reflow = 0
+            pdfBookmarkManager?.bookProgress?.reflow = 0
         }
         Logcat.d("onPause:mCrop:$mCrop,mReflow:$mReflow")
         viewController?.onPause()

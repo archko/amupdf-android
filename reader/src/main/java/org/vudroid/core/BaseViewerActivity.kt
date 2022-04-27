@@ -69,9 +69,9 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         val uri = intent.data
         val absolutePath = Uri.decode(uri!!.encodedPath)
         instance.diskIO().execute {
-            pdfBookmarkManager!!.setStartBookmark(absolutePath, 0)
-            if (null != pdfBookmarkManager!!.bookmarkToRestore) {
-                zoomModel.zoom = pdfBookmarkManager!!.bookmarkToRestore!!.zoomLevel / 1000
+            pdfBookmarkManager!!.setReadProgress(absolutePath, 0)
+            if (null != pdfBookmarkManager!!.bookProgress) {
+                zoomModel.zoom = pdfBookmarkManager!!.bookProgress!!.zoomLevel / 1000
             }
         }
         val progressModel = DecodingProgressModel()
@@ -99,14 +99,14 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
 
         /*final SharedPreferences sharedPreferences = getSharedPreferences(DOCUMENT_VIEW_STATE_PREFERENCES, 0);
         documentView.goToPage(sharedPreferences.getInt(getIntent().getData().toString(), 0));*/
-        val currentPage = pdfBookmarkManager!!.restoreBookmark(
+        val currentPage = pdfBookmarkManager!!.restoreReadProgress(
             decodeService!!.pageCount
         )
         if (0 < currentPage) {
             documentView!!.goToPage(
                 currentPage,
-                pdfBookmarkManager!!.bookmarkToRestore!!.offsetX,
-                pdfBookmarkManager!!.bookmarkToRestore!!.offsetY
+                pdfBookmarkManager!!.bookProgress!!.offsetX,
+                pdfBookmarkManager!!.bookProgress!!.offsetY
             )
         }
         documentView!!.showDocument()

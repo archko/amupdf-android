@@ -2,6 +2,7 @@ package cn.archko.pdf.common
 
 import android.content.Context
 import android.os.Bundle
+import android.text.TextUtils
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
@@ -9,6 +10,7 @@ import cn.archko.pdf.activities.MuPDFRecyclerViewActivity
 import cn.archko.pdf.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.adapters.MenuAdapter
 import cn.archko.pdf.entity.MenuBean
+import cn.archko.pdf.fragments.BookmarkFragment
 import cn.archko.pdf.fragments.OutlineFragment
 import cn.archko.pdf.listeners.MenuListener
 import cn.archko.pdf.utils.FileUtils
@@ -23,6 +25,7 @@ class MenuHelper public constructor(
 ) {
 
     private var outlineFragment: OutlineFragment? = null
+    private var bookmarkFragment: BookmarkFragment? = null
 
     fun setupMenu(mPath: String?, context: Context, menuListener: MenuListener?) {
         val menus = ArrayList<MenuBean>()
@@ -53,6 +56,13 @@ class MenuHelper public constructor(
     }
 
     fun setupOutline(currentPos: Int?) {
+        if (null == bookmarkFragment) {
+            bookmarkFragment = BookmarkFragment()
+        }
+        supportFragmentManager.beginTransaction()
+            .add(R.id.layout_outline, bookmarkFragment!!)
+            .commit()
+
         if (null == outlineFragment) {
             outlineFragment = OutlineFragment()
             val bundle = Bundle()
@@ -70,6 +80,28 @@ class MenuHelper public constructor(
     }
 
     fun updateSelection(pos: Int) {
+        val fragment = supportFragmentManager.findFragmentById(R.id.layout_outline)
+        supportFragmentManager.beginTransaction()
+            .hide(bookmarkFragment!!)
+            .show(outlineFragment!!)
+            .commit()
         outlineFragment?.updateSelection(pos)
+    }
+
+    fun showBookmark(bookmark: String?) {
+        val fragment = supportFragmentManager.findFragmentById(R.id.layout_outline)
+        supportFragmentManager.beginTransaction()
+            .hide(outlineFragment!!)
+            .show(bookmarkFragment!!)
+            .commit()
+
+        if (!TextUtils.isEmpty(bookmark)) {
+            bookmarkFragment?.updateBookmark(bookmark)
+        }
+    }
+
+    fun isOutline(): Boolean {
+        val fragment = supportFragmentManager.findFragmentById(R.id.layout_outline)
+        return fragment is OutlineFragment && fragment.isVisible
     }
 }

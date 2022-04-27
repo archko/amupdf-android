@@ -10,46 +10,46 @@ import java.io.File
  * @author: archko 2018/7/22 :12:43
  */
 class PDFBookmarkManager {
-    var bookmarkToRestore: BookProgress? = null
+    var bookProgress: BookProgress? = null
         private set
 
-    fun setStartBookmark(absolutePath: String?, autoCrop: Int) {
+    fun setReadProgress(absolutePath: String?, autoCrop: Int) {
         val file = File(absolutePath)
         val progress = Graph.database.progressDao().getProgress(file.name)
-        bookmarkToRestore = progress
-        if (null == bookmarkToRestore) {
-            bookmarkToRestore = BookProgress(FileUtils.getRealPath(absolutePath))
-            bookmarkToRestore!!.autoCrop = autoCrop
+        bookProgress = progress
+        if (null == bookProgress) {
+            bookProgress = BookProgress(FileUtils.getRealPath(absolutePath))
+            bookProgress!!.autoCrop = autoCrop
         }
-        bookmarkToRestore!!.readTimes = bookmarkToRestore!!.readTimes
-        bookmarkToRestore!!.inRecent = 0
+        bookProgress!!.readTimes = bookProgress!!.readTimes
+        bookProgress!!.inRecent = 0
     }
 
-    val bookmark: Int
+    val readPage: Int
         get() {
-            if (bookmarkToRestore == null) {
+            if (bookProgress == null) {
                 return 0
             }
             var currentPage = 0
-            if (0 < bookmarkToRestore!!.page) {
-                currentPage = bookmarkToRestore!!.page
+            if (0 < bookProgress!!.page) {
+                currentPage = bookProgress!!.page
             }
             return currentPage
         }
 
-    fun restoreBookmark(pageCount: Int): Int {
-        if (bookmarkToRestore == null) {
+    fun restoreReadProgress(pageCount: Int): Int {
+        if (bookProgress == null) {
             return 0
         }
         var currentPage = 0
-        if (bookmarkToRestore!!.pageCount != pageCount || bookmarkToRestore!!.page > pageCount) {
-            bookmarkToRestore!!.pageCount = pageCount
-            bookmarkToRestore!!.page =
-                if (bookmarkToRestore!!.page >= pageCount) 0 else bookmarkToRestore!!.page
+        if (bookProgress!!.pageCount != pageCount || bookProgress!!.page > pageCount) {
+            bookProgress!!.pageCount = pageCount
+            bookProgress!!.page =
+                if (bookProgress!!.page >= pageCount) 0 else bookProgress!!.page
             return currentPage
         }
-        if (0 < bookmarkToRestore!!.page) {
-            currentPage = bookmarkToRestore!!.page
+        if (0 < bookProgress!!.page) {
+            currentPage = bookProgress!!.page
         }
         return currentPage
     }
@@ -62,30 +62,30 @@ class PDFBookmarkManager {
         scrollX: Int,
         scrollY: Int
     ) {
-        if (null == bookmarkToRestore) {
-            bookmarkToRestore = BookProgress(FileUtils.getRealPath(absolutePath))
+        if (null == bookProgress) {
+            bookProgress = BookProgress(FileUtils.getRealPath(absolutePath))
         } else {
-            bookmarkToRestore!!.path = FileUtils.getRealPath(absolutePath)
-            bookmarkToRestore!!.readTimes = bookmarkToRestore!!.readTimes + 1
+            bookProgress!!.path = FileUtils.getRealPath(absolutePath)
+            bookProgress!!.readTimes = bookProgress!!.readTimes + 1
         }
-        bookmarkToRestore!!.inRecent = 0
-        bookmarkToRestore!!.pageCount = pageCount
-        bookmarkToRestore!!.page = currentPage
+        bookProgress!!.inRecent = 0
+        bookProgress!!.pageCount = pageCount
+        bookProgress!!.page = currentPage
         //if (zoom != 1000f) {
-        bookmarkToRestore!!.zoomLevel = zoom
+        bookProgress!!.zoomLevel = zoom
         //}
         if (scrollX >= 0) { //for mupdfrecycleractivity,don't modify scrollx
-            bookmarkToRestore!!.offsetX = scrollX
+            bookProgress!!.offsetX = scrollX
         }
-        bookmarkToRestore!!.offsetY = scrollY
-        bookmarkToRestore!!.progress = currentPage * 100 / pageCount
+        bookProgress!!.offsetY = scrollY
+        bookProgress!!.progress = currentPage * 100 / pageCount
         Logcat.i(
             Logcat.TAG,
-            String.format("last page saved for currentPage:%s, :%s", currentPage, bookmarkToRestore)
+            String.format("last page saved for currentPage:%s, :%s", currentPage, bookProgress)
         )
 
         AppExecutors.instance.diskIO().execute(Runnable {
-            addToDb(bookmarkToRestore)
+            addToDb(bookProgress)
         })
     }
 

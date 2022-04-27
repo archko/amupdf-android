@@ -64,8 +64,8 @@ class ANormalViewController(
         initDecodeService()
         val zoomModel = ZoomModel()
 
-        if (null != pdfBookmarkManager.bookmarkToRestore) {
-            zoomModel.zoom = pdfBookmarkManager.bookmarkToRestore!!.zoomLevel / 1000
+        if (null != pdfBookmarkManager.bookProgress) {
+            zoomModel.zoom = pdfBookmarkManager.bookProgress!!.zoomLevel / 1000
         }
         val progressModel = DecodingProgressModel()
         progressModel.addEventListener(this)
@@ -167,8 +167,8 @@ class ANormalViewController(
         if (pos > 0) {
             documentView.goToPage(
                     pos,
-                    pdfBookmarkManager.bookmarkToRestore!!.offsetX,
-                    pdfBookmarkManager.bookmarkToRestore!!.offsetY
+                    pdfBookmarkManager.bookProgress!!.offsetX,
+                    pdfBookmarkManager.bookProgress!!.offsetY
             )
         }
         documentView.showDocument()

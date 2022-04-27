@@ -3,9 +3,7 @@ package cn.archko.pdf.activities
 import android.annotation.TargetApi
 import android.app.ProgressDialog
 import android.content.Intent
-import android.database.Cursor
 import android.graphics.PointF
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
@@ -105,8 +103,8 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
                 if (!mCrop) {
                     autoCrop = 1
                 }
-                pdfBookmarkManager!!.setStartBookmark(mPath, autoCrop)
-                val bookmark = pdfBookmarkManager?.bookmarkToRestore
+                pdfBookmarkManager!!.setReadProgress(mPath, autoCrop)
+                val bookmark = pdfBookmarkManager?.bookProgress
                 bookmark?.let {
                     mCrop = it.autoCrop == 0
                     mReflow = it.reflow == 1

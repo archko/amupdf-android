@@ -199,10 +199,10 @@ class ACropViewController(
     }
 
     override fun onPause() {
-        pdfBookmarkManager.bookmarkToRestore?.autoCrop = 0
+        pdfBookmarkManager.bookProgress?.autoCrop = 0
 
         val position = getCurrentPos()
-        val zoomLevel = pdfBookmarkManager.bookmarkToRestore!!.zoomLevel
+        val zoomLevel = pdfBookmarkManager.bookProgress!!.zoomLevel
         if (null != mMupdfDocument) {
             pdfBookmarkManager.saveCurrentPage(
                 mPath,
