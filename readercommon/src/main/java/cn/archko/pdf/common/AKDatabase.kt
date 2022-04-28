@@ -3,10 +3,14 @@ package cn.archko.pdf.common
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import cn.archko.pdf.entity.BookProgress
+import cn.archko.pdf.entity.Bookmark
+import cn.archko.pdf.entity.Booknote
 
 @Database(
     entities = [
         BookProgress::class,
+        Booknote::class,
+        Bookmark::class,
     ],
     version = 6,
     exportSchema = false
