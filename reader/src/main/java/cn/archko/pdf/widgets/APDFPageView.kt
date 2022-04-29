@@ -3,6 +3,7 @@ package cn.archko.pdf.widgets
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.text.TextPaint
@@ -10,6 +11,7 @@ import android.view.View
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.mupdf.MupdfDocument
+import cn.archko.pdf.utils.Utils
 
 /**
  * @author: archko 2019/11/25 :12:43
@@ -25,14 +27,19 @@ class APDFPageView(
     private var mZoom: Float = 0.toFloat()
     private lateinit var pdfPage: APDFPage
     private var showBookmark: Boolean = false
+    private val bgpaint = TextPaint()
     private val paint = TextPaint()
-
+    private var fWidth: Float = 40f
 
     init {
-        paint.setColor(android.graphics.Color.MAGENTA)
+        paint.setColor(Color.MAGENTA)
         paint.setAntiAlias(true)
-        paint.setTextSize(36f)
+        paint.setTextSize(Utils.sp2px(20f).toFloat())
         paint.setTextAlign(Paint.Align.CENTER)
+        fWidth = paint.measureText("B")
+
+        bgpaint.setColor(Color.LTGRAY)
+
         mZoom = pageSize.zoom
         initPdfPage(crop)
         updateView()
@@ -91,7 +98,8 @@ class APDFPageView(
     }
 
     private fun drawBookmark(canvas: Canvas?) {
-        canvas?.drawText("B", 30f, 40f, paint)
+        canvas?.drawCircle(40f, 40f, 30f, bgpaint)
+        canvas?.drawText("B", 40f, 40f + fWidth / 2, paint)
     }
 
     fun updatePage(showBookmark: Boolean, pageSize: APage, newZoom: Float, crop: Boolean) {

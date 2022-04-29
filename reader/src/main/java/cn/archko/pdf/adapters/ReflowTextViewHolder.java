@@ -3,18 +3,19 @@ package cn.archko.pdf.adapters;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.Html;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
 
+import cn.archko.pdf.R;
 import cn.archko.pdf.common.Logcat;
 import cn.archko.pdf.common.ParseTextMain;
 import cn.archko.pdf.common.ReflowViewCache;
@@ -22,6 +23,7 @@ import cn.archko.pdf.common.StyleHelper;
 import cn.archko.pdf.entity.BitmapBean;
 import cn.archko.pdf.entity.ReflowBean;
 import cn.archko.pdf.utils.BitmapUtils;
+import cn.archko.pdf.utils.Utils;
 
 /**
  * @author: archko 2019-02-21 :09:18
@@ -72,17 +74,18 @@ public class ReflowTextViewHolder extends BaseViewHolder {
 
     public void bindAsList(byte[] result, int screenHeight, int screenWidth, float systemScale) {
         List<ReflowBean> text = ParseTextMain.Companion.getInstance().parseAsList(result, 0);
-        bindAsList(text, screenHeight, screenWidth, systemScale, null);
+        bindAsList(text, screenHeight, screenWidth, systemScale, null, false);
     }
 
-    public void bindAsList(List<ReflowBean> text, int screenHeight, int screenWidth, float systemScale, ReflowViewCache reflowViewCache) {
+    public void bindAsList(List<ReflowBean> text, int screenHeight, int screenWidth,
+                           float systemScale, ReflowViewCache reflowViewCache, boolean showBookmark) {
         recycleViews(reflowViewCache);
         pageView.applyStyle();
         for (ReflowBean reflowBean : text) {
             if (reflowBean.getType() == ReflowBean.TYPE_STRING) {
-                pageView.addTextView(reflowBean.getData(), reflowViewCache);
+                pageView.addTextView(reflowBean.getData(), reflowViewCache, showBookmark);
             } else {
-                pageView.addImageView(reflowBean.getData(), systemScale, screenHeight, screenWidth, reflowViewCache);
+                pageView.addImageView(reflowBean.getData(), systemScale, screenHeight, screenWidth, reflowViewCache, showBookmark);
             }
         }
     }
@@ -152,7 +155,7 @@ public class ReflowTextViewHolder extends BaseViewHolder {
         return true;
     }
 
-    public static class PDFTextView extends LinearLayout {
+    public static class PDFTextView extends RelativeLayout {
 
         static float minImgHeight = 32;
         private StyleHelper styleHelper;
@@ -160,7 +163,6 @@ public class ReflowTextViewHolder extends BaseViewHolder {
         public PDFTextView(Context context, StyleHelper styleHelper) {
             super(context);
             this.styleHelper = styleHelper;
-            setOrientation(VERTICAL);
             setMinimumHeight(480);
             setPadding(styleHelper.getStyleBean().getLeftPadding(), styleHelper.getStyleBean().getTopPadding(),
                     styleHelper.getStyleBean().getRightPadding(), styleHelper.getStyleBean().getBottomPadding());
@@ -185,7 +187,7 @@ public class ReflowTextViewHolder extends BaseViewHolder {
             setBackgroundColor(styleHelper.getStyleBean().getBgColor());
         }
 
-        void addTextView(String text, ReflowViewCache cacheViews) {
+        void addTextView(String text, ReflowViewCache cacheViews, boolean showBookmark) {
             if (TextUtils.isEmpty(text)) {
                 return;
             }
@@ -199,13 +201,27 @@ public class ReflowTextViewHolder extends BaseViewHolder {
                     minImgHeight = textView.getPaint().measureText("我") + 5;
                 }
             }
-            LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            lp.gravity = Gravity.CENTER_HORIZONTAL;
+            LayoutParams lp = new LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+            lp.addRule(Gravity.CENTER_HORIZONTAL);
             addView(textView, lp);
 
             applyStyleForText(getContext(), textView);
 
             textView.setText(Html.fromHtml(text));
+
+            if (showBookmark) {
+                lp = new LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                lp.leftMargin = Utils.dipToPixel(4);
+                lp.topMargin = Utils.dipToPixel(4);
+                TextView bm = new TextView(getContext());
+                bm.setText("B");
+                bm.setGravity(Gravity.CENTER);
+                bm.setBackgroundResource(R.drawable.bg_bookmark_cicle);
+                bm.setTextColor(Color.MAGENTA);
+                bm.setPadding(Utils.dipToPixel(2), 0, Utils.dipToPixel(2), 0);
+                bm.setTextSize(20);
+                addView(bm, lp);
+            }
         }
 
         /**
@@ -227,7 +243,7 @@ public class ReflowTextViewHolder extends BaseViewHolder {
             textView.setTypeface(typeface);
         }
 
-        void addImageView(String text, float systemScale, int screenHeight, int screenWidth, ReflowViewCache reflowViewCache) {
+        void addImageView(String text, float systemScale, int screenHeight, int screenWidth, ReflowViewCache reflowViewCache, boolean showBookmark) {
             BitmapBean bean = decodeBitmap(text, systemScale, screenHeight, screenWidth, getContext());
             if (null != bean && bean.getBitmap() != null) {
                 ImageView imageView = null;
@@ -242,9 +258,12 @@ public class ReflowTextViewHolder extends BaseViewHolder {
                 lp.bottomMargin = 20;
                 lp.leftMargin = 10;
                 lp.rightMargin = 10;
-                lp.gravity = Gravity.CENTER_HORIZONTAL;
+                lp.addRule(Gravity.CENTER_HORIZONTAL);
                 addView(imageView, lp);
                 imageView.setImageBitmap(bean.getBitmap());
+            }
+            if (showBookmark) {
+
             }
         }
     }

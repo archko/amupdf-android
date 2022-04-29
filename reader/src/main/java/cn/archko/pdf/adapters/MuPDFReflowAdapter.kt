@@ -11,6 +11,7 @@ import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.utils.Utils
+import cn.archko.pdf.viewmodel.PDFViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,7 +24,8 @@ class MuPDFReflowAdapter(
     private val mContext: Context,
     private val mupdfDocument: MupdfDocument?,
     private var styleHelper: StyleHelper?,
-    private var scope: CoroutineScope?
+    private var scope: CoroutineScope?,
+    private var pdfViewModel: PDFViewModel
 ) : BaseRecyclerAdapter<Any>(mContext) {
 
     private var screenHeight = 720
@@ -82,11 +84,24 @@ class MuPDFReflowAdapter(
                         screenHeight,
                         screenWidth,
                         systemScale,
-                        reflowCache
+                        reflowCache,
+                        showBookmark(pos)
                     )
                 }
             }
         }
+    }
+
+    private fun showBookmark(position: Int): Boolean {
+        val bookmarks = pdfViewModel.bookmarks
+        if (null != bookmarks) {
+            for (bookmark in bookmarks) {
+                if (position == bookmark.page) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     override fun onViewRecycled(holder: BaseViewHolder<*>) {

@@ -231,7 +231,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         viewController = aViewController
         Logcat.d("changeViewMode:$viewMode,controller:$viewController")
         addDocumentView()
-        val pos = pdfViewModel.readPage()
+        val pos = getCurrentPos()
         viewController?.init(mPageSizes, mMupdfDocument, pos)
         viewController?.notifyDataSetChanged()
     }
@@ -297,10 +297,12 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
     private fun deleteBookmark(bookmark: Bookmark) {
         pdfViewModel.deleteBookmark(bookmark)
+        viewController?.notifyDataSetChanged()
     }
 
     private fun addBookmark(page: Int) {
-        pdfViewModel.addBookmark(getCurrentPos())
+        pdfViewModel.addBookmark(getCurrentPos() + 1)
+        viewController?.notifyDataSetChanged()
     }
 
     override fun onDestroy() {
