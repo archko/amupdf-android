@@ -13,13 +13,13 @@ import android.widget.RelativeLayout
 import androidx.core.app.ComponentActivity
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.common.PDFBookmarkManager
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.listeners.SimpleGestureListener
 import cn.archko.pdf.mupdf.MupdfDocument
+import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
 import org.vudroid.core.AKDecodeService
 import org.vudroid.core.DecodeService
@@ -37,7 +37,7 @@ class ANormalViewController(
     private var context: ComponentActivity,
     private var contentView: View,
     private val mControllerLayout: RelativeLayout,
-    private var pdfBookmarkManager: PDFBookmarkManager,
+    private var pdfViewModel: PDFViewModel,
     private var mPath: String,
     private var mPageSeekBarControls: APageSeekBarControls?,
     private var gestureDetector: GestureDetector?,
@@ -64,8 +64,8 @@ class ANormalViewController(
         initDecodeService()
         val zoomModel = ZoomModel()
 
-        if (null != pdfBookmarkManager.bookProgress) {
-            zoomModel.zoom = pdfBookmarkManager.bookProgress!!.zoomLevel / 1000
+        if (null != pdfViewModel.getBookProgress()) {
+            zoomModel.zoom = pdfViewModel.getBookProgress()!!.zoomLevel / 1000
         }
         val progressModel = DecodingProgressModel()
         progressModel.addEventListener(this)
@@ -167,8 +167,8 @@ class ANormalViewController(
         if (pos > 0) {
             documentView.goToPage(
                     pos,
-                    pdfBookmarkManager.bookProgress!!.offsetX,
-                    pdfBookmarkManager.bookProgress!!.offsetY
+                    pdfViewModel.getBookProgress()!!.offsetX,
+                    pdfViewModel.getBookProgress()!!.offsetY
             )
         }
         documentView.showDocument()
@@ -239,7 +239,7 @@ class ANormalViewController(
     }
 
     override fun onPause() {
-        pdfBookmarkManager.saveCurrentPage(
+        pdfViewModel.saveCurrentPage(
             mPath, mMupdfDocument!!.countPages(), documentView.currentPage,
             documentView.zoomModel.zoom * 1000f, documentView.scrollX, documentView.scrollY
         )

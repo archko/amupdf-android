@@ -20,7 +20,6 @@ import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFReflowAdapter
 import cn.archko.pdf.colorpicker.ColorPickerDialog
 import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.common.PDFBookmarkManager
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.entity.APage
@@ -30,6 +29,7 @@ import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.DataListener
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.mupdf.MupdfDocument
+import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
 import kotlinx.coroutines.CoroutineScope
@@ -45,7 +45,7 @@ class AReflowViewController(
     private var context: ComponentActivity,
     private var contentView: View,
     private val mControllerLayout: RelativeLayout,
-    private var pdfBookmarkManager: PDFBookmarkManager,
+    private var pdfViewModel: PDFViewModel,
     private var mPath: String,
     private var mPageSeekBarControls: APageSeekBarControls?,
     private var gestureDetector: GestureDetector?,
@@ -246,10 +246,10 @@ class AReflowViewController(
     }
 
     override fun onPause() {
-        pdfBookmarkManager.bookProgress?.reflow = 1
+        pdfViewModel.getBookProgress()?.reflow = 1
         val position = getCurrentPos()
-        val zoomLevel = pdfBookmarkManager.bookProgress!!.zoomLevel;
-        pdfBookmarkManager.saveCurrentPage(
+        val zoomLevel = pdfViewModel.getBookProgress()!!.zoomLevel;
+        pdfViewModel.saveCurrentPage(
             mPath,
             mMupdfDocument!!.countPages(),
             position,

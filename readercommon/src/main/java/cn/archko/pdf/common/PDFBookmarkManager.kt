@@ -120,15 +120,21 @@ class PDFBookmarkManager {
         if (null == bookmark || bookProgress == null) {
             return
         }
-        AppExecutors.instance.diskIO().execute {
-            try {
-                val progressDao = Graph.database.progressDao()
 
-                progressDao.deleteBookmark(bookmark._id)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Logcat.i(Logcat.TAG, "deleteBookmark failed:$e")
+        val progressDao = Graph.database.progressDao()
+        progressDao.deleteBookmark(bookmark._id)
+    }
+
+    fun getBookmarks(): List<Bookmark>? {
+        try {
+            val progressDao = Graph.database.progressDao()
+            if (null != bookProgress && !TextUtils.isEmpty(bookProgress!!.path)) {
+                return progressDao.getBookmark(bookProgress!!.path!!)
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Logcat.i(Logcat.TAG, "deleteBookmark failed:$e")
         }
+        return null
     }
 }

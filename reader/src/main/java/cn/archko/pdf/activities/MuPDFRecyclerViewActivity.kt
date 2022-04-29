@@ -23,13 +23,13 @@ import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.common.PDFBookmarkManager
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.utils.Utils
+import cn.archko.pdf.viewmodel.PDFViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -50,7 +50,6 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     protected var gestureDetector: GestureDetector? = null
     protected var pageNumberToast: Toast? = null
 
-    protected var pdfBookmarkManager: PDFBookmarkManager? = null
     protected var sensorHelper: SensorHelper? = null
     protected var mMupdfDocument: MupdfDocument? = null
     protected var mPageSizes = SparseArray<APage>()
@@ -62,6 +61,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     protected var mDocumentView: FrameLayout? = null
     protected var viewController: AViewController? = null
     protected val optionRepository = PdfOptionRepository(Graph.dataStore)
+    protected val pdfViewModel: PDFViewModel = PDFViewModel()
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,18 +94,11 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     }
 
     open fun loadBookmark() {
-        pdfBookmarkManager = PDFBookmarkManager()
         lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                mCrop = optionRepository.pdfOptionFlow.first().autocrop
-
-                var autoCrop = 0
-                if (!mCrop) {
-                    autoCrop = 1
-                }
-                pdfBookmarkManager!!.setReadProgress(mPath, autoCrop)
-                val bookmark = pdfBookmarkManager?.bookProgress
-                bookmark?.let {
+            mCrop = optionRepository.pdfOptionFlow.first().autocrop
+            mPath?.run {
+                val bookProgress = pdfViewModel.loadBookmark(this, optionRepository)
+                bookProgress?.let {
                     mCrop = it.autoCrop == 0
                     mReflow = it.reflow == 1
                 }

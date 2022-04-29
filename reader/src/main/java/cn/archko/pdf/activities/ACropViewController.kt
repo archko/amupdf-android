@@ -13,12 +13,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.common.PDFBookmarkManager
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.mupdf.MupdfDocument
+import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APDFPageView
 import cn.archko.pdf.widgets.APageSeekBarControls
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
@@ -30,7 +30,7 @@ class ACropViewController(
     private var context: ComponentActivity,
     private var contentView: View,
     private val mControllerLayout: RelativeLayout,
-    private var pdfBookmarkManager: PDFBookmarkManager,
+    private var pdfViewModel: PDFViewModel,
     private var mPath: String,
     private var mPageSeekBarControls: APageSeekBarControls?,
     private var gestureDetector: GestureDetector?,
@@ -199,12 +199,12 @@ class ACropViewController(
     }
 
     override fun onPause() {
-        pdfBookmarkManager.bookProgress?.autoCrop = 0
+        pdfViewModel.getBookProgress()?.autoCrop = 0
 
         val position = getCurrentPos()
-        val zoomLevel = pdfBookmarkManager.bookProgress!!.zoomLevel
+        val zoomLevel = pdfViewModel.getBookProgress()!!.zoomLevel
         if (null != mMupdfDocument) {
-            pdfBookmarkManager.saveCurrentPage(
+            pdfViewModel.saveCurrentPage(
                 mPath,
                 mMupdfDocument!!.countPages(),
                 position,
