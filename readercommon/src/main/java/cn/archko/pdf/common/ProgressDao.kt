@@ -82,13 +82,13 @@ interface ProgressDao {
     fun getBooknote(path: String): List<Booknote>?
 
     @Query("SELECT * FROM booknote WHERE progress_id = :progressId order by page")
-    fun getBooknote(progressId: Long): List<Booknote>?
+    fun getBooknote(progressId: Int): List<Booknote>?
 
     @Query("Delete FROM booknote where _id = :noteid")
-    fun deleteBooknote(noteid: Long)
+    fun deleteBooknote(noteid: Int)
 
     @Query("Delete FROM booknote where progress_id = :progressId")
-    fun deleteBooknotesByProgress(progressId: Long)
+    fun deleteBooknotesByProgress(progressId: Int)
 
     //===================== book mark =====================
 
@@ -105,11 +105,11 @@ interface ProgressDao {
     fun getBookmark(path: String): List<Bookmark>?
 
     @Query("SELECT * FROM bookmark WHERE progress_id = :progressId order by page")
-    fun getBookmark(progressId: Long): List<Bookmark>?
+    fun getBookmark(progressId: Int): List<Bookmark>?
 
     @Query("Delete FROM bookmark where _id = :noteid")
-    fun deleteBookmark(noteid: Long)
+    fun deleteBookmark(noteid: Int)
 
     @Query("Delete FROM bookmark where progress_id = :progressId")
-    fun deleteBookmarksByProgress(progressId: Long)
+    fun deleteBookmarksByProgress(progressId: Int)
 }

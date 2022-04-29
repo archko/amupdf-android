@@ -3,6 +3,7 @@ package cn.archko.pdf.common
 import android.text.TextUtils
 import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.entity.BookProgress
+import cn.archko.pdf.entity.Bookmark
 import cn.archko.pdf.utils.FileUtils
 import java.io.File
 
@@ -84,9 +85,9 @@ class PDFBookmarkManager {
             String.format("last page saved for currentPage:%s, :%s", currentPage, bookProgress)
         )
 
-        AppExecutors.instance.diskIO().execute(Runnable {
+        AppExecutors.instance.diskIO().execute {
             addToDb(bookProgress)
-        })
+        }
     }
 
     fun addToDb(progress: BookProgress?) {
@@ -112,6 +113,22 @@ class PDFBookmarkManager {
         } catch (e: Exception) {
             e.printStackTrace()
             Logcat.i(Logcat.TAG, "onFailed:$e")
+        }
+    }
+
+    fun deleteBookmark(bookmark: Bookmark?) {
+        if (null == bookmark || bookProgress == null) {
+            return
+        }
+        AppExecutors.instance.diskIO().execute {
+            try {
+                val progressDao = Graph.database.progressDao()
+
+                progressDao.deleteBookmark(bookmark._id)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Logcat.i(Logcat.TAG, "deleteBookmark failed:$e")
+            }
         }
     }
 }

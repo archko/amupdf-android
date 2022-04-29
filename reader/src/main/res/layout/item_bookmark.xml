@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
+    android:background="@drawable/bg_list_item"
+    android:minHeight="36dp"
+    android:paddingLeft="8dp"
+    android:paddingTop="4dp"
+    android:paddingRight="8dp"
+    android:paddingBottom="4dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:paddingLeft="8dp"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        android:text="Page:" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/page"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/title"
+        android:paddingLeft="8dp"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        tools:text="33" />
+
+    <ImageView
+        android:id="@+id/delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="4dp"
+        android:padding="4dp"
+        android:src="@drawable/ic_delete" />
+
+</RelativeLayout>

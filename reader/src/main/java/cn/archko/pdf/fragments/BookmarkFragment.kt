@@ -6,21 +6,32 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.adapters.BaseViewHolder
+import cn.archko.pdf.entity.Bookmark
 
 /**
  * @author: archko 2019/7/11 :17:55
  */
 open class BookmarkFragment : Fragment() {
 
-    private lateinit var adapter: BaseRecyclerAdapter<String>
+    private lateinit var adapter: BaseRecyclerAdapter<Bookmark>
     private lateinit var recyclerView: RecyclerView
     private lateinit var nodataView: TextView
-    private var bookmarks = ArrayList<String>()
+    private var bookmarks = ArrayList<Bookmark>()
+    var itemListener: ItemListener? = null
+        set(value) {
+            field = value
+        }
+
+    interface ItemListener {
+        fun onClick(data: Bookmark, position: Int)
+        fun onDelete(data: Bookmark, position: Int)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,21 +47,29 @@ open class BookmarkFragment : Fragment() {
         recyclerView = view.findViewById(R.id.list)
         recyclerView.layoutManager = LinearLayoutManager(activity)
         recyclerView.itemAnimator = null
+        val itemDecoration = DividerItemDecoration(
+            context,
+            DividerItemDecoration.VERTICAL
+        )
+        context?.getDrawable(R.drawable.bg_divider)?.let { itemDecoration.setDrawable(it) }
+        recyclerView.addItemDecoration(
+            itemDecoration
+        )
         nodataView = view.findViewById(R.id.no_data)
 
-        adapter = object : BaseRecyclerAdapter<String>(activity, bookmarks!!) {
+        adapter = object : BaseRecyclerAdapter<Bookmark>(activity, bookmarks) {
 
             override fun onCreateViewHolder(
                 parent: ViewGroup,
                 viewType: Int
-            ): BaseViewHolder<String> {
-                val itemView = mInflater.inflate(R.layout.item_outline, parent, false)
+            ): BaseViewHolder<Bookmark> {
+                val itemView = mInflater.inflate(R.layout.item_bookmark, parent, false)
                 return ViewHolder(itemView)
             }
         }
         recyclerView.adapter = adapter
 
-        if (bookmarks == null || bookmarks!!.size == 0) {
+        if (bookmarks.size == 0) {
             noBookmark()
         }
         return view
@@ -61,14 +80,14 @@ open class BookmarkFragment : Fragment() {
         nodataView.visibility = View.VISIBLE
     }
 
-    open fun updateBookmark(bookmark: String?) {
+    open fun updateBookmark(list: List<Bookmark>) {
         if (!isResumed) {
             return
         }
-        bookmark?.let {
-            bookmarks.clear()
-            bookmarks.addAll(ArrayList(bookmark.split("_")))
-            if (bookmarks!!.size > 0) {
+        bookmarks.let {
+            this.bookmarks.clear()
+            this.bookmarks.addAll(list)
+            if (this.bookmarks.size > 0) {
                 adapter.notifyDataSetChanged()
             } else {
                 noBookmark()
@@ -76,18 +95,16 @@ open class BookmarkFragment : Fragment() {
         }
     }
 
-    protected fun onListItemClick(item: String) {
-    }
-
-    inner class ViewHolder(itemView: View) : BaseViewHolder<String>(itemView) {
+    inner class ViewHolder(itemView: View) : BaseViewHolder<Bookmark>(itemView) {
 
         var title: TextView = itemView.findViewById(R.id.title)
         var page: TextView = itemView.findViewById(R.id.page)
+        var delete: View = itemView.findViewById(R.id.delete)
 
-        override fun onBind(data: String, position: Int) {
-            title.text = "Page:"
-            page.text = data
-            itemView.setOnClickListener { onListItemClick(data) }
+        override fun onBind(data: Bookmark, position: Int) {
+            page.text = data.page.toString()
+            delete.setOnClickListener { itemListener?.onDelete(data, position) }
+            itemView.setOnClickListener { itemListener?.onClick(data, position) }
         }
     }
 }

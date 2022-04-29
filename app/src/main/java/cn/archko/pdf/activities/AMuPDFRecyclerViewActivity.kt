@@ -28,7 +28,9 @@ import cn.archko.pdf.common.OutlineHelper
 import cn.archko.pdf.common.PDFBookmarkManager
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.entity.APage
+import cn.archko.pdf.entity.Bookmark
 import cn.archko.pdf.entity.MenuBean
+import cn.archko.pdf.fragments.BookmarkFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.MenuListener
 import cn.archko.pdf.listeners.OutlineListener
@@ -245,8 +247,19 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             outlineHelper = OutlineHelper(mMupdfDocument, this)
 
             mMenuHelper = MenuHelper(mLeftDrawer, outlineHelper, supportFragmentManager)
-            mMenuHelper?.setupMenu(mPath, this@AMuPDFRecyclerViewActivity, menuListener)
-            mMenuHelper?.setupOutline(pos)
+            mMenuHelper?.apply {
+                setupMenu(mPath, this@AMuPDFRecyclerViewActivity, menuListener)
+                mMenuHelper?.itemListener = object : BookmarkFragment.ItemListener {
+                    override fun onClick(data: Bookmark, position: Int) {
+                        viewController?.scrollToPosition(data.page)
+                    }
+
+                    override fun onDelete(data: Bookmark, position: Int) {
+                        deleteBookmark(data)
+                    }
+                }
+                mMenuHelper?.setupOutline(pos)
+            }
 
             isDocLoaded = true
 
@@ -266,6 +279,10 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         } finally {
             progressDialog.dismiss()
         }
+    }
+
+    private fun deleteBookmark(bookmark: Bookmark) {
+        pdfBookmarkManager!!.deleteBookmark(bookmark)
     }
 
     override fun onDestroy() {
@@ -465,12 +482,19 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             //if (!TextUtils.isEmpty(pdfBookmarkManager?.bookProgress?.bookmark)) {
             val frameLayout = mPageSeekBarControls?.layoutOutline
 
+            val bookmarks = arrayListOf<Bookmark>()
+            var element = Bookmark()
+            element.page = 3
+            bookmarks.add(element)
+            element = Bookmark()
+            element.page = 30
+            bookmarks.add(element)
             if (frameLayout?.visibility == View.GONE) {
                 frameLayout.visibility = View.VISIBLE
-                mMenuHelper?.showBookmark("2_6")
+                mMenuHelper?.showBookmark(bookmarks)
             } else {
                 if (mMenuHelper!!.isOutline()) {
-                    mMenuHelper?.showBookmark("2_6")
+                    mMenuHelper?.showBookmark(bookmarks)
                 } else {
                     frameLayout?.visibility = View.GONE
                 }

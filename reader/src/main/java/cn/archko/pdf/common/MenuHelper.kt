@@ -2,13 +2,13 @@ package cn.archko.pdf.common
 
 import android.content.Context
 import android.os.Bundle
-import android.text.TextUtils
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.activities.MuPDFRecyclerViewActivity
 import cn.archko.pdf.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.adapters.MenuAdapter
+import cn.archko.pdf.entity.Bookmark
 import cn.archko.pdf.entity.MenuBean
 import cn.archko.pdf.fragments.BookmarkFragment
 import cn.archko.pdf.fragments.OutlineFragment
@@ -26,6 +26,10 @@ class MenuHelper public constructor(
 
     private var outlineFragment: OutlineFragment? = null
     private var bookmarkFragment: BookmarkFragment? = null
+    var itemListener: BookmarkFragment.ItemListener? = null
+        set(value) {
+            field = value
+        }
 
     fun setupMenu(mPath: String?, context: Context, menuListener: MenuListener?) {
         val menus = ArrayList<MenuBean>()
@@ -58,6 +62,7 @@ class MenuHelper public constructor(
     fun setupOutline(currentPos: Int?) {
         if (null == bookmarkFragment) {
             bookmarkFragment = BookmarkFragment()
+            bookmarkFragment!!.itemListener = itemListener
         }
         supportFragmentManager.beginTransaction()
             .add(R.id.layout_outline, bookmarkFragment!!)
@@ -87,13 +92,13 @@ class MenuHelper public constructor(
         outlineFragment?.updateSelection(pos)
     }
 
-    fun showBookmark(bookmark: String?) {
+    fun showBookmark(bookmark: List<Bookmark>?) {
         supportFragmentManager.beginTransaction()
             .hide(outlineFragment!!)
             .show(bookmarkFragment!!)
             .commit()
 
-        if (!TextUtils.isEmpty(bookmark)) {
+        if (bookmark != null && bookmark.isNotEmpty()) {
             bookmarkFragment?.updateBookmark(bookmark)
         }
     }
