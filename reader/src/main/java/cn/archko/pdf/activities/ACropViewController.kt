@@ -297,7 +297,19 @@ class ACropViewController(
                 if (pageSize.getTargetWidth() <= 0) {
                     return
                 }
-                view.updatePage(pageSize, 1.0f/*zoomModel!!.zoom*/, true)
+                view.updatePage(showBookmark(position), pageSize, 1.0f/*zoomModel!!.zoom*/, true)
+            }
+
+            private fun showBookmark(position: Int): Boolean {
+                val bookmarks = pdfViewModel.bookmarks
+                if (null != bookmarks) {
+                    for (bookmark in bookmarks) {
+                        if (position == bookmark.page) {
+                            return true
+                        }
+                    }
+                }
+                return false
             }
         }
 
