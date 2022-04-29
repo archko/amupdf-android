@@ -17,9 +17,9 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:paddingLeft="8dp"
+        android:text="@string/bookmark_page"
         android:textColor="@color/white"
-        android:textSize="15sp"
-        android:text="Page:" />
+        android:textSize="15sp" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/page"
@@ -30,6 +30,7 @@
         android:paddingLeft="8dp"
         android:textColor="@color/white"
         android:textSize="15sp"
+        tools:ignore="RelativeOverlap"
         tools:text="33" />
 
     <ImageView

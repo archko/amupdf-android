@@ -78,12 +78,13 @@ open class BookmarkFragment : Fragment() {
 
         if (bookmarks.size == 0) {
             noBookmark()
+        } else {
+            nodataView.visibility = View.GONE
         }
         return view
     }
 
     private fun noBookmark() {
-        nodataView.text = "No bookmark"
         nodataView.visibility = View.VISIBLE
     }
 
@@ -96,6 +97,7 @@ open class BookmarkFragment : Fragment() {
             this.bookmarks.clear()
             this.bookmarks.addAll(list)
             if (this.bookmarks.size > 0) {
+                nodataView.visibility = View.GONE
                 adapter.notifyDataSetChanged()
             } else {
                 noBookmark()

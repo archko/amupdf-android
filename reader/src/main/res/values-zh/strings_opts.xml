@@ -93,4 +93,7 @@
 
     <string name="title_home">主目录:</string>
     <string name="title_path">路径:</string>
+
+    <string name="bookmark_page">页码:</string>
+    <string name="no_bookmark">没有书签,先添加一个吧</string>
 </resources>

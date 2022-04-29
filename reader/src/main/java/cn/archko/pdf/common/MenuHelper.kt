@@ -104,7 +104,7 @@ class MenuHelper public constructor(
     }
 
     fun updateBookmark(page: Int, list: List<Bookmark>?) {
-        if (list != null && list.isNotEmpty()) {
+        if (list != null) {
             bookmarkFragment?.updateBookmark(page, list)
         }
     }

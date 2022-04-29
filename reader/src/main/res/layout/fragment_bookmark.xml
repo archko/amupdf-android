@@ -15,9 +15,10 @@
     <TextView
         android:id="@+id/no_data"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:textColor="@color/white"
         android:gravity="center"
-        android:text="no outline"
+        android:text="@string/no_bookmark"
         android:textSize="18sp"
         android:visibility="gone" />
 
