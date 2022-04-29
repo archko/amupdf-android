@@ -92,14 +92,20 @@ class MenuHelper public constructor(
         outlineFragment?.updateSelection(pos)
     }
 
-    fun showBookmark(bookmark: List<Bookmark>?) {
+    fun showBookmark(page: Int, list: List<Bookmark>?) {
         supportFragmentManager.beginTransaction()
             .hide(outlineFragment!!)
             .show(bookmarkFragment!!)
             .commit()
 
-        if (bookmark != null && bookmark.isNotEmpty()) {
-            bookmarkFragment?.updateBookmark(bookmark)
+        if (list != null && list.isNotEmpty()) {
+            bookmarkFragment?.updateBookmark(page, list)
+        }
+    }
+
+    fun updateBookmark(page: Int, list: List<Bookmark>?) {
+        if (list != null && list.isNotEmpty()) {
+            bookmarkFragment?.updateBookmark(page, list)
         }
     }
 

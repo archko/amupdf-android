@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.archko.pdf.App
 import cn.archko.pdf.common.APageSizeLoader
+import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.PDFBookmarkManager
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.entity.APage
@@ -46,8 +47,27 @@ class PDFViewModel : ViewModel() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 pdfBookmarkManager.deleteBookmark(bookmark)
-                bookmarks?.minus(bookmark)
+                bookmarks = bookmarks?.minus(bookmark)
                 uiBookmarksLiveData.postValue(bookmarks)
+            }
+        }
+    }
+
+    fun addBookmark(currentPos: Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val bookProgress = pdfBookmarkManager.bookProgress
+                bookProgress?.let {
+                    val bookmark = Bookmark()
+                    bookmark.page = currentPos
+                    bookmark.progressId = bookProgress._id
+                    bookmark.path = bookProgress.path
+                    bookmark.createAt = System.currentTimeMillis()
+
+                    Graph.database.progressDao().addBookmark(bookmark)
+                    bookmarks = pdfBookmarkManager.getBookmarks()
+                    uiBookmarksLiveData.postValue(bookmarks)
+                }
             }
         }
     }

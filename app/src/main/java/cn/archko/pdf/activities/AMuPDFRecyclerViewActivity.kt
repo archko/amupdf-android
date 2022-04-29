@@ -261,6 +261,10 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                     override fun onDelete(data: Bookmark, position: Int) {
                         deleteBookmark(data)
                     }
+
+                    override fun onAdd(page: Int) {
+                        addBookmark(page)
+                    }
                 }
                 mMenuHelper?.setupOutline(pos)
             }
@@ -287,11 +291,16 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
     fun obverseViewModel() {
         pdfViewModel.uiBookmarksLiveData.observe(this, Observer {
+            mMenuHelper?.updateBookmark(getCurrentPos(), it)
         })
     }
 
     private fun deleteBookmark(bookmark: Bookmark) {
         pdfViewModel.deleteBookmark(bookmark)
+    }
+
+    private fun addBookmark(page: Int) {
+        pdfViewModel.addBookmark(getCurrentPos())
     }
 
     override fun onDestroy() {
@@ -473,29 +482,25 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
     private fun showBookmark() {
         outlineHelper?.let {
-            //if (!TextUtils.isEmpty(pdfBookmarkManager?.bookProgress?.bookmark)) {
             val frameLayout = mPageSeekBarControls?.layoutOutline
 
-            val bookmarks = arrayListOf<Bookmark>()
+            /*val bookmarks = arrayListOf<Bookmark>()
             var element = Bookmark()
             element.page = 3
             bookmarks.add(element)
             element = Bookmark()
             element.page = 30
-            bookmarks.add(element)
+            bookmarks.add(element)*/
             if (frameLayout?.visibility == View.GONE) {
                 frameLayout.visibility = View.VISIBLE
-                mMenuHelper?.showBookmark(bookmarks)
+                mMenuHelper?.showBookmark(getCurrentPos(), pdfViewModel.bookmarks)
             } else {
                 if (mMenuHelper!!.isOutline()) {
-                    mMenuHelper?.showBookmark(bookmarks)
+                    mMenuHelper?.showBookmark(getCurrentPos(), pdfViewModel.bookmarks)
                 } else {
                     frameLayout?.visibility = View.GONE
                 }
             }
-            //} else {
-            //    mPageSeekBarControls?.layoutOutline?.visibility = View.GONE
-            //}
         }
     }
 

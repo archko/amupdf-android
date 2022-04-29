@@ -22,7 +22,9 @@ open class BookmarkFragment : Fragment() {
     private lateinit var adapter: BaseRecyclerAdapter<Bookmark>
     private lateinit var recyclerView: RecyclerView
     private lateinit var nodataView: TextView
+    private lateinit var addView: View
     private var bookmarks = ArrayList<Bookmark>()
+    private var page = 0
     var itemListener: ItemListener? = null
         set(value) {
             field = value
@@ -31,6 +33,7 @@ open class BookmarkFragment : Fragment() {
     interface ItemListener {
         fun onClick(data: Bookmark, position: Int)
         fun onDelete(data: Bookmark, position: Int)
+        fun onAdd(page: Int)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +45,7 @@ open class BookmarkFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_outline, container, false)
+        val view = inflater.inflate(R.layout.fragment_bookmark, container, false)
 
         recyclerView = view.findViewById(R.id.list)
         recyclerView.layoutManager = LinearLayoutManager(activity)
@@ -56,6 +59,10 @@ open class BookmarkFragment : Fragment() {
             itemDecoration
         )
         nodataView = view.findViewById(R.id.no_data)
+        addView = view.findViewById(R.id.add)
+        addView.setOnClickListener {
+            itemListener?.onAdd(page)
+        }
 
         adapter = object : BaseRecyclerAdapter<Bookmark>(activity, bookmarks) {
 
@@ -80,10 +87,11 @@ open class BookmarkFragment : Fragment() {
         nodataView.visibility = View.VISIBLE
     }
 
-    open fun updateBookmark(list: List<Bookmark>) {
+    open fun updateBookmark(page: Int, list: List<Bookmark>) {
         if (!isResumed) {
             return
         }
+        this.page = page
         bookmarks.let {
             this.bookmarks.clear()
             this.bookmarks.addAll(list)
