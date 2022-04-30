@@ -118,11 +118,14 @@ class ACropViewController(
         }
 
         if (pos > 0) {
-            mRecyclerView.scrollToPosition(pos)
+            (mRecyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(pos, 0)
         }
     }
 
     override fun getCurrentPos(): Int {
+        if (null == mRecyclerView || null == mRecyclerView.layoutManager) {
+            return 0
+        }
         var position =
             (mRecyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
         if (position < 0) {

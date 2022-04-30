@@ -209,17 +209,22 @@ public class ReflowTextViewHolder extends BaseViewHolder {
 
             textView.setText(Html.fromHtml(text));
 
+            addBookmark(showBookmark);
+        }
+
+        private void addBookmark(boolean showBookmark) {
+            LayoutParams lp;
             if (showBookmark) {
-                lp = new LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                lp.leftMargin = Utils.dipToPixel(4);
-                lp.topMargin = Utils.dipToPixel(4);
+                lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                lp.leftMargin = Utils.dipToPixel(2);
+                lp.topMargin = Utils.dipToPixel(2);
                 TextView bm = new TextView(getContext());
                 bm.setText("B");
                 bm.setGravity(Gravity.CENTER);
                 bm.setBackgroundResource(R.drawable.bg_bookmark_cicle);
                 bm.setTextColor(Color.MAGENTA);
-                bm.setPadding(Utils.dipToPixel(2), 0, Utils.dipToPixel(2), 0);
-                bm.setTextSize(20);
+                bm.setPadding(Utils.dipToPixel(4), 0, Utils.dipToPixel(4), 0);
+                bm.setTextSize(18);
                 addView(bm, lp);
             }
         }
@@ -262,9 +267,7 @@ public class ReflowTextViewHolder extends BaseViewHolder {
                 addView(imageView, lp);
                 imageView.setImageBitmap(bean.getBitmap());
             }
-            if (showBookmark) {
-
-            }
+            addBookmark(showBookmark);
         }
     }
 }

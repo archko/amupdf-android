@@ -261,7 +261,10 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     }
 
     open fun getCurrentPos(): Int {
-        return viewController?.getCurrentPos()!!
+        if (null == viewController) {
+            return 0
+        }
+        return viewController!!.getCurrentPos()
     }
 
     open fun getPassword(): String? {

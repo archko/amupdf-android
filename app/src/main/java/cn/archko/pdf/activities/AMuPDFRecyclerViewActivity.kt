@@ -216,6 +216,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     private fun changeViewMode() {
+        val pos = getCurrentPos()
         viewController?.onDestroy()
 
         val aViewController = ViewControllerFactory.getOrCreateViewController(
@@ -229,9 +230,8 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             optionRepository
         )
         viewController = aViewController
-        Logcat.d("changeViewMode:$viewMode,controller:$viewController")
+        Logcat.d("changeViewMode:$viewMode, pos:$pos, controller:$viewController")
         addDocumentView()
-        val pos = getCurrentPos()
         viewController?.init(mPageSizes, mMupdfDocument, pos)
         viewController?.notifyDataSetChanged()
     }
@@ -289,7 +289,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         }
     }
 
-    fun obverseViewModel() {
+    private fun obverseViewModel() {
         pdfViewModel.uiBookmarksLiveData.observe(this, Observer {
             mMenuHelper?.updateBookmark(getCurrentPos(), it)
         })
