@@ -30,4 +30,5 @@ interface AViewController {
 
     fun showController()
     fun notifyDataSetChanged()
+    fun notifyItemChanged(pos: Int)
 }

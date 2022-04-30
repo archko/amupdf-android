@@ -231,6 +231,9 @@ class ANormalViewController(
     override fun notifyDataSetChanged() {
     }
 
+    override fun notifyItemChanged(pos: Int) {
+    }
+
     //--------------------------------------
 
     override fun onResume() {

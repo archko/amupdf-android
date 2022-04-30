@@ -189,6 +189,10 @@ class ACropViewController(
         mRecyclerView.adapter?.notifyDataSetChanged()
     }
 
+    override fun notifyItemChanged(pos: Int) {
+        mRecyclerView.adapter?.notifyItemChanged(pos)
+    }
+
     //--------------------------------------
 
     override fun onResume() {

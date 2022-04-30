@@ -112,7 +112,7 @@ open class BookmarkFragment : Fragment() {
         var delete: View = itemView.findViewById(R.id.delete)
 
         override fun onBind(data: Bookmark, position: Int) {
-            page.text = data.page.toString()
+            page.text = (data.page + 1).toString()
             delete.setOnClickListener { itemListener?.onDelete(data, position) }
             itemView.setOnClickListener { itemListener?.onClick(data, position) }
         }

@@ -301,7 +301,8 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     private fun addBookmark(page: Int) {
-        pdfViewModel.addBookmark(getCurrentPos() + 1)
+        val currentPos = getCurrentPos()
+        pdfViewModel.addBookmark(currentPos)
         viewController?.notifyDataSetChanged()
     }
 
