@@ -344,7 +344,7 @@ private fun ItemList(
     FileInfoDialog(showInfoDialog, fileBean, menuOpt)
     LazyColumn(
         flingBehavior = StockFlingBehaviours.smoothScroll(),
-        modifier=modifier
+        modifier = modifier
     ) {
         itemsIndexed(list) { index, fileBean ->
             if (index > 0) {

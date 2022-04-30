@@ -164,7 +164,7 @@ class AReflowViewController(
     }
 
     override fun getCurrentPos(): Int {
-        if (null == mRecyclerView || null == mRecyclerView.layoutManager) {
+        if (null == mRecyclerView.layoutManager) {
             return 0
         }
         var position =
@@ -194,7 +194,7 @@ class AReflowViewController(
             mRecyclerView.scrollBy(0, scrollY - margin)
             return true
         }
-        return false;
+        return false
     }
 
     override fun onSingleTap() {
@@ -246,20 +246,15 @@ class AReflowViewController(
     //--------------------------------------
 
     override fun onResume() {
-        //mPageSeekBarControls?.hide()
         mStyleControls?.visibility = View.GONE
 
-        mRecyclerView.postDelayed(object : Runnable {
-            override fun run() {
-                mRecyclerView.adapter?.notifyDataSetChanged()
-            }
-        }, 250L)
+        mRecyclerView.postDelayed({ mRecyclerView.adapter?.notifyDataSetChanged() }, 250L)
     }
 
     override fun onPause() {
         pdfViewModel.getBookProgress()?.reflow = 1
         val position = getCurrentPos()
-        val zoomLevel = pdfViewModel.getBookProgress()!!.zoomLevel;
+        val zoomLevel = pdfViewModel.getBookProgress()!!.zoomLevel
         pdfViewModel.saveCurrentPage(
             mPath,
             mMupdfDocument!!.countPages(),
@@ -384,23 +379,23 @@ class AReflowViewController(
         }
         mBgSetting?.setOnClickListener {
             pickerColor(
-                mStyleHelper?.styleBean?.bgColor!!,
-                ColorPickerDialog.OnColorSelectedListener { color ->
-                    mColorLabel?.setBackgroundColor(color)
-                    mStyleHelper?.styleBean?.bgColor = color
-                    mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
-                    updateReflowAdapter()
-                })
+                mStyleHelper?.styleBean?.bgColor!!
+            ) { color ->
+                mColorLabel?.setBackgroundColor(color)
+                mStyleHelper?.styleBean?.bgColor = color
+                mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
+                updateReflowAdapter()
+            }
         }
         mFgSetting?.setOnClickListener {
             pickerColor(
-                mStyleHelper?.styleBean?.fgColor!!,
-                ColorPickerDialog.OnColorSelectedListener { color ->
-                    mColorLabel?.setTextColor(color)
-                    mStyleHelper?.styleBean?.fgColor = color
-                    mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
-                    updateReflowAdapter()
-                })
+                mStyleHelper?.styleBean?.fgColor!!
+            ) { color ->
+                mColorLabel?.setTextColor(color)
+                mStyleHelper?.styleBean?.fgColor = color
+                mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
+                updateReflowAdapter()
+            }
         }
     }
 

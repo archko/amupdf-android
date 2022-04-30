@@ -134,14 +134,15 @@ public class APDFView(
             }
         }
 
-        ImageDecoder.getInstance().loadImage(aPage, crop, 0, this, mupdfDocument?.document) { bitmap ->
-            //if (Logcat.loggable) {
-            //    Logcat.d(String.format("decode2 relayout bitmap:index:%s, %s:%s imageView->%s:%s",
-            //            pageSize.index, bitmap.width, bitmap.height,
-            //            getWidth(), getHeight()))
-            //}
-            setImageBitmap(bitmap)
-        }
+        ImageDecoder.getInstance()
+            .loadImage(aPage, crop, 0, this, mupdfDocument?.document) { bitmap ->
+                //if (Logcat.loggable) {
+                //    Logcat.d(String.format("decode2 relayout bitmap:index:%s, %s:%s imageView->%s:%s",
+                //            pageSize.index, bitmap.width, bitmap.height,
+                //            getWidth(), getHeight()))
+                //}
+                setImageBitmap(bitmap)
+            }
     }
 
     //override fun setImageBitmap(bm: Bitmap?) {

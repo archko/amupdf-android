@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                   android:layout_width="match_parent"
-                                                   android:layout_height="wrap_content"
-                                                   android:layout_marginLeft="8dp"
-                                                   android:layout_marginRight="8dp"
-                                                   android:orientation="vertical"
-                                                   android:paddingLeft="4dp"
-                                                   android:paddingRight="4dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    android:orientation="vertical"
+    android:paddingLeft="4dp"
+    android:paddingRight="4dp">
 
     <TextView
         android:id="@+id/label_location"
@@ -18,7 +18,7 @@
         android:text="@string/label_location"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/label_filename"
@@ -28,7 +28,7 @@
         android:text="@string/label_filename"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/location"/>
+        app:layout_constraintTop_toBottomOf="@id/location" />
 
     <TextView
         android:id="@+id/label_filesize"
@@ -38,7 +38,7 @@
         android:text="@string/label_filesize"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/fileName"/>
+        app:layout_constraintTop_toBottomOf="@id/fileName" />
 
     <TextView
         android:id="@+id/label_page_count"
@@ -48,7 +48,7 @@
         android:text="@string/label_pagecount"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label_filesize"/>
+        app:layout_constraintTop_toBottomOf="@id/label_filesize" />
 
     <TextView
         android:id="@+id/label_read_count"
@@ -58,7 +58,7 @@
         android:text="@string/label_read_count"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label_page_count"/>
+        app:layout_constraintTop_toBottomOf="@id/label_page_count" />
 
     <TextView
         android:id="@+id/label_last_read"
@@ -68,14 +68,14 @@
         android:text="@string/label_read"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label_read_count"/>
+        app:layout_constraintTop_toBottomOf="@id/label_read_count" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="end"
-        app:constraint_referenced_ids="label_location,label_filename, label_filesize, label_read_count, @+id/label_page_count, @+id/label_last_read"/>
+        app:constraint_referenced_ids="label_location,label_filename, label_filesize, label_read_count, @+id/label_page_count, @+id/label_last_read" />
 
     <TextView
         android:id="@+id/location"
@@ -86,7 +86,7 @@
         android:text="location"
         android:textSize="14sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/fileName"
@@ -96,7 +96,7 @@
         android:text="fileName"
         android:textSize="14sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
-        app:layout_constraintTop_toBottomOf="@id/location"/>
+        app:layout_constraintTop_toBottomOf="@id/location" />
 
     <TextView
         android:id="@+id/fileSize"
@@ -105,7 +105,7 @@
         android:padding="2dp"
         android:text="fileSize"
         app:layout_constraintLeft_toRightOf="@id/barrier"
-        app:layout_constraintTop_toBottomOf="@id/fileName"/>
+        app:layout_constraintTop_toBottomOf="@id/fileName" />
 
     <!--<LinearLayout
         android:layout_width="match_parent"
@@ -136,7 +136,7 @@
         android:text="1"
         android:textSize="14sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
-        app:layout_constraintTop_toBottomOf="@id/fileSize"/>
+        app:layout_constraintTop_toBottomOf="@id/fileSize" />
 
     <TextView
         android:id="@+id/readCount"
@@ -146,7 +146,7 @@
         android:text="1"
         android:textSize="14sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
-        app:layout_constraintTop_toBottomOf="@id/pageCount"/>
+        app:layout_constraintTop_toBottomOf="@id/pageCount" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/lay_last_read"
@@ -166,7 +166,7 @@
         android:text=""
         android:textSize="14sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
-        app:layout_constraintTop_toBottomOf="@id/readCount"/>
+        app:layout_constraintTop_toBottomOf="@id/readCount" />
 
     <ProgressBar
         android:id="@+id/progressbar"
@@ -180,7 +180,7 @@
         android:minHeight="2dp"
         android:textSize="14sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
-        app:layout_constraintTop_toBottomOf="@id/lastRead"/>
+        app:layout_constraintTop_toBottomOf="@id/lastRead" />
 
     <Button
         android:id="@+id/btn_cancel"
@@ -191,7 +191,7 @@
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/btn_ok"
-        app:layout_constraintTop_toBottomOf="@id/lastRead"/>
+        app:layout_constraintTop_toBottomOf="@id/lastRead" />
 
     <Button
         android:id="@+id/btn_ok"
@@ -202,7 +202,7 @@
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintLeft_toRightOf="@id/btn_cancel"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lastRead"/>
+        app:layout_constraintTop_toBottomOf="@id/lastRead" />
 
     <ImageView
         android:id="@+id/icon"
@@ -213,6 +213,6 @@
         android:src="@drawable/icon"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_cancel"/>
+        app:layout_constraintTop_toBottomOf="@id/btn_cancel" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

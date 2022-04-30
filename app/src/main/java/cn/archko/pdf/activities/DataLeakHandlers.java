@@ -3,11 +3,11 @@ package cn.archko.pdf.activities;
 /**
  * This file contains a, minimal, example implementation of the
  * SODataLeakHandlers interface.
- *
+ * <p>
  * This class is mandatory for all NUI Editor based applications.
- *
+ * <p>
  * NB. All methods in the interface are executed on the UI thread.
- *     Calls to SODoc methods *must* also be made on this thread.
+ * Calls to SODoc methods *must* also be made on this thread.
  */
 
 import android.app.Activity;
@@ -17,6 +17,7 @@ import android.os.Build;
 
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AlertDialog;
+
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.MotionEvent;
@@ -44,20 +45,22 @@ import com.artifex.sonui.editor.SOCustomSaveComplete;
 
 import cn.archko.mupdf.R;
 
-public class DataLeakHandlers implements SODataLeakHandlers
-{
-    private final  String           mDebugTag  = "DataLeakHandlers";
+public class DataLeakHandlers implements SODataLeakHandlers {
+    private final String mDebugTag = "DataLeakHandlers";
 
     //  a list of files to delete when the document is closed
     private ArrayList<String> mDeleteOnClose = null;
-    public void addDeleteOnClose(String path) {mDeleteOnClose.add(path);}
 
-    private Activity       mActivity;         // The calling activity.
-    private ConfigOptions  mConfigOptions;    // The configuration settings.
-    private SOSecureFS     mSecureFs;         // Instance of SecureFS.
-    private String         mSecurePath;       // Root of the secure container
-    private String         mSecurePrefix;     // The secure prefix
-    private String         mTempFolderPath;   // Temporary folder path.
+    public void addDeleteOnClose(String path) {
+        mDeleteOnClose.add(path);
+    }
+
+    private Activity mActivity;         // The calling activity.
+    private ConfigOptions mConfigOptions;    // The configuration settings.
+    private SOSecureFS mSecureFs;         // Instance of SecureFS.
+    private String mSecurePath;       // Root of the secure container
+    private String mSecurePrefix;     // The secure prefix
+    private String mTempFolderPath;   // Temporary folder path.
     private ProgressDialog mProgressDialog;   // Save?export progress dialog
 
 
@@ -72,12 +75,11 @@ public class DataLeakHandlers implements SODataLeakHandlers
      * @param message    The dialog message.
      * @param cancelable If set to true The dialog can be dismissed.
      */
-    private void displayProgressDialogue(final String  title,
-                                         final String  message,
-                                         final boolean cancelable)
-    {
+    private void displayProgressDialogue(final String title,
+                                         final String message,
+                                         final boolean cancelable) {
         mProgressDialog = new ProgressDialog(mActivity,
-                                             R.style.Theme_AppCompat_Dialog_Alert);
+                R.style.Theme_AppCompat_Dialog_Alert);
 
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setCancelable(cancelable);
@@ -92,15 +94,12 @@ public class DataLeakHandlers implements SODataLeakHandlers
      * @param title   The dialog title.
      * @param message The dialog message.
      */
-    private void displayDialogue(final String title, final String message)
-    {
+    private void displayDialogue(final String title, final String message) {
         AlertDialog alertDialog = new AlertDialog(
-            new ContextThemeWrapper(mActivity,
-                                    R.style.Theme_AppCompat_Dialog_Alert))
-        {
+                new ContextThemeWrapper(mActivity,
+                        R.style.Theme_AppCompat_Dialog_Alert)) {
             @Override
-            public boolean dispatchTouchEvent(MotionEvent event)
-            {
+            public boolean dispatchTouchEvent(MotionEvent event) {
                 /*
                  * Dismiss the dialog on a touch anywhere on the
                  * screen.
@@ -131,52 +130,40 @@ public class DataLeakHandlers implements SODataLeakHandlers
      * @throws IOException if the temporary folder cannot be created.
      */
     public void initDataLeakHandlers(Activity activity, ConfigOptions cfgOpts)
-        throws IOException
-    {
+            throws IOException {
         mConfigOptions = cfgOpts;
 
-        mActivity      = activity;
+        mActivity = activity;
 
         String errorBase =
-            "DataLeakHandlers experienced unexpected exception [%s]";
+                "DataLeakHandlers experienced unexpected exception [%s]";
 
-        try
-        {
+        try {
             // Search for a registered SecureFS instance.
             mSecureFs = ArDkLib.getSecureFS();
-            if (mSecureFs==null)
+            if (mSecureFs == null)
                 throw new ClassNotFoundException();
 
             mSecurePath = mSecureFs.getSecurePath();
             mSecurePrefix = mSecureFs.getSecurePrefix();
 
-        }
-        catch (ExceptionInInitializerError e)
-        {
+        } catch (ExceptionInInitializerError e) {
             Log.e(mDebugTag, String.format(errorBase,
-                             "ExceptionInInitializerError"));
-        }
-        catch (LinkageError e)
-        {
+                    "ExceptionInInitializerError"));
+        } catch (LinkageError e) {
             Log.e(mDebugTag, String.format(errorBase, "LinkageError"));
-        }
-        catch (SecurityException e)
-        {
+        } catch (SecurityException e) {
             Log.e(mDebugTag, String.format(errorBase,
-                                           "SecurityException"));
-        }
-        catch (ClassNotFoundException e)
-        {
+                    "SecurityException"));
+        } catch (ClassNotFoundException e) {
             Log.i(mDebugTag, "SecureFS implementation unavailable");
         }
 
-        mTempFolderPath = FileUtils.getTempPathRoot(mActivity)+
-                          File.separator + "dataleak" + File.separator;
+        mTempFolderPath = FileUtils.getTempPathRoot(mActivity) +
+                File.separator + "dataleak" + File.separator;
 
-        if (! FileUtils.fileExists(mTempFolderPath))
-        {
-            if (! FileUtils.createDirectory(mTempFolderPath))
-            {
+        if (!FileUtils.fileExists(mTempFolderPath)) {
+            if (!FileUtils.createDirectory(mTempFolderPath)) {
                 throw new IOException();
             }
         }
@@ -187,23 +174,21 @@ public class DataLeakHandlers implements SODataLeakHandlers
     /**
      * This method finalizes the DataLeakHandlers object <br><br>.
      */
-    public void finaliseDataLeakHandlers()
-    {
+    public void finaliseDataLeakHandlers() {
         //  delete temp files
-        if (mDeleteOnClose!=null) {
+        if (mDeleteOnClose != null) {
             for (int i = 0; i < mDeleteOnClose.size(); i++) {
                 FileUtils.deleteFile(mDeleteOnClose.get(i));
-        }
+            }
             mDeleteOnClose.clear();
-    }
+        }
     }
 
     /**
      * This method will be called when the application is in the correct state
      * to insert a previously captured/selected image.
      */
-    public void doInsert()
-    {
+    public void doInsert() {
     }
 
     /**
@@ -216,9 +201,8 @@ public class DataLeakHandlers implements SODataLeakHandlers
      * @param sModificationsdoc True if the document has unsaved modifications.
      * @param whenDone          run this when everything is done. Can be null.
      */
-    public void pauseHandler(ArDkDoc doc, boolean hasModifications, Runnable whenDone)
-    {
-        if (whenDone!=null)
+    public void pauseHandler(ArDkDoc doc, boolean hasModifications, Runnable whenDone) {
+        if (whenDone != null)
             whenDone.run();
     }
 
@@ -233,10 +217,9 @@ public class DataLeakHandlers implements SODataLeakHandlers
      * @param data        An Intent, which can return result data to the caller
      *                    (various data can be attached to Intent "extras").
      */
-    public void onActivityResult(int          requestCode,
-                                 int          resultCode,
-                                 final Intent data)
-    {
+    public void onActivityResult(int requestCode,
+                                 int resultCode,
+                                 final Intent data) {
     }
 
     /**
@@ -252,16 +235,13 @@ public class DataLeakHandlers implements SODataLeakHandlers
      *         In this case the button will be omitted from the user interface.
      */
     public void printHandler(ArDkDoc doc)
-        throws UnsupportedOperationException
-    {
+            throws UnsupportedOperationException {
         // If this feature is disabled throw an exception
-        if (! mConfigOptions.isPrintingEnabled())
-        {
-           throw new UnsupportedOperationException();
+        if (!mConfigOptions.isPrintingEnabled()) {
+            throw new UnsupportedOperationException();
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-        {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             /*
              * Print the current document using the Android PrintService.
              *
@@ -273,12 +253,10 @@ public class DataLeakHandlers implements SODataLeakHandlers
              * secure builds.
              */
             //new PrintHelperPdf().print(mActivity, doc);
-        }
-        else
-        {
+        } else {
             displayDialogue(
-                "Not Supported",
-                "Printing is not supported for this version of Android.");
+                    "Not Supported",
+                    "Printing is not supported for this version of Android.");
         }
     }
 
@@ -294,16 +272,14 @@ public class DataLeakHandlers implements SODataLeakHandlers
      *         In this case the button will be omitted from the user interface.
      */
     public void launchUrlHandler(String url)
-        throws UnsupportedOperationException
-    {
+            throws UnsupportedOperationException {
         // If this feature is disabled throw an exception
-        if (! mConfigOptions.isLaunchUrlEnabled())
-        {
-           throw new UnsupportedOperationException();
+        if (!mConfigOptions.isLaunchUrlEnabled()) {
+            throw new UnsupportedOperationException();
         }
 
         displayDialogue("Information",
-                        "Please implement a custom Url launch handler");
+                "Please implement a custom Url launch handler");
     }
 
     /**
@@ -322,8 +298,7 @@ public class DataLeakHandlers implements SODataLeakHandlers
      *         In this case the button will be omitted from the user interface.
      */
     public void insertImageHandler(NUIDocView docView)
-        throws UnsupportedOperationException
-    {
+            throws UnsupportedOperationException {
         // If this feature is disabled throw an exception
         throw new UnsupportedOperationException();
     }
@@ -345,8 +320,7 @@ public class DataLeakHandlers implements SODataLeakHandlers
      *         In this case the button will be omitted from the user interface.
      */
     public void insertPhotoHandler(NUIDocView docView)
-        throws UnsupportedOperationException
-    {
+            throws UnsupportedOperationException {
         // If this feature is disabled throw an exception
         throw new UnsupportedOperationException();
     }
@@ -373,12 +347,11 @@ public class DataLeakHandlers implements SODataLeakHandlers
      *         In this case the button will be omitted from the user interface.
      * @throws IOException on any file IO related error
      */
-    public void customSaveHandler(String                    filename,
-                                  ArDkDoc                      doc,
-                                 final String               customDocData,
-                                 final SOCustomSaveComplete completionCallback)
-        throws UnsupportedOperationException, IOException
-    {
+    public void customSaveHandler(String filename,
+                                  ArDkDoc doc,
+                                  final String customDocData,
+                                  final SOCustomSaveComplete completionCallback)
+            throws UnsupportedOperationException, IOException {
     }
 
     /**
@@ -398,16 +371,13 @@ public class DataLeakHandlers implements SODataLeakHandlers
      *         In this case the button will be omitted from the user interface.
      */
     @Override
-    public void saveAsHandler(String                 filename,
-                              ArDkDoc                  doc,
+    public void saveAsHandler(String filename,
+                              ArDkDoc doc,
                               final SOSaveAsComplete completionCallback)
-        throws UnsupportedOperationException
-
-    {
+            throws UnsupportedOperationException {
         // If this feature is disabled throw an exception
-        if (! mConfigOptions.isSaveAsEnabled())
-        {
-           throw new UnsupportedOperationException();
+        if (!mConfigOptions.isSaveAsEnabled()) {
+            throw new UnsupportedOperationException();
         }
 
         // Start a progress dialog.
@@ -421,43 +391,37 @@ public class DataLeakHandlers implements SODataLeakHandlers
         final String newPath = mTempFolderPath + filename;
 
         // Save the document.
-        doc.saveTo(newPath, new SODocSaveListener()
-        {
+        doc.saveTo(newPath, new SODocSaveListener() {
             @Override
-            public void onComplete(int result, int err)
-            {
+            public void onComplete(int result, int err) {
                 // Dismiss the progress dialog.
-                if (mProgressDialog != null)
-                {
+                if (mProgressDialog != null) {
                     mProgressDialog.dismiss();
                     mProgressDialog = null;
                 }
 
-                if (result == SODocSave_Succeeded)
-                {
+                if (result == SODocSave_Succeeded) {
                     displayDialogue("Information",
-                                    "Document saved to '" + newPath     +
-                                    "'.\n\n"                            +
+                            "Document saved to '" + newPath +
+                                    "'.\n\n" +
                                     "Please implement a custom saveAs " +
                                     "handler");
 
                     // Inform the application of the new file name and location.
                     completionCallback.onComplete(
-                        SOSaveAsComplete.SOSaveAsComplete_Succeeded,
-                        newPath);
-                }
-                else
-                {
+                            SOSaveAsComplete.SOSaveAsComplete_Succeeded,
+                            newPath);
+                } else {
                     displayDialogue("Information",
-                                    String.format("saveAsHandler failed: %d %d", result, err));
+                            String.format("saveAsHandler failed: %d %d", result, err));
 
                     /*
                      * Inform the application of the failure/cancellation of
                      * the operation.
                      */
                     completionCallback.onComplete(
-                        SOSaveAsComplete.SOSaveAsComplete_Error,
-                        null);
+                            SOSaveAsComplete.SOSaveAsComplete_Error,
+                            null);
                 }
             }
         });
@@ -469,8 +433,7 @@ public class DataLeakHandlers implements SODataLeakHandlers
      * The implementation can be minimal.
      */
     @Override
-    public void postSaveHandler(SOSaveAsComplete completionCallback)
-    {
+    public void postSaveHandler(SOSaveAsComplete completionCallback) {
         completionCallback.onComplete(0, null);
     }
 
@@ -489,8 +452,7 @@ public class DataLeakHandlers implements SODataLeakHandlers
      */
     @Override
     public void saveAsPdfHandler(String filename, ArDkDoc doc)
-        throws UnsupportedOperationException
-    {
+            throws UnsupportedOperationException {
         // If this feature is disabled throw an exception
         throw new UnsupportedOperationException();
     }
@@ -510,13 +472,10 @@ public class DataLeakHandlers implements SODataLeakHandlers
      */
     @Override
     public void openInHandler(String filename, ArDkDoc doc)
-        throws UnsupportedOperationException
-
-    {
+            throws UnsupportedOperationException {
         // If this feature is disabled throw an exception
-        if (! mConfigOptions.isOpenInEnabled())
-        {
-           throw new UnsupportedOperationException();
+        if (!mConfigOptions.isOpenInEnabled()) {
+            throw new UnsupportedOperationException();
         }
 
         // Start a progress dialog.
@@ -525,44 +484,37 @@ public class DataLeakHandlers implements SODataLeakHandlers
         final String tempPath = mTempFolderPath + filename;
 
         // Save the document to a temporary location.
-        doc.saveTo(tempPath, new SODocSaveListener()
-        {
+        doc.saveTo(tempPath, new SODocSaveListener() {
             @Override
-            public void onComplete(int result, int err)
-            {
+            public void onComplete(int result, int err) {
                 // Dismiss the progress dialog.
-                if (mProgressDialog != null)
-                {
+                if (mProgressDialog != null) {
                     mProgressDialog.dismiss();
                     mProgressDialog = null;
                 }
 
-                if (result == SODocSave_Succeeded)
-                {
+                if (result == SODocSave_Succeeded) {
                     // As an example, add this to the list of files
                     // to be deleted on closing document.
                     addDeleteOnClose(tempPath);
 
                     displayDialogue("Information",
-                                    "Document saved to '" + tempPath    +
-                                    "'.\n\n"                            +
+                            "Document saved to '" + tempPath +
+                                    "'.\n\n" +
                                     "Please implement a custom openIn " +
                                     "handler");
-                }
-                else
-                {
+                } else {
                     displayDialogue("Information",
                             String.format("openInHandler failed: %d %d", result, err));
                 }
 
-                if (mSecureFs != null)
-                {
+                if (mSecureFs != null) {
                     /*
                      * Convert the file path into a real path for sharing
                      * purposes.
                      */
                     String realPath =
-                        tempPath.replace(mSecurePrefix, mSecurePath);
+                            tempPath.replace(mSecurePrefix, mSecurePath);
                 }
 
                 // Do something with the file then delete it.
@@ -585,8 +537,7 @@ public class DataLeakHandlers implements SODataLeakHandlers
      */
     @Override
     public void openPdfInHandler(String filename, ArDkDoc doc)
-        throws UnsupportedOperationException
-    {
+            throws UnsupportedOperationException {
         // If this feature is disabled throw an exception
         throw new UnsupportedOperationException();
     }
@@ -606,12 +557,10 @@ public class DataLeakHandlers implements SODataLeakHandlers
      */
     @Override
     public void shareHandler(String filename, ArDkDoc doc)
-        throws UnsupportedOperationException
-    {
+            throws UnsupportedOperationException {
         // If this feature is disabled throw an exception
-        if (! mConfigOptions.isShareEnabled())
-        {
-           throw new UnsupportedOperationException();
+        if (!mConfigOptions.isShareEnabled()) {
+            throw new UnsupportedOperationException();
         }
 
         // Start a progress dialog.
@@ -620,42 +569,35 @@ public class DataLeakHandlers implements SODataLeakHandlers
         final String tempPath = mTempFolderPath + filename;
 
         // Save the document to a temporary location.
-        doc.saveTo(tempPath, new SODocSaveListener()
-        {
+        doc.saveTo(tempPath, new SODocSaveListener() {
             @Override
-            public void onComplete(int result, int err)
-            {
+            public void onComplete(int result, int err) {
                 // Dismiss the progress dialog.
-                if (mProgressDialog != null)
-                {
+                if (mProgressDialog != null) {
                     mProgressDialog.dismiss();
                     mProgressDialog = null;
                 }
 
-                if (result == SODocSave_Succeeded)
-                {
+                if (result == SODocSave_Succeeded) {
                     // As an example, add this to the list of files
                     // to be deleted on closing document.
                     addDeleteOnClose(tempPath);
 
                     displayDialogue("Information",
-                                    "Document saved to '" + tempPath    +
-                                    "'.\n\n"                                 +
+                            "Document saved to '" + tempPath +
+                                    "'.\n\n" +
                                     "Please implement a custom share " +
                                     "handler");
-                }
-                else
-                {
+                } else {
                     displayDialogue("Information",
                             String.format("shareHandler failed: %d %d", result, err));
                 }
 
-                if (mSecureFs != null)
-                {
+                if (mSecureFs != null) {
                     // Convert the file path into a real path for sharing
                     // purposes.
                     String realPath =
-                        tempPath.replace(mSecurePrefix, mSecurePath);
+                            tempPath.replace(mSecurePrefix, mSecurePath);
                 }
 
                 // Do something with the file then delete it.

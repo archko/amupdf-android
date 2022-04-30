@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical"
-              android:clickable="true"
-              android:focusable="true"
-              android:background="@color/menu_bg"
-              android:padding="10dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="@color/menu_bg"
+    android:padding="10dp">
 
     <LinearLayout
         android:id="@+id/layout_font_size"
@@ -22,7 +22,7 @@
             android:text="@string/menu_font_size"
             android:layout_width="85dp"
             android:textColor="@android:color/primary_text_dark"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <RelativeLayout
             android:layout_marginLeft="4dp"
@@ -36,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:progressDrawable="@drawable/seek_line"
-                android:thumb="@drawable/seek_thumb"/>
+                android:thumb="@drawable/seek_thumb" />
 
             <TextView
                 android:id="@+id/font_size_label"
@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="-1dp"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white" />
 
         </RelativeLayout>
     </LinearLayout>
@@ -63,7 +63,7 @@
             android:text="@string/menu_font_face"
             android:layout_width="85dp"
             android:textColor="@android:color/primary_text_dark"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/font_face_selected"
@@ -76,7 +76,7 @@
             android:layout_marginRight="4dp"
             android:enabled="false"
             android:background="@drawable/bg_menu_button"
-            android:layout_height="32dp"/>
+            android:layout_height="32dp" />
 
         <TextView
             android:id="@+id/font_face_change"
@@ -88,7 +88,7 @@
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:background="@drawable/bg_menu_button"
-            android:layout_height="32dp"/>
+            android:layout_height="32dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -104,7 +104,7 @@
             android:text="@string/menu_line_space"
             android:layout_width="85dp"
             android:textColor="@android:color/primary_text_dark"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/line_space_label"
@@ -113,7 +113,7 @@
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:textColor="@android:color/primary_text_dark"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/linespace_minus"
@@ -127,7 +127,7 @@
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:background="@drawable/bg_menu_button"
-            android:layout_height="32dp"/>
+            android:layout_height="32dp" />
 
         <TextView
             android:id="@+id/linespace_plus"
@@ -141,7 +141,7 @@
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:background="@drawable/bg_menu_button"
-            android:layout_height="32dp"/>
+            android:layout_height="32dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -157,7 +157,7 @@
             android:text="@string/menu_font_color"
             android:textColor="@android:color/primary_text_dark"
             android:layout_width="85dp"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/color_label"
@@ -169,7 +169,7 @@
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:textColor="@color/black"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
 
         <TextView
             android:id="@+id/bg_setting"
@@ -181,7 +181,7 @@
             android:background="@drawable/bg_menu_button"
             android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="32dp"/>
+            android:layout_height="32dp" />
 
         <TextView
             android:id="@+id/fg_setting"
@@ -193,7 +193,7 @@
             android:background="@drawable/bg_menu_button"
             android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="32dp"/>
+            android:layout_height="32dp" />
     </LinearLayout>
 
 

@@ -43,7 +43,7 @@ class ANormalViewController(
     private var gestureDetector: GestureDetector?,
     private var optionRepository: PdfOptionRepository
 ) :
-        OutlineListener, AViewController {
+    OutlineListener, AViewController {
 
     private lateinit var documentView: DocumentView
     private lateinit var frameLayout: FrameLayout
@@ -72,13 +72,13 @@ class ANormalViewController(
         currentPageModel = CurrentPageModel()
         currentPageModel.addEventListener(this)
         documentView =
-                DocumentView(context, zoomModel, progressModel, currentPageModel, simpleGestureListener)
+            DocumentView(context, zoomModel, progressModel, currentPageModel, simpleGestureListener)
         zoomModel.addEventListener(documentView)
         documentView.setLayoutParams(
-                ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-                )
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
         )
         decodeService?.setContainerView(documentView)
         documentView.setDecodeService(decodeService)
@@ -90,8 +90,8 @@ class ANormalViewController(
         zoomModel.addEventListener(this)
 
         val lp = RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
         lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
         mControllerLayout.addView(mPageControls, lp)
@@ -127,9 +127,9 @@ class ANormalViewController(
         }
     }
 
-    private fun createZoomControls(zoomModel: ZoomModel): PageViewZoomControls? {
+    private fun createZoomControls(zoomModel: ZoomModel): PageViewZoomControls {
         val controls = PageViewZoomControls(context, zoomModel)
-        controls.gravity = Gravity.RIGHT or Gravity.BOTTOM
+        controls.gravity = Gravity.END or Gravity.BOTTOM
         zoomModel.addEventListener(controls)
         return controls
     }
@@ -144,7 +144,7 @@ class ANormalViewController(
         }
     }
 
-    private fun createDecodeService(): DecodeService? {
+    private fun createDecodeService(): DecodeService {
         return AKDecodeService()
     }
 
@@ -166,9 +166,9 @@ class ANormalViewController(
         (decodeService as AKDecodeService).document = document
         if (pos > 0) {
             documentView.goToPage(
-                    pos,
-                    pdfViewModel.getBookProgress()!!.offsetX,
-                    pdfViewModel.getBookProgress()!!.offsetY
+                pos,
+                pdfViewModel.getBookProgress()!!.offsetX,
+                pdfViewModel.getBookProgress()!!.offsetY
             )
         }
         documentView.showDocument()
@@ -195,7 +195,7 @@ class ANormalViewController(
             //documentView.scrollPage(frameLayout.height - margin);
             return true
         }
-        return false;
+        return false
     }
 
     override fun onSingleTap() {

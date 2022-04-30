@@ -41,7 +41,6 @@ class ACropViewController(
     private lateinit var mRecyclerView: RecyclerView
     private var mMupdfDocument: MupdfDocument? = null
     private lateinit var mPageSizes: SparseArray<APage>
-    private var init: Boolean = false
 
     init {
         initView()
@@ -123,7 +122,7 @@ class ACropViewController(
     }
 
     override fun getCurrentPos(): Int {
-        if (null == mRecyclerView || null == mRecyclerView.layoutManager) {
+        if (null == mRecyclerView.layoutManager) {
             return 0
         }
         var position =
@@ -153,7 +152,7 @@ class ACropViewController(
             mRecyclerView.scrollBy(0, scrollY - margin)
             return true
         }
-        return false;
+        return false
     }
 
     override fun onSingleTap() {

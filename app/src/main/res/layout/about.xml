@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:fitsSystemWindows="true"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:padding="10dip">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fitsSystemWindows="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dip">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -14,12 +14,12 @@
         app:navigationIcon="@drawable/ic_nav"
         app:subtitle="@string/about_title"
         app:popupTheme="@style/ThemeOverlay.MaterialComponents.ActionBar"
-        app:title="@string/app_name"/>
+        app:title="@string/app_name" />
 
     <ExpandableListView
         android:id="@+id/about_parts"
         android:layout_width="match_parent"
         android:scrollbars="none"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
 </LinearLayout>

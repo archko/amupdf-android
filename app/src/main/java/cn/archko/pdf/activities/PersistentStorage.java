@@ -3,7 +3,7 @@ package cn.archko.pdf.activities;
 /**
  * This file contains an example implementation, using SharedPreferences,
  * of the SOPersistentStorage interface.
- *
+ * <p>
  * This class is mandatory for all NUI Editor based applications.
  */
 
@@ -15,10 +15,9 @@ import java.util.Map;
 
 import com.artifex.sonui.editor.SOPersistentStorage;
 
-public class PersistentStorage implements SOPersistentStorage
-{
-    private static final String  mDebugTag  = "ExamplePersistentStorage";
-    private static final boolean mLogDebug  = false;
+public class PersistentStorage implements SOPersistentStorage {
+    private static final String mDebugTag = "ExamplePersistentStorage";
+    private static final boolean mLogDebug = false;
 
     /**
      * This method will be called to obtain a storage object for the named
@@ -31,15 +30,13 @@ public class PersistentStorage implements SOPersistentStorage
      *
      */
     public Object getStorageObject(Context context,
-                                   String  storeName)
-    {
-        if (mLogDebug)
-        {
+                                   String storeName) {
+        if (mLogDebug) {
             Log.d(mDebugTag, "getStorageObject: '" + storeName + "'");
         }
 
         SharedPreferences sharedPref =
-            context.getSharedPreferences(storeName, Context.MODE_PRIVATE);
+                context.getSharedPreferences(storeName, Context.MODE_PRIVATE);
 
         return sharedPref;
     }
@@ -54,16 +51,14 @@ public class PersistentStorage implements SOPersistentStorage
      */
     public void setStringPreference(Object storageObject,
                                     String key,
-                                    String value)
-    {
-        if (mLogDebug)
-        {
+                                    String value) {
+        if (mLogDebug) {
             Log.d(mDebugTag, "setStringPreference: Key '" + key + "' Value '" +
-                             value + "'");
+                    value + "'");
         }
 
-        SharedPreferences        sharedPrefs = (SharedPreferences)storageObject;
-        SharedPreferences.Editor editor      = sharedPrefs.edit();
+        SharedPreferences sharedPrefs = (SharedPreferences) storageObject;
+        SharedPreferences.Editor editor = sharedPrefs.edit();
 
         editor.putString(key, value);
         editor.commit();
@@ -85,16 +80,14 @@ public class PersistentStorage implements SOPersistentStorage
      */
     public String getStringPreference(Object storageObject,
                                       String key,
-                                      String defaultValue)
-    {
-        SharedPreferences sharedPrefs = (SharedPreferences)storageObject;
+                                      String defaultValue) {
+        SharedPreferences sharedPrefs = (SharedPreferences) storageObject;
         String value = sharedPrefs.getString(key, defaultValue);
 
-        if (mLogDebug)
-        {
+        if (mLogDebug) {
             Log.d(mDebugTag, "getStringPreference: Key '" + key +
-                             "' DefaultValues'" + defaultValue +
-                             "' Value '" + value + "'");
+                    "' DefaultValues'" + defaultValue +
+                    "' Value '" + value + "'");
         }
 
         return value;
@@ -110,14 +103,12 @@ public class PersistentStorage implements SOPersistentStorage
      *
      * @return The retrieved key/value pairs.
      */
-    public  Map<String,?> getAllStringPreferences(Object storageObject)
-    {
-        if (mLogDebug)
-        {
+    public Map<String, ?> getAllStringPreferences(Object storageObject) {
+        if (mLogDebug) {
             Log.d(mDebugTag, "getAllStringPreferences");
         }
 
-        SharedPreferences sharedPrefs = (SharedPreferences)storageObject;
+        SharedPreferences sharedPrefs = (SharedPreferences) storageObject;
         return sharedPrefs.getAll();
     }
 
@@ -131,15 +122,13 @@ public class PersistentStorage implements SOPersistentStorage
      * @param key           The data key
      */
     public void removePreference(Object storageObject,
-                                 String key)
-    {
-        if (mLogDebug)
-        {
+                                 String key) {
+        if (mLogDebug) {
             Log.d(mDebugTag, "removePreference: Key '" + key + "'");
         }
 
-        SharedPreferences        sharedPrefs = (SharedPreferences)storageObject;
-        SharedPreferences.Editor editor      = sharedPrefs.edit();
+        SharedPreferences sharedPrefs = (SharedPreferences) storageObject;
+        SharedPreferences.Editor editor = sharedPrefs.edit();
 
         editor.remove(key);
         editor.commit();

@@ -81,17 +81,17 @@ fun FileFavoritiesList(
             state = rememberSwipeRefreshState(loading),
             onRefresh = refresh,
         ) {
-        FileList(
-            result,
-            FileBeanType.Favorite,
-            loadMore,
-            showUserDialog,
-            showInfoDialog,
-            menuOpt,
-            onClick,
-            viewModel,
-            modifier,
-        )
+            FileList(
+                result,
+                FileBeanType.Favorite,
+                loadMore,
+                showUserDialog,
+                showInfoDialog,
+                menuOpt,
+                onClick,
+                viewModel,
+                modifier,
+            )
+        }
     }
-}
 }

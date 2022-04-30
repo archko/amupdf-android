@@ -86,7 +86,7 @@ fun AboutScreen(
                 }
                 LazyColumn(
                     flingBehavior = StockFlingBehaviours.smoothScroll(),
-                    modifier=modifier
+                    modifier = modifier
                 ) {
                     itemsIndexed(PARTS) { index, part ->
                         Divider(thickness = 1.dp)
@@ -130,7 +130,7 @@ fun PartItem(
                 WebView(context).apply {
                     coroutineScope.launch(Dispatchers.IO) {
                         val content = part.getContent(context).toString()
-                        withContext(Dispatchers.Main){
+                        withContext(Dispatchers.Main) {
                             loadData(content, "text/html", "UTF-8")
                         }
                     }

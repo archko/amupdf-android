@@ -125,7 +125,7 @@ fun ComposeCookBookTheme(
         ColorPallet.PURPLE -> if (darkTheme) DarkPurpleColorPalette else LightPurpleColorPalette
         ColorPallet.ORANGE -> if (darkTheme) DarkOrangeColorPalette else LightOrangeColorPalette
         ColorPallet.BLUE -> if (darkTheme) DarkBlueColorPalette else LightBlueColorPalette
-        else ->  if (darkTheme) DarkBlueColorPalette else LightBlueColorPalette
+        else -> if (darkTheme) DarkBlueColorPalette else LightBlueColorPalette
     }
 
     MaterialTheme(
