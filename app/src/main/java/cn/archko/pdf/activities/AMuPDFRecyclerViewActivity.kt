@@ -17,7 +17,6 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.core.app.ComponentActivity
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,6 +35,7 @@ import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.MenuListener
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.presenter.PageViewPresenter
+import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
@@ -101,20 +101,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         mDocumentView = findViewById(R.id.document_view)
 
         initTouchParams()
-        if (mReflow) {
-            viewMode = ViewMode.REFLOW
-        } else if (mCrop) {
-            viewMode = ViewMode.CROP
-        } else {
-            viewMode = ViewMode.NORMAL
-        }
-
-        //checkout bookmark
-        changeViewMode()
-
-        cropModeSet(mCrop)
-
-        obverseViewModel()
     }
 
     override fun getDocumentView(): View? {
@@ -215,8 +201,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         })
     }
 
-    private fun changeViewMode() {
-        val pos = getCurrentPos()
+    private fun changeViewMode(pos: Int) {
         viewController?.onDestroy()
 
         val aViewController = ViewControllerFactory.getOrCreateViewController(
@@ -240,10 +225,10 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         try {
             progressDialog.setMessage("Loading menu")
 
-            Logcat.d("doLoadDoc:mCrop:$mCrop,mReflow:$mReflow")
             setCropButton(mCrop)
 
             val pos = pdfViewModel.getCurrentPage(mMupdfDocument!!.countPages())
+            Logcat.d("doLoadDoc:mCrop:$mCrop,mReflow:$mReflow, pos:$pos")
             viewController?.doLoadDoc(mPageSizes, mMupdfDocument!!, pos)
 
             mPageSeekBarControls?.showReflow(true)
@@ -281,6 +266,21 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                     .putBoolean(PREF_READER_KEY_FIRST, false)
                     .apply()
             }
+
+            if (mReflow) {
+                viewMode = ViewMode.REFLOW
+            } else if (mCrop) {
+                viewMode = ViewMode.CROP
+            } else {
+                viewMode = ViewMode.NORMAL
+            }
+
+            //checkout bookmark
+            changeViewMode(pos)
+
+            cropModeSet(mCrop)
+
+            obverseViewModel()
         } catch (e: Exception) {
             e.printStackTrace()
             finish()
@@ -290,9 +290,9 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     private fun obverseViewModel() {
-        pdfViewModel.uiBookmarksLiveData.observe(this, Observer {
+        pdfViewModel.uiBookmarksLiveData.observe(this) {
             mMenuHelper?.updateBookmark(getCurrentPos(), it)
-        })
+        }
     }
 
     private fun deleteBookmark(bookmark: Bookmark) {
@@ -318,8 +318,9 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     override fun preparePageSize(cp: Int) {
-        val mRecyclerView = viewController?.getDocumentView()!!
-        val width = mRecyclerView.width
+        val mRecyclerView = viewController?.getDocumentView()
+        val width =
+            mRecyclerView?.width ?: Utils.getScreenWidthPixelWithOrientation(this)
         var start = SystemClock.uptimeMillis()
 
         lifecycleScope.launch {
@@ -371,7 +372,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         } else {
             viewMode = ViewMode.REFLOW
         }
-        changeViewMode()
+        changeViewMode(getCurrentPos())
 
         mReflow = !mReflow
         setReflowButton(mReflow)
@@ -518,7 +519,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             } else {
                 viewMode = ViewMode.NORMAL
             }
-            changeViewMode()
+            changeViewMode(getCurrentPos())
         }
     }
 
