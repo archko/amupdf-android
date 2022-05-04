@@ -208,19 +208,19 @@ class ACropViewController(
     }
 
     override fun onPause() {
-        pdfViewModel.getBookProgress()?.autoCrop = 0
-
-        val position = getCurrentPos()
-        val zoomLevel = pdfViewModel.getBookProgress()!!.zoomLevel
         if (null != mMupdfDocument) {
-            pdfViewModel.saveCurrentPage(
-                mPath,
-                mMupdfDocument!!.countPages(),
-                position,
-                zoomLevel,
-                -1,
-                0
-            )
+            pdfViewModel.bookProgress?.run {
+                autoCrop = 0
+                val position = getCurrentPos()
+                pdfViewModel.saveBookProgress(
+                    mPath,
+                    mMupdfDocument!!.countPages(),
+                    position,
+                    pdfViewModel.bookProgress!!.zoomLevel,
+                    -1,
+                    0
+                )
+            }
         }
     }
 

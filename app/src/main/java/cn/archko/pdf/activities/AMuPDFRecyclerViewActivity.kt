@@ -243,7 +243,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             Logcat.d("doLoadDoc:mCrop:$mCrop,mReflow:$mReflow")
             setCropButton(mCrop)
 
-            val pos = pdfViewModel.restoreReadProgress(mMupdfDocument!!.countPages())
+            val pos = pdfViewModel.getCurrentPage(mMupdfDocument!!.countPages())
             viewController?.doLoadDoc(mPageSizes, mMupdfDocument!!, pos)
 
             mPageSeekBarControls?.showReflow(true)
@@ -580,7 +580,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     override fun onPause() {
         super.onPause()
         lifecycleScope.launch {
-            pdfViewModel.pause(mCrop, mReflow)
+            pdfViewModel.storeCropAndReflow(mCrop, mReflow)
         }
         Logcat.d("onPause:mCrop:$mCrop,mReflow:$mReflow")
         viewController?.onPause()

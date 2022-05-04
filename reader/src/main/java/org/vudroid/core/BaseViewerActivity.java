@@ -21,7 +21,6 @@
 //import cn.archko.pdf.AppExecutors;
 //import cn.archko.pdf.activities.PdfOptionsActivity;
 //import cn.archko.pdf.common.BitmapCache;
-//import cn.archko.pdf.common.PDFBookmarkManager;
 //import cn.archko.pdf.common.SensorHelper;
 //
 //import cn.archko.pdf.listeners.SimpleGestureListener;
@@ -59,7 +58,6 @@
 //    //private CurrentPageModel mPageModel;
 //    APageSeekBarControls mPageSeekBarControls;
 //
-//    PDFBookmarkManager pdfBookmarkManager;
 //    SensorHelper sensorHelper;
 //
 //    /**
@@ -72,7 +70,6 @@
 //        BitmapCache.getInstance().resize(BitmapCache.CAPACITY_FOR_VUDROID);
 //        initDecodeService();
 //        final ZoomModel zoomModel = new ZoomModel();
-//        pdfBookmarkManager = new PDFBookmarkManager();
 //        sensorHelper = new SensorHelper(this);
 //
 //        Uri uri = getIntent().getData();

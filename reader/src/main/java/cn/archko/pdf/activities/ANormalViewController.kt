@@ -64,8 +64,8 @@ class ANormalViewController(
         initDecodeService()
         val zoomModel = ZoomModel()
 
-        if (null != pdfViewModel.getBookProgress()) {
-            zoomModel.zoom = pdfViewModel.getBookProgress()!!.zoomLevel / 1000
+        pdfViewModel.bookProgress?.run {
+            zoomModel.zoom = this.zoomLevel / 1000
         }
         val progressModel = DecodingProgressModel()
         progressModel.addEventListener(this)
@@ -167,8 +167,8 @@ class ANormalViewController(
         if (pos > 0) {
             documentView.goToPage(
                 pos,
-                pdfViewModel.getBookProgress()!!.offsetX,
-                pdfViewModel.getBookProgress()!!.offsetY
+                pdfViewModel.bookProgress!!.offsetX,
+                pdfViewModel.bookProgress!!.offsetY
             )
         }
         documentView.showDocument()
@@ -242,10 +242,19 @@ class ANormalViewController(
     }
 
     override fun onPause() {
-        pdfViewModel.saveCurrentPage(
-            mPath, mMupdfDocument!!.countPages(), documentView.currentPage,
-            documentView.zoomModel.zoom * 1000f, documentView.scrollX, documentView.scrollY
-        )
+        if (null != mMupdfDocument) {
+            pdfViewModel.bookProgress?.run {
+                val position = documentView.currentPage
+                pdfViewModel.saveBookProgress(
+                    mPath,
+                    mMupdfDocument!!.countPages(),
+                    position,
+                    documentView.zoomModel.zoom * 1000f,
+                    documentView.scrollX,
+                    documentView.scrollY
+                )
+            }
+        }
     }
 
     override fun onDestroy() {

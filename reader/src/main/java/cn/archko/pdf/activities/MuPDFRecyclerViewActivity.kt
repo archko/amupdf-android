@@ -66,7 +66,6 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         progressDialog = ProgressDialog(this)
 
         if (null != savedInstanceState) {
@@ -97,7 +96,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         lifecycleScope.launch {
             mCrop = optionRepository.pdfOptionFlow.first().autocrop
             mPath?.run {
-                val bookProgress = pdfViewModel.loadBookmark(this, optionRepository)
+                val bookProgress = pdfViewModel.loadBookProgressByPath(this, optionRepository)
                 bookProgress?.let {
                     mCrop = it.autoCrop == 0
                     mReflow = it.reflow == 1

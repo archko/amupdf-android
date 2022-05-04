@@ -15,16 +15,15 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import cn.archko.pdf.AppExecutors.Companion.instance
 import cn.archko.pdf.R
 import cn.archko.pdf.activities.PdfOptionsActivity.Companion.start
-import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.Graph
-import cn.archko.pdf.common.PDFBookmarkManager
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.listeners.SimpleGestureListener
 import cn.archko.pdf.presenter.PageViewPresenter
+import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -52,9 +51,9 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
 
     //private CurrentPageModel mPageModel;
     var pageSeekBarControls: APageSeekBarControls? = null
-    var pdfBookmarkManager: PDFBookmarkManager? = null
     var sensorHelper: SensorHelper? = null
     val preferencesRepository = PdfOptionRepository(Graph.dataStore)
+    protected val pdfViewModel: PDFViewModel = PDFViewModel()
 
     /**
      * Called when the activity is first created.
@@ -64,15 +63,13 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         BitmapCache.getInstance().resize(BitmapCache.CAPACITY_FOR_VUDROID)
         initDecodeService()
         val zoomModel = ZoomModel()
-        pdfBookmarkManager = PDFBookmarkManager()
         sensorHelper = SensorHelper(this)
         val uri = intent.data
         val absolutePath = Uri.decode(uri!!.encodedPath)
-        instance.diskIO().execute {
-            pdfBookmarkManager!!.setReadProgress(absolutePath, 0)
-            if (null != pdfBookmarkManager!!.bookProgress) {
-                zoomModel.zoom = pdfBookmarkManager!!.bookProgress!!.zoomLevel / 1000
-            }
+        lifecycleScope.launch {
+            val bookProgress =
+                pdfViewModel.loadBookProgressByPath(absolutePath, preferencesRepository)
+            zoomModel.zoom = bookProgress!!.zoomLevel / 1000
         }
         val progressModel = DecodingProgressModel()
         progressModel.addEventListener(this)
@@ -99,14 +96,14 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
 
         /*final SharedPreferences sharedPreferences = getSharedPreferences(DOCUMENT_VIEW_STATE_PREFERENCES, 0);
         documentView.goToPage(sharedPreferences.getInt(getIntent().getData().toString(), 0));*/
-        val currentPage = pdfBookmarkManager!!.restoreReadProgress(
+        val currentPage = pdfViewModel.getCurrentPage(
             decodeService!!.pageCount
         )
-        if (0 < currentPage) {
+        if (0 < currentPage && null != pdfViewModel.bookProgress) {
             documentView!!.goToPage(
                 currentPage,
-                pdfBookmarkManager!!.bookProgress!!.offsetX,
-                pdfBookmarkManager!!.bookProgress!!.offsetY
+                pdfViewModel.bookProgress!!.offsetX,
+                pdfViewModel.bookProgress!!.offsetY
             )
         }
         documentView!!.showDocument()
@@ -361,7 +358,7 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         super.onPause()
         val uri = intent.data
         val filePath = Uri.decode(uri!!.encodedPath)
-        pdfBookmarkManager!!.saveCurrentPage(
+        pdfViewModel.saveBookProgress(
             filePath,
             decodeService!!.pageCount,
             documentView!!.currentPage,

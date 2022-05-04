@@ -245,17 +245,20 @@ class AReflowViewController(
     }
 
     override fun onPause() {
-        pdfViewModel.getBookProgress()?.reflow = 1
-        val position = getCurrentPos()
-        val zoomLevel = pdfViewModel.getBookProgress()!!.zoomLevel
-        pdfViewModel.saveCurrentPage(
-            mPath,
-            mMupdfDocument!!.countPages(),
-            position,
-            zoomLevel,
-            -1,
-            0
-        )
+        if (null != mMupdfDocument) {
+            pdfViewModel.bookProgress?.run {
+                reflow = 1
+                val position = getCurrentPos()
+                pdfViewModel.saveBookProgress(
+                    mPath,
+                    mMupdfDocument!!.countPages(),
+                    position,
+                    pdfViewModel.bookProgress!!.zoomLevel,
+                    -1,
+                    0
+                )
+            }
+        }
         if (null != mRecyclerView.adapter && mRecyclerView.adapter is MuPDFReflowAdapter) {
             (mRecyclerView.adapter as MuPDFReflowAdapter).clearCacheViews()
         }

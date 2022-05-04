@@ -17,20 +17,21 @@ import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import androidx.lifecycle.lifecycleScope
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.ActivityDocViewBinding
-import cn.archko.pdf.AppExecutors.Companion.instance
-import cn.archko.pdf.activities.DocumentActivity
-import cn.archko.pdf.common.PDFBookmarkManager
+import cn.archko.pdf.common.Graph
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
+import cn.archko.pdf.viewmodel.PDFViewModel
 import com.artifex.solib.ArDkLib
 import com.artifex.solib.ConfigOptions
 import com.artifex.solib.FileUtils
 import com.artifex.solib.SOClipboardHandler
 import com.artifex.sonui.editor.DocumentListener
-import com.artifex.sonui.editor.NUIView.OnDoneListener
 import com.artifex.sonui.editor.Utilities
 import com.thuypham.ptithcm.editvideo.base.BaseActivity
+import kotlinx.coroutines.launch
 
 /**
  * @author: archko 2020/10/31 :9:49 上午
@@ -39,7 +40,8 @@ class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.activity_
     private var path: String? = null
     private var mUri: Uri? = null
     var sensorHelper: SensorHelper? = null
-    private var pdfBookmarkManager: PDFBookmarkManager? = null
+    val preferencesRepository = PdfOptionRepository(Graph.dataStore)
+    protected val pdfViewModel: PDFViewModel = PDFViewModel()
 
     internal class ClipboardHandler : SOClipboardHandler {
         private var mActivity // The current activity.
@@ -130,9 +132,9 @@ class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.activity_
     }
 
     private fun loadBookmark() {
-        if (!TextUtils.isEmpty(path)) {
-            pdfBookmarkManager = PDFBookmarkManager()
-            instance.diskIO().execute { pdfBookmarkManager!!.setReadProgress(path, 0) }
+        lifecycleScope.launch {
+            val bookProgress =
+                path?.let { pdfViewModel.loadBookProgressByPath(it, preferencesRepository) }
         }
     }
 
@@ -222,7 +224,7 @@ class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.activity_
         binding.documentView.setDocDataLeakHandler(Utilities.getDataLeakHandlers())
 
         //  set an optional listener for document events
-        val page = pdfBookmarkManager!!.readPage
+        val page = pdfViewModel.getCurrentPage()
         binding.documentView.setDocumentListener(object : DocumentListener {
             override fun onPageLoaded(pagesLoaded: Int) {}
             override fun onDocCompleted() {
@@ -241,7 +243,7 @@ class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.activity_
 
         //  set a listener for when the document view is closed.
         //  typically you'll use it to close your activity.
-        binding.documentView.setOnDoneListener(OnDoneListener { super@DocumentActivity.finish() })
+        binding.documentView.setOnDoneListener { super@DocumentActivity.finish() }
 
         //  get the URI for the document
         //mUri = getIntent().getData();
