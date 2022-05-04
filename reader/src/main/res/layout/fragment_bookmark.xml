@@ -1,35 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:cacheColorHint="#00000000"
-        android:divider="@color/tab_divider_color"
-        android:dividerHeight="1px" />
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/no_data"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textColor="@color/white"
-        android:gravity="center"
-        android:text="@string/no_bookmark"
-        android:textSize="18sp"
-        android:visibility="gone" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:cacheColorHint="#00000000"
+            android:divider="@color/tab_divider_color"
+            android:dividerHeight="1px"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="6"
+            tools:listitem="@layout/item_bookmark" />
 
-    <ImageView
-        android:id="@+id/add"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginRight="88dp"
-        android:layout_marginBottom="8dp"
-        android:src="@drawable/ic_add" />
+        <TextView
+            android:id="@+id/nodataView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/no_bookmark"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:visibility="gone" />
 
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/add"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="88dp"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/ic_add" />
+
+    </RelativeLayout>
+</layout>

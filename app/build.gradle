@@ -6,7 +6,6 @@ apply plugin: 'kotlin-kapt'
 import cn.archko.mupdf.buildsrc.BuildConfig
 import cn.archko.mupdf.buildsrc.Libs
 
-
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
@@ -103,6 +102,17 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion Libs.AndroidX.Compose.version
+    }
+
+    dataBinding {
+        enabled = true
+    }
+    viewBinding {
+        enabled = true
+    }
+
+    packagingOptions {
+        exclude("META-INF/*.kotlin_module")
     }
 }
 
