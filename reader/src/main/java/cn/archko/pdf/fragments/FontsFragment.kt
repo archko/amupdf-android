@@ -6,31 +6,28 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.adapters.BaseViewHolder
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.StyleHelper
+import cn.archko.pdf.databinding.FragmentFontBinding
+import cn.archko.pdf.databinding.ItemOutlineBinding
 import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.listeners.DataListener
 import cn.archko.pdf.utils.Utils
-import com.google.android.material.appbar.MaterialToolbar
+import com.thuypham.ptithcm.editvideo.base.BaseDialogFragment
 import com.umeng.analytics.MobclickAgent
 
 /**
  * 字体列表
  * @author: archko 2019/9/29 :15:58
  */
-open class FontsFragment : DialogFragment() {
+open class FontsFragment : BaseDialogFragment<FragmentFontBinding>(R.layout.fragment_font) {
 
-    private lateinit var recyclerView: RecyclerView
     lateinit var adapter: BaseRecyclerAdapter<FontBean>
     var mStyleHelper: StyleHelper? = null
     var mDataListener: DataListener? = null
@@ -51,7 +48,7 @@ open class FontsFragment : DialogFragment() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             themeId = android.R.style.Theme_Material_Dialog
         }
-        setStyle(DialogFragment.STYLE_NO_FRAME, themeId)
+        setStyle(STYLE_NO_FRAME, themeId)
 
         fontsViewModel = FontsViewModel(optionRepository)
     }
@@ -66,22 +63,12 @@ open class FontsFragment : DialogFragment() {
         MobclickAgent.onPageEnd(TAG)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.item_font, container, false)
-        view.findViewById<View>(R.id.layout_search).visibility = View.GONE
-        val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
-        toolbar.setNavigationOnClickListener { dismiss() }
+    override fun setupView() {
+        binding.layoutSearch.visibility = View.GONE
+        binding.toolbar.setNavigationOnClickListener { dismiss() }
 
-        toolbar?.setTitle(R.string.dialog_title_font)
-        toolbar?.setSubtitle(R.string.dialog_sub_title_font)
-
-        recyclerView = view.findViewById(R.id.files)
-        recyclerView.layoutManager =
-            LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+        binding.toolbar.setTitle(R.string.dialog_title_font)
+        binding.toolbar.setSubtitle(R.string.dialog_sub_title_font)
 
         fontsViewModel.uiFontModel.observe(viewLifecycleOwner) { list ->
             kotlin.run {
@@ -98,7 +85,6 @@ open class FontsFragment : DialogFragment() {
                 }
             }
         }
-        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -107,37 +93,46 @@ open class FontsFragment : DialogFragment() {
         adapter = object : BaseRecyclerAdapter<FontBean>(activity) {
 
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<*> {
-                val v = mInflater.inflate(R.layout.item_outline, parent, false)
-                return FontHolder(v)
+                val binding =
+                    ItemOutlineBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    )
+                return FontHolder(binding)
             }
         }
-        recyclerView.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
         fontsViewModel.loadFonts()
     }
 
-    inner class FontHolder(itemView: View?) : BaseViewHolder<FontBean>(itemView) {
-
-        var title: TextView = itemView!!.findViewById(cn.archko.pdf.R.id.title)
+    inner class FontHolder(private val binding: ItemOutlineBinding) :
+        BaseViewHolder<FontBean>(binding.root) {
 
         init {
-            itemView!!.minimumHeight = Utils.dipToPixel(48f)
+            itemView.minimumHeight = Utils.dipToPixel(48f)
         }
 
         override fun onBind(data: FontBean?, position: Int) {
-            title.setText(String.format(getString(R.string.dialog_item_title_font), data?.fontName))
+            binding.title.setText(
+                String.format(
+                    getString(R.string.dialog_item_title_font),
+                    data?.fontName
+                )
+            )
             if (data?.fontType == PdfOptionRepository.CUSTOM) {
                 if (null != data.file) {
                     val typeface =
                         mStyleHelper?.fontHelper?.createFontByPath(data.file?.absolutePath!!)
-                    title.setTypeface(typeface)
+                    binding.title.setTypeface(typeface)
                 }
             } else {
                 when (data?.fontType) {
-                    PdfOptionRepository.DEFAULT -> title.setTypeface(Typeface.DEFAULT)
-                    PdfOptionRepository.SANS_SERIF -> title.setTypeface(Typeface.SANS_SERIF)
-                    PdfOptionRepository.SERIF -> title.setTypeface(Typeface.SERIF)
-                    PdfOptionRepository.MONOSPACE -> title.setTypeface(Typeface.MONOSPACE)
+                    PdfOptionRepository.DEFAULT -> binding.title.setTypeface(Typeface.DEFAULT)
+                    PdfOptionRepository.SANS_SERIF -> binding.title.setTypeface(Typeface.SANS_SERIF)
+                    PdfOptionRepository.SERIF -> binding.title.setTypeface(Typeface.SERIF)
+                    PdfOptionRepository.MONOSPACE -> binding.title.setTypeface(Typeface.MONOSPACE)
                 }
             }
 
