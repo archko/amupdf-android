@@ -98,7 +98,7 @@ class MenuHelper public constructor(
             .show(bookmarkFragment!!)
             .commit()
 
-        if (list != null && list.isNotEmpty()) {
+        if ((list != null) && list.isNotEmpty()) {
             bookmarkFragment?.updateBookmark(page, list)
         }
     }
