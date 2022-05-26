@@ -16,8 +16,8 @@ import com.artifex.mupdf.fitz.PDFDocument;
 import com.artifex.mupdf.fitz.PDFObject;
 import com.artifex.mupdf.fitz.PDFPage;
 import com.artifex.mupdf.fitz.Page;
-import com.artifex.mupdf.fitz.SeekableInputStream;
 import com.artifex.mupdf.fitz.SeekableInputOutputStream;
+import com.artifex.mupdf.fitz.SeekableInputStream;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,8 +53,8 @@ public class MuPDFDoc extends ArDkDoc
     //  a listener passed to mupdf, which in turn calls the holder's listener.
     public PDFDocument.JsEventListener jsEventListener = new PDFDocument.JsEventListener() {
         @Override
-        public AlertResult onAlert(PDFDocument pdfDocument, String s, String s1, int i, int i1, String s2, boolean b) {
-            if (jsEventListener2!=null) {
+        public AlertResult onAlert(PDFDocument pdfDocument, String s, String s1, int i, int i1, boolean b, String s2, boolean b1) {
+            if (jsEventListener2 != null) {
                 jsEventListener2.onAlert(s);
             }
             return new AlertResult();
@@ -63,7 +63,7 @@ public class MuPDFDoc extends ArDkDoc
 
     public PDFDocument.JsEventListener jsNullEventListener = new PDFDocument.JsEventListener() {
         @Override
-        public AlertResult onAlert(PDFDocument pdfDocument, String s, String s1, int i, int i1, String s2, boolean b) {
+        public AlertResult onAlert(PDFDocument pdfDocument, String s, String s1, int i, int i1, boolean b, String s2, boolean b1) {
             return null;
         }
     };
