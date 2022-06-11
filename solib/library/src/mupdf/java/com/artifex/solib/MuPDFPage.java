@@ -1104,11 +1104,10 @@ public class MuPDFPage extends ArDkPage
 
         for (Link link: links)
         {
-            if (link.bounds.contains(atX, atY))
-            {
+            if (link.getBounds().contains(atX, atY)) {
                 SOHyperlink hyper = new SOHyperlink();
-                Location    loc   = doc.resolveLink(link);
-                int         page  = doc.pageNumberFromLocation(loc);
+                Location loc = doc.resolveLink(link);
+                int page = doc.pageNumberFromLocation(loc);
 
                 hyper.pageNum = page;
                 if (page >= 0) {
@@ -1116,7 +1115,7 @@ public class MuPDFPage extends ArDkPage
                     hyper.url = null;
                 } else {
                     hyper.bbox = null;
-                    hyper.url = link.uri;
+                    hyper.url = link.getURI();
                 }
 
                 return hyper;

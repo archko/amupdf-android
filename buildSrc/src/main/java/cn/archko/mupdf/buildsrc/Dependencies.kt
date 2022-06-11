@@ -5,8 +5,8 @@ object Versions {
 }
 
 object BuildConfig {
-    const val compileSdkVersion = 31
-    const val buildToolsVersion = "31.0.0"
+    const val compileSdkVersion = 32
+    const val buildToolsVersion = "32.0.0"
     const val minSdkVersion = 21
     const val targetSdkVersion = 29
     const val versionCode = 250
@@ -16,10 +16,10 @@ object BuildConfig {
 object Libs {
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.1.5"
     const val flinger = "com.github.iamjosephmj:flinger:1.0.5"
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.2.0-rc01"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.2.1"
 
     object Accompanist {
-        const val version = "0.24.6-alpha"
+        const val version = "0.24.8-beta"
         const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
         const val pagerIndicators = "com.google.accompanist:accompanist-pager-indicators:$version"
@@ -30,11 +30,11 @@ object Libs {
     }
 
     object Coil {
-        const val coilCompose = "io.coil-kt:coil-compose:1.4.0"
+        const val coilCompose = "io.coil-kt:coil-compose:2.1.0"
     }
 
     object Kotlin {
-        private const val version = "1.6.10"
+        private const val version = "1.6.21"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
@@ -54,11 +54,11 @@ object Libs {
     }
 
     object AndroidX {
-        const val coreKtx = "androidx.core:core-ktx:1.7.0"
+        const val coreKtx = "androidx.core:core-ktx:1.8.0"
         const val navigation = "androidx.navigation:navigation-compose:2.5.0-alpha01"
 
         object Compose {
-            const val version = "1.2.0-alpha07"
+            const val version = "1.2.0-beta03"
 
             const val runtime = "androidx.compose.runtime:runtime:$version"
             const val runtimeLivedata = "androidx.compose.runtime:runtime-livedata:$version"
@@ -78,7 +78,7 @@ object Libs {
 
             object Material3 {
                 const val snapshot = ""
-                const val version = "1.0.0-alpha02"
+                const val version = "1.0.0-alpha13"
 
                 const val material3 = "androidx.compose.material3:material3:$version"
             }
@@ -114,7 +114,7 @@ object Libs {
         }
 
         object Navigation {
-            private const val version = "2.4.1"
+            private const val version = "2.4.2"
             const val fragment = "androidx.navigation:navigation-fragment-ktx:$version"
             const val uiKtx = "androidx.navigation:navigation-ui-ktx:$version"
             const val runtime = "androidx.navigation:navigation-runtime:$version"
