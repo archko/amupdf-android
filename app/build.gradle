@@ -183,7 +183,7 @@ dependencies {
 
     kapt Libs.AndroidX.Room.compiler
 
-    implementation Libs.flinger
+    //implementation Libs.flinger
 
     implementation project(':reader')
     implementation project(':editor')

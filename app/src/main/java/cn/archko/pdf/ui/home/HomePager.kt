@@ -4,8 +4,16 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumedWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Tab
@@ -58,7 +66,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
 @Composable
@@ -188,11 +196,19 @@ fun HomePager(
                         IconButton(onClick = { showMenu.value = !showMenu.value }) {
                             Icon(imageVector = Icons.Default.MoreVert, contentDescription = null)
                         }
-                    }
+                    },
+                    modifier = Modifier.windowInsetsPadding(
+                        WindowInsets.safeDrawing.only(WindowInsetsSides.Top)
+                    )
                 )
             }
-        ) {
-            Box(modifier = Modifier.fillMaxSize()) {
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .consumedWindowInsets(innerPadding)
+            ) {
                 TabContent(
                     viewModel, up, navController, navItems, setCurrentSection
                 )

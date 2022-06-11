@@ -2,6 +2,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -27,7 +28,6 @@ import cn.archko.pdf.ui.home.FileItem
 import cn.archko.pdf.ui.home.MenuItemType
 import cn.archko.pdf.ui.home.UserOptDialog
 import cn.archko.pdf.viewmodel.FileViewModel
-import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
 import kotlinx.coroutines.launch
 
 @Composable
@@ -97,7 +97,6 @@ private fun ItemList(
     FileInfoDialog(showInfoDialog, fileBean, menuOpt)
     LazyColumn(
         state = listState,
-        flingBehavior = StockFlingBehaviours.smoothScroll(),
         modifier = modifier
     ) {
         if (fileBeanType == FileBeanType.SysFile) {

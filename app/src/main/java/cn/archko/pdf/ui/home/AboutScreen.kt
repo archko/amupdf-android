@@ -6,9 +6,16 @@ import android.webkit.WebView
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumedWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.TopAppBar
@@ -17,6 +24,7 @@ import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,12 +44,11 @@ import cn.archko.mupdf.R
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
-import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun AboutScreen(
     modifier: Modifier = Modifier,
@@ -56,6 +63,7 @@ fun AboutScreen(
     Scaffold(
         topBar = {
             TopAppBar(
+                backgroundColor = MaterialTheme.colorScheme.primaryContainer,
                 title = {
                     Text(
                         text = stringResource(id = R.string.app_name),
@@ -68,10 +76,18 @@ fun AboutScreen(
                         Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
                     }
                 },
+                modifier = Modifier.windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(WindowInsetsSides.Top)
+                )
             )
         }
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .consumedWindowInsets(innerPadding)
+        ) {
             Column {
                 Box(
                     modifier
@@ -85,7 +101,6 @@ fun AboutScreen(
                     )
                 }
                 LazyColumn(
-                    flingBehavior = StockFlingBehaviours.smoothScroll(),
                     modifier = modifier
                 ) {
                     itemsIndexed(PARTS) { index, part ->

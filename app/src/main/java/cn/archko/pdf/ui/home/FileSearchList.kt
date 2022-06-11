@@ -18,14 +18,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.RadioButton
-import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -54,8 +54,6 @@ import cn.archko.pdf.theme.Typography
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.google.accompanist.insets.statusBarsPadding
 import com.umeng.analytics.MobclickAgent
-import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
-import java.util.*
 
 @Composable
 fun FileSearchList(
@@ -343,7 +341,6 @@ private fun ItemList(
     UserOptDialog(showUserDialog, fileBean, menuOpt)
     FileInfoDialog(showInfoDialog, fileBean, menuOpt)
     LazyColumn(
-        flingBehavior = StockFlingBehaviours.smoothScroll(),
         modifier = modifier
     ) {
         itemsIndexed(list) { index, fileBean ->

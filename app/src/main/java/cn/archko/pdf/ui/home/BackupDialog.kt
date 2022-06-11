@@ -29,7 +29,6 @@ import cn.archko.mupdf.R
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.viewmodel.FileViewModel
-import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
 import java.io.File
 
 @Composable
@@ -75,9 +74,7 @@ fun RestoreDialog(
                         )
                     }
                     Divider(thickness = 1.dp)
-                    LazyColumn(
-                        flingBehavior = StockFlingBehaviours.smoothScroll(),
-                    ) {
+                    LazyColumn {
                         itemsIndexed(uiBackupFiles.list!!) { index, file ->
                             if (index > 0) {
                                 Divider(thickness = 0.5.dp)

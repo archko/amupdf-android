@@ -10,7 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavHostController
 import cn.archko.pdf.BackPressHandler
 import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.Logcat
@@ -22,7 +21,6 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.umeng.analytics.MobclickAgent
 import java.io.File
-import java.util.*
 
 @Composable
 fun FileBrowserList(
