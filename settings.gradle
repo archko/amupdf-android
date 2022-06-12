@@ -3,6 +3,7 @@ include ':app'
 include ':reader'
 include ':readercommon'
 include ':vudroid'
+include ':core-ui'
 
 include ':library'
 include ':editor'

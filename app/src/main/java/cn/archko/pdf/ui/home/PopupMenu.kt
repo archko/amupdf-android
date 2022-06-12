@@ -66,7 +66,6 @@ fun MenuItem(name: String, onPalletChange: () -> Unit) {
             modifier = Modifier
                 .padding(2.dp)
                 .fillMaxWidth(),
-            color = MaterialTheme.colorScheme.primaryContainer,
         )
     }
 }

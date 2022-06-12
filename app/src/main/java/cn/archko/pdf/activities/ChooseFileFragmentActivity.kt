@@ -4,89 +4,94 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumedWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.NavGraph
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PdfOptionRepository
-import cn.archko.pdf.theme.AppThemeState
-import cn.archko.pdf.theme.ColorPallet
-import cn.archko.pdf.theme.ComposeCookBookMaterialTheme
-import cn.archko.pdf.theme.blue700
-import cn.archko.pdf.theme.green700
-import cn.archko.pdf.theme.orange700
-import cn.archko.pdf.theme.purple700
-import cn.archko.pdf.utils.LocalSystemUiController
-import cn.archko.pdf.utils.SystemUiController
-import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
+import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
 import com.umeng.analytics.MobclickAgent
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 /**
  * @author archko
  */
 open class ChooseFileFragmentActivity : AnalysticActivity() {
 
-    @OptIn(ExperimentalMaterialApi::class, com.google.accompanist.pager.ExperimentalPagerApi::class)
+    @OptIn(
+        ExperimentalMaterialApi::class, ExperimentalPagerApi::class,
+        ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         isLive = true
         super.onCreate(savedInstanceState)
 
-        // This app draws behind the system bars, so we want to handle fitting system windows
         WindowCompat.setDecorFitsSystemWindows(window, true)
-
+        //val windowSizeClass = calculateWindowSizeClass(this)
         val preferencesRepository = PdfOptionRepository(Graph.dataStore)
         setContent {
-            val systemUiController = remember { SystemUiController(window) }
-            val darkTheme = runBlocking {
-                preferencesRepository.pdfOptionFlow.first().dartTheme
-            }
+            val navController = rememberNavController()
 
-            Logcat.d("darkTheme:$darkTheme")
-            val appTheme = remember {
-                mutableStateOf(
-                    AppThemeState(
-                        darkTheme = darkTheme
-                    )
-                )
-            }
-            val color = when (appTheme.value.pallet) {
-                ColorPallet.GREEN -> green700
-                ColorPallet.BLUE -> blue700
-                ColorPallet.ORANGE -> orange700
-                ColorPallet.PURPLE -> purple700
-                else -> green700
-            }
-            systemUiController.setStatusBarColor(
-                color = color,
-                darkIcons = appTheme.value.darkTheme
-            )
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
             val changeTheme: (Boolean) -> Unit = { it ->
                 lifecycleScope.launch {
                     preferencesRepository.setDartTheme(it)
                 }
             }
-            CompositionLocalProvider(
-                LocalSystemUiController provides systemUiController,
-                LocalBackPressedDispatcher provides this.onBackPressedDispatcher
-            ) {
-                ProvideWindowInsets {
-                    ComposeCookBookMaterialTheme(
-                        darkTheme = appTheme.value.darkTheme,
-                        colorPallet = appTheme.value.pallet
-                    ) {
-                        NavGraph(changeTheme, appTheme, up = { finish() })
+            NiaTheme {
+                CompositionLocalProvider(
+                    LocalBackPressedDispatcher provides this.onBackPressedDispatcher
+                ) {
+                    NiaBackground {
+                        Scaffold(
+                            modifier = Modifier,
+                            containerColor = Color.Transparent,
+                            contentColor = MaterialTheme.colorScheme.onBackground,
+                        ) { padding ->
+                            Row(
+                                Modifier
+                                    .fillMaxSize()
+                                    .windowInsetsPadding(
+                                        WindowInsets.safeDrawing.only(
+                                            WindowInsetsSides.Horizontal
+                                        )
+                                    )
+                            ) {
+                                NavGraph(
+                                    changeTheme, up = { finish() },
+                                    modifier = Modifier
+                                        .padding(padding)
+                                        .consumedWindowInsets(padding)
+                                )
+                            }
+                        }
                     }
                 }
             }

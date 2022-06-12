@@ -5,6 +5,7 @@ import android.text.TextUtils
 import android.webkit.WebView
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
@@ -18,20 +19,21 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -44,6 +46,7 @@ import cn.archko.mupdf.R
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
+import com.google.samples.apps.nowinandroid.core.ui.component.NiaGradientBackground
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -60,53 +63,56 @@ fun AboutScreen(
     val name = stringResource(packageInfo.applicationInfo.labelRes)
     val text = name + if (LengthUtils.isNotEmpty(version)) " v$version" else ""
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                backgroundColor = MaterialTheme.colorScheme.primaryContainer,
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.app_name),
-                        overflow = TextOverflow.Ellipsis,
+    NiaGradientBackground {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(id = R.string.app_name),
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { onBack() }) {
+                            Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = null)
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = Color.Transparent
+                    ),
+                    modifier = Modifier.windowInsetsPadding(
+                        WindowInsets.safeDrawing.only(WindowInsetsSides.Top)
                     )
-                },
-                elevation = 0.dp,
-                navigationIcon = {
-                    IconButton(onClick = { onBack() }) {
-                        Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
-                    }
-                },
-                modifier = Modifier.windowInsetsPadding(
-                    WindowInsets.safeDrawing.only(WindowInsetsSides.Top)
                 )
-            )
-        }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .consumedWindowInsets(innerPadding)
-        ) {
-            Column {
-                Box(
-                    modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
-                ) {
-                    Text(
-                        text = "Version:$text",
-                        overflow = TextOverflow.Ellipsis,
-                        style = TextStyle(fontSize = 18.sp)
-                    )
-                }
-                LazyColumn(
-                    modifier = modifier
-                ) {
-                    itemsIndexed(PARTS) { index, part ->
-                        Divider(thickness = 1.dp)
-                        PartItem(context, part, modifier)
-                        Divider(thickness = 1.dp)
+            },
+            containerColor = Color.Transparent
+        ) { innerPadding ->
+            BoxWithConstraints(
+                modifier = modifier
+                    .padding(innerPadding)
+                    .consumedWindowInsets(innerPadding)
+            ) {
+                Column {
+                    Box(
+                        modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = "Version:$text",
+                            overflow = TextOverflow.Ellipsis,
+                            style = TextStyle(fontSize = 18.sp)
+                        )
+                    }
+                    LazyColumn(
+                        modifier = modifier
+                    ) {
+                        itemsIndexed(PARTS) { index, part ->
+                            Divider(thickness = 1.dp)
+                            PartItem(context, part, modifier)
+                            Divider(thickness = 1.dp)
+                        }
                     }
                 }
             }

@@ -81,6 +81,8 @@ object Libs {
                 const val version = "1.0.0-alpha13"
 
                 const val material3 = "androidx.compose.material3:material3:$version"
+                const val material3WindowSizeClass =
+                    "androidx.compose.material3:material3-window-size-class:$version"
             }
         }
 
@@ -175,7 +177,7 @@ object Libs {
 
     object Dependency {
         const val multidex = "androidx.multidex:multidex:2.0.1"
-        const val material = "com.google.android.material:material:1.3.0"
+        const val material = "com.google.android.material:material:1.6.1"
         const val liveEventBusX = "com.jeremyliao:live-event-bus-x:1.5.0"
         const val viewpager2 = "androidx.viewpager2:viewpager2:1.0.0"
         const val vectordrawable =

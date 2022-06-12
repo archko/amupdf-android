@@ -1,6 +1,5 @@
 package cn.archko.pdf.ui.home
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,8 +19,8 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.RadioButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,10 +46,9 @@ import cn.archko.mupdf.R
 import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.components.Divider
-import cn.archko.pdf.components.Surface
+import androidx.compose.material3.Surface
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.model.SearchSuggestionGroup
-import cn.archko.pdf.theme.Typography
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.google.accompanist.insets.statusBarsPadding
 import com.umeng.analytics.MobclickAgent
@@ -160,7 +158,7 @@ fun FileSearchList(
                     SearchDisplay.Categories -> {
                         Text(
                             text = "",
-                            style = Typography.subtitle1,
+                            style = androidx.compose.material.Typography().subtitle1,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -263,7 +261,7 @@ private fun SearchBar(
                 if (searchFocused) {
                     IconButton(onClick = onClearQuery) {
                         Icon(
-                            imageVector = Icons.Outlined.ArrowBack,
+                            imageVector = Icons.Rounded.ArrowBack,
                             contentDescription = null
                         )
                     }
@@ -302,7 +300,7 @@ private fun SearchHint() {
             .wrapContentSize()
     ) {
         Icon(
-            imageVector = Icons.Outlined.Search,
+            imageVector = Icons.Rounded.Search,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
         )
@@ -314,7 +312,6 @@ private fun SearchHint() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ItemList(
     list: MutableList<FileBean>,

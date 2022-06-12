@@ -1,0 +1,79 @@
+apply from: "../gradle/library_common.gradle"
+
+import cn.archko.mupdf.buildsrc.*
+
+apply plugin: "com.android.library"
+apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-parcelize"
+apply plugin: "kotlin-kapt"
+
+android {
+    compileOptions {
+        encoding "UTF-8"
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    lintOptions { abortOnError false }
+
+    buildFeatures {
+        compose true
+        // Disable unused AGP features
+        buildConfig false
+        aidl false
+        renderScript false
+        resValues false
+        shaders false
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion Libs.AndroidX.Compose.version
+    }
+
+    packagingOptions {
+        exclude("META-INF/*.kotlin_module")
+    }
+}
+
+dependencies {
+    //implementation(project(":core-model"))
+
+    //implementation(Libs.androidx.core.ktx)
+    //implementation(Libs.coil.kt)
+    //implementation(Libs.coil.kt.compose)
+    //implementation(Libs.kotlinx.datetime)
+
+    // TODO : Remove these dependency once we upgrade to Android Studio Dolphin b/228889042
+    // These dependencies are currently necessary to render Compose previews
+    //debugImplementation(Libs.androidx.customview.poolingcontainer)
+    //debugImplementation(Libs.androidx.lifecycle.viewModelCompose)
+    //debugImplementation(Libs.androidx.savedstate.ktx)
+
+    //api(Libs.androidx.compose.foundation)
+    //api(Libs.androidx.compose.foundation.layout)
+    //api(Libs.androidx.compose.material.iconsExtended)
+    //api(Libs.androidx.compose.material3)
+    //debugApi(Libs.androidx.compose.ui.tooling)
+    //api(Libs.androidx.compose.ui.tooling.preview)
+    //api(Libs.androidx.compose.ui.util)
+    //api(Libs.androidx.compose.runtime)
+    //api(Libs.androidx.compose.runtime.livedata)
+
+    implementation Libs.AndroidX.coreKtx
+
+    implementation Libs.AndroidX.Compose.runtime
+    implementation Libs.AndroidX.Compose.foundation
+    implementation Libs.AndroidX.Compose.layout
+    implementation Libs.AndroidX.Compose.ui
+    implementation Libs.AndroidX.Compose.uiUtil
+    implementation Libs.AndroidX.Compose.material
+    implementation Libs.AndroidX.Compose.Material3.material3
+    implementation Libs.AndroidX.Compose.animation
+    implementation Libs.AndroidX.Compose.iconsExtended
+    implementation Libs.AndroidX.Compose.tooling
+}

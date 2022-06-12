@@ -145,6 +145,7 @@ dependencies {
     implementation Libs.AndroidX.Compose.uiUtil
     implementation Libs.AndroidX.Compose.material
     implementation Libs.AndroidX.Compose.Material3.material3
+    implementation Libs.AndroidX.Compose.Material3.material3WindowSizeClass
     implementation Libs.AndroidX.Compose.animation
     //implementation Libs.AndroidX.Compose.iconsExtended
     implementation Libs.AndroidX.Compose.tooling
@@ -188,4 +189,5 @@ dependencies {
     implementation project(':reader')
     implementation project(':editor')
     implementation project(':library')
+    implementation project(':core-ui')
 }

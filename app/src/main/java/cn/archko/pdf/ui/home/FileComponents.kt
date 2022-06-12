@@ -32,7 +32,6 @@ import cn.archko.mupdf.R
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.theme.Typography
 import cn.archko.pdf.utils.FileUtils
 
 @Composable
@@ -53,7 +52,7 @@ fun EmptyView(modifier: Modifier) {
             )
             Text(
                 text = stringResource(id = R.string.empty_title),
-                style = Typography.h5,
+                style = androidx.compose.material.Typography().h5,
                 modifier = Modifier
                     .padding(12.dp)
                     .fillMaxWidth(),
@@ -61,7 +60,7 @@ fun EmptyView(modifier: Modifier) {
             )
             Text(
                 text = stringResource(id = R.string.empty_subtitle),
-                style = Typography.subtitle1,
+                style = androidx.compose.material.Typography().subtitle1,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )

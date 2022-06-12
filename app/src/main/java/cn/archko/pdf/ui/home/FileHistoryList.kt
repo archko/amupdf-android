@@ -3,7 +3,6 @@ package cn.archko.pdf.ui.home
 import FileList
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,7 +20,6 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.umeng.analytics.MobclickAgent
-import java.util.*
 
 @Composable
 fun FileHistoryList(
@@ -94,7 +92,7 @@ fun FileHistoryList(
                     // Enable the scale animation
                     scale = true,
                     // Change the color and shape
-                    backgroundColor = MaterialTheme.colorScheme.primary,
+                    //backgroundColor = MaterialTheme.colorScheme.primary,
                 )
             }
         ) {

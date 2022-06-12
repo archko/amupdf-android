@@ -1,33 +1,33 @@
 package cn.archko.pdf.ui.home
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumedWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ScrollableTabRow
-import androidx.compose.material.Tab
 import androidx.compose.material.TabRowDefaults
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -54,17 +54,16 @@ import cn.archko.pdf.activities.PdfOptionsActivity
 import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.paging.State
-import cn.archko.pdf.theme.AppThemeState
 import cn.archko.pdf.viewmodel.FileViewModel
-import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
+import com.google.samples.apps.nowinandroid.core.ui.component.NiaGradientBackground
+import com.google.samples.apps.nowinandroid.core.ui.component.NiaTab
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import java.io.File
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @ExperimentalPagerApi
@@ -72,9 +71,9 @@ import java.util.*
 @Composable
 fun HomePager(
     changeTheme: (Boolean) -> Unit,
-    appThemeState: MutableState<AppThemeState>,
     up: () -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val showLoadingDialog = remember { mutableStateOf(false) }
@@ -158,19 +157,16 @@ fun HomePager(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    NiaGradientBackground {
         Scaffold(
             topBar = {
-                TopAppBar(
-                    backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                CenterAlignedTopAppBar(
                     title = {
                         Text(
                             text = stringResource(id = R.string.app_name),
                             overflow = TextOverflow.Ellipsis,
-                            color = Color.White
                         )
                     },
-                    elevation = 0.dp,
                     navigationIcon = {
                         Image(
                             painter = painterResource(id = R.drawable.icon),
@@ -178,16 +174,13 @@ fun HomePager(
                         )
                     },
                     actions = {
-                        IconButton(onClick = {
-                            appThemeState.value = appThemeState
-                                .value.copy(darkTheme = !appThemeState.value.darkTheme)
-                            changeTheme(appThemeState.value.darkTheme)
+                        /*IconButton(onClick = {
                         }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_sleep),
                                 contentDescription = null
                             )
-                        }
+                        }*/
                         IconButton(onClick = { PdfOptionsActivity.start(context) }) {
                             Icon(
                                 imageVector = Icons.Default.Settings, contentDescription = null,
@@ -197,15 +190,18 @@ fun HomePager(
                             Icon(imageVector = Icons.Default.MoreVert, contentDescription = null)
                         }
                     },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = Color.Transparent
+                    ),
                     modifier = Modifier.windowInsetsPadding(
                         WindowInsets.safeDrawing.only(WindowInsetsSides.Top)
                     )
                 )
-            }
+            },
+            containerColor = Color.Transparent
         ) { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
+            BoxWithConstraints(
+                modifier = modifier
                     .padding(innerPadding)
                     .consumedWindowInsets(innerPadding)
             ) {
@@ -246,22 +242,24 @@ private fun TabContent(
     Logcat.d("$navController")
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = 1)
-    Column(Modifier.fillMaxSize()) {
+    Column {
         ScrollableTabRow(
             selectedTabIndex = pagerState.currentPage,
-            modifier = Modifier.navigationBarsPadding(bottom = false),
+            modifier = Modifier.navigationBarsPadding(),
             edgePadding = 2.dp,
             indicator = { tabPositions ->
                 TabRowDefaults.Indicator(
                     Modifier
                         .pagerTabIndicatorOffset(pagerState, tabPositions)
                         .height(4.dp),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             },
             backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSurface,
         ) {
             navItems.forEachIndexed { index, title ->
-                Tab(
+                NiaTab(
                     selected = pagerState.currentPage == index,
                     onClick = {
                         // Animate to the selected page when clicked
@@ -269,12 +267,7 @@ private fun TabContent(
                             pagerState.animateScrollToPage(index)
                         }
                     },
-                    text = {
-                        Text(
-                            text = title.toUpperCase(Locale.getDefault()),
-                            color = Color.White
-                        )
-                    },
+                    text = { Text(text = title) },
                 )
             }
         }

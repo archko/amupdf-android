@@ -6,22 +6,24 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import cn.archko.pdf.LocalBackPressedDispatcher
-import cn.archko.pdf.theme.AppThemeState
-import cn.archko.pdf.theme.ColorPallet
-import cn.archko.pdf.theme.ComposeCookBookMaterialTheme
-import cn.archko.pdf.theme.blue700
-import cn.archko.pdf.theme.green700
-import cn.archko.pdf.theme.orange700
-import cn.archko.pdf.theme.purple700
 import cn.archko.pdf.ui.home.AboutScreen
-import cn.archko.pdf.utils.LocalSystemUiController
-import cn.archko.pdf.utils.SystemUiController
-import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
+import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
 import com.umeng.analytics.MobclickAgent
 
 /**
@@ -37,35 +39,35 @@ class AboutActivity : ComponentActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, true)
 
         setContent {
-            val systemUiController = remember { SystemUiController(window) }
-            val appTheme = remember { mutableStateOf(AppThemeState()) }
-            val color = when (appTheme.value.pallet) {
-                ColorPallet.GREEN -> green700
-                ColorPallet.BLUE -> blue700
-                ColorPallet.ORANGE -> orange700
-                ColorPallet.PURPLE -> purple700
-                else -> green700
-            }
-            systemUiController.setStatusBarColor(
-                color = color,
-                darkIcons = appTheme.value.darkTheme
-            )
-            CompositionLocalProvider(
-                LocalSystemUiController provides systemUiController,
-                LocalBackPressedDispatcher provides this.onBackPressedDispatcher
-            ) {
-                ProvideWindowInsets {
-                    ComposeCookBookMaterialTheme(
-                        darkTheme = appTheme.value.darkTheme,
-                        colorPallet = appTheme.value.pallet
-                    ) {
-                        AboutScreen() {
-                            onBackPressed()
+            NiaTheme {
+                CompositionLocalProvider(
+                    LocalBackPressedDispatcher provides this.onBackPressedDispatcher
+                ) {
+                    NiaBackground {
+                        Scaffold(
+                            modifier = Modifier,
+                            containerColor = Color.Transparent,
+                            contentColor = MaterialTheme.colorScheme.onBackground,
+                        ) { padding ->
+                            Row(
+                                Modifier
+                                    .fillMaxSize()
+                                    .windowInsetsPadding(
+                                        WindowInsets.safeDrawing.only(
+                                            WindowInsetsSides.Horizontal
+                                        )
+                                    )
+                            ) {
+                                AboutScreen() {
+                                    onBackPressed()
+                                }
+                            }
                         }
                     }
                 }
