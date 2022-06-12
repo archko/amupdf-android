@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -20,14 +21,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.NavGraph
 import cn.archko.pdf.common.Graph
@@ -56,16 +56,17 @@ open class ChooseFileFragmentActivity : AnalysticActivity() {
         //val windowSizeClass = calculateWindowSizeClass(this)
         val preferencesRepository = PdfOptionRepository(Graph.dataStore)
         setContent {
-            val navController = rememberNavController()
-
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentDestination = navBackStackEntry?.destination
+            val sysDark = isSystemInDarkTheme()
+            val darkTheme = remember {
+                mutableStateOf(sysDark)
+            }
             val changeTheme: (Boolean) -> Unit = { it ->
                 lifecycleScope.launch {
                     preferencesRepository.setDartTheme(it)
+                    darkTheme.value = !darkTheme.value
                 }
             }
-            NiaTheme {
+            NiaTheme(darkTheme = darkTheme.value) {
                 CompositionLocalProvider(
                     LocalBackPressedDispatcher provides this.onBackPressedDispatcher
                 ) {
@@ -85,7 +86,9 @@ open class ChooseFileFragmentActivity : AnalysticActivity() {
                                     )
                             ) {
                                 NavGraph(
-                                    changeTheme, up = { finish() },
+                                    changeTheme,
+                                    darkTheme.value,
+                                    up = { finish() },
                                     modifier = Modifier
                                         .padding(padding)
                                         .consumedWindowInsets(padding)
@@ -100,7 +103,7 @@ open class ChooseFileFragmentActivity : AnalysticActivity() {
         checkSdcardPermission()
 
         // 设置为U-APP场景
-        MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
+        MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL)
     }
 
     public override fun onResume() {

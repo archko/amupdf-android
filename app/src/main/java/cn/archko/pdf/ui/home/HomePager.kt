@@ -1,9 +1,9 @@
 package cn.archko.pdf.ui.home
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -20,11 +20,11 @@ import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -71,6 +71,7 @@ import java.io.File
 @Composable
 fun HomePager(
     changeTheme: (Boolean) -> Unit,
+    darkTheme: Boolean,
     up: () -> Unit,
     navController: NavHostController,
     modifier: Modifier = Modifier,
@@ -114,7 +115,7 @@ fun HomePager(
         viewModel.restoreToDb(it)
     }
 
-    val menuContent: @Composable BoxScope.() -> Unit = {
+    val menuContent: @Composable ColumnScope.() -> Unit = {
         Column(
             horizontalAlignment = Alignment.Start
         ) {
@@ -160,7 +161,7 @@ fun HomePager(
     NiaGradientBackground {
         Scaffold(
             topBar = {
-                CenterAlignedTopAppBar(
+                MediumTopAppBar(
                     title = {
                         Text(
                             text = stringResource(id = R.string.app_name),
@@ -174,13 +175,14 @@ fun HomePager(
                         )
                     },
                     actions = {
-                        /*IconButton(onClick = {
+                        IconButton(onClick = {
+                            changeTheme(darkTheme)
                         }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_sleep),
                                 contentDescription = null
                             )
-                        }*/
+                        }
                         IconButton(onClick = { PdfOptionsActivity.start(context) }) {
                             Icon(
                                 imageVector = Icons.Default.Settings, contentDescription = null,
