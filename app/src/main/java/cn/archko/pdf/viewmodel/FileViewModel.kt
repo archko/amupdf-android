@@ -730,7 +730,7 @@ class FileViewModel() : ViewModel() {
             return
         }
         if (currentSection == 1) {
-            val result = _historyFileModel.value
+            /*val result = _historyFileModel.value
             var findBean: FileBean? = null
 
             if (result.list != null) {
@@ -747,7 +747,8 @@ class FileViewModel() : ViewModel() {
                 updateHistory(findBean, path)
             } else {
                 updateHistory(null, path)
-            }
+            }*/
+            loadHistories(true)
         } else if (currentSection == 2) {
             loadFiles(null, refresh = true)
         } else if (currentSection == 3) {

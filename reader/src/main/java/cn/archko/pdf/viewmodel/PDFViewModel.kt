@@ -51,7 +51,7 @@ class PDFViewModel : ViewModel() {
         if (null == bookProgress) {
             bookProgress = BookProgress(FileUtils.getRealPath(absolutePath))
             bookProgress!!.autoCrop = autoCrop
-            Graph.database.progressDao().addProgress(bookProgress!!)
+            bookProgress!!._id = Graph.database.progressDao().addProgress(bookProgress!!).toInt()
         }
         bookProgress!!.readTimes = bookProgress!!.readTimes
         bookProgress!!.inRecent = 0
@@ -107,6 +107,7 @@ class PDFViewModel : ViewModel() {
             val filepath = FileUtils.getStoragePath(progress.path)
             val file = File(filepath)
             var old = progressDao.getProgress(file.name)
+            Logcat.i(Logcat.TAG, "old:$old")
             if (old == null) {
                 old = progress
                 old.lastTimestampe = System.currentTimeMillis()
@@ -116,7 +117,6 @@ class PDFViewModel : ViewModel() {
                 progress.isFavorited = old.isFavorited
                 progressDao.updateProgress(progress)
             }
-            Logcat.i(Logcat.TAG, "onSuccess")
         } catch (e: Exception) {
             e.printStackTrace()
             Logcat.i(Logcat.TAG, "onFailed:$e")
