@@ -2,7 +2,6 @@ package cn.archko.pdf.viewmodel
 
 import android.text.TextUtils
 import android.util.SparseArray
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.archko.pdf.App
@@ -16,6 +15,8 @@ import cn.archko.pdf.entity.Bookmark
 import cn.archko.pdf.utils.FileUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -25,13 +26,10 @@ class PDFViewModel : ViewModel() {
     var bookmarks: List<Bookmark>? = null
         get() = field
 
-    val uiBookmarksLiveData = MutableLiveData<List<Bookmark>?>()
-        get() = field
-
     var bookProgress: BookProgress? = null
         private set
 
-    fun loadBookmarks(): List<Bookmark>? {
+    private fun loadBookmarks(): List<Bookmark>? {
         try {
             val progressDao = Graph.database.progressDao()
             if (null != bookProgress && !TextUtils.isEmpty(bookProgress!!.path)) {
@@ -44,7 +42,7 @@ class PDFViewModel : ViewModel() {
         return null
     }
 
-    fun loadProgressAndBookmark(absolutePath: String?, autoCrop: Int) {
+    private fun loadProgressAndBookmark(absolutePath: String?, autoCrop: Int) {
         val file = File(absolutePath)
         val progress = Graph.database.progressDao().getProgress(file.name)
         bookProgress = progress
@@ -97,7 +95,7 @@ class PDFViewModel : ViewModel() {
         return currentPage
     }
 
-    fun addToDb(progress: BookProgress?) {
+    private fun addToDb(progress: BookProgress?) {
         if (null == progress || TextUtils.isEmpty(progress.path) || TextUtils.isEmpty(progress.name)) {
             Logcat.d("", "path is null.$progress")
             return
@@ -140,86 +138,71 @@ class PDFViewModel : ViewModel() {
         return bookProgress
     }
 
-    fun deleteBookmark(bookmark: Bookmark?) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                if (null != bookmark && bookProgress != null) {
-                    val progressDao = Graph.database.progressDao()
-                    progressDao.deleteBookmark(bookmark._id)
-                    bookmarks = bookmarks?.minus(bookmark)
-                    uiBookmarksLiveData.postValue(bookmarks)
-                }
-            }
+    suspend fun deleteBookmark(bookmark: Bookmark?) = flow {
+        if (null != bookmark && bookProgress != null) {
+            val progressDao = Graph.database.progressDao()
+            progressDao.deleteBookmark(bookmark._id)
+            bookmarks = bookmarks?.minus(bookmark)
+        }
+        emit(bookmarks)
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun addBookmark(page: Int) = flow {
+        val bookProgress = bookProgress
+        bookProgress?.let {
+            val bookmark = Bookmark()
+            bookmark.page = page
+            bookmark.progressId = bookProgress._id
+            bookmark.path = bookProgress.path
+            bookmark.createAt = System.currentTimeMillis()
+
+            Graph.database.progressDao().addBookmark(bookmark)
+            bookmarks = loadBookmarks()
+        }
+        emit(bookmarks)
+    }.flowOn(Dispatchers.IO)
+
+    fun storeCropAndReflow(crop: Boolean, reflow: Boolean) {
+        if (crop) {
+            bookProgress?.autoCrop = 0
+        } else {
+            bookProgress?.autoCrop = 1
+        }
+        if (reflow) {
+            bookProgress?.reflow = 1
+        } else {
+            bookProgress?.reflow = 0
         }
     }
 
-    fun addBookmark(page: Int) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val bookProgress = bookProgress
-                bookProgress?.let {
-                    val bookmark = Bookmark()
-                    bookmark.page = page
-                    bookmark.progressId = bookProgress._id
-                    bookmark.path = bookProgress.path
-                    bookmark.createAt = System.currentTimeMillis()
+    suspend fun savePageSize(crop: Boolean, pageSizes: SparseArray<APage>) = flow {
+        APageSizeLoader.savePageSizeToFile(
+            crop,
+            bookProgress!!.size,
+            pageSizes,
+            FileUtils.getDiskCacheDir(
+                App.instance,
+                bookProgress?.name
+            )
+        )
+        emit(null)
+    }.flowOn(Dispatchers.IO)
 
-                    Graph.database.progressDao().addBookmark(bookmark)
-                    bookmarks = loadBookmarks()
-                    uiBookmarksLiveData.postValue(bookmarks)
-                }
-            }
-        }
-    }
-
-    suspend fun storeCropAndReflow(crop: Boolean, reflow: Boolean) {
-        withContext(Dispatchers.IO) {
-            if (crop) {
-                bookProgress?.autoCrop = 0
-            } else {
-                bookProgress?.autoCrop = 1
-            }
-            if (reflow) {
-                bookProgress?.reflow = 1
-            } else {
-                bookProgress?.reflow = 0
-            }
-        }
-    }
-
-    fun savePageSize(crop: Boolean, pageSizes: SparseArray<APage>) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                APageSizeLoader.savePageSizeToFile(
-                    crop,
-                    bookProgress!!.size,
-                    pageSizes,
-                    FileUtils.getDiskCacheDir(
-                        App.instance,
-                        bookProgress?.name
-                    )
+    suspend fun preparePageSize(width: Int) = flow {
+        var pageSizeBean: APageSizeLoader.PageSizeBean? = null
+        if (bookProgress != null) {
+            pageSizeBean = APageSizeLoader.loadPageSizeFromFile(
+                width,
+                bookProgress!!.pageCount,
+                bookProgress!!.size,
+                FileUtils.getDiskCacheDir(
+                    App.instance,
+                    bookProgress?.name
                 )
-            }
+            )
         }
-    }
-
-    suspend fun preparePageSize(width: Int): APageSizeLoader.PageSizeBean? {
-        return withContext(Dispatchers.IO) {
-            var pageSizeBean: APageSizeLoader.PageSizeBean? = null
-            if (bookProgress != null) {
-                pageSizeBean = APageSizeLoader.loadPageSizeFromFile(
-                    width,
-                    bookProgress!!.pageCount,
-                    bookProgress!!.size,
-                    FileUtils.getDiskCacheDir(
-                        App.instance,
-                        bookProgress?.name
-                    )
-                )
-            }
-            pageSizeBean
-        }
-    }
+        emit(pageSizeBean)
+    }.flowOn(Dispatchers.IO)
 
     fun saveBookProgress(
         absolutePath: String?,

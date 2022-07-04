@@ -39,6 +39,7 @@ import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 /**
@@ -279,8 +280,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             changeViewMode(pos)
 
             cropModeSet(mCrop)
-
-            obverseViewModel()
         } catch (e: Exception) {
             e.printStackTrace()
             finish()
@@ -289,21 +288,22 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         }
     }
 
-    private fun obverseViewModel() {
-        pdfViewModel.uiBookmarksLiveData.observe(this) {
-            mMenuHelper?.updateBookmark(getCurrentPos(), it)
+    private fun deleteBookmark(bookmark: Bookmark) {
+        lifecycleScope.launch {
+            pdfViewModel.deleteBookmark(bookmark).collectLatest {
+                mMenuHelper?.updateBookmark(getCurrentPos(), it)
+                viewController?.notifyDataSetChanged()
+            }
         }
     }
 
-    private fun deleteBookmark(bookmark: Bookmark) {
-        pdfViewModel.deleteBookmark(bookmark)
-        viewController?.notifyDataSetChanged()
-    }
-
     private fun addBookmark(page: Int) {
-        val currentPos = getCurrentPos()
-        pdfViewModel.addBookmark(currentPos)
-        viewController?.notifyDataSetChanged()
+        lifecycleScope.launch {
+            val currentPos = getCurrentPos()
+            pdfViewModel.addBookmark(currentPos).collectLatest {
+                viewController?.notifyDataSetChanged()
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -313,7 +313,9 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             if (it.size() < 0 || it.size() < APageSizeLoader.PAGE_COUNT) {
                 return
             }
-            pdfViewModel.savePageSize(mCrop, mPageSizes)
+            lifecycleScope.launch {
+                pdfViewModel.savePageSize(mCrop, mPageSizes).collectLatest { }
+            }
         }
     }
 
@@ -324,22 +326,22 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         var start = SystemClock.uptimeMillis()
 
         lifecycleScope.launch {
-            val pageSizeBean: APageSizeLoader.PageSizeBean? = pdfViewModel.preparePageSize(width)
+            pdfViewModel.preparePageSize(width).collectLatest { pageSizeBean ->
+                Logcat.d("open3:" + (SystemClock.uptimeMillis() - start))
 
-            Logcat.d("open3:" + (SystemClock.uptimeMillis() - start))
-
-            var pageSizes: SparseArray<APage>? = null
-            if (pageSizeBean != null) {
-                pageSizes = pageSizeBean.sparseArray
-            }
-            if (pageSizes != null && pageSizes.size() > 0) {
-                Logcat.d("open3:pageSizes>0:" + pageSizes.size())
-                mPageSizes = pageSizes
-                checkPageSize(cp)
-            } else {
-                start = SystemClock.uptimeMillis()
-                super.preparePageSize(cp)
-                Logcat.d("open2:" + (SystemClock.uptimeMillis() - start))
+                var pageSizes: SparseArray<APage>? = null
+                if (pageSizeBean != null) {
+                    pageSizes = pageSizeBean.sparseArray
+                }
+                if (pageSizes != null && pageSizes.size() > 0) {
+                    Logcat.d("open3:pageSizes>0:" + pageSizes.size())
+                    mPageSizes = pageSizes
+                    checkPageSize(cp)
+                } else {
+                    start = SystemClock.uptimeMillis()
+                    super.preparePageSize(cp)
+                    Logcat.d("open2:" + (SystemClock.uptimeMillis() - start))
+                }
             }
         }
     }
@@ -580,9 +582,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
     override fun onPause() {
         super.onPause()
-        lifecycleScope.launch {
-            pdfViewModel.storeCropAndReflow(mCrop, mReflow)
-        }
+        pdfViewModel.storeCropAndReflow(mCrop, mReflow)
         Logcat.d("onPause:mCrop:$mCrop,mReflow:$mReflow")
         viewController?.onPause()
     }
