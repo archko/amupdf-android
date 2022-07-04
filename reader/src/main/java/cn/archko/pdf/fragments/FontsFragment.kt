@@ -8,6 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.adapters.BaseViewHolder
@@ -21,6 +24,8 @@ import cn.archko.pdf.listeners.DataListener
 import cn.archko.pdf.utils.Utils
 import com.thuypham.ptithcm.editvideo.base.BaseDialogFragment
 import com.umeng.analytics.MobclickAgent
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 /**
  * 字体列表
@@ -70,18 +75,19 @@ open class FontsFragment : BaseDialogFragment<FragmentFontBinding>(R.layout.frag
         binding.toolbar.setTitle(R.string.dialog_title_font)
         binding.toolbar.setSubtitle(R.string.dialog_sub_title_font)
 
-        fontsViewModel.uiFontModel.observe(viewLifecycleOwner) { list ->
-            kotlin.run {
-                if (list.size > 0) {
-                    adapter.data = list
-                    adapter.notifyDataSetChanged()
-                } else {
-                    Toast.makeText(
-                        this@FontsFragment.activity,
-                        R.string.dialog_sub_title_font,
-                        Toast.LENGTH_LONG
-                    )
-                        .show()
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                fontsViewModel.loadFonts().collectLatest { list ->
+                    if (list.size > 0) {
+                        adapter.data = list
+                        adapter.notifyDataSetChanged()
+                    } else {
+                        Toast.makeText(
+                            this@FontsFragment.activity,
+                            R.string.dialog_sub_title_font,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
         }
@@ -103,8 +109,6 @@ open class FontsFragment : BaseDialogFragment<FragmentFontBinding>(R.layout.frag
             }
         }
         binding.recyclerView.adapter = adapter
-
-        fontsViewModel.loadFonts()
     }
 
     inner class FontHolder(private val binding: ItemOutlineBinding) :

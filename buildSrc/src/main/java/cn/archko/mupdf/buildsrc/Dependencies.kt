@@ -19,7 +19,7 @@ object Libs {
     const val androidGradlePlugin = "com.android.tools.build:gradle:7.2.1"
 
     object Accompanist {
-        const val version = "0.24.8-beta"
+        const val version = "0.24.13-rc"
         const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
         const val pagerIndicators = "com.google.accompanist:accompanist-pager-indicators:$version"
@@ -34,7 +34,7 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.6.21"
+        private const val version = "1.7.0"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
@@ -55,10 +55,10 @@ object Libs {
 
     object AndroidX {
         const val coreKtx = "androidx.core:core-ktx:1.8.0"
-        const val navigation = "androidx.navigation:navigation-compose:2.5.0-alpha01"
+        const val navigation = "androidx.navigation:navigation-compose:2.5.0"
 
         object Compose {
-            const val version = "1.2.0-beta03"
+            const val version = "1.2.0-rc02"
 
             const val runtime = "androidx.compose.runtime:runtime:$version"
             const val runtimeLivedata = "androidx.compose.runtime:runtime-livedata:$version"
@@ -87,16 +87,16 @@ object Libs {
         }
 
         object Activity {
-            const val activityCompose = "androidx.activity:activity-compose:1.4.0"
-            const val activityKtx = "androidx.activity:activity-ktx:1.4.0"
+            const val activityCompose = "androidx.activity:activity-compose:1.5.0"
+            const val activityKtx = "androidx.activity:activity-ktx:1.5.0"
             const val appCompat = "androidx.appcompat:appcompat:1.4.1"
-            const val annotations = "androidx.annotation:annotation:1.2.0"
+            const val annotations = "androidx.annotation:annotation:1.4.0"
         }
 
         object Lifecycle {
-            const val viewModelCompose = "androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1"
+            const val viewModelCompose = "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0"
 
-            const val lifecycle = "2.3.1"
+            const val lifecycle = "2.5.0"
             const val runtime = "androidx.lifecycle:lifecycle-runtime:${lifecycle}"
             const val java8 = "androidx.lifecycle:lifecycle-common-java8:${lifecycle}"
             const val compiler = "androidx.lifecycle:lifecycle-compiler:${lifecycle}"
@@ -116,7 +116,7 @@ object Libs {
         }
 
         object Navigation {
-            private const val version = "2.4.2"
+            private const val version = "2.5.0"
             const val fragment = "androidx.navigation:navigation-fragment-ktx:$version"
             const val uiKtx = "androidx.navigation:navigation-ui-ktx:$version"
             const val runtime = "androidx.navigation:navigation-runtime:$version"
@@ -162,7 +162,7 @@ object Libs {
     }
 
     object Fragment {
-        const val version = "1.3.2"
+        const val version = "1.5.0"
         const val runtime = "androidx.fragment:fragment:${version}"
         const val runtimeKtx = "androidx.fragment:fragment-ktx:${version}"
         const val testing = "androidx.fragment:fragment-testing:${version}"

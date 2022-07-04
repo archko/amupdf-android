@@ -68,16 +68,29 @@ dependencies {
 
     api Libs.Dependency.liveEventBusX
     api Libs.AndroidX.Activity.appCompat
+    api Libs.AndroidX.coreKtx
+    api Libs.AndroidX.Lifecycle.runtime
+    api Libs.AndroidX.Lifecycle.viewModel
+    api Libs.AndroidX.Lifecycle.liveDataKtx
+    api Libs.AndroidX.Lifecycle.viewModelKtx
 
     implementation Libs.AndroidX.Room.runtime
     implementation Libs.AndroidX.Room.ktx
     api Libs.AndroidX.DataStore.dataStore
-    api (Libs.AndroidX.DataStore.preference_ktx) {
+    api(Libs.AndroidX.DataStore.preference_ktx) {
         exclude group: 'androidx.recyclerview'
     }
 
     kapt Libs.AndroidX.Room.compiler
 
-    api Libs.Umeng.asms
-    api Libs.Umeng.umengCommon
+    api(Libs.Umeng.asms) {
+        exclude group: 'androidx.lifecycle'
+        exclude group: 'androidx.activity'
+        exclude group: 'androidx.fragment'
+    }
+    api(Libs.Umeng.umengCommon) {
+        exclude group: 'androidx.lifecycle'
+        exclude group: 'androidx.activity'
+        exclude group: 'androidx.fragment'
+    }
 }
