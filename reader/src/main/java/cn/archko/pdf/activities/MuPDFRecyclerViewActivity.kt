@@ -42,7 +42,6 @@ import kotlinx.coroutines.withContext
  */
 abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
 
-    protected val OUTLINE_REQUEST = 0
     protected var mPath: String? = null
 
     protected lateinit var progressDialog: ProgressDialog

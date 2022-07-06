@@ -1,7 +1,6 @@
 package cn.archko.pdf.activities
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
@@ -542,16 +541,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         } else {
             mPageSeekBarControls?.autoCropButton!!.setColorFilter(Color.argb(0xFF, 255, 255, 255))
         }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            OUTLINE_REQUEST -> {
-                onSelectedOutline(resultCode)
-            }
-        }
-
-        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onSelectedOutline(index: Int) {

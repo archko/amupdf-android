@@ -127,7 +127,7 @@ fun PartItem(
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val expanded = remember { mutableStateOf(false) }
+    val expanded = remember { mutableStateOf(part.expanded) }
     Column(
         modifier
             .fillMaxWidth()
@@ -135,7 +135,10 @@ fun PartItem(
     ) {
         Box(
             modifier
-                .clickable { expanded.value = !expanded.value }
+                .clickable {
+                    expanded.value = !expanded.value
+                    part.expanded = expanded.value
+                }
                 .fillMaxWidth()
                 .padding(4.dp)
         ) {
@@ -170,24 +173,25 @@ val PARTS = arrayOf(
     Part(
         R.string.about_commmon_title,
         Format.HTML,
-        "about_common.html"
-    ),  //new Part(R.string.about_license_title, Format.HTML, "about_license.html"),
+        "about_common.html", false
+    ),
     Part(
         R.string.about_3dparty_title,
         Format.HTML,
-        "about_3rdparty.html"
+        "about_3rdparty.html", false
     ),
     Part(
         R.string.about_changelog_title,
         Format.HTML,
-        "about_changelog.html"
+        "about_changelog.html", false
     )
 )
 
 class Part(
     val labelId: Int,
     val format: Format,
-    val fileName: String
+    val fileName: String,
+    var expanded: Boolean
 ) {
     var content: CharSequence? = null
     fun getContent(context: Context?): CharSequence? {

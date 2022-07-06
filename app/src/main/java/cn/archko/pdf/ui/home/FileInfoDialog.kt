@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -222,26 +223,35 @@ fun FileInfoDialog(
                         }
                     }
 
-                    val androidImageView = remember {
-                        ImageView(context).apply {
-                            ImageLoader.getInstance().loadImage(
-                                fileBean.file?.path,
-                                0,
-                                1.0f,
-                                App.instance!!.screenWidth,
-                                this
-                            )
+                    fileBean.file?.path?.let {
+                        if (fileBean.file!!.exists()) {
+                            val androidImageView = remember {
+                                ImageView(context).apply {
+                                    ImageLoader.getInstance().loadImage(
+                                        fileBean.file?.path,
+                                        0,
+                                        1.0f,
+                                        App.instance!!.screenWidth,
+                                        this
+                                    )
+                                }
+                            }
+
+                            AndroidView(
+                                { androidImageView },
+                                modifier = Modifier
+                                    .padding(bottom = 8.dp)
+                                    .width(120.dp)
+                                    .height(160.dp)
+                                    .align(Alignment.CenterHorizontally)
+                            ) {
+                            }
+
                         }
-                    }
-                    AndroidView(
-                        { androidImageView },
-                        modifier = Modifier
-                            .padding(bottom = 8.dp)
-                            .align(Alignment.CenterHorizontally)
-                    ) {
                     }
                 }
             }
         }
     }
+
 }

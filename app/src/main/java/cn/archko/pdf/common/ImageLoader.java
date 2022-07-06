@@ -108,14 +108,14 @@ public class ImageLoader extends ImageWorker {
 
     }
 
-    protected Bitmap decodeFromFile(File file) {
+    public static Bitmap decodeFromFile(File file) {
         if (file.exists()) {
             return BitmapUtils.decodeFile(file);
         }
         return null;
     }
 
-    protected Bitmap decodeFromPDF(String key, int pageNum, float zoom, int screenWidth) {
+    public static Bitmap decodeFromPDF(String key, int pageNum, float zoom, int screenWidth) {
         Document mDocument = Document.openDocument(key);
 
         Page p = mDocument.loadPage(0);
@@ -123,10 +123,10 @@ public class ImageLoader extends ImageWorker {
         float w = b.x1 - b.x0;
         float h = b.y1 - b.y0;
         PointF pointf = new PointF(w, h);
-        APage aPage = getPageLruCache().get(key);
+        APage aPage = ImageLoader.getInstance().getPageLruCache().get(key);
         if (null == aPage) {
             aPage = new APage(pageNum, pointf, zoom, screenWidth / 3);
-            getPageLruCache().put(key, aPage);
+            ImageLoader.getInstance().getPageLruCache().put(key, aPage);
         }
 
         Page page = mDocument.loadPage(aPage.index);
