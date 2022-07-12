@@ -53,6 +53,11 @@ open class ChooseFileFragmentActivity : AnalysticActivity() {
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, true)
+
+        if (!isTaskRoot) { //如果是进入了二级页面,不处理.
+            Logcat.d(TAG, "!isTaskRoot")
+            return
+        }
         //val windowSizeClass = calculateWindowSizeClass(this)
         val preferencesRepository = PdfOptionRepository(Graph.dataStore)
         setContent {
