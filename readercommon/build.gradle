@@ -59,7 +59,7 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
-    android.ndkVersion '23.1.7779620'
+    android.ndkVersion '25.0.8775105'
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
