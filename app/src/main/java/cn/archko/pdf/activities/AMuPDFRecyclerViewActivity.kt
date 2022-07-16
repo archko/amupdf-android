@@ -221,6 +221,15 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         viewController?.notifyDataSetChanged()
     }
 
+    override fun loadDoc() {
+        if (mPath!!.endsWith("txt", false)) {
+            TextActivity.start(this, mPath!!)
+            finish()
+        } else {
+            super.loadDoc()
+        }
+    }
+
     override fun doLoadDoc() {
         try {
             progressDialog.setMessage("Loading menu")

@@ -187,7 +187,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
             return
         }
         val pos = getCurrentPos()
-        val pageText = (pos + 1).toString() + "/" + mMupdfDocument!!.countPages()
+        val pageText = (pos + 1).toString() + "/" + mMupdfDocument?.countPages()
         if (pageNumberToast != null) {
             pageNumberToast!!.setText(pageText)
         } else {
