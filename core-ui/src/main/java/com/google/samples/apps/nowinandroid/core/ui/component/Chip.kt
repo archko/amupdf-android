@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
-import com.google.samples.apps.nowinandroid.core.ui.icon.NiaIcons
 
 /**
  * Now in Android filter chip with included leading checked icon as well as text content slot.

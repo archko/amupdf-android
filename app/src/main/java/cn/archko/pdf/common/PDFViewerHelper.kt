@@ -43,9 +43,8 @@ class PDFViewerHelper {
             MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
             Logcat.i(Logcat.TAG, "post intent to open file $f")
             if (f.absolutePath.endsWith("txt", true)) {
-                Toast.makeText(activity, "can't load f:${f.absolutePath}", Toast.LENGTH_SHORT)
-                    .show()
-                return
+                //Toast.makeText(activity, "can't load f:${f.absolutePath}", Toast.LENGTH_SHORT).show()
+                //return
             }
             openWithDefaultViewer(Uri.fromFile(f), activity)
         }

@@ -16,10 +16,8 @@
 
 package com.google.samples.apps.nowinandroid.core.ui.component
 
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.google.samples.apps.nowinandroid.core.ui.icon.NiaIcons
 
 /**
  * Now in Android view toggle button with included trailing icon as well as compact and expanded

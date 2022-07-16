@@ -19,14 +19,12 @@ package com.google.samples.apps.nowinandroid.core.ui.component
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.google.samples.apps.nowinandroid.core.ui.icon.NiaIcons
 
 /**
  * Now in Android dropdown menu button with included trailing icon as well as text label and item
