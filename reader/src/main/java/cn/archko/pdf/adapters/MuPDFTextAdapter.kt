@@ -105,6 +105,7 @@ class MuPDFTextAdapter(
         val pdfHolder = holder as AKTextViewHolder?
 
         Logcat.d("onViewRecycled end,exist count::${reflowCache.textViewCount()},${reflowCache.imageViewCount()}")
+        pdfHolder?.recycleViews(reflowCache)
     }
 
     fun clearCacheViews() {
