@@ -1,5 +1,6 @@
 package cn.archko.pdf.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -28,7 +29,7 @@ import cn.archko.pdf.utils.Utils;
 /**
  * @author: archko 2019-02-21 :09:18
  */
-public class ReflowTextViewHolder extends BaseViewHolder {
+public class ReflowTextViewHolder extends BaseViewHolder<ReflowBean> {
 
     public PDFTextView pageView;
 
@@ -155,6 +156,7 @@ public class ReflowTextViewHolder extends BaseViewHolder {
         return true;
     }
 
+    @SuppressLint("ViewConstructor")
     public static class PDFTextView extends RelativeLayout {
 
         static float minImgHeight = 32;

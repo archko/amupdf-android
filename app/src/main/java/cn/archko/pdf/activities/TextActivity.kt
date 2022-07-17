@@ -1,5 +1,6 @@
 package cn.archko.pdf.activities
 
+import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
@@ -9,19 +10,32 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.GestureDetector
+import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
-import android.view.WindowManager
+import android.view.ViewGroup
+import android.widget.RelativeLayout
+import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.AppExecutors
+import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFTextAdapter
+import cn.archko.pdf.colorpicker.ColorPickerDialog
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.common.StyleHelper
+import cn.archko.pdf.databinding.TextStyleBinding
+import cn.archko.pdf.entity.FontBean
+import cn.archko.pdf.fragments.FontsFragment
+import cn.archko.pdf.listeners.DataListener
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
 import kotlinx.coroutines.CoroutineScope
@@ -36,28 +50,48 @@ class TextActivity : AppCompatActivity() {
 
     private var path: String? = null
     private var mUri: Uri? = null
-    var sensorHelper: SensorHelper? = null
-    val preferencesRepository = PdfOptionRepository(Graph.dataStore)
+    private var sensorHelper: SensorHelper? = null
+    private val preferencesRepository = PdfOptionRepository(Graph.dataStore)
     protected val pdfViewModel: PDFViewModel = PDFViewModel()
 
+    private var mStyleControls: View? = null
+    private lateinit var binding: TextStyleBinding
+    private var mControllerLayout: RelativeLayout? = null
+    private var recyclerView: RecyclerView? = null
+    private var colorPickerDialog: ColorPickerDialog? = null
+
+    private var mStyleHelper: StyleHelper? = null
+
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         if (null != savedInstanceState) {
             path = savedInstanceState.getString("path", null)
         }
         sensorHelper = SensorHelper(this)
         initIntent()
         loadBookmark()
-        
+
         if (TextUtils.isEmpty(path)) {
             return
         }
 
-        val recyclerView = RecyclerView(this)
-        setContentView(recyclerView)
+        mStyleHelper = StyleHelper(this, preferencesRepository)
+        val gestureDetector = GestureDetector(this, object :
+            GestureDetector.SimpleOnGestureListener() {
 
-        with(recyclerView) {
+            override fun onDoubleTap(e: MotionEvent?): Boolean {
+                showReflowConfigMenu()
+                return super.onDoubleTap(e)
+            }
+        })
+
+        recyclerView = RecyclerView(this)
+        mControllerLayout = RelativeLayout(this)
+        mControllerLayout!!.addView(recyclerView)
+        setContentView(mControllerLayout)
+
+        recyclerView?.run {
             descendantFocusability = android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
             isNestedScrollingEnabled = false
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -73,11 +107,16 @@ class TextActivity : AppCompatActivity() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 }
             })
+
+            setOnTouchListener { _, event ->
+                gestureDetector.onTouchEvent(event)
+                false
+            }
         }
 
         val scope = CoroutineScope(Job() + AppExecutors.instance.diskIO().asCoroutineDispatcher())
-        recyclerView.adapter =
-            MuPDFTextAdapter(this, path!!, StyleHelper(this, preferencesRepository), scope)
+        recyclerView?.adapter =
+            MuPDFTextAdapter(this, path!!, mStyleHelper, scope)
     }
 
     private fun loadBookmark() {
@@ -167,7 +206,155 @@ class TextActivity : AppCompatActivity() {
         }
     }
 
+    private fun showReflowConfigMenu() {
+        if (null == mStyleControls) {
+            initStyleControls()
+        } else {
+            if (mStyleControls?.visibility == View.VISIBLE) {
+                mStyleControls?.visibility = View.GONE
+            } else {
+                showStyleFragment()
+            }
+        }
+    }
+
+    private fun showStyleFragment() {
+        mStyleControls?.visibility = View.VISIBLE
+    }
+
+    private fun initStyleControls() {
+        if (null == mStyleControls) {
+            binding = DataBindingUtil.inflate(
+                LayoutInflater.from(this),
+                R.layout.text_style,
+                null,
+                false
+            )
+            mStyleControls = binding.root
+            //LayoutInflater.from(context).inflate(R.layout.text_style, null, false)
+
+            val lp = RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+            mControllerLayout?.addView(mStyleControls, lp)
+        }
+        mStyleControls?.visibility = View.VISIBLE
+
+        mStyleHelper?.let {
+            val progress = (it.styleBean?.textSize!! - START_PROGRESS).toInt()
+            binding.fontSizeLabel.text = String.format("%s", progress + START_PROGRESS)
+            binding.fontSeekBar.max = 10
+            binding.fontSeekBar.setOnSeekBarChangeListener(object :
+                SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
+                    val index = (progress + START_PROGRESS)
+                    binding.fontSizeLabel.text = String.format("%s", index)
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                    it.styleBean?.textSize = (seekBar?.progress!! + START_PROGRESS).toFloat()
+                    it.saveStyleToSP(it.styleBean)
+                    updateReflowAdapter()
+                }
+            })
+            binding.fontFaceSelected.text = it.fontHelper?.fontBean?.fontName
+
+            binding.lineSpaceLabel.text = String.format("%s倍", it.styleBean?.lineSpacingMult)
+            binding.colorLabel.setBackgroundColor(it.styleBean?.bgColor!!)
+            binding.colorLabel.setTextColor(it.styleBean?.fgColor!!)
+        }
+
+        binding.fontFaceChange.setOnClickListener {
+            FontsFragment.showFontsDialog(
+                this as FragmentActivity, mStyleHelper,
+                object : DataListener {
+                    override fun onSuccess(vararg args: Any?) {
+                        updateReflowAdapter()
+                        val fBean = args[0] as FontBean
+                        binding.fontFaceSelected.text = fBean.fontName
+                    }
+
+                    override fun onFailed(vararg args: Any?) {
+                    }
+                })
+        }
+
+        binding.linespaceMinus.setOnClickListener {
+            var old = mStyleHelper?.styleBean?.lineSpacingMult
+            if (old!! < 0.8f) {
+                return@setOnClickListener
+            }
+            old = old.minus(0.1f)
+            applyLineSpace(old)
+        }
+        binding.linespacePlus.setOnClickListener {
+            var old = mStyleHelper?.styleBean?.lineSpacingMult
+            if (old!! > 2.2f) {
+                return@setOnClickListener
+            }
+            old = old?.plus(0.1f)
+            applyLineSpace(old)
+        }
+        binding.bgSetting.setOnClickListener {
+            pickerColor(
+                mStyleHelper?.styleBean?.bgColor!!
+            ) { color ->
+                binding.colorLabel.setBackgroundColor(color)
+                mStyleHelper?.styleBean?.bgColor = color
+                mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
+                updateReflowAdapter()
+            }
+        }
+        binding.fgSetting.setOnClickListener {
+            pickerColor(
+                mStyleHelper?.styleBean?.fgColor!!
+            ) { color ->
+                binding.colorLabel.setTextColor(color)
+                mStyleHelper?.styleBean?.fgColor = color
+                mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
+                updateReflowAdapter()
+            }
+        }
+    }
+
+    private fun updateReflowAdapter() {
+        recyclerView?.adapter?.run {
+            this.notifyDataSetChanged()
+        }
+    }
+
+    private fun applyLineSpace(old: Float?) {
+        binding.lineSpaceLabel.text = String.format("%s倍", old)
+        mStyleHelper?.styleBean?.lineSpacingMult = old!!
+        mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
+        updateReflowAdapter()
+    }
+
+    private fun pickerColor(
+        initialColor: Int,
+        selectedListener: ColorPickerDialog.OnColorSelectedListener
+    ) {
+        if (null == colorPickerDialog) {
+            colorPickerDialog = ColorPickerDialog(this, initialColor, selectedListener)
+        } else {
+            colorPickerDialog?.updateColor(initialColor)
+            colorPickerDialog?.setOnColorSelectedListener(selectedListener)
+        }
+        colorPickerDialog?.show()
+    }
+
     companion object {
+
+        private val START_PROGRESS = 15
         fun start(context: Context, path: String) {
             val intent = Intent(context, TextActivity::class.java)
             intent.putExtra("path", path)
