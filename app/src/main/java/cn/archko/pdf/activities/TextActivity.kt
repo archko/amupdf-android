@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.GestureDetector
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -18,6 +19,7 @@ import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.SeekBar
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
@@ -40,6 +42,7 @@ import cn.archko.pdf.fragments.FontsFragment
 import cn.archko.pdf.listeners.DataListener
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.StreamUtils
+import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -70,6 +73,7 @@ class TextActivity : AppCompatActivity() {
 
     private var mStyleHelper: StyleHelper? = null
     private var adapter: MuPDFTextAdapter? = null
+    protected var pageNumberToast: Toast? = null
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,7 +112,27 @@ class TextActivity : AppCompatActivity() {
                 val bottom = documentView.height * 3 / 4
 
                 val rs: Boolean = scrollPage(e.y.toInt(), top, bottom, finalMargin)
+                if (!rs) {
+                    onSingleTap()
+                }
                 return true
+            }
+
+            private fun onSingleTap() {
+                val pos = getCurrentPos()
+                val pageText = (pos + 1).toString() + "/" + (adapter?.itemCount?.minus(2))
+                if (pageNumberToast != null) {
+                    pageNumberToast!!.setText(pageText)
+                } else {
+                    pageNumberToast =
+                        Toast.makeText(this@TextActivity, pageText, Toast.LENGTH_SHORT)
+                }
+                pageNumberToast!!.setGravity(
+                    Gravity.BOTTOM or Gravity.START,
+                    Utils.dipToPixel(15f),
+                    0
+                )
+                pageNumberToast!!.show()
             }
         })
 

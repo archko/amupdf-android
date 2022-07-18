@@ -91,6 +91,17 @@ public class ReflowTextViewHolder extends BaseViewHolder<ReflowBean> {
         }
     }
 
+    public void bindAsReflowBean(ReflowBean reflowBean, int screenHeight, int screenWidth,
+                                 float systemScale, ReflowViewCache reflowViewCache, boolean showBookmark) {
+        recycleViews(reflowViewCache);
+        pageView.applyStyle();
+        if (reflowBean.getType() == ReflowBean.TYPE_STRING) {
+            pageView.addTextView(reflowBean.getData(), reflowViewCache, showBookmark);
+        } else {
+            pageView.addImageView(reflowBean.getData(), systemScale, screenHeight, screenWidth, reflowViewCache, showBookmark);
+        }
+    }
+
     public void recycleViews(ReflowViewCache reflowViewCache) {
         if (null != reflowViewCache) {
             for (int i = 0; i < pageView.getChildCount(); i++) {
