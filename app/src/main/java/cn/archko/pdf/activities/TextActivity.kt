@@ -14,6 +14,7 @@ import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.SeekBar
@@ -28,20 +29,31 @@ import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFTextAdapter
 import cn.archko.pdf.common.Graph
+import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.databinding.TextStyleBinding
 import cn.archko.pdf.entity.FontBean
+import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.fragments.FontsFragment
 import cn.archko.pdf.listeners.DataListener
+import cn.archko.pdf.utils.FileUtils
+import cn.archko.pdf.utils.StreamUtils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
+import java.io.BufferedReader
+import java.io.FileInputStream
+import java.io.InputStreamReader
 
 
 /**
@@ -61,6 +73,7 @@ class TextActivity : AppCompatActivity() {
     private var recyclerView: RecyclerView? = null
 
     private var mStyleHelper: StyleHelper? = null
+    private var adapter: MuPDFTextAdapter? = null
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,12 +90,29 @@ class TextActivity : AppCompatActivity() {
         }
 
         mStyleHelper = StyleHelper(this, preferencesRepository)
+
+        var margin = window.decorView.height
+        if (margin <= 0) {
+            margin = ViewConfiguration.get(this).scaledTouchSlop * 2
+        } else {
+            margin = (margin * 0.03).toInt()
+        }
+        val finalMargin = margin
         val gestureDetector = GestureDetector(this, object :
             GestureDetector.SimpleOnGestureListener() {
 
             override fun onDoubleTap(e: MotionEvent?): Boolean {
                 showReflowConfigMenu()
                 return super.onDoubleTap(e)
+            }
+
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                val documentView = recyclerView!!
+                val top = documentView.height / 4
+                val bottom = documentView.height * 3 / 4
+
+                val rs: Boolean = scrollPage(e.y.toInt(), top, bottom, finalMargin)
+                return true
             }
         })
 
@@ -115,8 +145,41 @@ class TextActivity : AppCompatActivity() {
         }
 
         val scope = CoroutineScope(Job() + AppExecutors.instance.diskIO().asCoroutineDispatcher())
-        recyclerView?.adapter =
-            MuPDFTextAdapter(this, path!!, mStyleHelper, scope)
+        adapter = MuPDFTextAdapter(this, mStyleHelper)
+        recyclerView?.adapter = adapter
+
+        scope.launch {
+            val reflowBeans = withContext(Dispatchers.IO) {
+                readString(path!!)
+            }
+            adapter?.data = reflowBeans
+            adapter?.notifyDataSetChanged()
+        }
+        lifecycleScope.launchWhenCreated {
+            //viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            flow {
+                emit(readString(path!!))
+            }.collectLatest { reflowBeans ->
+                adapter?.data = reflowBeans
+                adapter?.notifyDataSetChanged()
+            }
+            //}
+        }
+    }
+
+    fun scrollPage(y: Int, top: Int, bottom: Int, margin: Int): Boolean {
+        if (y < top) {
+            var scrollY = recyclerView!!.scrollY
+            scrollY -= recyclerView!!.height
+            recyclerView!!.scrollBy(0, scrollY + margin)
+            return true
+        } else if (y > bottom) {
+            var scrollY = recyclerView!!.scrollY
+            scrollY += recyclerView!!.height
+            recyclerView!!.scrollBy(0, scrollY - margin)
+            return true
+        }
+        return false
     }
 
     private fun loadBookmark() {
@@ -144,6 +207,11 @@ class TextActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         //sensorHelper.onResume();
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        adapter?.clearCacheViews()
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -348,6 +416,65 @@ class TextActivity : AppCompatActivity() {
             val intent = Intent(context, TextActivity::class.java)
             intent.putExtra("path", path)
             context.startActivity(intent)
+        }
+
+        private const val READ_LINE = 10
+        private const val READ_CHAR_COUNT = 400
+        private const val TEMP_LINE = "\n"
+
+        private fun readString(path: String): List<ReflowBean> {
+            var bufferedReader: BufferedReader? = null
+            val reflowBeans = mutableListOf<ReflowBean>()
+            reflowBeans.add(ReflowBean(TEMP_LINE, ReflowBean.TYPE_STRING))
+            var lineCount = 0
+            val sb = StringBuilder()
+            try {
+                val fileCharsetName = FileUtils.getFileCharsetName(path)
+                val isr = InputStreamReader(FileInputStream(path), fileCharsetName)
+                bufferedReader = BufferedReader(isr)
+                var temp: String?
+                while (bufferedReader.readLine().also { temp = it } != null) {
+                    temp = temp?.trimIndent()
+                    if (null != temp && temp!!.length > READ_CHAR_COUNT + 40) {
+                        //如果一行大于READ_CHAR_COUNT个字符,就应该把这一行按READ_CHAR_COUNT一个字符换行.
+                        addLargeLine(temp!!, reflowBeans)
+                    } else {
+                        if (lineCount < READ_LINE) {
+                            sb.append(temp)
+                            lineCount++
+                        } else {
+                            Logcat.d("======================:$sb")
+                            reflowBeans.add(ReflowBean(sb.toString(), ReflowBean.TYPE_STRING))
+                            sb.setLength(0)
+                            lineCount = 0
+                        }
+                    }
+                }
+                if (sb.isNotEmpty()) {
+                    reflowBeans.add(ReflowBean(sb.toString(), ReflowBean.TYPE_STRING))
+                }
+                reflowBeans.add(ReflowBean(TEMP_LINE, ReflowBean.TYPE_STRING))
+            } catch (e: Throwable) {
+                e.printStackTrace()
+            } finally {
+                StreamUtils.closeStream(bufferedReader)
+            }
+
+            return reflowBeans
+        }
+
+        private fun addLargeLine(temp: String, reflowBeans: MutableList<ReflowBean>) {
+            val length = temp.length
+            var start = 0;
+            while (start < length) {
+                var end = start + READ_CHAR_COUNT
+                if (end > length) {
+                    end = length
+                }
+                val line = temp.subSequence(start, end)
+                reflowBeans.add(ReflowBean(line.toString(), ReflowBean.TYPE_STRING))
+                start = end
+            }
         }
     }
 }
