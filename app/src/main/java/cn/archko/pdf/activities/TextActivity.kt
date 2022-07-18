@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFTextAdapter
+import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PdfOptionRepository
@@ -41,6 +42,7 @@ import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.StreamUtils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
+import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -178,16 +180,29 @@ class TextActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         //sensorHelper.onPause();
-        /*mDocView.onPause(() -> {
-            pdfBookmarkManager.saveCurrentPage(
-                    path,
-                    mDocView.getPageCount(),
-                    mDocView.getPageNumber(),
-                    1,
-                    -1,
-                    0
-            );
-        });*/
+        pdfViewModel.bookProgress?.run {
+            val position = getCurrentPos()
+            pdfViewModel.saveBookProgress(
+                path,
+                adapter?.itemCount?.minus(2) ?: 1,
+                position,
+                pdfViewModel.bookProgress!!.zoomLevel,
+                -1,
+                0
+            )
+        }
+    }
+
+    fun getCurrentPos(): Int {
+        if (null == recyclerView?.layoutManager) {
+            return 0
+        }
+        var position =
+            (recyclerView!!.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+        if (position < 0) {
+            position = 0
+        }
+        return position
     }
 
     override fun onResume() {
@@ -198,6 +213,9 @@ class TextActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         adapter?.clearCacheViews()
+        LiveEventBus
+            .get(Event.ACTION_STOPPED)
+            .post(path)
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
