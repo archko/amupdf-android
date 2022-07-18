@@ -16,6 +16,7 @@ import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.ReflowViewCache
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.entity.ReflowBean
+import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.StreamUtils
 import cn.archko.pdf.utils.Utils
 import kotlinx.coroutines.CoroutineScope
@@ -23,10 +24,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
-import java.io.FileReader
+import java.io.FileInputStream
+import java.io.InputStreamReader
 
 /**
- * @author: archko 2016/5/13 :11:03
+ * @author: archko 2022/7/13 :11:03
  */
 class MuPDFTextAdapter(
     private val mContext: Context,
@@ -253,7 +255,9 @@ class MuPDFTextAdapter(
             var lineCount = 0
             val sb = StringBuilder()
             try {
-                bufferedReader = BufferedReader(FileReader(path))
+                val fileCharsetName = FileUtils.getFileCharsetName(path)
+                val isr = InputStreamReader(FileInputStream(path), fileCharsetName)
+                bufferedReader = BufferedReader(isr)
                 var temp: String?
                 while (bufferedReader.readLine().also { temp = it } != null) {
                     temp = temp?.trimIndent()
