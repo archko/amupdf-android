@@ -17,6 +17,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.RelativeLayout
 import android.widget.SeekBar
 import android.widget.Toast
@@ -89,6 +90,25 @@ class TextActivity : AppCompatActivity() {
             return
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val lp: WindowManager.LayoutParams = window.getAttributes()
+            lp.layoutInDisplayCutoutMode =
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            window.attributes = lp
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.setDecorFitsSystemWindows(false)
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+        } else {
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+        }
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LOW_PROFILE or
+                View.SYSTEM_UI_FLAG_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+
         mStyleHelper = StyleHelper(this, preferencesRepository)
 
         var margin = window.decorView.height
@@ -120,7 +140,7 @@ class TextActivity : AppCompatActivity() {
 
             private fun onSingleTap() {
                 val pos = getCurrentPos()
-                val pageText = (pos + 1).toString() + "/" + (adapter?.itemCount?.minus(2))
+                val pageText = (pos + 1).toString() + "/" + (adapter?.itemCount)
                 if (pageNumberToast != null) {
                     pageNumberToast!!.setText(pageText)
                 } else {
@@ -142,7 +162,7 @@ class TextActivity : AppCompatActivity() {
         setContentView(mControllerLayout)
 
         recyclerView?.run {
-            descendantFocusability = android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
+            descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
             isNestedScrollingEnabled = false
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             //setItemViewCacheSize(0)
@@ -165,6 +185,13 @@ class TextActivity : AppCompatActivity() {
         }
 
         adapter = MuPDFTextAdapter(this, mStyleHelper)
+        var header = View(this)
+        header.minimumHeight = Utils.dipToPixel(40f)
+        adapter!!.addHeaderView(header)
+        header = View(this)
+        header.minimumHeight = Utils.dipToPixel(40f)
+        adapter!!.addFootView(header)
+
         recyclerView?.adapter = adapter
 
         lifecycleScope.launchWhenCreated {
@@ -439,7 +466,7 @@ class TextActivity : AppCompatActivity() {
 
     companion object {
 
-        private val START_PROGRESS = 15
+        private const val START_PROGRESS = 15
         fun start(context: Context, path: String) {
             val intent = Intent(context, TextActivity::class.java)
             intent.putExtra("path", path)
@@ -453,7 +480,6 @@ class TextActivity : AppCompatActivity() {
         private fun readString(path: String): List<ReflowBean> {
             var bufferedReader: BufferedReader? = null
             val reflowBeans = mutableListOf<ReflowBean>()
-            reflowBeans.add(ReflowBean(TEMP_LINE, ReflowBean.TYPE_STRING))
             var lineCount = 0
             val sb = StringBuilder()
             try {
@@ -481,7 +507,6 @@ class TextActivity : AppCompatActivity() {
                 if (sb.isNotEmpty()) {
                     reflowBeans.add(ReflowBean(sb.toString(), ReflowBean.TYPE_STRING))
                 }
-                reflowBeans.add(ReflowBean(TEMP_LINE, ReflowBean.TYPE_STRING))
             } catch (e: Throwable) {
                 e.printStackTrace()
             } finally {

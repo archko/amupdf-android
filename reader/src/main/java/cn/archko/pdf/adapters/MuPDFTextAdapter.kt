@@ -15,7 +15,7 @@ import cn.archko.pdf.utils.Utils
 class MuPDFTextAdapter(
     private val context: Context,
     private var styleHelper: StyleHelper?,
-) : BaseRecyclerAdapter<ReflowBean>(context) {
+) : HeaderAndFooterRecyclerAdapter<ReflowBean>(context) {
 
     private var screenHeight = 720
     private var screenWidth = 1080
@@ -27,7 +27,7 @@ class MuPDFTextAdapter(
         screenWidth = App.instance!!.screenWidth
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<ReflowBean> {
+    override fun doCreateViewHolder(parent: ViewGroup?, viewType: Int): BaseViewHolder<ReflowBean> {
         val pdfView: ReflowTextViewHolder.PDFTextView =
             ReflowTextViewHolder.PDFTextView(context, styleHelper)
         val holder = ReflowTextViewHolder(pdfView)
@@ -40,23 +40,20 @@ class MuPDFTextAdapter(
         return holder
     }
 
-    override fun onBindViewHolder(holder: BaseViewHolder<Any>, pos: Int) {
-        val result = data.get(pos)
+    override fun onBindNormalViewHolder(
+        holder: BaseViewHolder<Any>,
+        position: Int,
+        realPos: Int
+    ) {
+        val result = data.get(realPos)
         result?.run {
-            var position = "$pos"
-            if (pos == 0) {
-                position = ""
-            }
-            if (pos == itemCount - 1) {
-                position = ""
-            }
             (holder as ReflowTextViewHolder).bindAsReflowBean(
                 result,
                 screenHeight,
                 screenWidth,
                 systemScale,
                 reflowCache,
-                showBookmark(pos)
+                showBookmark(realPos)
             )
         }
     }
