@@ -57,7 +57,9 @@ dependencies {
     }
     implementation Libs.AndroidX.Room.runtime
     implementation Libs.AndroidX.Room.ktx
-    implementation Libs.Dependency.colorPickerDialog
+    implementation (Libs.Dependency.colorPickerDialog) {
+        exclude group: 'androidx.recyclerview'
+    }
 
     api project(":vudroid")
 }

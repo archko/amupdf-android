@@ -178,7 +178,9 @@ dependencies {
     implementation(Libs.Dependency.material) {
         exclude group: 'androidx.recyclerview'
     }
-    implementation Libs.Dependency.colorPickerDialog
+    implementation (Libs.Dependency.colorPickerDialog) {
+        exclude group: 'androidx.recyclerview'
+    }
 
     implementation Libs.AndroidX.Room.runtime
     implementation Libs.AndroidX.Room.ktx
