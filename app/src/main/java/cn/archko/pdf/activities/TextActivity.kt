@@ -25,7 +25,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFTextAdapter
 import cn.archko.pdf.common.Graph
@@ -42,14 +41,9 @@ import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.StreamUtils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
 import java.io.BufferedReader
 import java.io.FileInputStream
@@ -144,17 +138,9 @@ class TextActivity : AppCompatActivity() {
             }
         }
 
-        val scope = CoroutineScope(Job() + AppExecutors.instance.diskIO().asCoroutineDispatcher())
         adapter = MuPDFTextAdapter(this, mStyleHelper)
         recyclerView?.adapter = adapter
 
-        scope.launch {
-            val reflowBeans = withContext(Dispatchers.IO) {
-                readString(path!!)
-            }
-            adapter?.data = reflowBeans
-            adapter?.notifyDataSetChanged()
-        }
         lifecycleScope.launchWhenCreated {
             //viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             flow {
