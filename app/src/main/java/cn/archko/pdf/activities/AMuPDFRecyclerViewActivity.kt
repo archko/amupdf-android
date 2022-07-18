@@ -14,8 +14,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.Toast
-import androidx.core.app.ComponentActivity
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -625,7 +625,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         fun getOrCreateViewController(
             viewControllerCache: SparseArray<AViewController>,
             viewMode: ViewMode,
-            context: ComponentActivity,
+            context: FragmentActivity,
             contentView: View,
             controllerLayout: RelativeLayout,
             pdfViewModel: PDFViewModel,
@@ -653,7 +653,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
         fun createViewController(
             viewMode: ViewMode,
-            context: ComponentActivity,
+            context: FragmentActivity,
             contentView: View,
             controllerLayout: RelativeLayout,
             pdfViewModel: PDFViewModel,

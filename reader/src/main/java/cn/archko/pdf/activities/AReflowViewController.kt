@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.SeekBar
-import androidx.core.app.ComponentActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFReflowAdapter
-import cn.archko.pdf.colorpicker.ColorPickerDialog
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.StyleHelper
@@ -38,12 +36,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
+import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
 
 /**
  * @author: archko 2020/5/15 :12:43
  */
 class AReflowViewController(
-    private var context: ComponentActivity,
+    private var context: FragmentActivity,
     private var contentView: View,
     private val mControllerLayout: RelativeLayout,
     private var pdfViewModel: PDFViewModel,
@@ -58,8 +57,6 @@ class AReflowViewController(
     private var mStyleControls: View? = null
 
     private lateinit var binding: TextStyleBinding
-
-    private var colorPickerDialog: ColorPickerDialog? = null
 
     private lateinit var mRecyclerView: RecyclerView
     private var mStyleHelper: StyleHelper? = null
@@ -372,24 +369,26 @@ class AReflowViewController(
             applyLineSpace(old)
         }
         binding.bgSetting.setOnClickListener {
-            pickerColor(
-                mStyleHelper?.styleBean?.bgColor!!
-            ) { color ->
-                binding.colorLabel.setBackgroundColor(color)
-                mStyleHelper?.styleBean?.bgColor = color
-                mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
-                updateReflowAdapter()
-            }
+            ColorPickerDialog()
+                .withColor(mStyleHelper?.styleBean?.bgColor!!)
+                .withListener { _, color ->
+                    binding.colorLabel.setBackgroundColor(color)
+                    mStyleHelper?.styleBean?.bgColor = color
+                    mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
+                    updateReflowAdapter()
+                }
+                .show(context.supportFragmentManager, "colorPicker")
         }
         binding.fgSetting.setOnClickListener {
-            pickerColor(
-                mStyleHelper?.styleBean?.fgColor!!
-            ) { color ->
-                binding.colorLabel.setTextColor(color)
-                mStyleHelper?.styleBean?.fgColor = color
-                mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
-                updateReflowAdapter()
-            }
+            ColorPickerDialog()
+                .withColor(mStyleHelper?.styleBean?.fgColor!!)
+                .withListener { _, color ->
+                    binding.colorLabel.setTextColor(color)
+                    mStyleHelper?.styleBean?.fgColor = color
+                    mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
+                    updateReflowAdapter()
+                }
+                .show(context.supportFragmentManager, "colorPicker")
         }
     }
 
@@ -404,19 +403,6 @@ class AReflowViewController(
         mStyleHelper?.styleBean?.lineSpacingMult = old!!
         mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
         updateReflowAdapter()
-    }
-
-    private fun pickerColor(
-        initialColor: Int,
-        selectedListener: ColorPickerDialog.OnColorSelectedListener
-    ) {
-        if (null == colorPickerDialog) {
-            colorPickerDialog = ColorPickerDialog(context, initialColor, selectedListener)
-        } else {
-            colorPickerDialog?.updateColor(initialColor)
-            colorPickerDialog?.setOnColorSelectedListener(selectedListener)
-        }
-        colorPickerDialog?.show()
     }
 
     private fun showStyleFragment() {

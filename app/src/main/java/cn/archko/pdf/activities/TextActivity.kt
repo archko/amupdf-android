@@ -27,7 +27,6 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFTextAdapter
-import cn.archko.pdf.colorpicker.ColorPickerDialog
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
@@ -42,6 +41,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
+import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
+
 
 /**
  * @author: archko 2022/7/11 :9:49 上午
@@ -58,7 +59,6 @@ class TextActivity : AppCompatActivity() {
     private lateinit var binding: TextStyleBinding
     private var mControllerLayout: RelativeLayout? = null
     private var recyclerView: RecyclerView? = null
-    private var colorPickerDialog: ColorPickerDialog? = null
 
     private var mStyleHelper: StyleHelper? = null
 
@@ -305,24 +305,26 @@ class TextActivity : AppCompatActivity() {
             applyLineSpace(old)
         }
         binding.bgSetting.setOnClickListener {
-            pickerColor(
-                mStyleHelper?.styleBean?.bgColor!!
-            ) { color ->
-                binding.colorLabel.setBackgroundColor(color)
-                mStyleHelper?.styleBean?.bgColor = color
-                mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
-                updateReflowAdapter()
-            }
+            ColorPickerDialog()
+                .withColor(mStyleHelper?.styleBean?.bgColor!!)
+                .withListener { _, color ->
+                    binding.colorLabel.setBackgroundColor(color)
+                    mStyleHelper?.styleBean?.bgColor = color
+                    mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
+                    updateReflowAdapter()
+                }
+                .show(supportFragmentManager, "colorPicker")
         }
         binding.fgSetting.setOnClickListener {
-            pickerColor(
-                mStyleHelper?.styleBean?.fgColor!!
-            ) { color ->
-                binding.colorLabel.setTextColor(color)
-                mStyleHelper?.styleBean?.fgColor = color
-                mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
-                updateReflowAdapter()
-            }
+            ColorPickerDialog()
+                .withColor(mStyleHelper?.styleBean?.fgColor!!)
+                .withListener { _, color ->
+                    binding.colorLabel.setTextColor(color)
+                    mStyleHelper?.styleBean?.fgColor = color
+                    mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
+                    updateReflowAdapter()
+                }
+                .show(supportFragmentManager, "colorPicker")
         }
     }
 
@@ -337,19 +339,6 @@ class TextActivity : AppCompatActivity() {
         mStyleHelper?.styleBean?.lineSpacingMult = old!!
         mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
         updateReflowAdapter()
-    }
-
-    private fun pickerColor(
-        initialColor: Int,
-        selectedListener: ColorPickerDialog.OnColorSelectedListener
-    ) {
-        if (null == colorPickerDialog) {
-            colorPickerDialog = ColorPickerDialog(this, initialColor, selectedListener)
-        } else {
-            colorPickerDialog?.updateColor(initialColor)
-            colorPickerDialog?.setOnColorSelectedListener(selectedListener)
-        }
-        colorPickerDialog?.show()
     }
 
     companion object {

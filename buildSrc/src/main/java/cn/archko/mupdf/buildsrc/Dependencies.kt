@@ -184,5 +184,6 @@ object Libs {
             "androidx.vectordrawable:vectordrawable:1.1.0"
         const val swiperefreshlayout =
             "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+        const val colorPickerDialog = "me.jfenn.ColorPickerDialog:base:0.2.2"
     }
 }
