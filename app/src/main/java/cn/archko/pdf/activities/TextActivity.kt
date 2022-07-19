@@ -70,6 +70,9 @@ class TextActivity : AppCompatActivity() {
     private var adapter: MuPDFTextAdapter? = null
     protected var pageNumberToast: Toast? = null
 
+    private var header: View? = null
+    private var footer: View? = null
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -178,12 +181,14 @@ class TextActivity : AppCompatActivity() {
         }
 
         adapter = MuPDFTextAdapter(this, mStyleHelper)
-        var header = View(this)
-        header.minimumHeight = Utils.dipToPixel(TextHelper.HEADER_HEIGHT)
-        adapter!!.addHeaderView(header)
         header = View(this)
-        header.minimumHeight = Utils.dipToPixel(TextHelper.HEADER_HEIGHT)
-        adapter!!.addFootView(header)
+        header!!.minimumHeight = Utils.dipToPixel(TextHelper.HEADER_HEIGHT)
+        adapter!!.addHeaderView(header)
+        footer = View(this)
+        footer!!.minimumHeight = Utils.dipToPixel(TextHelper.HEADER_HEIGHT)
+        adapter!!.addFootView(footer)
+
+        updateHeaderFooterBg()
 
         recyclerView?.adapter = adapter
 
@@ -396,6 +401,7 @@ class TextActivity : AppCompatActivity() {
             binding.lineSpaceLabel.text = String.format("%s倍", it.styleBean?.lineSpacingMult)
             binding.colorLabel.setBackgroundColor(it.styleBean?.bgColor!!)
             binding.colorLabel.setTextColor(it.styleBean?.fgColor!!)
+            updateHeaderFooterBg()
         }
 
         binding.fontFaceChange.setOnClickListener {
@@ -437,6 +443,7 @@ class TextActivity : AppCompatActivity() {
                     mStyleHelper?.styleBean?.bgColor = color
                     mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
                     updateReflowAdapter()
+                    updateHeaderFooterBg()
                 }
                 .show(supportFragmentManager, "colorPicker")
         }
@@ -451,6 +458,11 @@ class TextActivity : AppCompatActivity() {
                 }
                 .show(supportFragmentManager, "colorPicker")
         }
+    }
+
+    private fun updateHeaderFooterBg() {
+        header?.setBackgroundColor(mStyleHelper?.styleBean?.bgColor!!)
+        footer?.setBackgroundColor(mStyleHelper?.styleBean?.bgColor!!)
     }
 
     private fun updateReflowAdapter() {
