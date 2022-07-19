@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Gravity
+import android.view.ViewConfiguration
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -34,6 +35,7 @@ import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
+import cn.archko.pdf.common.TextHelper
 import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.paging.LoadResult
 import cn.archko.pdf.paging.State
@@ -83,7 +85,7 @@ class ComposeTextActivity : ComponentActivity() {
     private fun loadBook() {
         lifecycleScope.launch {
             flow {
-                emit(TextActivity.readString(path!!))
+                emit(TextHelper.readString(path!!))
             }
                 .flowOn(Dispatchers.IO)
                 .collectLatest { reflowBeans ->
@@ -97,6 +99,12 @@ class ComposeTextActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     private fun setView() {
+        var margin = window.decorView.height
+        if (margin <= 0) {
+            margin = ViewConfiguration.get(this).scaledTouchSlop * 2
+        } else {
+            margin = (margin * 0.03).toInt()
+        }
         setContent {
             NiaTheme {
                 CompositionLocalProvider(
@@ -128,7 +136,9 @@ class ComposeTextActivity : ComponentActivity() {
                                 } else {
                                     TextViewer(
                                         result = result,
-                                        onClick = { pos -> showToast(pos, result.list!!.size) }
+                                        onClick = { pos -> showToast(pos, result.list!!.size) },
+                                        height = window.decorView.height,
+                                        margin = margin,
                                     )
                                 }
                             }

@@ -1,5 +1,5 @@
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -7,48 +7,80 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.paging.LoadResult
 import cn.archko.pdf.paging.itemsIndexed
+import kotlinx.coroutines.launch
 
 @Composable
 fun TextViewer(
     result: LoadResult<Any, ReflowBean>,
     onClick: (pos: Int) -> Unit,
+    height: Int,
+    margin: Int,
     modifier: Modifier = Modifier,
 ) {
     val list = result.list!!
     val listState = rememberLazyListState(0)
+    val coroutineScope = rememberCoroutineScope()
 
-    LazyColumn(
-        state = listState,
-        modifier = modifier
-    ) {
-        item {
-            HeaderFooterItem(
+    Box(modifier = modifier
+        .pointerInput(Unit) {
+            detectTapGestures(
+                onPress = {
+                },
+                onDoubleTap = {
+                },
+                onTap = {
+                    coroutineScope.launch {
+                        val top = height / 4
+                        val bottom = height * 3 / 4
+                        val y = it.y   //点击的位置
+                        var scrollY = 0
+                        if (y < top) {
+                            scrollY -= height
+                            listState.scrollBy((scrollY + margin).toFloat())
+                        } else if (y > bottom) {
+                            scrollY += height
+                            listState.scrollBy((scrollY - margin).toFloat())
+                        } else {
+                            
+                        }
+                        Logcat.d("scroll:$top, y:$y, margin:$margin, scrollY:$scrollY")
+                    }
+                }
             )
-        }
-        itemsIndexed(list) { index, reflowBean ->
-            if (index > 0) {
-                Divider(thickness = 1.dp)
+        }) {
+        LazyColumn(
+            state = listState,
+            modifier = modifier
+        ) {
+            item {
+                HeaderFooterItem()
             }
-            reflowBean?.let {
-                TextItem(
-                    reflowBean = reflowBean,
-                    onClick = onClick,
-                    index = index,
-                )
+            itemsIndexed(list) { index, reflowBean ->
+                if (index > 0) {
+                    Divider(thickness = 1.dp)
+                }
+                reflowBean?.let {
+                    TextItem(
+                        reflowBean = reflowBean,
+                        onClick = onClick,
+                        index = index,
+                    )
+                }
             }
-        }
-        item {
-            HeaderFooterItem(
-            )
+            item {
+                HeaderFooterItem()
+            }
         }
     }
 }
@@ -64,12 +96,12 @@ fun TextItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 10.dp)
-            .clickable(
-                onClick = { onClick(index) },
-                indication = null,
-                interactionSource = remember {
-                    MutableInteractionSource()
-                })
+        /*.clickable(
+            onClick = { onClick(index) },
+            indication = null,
+            interactionSource = remember {
+                MutableInteractionSource()
+            })*/
     ) {
         reflowBean.data?.let {
             Text(
@@ -90,6 +122,5 @@ private fun HeaderFooterItem(
             .fillMaxWidth()
             .padding(vertical = 30.dp)
     ) {
-
     }
 }
