@@ -223,7 +223,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
     override fun loadDoc() {
         if (mPath!!.endsWith("txt", false)) {
-            TextActivity.start(this, mPath!!)
+            ComposeTextActivity.start(this, mPath!!)
             finish()
         } else {
             super.loadDoc()

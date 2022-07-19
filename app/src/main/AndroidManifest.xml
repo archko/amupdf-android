@@ -111,7 +111,7 @@
             android:screenOrientation="sensor"
             android:theme="@style/AppFullscreen"></activity>
         <activity
-            android:name="cn.archko.pdf.activities.TextActivity"
+            android:name="cn.archko.pdf.activities.ComposeTextActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
             android:windowSoftInputMode="adjustResize"
             android:label="Text"

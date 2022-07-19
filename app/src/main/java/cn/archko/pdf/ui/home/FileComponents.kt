@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -219,6 +220,44 @@ fun LoadingDialog(
                             .align(alignment = Alignment.CenterHorizontally)
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun LoadingView(
+    showLoading: MutableState<Boolean>,
+    text: String = "Please Waiting"
+) {
+    if (showLoading.value) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(160.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(2.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text,
+                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                    modifier = Modifier.padding(8.dp)
+                )
+                CircularProgressIndicator(
+                    strokeWidth = 2.dp,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(20.dp)
+                )
+                /*Spacer(modifier = Modifier.height(40.dp))
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .height(18.dp)
+                        .align(alignment = Alignment.CenterHorizontally)
+                )*/
             }
         }
     }

@@ -486,7 +486,7 @@ class TextActivity : AppCompatActivity() {
         private const val TEMP_LINE = "\n"
         private const val HEADER_HEIGHT = 60f
 
-        private fun readString(path: String): List<ReflowBean> {
+        fun readString(path: String): List<ReflowBean> {
             var bufferedReader: BufferedReader? = null
             val reflowBeans = mutableListOf<ReflowBean>()
             var lineCount = 0
