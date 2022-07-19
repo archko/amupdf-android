@@ -84,7 +84,6 @@ class TextActivity : AppCompatActivity() {
         }
         sensorHelper = SensorHelper(this)
         initIntent()
-        loadBookmark()
 
         if (TextUtils.isEmpty(path)) {
             return
@@ -186,10 +185,10 @@ class TextActivity : AppCompatActivity() {
 
         adapter = MuPDFTextAdapter(this, mStyleHelper)
         var header = View(this)
-        header.minimumHeight = Utils.dipToPixel(40f)
+        header.minimumHeight = Utils.dipToPixel(HEADER_HEIGHT)
         adapter!!.addHeaderView(header)
         header = View(this)
-        header.minimumHeight = Utils.dipToPixel(40f)
+        header.minimumHeight = Utils.dipToPixel(HEADER_HEIGHT)
         adapter!!.addFootView(header)
 
         recyclerView?.adapter = adapter
@@ -201,6 +200,7 @@ class TextActivity : AppCompatActivity() {
             }.collectLatest { reflowBeans ->
                 adapter?.data = reflowBeans
                 adapter?.notifyDataSetChanged()
+                loadBookmark()
             }
             //}
         }
@@ -224,7 +224,15 @@ class TextActivity : AppCompatActivity() {
     private fun loadBookmark() {
         lifecycleScope.launch {
             val bookProgress =
-                path?.let { pdfViewModel.loadBookProgressByPath(it, preferencesRepository) }
+                path!!.run { pdfViewModel.loadBookProgressByPath(this, preferencesRepository) }
+            bookProgress?.page?.let { scrollToPosition(it) }
+        }
+    }
+
+    private fun scrollToPosition(page: Int) {
+        recyclerView?.layoutManager?.run {
+            val layoutManager: LinearLayoutManager = this as LinearLayoutManager
+            layoutManager.scrollToPositionWithOffset(page, 0)
         }
     }
 
@@ -476,6 +484,7 @@ class TextActivity : AppCompatActivity() {
         private const val READ_LINE = 10
         private const val READ_CHAR_COUNT = 400
         private const val TEMP_LINE = "\n"
+        private const val HEADER_HEIGHT = 60f
 
         private fun readString(path: String): List<ReflowBean> {
             var bufferedReader: BufferedReader? = null

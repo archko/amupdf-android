@@ -64,9 +64,9 @@ class MuPDFTextAdapter(
 
     override fun onViewRecycled(holder: BaseViewHolder<*>) {
         super.onViewRecycled(holder)
-        val pdfHolder = holder as ReflowTextViewHolder?
-
-        pdfHolder?.recycleViews(reflowCache)
+        if (holder is ReflowTextViewHolder) {
+            holder.recycleViews(reflowCache)
+        }
     }
 
     fun clearCacheViews() {
