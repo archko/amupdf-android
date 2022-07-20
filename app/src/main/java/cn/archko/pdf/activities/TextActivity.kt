@@ -5,7 +5,6 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -25,13 +24,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFTextAdapter
 import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Graph
+import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.common.StyleHelper
@@ -44,8 +46,6 @@ import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
 import com.jeremyliao.liveeventbus.LiveEventBus
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
 
@@ -192,16 +192,14 @@ class TextActivity : AppCompatActivity() {
 
         recyclerView?.adapter = adapter
 
-        lifecycleScope.launchWhenCreated {
-            //viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            flow {
-                emit(TextHelper.readString(path!!))
-            }.collectLatest { reflowBeans ->
-                adapter?.data = reflowBeans
-                adapter?.notifyDataSetChanged()
-                loadBookmark()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                pdfViewModel.textFlow.collect {
+                    adapter?.data = it.list
+                    adapter?.notifyDataSetChanged()
+                    loadBookmark()
+                }
             }
-            //}
         }
     }
 
@@ -302,38 +300,8 @@ class TextActivity : AppCompatActivity() {
         if (!TextUtils.isEmpty(path)) {
             return
         }
-        val intent = intent
-        if (Intent.ACTION_VIEW == intent.action) {
-            var uri = intent.data
-            println("URI to open is: $uri")
-            if (uri!!.scheme == "file") {
-                //if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED)
-                //	ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
-                path = uri.path
-            } else if (uri.scheme == "content") {
-                var cursor: Cursor? = null
-                try {
-                    cursor = contentResolver.query(uri, arrayOf("_data"), null, null, null)
-                    if (cursor!!.moveToFirst()) {
-                        val p = cursor.getString(0)
-                        if (!TextUtils.isEmpty(p)) {
-                            uri = Uri.parse(p)
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                } finally {
-                    cursor?.close()
-                }
-                path = Uri.decode(uri!!.encodedPath)
-            }
-            mUri = uri
-        } else {
-            if (!TextUtils.isEmpty(getIntent().getStringExtra("path"))) {
-                path = getIntent().getStringExtra("path")
-                mUri = Uri.parse(path)
-            }
-        }
+
+        path = IntentFile.processIntentAction(intent, this@TextActivity)
     }
 
     private fun showReflowConfigMenu() {

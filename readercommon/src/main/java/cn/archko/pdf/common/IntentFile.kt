@@ -3,17 +3,34 @@ package cn.archko.pdf.common
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
+import android.text.TextUtils
 import android.util.Log
 import java.io.File
-import java.lang.StringBuilder
 
 object IntentFile {
+
+    @JvmStatic
+    fun processIntentAction(intent: Intent, context: Context): String? {
+        var path: String? = null
+        if (Intent.ACTION_VIEW == intent.action) {
+            path = getPath(context, intent.data)
+            if (path == null && intent.data != null) {
+                path = intent.data.toString()
+            }
+        } else {
+            if (!TextUtils.isEmpty(intent.getStringExtra("path"))) {
+                path = intent.getStringExtra("path")
+            }
+        }
+        return path
+    }
 
     @JvmStatic
     fun getPath(context: Context, data: Uri?): String? {

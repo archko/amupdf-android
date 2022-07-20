@@ -3,7 +3,6 @@ package cn.archko.pdf.activities
 import TextViewer
 import android.content.Context
 import android.content.Intent
-import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
@@ -33,6 +32,7 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.common.Graph
+import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.entity.State
@@ -155,38 +155,8 @@ class ComposeTextActivity : ComponentActivity() {
         if (!TextUtils.isEmpty(path)) {
             return
         }
-        val intent = intent
-        if (Intent.ACTION_VIEW == intent.action) {
-            var uri = intent.data
-            println("URI to open is: $uri")
-            if (uri!!.scheme == "file") {
-                //if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED)
-                //	ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
-                path = uri.path
-            } else if (uri.scheme == "content") {
-                var cursor: Cursor? = null
-                try {
-                    cursor = contentResolver.query(uri, arrayOf("_data"), null, null, null)
-                    if (cursor!!.moveToFirst()) {
-                        val p = cursor.getString(0)
-                        if (!TextUtils.isEmpty(p)) {
-                            uri = Uri.parse(p)
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                } finally {
-                    cursor?.close()
-                }
-                path = Uri.decode(uri!!.encodedPath)
-            }
-            mUri = uri
-        } else {
-            if (!TextUtils.isEmpty(getIntent().getStringExtra("path"))) {
-                path = getIntent().getStringExtra("path")
-                mUri = Uri.parse(path)
-            }
-        }
+        
+        path = IntentFile.processIntentAction(intent, this@ComposeTextActivity)
     }
 
     companion object {

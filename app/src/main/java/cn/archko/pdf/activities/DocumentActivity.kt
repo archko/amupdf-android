@@ -7,7 +7,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.database.Cursor
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Build
@@ -22,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.ActivityDocViewBinding
 import cn.archko.pdf.common.Graph
+import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.viewmodel.PDFViewModel
@@ -39,7 +39,6 @@ import kotlinx.coroutines.launch
  */
 class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.activity_doc_view) {
     private var path: String? = null
-    private var mUri: Uri? = null
     var sensorHelper: SensorHelper? = null
     val preferencesRepository = PdfOptionRepository(Graph.dataStore)
     protected val pdfViewModel: PDFViewModel = PDFViewModel()
@@ -190,38 +189,8 @@ class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.activity_
         if (!TextUtils.isEmpty(path)) {
             return
         }
-        val intent = intent
-        if (Intent.ACTION_VIEW == intent.action) {
-            var uri = intent.data
-            println("URI to open is: $uri")
-            if (uri!!.scheme == "file") {
-                //if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED)
-                //	ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
-                path = uri.path
-            } else if (uri.scheme == "content") {
-                var cursor: Cursor? = null
-                try {
-                    cursor = contentResolver.query(uri, arrayOf("_data"), null, null, null)
-                    if (cursor!!.moveToFirst()) {
-                        val p = cursor.getString(0)
-                        if (!TextUtils.isEmpty(p)) {
-                            uri = Uri.parse(p)
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                } finally {
-                    cursor?.close()
-                }
-                path = Uri.decode(uri!!.encodedPath)
-            }
-            mUri = uri
-        } else {
-            if (!TextUtils.isEmpty(getIntent().getStringExtra("path"))) {
-                path = getIntent().getStringExtra("path")
-                mUri = Uri.parse(path)
-            }
-        }
+
+        path = IntentFile.processIntentAction(intent, this)
     }
 
     private fun useDefaultUI() {
@@ -255,7 +224,7 @@ class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.activity_
         //mUri = getIntent().getData();
 
         //  open it, specifying showUI = true;
-        binding.documentView.start(mUri, 0, true)
+        binding.documentView.start(Uri.parse(path), 0, true)
     }
 
     override fun onDestroy() {
