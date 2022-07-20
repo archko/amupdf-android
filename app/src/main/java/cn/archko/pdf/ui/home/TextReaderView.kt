@@ -13,7 +13,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.paging.LoadResult
@@ -52,9 +51,9 @@ fun TextViewer(
                             scrollY += height
                             listState.scrollBy((scrollY - margin).toFloat())
                         } else {
-                            
+                            onClick(listState.firstVisibleItemIndex)
                         }
-                        Logcat.d("scroll:$top, y:$y, margin:$margin, scrollY:$scrollY")
+                        //Logcat.d("scroll:$top, y:$y, margin:$margin, scrollY:$scrollY, firstVisibleItemIndex:${listState.firstVisibleItemIndex}")
                     }
                 }
             )
@@ -71,11 +70,7 @@ fun TextViewer(
                     Divider(thickness = 1.dp)
                 }
                 reflowBean?.let {
-                    TextItem(
-                        reflowBean = reflowBean,
-                        onClick = onClick,
-                        index = index,
-                    )
+                    TextItem(reflowBean = reflowBean)
                 }
             }
             item {
@@ -88,20 +83,12 @@ fun TextViewer(
 @Composable
 fun TextItem(
     reflowBean: ReflowBean,
-    onClick: (pos: Int) -> Unit,
-    index: Int,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 10.dp)
-        /*.clickable(
-            onClick = { onClick(index) },
-            indication = null,
-            interactionSource = remember {
-                MutableInteractionSource()
-            })*/
     ) {
         reflowBean.data?.let {
             Text(
