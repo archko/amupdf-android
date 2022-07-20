@@ -1,5 +1,6 @@
 package cn.archko.pdf.viewmodel
 
+import android.content.Context
 import android.text.TextUtils
 import android.util.SparseArray
 import androidx.lifecycle.ViewModel
@@ -9,11 +10,19 @@ import cn.archko.pdf.common.APageSizeLoader
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PdfOptionRepository
+import cn.archko.pdf.common.TextHelper
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.Bookmark
+import cn.archko.pdf.entity.LoadResult
+import cn.archko.pdf.entity.ReflowBean
+import cn.archko.pdf.entity.State
+import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.utils.FileUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -28,6 +37,23 @@ class PDFViewModel : ViewModel() {
 
     var bookProgress: BookProgress? = null
         private set
+    var mupdfDocument: MupdfDocument? = null
+        get() = field
+
+    fun loadPdfDoc(context: Context, path: String, password: String?) = flow {
+        try {
+            mupdfDocument = MupdfDocument(context)
+            mupdfDocument!!.newDocument(path, password)
+            mupdfDocument!!.let {
+                if (it.document.needsPassword()) {
+                    it.document.authenticatePassword(password)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        emit(mupdfDocument)
+    }.flowOn(Dispatchers.IO)
 
     private fun loadBookmarks(): List<Bookmark>? {
         try {
@@ -243,4 +269,18 @@ class PDFViewModel : ViewModel() {
             }
         }
     }
+
+    private val _textFlow = MutableStateFlow<LoadResult<Any, ReflowBean>>(LoadResult(State.INIT))
+    val textFlow: StateFlow<LoadResult<Any, ReflowBean>>
+        get() = _textFlow
+
+    suspend fun loadTextDoc(path: String) = flow {
+        emit(TextHelper.readString(path))
+    }.flowOn(Dispatchers.IO)
+        .collectLatest {
+            _textFlow.value = LoadResult(
+                State.FINISHED,
+                list = it
+            )
+        }
 }

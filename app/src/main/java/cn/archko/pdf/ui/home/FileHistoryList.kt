@@ -14,7 +14,7 @@ import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.paging.State
+import cn.archko.pdf.entity.State
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator

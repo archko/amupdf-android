@@ -35,21 +35,12 @@ import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
-import cn.archko.pdf.common.TextHelper
-import cn.archko.pdf.entity.ReflowBean
-import cn.archko.pdf.paging.LoadResult
-import cn.archko.pdf.paging.State
+import cn.archko.pdf.entity.State
 import cn.archko.pdf.ui.home.LoadingView
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
 import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
 /**
@@ -63,10 +54,6 @@ class ComposeTextActivity : ComponentActivity() {
     private val preferencesRepository = PdfOptionRepository(Graph.dataStore)
     private val pdfViewModel: PDFViewModel = PDFViewModel()
     protected var pageNumberToast: Toast? = null
-
-    private val _textFlow = MutableStateFlow<LoadResult<Any, ReflowBean>>(LoadResult(State.INIT))
-    private val textFlow: StateFlow<LoadResult<Any, ReflowBean>>
-        get() = _textFlow
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,16 +71,7 @@ class ComposeTextActivity : ComponentActivity() {
 
     private fun loadBook() {
         lifecycleScope.launch {
-            flow {
-                emit(TextHelper.readString(path!!))
-            }
-                .flowOn(Dispatchers.IO)
-                .collectLatest { reflowBeans ->
-                    _textFlow.value = LoadResult(
-                        State.FINISHED,
-                        list = reflowBeans
-                    )
-                }
+            pdfViewModel.loadTextDoc(path!!)
         }
     }
 
@@ -126,7 +104,7 @@ class ComposeTextActivity : ComponentActivity() {
                                     )
                             ) {
                                 val showLoading = remember { mutableStateOf(true) }
-                                val result by textFlow.collectAsState()
+                                val result by pdfViewModel.textFlow.collectAsState()
                                 if (result.state == State.INIT) {
                                     loadBook()
                                 }

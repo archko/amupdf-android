@@ -16,8 +16,8 @@ import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.components.LoadingFooter
 import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.paging.LoadResult
-import cn.archko.pdf.paging.State
+import cn.archko.pdf.entity.LoadResult
+import cn.archko.pdf.entity.State
 import cn.archko.pdf.paging.itemsIndexed
 import cn.archko.pdf.ui.home.EmptyView
 import cn.archko.pdf.ui.home.FileBeanType

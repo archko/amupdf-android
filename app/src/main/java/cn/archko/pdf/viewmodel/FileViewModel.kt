@@ -15,9 +15,9 @@ import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.ProgressScaner
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
+import cn.archko.pdf.entity.LoadResult
+import cn.archko.pdf.entity.State
 import cn.archko.pdf.model.SearchSuggestionGroup
-import cn.archko.pdf.paging.LoadResult
-import cn.archko.pdf.paging.State
 import cn.archko.pdf.utils.DateUtils
 import cn.archko.pdf.ui.home.searchTypeFavorite
 import cn.archko.pdf.ui.home.searchTypeFile

@@ -33,6 +33,7 @@ import cn.archko.pdf.viewmodel.PDFViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -287,40 +288,29 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         progressDialog.setMessage(mPath)
         progressDialog.show()
         lifecycleScope.launch {
-            val result = withContext(Dispatchers.IO) {
-                try {
-                    var start = SystemClock.uptimeMillis()
-                    mMupdfDocument = MupdfDocument(this@MuPDFRecyclerViewActivity)
-                    mMupdfDocument?.newDocument(mPath, getPassword())
-                    var res = true
-                    mMupdfDocument?.let {
-                        if (it.document.needsPassword()) {
-                            res = it.document.authenticatePassword(getPassword())
+            val start = SystemClock.uptimeMillis()
+            pdfViewModel.loadPdfDoc(this@MuPDFRecyclerViewActivity, mPath!!, getPassword())
+                .collectLatest {
+                    mMupdfDocument = it
+
+                    if (mMupdfDocument != null) {
+                        val cp = mMupdfDocument!!.countPages()
+                        Logcat.d(TAG, "open:" + (SystemClock.uptimeMillis() - start) + " cp:" + cp)
+
+                        //val loc = mDocument!!.layout(mLayoutW, mLayoutH, mLayoutEM)
+
+                        preparePageSize(cp)
+                        Logcat.d(TAG, "open:end." + mPageSizes.size())
+                        val mill = SystemClock.uptimeMillis() - start
+                        if (mill < 500L) {
+                            delay(500L - mill)
                         }
+
+                        doLoadDoc()
+                    } else {
+                        finish()
                     }
-
-                    val cp = mMupdfDocument!!.countPages()
-                    Logcat.d(TAG, "open:" + (SystemClock.uptimeMillis() - start) + " cp:" + cp)
-
-                    //val loc = mDocument!!.layout(mLayoutW, mLayoutH, mLayoutEM)
-
-                    preparePageSize(cp)
-                    Logcat.d(TAG, "open:end." + mPageSizes.size())
-                    val mill = SystemClock.uptimeMillis() - start
-                    if (mill < 500L) {
-                        delay(500L - mill)
-                    }
-                    return@withContext true
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
-                return@withContext false
-            }
-            if (result) {
-                doLoadDoc()
-            } else {
-                finish()
-            }
         }
     }
 

@@ -53,7 +53,7 @@ import cn.archko.pdf.activities.AboutActivity
 import cn.archko.pdf.activities.PdfOptionsActivity
 import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.paging.State
+import cn.archko.pdf.entity.State
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager

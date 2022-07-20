@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cn.archko.pdf.paging.State
+import cn.archko.pdf.entity.State
 
 @Composable
 fun LoadingFooter(

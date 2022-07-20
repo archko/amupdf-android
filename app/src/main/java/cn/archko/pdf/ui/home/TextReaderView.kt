@@ -14,8 +14,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cn.archko.pdf.components.Divider
+import cn.archko.pdf.entity.LoadResult
 import cn.archko.pdf.entity.ReflowBean
-import cn.archko.pdf.paging.LoadResult
 import cn.archko.pdf.paging.itemsIndexed
 import kotlinx.coroutines.launch
 
