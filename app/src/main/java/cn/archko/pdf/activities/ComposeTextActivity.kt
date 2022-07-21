@@ -1,5 +1,6 @@
 package cn.archko.pdf.activities
 
+import ImageViewer
 import TextViewer
 import android.content.Context
 import android.content.Intent
@@ -69,12 +70,6 @@ class ComposeTextActivity : ComponentActivity() {
         setView()
     }
 
-    private fun loadBook() {
-        lifecycleScope.launch {
-            pdfViewModel.loadTextDoc(path!!)
-        }
-    }
-
     @OptIn(ExperimentalMaterial3Api::class)
     private fun setView() {
         var margin = window.decorView.height
@@ -103,21 +98,50 @@ class ComposeTextActivity : ComponentActivity() {
                                         )
                                     )
                             ) {
-                                val showLoading = remember { mutableStateOf(true) }
-                                val result by pdfViewModel.textFlow.collectAsState()
-                                if (result.state == State.INIT) {
-                                    loadBook()
-                                }
-                                showLoading.value = (result.state != State.FINISHED)
-                                if (result.state == State.INIT || result.list == null) {
-                                    LoadingView(showLoading)
+                                if (path!!.endsWith("txt", true)) {
+                                    val showLoading = remember { mutableStateOf(true) }
+                                    val result by pdfViewModel.textFlow.collectAsState()
+                                    if (result.state == State.INIT) {
+                                        lifecycleScope.launch {
+                                            pdfViewModel.loadTextDoc(path!!)
+                                        }
+                                    }
+                                    showLoading.value = (result.state != State.FINISHED)
+                                    if (result.state == State.INIT || result.list == null) {
+                                        LoadingView(showLoading)
+                                    } else {
+                                        TextViewer(
+                                            result = result,
+                                            onClick = { pos -> showToast(pos, result.list!!.size) },
+                                            height = window.decorView.height,
+                                            margin = margin,
+                                        )
+                                    }
                                 } else {
-                                    TextViewer(
-                                        result = result,
-                                        onClick = { pos -> showToast(pos, result.list!!.size) },
-                                        height = window.decorView.height,
-                                        margin = margin,
-                                    )
+                                    val showLoading = remember { mutableStateOf(true) }
+                                    val result by pdfViewModel.pageFlow.collectAsState()
+                                    if (result.state == State.INIT) {
+                                        lifecycleScope.launch {
+                                            pdfViewModel.loadPdfDoc2(
+                                                this@ComposeTextActivity,
+                                                path!!,
+                                                null
+                                            )
+                                        }
+                                    }
+                                    showLoading.value = (result.state != State.FINISHED)
+                                    if (result.state == State.INIT || result.list == null || pdfViewModel.mupdfDocument == null) {
+                                        LoadingView(showLoading)
+                                    } else {
+                                        ImageViewer(
+                                            result = result,
+                                            mupdfDocument = pdfViewModel.mupdfDocument!!,
+                                            onClick = { pos -> showToast(pos, result.list!!.size) },
+                                            width = window.decorView.width,
+                                            height = window.decorView.height,
+                                            margin = margin,
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -155,7 +179,7 @@ class ComposeTextActivity : ComponentActivity() {
         if (!TextUtils.isEmpty(path)) {
             return
         }
-        
+
         path = IntentFile.processIntentAction(intent, this@ComposeTextActivity)
     }
 
