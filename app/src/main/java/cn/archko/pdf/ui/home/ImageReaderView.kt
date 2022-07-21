@@ -4,8 +4,6 @@ import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -14,8 +12,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import cn.archko.pdf.common.ImageWorker
+import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.LoadResult
@@ -95,10 +96,14 @@ private fun ImageItem(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 10.dp)
+        modifier = modifier.fillMaxWidth()
     ) {
+        val configuration = LocalConfiguration.current
+        val screenHeight = configuration.screenHeightDp.dp
+        val screenWidth = configuration.screenWidthDp.dp
+        var h: Float =
+            aPage.effectivePagesWidth.toFloat() / width * height * (screenWidth.value / width)
+        Logcat.d("h:$h,width:$width, height:$height, screenHeight:$screenHeight, screenWidth:$screenWidth, aPage.effectivePagesWidth:${aPage.effectivePagesWidth}, aPage:$aPage")
         Image(
             painter = remember {
                 AsyncPageImagePainter(
@@ -115,7 +120,9 @@ private fun ImageItem(
             },
             contentScale = ContentScale.FillWidth,
             contentDescription = null,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(h.dp)
         )
     }
 }

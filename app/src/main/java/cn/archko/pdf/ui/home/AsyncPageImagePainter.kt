@@ -13,7 +13,6 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.BitmapPool
-import cn.archko.pdf.common.ImageDecoder
 import cn.archko.pdf.common.ImageWorker
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.Logcat.d
@@ -160,7 +159,7 @@ class AsyncPageImagePainter internal constructor(
             }
             if (Logcat.loggable) {
                 d(
-                    ImageDecoder.TAG, String.format(
+                    String.format(
                         "decode bitmap: %s-%s,page:%s-%s,xOrigin:%s, bound(left-top):%s-%s, page:%s",
                         pageW, pageH, pageSize.zoomPoint.x, pageSize.zoomPoint.y,
                         decodeParam.xOrigin, leftBound, topBound, pageSize
@@ -175,6 +174,15 @@ class AsyncPageImagePainter internal constructor(
             BitmapCache.getInstance().addBitmap(decodeParam.key, bitmap)
             return bitmap
         } catch (e: Exception) {
+            if (Logcat.loggable) {
+                d(
+                    String.format(
+                        "decode bitmap error:countPages-page:%s-%s",
+                        decodeParam.document.countPages(),
+                        decodeParam
+                    )
+                )
+            }
             e.printStackTrace()
         }
         return null

@@ -389,5 +389,22 @@ public abstract class ImageWorker {
             this.document = document;
             this.decodeCallback = callback;
         }
+
+        @Override
+        public String toString() {
+            return "DecodeParam{" +
+                    "key='" + key + '\'' +
+                    ", pageNum=" + pageNum +
+                    ", zoom=" + zoom +
+                    ", screenWidth=" + screenWidth +
+                    ", imageView=" + imageView +
+                    ", crop=" + crop +
+                    ", xOrigin=" + xOrigin +
+                    ", pageSize=" + pageSize +
+                    ", document=" + document +
+                    ", targetWidth=" + targetWidth +
+                    ", decodeCallback=" + decodeCallback +
+                    '}';
+        }
     }
 }
