@@ -101,20 +101,21 @@ private fun ImageItem(
         val configuration = LocalConfiguration.current
         val screenHeight = configuration.screenHeightDp.dp
         val screenWidth = configuration.screenWidthDp.dp
-        var h: Float =
-            aPage.effectivePagesWidth.toFloat() / width * height * (screenWidth.value / width)
-        Logcat.d("h:$h,width:$width, height:$height, screenHeight:$screenHeight, screenWidth:$screenWidth, aPage.effectivePagesWidth:${aPage.effectivePagesWidth}, aPage:$aPage")
+        val h: Float =
+            aPage.effectivePagesHeight.toFloat() * width / aPage.effectivePagesWidth
+        val theDp = with(LocalDensity.current) {
+            h.toDp()
+        }
+        Logcat.d("h:$h, theDp:$theDp, width:$width, height:$height, screenHeight:$screenHeight, screenWidth:$screenWidth, aPage.effectivePagesWidth:${aPage.effectivePagesWidth}, aPage:$aPage")
         Image(
             painter = remember {
                 AsyncPageImagePainter(
                     ImageWorker.DecodeParam(
                         aPage.toString(),
-                        null,
                         false,
                         0,
                         aPage,
                         mupdfDocument.document,
-                        null
                     )
                 )
             },
@@ -122,7 +123,7 @@ private fun ImageItem(
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(h.dp)
+                .height(theDp)
         )
     }
 }

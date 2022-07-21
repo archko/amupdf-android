@@ -390,6 +390,17 @@ public abstract class ImageWorker {
             this.decodeCallback = callback;
         }
 
+        public DecodeParam(String key, boolean crop, int xOrigin, APage pageSize, Document document) {
+            this.key = key;
+            if (TextUtils.isEmpty(key)) {
+                this.key = String.format("%s,%s,%s", crop, xOrigin, pageSize);
+            }
+            this.crop = crop;
+            this.xOrigin = xOrigin;
+            this.pageSize = pageSize;
+            this.document = document;
+        }
+
         @Override
         public String toString() {
             return "DecodeParam{" +

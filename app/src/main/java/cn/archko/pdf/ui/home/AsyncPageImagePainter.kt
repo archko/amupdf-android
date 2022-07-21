@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
+import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.BitmapPool
 import cn.archko.pdf.common.ImageWorker
@@ -25,6 +26,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
@@ -82,7 +84,7 @@ class AsyncPageImagePainter internal constructor(
         scope.launch {
             snapshotFlow {
                 decode(request)
-            }.flowOn(Dispatchers.IO)
+            }.flowOn(AppExecutors.instance.diskIO().asCoroutineDispatcher())
                 .mapLatest { bitmap ->
                     if (null != bitmap) {
                         State.Success(
