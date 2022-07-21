@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,27 +33,32 @@ fun TextViewer(
     val listState = rememberLazyListState(0)
     val coroutineScope = rememberCoroutineScope()
 
-    Box(modifier = modifier
-        .pointerInput(Unit) {
-            detectTapGestures(
-                onPress = {
-                },
-                onDoubleTap = {
-                },
-                onTap = {
-                    coroutineScope.launch {
-                        val top = height / 4
-                        val bottom = height * 3 / 4
-                        val y = it.y   //点击的位置
-                        var scrollY = 0
-                        if (y < top) {
-                            scrollY -= height
-                            listState.scrollBy((scrollY + margin).toFloat())
-                        } else if (y > bottom) {
-                            scrollY += height
-                            listState.scrollBy((scrollY - margin).toFloat())
-                        } else {
-                            onClick(listState.firstVisibleItemIndex)
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+
+    Box(
+        modifier = modifier
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                    },
+                    onDoubleTap = {
+                    },
+                    onTap = {
+                        coroutineScope.launch {
+                            val h = screenHeight.toPx()
+                            val top = h / 4
+                            val bottom = h * 3 / 4
+                            val y = it.y   //点击的位置
+                            var scrollY = 0
+                            if (y < top) {
+                                scrollY -= h.toInt()
+                                listState.scrollBy((scrollY + margin).toFloat())
+                            } else if (y > bottom) {
+                                scrollY += h.toInt()
+                                listState.scrollBy((scrollY - margin).toFloat())
+                            } else {
+                                onClick(listState.firstVisibleItemIndex)
                         }
                         //Logcat.d("scroll:$top, y:$y, margin:$margin, scrollY:$scrollY, firstVisibleItemIndex:${listState.firstVisibleItemIndex}")
                     }

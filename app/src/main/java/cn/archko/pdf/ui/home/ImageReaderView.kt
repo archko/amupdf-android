@@ -23,7 +23,6 @@ import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.paging.itemsIndexed
 import cn.archko.pdf.ui.home.AsyncPageImagePainter
 import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
-import io.iamjosephmj.flinger.flings.flingBehavior
 import kotlinx.coroutines.launch
 
 @Composable
@@ -40,27 +39,32 @@ fun ImageViewer(
     val listState = rememberLazyListState(0)
     val coroutineScope = rememberCoroutineScope()
 
-    Box(modifier = modifier
-        .pointerInput(Unit) {
-            detectTapGestures(
-                onPress = {
-                },
-                onDoubleTap = {
-                },
-                onTap = {
-                    coroutineScope.launch {
-                        val top = height / 4
-                        val bottom = height * 3 / 4
-                        val y = it.y   //点击的位置
-                        var scrollY = 0
-                        if (y < top) {
-                            scrollY -= height
-                            listState.scrollBy((scrollY + margin).toFloat())
-                        } else if (y > bottom) {
-                            scrollY += height
-                            listState.scrollBy((scrollY - margin).toFloat())
-                        } else {
-                            onClick(listState.firstVisibleItemIndex)
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+
+    Box(
+        modifier = modifier
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                    },
+                    onDoubleTap = {
+                    },
+                    onTap = {
+                        coroutineScope.launch {
+                            val h = screenHeight.toPx()
+                            val top = h / 4
+                            val bottom = h * 3 / 4
+                            val y = it.y   //点击的位置
+                            var scrollY = 0
+                            if (y < top) {
+                                scrollY -= h.toInt()
+                                listState.scrollBy((scrollY + margin).toFloat())
+                            } else if (y > bottom) {
+                                scrollY += h.toInt()
+                                listState.scrollBy((scrollY - margin).toFloat())
+                            } else {
+                                onClick(listState.firstVisibleItemIndex)
                         }
                         //Logcat.d("scroll:$top, y:$y, margin:$margin, scrollY:$scrollY, firstVisibleItemIndex:${listState.firstVisibleItemIndex}")
                     }
