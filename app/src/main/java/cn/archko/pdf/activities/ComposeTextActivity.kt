@@ -64,12 +64,20 @@ class ComposeTextActivity : ComponentActivity() {
         initIntent()
 
         if (TextUtils.isEmpty(path)) {
-            Toast.makeText(this@ComposeTextActivity, "error file path:$path", Toast.LENGTH_SHORT)
-                .show()
+            error()
             return
         }
 
         setView()
+    }
+
+    private fun error() {
+        Toast.makeText(
+            this@ComposeTextActivity,
+            "error file path:$path",
+            Toast.LENGTH_SHORT
+        ).show()
+        finish()
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -103,7 +111,7 @@ class ComposeTextActivity : ComponentActivity() {
                                 if (path!!.endsWith("txt", true)) {
                                     val showLoading = remember { mutableStateOf(true) }
                                     val result by pdfViewModel.textFlow.collectAsState()
-                                    if (result.state == State.INIT) {
+                                    if (State.INIT == result.state) {
                                         lifecycleScope.launch {
                                             pdfViewModel.loadTextDoc(path!!)
                                         }
@@ -111,6 +119,8 @@ class ComposeTextActivity : ComponentActivity() {
                                     showLoading.value = (result.state != State.FINISHED)
                                     if (result.state == State.INIT || result.list == null) {
                                         LoadingView(showLoading)
+                                    } else if (State.ERROR == result.state) {
+                                        error()
                                     } else {
                                         TextViewer(
                                             result = result,
@@ -134,6 +144,8 @@ class ComposeTextActivity : ComponentActivity() {
                                     showLoading.value = (result.state != State.FINISHED)
                                     if (result.state == State.INIT || result.list == null || pdfViewModel.mupdfDocument == null) {
                                         LoadingView(showLoading)
+                                    } else if (State.ERROR == result.state) {
+                                        error()
                                     } else {
                                         ImageViewer(
                                             result = result,

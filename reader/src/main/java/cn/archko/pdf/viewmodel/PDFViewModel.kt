@@ -280,10 +280,17 @@ class PDFViewModel : ViewModel() {
         emit(TextHelper.readString(path))
     }.flowOn(Dispatchers.IO)
         .collectLatest {
-            _textFlow.value = LoadResult(
-                State.FINISHED,
-                list = it
-            )
+            if (it.isNotEmpty()) {
+                _textFlow.value = LoadResult(
+                    State.FINISHED,
+                    list = it
+                )
+            } else {
+                _textFlow.value = LoadResult(
+                    State.ERROR,
+                    list = it
+                )
+            }
         }
 
     private val _pageFlow = MutableStateFlow<LoadResult<Any, APage>>(LoadResult(State.INIT))
@@ -307,10 +314,17 @@ class PDFViewModel : ViewModel() {
         }
     }.flowOn(Dispatchers.IO)
         .collectLatest {
-            _pageFlow.value = LoadResult(
-                State.FINISHED,
-                list = it
-            )
+            if (it.isNotEmpty()) {
+                _pageFlow.value = LoadResult(
+                    State.FINISHED,
+                    list = it
+                )
+            } else {
+                _pageFlow.value = LoadResult(
+                    State.ERROR,
+                    list = it
+                )
+            }
         }
 
     private fun loadAllPageSize(cp: Int): List<APage> {
