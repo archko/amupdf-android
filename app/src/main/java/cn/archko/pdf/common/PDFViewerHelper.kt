@@ -26,7 +26,6 @@ class PDFViewerHelper {
 
         const val mupdfContextMenuItem = Menu.FIRST + 110
 
-        //protected const val apvContextMenuItem = Menu.FIRST + 111
         const val vudroidContextMenuItem = Menu.FIRST + 112
         const val otherContextMenuItem = Menu.FIRST + 113
         const val infoContextMenuItem = Menu.FIRST + 114

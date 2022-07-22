@@ -64,6 +64,8 @@ class ComposeTextActivity : ComponentActivity() {
         initIntent()
 
         if (TextUtils.isEmpty(path)) {
+            Toast.makeText(this@ComposeTextActivity, "error file path:$path", Toast.LENGTH_SHORT)
+                .show()
             return
         }
 
