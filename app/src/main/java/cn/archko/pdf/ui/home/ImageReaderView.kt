@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import cn.archko.pdf.common.ImageWorker
 import cn.archko.pdf.common.Logcat
@@ -65,12 +66,12 @@ fun ImageViewer(
                                 listState.scrollBy((scrollY - margin).toFloat())
                             } else {
                                 onClick(listState.firstVisibleItemIndex)
+                            }
+                            //Logcat.d("scroll:$top, y:$y, margin:$margin, scrollY:$scrollY, firstVisibleItemIndex:${listState.firstVisibleItemIndex}")
                         }
-                        //Logcat.d("scroll:$top, y:$y, margin:$margin, scrollY:$scrollY, firstVisibleItemIndex:${listState.firstVisibleItemIndex}")
                     }
-                }
-            )
-        }) {
+                )
+            }) {
         LazyColumn(
             state = listState,
             flingBehavior = StockFlingBehaviours.smoothScroll(),
@@ -110,8 +111,14 @@ private fun ImageItem(
         val h: Float =
             aPage.effectivePagesHeight.toFloat() * screenWidth.value / aPage.effectivePagesWidth
         val theDp = h.dp
+        val w = with(LocalDensity.current) {
+            screenWidth.toPx()
+        }
+        if (aPage.getTargetWidth() != w.toInt()) {
+            aPage.setTargetWidth(w.toInt())
+        }
 
-        Logcat.d("h:$h, theDp:$theDp, width:$width, height:$height, screenHeight:$screenHeight, screenWidth:$screenWidth, aPage.effectivePagesWidth:${aPage.effectivePagesWidth}, aPage:$aPage")
+        Logcat.d("h:$h, theDp:$theDp,w:$w, width:$width, height:$height, screenHeight:$screenHeight, screenWidth:$screenWidth, aPage.effectivePagesWidth:${aPage.effectivePagesWidth}, aPage:$aPage")
         Image(
             painter = remember {
                 AsyncPageImagePainter(
