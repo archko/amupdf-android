@@ -7,13 +7,12 @@ import android.net.Uri
 import android.os.Build
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.core.content.FileProvider
 import cn.archko.pdf.activities.AMuPDFRecyclerViewActivity
+import cn.archko.pdf.activities.ComposeTextActivity
 import com.umeng.analytics.MobclickAgent
 import org.vudroid.pdfdroid.PdfViewerActivity
 import java.io.File
-import java.util.*
 
 /**
  * @author: archko 2020/1/4 :2:06 下午
@@ -34,7 +33,7 @@ class PDFViewerHelper {
         const val documentContextMenuItem = Menu.FIRST + 115
         const val addToFavoriteContextMenuItem = Menu.FIRST + 116
         const val removeFromFavoriteContextMenuItem = Menu.FIRST + 117
-        //protected const val bartekscViewContextMenuItem = Menu.FIRST + 118
+        const val composeViewContextMenuItem = Menu.FIRST + 118
 
         fun openWithDefaultViewer(f: File, activity: Context) {
             val map = HashMap<String, String>()
@@ -93,6 +92,9 @@ class PDFViewerHelper {
                     // API>=21: intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT); /* launch as a new document */
                     activity.startActivity(intent)
                 }
+                composeViewContextMenuItem -> {
+                    openComposeViewerMupdf(clickedFile, activity)
+                }
                 otherContextMenuItem -> {
                     val map = mapOf("type" to "other", "name" to clickedFile.name)
                     MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
@@ -141,6 +143,20 @@ class PDFViewerHelper {
             MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
 
             intent.setClass(activity, cn.archko.pdf.activities.DocumentActivity::class.java)
+            // API>=21: intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT); /* launch as a new document */
+            activity.startActivity(intent)
+        }
+
+        fun openComposeViewerMupdf(clickedFile: File, activity: Context) {
+            val uri = Uri.fromFile(clickedFile)
+            val intent = Intent()
+            intent.action = Intent.ACTION_VIEW
+            intent.data = uri
+
+            val map = mapOf("type" to "Document", "name" to clickedFile.name)
+            MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
+
+            intent.setClass(activity, ComposeTextActivity::class.java)
             // API>=21: intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT); /* launch as a new document */
             activity.startActivity(intent)
         }

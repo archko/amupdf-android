@@ -72,6 +72,7 @@ fun EmptyView(modifier: Modifier) {
 sealed class MenuItemType {
     object ViewBookWithAMupdf : MenuItemType()
     object ViewBookWithMupdf : MenuItemType()
+    object ViewBookWithComposeMupdf : MenuItemType()
     object ViewBookInfo : MenuItemType()
     object DeleteHistory : MenuItemType()
     object DeleteFile : MenuItemType()
@@ -126,6 +127,11 @@ fun UserOptDialog(
                     DialogItem(
                         txt = stringResource(id = R.string.menu_mupdf),
                         onClick = { menuOpt(MenuItemType.ViewBookWithAMupdf, fileBean) }
+                    )
+                    Divider(thickness = 0.5.dp)
+                    DialogItem(
+                        txt = stringResource(id = R.string.menu_compose_mupdf),
+                        onClick = { menuOpt(MenuItemType.ViewBookWithComposeMupdf, fileBean) }
                     )
                     Divider(thickness = 0.5.dp)
                     DialogItem(

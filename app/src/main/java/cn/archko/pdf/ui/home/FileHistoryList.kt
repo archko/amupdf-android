@@ -58,6 +58,9 @@ fun FileHistoryList(
             MenuItemType.ViewBookWithMupdf -> {
                 PDFViewerHelper.openViewerMupdf(fb.file!!, context)
             }
+            MenuItemType.ViewBookWithComposeMupdf -> {
+                PDFViewerHelper.openComposeViewerMupdf(fb.file!!, context)
+            }
             MenuItemType.OpenWithOther -> {
                 PDFViewerHelper.openViewerOther(fb.file!!, context)
             }

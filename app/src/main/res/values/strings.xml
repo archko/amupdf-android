@@ -21,6 +21,7 @@
 
     <string name="menu_vudroid">Open with Vudroid</string>
     <string name="menu_mupdf">Open with AMupdf</string>
+    <string name="menu_compose_mupdf">Open with Compose AMupdf</string>
     <string name="menu_other">Open with Other App</string>
     <string name="menu_info">View File Info</string>
     <string name="menu_remove_from_recent">Remove from recent</string>
