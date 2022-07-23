@@ -1,6 +1,7 @@
 package cn.archko.pdf.ui.home
 
 import android.graphics.Bitmap
+import android.graphics.RectF
 import androidx.compose.runtime.RememberObserver
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.BitmapPool
@@ -45,8 +46,13 @@ class AsyncPageImagePainter internal constructor(
                 val cropScale = arr[3]
                 pageSize.setCropHeight(pageH)
                 pageSize.setCropWidth(pageW)
-                //RectF cropRectf = new RectF(leftBound, topBound, leftBound + pageW, topBound + pageH);
-                //pageSize.setCropBounds(cropRectf, cropScale);
+                val cropRectf = RectF(
+                    leftBound.toFloat(),
+                    topBound.toFloat(),
+                    (leftBound + pageW).toFloat(),
+                    (topBound + pageH).toFloat()
+                );
+                pageSize.setCropBounds(cropRectf, cropScale);
             }
             if (Logcat.loggable) {
                 d(
@@ -57,8 +63,8 @@ class AsyncPageImagePainter internal constructor(
                     )
                 )
             }
-            val bitmap = BitmapPool.getInstance()
-                .acquire(pageW, pageH) //Bitmap.createBitmap(sizeX, sizeY, Bitmap.Config.ARGB_8888);
+            val bitmap = BitmapPool.getInstance().acquire(pageW, pageH)
+            //Bitmap.createBitmap(sizeX, sizeY, Bitmap.Config.ARGB_8888);
             MupdfDocument.render(page, ctm, bitmap, decodeParam.xOrigin, leftBound, topBound)
             page.destroy()
             //Logcat.d(TAG, "decode:" + (SystemClock.uptimeMillis() - start));
@@ -78,5 +84,4 @@ class AsyncPageImagePainter internal constructor(
         }
         return null
     }
-
 }
