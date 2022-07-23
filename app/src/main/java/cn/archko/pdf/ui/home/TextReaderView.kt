@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.LoadResult
 import cn.archko.pdf.entity.ReflowBean
@@ -59,12 +60,12 @@ fun TextViewer(
                                 listState.scrollBy((scrollY - margin).toFloat())
                             } else {
                                 onClick(listState.firstVisibleItemIndex)
+                            }
+                            Logcat.d("scroll:$top, bottom:$bottom, y:$y,h:$h, screenHeight:$screenHeight, margin:$margin, scrollY:$scrollY, firstVisibleItemIndex:${listState.firstVisibleItemIndex}")
                         }
-                        //Logcat.d("scroll:$top, y:$y, margin:$margin, scrollY:$scrollY, firstVisibleItemIndex:${listState.firstVisibleItemIndex}")
                     }
-                }
-            )
-        }) {
+                )
+            }) {
         LazyColumn(
             state = listState,
             flingBehavior = StockFlingBehaviours.smoothScroll(),
@@ -93,18 +94,15 @@ private fun TextItem(
     aPage: ReflowBean,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 10.dp)
-    ) {
-        aPage.data?.let {
-            Text(
-                text = it,
-                overflow = TextOverflow.Visible,
-                fontSize = 17.sp,
-            )
-        }
+    aPage.data?.let {
+        Text(
+            text = it,
+            overflow = TextOverflow.Visible,
+            fontSize = 17.sp,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 10.dp)
+        )
     }
 }
 

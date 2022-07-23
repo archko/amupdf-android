@@ -23,6 +23,7 @@ import cn.archko.pdf.entity.LoadResult
 import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.paging.itemsIndexed
 import cn.archko.pdf.ui.home.AsyncPageImagePainter
+import cn.archko.pdf.ui.home.BitmapState
 import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
 import kotlinx.coroutines.launch
 
@@ -67,7 +68,7 @@ fun ImageViewer(
                             } else {
                                 onClick(listState.firstVisibleItemIndex)
                             }
-                            //Logcat.d("scroll:$top, y:$y, margin:$margin, scrollY:$scrollY, firstVisibleItemIndex:${listState.firstVisibleItemIndex}")
+                            Logcat.d("scroll:$top, bottom:$bottom, y:$y,h:$h, screenHeight:$screenHeight, margin:$margin, scrollY:$scrollY, firstVisibleItemIndex:${listState.firstVisibleItemIndex}")
                         }
                     }
                 )
@@ -103,7 +104,8 @@ private fun ImageItem(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier.fillMaxWidth()
+        modifier
+            .fillMaxWidth()
     ) {
         val configuration = LocalConfiguration.current
         val screenHeight = configuration.screenHeightDp.dp
@@ -119,7 +121,7 @@ private fun ImageItem(
         }
 
         Logcat.d("h:$h, theDp:$theDp,w:$w, width:$width, height:$height, screenHeight:$screenHeight, screenWidth:$screenWidth, aPage.effectivePagesWidth:${aPage.effectivePagesWidth}, aPage:$aPage")
-        Image(
+        /*Image(
             painter = remember {
                 AsyncPageImagePainter(
                     ImageWorker.DecodeParam(
@@ -136,7 +138,36 @@ private fun ImageItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(theDp)
+        )*/
+        val painter = remember {
+            AsyncPageImagePainter(
+                ImageWorker.DecodeParam(
+                    aPage.toString(),
+                    false,
+                    0,
+                    aPage,
+                    mupdfDocument.document,
+                )
+            )
+        }
+
+        Image(
+            painter = painter,
+            contentScale = ContentScale.FillWidth,
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(theDp)
         )
+
+        when (painter.bitmapState) {
+            is BitmapState.Loading -> {
+            }
+            is BitmapState.Error -> {
+            }
+            else -> {
+
+            }
+        }
     }
 }
- 
