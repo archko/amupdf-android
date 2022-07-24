@@ -29,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.LocalBackPressedDispatcher
@@ -68,6 +69,7 @@ class ComposeTextActivity : ComponentActivity() {
             return
         }
 
+        sensorHelper = SensorHelper(this@ComposeTextActivity)
         lifecycleScope.launch {
             pdfViewModel.loadBookProgressByPath(path!!, preferencesRepository)
         }
@@ -188,10 +190,12 @@ class ComposeTextActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
+        sensorHelper?.onPause()
     }
 
     override fun onResume() {
         super.onResume()
+        sensorHelper?.onResume()
     }
 
     private fun initIntent() {

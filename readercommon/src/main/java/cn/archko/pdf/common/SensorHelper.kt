@@ -7,9 +7,9 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Build
+import androidx.activity.ComponentActivity
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -19,7 +19,7 @@ import kotlinx.coroutines.withContext
 /**
  * @author: archko 2018/7/22 :13:03
  */
-class SensorHelper(private val activity: FragmentActivity) {
+class SensorHelper(private val activity: ComponentActivity) {
 
     private val sensorEventListener: SensorEventListener = object : SensorEventListener {
         /**
@@ -125,7 +125,7 @@ class SensorHelper(private val activity: FragmentActivity) {
     companion object {
         const val PREF_ORIENTATION = "orientation"
         const val PREF_PREV_ORIENTATION = "prevOrientation"
-        fun setOrientation(activity: FragmentActivity, orientation: Int, prev: Int): Boolean {
+        fun setOrientation(activity: Activity, orientation: Int, prev: Int): Boolean {
             when (orientation) {
                 0 -> activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
                 1 -> activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT

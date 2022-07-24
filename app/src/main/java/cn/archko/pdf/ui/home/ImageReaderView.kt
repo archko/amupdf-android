@@ -85,10 +85,10 @@ fun ImageViewer(
                             var scrollY = 0
                             if (y < top) {
                                 scrollY -= h.toInt()
-                                listState.scrollBy((scrollY + margin).toFloat())
+                                listState.scrollBy((scrollY - margin).toFloat())
                             } else if (y > bottom) {
                                 scrollY += h.toInt()
-                                listState.scrollBy((scrollY - margin).toFloat())
+                                listState.scrollBy((scrollY + margin).toFloat())
                             } else {
                                 onClick(listState.firstVisibleItemIndex)
                             }
@@ -152,7 +152,7 @@ private fun ImageItem(
             aPage.setTargetWidth(w.toInt())
         }
 
-        Logcat.d("h:$h, theDp:$theDp,w:$w, width:$width, height:$height, screenHeight:$screenHeight, screenWidth:$screenWidth, aPage.effectivePagesWidth:${aPage.effectivePagesWidth}, aPage:$aPage")
+        //Logcat.d("h:$h, theDp:$theDp,w:$w, width:$width, height:$height, screenHeight:$screenHeight, screenWidth:$screenWidth, aPage.effectivePagesWidth:${aPage.effectivePagesWidth}, aPage:$aPage")
 
         /*
         使用painter
@@ -207,6 +207,8 @@ private fun ImageItem(
 
         //使用同步加载
         //val imageState = loadPage(aPage, mupdfDocument)
+
+        //在DisposableEffect中使用flow异步加载
         val imageState: MutableState<Bitmap?> = remember { mutableStateOf(null) }
         asyncDecodePage(aPage, mupdfDocument, imageState)
 
