@@ -2,23 +2,35 @@ import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.common.ImageWorker.DecodeParam
 import cn.archko.pdf.common.Logcat
@@ -27,14 +39,14 @@ import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.LoadResult
 import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.paging.itemsIndexed
-import cn.archko.pdf.ui.home.LoadingView
 import cn.archko.pdf.ui.home.PdfImageDecoder
 import cn.archko.pdf.viewmodel.PDFViewModel
 import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
@@ -141,7 +153,10 @@ private fun ImageItem(
         }
 
         Logcat.d("h:$h, theDp:$theDp,w:$w, width:$width, height:$height, screenHeight:$screenHeight, screenWidth:$screenWidth, aPage.effectivePagesWidth:${aPage.effectivePagesWidth}, aPage:$aPage")
-        /*Image(
+
+        /*
+        使用painter
+        Image(
             painter = remember {
                 AsyncPageImagePainter(
                     ImageWorker.DecodeParam(
@@ -158,8 +173,8 @@ private fun ImageItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(theDp)
-        )*/
-        /*val painter = remember {
+        )
+        val painter = remember {
             AsyncPageImagePainter(
                 DecodeParam(
                     aPage.toString(),
@@ -189,15 +204,12 @@ private fun ImageItem(
 
             }
         }*/
-        val imageState = asyncLoadImage(
-            DecodeParam(
-                aPage.toString(),
-                true,
-                0,
-                aPage,
-                mupdfDocument.document,
-            )
-        )
+
+        //使用同步加载
+        //val imageState = loadPage(aPage, mupdfDocument)
+        val imageState: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+        asyncDecodePage(aPage, mupdfDocument, imageState)
+
         if (imageState.value != null) {
             val bitmap = imageState.value
             val bh = with(LocalDensity.current) {
@@ -217,27 +229,86 @@ private fun ImageItem(
                     .fillMaxWidth()
                     .height(theDp)
             ) {
-                LoadingView(mutableStateOf(true))
+                LoadingView("Decoding Page:${aPage.index + 1}")
             }
         }
     }
 }
 
-fun asyncLoadImage(
-    decodeParam: DecodeParam
+@Composable
+private fun LoadingView(
+    text: String = "Decoding"
+) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ) {
+        Text(
+            text,
+            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(12.dp)
+        )
+        /*CircularProgressIndicator(
+            strokeWidth = 2.dp,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(20.dp)
+        )*/
+        Spacer(modifier = Modifier.height(20.dp))
+        LinearProgressIndicator(
+            modifier = Modifier
+                .height(6.dp)
+                .align(alignment = Alignment.CenterHorizontally)
+        )
+    }
+}
+
+fun loadPage(
+    aPage: APage,
+    mupdfDocument: MupdfDocument,
 ): MutableState<Bitmap?> {
+    val decodeParam = DecodeParam(
+        aPage.toString(),
+        true,
+        0,
+        aPage,
+        mupdfDocument.document,
+    )
     val bitmapState: MutableState<Bitmap?> = mutableStateOf(null)
     bitmapState.value = PdfImageDecoder.decode(decodeParam)
     return bitmapState
 }
 
 @Composable
-fun asyncLoadImage2(decodeParam: DecodeParam) {
-    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-    scope.launch {
-        snapshotFlow {
-            PdfImageDecoder.decode(decodeParam)
-        }.flowOn(AppExecutors.instance.diskIO().asCoroutineDispatcher())
-        //.collect(::updateState)
+fun asyncDecodePage(
+    aPage: APage,
+    mupdfDocument: MupdfDocument,
+    imageState: MutableState<Bitmap?>
+) {
+    DisposableEffect(aPage) {
+        val decodeParam = DecodeParam(
+            aPage.toString(),
+            true,
+            0,
+            aPage,
+            mupdfDocument.document,
+        )
+        val scope =
+            CoroutineScope(SupervisorJob() + AppExecutors.instance.diskIO().asCoroutineDispatcher())
+        scope.launch {
+            snapshotFlow {
+                PdfImageDecoder.decode(decodeParam)
+            }.flowOn(AppExecutors.instance.diskIO().asCoroutineDispatcher())
+                .collectLatest {
+                    imageState.value = it
+                }
+        }
+        onDispose {
+            scope.cancel()
+        }
     }
 }
