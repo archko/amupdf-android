@@ -29,6 +29,7 @@ import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.paging.itemsIndexed
 import cn.archko.pdf.ui.home.LoadingView
 import cn.archko.pdf.ui.home.PdfImageDecoder
+import cn.archko.pdf.viewmodel.PDFViewModel
 import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +41,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ImageViewer(
     result: LoadResult<Any, APage>,
+    pdfViewModel: PDFViewModel,
     mupdfDocument: MupdfDocument,
     onClick: (pos: Int) -> Unit,
     width: Int,
@@ -85,7 +87,7 @@ fun ImageViewer(
             }) {
         DisposableEffect(result) {
             coroutineScope.launch {
-                listState.scrollToItem(10)
+                listState.scrollToItem(pdfViewModel.getCurrentPage())
             }
             onDispose {
             }

@@ -68,6 +68,9 @@ class ComposeTextActivity : ComponentActivity() {
             return
         }
 
+        lifecycleScope.launch {
+            pdfViewModel.loadBookProgressByPath(path!!, preferencesRepository)
+        }
         setView()
     }
 
@@ -124,6 +127,7 @@ class ComposeTextActivity : ComponentActivity() {
                                     } else {
                                         TextViewer(
                                             result = result,
+                                            pdfViewModel = pdfViewModel,
                                             onClick = { pos -> showToast(pos, result.list!!.size) },
                                             height = window.decorView.height,
                                             margin = margin,
@@ -149,6 +153,7 @@ class ComposeTextActivity : ComponentActivity() {
                                     } else {
                                         ImageViewer(
                                             result = result,
+                                            pdfViewModel = pdfViewModel,
                                             mupdfDocument = pdfViewModel.mupdfDocument!!,
                                             onClick = { pos -> showToast(pos, result.list!!.size) },
                                             width = window.decorView.width,

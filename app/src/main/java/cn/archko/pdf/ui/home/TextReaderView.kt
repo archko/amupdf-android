@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -19,12 +20,14 @@ import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.LoadResult
 import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.paging.itemsIndexed
+import cn.archko.pdf.viewmodel.PDFViewModel
 import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
 import kotlinx.coroutines.launch
 
 @Composable
 fun TextViewer(
     result: LoadResult<Any, ReflowBean>,
+    pdfViewModel: PDFViewModel,
     onClick: (pos: Int) -> Unit,
     height: Int,
     margin: Int,
@@ -66,6 +69,13 @@ fun TextViewer(
                     }
                 )
             }) {
+        DisposableEffect(result) {
+            coroutineScope.launch {
+                listState.scrollToItem(pdfViewModel.getCurrentPage())
+            }
+            onDispose {
+            }
+        }
         LazyColumn(
             state = listState,
             flingBehavior = StockFlingBehaviours.smoothScroll(),
