@@ -57,10 +57,10 @@ fun TextViewer(
                             var scrollY = 0
                             if (y < top) {
                                 scrollY -= h.toInt()
-                                listState.scrollBy((scrollY + margin).toFloat())
+                                listState.scrollBy((scrollY - margin).toFloat())
                             } else if (y > bottom) {
                                 scrollY += h.toInt()
-                                listState.scrollBy((scrollY - margin).toFloat())
+                                listState.scrollBy((scrollY + margin).toFloat())
                             } else {
                                 onClick(listState.firstVisibleItemIndex)
                             }
@@ -111,7 +111,7 @@ private fun TextItem(
             fontSize = 17.sp,
             modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 10.dp)
+                .padding(horizontal = 10.dp, vertical = 10.dp)
         )
     }
 }
