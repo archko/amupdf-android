@@ -217,7 +217,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         viewController = aViewController
         Logcat.d("changeViewMode:$viewMode, pos:$pos, controller:$viewController")
         addDocumentView()
-        viewController?.init(mPageSizes, mMupdfDocument, pos)
+        viewController?.init(mPageSizes, pos)
         viewController?.notifyDataSetChanged()
     }
 
@@ -236,13 +236,13 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
             setCropButton(mCrop)
 
-            val pos = pdfViewModel.getCurrentPage(mMupdfDocument!!.countPages())
+            val pos = pdfViewModel.getCurrentPage(pdfViewModel.countPages())
             Logcat.d("doLoadDoc:mCrop:$mCrop,mReflow:$mReflow, pos:$pos")
-            viewController?.doLoadDoc(mPageSizes, mMupdfDocument!!, pos)
+            viewController?.doLoadDoc(mPageSizes, pos)
 
             mPageSeekBarControls?.showReflow(true)
 
-            outlineHelper = OutlineHelper(mMupdfDocument, this)
+            outlineHelper = OutlineHelper(pdfViewModel.mupdfDocument, this)
 
             mMenuHelper = MenuHelper(mLeftDrawer, outlineHelper, supportFragmentManager)
             mMenuHelper?.apply {
@@ -438,7 +438,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             }
 
             override fun getPageCount(): Int {
-                return mMupdfDocument!!.countPages()
+                return pdfViewModel.countPages()
             }
 
             override fun getCurrentPageIndex(): Int {
@@ -519,7 +519,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     private fun toggleCrop() {
-        var flag = cropModeSet(!mCrop)
+        val flag = cropModeSet(!mCrop)
         if (flag) {
             BitmapCache.getInstance().clear()
             viewController?.notifyDataSetChanged()

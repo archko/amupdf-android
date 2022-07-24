@@ -27,10 +27,14 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.common.ImageWorker.DecodeParam
 import cn.archko.pdf.common.Logcat
@@ -59,6 +63,7 @@ fun ImageViewer(
     width: Int,
     height: Int,
     margin: Int,
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     modifier: Modifier = Modifier,
 ) {
     val list = result.list!!
@@ -101,7 +106,26 @@ fun ImageViewer(
             coroutineScope.launch {
                 listState.scrollToItem(pdfViewModel.getCurrentPage())
             }
+            val observer = LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_PAUSE) {
+                    pdfViewModel.bookProgress?.run {
+                        autoCrop = 0
+                        val position = listState.firstVisibleItemIndex
+                        pdfViewModel.saveBookProgress(
+                            pdfViewModel.pdfPath,
+                            pdfViewModel.countPages(),
+                            position,
+                            pdfViewModel.bookProgress!!.zoomLevel,
+                            -1,
+                            listState.firstVisibleItemScrollOffset
+                        )
+                    }
+                }
+            }
+
+            lifecycleOwner.lifecycle.addObserver(observer)
             onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
         LazyColumn(
@@ -206,11 +230,11 @@ private fun ImageItem(
         }*/
 
         //使用同步加载
-        //val imageState = loadPage(aPage, mupdfDocument)
+        val imageState = loadPage(aPage, mupdfDocument)
 
         //在DisposableEffect中使用flow异步加载
-        val imageState: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-        asyncDecodePage(aPage, mupdfDocument, imageState)
+        //val imageState: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+        //asyncDecodePage(aPage, mupdfDocument, imageState)
 
         if (imageState.value != null) {
             val bitmap = imageState.value

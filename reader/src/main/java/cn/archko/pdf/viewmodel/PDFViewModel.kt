@@ -20,6 +20,7 @@ import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.entity.State
 import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.utils.FileUtils
+import com.artifex.mupdf.fitz.Page
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,6 +34,7 @@ import java.io.File
 
 class PDFViewModel : ViewModel() {
 
+    var pdfPath: String? = null
     var bookmarks: List<Bookmark>? = null
         get() = field
 
@@ -44,6 +46,7 @@ class PDFViewModel : ViewModel() {
 
     fun loadPdfDoc(context: Context, path: String, password: String?) = flow {
         try {
+            pdfPath = path
             mupdfDocument = MupdfDocument(context)
             mupdfDocument!!.newDocument(path, password)
             mupdfDocument!!.let {
@@ -277,6 +280,7 @@ class PDFViewModel : ViewModel() {
         get() = _textFlow
 
     suspend fun loadTextDoc(path: String) = flow {
+        pdfPath = path
         emit(TextHelper.readString(path))
     }.flowOn(Dispatchers.IO)
         .collectLatest {
@@ -299,6 +303,7 @@ class PDFViewModel : ViewModel() {
 
     suspend fun loadPdfDoc2(context: Context, path: String, password: String?) = flow {
         try {
+            pdfPath = path
             mupdfDocument = MupdfDocument(context)
             mupdfDocument!!.newDocument(path, password)
             mupdfDocument!!.let {
@@ -347,5 +352,17 @@ class PDFViewModel : ViewModel() {
         val pointf = PointF(w, h)
         p.destroy()
         return APage(pageNum, pointf, 1.0f/*zoomModel!!.zoom*/, 0)
+    }
+
+    fun destroy() {
+        mupdfDocument?.destroy()
+    }
+
+    fun countPages(): Int {
+        return mupdfDocument?.countPages() ?: 0
+    }
+
+    fun loadPage(pageNum: Int): Page? {
+        return mupdfDocument?.loadPage(pageNum)
     }
 }

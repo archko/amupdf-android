@@ -12,9 +12,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.LoadResult
@@ -31,6 +35,7 @@ fun TextViewer(
     onClick: (pos: Int) -> Unit,
     height: Int,
     margin: Int,
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     modifier: Modifier = Modifier,
 ) {
     val list = result.list!!
@@ -73,7 +78,26 @@ fun TextViewer(
             coroutineScope.launch {
                 listState.scrollToItem(pdfViewModel.getCurrentPage())
             }
+            val observer = LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_PAUSE) {
+                    pdfViewModel.bookProgress?.run {
+                        autoCrop = 0
+                        val position = listState.firstVisibleItemIndex
+                        pdfViewModel.saveBookProgress(
+                            pdfViewModel.pdfPath,
+                            pdfViewModel.countPages(),
+                            position,
+                            pdfViewModel.bookProgress!!.zoomLevel,
+                            -1,
+                            listState.firstVisibleItemScrollOffset
+                        )
+                    }
+                }
+            }
+
+            lifecycleOwner.lifecycle.addObserver(observer)
             onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
         LazyColumn(

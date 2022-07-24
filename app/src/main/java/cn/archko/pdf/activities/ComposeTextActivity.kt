@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.LocalBackPressedDispatcher
+import cn.archko.pdf.common.BitmapCache
+import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.PdfOptionRepository
@@ -43,6 +45,7 @@ import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
 import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
+import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 
 /**
@@ -196,6 +199,15 @@ class ComposeTextActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         sensorHelper?.onResume()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        LiveEventBus
+            .get(Event.ACTION_STOPPED)
+            .post(path)
+        pdfViewModel.destroy()
+        BitmapCache.getInstance().clear()
     }
 
     private fun initIntent() {

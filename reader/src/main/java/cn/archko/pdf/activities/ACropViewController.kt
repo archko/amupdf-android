@@ -17,7 +17,6 @@ import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
-import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APDFPageView
 import cn.archko.pdf.widgets.APageSeekBarControls
@@ -39,7 +38,6 @@ class ACropViewController(
     OutlineListener, AViewController {
 
     private lateinit var mRecyclerView: RecyclerView
-    private var mMupdfDocument: MupdfDocument? = null
     private lateinit var mPageSizes: SparseArray<APage>
 
     init {
@@ -69,12 +67,11 @@ class ACropViewController(
 
     }
 
-    override fun init(pageSizes: SparseArray<APage>, mupdfDocument: MupdfDocument?, pos: Int) {
+    override fun init(pageSizes: SparseArray<APage>, pos: Int) {
         try {
             Logcat.d("init:$this")
-            if (null != mupdfDocument) {
+            if (null != pdfViewModel.mupdfDocument) {
                 this.mPageSizes = pageSizes
-                this.mMupdfDocument = mupdfDocument
 
                 setCropMode(pos)
             }
@@ -85,11 +82,10 @@ class ACropViewController(
         }
     }
 
-    override fun doLoadDoc(pageSizes: SparseArray<APage>, mupdfDocument: MupdfDocument, pos: Int) {
+    override fun doLoadDoc(pageSizes: SparseArray<APage>, pos: Int) {
         try {
             Logcat.d("doLoadDoc:$this")
             this.mPageSizes = pageSizes
-            this.mMupdfDocument = mupdfDocument
 
             setCropMode(pos)
             addGesture()
@@ -182,7 +178,7 @@ class ACropViewController(
     }
 
     private fun updateProgress(index: Int) {
-        if (mMupdfDocument != null && mPageSeekBarControls?.visibility == View.VISIBLE) {
+        if (pdfViewModel.mupdfDocument != null && mPageSeekBarControls?.visibility == View.VISIBLE) {
             mPageSeekBarControls?.updatePageProgress(index)
         }
     }
@@ -208,13 +204,13 @@ class ACropViewController(
     }
 
     override fun onPause() {
-        if (null != mMupdfDocument) {
+        if (null != pdfViewModel.mupdfDocument) {
             pdfViewModel.bookProgress?.run {
                 autoCrop = 0
                 val position = getCurrentPos()
                 pdfViewModel.saveBookProgress(
                     mPath,
-                    mMupdfDocument!!.countPages(),
+                    pdfViewModel.countPages(),
                     position,
                     pdfViewModel.bookProgress!!.zoomLevel,
                     -1,
@@ -250,7 +246,7 @@ class ACropViewController(
                 height = it.effectivePagesHeight
             }
 
-            val view = APDFPageView(context, mMupdfDocument, pageSize!!, true)
+            val view = APDFPageView(context, pdfViewModel.mupdfDocument, pageSize!!, true)
             var lp: RecyclerView.LayoutParams? = view.layoutParams as RecyclerView.LayoutParams?
 
             Logcat.d(
@@ -286,7 +282,7 @@ class ACropViewController(
         }
 
         override fun getItemCount(): Int {
-            return mMupdfDocument!!.countPages()
+            return pdfViewModel.countPages()
         }
 
         inner class PdfHolder(internal var view: APDFPageView) : RecyclerView.ViewHolder(view) {

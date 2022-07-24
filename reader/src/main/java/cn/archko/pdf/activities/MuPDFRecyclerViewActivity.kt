@@ -27,7 +27,6 @@ import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.listeners.AViewController
-import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -51,7 +50,6 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     protected var pageNumberToast: Toast? = null
 
     protected var sensorHelper: SensorHelper? = null
-    protected var mMupdfDocument: MupdfDocument? = null
     protected var mPageSizes = SparseArray<APage>()
 
     protected var mReflow = false
@@ -152,7 +150,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         LiveEventBus
             .get(Event.ACTION_STOPPED)
             .post(mPath)
-        mMupdfDocument?.destroy()
+        pdfViewModel.destroy()
         progressDialog.dismiss()
         BitmapCache.getInstance().clear()
     }
@@ -188,7 +186,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
             return
         }
         val pos = getCurrentPos()
-        val pageText = (pos + 1).toString() + "/" + mMupdfDocument?.countPages()
+        val pageText = (pos + 1).toString() + "/" + pdfViewModel.countPages()
         if (pageNumberToast != null) {
             pageNumberToast!!.setText(pageText)
         } else {
@@ -291,10 +289,8 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
             val start = SystemClock.uptimeMillis()
             pdfViewModel.loadPdfDoc(this@MuPDFRecyclerViewActivity, mPath!!, getPassword())
                 .collectLatest {
-                    mMupdfDocument = it
-
-                    if (mMupdfDocument != null) {
-                        val cp = mMupdfDocument!!.countPages()
+                    val cp = pdfViewModel.countPages()
+                    if (cp > 0) {
                         Logcat.d(TAG, "open:" + (SystemClock.uptimeMillis() - start) + " cp:" + cp)
 
                         //val loc = mDocument!!.layout(mLayoutW, mLayoutH, mLayoutEM)
@@ -315,7 +311,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     }
 
     open fun getPageSize(pageNum: Int): APage? {
-        val p = mMupdfDocument?.loadPage(pageNum) ?: return null
+        val p = pdfViewModel.loadPage(pageNum) ?: return null
 
         //Logcat.d(TAG, "open:getPageSize.$pageNum page:$p")
         val b = p.bounds

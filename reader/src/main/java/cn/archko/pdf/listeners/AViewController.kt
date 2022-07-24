@@ -11,8 +11,8 @@ import cn.archko.pdf.mupdf.MupdfDocument
  */
 interface AViewController {
 
-    fun init(pageSizes: SparseArray<APage>, mupdfDocument: MupdfDocument?, pos: Int)
-    fun doLoadDoc(pageSizes: SparseArray<APage>, mupdfDocument: MupdfDocument, pos: Int)
+    fun init(pageSizes: SparseArray<APage>, pos: Int)
+    fun doLoadDoc(pageSizes: SparseArray<APage>, pos: Int)
 
     fun getDocumentView(): View
     fun onSingleTap()

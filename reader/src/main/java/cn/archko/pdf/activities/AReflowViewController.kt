@@ -27,7 +27,6 @@ import cn.archko.pdf.fragments.FontsFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.DataListener
 import cn.archko.pdf.listeners.OutlineListener
-import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
@@ -60,7 +59,6 @@ class AReflowViewController(
 
     private lateinit var mRecyclerView: RecyclerView
     private var mStyleHelper: StyleHelper? = null
-    private var mMupdfDocument: MupdfDocument? = null
     private val START_PROGRESS = 15
     private lateinit var mPageSizes: SparseArray<APage>
     private var scope: CoroutineScope? = null
@@ -91,16 +89,15 @@ class AReflowViewController(
         }
     }
 
-    override fun init(pageSizes: SparseArray<APage>, mupdfDocument: MupdfDocument?, pos: Int) {
+    override fun init(pageSizes: SparseArray<APage>, pos: Int) {
         try {
             if (scope == null || !scope!!.isActive) {
                 scope =
                     CoroutineScope(Job() + AppExecutors.instance.diskIO().asCoroutineDispatcher())
             }
             Logcat.d("init:$this")
-            if (null != mupdfDocument) {
+            if (null != pdfViewModel.mupdfDocument) {
                 this.mPageSizes = pageSizes
-                this.mMupdfDocument = mupdfDocument
 
                 setReflowMode(pos)
             }
@@ -111,11 +108,10 @@ class AReflowViewController(
         }
     }
 
-    override fun doLoadDoc(pageSizes: SparseArray<APage>, mupdfDocument: MupdfDocument, pos: Int) {
+    override fun doLoadDoc(pageSizes: SparseArray<APage>, pos: Int) {
         try {
             Logcat.d("doLoadDoc:$this")
             this.mPageSizes = pageSizes
-            this.mMupdfDocument = mupdfDocument
 
             setReflowMode(pos)
         } catch (e: Exception) {
@@ -143,7 +139,13 @@ class AReflowViewController(
         if (null == mRecyclerView.adapter) {
 
             mRecyclerView.adapter =
-                MuPDFReflowAdapter(context, mMupdfDocument, mStyleHelper, scope, pdfViewModel)
+                MuPDFReflowAdapter(
+                    context,
+                    pdfViewModel.mupdfDocument,
+                    mStyleHelper,
+                    scope,
+                    pdfViewModel
+                )
         } else {
             (mRecyclerView.adapter as MuPDFReflowAdapter).setScope(scope)
         }
@@ -220,7 +222,7 @@ class AReflowViewController(
     }
 
     fun updateProgress(index: Int) {
-        if (mMupdfDocument != null && mPageSeekBarControls?.visibility == View.VISIBLE) {
+        if (pdfViewModel.mupdfDocument != null && mPageSeekBarControls?.visibility == View.VISIBLE) {
             mPageSeekBarControls?.updatePageProgress(index)
         }
     }
@@ -242,13 +244,13 @@ class AReflowViewController(
     }
 
     override fun onPause() {
-        if (null != mMupdfDocument) {
+        if (null != pdfViewModel.mupdfDocument) {
             pdfViewModel.bookProgress?.run {
                 reflow = 1
                 val position = getCurrentPos()
                 pdfViewModel.saveBookProgress(
                     mPath,
-                    mMupdfDocument!!.countPages(),
+                    pdfViewModel.countPages(),
                     position,
                     pdfViewModel.bookProgress!!.zoomLevel,
                     -1,
