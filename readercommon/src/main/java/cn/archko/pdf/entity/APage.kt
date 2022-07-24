@@ -189,30 +189,37 @@ class APage {
             return cropHeight
         }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
-        val aPage = o as APage
-        if (index != aPage.index) return false
-        if (java.lang.Float.compare(aPage.zoom, zoom) != 0) return false
-        if (targetWidth != aPage.targetWidth) return false
-        if (java.lang.Float.compare(aPage.scale, scale) != 0) return false
-        if (java.lang.Float.compare(aPage.cropScale, cropScale) != 0) return false
-        if (if (pageSize != null) pageSize != aPage.pageSize else aPage.pageSize != null) return false
-        if (if (sourceBounds != null) sourceBounds != aPage.sourceBounds else aPage.sourceBounds != null) return false
-        return if (cropBounds != null) cropBounds == aPage.cropBounds else aPage.cropBounds == null
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as APage
+
+        if (index != other.index) return false
+        if (pageSize != other.pageSize) return false
+        if (zoom != other.zoom) return false
+        if (targetWidth != other.targetWidth) return false
+        if (scale != other.scale) return false
+        if (cropScale != other.cropScale) return false
+        if (sourceBounds != other.sourceBounds) return false
+        if (cropBounds != other.cropBounds) return false
+        if (cropWidth != other.cropWidth) return false
+        if (cropHeight != other.cropHeight) return false
+
+        return true
     }
 
     override fun hashCode(): Int {
         var result = index
-        result = 31 * result + if (pageSize != null) pageSize.hashCode() else 0
-        result = 31 * result + if (zoom != +0.0f) java.lang.Float.floatToIntBits(zoom) else 0
+        result = 31 * result + (pageSize?.hashCode() ?: 0)
+        result = 31 * result + zoom.hashCode()
         result = 31 * result + targetWidth
-        result = 31 * result + if (scale != +0.0f) java.lang.Float.floatToIntBits(scale) else 0
-        result =
-            31 * result + if (cropScale != +0.0f) java.lang.Float.floatToIntBits(cropScale) else 0
-        result = 31 * result + if (sourceBounds != null) sourceBounds.hashCode() else 0
-        result = 31 * result + if (cropBounds != null) cropBounds.hashCode() else 0
+        result = 31 * result + scale.hashCode()
+        result = 31 * result + cropScale.hashCode()
+        result = 31 * result + (sourceBounds?.hashCode() ?: 0)
+        result = 31 * result + (cropBounds?.hashCode() ?: 0)
+        result = 31 * result + cropWidth
+        result = 31 * result + cropHeight
         return result
     }
 

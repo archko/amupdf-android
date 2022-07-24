@@ -64,7 +64,7 @@ object PdfImageDecoder {
             MupdfDocument.render(page, ctm, bitmap, decodeParam.xOrigin, leftBound, topBound)
             page.destroy()
             //Logcat.d(TAG, "decode:" + (SystemClock.uptimeMillis() - start));
-            BitmapCache.getInstance().addBitmap(decodeParam.key, bitmap)
+            //BitmapCache.getInstance().addBitmap(decodeParam.key, bitmap)
             return bitmap
         } catch (e: Exception) {
             if (Logcat.loggable) {

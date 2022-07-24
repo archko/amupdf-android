@@ -36,13 +36,12 @@ class PDFViewModel : ViewModel() {
 
     var pdfPath: String? = null
     var bookmarks: List<Bookmark>? = null
-        get() = field
 
     var bookProgress: BookProgress? = null
         private set
     var mupdfDocument: MupdfDocument? = null
-        get() = field
     val mPageSizes = mutableListOf<APage>()
+    var txtPageCount: Int = 1
 
     fun loadPdfDoc(context: Context, path: String, password: String?) = flow {
         try {
@@ -281,7 +280,9 @@ class PDFViewModel : ViewModel() {
 
     suspend fun loadTextDoc(path: String) = flow {
         pdfPath = path
-        emit(TextHelper.readString(path))
+        val reflowBeans = TextHelper.readString(path)
+        txtPageCount = reflowBeans.size
+        emit(reflowBeans)
     }.flowOn(Dispatchers.IO)
         .collectLatest {
             if (it.isNotEmpty()) {
@@ -359,6 +360,9 @@ class PDFViewModel : ViewModel() {
     }
 
     fun countPages(): Int {
+        if (!TextUtils.isEmpty(pdfPath) && pdfPath!!.endsWith("txt", true)) {
+            return txtPageCount
+        }
         return mupdfDocument?.countPages() ?: 0
     }
 

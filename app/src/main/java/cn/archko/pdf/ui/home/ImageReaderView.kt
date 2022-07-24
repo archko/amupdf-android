@@ -1,3 +1,4 @@
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
@@ -23,6 +25,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
@@ -71,7 +74,12 @@ fun ImageViewer(
     val coroutineScope = rememberCoroutineScope()
 
     val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
+    val screenHeight = with(LocalDensity.current) {
+        configuration.screenHeightDp.dp.toPx()
+    }
+    val screenWidth = with(LocalDensity.current) {
+        configuration.screenWidthDp.dp.toPx()
+    }
 
     Box(
         modifier = modifier
@@ -82,23 +90,16 @@ fun ImageViewer(
                     onDoubleTap = {
                     },
                     onTap = {
-                        coroutineScope.launch {
-                            val h = screenHeight.toPx()
-                            val top = h / 4
-                            val bottom = h * 3 / 4
-                            val y = it.y   //点击的位置
-                            var scrollY = 0
-                            if (y < top) {
-                                scrollY -= h.toInt()
-                                listState.scrollBy((scrollY - margin).toFloat())
-                            } else if (y > bottom) {
-                                scrollY += h.toInt()
-                                listState.scrollBy((scrollY + margin).toFloat())
-                            } else {
-                                onClick(listState.firstVisibleItemIndex)
-                            }
-                            Logcat.d("scroll:$top, bottom:$bottom, y:$y,h:$h, screenHeight:$screenHeight, margin:$margin, scrollY:$scrollY, firstVisibleItemIndex:${listState.firstVisibleItemIndex}")
-                        }
+                        scrollOnTab(
+                            coroutineScope,
+                            listState,
+                            it,
+                            configuration,
+                            screenHeight,
+                            screenWidth,
+                            margin,
+                            onClick
+                        )
                     }
                 )
             }) {
@@ -151,6 +152,47 @@ fun ImageViewer(
     }
 }
 
+fun scrollOnTab(
+    coroutineScope: CoroutineScope,
+    listState: LazyListState,
+    offset: Offset,
+    configuration: Configuration,
+    screenHeight: Float,
+    screenWidth: Float,
+    margin: Int,
+    onClick: (pos: Int) -> Unit
+) {
+    coroutineScope.launch {
+        val h = if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            if (screenWidth < screenHeight) {
+                screenHeight
+            } else {
+                screenWidth
+            }
+        } else {
+            if (screenWidth < screenHeight) {
+                screenWidth
+            } else {
+                screenHeight
+            }
+        }
+        val top = h / 4
+        val bottom = h * 3 / 4
+        val y = offset.y   //点击的位置
+        var scrollY = 0
+        if (y < top) {
+            scrollY -= h.toInt()
+            listState.scrollBy((scrollY - margin).toFloat())
+        } else if (y > bottom) {
+            scrollY += h.toInt()
+            listState.scrollBy((scrollY + margin).toFloat())
+        } else {
+            onClick(listState.firstVisibleItemIndex)
+        }
+        Logcat.d("scroll:$top, bottom:$bottom, y:$y,h:$h, screenHeight:$screenHeight, margin:$margin, scrollY:$scrollY, firstVisibleItemIndex:${listState.firstVisibleItemIndex}")
+    }
+}
+
 @Composable
 private fun ImageItem(
     mupdfDocument: MupdfDocument,
@@ -166,17 +208,31 @@ private fun ImageItem(
         val configuration = LocalConfiguration.current
         val screenHeight = configuration.screenHeightDp.dp
         val screenWidth = configuration.screenWidthDp.dp
+
+        val swidth = if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            if (screenWidth < screenHeight) {
+                screenWidth
+            } else {
+                screenHeight
+            }
+        } else {
+            if (screenWidth < screenHeight) {
+                screenHeight
+            } else {
+                screenWidth
+            }
+        }
         val h: Float =
-            aPage.effectivePagesHeight.toFloat() * screenWidth.value / aPage.effectivePagesWidth
+            aPage.effectivePagesHeight.toFloat() * swidth.value / aPage.effectivePagesWidth
         val theDp = h.dp
         val w = with(LocalDensity.current) {
-            screenWidth.toPx()
+            swidth.toPx()
         }
         if (aPage.getTargetWidth() != w.toInt()) {
             aPage.setTargetWidth(w.toInt())
         }
 
-        //Logcat.d("h:$h, theDp:$theDp,w:$w, width:$width, height:$height, screenHeight:$screenHeight, screenWidth:$screenWidth, aPage.effectivePagesWidth:${aPage.effectivePagesWidth}, aPage:$aPage")
+        Logcat.d("h:$h, theDp:$theDp,w:$w, width:$width, height:$height, swidth:$swidth screenHeight:$screenHeight, screenWidth:$screenWidth, aPage.effectivePagesWidth:${aPage.effectivePagesWidth}, aPage:$aPage")
 
         /*
         使用painter
@@ -230,20 +286,20 @@ private fun ImageItem(
         }*/
 
         //使用同步加载
-        val imageState = loadPage(aPage, mupdfDocument)
+        //val imageState = loadPage(aPage, mupdfDocument)
 
         //在DisposableEffect中使用flow异步加载
-        //val imageState: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-        //asyncDecodePage(aPage, mupdfDocument, imageState)
+        val imageState: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+        asyncDecodePage(aPage, mupdfDocument, imageState)
 
         if (imageState.value != null) {
             val bitmap = imageState.value
             val bh = with(LocalDensity.current) {
                 bitmap!!.height.toDp()
             }
-            Logcat.d("bitmap:${bitmap!!.width}, h:${bitmap.height},bh:$bh, width:$width, height:$height, screenHeight:$screenHeight, screenWidth:$screenWidth, aPage.effectivePagesWidth:${aPage.effectivePagesWidth}, aPage:$aPage")
+            //Logcat.d("bitmap:${bitmap!!.width}, h:${bitmap.height},bh:$bh, width:$width, height:$height, screenHeight:$screenHeight, screenWidth:$screenWidth, aPage.effectivePagesWidth:${aPage.effectivePagesWidth}, aPage:$aPage")
             Image(
-                bitmap = bitmap.asImageBitmap(),
+                bitmap = bitmap!!.asImageBitmap(),
                 contentDescription = "",
                 modifier = Modifier
                     .fillMaxWidth()
@@ -315,7 +371,7 @@ fun asyncDecodePage(
     mupdfDocument: MupdfDocument,
     imageState: MutableState<Bitmap?>
 ) {
-    DisposableEffect(aPage) {
+    DisposableEffect(aPage.getTargetWidth()) {
         val decodeParam = DecodeParam(
             aPage.toString(),
             true,
