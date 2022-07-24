@@ -193,6 +193,7 @@ class TextActivity : AppCompatActivity() {
         recyclerView?.adapter = adapter
 
         lifecycleScope.launch {
+            pdfViewModel.loadTextDoc(path!!)
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 pdfViewModel.textFlow.collect {
                     adapter?.data = it.list
