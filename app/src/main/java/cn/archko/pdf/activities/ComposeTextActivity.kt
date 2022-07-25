@@ -2,6 +2,7 @@ package cn.archko.pdf.activities
 
 import ImageViewer
 import TextViewer
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -39,6 +40,7 @@ import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
+import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.entity.State
 import cn.archko.pdf.ui.home.LoadingView
 import cn.archko.pdf.utils.Utils
@@ -58,6 +60,7 @@ class ComposeTextActivity : ComponentActivity() {
     private var sensorHelper: SensorHelper? = null
     private val preferencesRepository = PdfOptionRepository(Graph.dataStore)
     private val pdfViewModel: PDFViewModel = PDFViewModel()
+    private var mStyleHelper: StyleHelper? = null
     protected var pageNumberToast: Toast? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,6 +75,7 @@ class ComposeTextActivity : ComponentActivity() {
             return
         }
 
+        mStyleHelper = StyleHelper(this, preferencesRepository)
         sensorHelper = SensorHelper(this@ComposeTextActivity)
         lifecycleScope.launch {
             pdfViewModel.loadBookProgressByPath(path!!, preferencesRepository)
@@ -88,6 +92,7 @@ class ComposeTextActivity : ComponentActivity() {
         finish()
     }
 
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalMaterial3Api::class)
     private fun setView() {
         var margin = window.decorView.height
@@ -133,6 +138,7 @@ class ComposeTextActivity : ComponentActivity() {
                                         TextViewer(
                                             result = result,
                                             pdfViewModel = pdfViewModel,
+                                            styleHelper = mStyleHelper,
                                             onClick = { pos -> showToast(pos, result.list!!.size) },
                                             height = window.decorView.height,
                                             margin = margin,

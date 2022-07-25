@@ -290,7 +290,7 @@ private fun ImageItem(
 
         //在DisposableEffect中使用flow异步加载
         val imageState: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-        asyncDecodePage(aPage, mupdfDocument, imageState)
+        AsyncDecodePage(aPage, mupdfDocument, imageState)
 
         if (imageState.value != null) {
             val bitmap = imageState.value
@@ -366,7 +366,7 @@ fun loadPage(
 }
 
 @Composable
-fun asyncDecodePage(
+private fun AsyncDecodePage(
     aPage: APage,
     mupdfDocument: MupdfDocument,
     imageState: MutableState<Bitmap?>
