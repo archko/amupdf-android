@@ -26,7 +26,7 @@ class CakeView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
     private var ctx: Context? = null
     private var format: DecimalFormat? = null
-    private var mList: MutableList<BaseMessage> = ArrayList()
+    private var mList: MutableList<BaseMenu> = ArrayList()
     private var arcPaint: Paint? = null
     private var linePaint: Paint? = null
     private var textPaint: Paint? = null
@@ -247,7 +247,7 @@ class CakeView @JvmOverloads constructor(
      *
      * @param list
      */
-    fun setCakeData(list: MutableList<BaseMessage>?) {
+    fun setCakeData(list: MutableList<BaseMenu>?) {
         total = 0f
         if (list == null) {
             return
