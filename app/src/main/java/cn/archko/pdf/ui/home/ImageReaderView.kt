@@ -1,16 +1,21 @@
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.graphics.PointF
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -18,6 +23,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,15 +32,25 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.center
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -48,14 +64,20 @@ import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.paging.itemsIndexed
 import cn.archko.pdf.ui.home.PdfImageDecoder
 import cn.archko.pdf.viewmodel.PDFViewModel
+import cn.archko.pdf.widgets.BaseMenu
+import cn.archko.pdf.widgets.CakeView
 import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.math.cos
+import kotlin.math.sin
 
 @Composable
 fun ImageViewer(
@@ -72,6 +94,7 @@ fun ImageViewer(
     val list = result.list!!
     val listState = rememberLazyListState(0)
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val configuration = LocalConfiguration.current
     val screenHeight = with(LocalDensity.current) {
@@ -81,6 +104,8 @@ fun ImageViewer(
         configuration.screenWidthDp.dp.toPx()
     }
 
+    val showMenu = remember { mutableStateOf(false) }
+
     Box(
         modifier = modifier
             .pointerInput(Unit) {
@@ -88,8 +113,10 @@ fun ImageViewer(
                     onPress = {
                     },
                     onDoubleTap = {
+                        showMenu.value = !showMenu.value
                     },
                     onTap = {
+                        showMenu.value = false
                         scrollOnTab(
                             coroutineScope,
                             listState,
@@ -129,27 +156,212 @@ fun ImageViewer(
                 lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
-        LazyColumn(
-            state = listState,
-            flingBehavior = StockFlingBehaviours.smoothScroll(),
-            modifier = modifier
-        ) {
-
-            itemsIndexed(list) { index, aPage ->
-                if (index > 0) {
-                    Divider(thickness = 1.dp)
-                }
-                aPage?.let {
-                    ImageItem(
-                        mupdfDocument = mupdfDocument,
-                        width = width,
-                        height = height,
-                        aPage = aPage
-                    )
+        Box(modifier = modifier) {
+            LazyColumn(
+                state = listState,
+                flingBehavior = StockFlingBehaviours.smoothScroll(),
+                modifier = modifier
+            ) {
+                itemsIndexed(list) { index, aPage ->
+                    if (index > 0) {
+                        Divider(thickness = 1.dp)
+                    }
+                    aPage?.let {
+                        ImageItem(
+                            mupdfDocument = mupdfDocument,
+                            width = width,
+                            height = height,
+                            aPage = aPage
+                        )
+                    }
                 }
             }
+
+            /*if (showMenu.value) {
+                val menus = arrayListOf<BaseMenu>()
+
+                val color = Color(0xff1d84fb).toArgb()
+                addMenu("设置", color, menus)
+                addMenu("重排", color, menus)
+                addMenu("切割", color, menus)
+                addMenu("字体", color, menus)
+                addMenu("大纲", color, menus)
+                addMenu("退出", color, menus)
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center),
+                ) {
+                    //draw(menus)
+                    val cakeView = remember {
+                        CakeView(context)
+                    }
+                    //cakeView.setTextColor(Color(0xffffffff).toArgb())
+                    cakeView.setCakeData(menus)
+
+                    AndroidView(
+                        { cakeView },
+                        modifier = Modifier
+                            .padding(28.dp)
+                            .width(220.dp)
+                            .height(220.dp)
+                    ) {
+                    }
+                }
+            }*/
         }
     }
+}
+
+@Composable
+fun draw(menus: ArrayList<BaseMenu>) {
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(100.dp, 100.dp, 0.dp, 0.dp)
+    ) {
+        val state = remember {
+            mutableStateOf(0f)
+        }
+        /*LaunchedEffect(state.value) {
+            state.value += 60f
+            if (state.value >= 360f) {
+                state.value = 360f
+            }
+            withContext(Dispatchers.IO) {
+                Thread.sleep(50)
+            }
+        }*/
+        var angle = state.value
+        val textPaint = Paint().asFrameworkPaint().apply {
+            isAntiAlias = true
+            textSize = 40f
+            color = Color.White.toArgb()
+        }
+        /*Canvas(
+            modifier = Modifier
+                .width(200.dp)
+                .height(200.dp)
+                .background(Color.Yellow)
+        ) {
+            val canvasWidth = size.width  // 画布的宽
+            val canvasHeight = size.height  // 画布的高
+            val stroke = 50f
+            val radius = canvasWidth / 2
+            drawCircle(
+                color = Color.Red, // 颜色
+                center = Offset(x = canvasWidth / 2, y = canvasHeight / 2), // 圆点
+                radius = radius  // 半径
+            )
+            drawLine(
+                start = Offset(x = 0f, y = canvasHeight), // 起点
+                end = Offset(x = canvasWidth, y = 0f), // 终点
+                color = Color.Blue,  // 颜色
+                strokeWidth = 2f
+            )
+            drawLine(
+                start = Offset(x = canvasWidth/2, y = canvasHeight), // 起点
+                end = Offset(x = canvasWidth/2, y = canvasHeight/2), // 终点
+                color = Color.Yellow,  // 颜色
+                strokeWidth = 2f
+            )
+            
+        }*/
+        Canvas(
+            modifier = Modifier
+                .width(200.dp)
+                .height(200.dp)
+                //.background(Color.LightGray)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onPress = {
+                        },
+                        onDoubleTap = {
+                        },
+                        onTap = {
+                            Logcat.d("onTap:$it")
+                        }
+                    )
+                }
+        ) {
+            val canvasWidth = size.width  // 画布的宽
+            val canvasHeight = size.height  // 画布的高
+            val stroke = 130f
+            val radius = canvasWidth - stroke
+            drawArc(
+                Color.Red,
+                0f, // 开始度数
+                360f, // 结束度数
+                useCenter = false, // 指示圆弧是否闭合边界中心的标志
+                // 偏移量
+                topLeft = Offset(stroke / 2, stroke / 2),
+                // 大小
+                size = Size(radius, radius),
+                // 样式
+                style = Stroke(width = stroke),
+            )
+
+            for (i in 0 until 6) {
+                val px =
+                    ((canvasWidth - stroke / 2) / 2 + radius / 2 * cos(Math.toRadians(angle.toDouble()))).toFloat()
+                val py =
+                    (canvasHeight / 2 + radius / 2 * sin(Math.toRadians(angle.toDouble()))).toFloat()
+
+                drawIntoCanvas {
+                    it.nativeCanvas.drawText(
+                        "${menus[i].content}",
+                        px,
+                        py,
+                        textPaint
+                    )
+                }
+                angle += 60f
+            }
+
+            /*angle = 100f
+            val startX =
+                ((radius) / 2 + (radius - stroke / 2) * cos(Math.toRadians(angle.toDouble()))).toFloat()
+            val startY =
+                ((radius) / 2 + (radius - stroke / 2) * sin(Math.toRadians(angle.toDouble()))).toFloat()
+            val stopX =
+                ((radius) / 2 + (radius + stroke / 2) * cos(Math.toRadians(angle.toDouble()))).toFloat()
+            val stopY =
+                ((radius) / 2 + (radius + stroke / 2) * sin(Math.toRadians(angle.toDouble()))).toFloat()
+            drawLine(
+                start = Offset(x = radius / 2 + stroke / 2, y = radius / 2 + stroke / 2), // 起点
+                end = Offset(x = stopX, y = stopY), // 终点
+                color = Color.Green,  // 颜色
+                strokeWidth = 10f
+            )*/
+        }
+    }
+}
+
+private fun getLinePointFs(
+    angle: Float,
+    size: Size,
+    radius: Float,
+    strokeWidth: Float
+): Array<PointF> {
+    val stopX =
+        (size.center.x / 2 + (radius + strokeWidth / 2) * cos(Math.toRadians(angle.toDouble()))).toFloat()
+    val stopY =
+        (size.center.y / 2 + (radius + strokeWidth / 2) * sin(Math.toRadians(angle.toDouble()))).toFloat()
+    val startX =
+        (size.center.x / 2 + (radius - strokeWidth / 2) * cos(Math.toRadians(angle.toDouble()))).toFloat()
+    val startY =
+        (size.center.y / 2 + (radius - strokeWidth / 2) * sin(Math.toRadians(angle.toDouble()))).toFloat()
+    val startPoint = PointF(startX, startY)
+    val stopPoint = PointF(stopX, stopY)
+    return arrayOf(startPoint, stopPoint)
+}
+
+fun addMenu(text: String, color: Int, list: ArrayList<BaseMenu>) {
+    val menu = BaseMenu()
+    menu.content = text
+    menu.color = color
+    menu.percent = 60f
+    list.add(menu)
 }
 
 fun scrollOnTab(

@@ -196,13 +196,13 @@ class CakeView @JvmOverloads constructor(
             textPaint!!.textAlign = Paint.Align.CENTER
             val text = mList[i].content
             canvas.drawText(text!!, textList[i].x, textList[i].y, textPaint!!)
-            val fm = textPaint!!.fontMetrics
+            /*val fm = textPaint!!.fontMetrics
             canvas.drawText(
                 format!!.format((mList[i].percent * 100 / total).toDouble()) + "%",
                 textList[i].x,
                 textList[i].y + (fm.descent - fm.ascent),
                 textPaint!!
-            )
+            )*/
         }
     }
 
