@@ -1,6 +1,7 @@
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.PointF
+import android.view.View
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -177,7 +178,7 @@ fun ImageViewer(
                 }
             }
 
-            /*if (showMenu.value) {
+            if (showMenu.value) {
                 val menus = arrayListOf<BaseMenu>()
 
                 val color = Color(0xff1d84fb).toArgb()
@@ -198,7 +199,15 @@ fun ImageViewer(
                     }
                     //cakeView.setTextColor(Color(0xffffffff).toArgb())
                     cakeView.setCakeData(menus)
+                    cakeView.viewOnclickListener = object : CakeView.ViewOnclickListener {
+                        override fun onViewClick(v: View?, position: Int) {
 
+                        }
+
+                        override fun onViewCenterClick() {
+
+                        }
+                    }
                     AndroidView(
                         { cakeView },
                         modifier = Modifier
@@ -208,7 +217,7 @@ fun ImageViewer(
                     ) {
                     }
                 }
-            }*/
+            }
         }
     }
 }
@@ -534,11 +543,12 @@ private fun LoadingView(
     text: String = "Decoding"
 ) {
     Column(
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
     ) {
+        Spacer(modifier = Modifier.height(40.dp))
         Text(
             text,
             style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),

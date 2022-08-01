@@ -38,7 +38,9 @@ fun FileFavoritiesList(
         viewModel.loadFavorities()
     }
     val onClick: (FileBean) -> Unit = { it ->
-        PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
+        it.file?.run {
+            PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
+        }
     }
     val refresh: () -> Unit = { ->
         viewModel.loadFavorities(true)
@@ -50,8 +52,8 @@ fun FileFavoritiesList(
         showUserDialog.value = false
         when (menuType) {
             MenuItemType.ViewBookWithAMupdf -> {
-                if (fb.file != null) {
-                    PDFViewerHelper.openWithDefaultViewer(fb.file!!, context)
+                fb.file?.run {
+                    PDFViewerHelper.openComposeViewerMupdf(this, context)
                 }
             }
             MenuItemType.ViewBookWithMupdf -> {
@@ -73,6 +75,7 @@ fun FileFavoritiesList(
             MenuItemType.DeleteFav -> {
                 viewModel.favorite(context, fb, 0, true)
             }
+            else -> {}
         }
     }
     Box(modifier = Modifier.fillMaxSize()) {

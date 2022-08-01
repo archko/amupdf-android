@@ -82,15 +82,12 @@ fun FileBrowserList(
         showUserDialog.value = false
         when (menuType) {
             MenuItemType.ViewBookWithAMupdf -> {
-                if (fb.file != null) {
-                    PDFViewerHelper.openWithDefaultViewer(fb.file!!, context)
+                fb.file?.run {
+                    PDFViewerHelper.openComposeViewerMupdf(this, context)
                 }
             }
             MenuItemType.ViewBookWithMupdf -> {
                 PDFViewerHelper.openViewerMupdf(fb.file!!, context)
-            }
-            MenuItemType.ViewBookWithComposeMupdf -> {
-                PDFViewerHelper.openComposeViewerMupdf(fb.file!!, context)
             }
             MenuItemType.OpenWithOther -> {
                 PDFViewerHelper.openViewerOther(fb.file!!, context)
@@ -111,6 +108,7 @@ fun FileBrowserList(
             MenuItemType.DeleteFav -> {
                 viewModel.favorite(context, fb, 0)
             }
+            else -> {}
         }
     }
     Box(modifier = Modifier.fillMaxSize()) {

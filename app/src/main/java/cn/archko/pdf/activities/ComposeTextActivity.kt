@@ -5,7 +5,6 @@ import TextViewer
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Gravity
@@ -13,24 +12,38 @@ import android.view.ViewConfiguration
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.LocalBackPressedDispatcher
@@ -42,7 +55,6 @@ import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.entity.State
-import cn.archko.pdf.ui.home.LoadingView
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
@@ -56,7 +68,6 @@ import kotlinx.coroutines.launch
 class ComposeTextActivity : ComponentActivity() {
 
     private var path: String? = null
-    private var mUri: Uri? = null
     private var sensorHelper: SensorHelper? = null
     private val preferencesRepository = PdfOptionRepository(Graph.dataStore)
     private val pdfViewModel: PDFViewModel = PDFViewModel()
@@ -131,7 +142,7 @@ class ComposeTextActivity : ComponentActivity() {
                                     }
                                     showLoading.value = (result.state != State.FINISHED)
                                     if (result.state == State.INIT || result.list == null) {
-                                        LoadingView(showLoading)
+                                        LoadingView()
                                     } else if (State.ERROR == result.state) {
                                         error()
                                     } else {
@@ -158,7 +169,7 @@ class ComposeTextActivity : ComponentActivity() {
                                     }
                                     showLoading.value = (result.state != State.FINISHED)
                                     if (result.state == State.INIT || result.list == null || pdfViewModel.mupdfDocument == null) {
-                                        LoadingView(showLoading)
+                                        LoadingView()
                                     } else if (State.ERROR == result.state) {
                                         error()
                                     } else {
@@ -178,6 +189,39 @@ class ComposeTextActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun LoadingView(
+        text: String = "Loading"
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Top,
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+        ) {
+            Spacer(modifier = Modifier.height(40.dp))
+            Text(
+                text,
+                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(12.dp)
+            )
+            /*CircularProgressIndicator(
+                strokeWidth = 2.dp,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(20.dp)
+            )*/
+            Spacer(modifier = Modifier.height(20.dp))
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .height(8.dp)
+                    .align(alignment = Alignment.CenterHorizontally)
+            )
         }
     }
 

@@ -32,7 +32,6 @@ class PDFViewerHelper {
         const val documentContextMenuItem = Menu.FIRST + 115
         const val addToFavoriteContextMenuItem = Menu.FIRST + 116
         const val removeFromFavoriteContextMenuItem = Menu.FIRST + 117
-        const val composeViewContextMenuItem = Menu.FIRST + 118
 
         fun openWithDefaultViewer(f: File, activity: Context) {
             val map = HashMap<String, String>()
@@ -40,10 +39,10 @@ class PDFViewerHelper {
             map["name"] = f.name
             MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
             Logcat.i(Logcat.TAG, "post intent to open file $f")
-            if (f.absolutePath.endsWith("txt", true)) {
-                //Toast.makeText(activity, "can't load f:${f.absolutePath}", Toast.LENGTH_SHORT).show()
-                //return
-            }
+            //if (f.absolutePath.endsWith("txt", true)) {
+            //    Toast.makeText(activity, "can't load f:${f.absolutePath}", Toast.LENGTH_SHORT).show()
+            //    return
+            //}
             openWithDefaultViewer(Uri.fromFile(f), activity)
         }
 
@@ -90,9 +89,6 @@ class PDFViewerHelper {
                     intent.setClass(activity, cn.archko.pdf.activities.DocumentActivity::class.java)
                     // API>=21: intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT); /* launch as a new document */
                     activity.startActivity(intent)
-                }
-                composeViewContextMenuItem -> {
-                    openComposeViewerMupdf(clickedFile, activity)
                 }
                 otherContextMenuItem -> {
                     val map = mapOf("type" to "other", "name" to clickedFile.name)

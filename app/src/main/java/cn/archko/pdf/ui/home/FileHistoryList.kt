@@ -39,7 +39,9 @@ fun FileHistoryList(
         viewModel.loadHistories()
     }
     val onClick: (FileBean) -> Unit = { it ->
-        PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
+        it.file?.run {
+            PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
+        }
     }
     val refresh: () -> Unit = { ->
         viewModel.loadHistories(true)
@@ -51,15 +53,12 @@ fun FileHistoryList(
         showUserDialog.value = false
         when (menuType) {
             MenuItemType.ViewBookWithAMupdf -> {
-                if (fb.file != null) {
-                    PDFViewerHelper.openWithDefaultViewer(fb.file!!, context)
+                fb.file?.run {
+                    PDFViewerHelper.openComposeViewerMupdf(this, context)
                 }
             }
             MenuItemType.ViewBookWithMupdf -> {
                 PDFViewerHelper.openViewerMupdf(fb.file!!, context)
-            }
-            MenuItemType.ViewBookWithComposeMupdf -> {
-                PDFViewerHelper.openComposeViewerMupdf(fb.file!!, context)
             }
             MenuItemType.OpenWithOther -> {
                 PDFViewerHelper.openViewerOther(fb.file!!, context)
@@ -81,6 +80,7 @@ fun FileHistoryList(
             MenuItemType.DeleteFav -> {
                 viewModel.favorite(context, fb, 0)
             }
+            else -> {}
         }
     }
     Box(modifier = Modifier.fillMaxSize()) {

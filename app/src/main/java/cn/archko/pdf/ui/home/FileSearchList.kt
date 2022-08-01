@@ -24,6 +24,7 @@ import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,7 +47,6 @@ import cn.archko.mupdf.R
 import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.components.Divider
-import androidx.compose.material3.Surface
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.model.SearchSuggestionGroup
 import cn.archko.pdf.viewmodel.FileViewModel
@@ -61,9 +61,10 @@ fun FileSearchList(
 ) {
     val context = LocalContext.current
     val onClick: (FileBean) -> Unit = { it ->
-        if (it.isDirectory) {
-        } else {
-            PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
+        it.file?.run {
+            if (!it.isDirectory) {
+                PDFViewerHelper.openWithDefaultViewer(this, context)
+            }
         }
     }
     val showUserDialog = remember { mutableStateOf(false) }
@@ -74,7 +75,9 @@ fun FileSearchList(
         showUserDialog.value = false
         when (menuType) {
             MenuItemType.ViewBookWithAMupdf -> {
-                PDFViewerHelper.openWithDefaultViewer(fb.file!!, context)
+                fb.file?.run {
+                    PDFViewerHelper.openComposeViewerMupdf(this, context)
+                }
             }
             MenuItemType.ViewBookWithMupdf -> {
                 PDFViewerHelper.openViewerMupdf(fb.file!!, context)
@@ -98,6 +101,7 @@ fun FileSearchList(
             MenuItemType.DeleteFav -> {
                 viewModel.favorite(context, fb, 0)
             }
+            else -> {}
         }
     }
     Surface(modifier = modifier.fillMaxSize()) {
