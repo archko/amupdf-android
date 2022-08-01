@@ -119,7 +119,7 @@ public class ReflowTextViewHolder extends BaseViewHolder<ReflowBean> {
 
     private static String IMAGE_HEADER = "base64,";
 
-    private static BitmapBean decodeBitmap(String base64Source, float systemScale, int screenHeight, int screenWidth, Context context) {
+    public static BitmapBean decodeBitmap(String base64Source, float systemScale, int screenHeight, int screenWidth, Context context) {
         if (TextUtils.isEmpty(base64Source)) {
             return null;
         }

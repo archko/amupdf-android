@@ -1,6 +1,7 @@
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.PointF
+import android.text.Html
 import android.view.View
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -24,7 +25,6 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,27 +56,29 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import cn.archko.pdf.AppExecutors
+import cn.archko.pdf.adapters.ReflowTextViewHolder
 import cn.archko.pdf.common.ImageWorker.DecodeParam
 import cn.archko.pdf.common.Logcat
+import cn.archko.pdf.common.ParseTextMain
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.LoadResult
+import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.paging.itemsIndexed
 import cn.archko.pdf.ui.home.PdfImageDecoder
+import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.BaseMenu
 import cn.archko.pdf.widgets.CakeView
 import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -169,13 +171,24 @@ fun ImageViewer(
                     if (index > 0) {
                         Divider(thickness = 1.dp)
                     }
-                    aPage?.let {
-                        ImageItem(
-                            mupdfDocument = mupdfDocument,
-                            width = width,
-                            height = height,
-                            aPage = aPage
-                        )
+                    if (pdfViewModel.bookProgress?.reflow == 0) {
+                        aPage?.let {
+                            ImageItem(
+                                mupdfDocument = mupdfDocument,
+                                width = width,
+                                height = height,
+                                aPage = aPage
+                            )
+                        }
+                    } else {
+                        aPage?.let {
+                            ReflowItem(
+                                mupdfDocument = mupdfDocument,
+                                width = width,
+                                height = height,
+                                aPage = aPage
+                            )
+                        }
                     }
                 }
             }
@@ -542,11 +555,12 @@ private fun ImageItem(
 
 @Composable
 private fun LoadingView(
-    text: String = "Decoding"
+    text: String = "Decoding",
+    modifier: Modifier = Modifier
 ) {
     Column(
         verticalArrangement = Arrangement.Top,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight()
     ) {
@@ -608,6 +622,104 @@ private fun AsyncDecodePage(
         scope.launch {
             snapshotFlow {
                 PdfImageDecoder.decode(decodeParam)
+            }.flowOn(AppExecutors.instance.diskIO().asCoroutineDispatcher())
+                .collectLatest {
+                    imageState.value = it
+                }
+        }
+        onDispose {
+            scope.cancel()
+        }
+    }
+}
+
+@Composable
+fun ReflowItem(
+    mupdfDocument: MupdfDocument,
+    width: Int,
+    height: Int,
+    aPage: APage,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier
+            .fillMaxWidth()
+    ) {
+        val context = LocalContext.current
+        val configuration = LocalConfiguration.current
+        val screenHeight = configuration.screenHeightDp.dp
+        val screenWidth = configuration.screenWidthDp.dp
+
+        //在DisposableEffect中使用flow异步加载
+        val reflowState: MutableState<List<ReflowBean>?> = remember { mutableStateOf(null) }
+        AsyncDecodeTextPage(aPage, mupdfDocument, reflowState)
+
+        val reflowBeans = reflowState.value
+        if (reflowBeans != null) {
+            Column {
+                for (reflowBean in reflowBeans) {
+                    reflowBean.data?.let {
+                        if (reflowBean.type == ReflowBean.TYPE_STRING) {
+                            Text(
+                                Html.fromHtml(it).toString(),
+                                style = TextStyle(fontSize = 17.sp, lineHeight = 24.sp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp, 10.dp, 24.dp, 10.dp)
+                            )
+                        } else {
+                            val bean = ReflowTextViewHolder.decodeBitmap(
+                                reflowBean.data,
+                                Utils.getScale(),
+                                height,
+                                width,
+                                context
+                            )
+                            val bh = with(LocalDensity.current) {
+                                bean.height.toDp()
+                            }
+                            Image(
+                                bitmap = bean.bitmap.asImageBitmap(),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(bh)
+                                    .padding(vertical = 10.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)
+            ) {
+                LoadingView("Decoding Page:${aPage.index + 1}")
+            }
+        }
+    }
+}
+
+@Composable
+private fun AsyncDecodeTextPage(
+    aPage: APage,
+    mupdfDocument: MupdfDocument,
+    imageState: MutableState<List<ReflowBean>?>
+) {
+    DisposableEffect(aPage.index) {
+        val scope =
+            CoroutineScope(SupervisorJob() + AppExecutors.instance.diskIO().asCoroutineDispatcher())
+        scope.launch {
+            snapshotFlow {
+                val result = mupdfDocument.loadPage(aPage.index)
+                    ?.textAsText("preserve-whitespace,inhibit-spaces,preserve-images")
+                if (null != result) {
+                    ParseTextMain.instance.parseAsList(result, aPage.index)
+                } else {
+                    return@snapshotFlow null
+                }
             }.flowOn(AppExecutors.instance.diskIO().asCoroutineDispatcher())
                 .collectLatest {
                     imageState.value = it
