@@ -112,12 +112,14 @@ fun ImageViewer(
             .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = {
+                        if (showMenu.value) {
+                            showMenu.value = false
+                        }
                     },
                     onDoubleTap = {
                         showMenu.value = !showMenu.value
                     },
                     onTap = {
-                        showMenu.value = false
                         scrollOnTab(
                             coroutineScope,
                             listState,

@@ -161,13 +161,13 @@ class CakeView @JvmOverloads constructor(
         textList.clear()
         lineList.clear()
         mCanvas = canvas
-        if (mList != null) {
-            val mRectF =
+        if (mList.isNotEmpty()) {
+            val rectF =
                 RectF(centerX - radius, centerY - radius, centerX + radius, centerY + radius)
             for (i in mList.indices) {
                 arcPaint!!.color = mList[i].color
                 canvas.drawArc(
-                    mRectF,
+                    rectF,
                     startAngle,
                     mList[i].percent / total * roundAngle,
                     false,
@@ -247,9 +247,10 @@ class CakeView @JvmOverloads constructor(
      * @param canvas
      */
     private fun drawSpacingLine(canvas: Canvas?, pointFs: List<Array<PointF>>?) {
-        for (i in pointFs!!.indices) {
-            val fp = pointFs[i]
-            canvas!!.drawLine(fp[0].x, fp[0].y, fp[1].x, fp[1].y, linePaint!!)
+        canvas?.run {
+            for (fp in pointFs!!) {
+                this.drawLine(fp[0].x, fp[0].y, fp[1].x, fp[1].y, linePaint!!)
+            }
         }
     }
 
@@ -263,11 +264,7 @@ class CakeView @JvmOverloads constructor(
         for (i in textList.indices) {
             textPaint!!.textAlign = Paint.Align.CENTER
             val text = mList[i].content
-            canvas.drawText(
-                text!!, textList[i].x, textList[i].y + dip2px(
-                    context, 25f
-                ), textPaint!!
-            )
+            canvas.drawText(text!!, textList[i].x, textList[i].y, textPaint!!)
             //Paint.FontMetrics fm = textPaint.getFontMetrics();
             //canvas.drawText(format.format(mList.get(i).percent * 100 / total) + "%", textList.get(i).x, textList.get(i).y + (fm.descent - fm.ascent), textPaint);
             // 设置绘制图片的区域

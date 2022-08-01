@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -167,8 +168,7 @@ public class ReflowTextViewHolder extends BaseViewHolder<ReflowBean> {
         return true;
     }
 
-    @SuppressLint("ViewConstructor")
-    public static class PDFTextView extends RelativeLayout {
+    public static class PDFTextView extends LinearLayout {
 
         static float minImgHeight = 32;
         private StyleHelper styleHelper;
@@ -176,6 +176,7 @@ public class ReflowTextViewHolder extends BaseViewHolder<ReflowBean> {
         public PDFTextView(Context context, StyleHelper styleHelper) {
             super(context);
             this.styleHelper = styleHelper;
+            setOrientation(VERTICAL);
             setMinimumHeight(480);
             setPadding(styleHelper.getStyleBean().getLeftPadding(), styleHelper.getStyleBean().getTopPadding(),
                     styleHelper.getStyleBean().getRightPadding(), styleHelper.getStyleBean().getBottomPadding());
@@ -214,8 +215,8 @@ public class ReflowTextViewHolder extends BaseViewHolder<ReflowBean> {
                     minImgHeight = textView.getPaint().measureText("我") + 5;
                 }
             }
-            LayoutParams lp = new LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-            lp.addRule(Gravity.CENTER_HORIZONTAL);
+            LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+            lp.gravity = Gravity.CENTER_HORIZONTAL;
             addView(textView, lp);
 
             applyStyleForText(getContext(), textView);
@@ -276,7 +277,7 @@ public class ReflowTextViewHolder extends BaseViewHolder<ReflowBean> {
                 lp.bottomMargin = 20;
                 lp.leftMargin = 10;
                 lp.rightMargin = 10;
-                lp.addRule(Gravity.CENTER_HORIZONTAL);
+                lp.gravity = Gravity.CENTER_HORIZONTAL;
                 addView(imageView, lp);
                 imageView.setImageBitmap(bean.getBitmap());
             }
