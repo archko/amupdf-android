@@ -176,6 +176,7 @@ class ComposeTextActivity : ComponentActivity() {
                                         ImageViewer(
                                             result = result,
                                             pdfViewModel = pdfViewModel,
+                                            styleHelper = mStyleHelper,
                                             mupdfDocument = pdfViewModel.mupdfDocument!!,
                                             onClick = { pos -> showToast(pos, result.list!!.size) },
                                             width = window.decorView.width,

@@ -3,6 +3,7 @@ import android.graphics.Bitmap
 import android.view.View
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
@@ -57,9 +58,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import cn.archko.pdf.AppExecutors
-import cn.archko.pdf.adapters.ReflowTextViewHolder
 import cn.archko.pdf.common.ImageWorker.DecodeParam
 import cn.archko.pdf.common.Logcat
+import cn.archko.pdf.common.ParseTextMain
+import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.LoadResult
@@ -86,6 +88,7 @@ import kotlin.math.sin
 fun ImageViewer(
     result: LoadResult<Any, APage>,
     pdfViewModel: PDFViewModel,
+    styleHelper: StyleHelper?,
     mupdfDocument: MupdfDocument,
     onClick: (pos: Int) -> Unit,
     width: Int,
@@ -187,6 +190,7 @@ fun ImageViewer(
                         aPage?.let {
                             ReflowItem(
                                 mupdfDocument = mupdfDocument,
+                                styleHelper = styleHelper,
                                 width = width,
                                 height = height,
                                 aPage = aPage
@@ -620,6 +624,7 @@ private fun AsyncDecodePage(
 @Composable
 fun ReflowItem(
     mupdfDocument: MupdfDocument,
+    styleHelper: StyleHelper?,
     width: Int,
     height: Int,
     aPage: APage,
@@ -631,32 +636,40 @@ fun ReflowItem(
     ) {
         val context = LocalContext.current
 
-        //在DisposableEffect中使用flow异步加载
         val reflowState: MutableState<List<ReflowBean>?> = remember { mutableStateOf(null) }
         AsyncDecodeTextPage(aPage, mupdfDocument, reflowState)
 
+        val fontSize = styleHelper?.styleBean?.textSize ?: 17f
+        val lineHeight = fontSize.sp * 1.46f
+        val bgColor = styleHelper?.styleBean?.bgColor ?: Color.White.toArgb()
+        val fgColor = styleHelper?.styleBean?.fgColor ?: Color.Black.toArgb()
+
         val reflowBeans = reflowState.value
         if (reflowBeans != null) {
-            Column {
+            Column(modifier.background(color = Color(bgColor))) {
                 for (reflowBean in reflowBeans) {
                     reflowBean.data?.let {
                         if (reflowBean.type == ReflowBean.TYPE_STRING) {
                             Text(
                                 buildAnnotatedString {
                                     withStyle(
-                                        style = SpanStyle(fontFamily = FontFamily.SansSerif)
+                                        style = SpanStyle(fontFamily = FontFamily.Monospace)
                                     ) {
                                         append(it)
                                     }
                                 },
-                                style = TextStyle(fontSize = 17.sp, lineHeight = 24.sp),
+                                style = TextStyle(
+                                    fontSize = fontSize.sp,
+                                    lineHeight = lineHeight,
+                                    color = Color(fgColor)
+                                ),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(24.dp, 10.dp, 24.dp, 10.dp)
                             )
                         } else {
-                            val bitmap = ReflowTextViewHolder.decodeBitmap(
-                                reflowBean.data,
+                            val bitmap = ParseTextMain.decodeBitmap(
+                                reflowBean.data!!,
                                 Utils.getScale(),
                                 height,
                                 width,

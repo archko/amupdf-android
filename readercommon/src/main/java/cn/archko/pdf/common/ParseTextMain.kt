@@ -1,7 +1,14 @@
 package cn.archko.pdf.common
 
+import android.content.Context
+import android.content.res.Configuration
 import android.text.Html
+import android.text.TextUtils
+import cn.archko.pdf.common.Logcat.d
+import cn.archko.pdf.common.Logcat.i
+import cn.archko.pdf.entity.BitmapBean
 import cn.archko.pdf.entity.ReflowBean
+import cn.archko.pdf.utils.BitmapUtils
 import cn.archko.pdf.utils.StreamUtils
 import java.util.regex.Pattern
 
@@ -318,4 +325,78 @@ object ParseTextMain {
      * 最大的页面是30页,如果是30页前的,一行小于25字,认为可能是目录.在这之后的,文本重排时不认为是目录.合并为一行.
      */
     internal const val MAX_PAGEINDEX = 20
+
+    //========================== decode image ==========================
+    private const val IMAGE_HEADER = "base64,"
+
+    var minImgHeight = 32f
+        set
+        get
+
+    fun decodeBitmap(
+        base64Source: String,
+        systemScale: Float,
+        screenHeight: Int,
+        screenWidth: Int,
+        context: Context
+    ): BitmapBean? {
+        var base64Source = base64Source
+        if (TextUtils.isEmpty(base64Source)) {
+            return null
+        }
+        //Logcat.longLog("text", base64Source);
+        if (!base64Source.contains(IMAGE_HEADER)) {
+            return null
+        }
+        val index = base64Source.indexOf(IMAGE_HEADER)
+        base64Source = base64Source.substring(index + IMAGE_HEADER.length)
+        //Logcat.d("base:" + base64Source);
+        val bitmap = BitmapUtils.base64ToBitmap(
+            base64Source.replace(
+                "\"/></p>".toRegex(),
+                ""
+            ) /*.replaceAll("\\s", "")*/
+        )
+        if (null == bitmap
+            || (bitmap.width < minImgHeight
+                    && bitmap.height < minImgHeight)
+        ) {
+            i("text", "bitmap decode failed.")
+            return null
+        }
+        var width = bitmap.width * systemScale
+        var height = bitmap.height * systemScale
+        if (Logcat.loggable) {
+            d(
+                String.format(
+                    "width:%s, height:%s systemScale:%s",
+                    bitmap.width,
+                    bitmap.height,
+                    systemScale
+                )
+            )
+        }
+        var sw = screenHeight
+        if (isScreenPortrait(context)) {
+            sw = screenWidth
+        }
+        if (width > sw) {
+            val ratio = sw / width
+            height = ratio * height
+            width = sw.toFloat()
+        }
+        return BitmapBean(bitmap, width, height)
+    }
+
+    fun isScreenPortrait(context: Context): Boolean {
+        val mConfiguration = context.resources.configuration //获取设置的配置信息
+        val ori = mConfiguration.orientation //获取屏幕方向
+        if (ori == Configuration.ORIENTATION_LANDSCAPE) {
+            //横屏
+            return false
+        } else if (ori == Configuration.ORIENTATION_PORTRAIT) {
+            //竖屏
+        }
+        return true
+    }
 }

@@ -1,8 +1,6 @@
 package cn.archko.pdf.adapters;
 
 import android.content.Context;
-import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.TextUtils;
@@ -15,12 +13,11 @@ import android.widget.TextView;
 import java.util.List;
 
 import cn.archko.pdf.R;
-import cn.archko.pdf.common.Logcat;
+import cn.archko.pdf.common.ParseTextMain;
 import cn.archko.pdf.common.ReflowViewCache;
 import cn.archko.pdf.common.StyleHelper;
 import cn.archko.pdf.entity.BitmapBean;
 import cn.archko.pdf.entity.ReflowBean;
-import cn.archko.pdf.utils.BitmapUtils;
 import cn.archko.pdf.utils.Utils;
 
 /**
@@ -73,60 +70,8 @@ public class ReflowTextViewHolder extends BaseViewHolder<ReflowBean> {
         }
     }
 
-    private static String IMAGE_HEADER = "base64,";
-
-    public static BitmapBean decodeBitmap(String base64Source, float systemScale, int screenHeight, int screenWidth, Context context) {
-        if (TextUtils.isEmpty(base64Source)) {
-            return null;
-        }
-        //Logcat.longLog("text", base64Source);
-        if (!base64Source.contains(IMAGE_HEADER)) {
-            return null;
-        }
-        int index = base64Source.indexOf(IMAGE_HEADER);
-        base64Source = base64Source.substring(index + IMAGE_HEADER.length());
-        //Logcat.d("base:" + base64Source);
-        Bitmap bitmap = BitmapUtils.base64ToBitmap(base64Source.replaceAll("\"/></p>", "")/*.replaceAll("\\s", "")*/);
-
-        if (null == bitmap
-                || (bitmap.getWidth() < PDFTextView.minImgHeight
-                && bitmap.getHeight() < PDFTextView.minImgHeight)) {
-            Logcat.i("text", "bitmap decode failed.");
-            return null;
-        }
-        float width = bitmap.getWidth() * systemScale;
-        float height = bitmap.getHeight() * systemScale;
-        if (Logcat.loggable) {
-            Logcat.d(String.format("width:%s, height:%s systemScale:%s", bitmap.getWidth(), bitmap.getHeight(), systemScale));
-        }
-        int sw = screenHeight;
-        if (isScreenPortrait(context)) {
-            sw = screenWidth;
-        }
-        if (width > sw) {
-            float ratio = sw / width;
-            height = ratio * height;
-            width = sw;
-        }
-
-        return new BitmapBean(bitmap, width, height);
-    }
-
-    static boolean isScreenPortrait(Context context) {
-        Configuration mConfiguration = context.getResources().getConfiguration(); //获取设置的配置信息
-        int ori = mConfiguration.orientation; //获取屏幕方向
-        if (ori == Configuration.ORIENTATION_LANDSCAPE) {
-            //横屏
-            return false;
-        } else if (ori == Configuration.ORIENTATION_PORTRAIT) {
-            //竖屏
-        }
-        return true;
-    }
-
     public static class PDFTextView extends LinearLayout {
 
-        static float minImgHeight = 32;
         private StyleHelper styleHelper;
 
         public PDFTextView(Context context, StyleHelper styleHelper) {
@@ -167,8 +112,8 @@ public class ReflowTextViewHolder extends BaseViewHolder<ReflowBean> {
             } else {
                 textView = new TextView(getContext());
                 textView.setTextIsSelectable(false);
-                if (minImgHeight == 32) {
-                    minImgHeight = textView.getPaint().measureText("我") + 5;
+                if (ParseTextMain.INSTANCE.getMinImgHeight() == 32f) {
+                    ParseTextMain.INSTANCE.setMinImgHeight(textView.getPaint().measureText("我") + 5);
                 }
             }
             LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
@@ -219,7 +164,7 @@ public class ReflowTextViewHolder extends BaseViewHolder<ReflowBean> {
         }
 
         void addImageView(String text, float systemScale, int screenHeight, int screenWidth, ReflowViewCache reflowViewCache, boolean showBookmark) {
-            BitmapBean bean = decodeBitmap(text, systemScale, screenHeight, screenWidth, getContext());
+            BitmapBean bean = ParseTextMain.INSTANCE.decodeBitmap(text, systemScale, screenHeight, screenWidth, getContext());
             if (null != bean && bean.getBitmap() != null) {
                 ImageView imageView = null;
                 if (null != reflowViewCache && reflowViewCache.imageViewCount() > 0) {
