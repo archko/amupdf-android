@@ -86,7 +86,10 @@ fun TextViewer(
             }) {
         DisposableEffect(result) {
             coroutineScope.launch {
-                listState.scrollToItem(pdfViewModel.getCurrentPage())
+                listState.scrollToItem(
+                    pdfViewModel.getCurrentPage(),
+                    pdfViewModel.bookProgress!!.offsetY
+                )
             }
             val observer = LifecycleEventObserver { _, event ->
                 if (event == Lifecycle.Event.ON_PAUSE) {

@@ -1,6 +1,5 @@
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.graphics.PointF
 import android.view.View
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.asImageBitmap
@@ -141,7 +138,10 @@ fun ImageViewer(
             }) {
         DisposableEffect(result) {
             coroutineScope.launch {
-                listState.scrollToItem(pdfViewModel.getCurrentPage())
+                listState.scrollToItem(
+                    pdfViewModel.getCurrentPage(),
+                    pdfViewModel.bookProgress!!.offsetY
+                )
             }
             val observer = LifecycleEventObserver { _, event ->
                 if (event == Lifecycle.Event.ON_PAUSE) {
@@ -363,25 +363,6 @@ fun draw(menus: ArrayList<BaseMenu>) {
             )*/
         }
     }
-}
-
-private fun getLinePointFs(
-    angle: Float,
-    size: Size,
-    radius: Float,
-    strokeWidth: Float
-): Array<PointF> {
-    val stopX =
-        (size.center.x / 2 + (radius + strokeWidth / 2) * cos(Math.toRadians(angle.toDouble()))).toFloat()
-    val stopY =
-        (size.center.y / 2 + (radius + strokeWidth / 2) * sin(Math.toRadians(angle.toDouble()))).toFloat()
-    val startX =
-        (size.center.x / 2 + (radius - strokeWidth / 2) * cos(Math.toRadians(angle.toDouble()))).toFloat()
-    val startY =
-        (size.center.y / 2 + (radius - strokeWidth / 2) * sin(Math.toRadians(angle.toDouble()))).toFloat()
-    val startPoint = PointF(startX, startY)
-    val stopPoint = PointF(stopX, stopY)
-    return arrayOf(startPoint, stopPoint)
 }
 
 fun addMenu(text: String, color: Int, list: ArrayList<BaseMenu>) {
@@ -650,9 +631,6 @@ fun ReflowItem(
             .fillMaxWidth()
     ) {
         val context = LocalContext.current
-        val configuration = LocalConfiguration.current
-        val screenHeight = configuration.screenHeightDp.dp
-        val screenWidth = configuration.screenWidthDp.dp
 
         //在DisposableEffect中使用flow异步加载
         val reflowState: MutableState<List<ReflowBean>?> = remember { mutableStateOf(null) }
@@ -674,7 +652,6 @@ fun ReflowItem(
                                 },
                                 style = TextStyle(fontSize = 17.sp, lineHeight = 24.sp),
                                 modifier = Modifier
-                                    .heightIn(min = 250.dp)
                                     .fillMaxWidth()
                                     .padding(24.dp, 10.dp, 24.dp, 10.dp)
                             )
@@ -707,7 +684,7 @@ fun ReflowItem(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(250.dp)
+                    .height(200.dp)
             ) {
                 LoadingView("Decoding Page:${aPage.index + 1}")
             }
