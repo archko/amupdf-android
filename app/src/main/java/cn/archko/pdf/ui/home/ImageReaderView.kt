@@ -575,22 +575,6 @@ private fun LoadingView(
     }
 }
 
-fun loadPage(
-    aPage: APage,
-    mupdfDocument: MupdfDocument,
-): MutableState<Bitmap?> {
-    val decodeParam = DecodeParam(
-        aPage.toString(),
-        true,
-        0,
-        aPage,
-        mupdfDocument.document,
-    )
-    val bitmapState: MutableState<Bitmap?> = mutableStateOf(null)
-    bitmapState.value = PdfImageDecoder.decode(decodeParam)
-    return bitmapState
-}
-
 @Composable
 private fun AsyncDecodePage(
     aPage: APage,
