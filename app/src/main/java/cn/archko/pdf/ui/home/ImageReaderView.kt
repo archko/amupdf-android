@@ -173,7 +173,7 @@ fun ImageViewer(
             ) {
                 itemsIndexed(list) { index, aPage ->
                     if (index > 0) {
-                        Divider(thickness = 1.dp)
+                        Divider(thickness = 0.5.dp)
                     }
                     if (pdfViewModel.bookProgress?.reflow == 0) {
                         aPage?.let {
