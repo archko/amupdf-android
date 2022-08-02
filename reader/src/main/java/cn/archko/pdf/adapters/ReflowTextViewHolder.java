@@ -1,25 +1,21 @@
 package cn.archko.pdf.adapters;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.text.Html;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
 
 import cn.archko.pdf.R;
 import cn.archko.pdf.common.Logcat;
-import cn.archko.pdf.common.ParseTextMain;
 import cn.archko.pdf.common.ReflowViewCache;
 import cn.archko.pdf.common.StyleHelper;
 import cn.archko.pdf.entity.BitmapBean;
@@ -37,46 +33,6 @@ public class ReflowTextViewHolder extends BaseViewHolder<ReflowBean> {
     public ReflowTextViewHolder(PDFTextView itemView) {
         super(itemView);
         pageView = itemView;
-    }
-
-    public void bindAsText(byte[] result, int screenHeight, int screenWidth, float systemScale) {
-        /*String text = ParseTextMain.Companion.getInstance().parseAsText(result);
-        //Logcat.d("text", text = UnicodeDecoder.unescape2(text));
-        Html.ImageGetter imageGetter = new Html.ImageGetter() {
-            @Override
-            public Drawable getDrawable(String source) {
-                //Log.d("text", source);
-                Bitmap bitmap = BitmapUtils.base64ToBitmap(source.replaceAll("data:image/(png|jpeg);base64,", "")*//*.replaceAll("\\s", "")*//*);
-
-                if (null == bitmap ||
-                        (bitmap.getWidth() < PDFTextView.minImgHeight
-                                && bitmap.getHeight() < PDFTextView.minImgHeight)) {
-                    Logcat.d("text", "bitmap decode failed.");
-                    return null;
-                }
-                float width = bitmap.getWidth() * systemScale;
-                float height = bitmap.getHeight() * systemScale;
-                int sw = screenHeight;
-                if (isScreenPortrait(pageView.getContext())) {
-                    sw = screenWidth;
-                }
-                if (width > sw) {
-                    float ratio = sw / width;
-                    height = ratio * height;
-                    width = sw;
-                }
-                Drawable drawable = new BitmapDrawable(null, bitmap);
-                drawable.setBounds(0, 0, (int) width, (int) height);
-                return drawable;
-            }
-        };
-        Spanned spanned = AHtml.fromHtml(text, imageGetter, null);
-        pageView.textView.setText(spanned);*/
-    }
-
-    public void bindAsList(byte[] result, int screenHeight, int screenWidth, float systemScale) {
-        List<ReflowBean> text = ParseTextMain.Companion.getInstance().parseAsList(result, 0);
-        bindAsList(text, screenHeight, screenWidth, systemScale, null, false);
     }
 
     public void bindAsList(List<ReflowBean> text, int screenHeight, int screenWidth,
@@ -221,7 +177,7 @@ public class ReflowTextViewHolder extends BaseViewHolder<ReflowBean> {
 
             applyStyleForText(getContext(), textView);
 
-            textView.setText(Html.fromHtml(text));
+            textView.setText(text);
 
             addBookmark(showBookmark);
         }

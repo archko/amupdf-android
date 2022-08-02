@@ -1,7 +1,6 @@
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.PointF
-import android.text.Html
 import android.view.View
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -47,8 +47,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -661,31 +665,40 @@ fun ReflowItem(
                     reflowBean.data?.let {
                         if (reflowBean.type == ReflowBean.TYPE_STRING) {
                             Text(
-                                Html.fromHtml(it).toString(),
+                                buildAnnotatedString {
+                                    withStyle(
+                                        style = SpanStyle(fontFamily = FontFamily.SansSerif)
+                                    ) {
+                                        append(it)
+                                    }
+                                },
                                 style = TextStyle(fontSize = 17.sp, lineHeight = 24.sp),
                                 modifier = Modifier
+                                    .heightIn(min = 250.dp)
                                     .fillMaxWidth()
                                     .padding(24.dp, 10.dp, 24.dp, 10.dp)
                             )
                         } else {
-                            val bean = ReflowTextViewHolder.decodeBitmap(
+                            val bitmap = ReflowTextViewHolder.decodeBitmap(
                                 reflowBean.data,
                                 Utils.getScale(),
                                 height,
                                 width,
                                 context
                             )
-                            val bh = with(LocalDensity.current) {
-                                bean.height.toDp()
+                            if (null != bitmap) {
+                                val bh = with(LocalDensity.current) {
+                                    bitmap.height.toDp()
+                                }
+                                Image(
+                                    bitmap = bitmap.bitmap.asImageBitmap(),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(bh)
+                                        .padding(vertical = 10.dp)
+                                )
                             }
-                            Image(
-                                bitmap = bean.bitmap.asImageBitmap(),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(bh)
-                                    .padding(vertical = 10.dp)
-                            )
                         }
                     }
                 }
@@ -694,7 +707,7 @@ fun ReflowItem(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp)
+                    .height(250.dp)
             ) {
                 LoadingView("Decoding Page:${aPage.index + 1}")
             }
@@ -716,7 +729,7 @@ private fun AsyncDecodeTextPage(
                 val result = mupdfDocument.loadPage(aPage.index)
                     ?.textAsText("preserve-whitespace,inhibit-spaces,preserve-images")
                 if (null != result) {
-                    ParseTextMain.instance.parseAsList(result, aPage.index)
+                    ParseTextMain.instance.parseAsHtmlList(result, aPage.index)
                 } else {
                     return@snapshotFlow null
                 }

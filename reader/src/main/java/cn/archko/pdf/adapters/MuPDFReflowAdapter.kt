@@ -63,7 +63,7 @@ class MuPDFReflowAdapter(
         try {
             val result = mupdfDocument?.loadPage(pos)
                 ?.textAsText("preserve-whitespace,inhibit-spaces,preserve-images")
-            val list = result?.let { ParseTextMain.instance.parseAsList(it, pos) }
+            val list = result?.let { ParseTextMain.instance.parseAsHtmlList(it, pos) }
             return list
         } catch (e: Exception) {
         }

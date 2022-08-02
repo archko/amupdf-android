@@ -1,9 +1,9 @@
 package cn.archko.pdf.common
 
+import android.text.Html
 import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.utils.StreamUtils
 import java.util.regex.Pattern
-import kotlin.collections.ArrayList
 
 /**
  * @author: archko 2019/2/18 :15:57
@@ -28,6 +28,18 @@ class ParseTextMain private constructor() {
     fun parseAsList(bytes: ByteArray, pageIndex: Int): List<ReflowBean> {
         val content = String(bytes)
         return txtParser.parseAsList(content, pageIndex)
+    }
+
+    /**
+     * 解析为spanned,可以直接使用
+     */
+    fun parseAsHtmlList(bytes: ByteArray, pageIndex: Int): List<ReflowBean> {
+        val content = String(bytes)
+        val list = txtParser.parseAsList(content, pageIndex)
+        for (reflowBean in list) {
+            reflowBean.data = Html.fromHtml(reflowBean.data).toString()
+        }
+        return list
     }
 
     fun parseXHtmlResult(bytes: ByteArray): String {
