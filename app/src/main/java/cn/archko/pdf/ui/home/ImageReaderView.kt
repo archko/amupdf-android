@@ -60,7 +60,6 @@ import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.adapters.ReflowTextViewHolder
 import cn.archko.pdf.common.ImageWorker.DecodeParam
 import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.common.ParseTextMain
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.LoadResult
@@ -703,13 +702,7 @@ private fun AsyncDecodeTextPage(
             CoroutineScope(SupervisorJob() + AppExecutors.instance.diskIO().asCoroutineDispatcher())
         scope.launch {
             snapshotFlow {
-                val result = mupdfDocument.loadPage(aPage.index)
-                    ?.textAsText("preserve-whitespace,inhibit-spaces,preserve-images")
-                if (null != result) {
-                    ParseTextMain.instance.parseAsHtmlList(result, aPage.index)
-                } else {
-                    return@snapshotFlow null
-                }
+                return@snapshotFlow mupdfDocument.decodeReflow(aPage.index)
             }.flowOn(AppExecutors.instance.diskIO().asCoroutineDispatcher())
                 .collectLatest {
                     imageState.value = it

@@ -24,9 +24,12 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.archko.pdf.common.BitmapPool;
 import cn.archko.pdf.common.Logcat;
+import cn.archko.pdf.common.ParseTextMain;
+import cn.archko.pdf.entity.ReflowBean;
 
 /**
  * @author archko 2019/12/8 :12:43
@@ -360,5 +363,23 @@ public class MupdfDocument {
 
     public int pageNumberFromLocation(Outline node) {
         return document.pageNumberFromLocation(document.resolveLink(node));
+    }
+
+    /**
+     * 文本重排解析
+     *
+     * @param index
+     * @return
+     */
+    public List<ReflowBean> decodeReflow(int index) {
+        Page p = loadPage(index);
+        if (null == p) {
+            return null;
+        }
+        byte[] result = p.textAsText("preserve-whitespace,inhibit-spaces,preserve-images");
+        if (null != result) {
+            return ParseTextMain.INSTANCE.parseAsHtmlList(result, index);
+        }
+        return null;
     }
 }

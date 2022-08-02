@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.App
 import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.common.ParseTextMain
 import cn.archko.pdf.common.ReflowViewCache
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.entity.ReflowBean
@@ -60,21 +59,10 @@ class MuPDFReflowAdapter(
     }
 
     fun decode(pos: Int): List<ReflowBean>? {
-        try {
-            val result = mupdfDocument?.loadPage(pos)
-                ?.textAsText("preserve-whitespace,inhibit-spaces,preserve-images")
-            val list = result?.let { ParseTextMain.instance.parseAsHtmlList(it, pos) }
-            return list
-        } catch (e: Exception) {
-        }
-        return null
+        return mupdfDocument?.decodeReflow(pos);
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder<Any>, pos: Int) {
-        /*val result = mCore?.loadPage(pos)?.textAsText("preserve-whitespace,inhibit-spaces,preserve-images")
-
-        (holder as ReflowTextViewHolder).bindAsList(result, screenHeight, screenWidth, systemScale)*/
-
         scope!!.launch {
             val result = decode(pos)
             withContext(Dispatchers.Main) {

@@ -8,17 +8,9 @@ import java.util.regex.Pattern
 /**
  * @author: archko 2019/2/18 :15:57
  */
-class ParseTextMain private constructor() {
+object ParseTextMain {
 
-    private val txtParser: TxtParser
-
-    private object Factory {
-        val instance = ParseTextMain()
-    }
-
-    init {
-        txtParser = TxtParser()
-    }
+    private val txtParser: TxtParser = TxtParser()
 
     fun parseAsText(bytes: ByteArray): String {
         val content = String(bytes)
@@ -280,56 +272,50 @@ class ParseTextMain private constructor() {
         }
     }
 
-    companion object {
-
-        @JvmStatic
-        fun main(args: Array<String>) {
-            val filepath = "F:\\ebook\\pdf.text"
-            val txtParser = TxtParser(filepath)
-            txtParser.parseTxt()
-        }
-
-        /**
-         * 段落的开始字符可能是以下的:
-         * 第1章,第四章.
-         * 总结,小结,●,■,（2）,（3）
-         * //|var|val|let|这是程序的注释.需要换行,或者是程序的开头.
-         */
-        internal val START_MARK =
-            Pattern.compile("(第\\w*[^章]章)|总结|小结|●|■|//|var|val|let|fun|public|private|static|abstract|protected|import|export|pack|overri|open|class|void|for|while")
-        internal val START_MARK2 = Pattern.compile("\\d+\\.")
-
-        /**
-         * 段落的结束字符可能是以下.
-         */
-        internal const val END_MARK = ".!?．！？。！?:：」？” ——"
-
-        /**
-         * 如果遇到的是代码,通常是以这些结尾
-         */
-        internal const val PROGRAM_MARK = "\\]>){};,'\""
-
-        /**
-         * 解析pdf得到的文本,取出其中的图片
-         */
-        internal const val IMAGE_START_MARK = "<p><img"
-
-        /**
-         * 图片结束,jni中的特定结束符.
-         */
-        internal const val IMAGE_END_MARK = "</p>"
-
-        /**
-         * 一行如果不到20个字符,有可能是目录或是标题.
-         */
-        internal const val LINE_LENGTH = 20
-
-        /**
-         * 最大的页面是30页,如果是30页前的,一行小于25字,认为可能是目录.在这之后的,文本重排时不认为是目录.合并为一行.
-         */
-        internal const val MAX_PAGEINDEX = 20
-
-        val instance: ParseTextMain
-            get() = Factory.instance
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val filepath = "F:\\ebook\\pdf.text"
+        val txtParser = TxtParser(filepath)
+        txtParser.parseTxt()
     }
+
+    /**
+     * 段落的开始字符可能是以下的:
+     * 第1章,第四章.
+     * 总结,小结,●,■,（2）,（3）
+     * //|var|val|let|这是程序的注释.需要换行,或者是程序的开头.
+     */
+    internal val START_MARK =
+        Pattern.compile("(第\\w*[^章]章)|总结|小结|●|■|//|var|val|let|fun|public|private|static|abstract|protected|import|export|pack|overri|open|class|void|for|while")
+    internal val START_MARK2 = Pattern.compile("\\d+\\.")
+
+    /**
+     * 段落的结束字符可能是以下.
+     */
+    internal const val END_MARK = ".!?．！？。！?:：」？” ——"
+
+    /**
+     * 如果遇到的是代码,通常是以这些结尾
+     */
+    internal const val PROGRAM_MARK = "\\]>){};,'\""
+
+    /**
+     * 解析pdf得到的文本,取出其中的图片
+     */
+    internal const val IMAGE_START_MARK = "<p><img"
+
+    /**
+     * 图片结束,jni中的特定结束符.
+     */
+    internal const val IMAGE_END_MARK = "</p>"
+
+    /**
+     * 一行如果不到20个字符,有可能是目录或是标题.
+     */
+    internal const val LINE_LENGTH = 20
+
+    /**
+     * 最大的页面是30页,如果是30页前的,一行小于25字,认为可能是目录.在这之后的,文本重排时不认为是目录.合并为一行.
+     */
+    internal const val MAX_PAGEINDEX = 20
 }
