@@ -92,14 +92,15 @@ fun OutlineDialog(
         DisposableEffect(currentPage.value) {
             if (null != outlines.list) {
                 var found = -1
-                for (i in outlines.list!!.indices) {
+                for (i in 0 until outlines.list!!.size) {
                     val item = outlines.list!![i]
-                    if (found < 0 && item.page >= currentPage.value) {
+                    if (item.page >= currentPage.value) {
                         found = i
+                        break
                     }
                 }
                 Logcat.d("found:${found}, listState:$listState")
-                if (found >= 0) {
+                if (found > 0) {
                     coroutineScope.launch {
                         listState.scrollToItem(found, 0)
                     }
@@ -136,6 +137,7 @@ private fun DialogItem(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             fontSize = 14.sp,
+            modifier = modifier.padding(horizontal = 2.dp)
         )
     }
 }
