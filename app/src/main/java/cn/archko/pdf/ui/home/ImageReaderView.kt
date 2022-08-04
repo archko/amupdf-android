@@ -65,9 +65,11 @@ import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.LoadResult
+import cn.archko.pdf.entity.OutlineItem
 import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.paging.itemsIndexed
+import cn.archko.pdf.ui.home.OutlineDialog
 import cn.archko.pdf.ui.home.PdfImageDecoder
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
@@ -111,6 +113,17 @@ fun ImageViewer(
     }
 
     val showMenu = remember { mutableStateOf(false) }
+    val showOutlineDialog = remember { mutableStateOf(false) }
+    val currentPage = remember { mutableStateOf(0) }
+
+    val onSelect: (OutlineItem) -> Unit = { it ->
+        showOutlineDialog.value = false
+        Logcat.d("select OutlineItem:$it")
+        coroutineScope.launch {
+            listState.scrollToItem(it.page, 0)
+        }
+    }
+    OutlineDialog(showOutlineDialog, pdfViewModel, currentPage, onSelect)
 
     Box(
         modifier = modifier
@@ -122,6 +135,8 @@ fun ImageViewer(
                     onTap = {
                         if (showMenu.value) {
                             showMenu.value = false
+                        } else if (showOutlineDialog.value) {
+                            showOutlineDialog.value = false
                         } else {
                             scrollOnTab(
                                 coroutineScope,
@@ -222,7 +237,10 @@ fun ImageViewer(
                     cakeView.setCakeData(menus)
                     cakeView.viewOnclickListener = object : CakeView.ViewOnclickListener {
                         override fun onViewClick(v: View?, position: Int) {
-
+                            Logcat.d("click:${menus[position]}")
+                            currentPage.value = listState.firstVisibleItemIndex
+                            showOutlineDialog.value = true
+                            showMenu.value = false
                         }
 
                         override fun onViewCenterClick() {

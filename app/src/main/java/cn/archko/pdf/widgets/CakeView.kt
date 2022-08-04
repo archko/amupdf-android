@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.PointF
 import android.graphics.RectF
 import android.graphics.Region
@@ -273,23 +274,40 @@ class CakeView @JvmOverloads constructor(
             /*Rect rect = new Rect((int) (textList.get(i).x - (bitmap.getWidth() / 2)),
                     (int) (textList.get(i).y) - (bitmap.getHeight() * 5 / 4 - dip2px(getContext(), 20)),
                     (int) textList.get(i).x + (bitmap.getWidth() / 2),
-                    (int) textList.get(i).y - (bitmap.getHeight() / 4) + dip2px(getContext(), 20));
+                    (int) textList.get(i).y - (bitmap.getHeight() / 4) + dip2px(getContext(), 20));*/
 
-            Region re = new Region();
-            Path path = new Path();
-            path.moveTo((float) (textList.get(i).x - dip2px(getContext(), 35)), (float) textList.get(i).y - dip2px(getContext(), 35));
-            path.lineTo((float) (textList.get(i).x + dip2px(getContext(), 35)), (float) textList.get(i).y - dip2px(getContext(), 35));
-            path.lineTo((float) (textList.get(i).x + dip2px(getContext(), 35)), (float) textList.get(i).y + dip2px(getContext(), 35));
-            path.lineTo((float) (textList.get(i).x - dip2px(getContext(), 35)), (float) textList.get(i).y + dip2px(getContext(), 35));
+            val re = Region();
+            val path = Path();
+            path.moveTo(
+                (textList.get(i).x - dip2px(getContext(), 35f)),
+                textList.get(i).y - dip2px(getContext(), 35f)
+            );
+            path.lineTo(
+                (textList.get(i).x + dip2px(getContext(), 35f)),
+                textList.get(i).y - dip2px(getContext(), 35f)
+            );
+            path.lineTo(
+                (textList.get(i).x + dip2px(getContext(), 35f)),
+                textList.get(i).y + dip2px(getContext(), 35f)
+            );
+            path.lineTo(
+                (textList.get(i).x - dip2px(getContext(), 35f)),
+                textList.get(i).y + dip2px(getContext(), 35f)
+            );
             path.close();
 
-            RectF r = new RectF();
+            val r = RectF();
             //计算控制点的边界
             path.computeBounds(r, true);
             //设置区域路径和剪辑描述的区域
-            re.setPath(path, new Region((int) r.left, (int) r.top, (int) r.right, (int) r.bottom));
+            re.setPath(
+                path, Region(
+                    r.left.toInt(), r.top.toInt(), r.right.toInt(),
+                    r.bottom.toInt()
+                )
+            );
             regionList[i] = re;
-            canvas.drawBitmap(bitmap, null, rect, null);*/
+            //canvas.drawBitmap(bitmap, null, rect, null);
         }
     }
 

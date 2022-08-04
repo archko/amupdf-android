@@ -10,12 +10,14 @@ import cn.archko.pdf.App
 import cn.archko.pdf.common.APageSizeLoader
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.Logcat
+import cn.archko.pdf.common.OutlineHelper
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.TextHelper
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.Bookmark
 import cn.archko.pdf.entity.LoadResult
+import cn.archko.pdf.entity.OutlineItem
 import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.entity.State
 import cn.archko.pdf.mupdf.MupdfDocument
@@ -42,6 +44,7 @@ class PDFViewModel : ViewModel() {
     var mupdfDocument: MupdfDocument? = null
     val mPageSizes = mutableListOf<APage>()
     var txtPageCount: Int = 1
+    var outlineHelper: OutlineHelper? = null
 
     fun loadPdfDoc(context: Context, path: String, password: String?) = flow {
         try {
@@ -301,6 +304,10 @@ class PDFViewModel : ViewModel() {
     private val _pageFlow = MutableStateFlow<LoadResult<Any, APage>>(LoadResult(State.INIT))
     val pageFlow: StateFlow<LoadResult<Any, APage>>
         get() = _pageFlow
+    private val _outlineFlow =
+        MutableStateFlow<LoadResult<Any, OutlineItem>>(LoadResult(State.INIT))
+    val outlineFlow: StateFlow<LoadResult<Any, OutlineItem>>
+        get() = _outlineFlow
 
     suspend fun loadPdfDoc2(context: Context, path: String, password: String?) = flow {
         try {
@@ -312,6 +319,8 @@ class PDFViewModel : ViewModel() {
                     it.document.authenticatePassword(password)
                 }
             }
+
+            outlineHelper = OutlineHelper(mupdfDocument, null)
             val cp = mupdfDocument!!.countPages()
             emit(loadAllPageSize(cp))
         } catch (e: Exception) {
@@ -331,6 +340,20 @@ class PDFViewModel : ViewModel() {
                     list = it
                 )
             }
+        }
+
+    suspend fun loadOutline() = flow {
+        if (mupdfDocument != null && null != outlineHelper && outlineHelper!!.hasOutline()) {
+            emit(outlineHelper!!.getOutline())
+            return@flow
+        }
+        emit(arrayListOf())
+    }.flowOn(Dispatchers.IO)
+        .collectLatest {
+            _outlineFlow.value = LoadResult(
+                State.FINISHED,
+                list = it
+            )
         }
 
     private fun loadAllPageSize(cp: Int): List<APage> {

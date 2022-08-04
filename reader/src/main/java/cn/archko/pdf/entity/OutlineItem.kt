@@ -39,4 +39,9 @@ class OutlineItem(var id: Int, private var pid: Int, private var title: String) 
     override fun getImageResId(): Int {
         return 0
     }
+
+    override fun toString(): String {
+        return "OutlineItem(id=$id, pid=$pid, title='$title', page=$page, resId=$resId)"
+    }
+
 }
