@@ -75,7 +75,7 @@ fun OutlineDialog(
                         )
                     }
                     Divider(thickness = 1.dp)
-                    LazyColumn {
+                    LazyColumn(state = listState) {
                         itemsIndexed(outlines.list!!) { index, outlineItem ->
                             if (index > 0) {
                                 Divider(thickness = 0.5.dp)
