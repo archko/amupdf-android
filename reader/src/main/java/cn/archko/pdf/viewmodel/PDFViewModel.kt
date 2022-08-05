@@ -386,7 +386,9 @@ class PDFViewModel : ViewModel() {
         if (!TextUtils.isEmpty(pdfPath) && pdfPath!!.endsWith("txt", true)) {
             return txtPageCount
         }
-        return mupdfDocument?.countPages() ?: 0
+        val pc = mupdfDocument?.countPages() ?: 0
+        bookProgress?.pageCount = pc
+        return pc
     }
 
     fun loadPage(pageNum: Int): Page? {

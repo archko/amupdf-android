@@ -58,6 +58,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import cn.archko.pdf.AppExecutors
+import cn.archko.pdf.BackPressHandler
 import cn.archko.pdf.common.ImageWorker.DecodeParam
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.ParseTextMain
@@ -69,7 +70,7 @@ import cn.archko.pdf.entity.OutlineItem
 import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.paging.itemsIndexed
-import cn.archko.pdf.ui.home.OutlineDialog
+import cn.archko.pdf.ui.home.OutlineMenu
 import cn.archko.pdf.ui.home.PdfImageDecoder
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
@@ -117,13 +118,17 @@ fun ImageViewer(
     val currentPage = remember { mutableStateOf(0) }
 
     val onSelect: (OutlineItem) -> Unit = { it ->
-        showOutlineDialog.value = false
         Logcat.d("select OutlineItem:$it")
         coroutineScope.launch {
             listState.scrollToItem(it.page, 0)
         }
     }
-    OutlineDialog(showOutlineDialog, pdfViewModel, currentPage, onSelect)
+
+    if (showOutlineDialog.value) {
+        BackPressHandler(onBackPressed = {
+            showOutlineDialog.value = false
+        })
+    }
 
     Box(
         modifier = modifier
@@ -258,6 +263,7 @@ fun ImageViewer(
                 }
             }
         }
+        OutlineMenu(showOutlineDialog, pdfViewModel, currentPage, onSelect)
     }
 }
 
