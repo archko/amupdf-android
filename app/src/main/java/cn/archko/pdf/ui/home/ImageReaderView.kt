@@ -70,13 +70,13 @@ import cn.archko.pdf.entity.OutlineItem
 import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.paging.itemsIndexed
+import cn.archko.pdf.bahaviours.CustomFlingBehaviours
 import cn.archko.pdf.ui.home.OutlineMenu
-import cn.archko.pdf.ui.home.PdfImageDecoder
+import cn.archko.pdf.common.PdfImageDecoder
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.BaseMenu
 import cn.archko.pdf.widgets.CakeView
-import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -189,7 +189,7 @@ fun ImageViewer(
         Box(modifier = modifier) {
             LazyColumn(
                 state = listState,
-                flingBehavior = StockFlingBehaviours.smoothScroll(),
+                flingBehavior = CustomFlingBehaviours.smoothScroll(),
                 modifier = modifier
             ) {
                 itemsIndexed(list) { index, aPage ->

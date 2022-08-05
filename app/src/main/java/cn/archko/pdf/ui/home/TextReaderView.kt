@@ -37,8 +37,8 @@ import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.LoadResult
 import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.paging.itemsIndexed
+import cn.archko.pdf.bahaviours.CustomFlingBehaviours
 import cn.archko.pdf.viewmodel.PDFViewModel
-import io.iamjosephmj.flinger.bahaviours.StockFlingBehaviours
 import kotlinx.coroutines.launch
 
 @Composable
@@ -119,7 +119,7 @@ fun TextViewer(
         }
         LazyColumn(
             state = listState,
-            flingBehavior = StockFlingBehaviours.smoothScroll(),
+            flingBehavior = CustomFlingBehaviours.smoothScroll(),
             modifier = modifier
         ) {
             item {

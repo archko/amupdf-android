@@ -1,4 +1,4 @@
-package cn.archko.pdf.ui.home
+package cn.archko.pdf.common
 
 import android.graphics.Bitmap
 import androidx.compose.runtime.RememberObserver
@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import cn.archko.pdf.AppExecutors
-import cn.archko.pdf.common.ImageWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

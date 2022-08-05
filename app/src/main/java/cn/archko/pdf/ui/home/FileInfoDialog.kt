@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cn.archko.mupdf.R
 import cn.archko.pdf.App
+import cn.archko.pdf.common.AsyncPdfImagePainter
 import cn.archko.pdf.common.ImageWorker
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.FileBean

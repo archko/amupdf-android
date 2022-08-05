@@ -1,4 +1,4 @@
-package cn.archko.pdf.ui.home
+package cn.archko.pdf.common
 
 import android.graphics.Bitmap
 import androidx.compose.ui.graphics.painter.Painter
