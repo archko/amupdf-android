@@ -3,6 +3,7 @@ package cn.archko.pdf.ui.home
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -85,22 +86,28 @@ fun OutlineMenu(
 
         Column(
             modifier = Modifier
-                .clickable { }
+                .clickable(
+                    onClick = { },
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                )
                 .background(Color.Transparent)
         ) {
-            Column(
+            Box(
                 Modifier
                     .fillMaxWidth()
                     .background(Color(0xCc202020))
             ) {
                 val count = viewModel.bookProgress?.pageCount?.toFloat() ?: 1f
                 Text(
-                    "Outline, Page:${currentPage.value}/${count.toInt()}",
+                    "Outline=>Page:${currentPage.value}/${count.toInt()}",
                     style = TextStyle(
                         fontSize = 14.sp, fontWeight = FontWeight.Bold,
                         color = Color.White
                     ),
-                    modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                    modifier = Modifier
+                        .padding(0.dp, 4.dp, 0.dp, 0.dp)
+                        .align(Alignment.TopCenter)
                 )
                 var sliderState by remember { mutableStateOf(currentPage.value) }
                 SliderWithLabel(
@@ -113,7 +120,7 @@ fun OutlineMenu(
                     onValueChangeFinished = {
                         onSelect(OutlineItem("", sliderState))
                     },
-                    modifier = Modifier.padding(20.dp, 0.dp, 20.dp, 0.dp),
+                    modifier = Modifier.padding(20.dp, 2.dp, 20.dp, 0.dp),
                 )
             }
             Row(
