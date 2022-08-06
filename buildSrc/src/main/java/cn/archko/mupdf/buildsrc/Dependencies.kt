@@ -15,7 +15,7 @@ object BuildConfig {
 
 object Libs {
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.1.5"
-    const val flinger = "com.github.iamjosephmj:flinger:1.0.5"
+    const val flinger = "com.github.iamjosephmj:flinger:1.1.1"
     const val androidGradlePlugin = "com.android.tools.build:gradle:7.2.1"
 
     object Accompanist {
