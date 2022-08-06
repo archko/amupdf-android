@@ -10,9 +10,9 @@ object CustomFlingBehaviours {
     @Composable
     fun smoothScroll(): FlingBehavior = flingBehavior(
         scrollConfiguration = FlingConfiguration.Builder()
-            .decelerationFriction(0.08f)
+            .decelerationFriction(0.049f)
             .splineStartTension(0.2f)
-            .splineInflection(0.2f)
+            .splineInflection(0.15f)
             .build()
     )
 }

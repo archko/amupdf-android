@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import cn.archko.mupdf.R
+import cn.archko.pdf.bahaviours.CustomFlingBehaviours
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
@@ -106,6 +107,7 @@ fun AboutScreen(
                         )
                     }
                     LazyColumn(
+                        flingBehavior = CustomFlingBehaviours.smoothScroll(),
                         modifier = modifier
                     ) {
                         itemsIndexed(PARTS) { index, part ->
