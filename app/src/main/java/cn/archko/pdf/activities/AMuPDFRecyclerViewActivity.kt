@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.archko.mupdf.R
 import cn.archko.pdf.common.APageSizeLoader
 import cn.archko.pdf.common.BitmapCache
+import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.MenuHelper
 import cn.archko.pdf.common.OutlineHelper
@@ -222,7 +223,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     override fun loadDoc() {
-        if (mPath!!.endsWith("txt", false)) {
+        if (IntentFile.isText(mPath)) {
             TextActivity.start(this, mPath!!)
             finish()
         } else {

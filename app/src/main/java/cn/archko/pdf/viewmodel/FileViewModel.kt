@@ -153,6 +153,14 @@ class FileViewModel() : ViewModel() {
             return@FileFilter true
         if (fname.endsWith(".txt"))
             return@FileFilter true
+        if (fname.endsWith(".log"))
+            return@FileFilter true
+        if (fname.endsWith(".xml"))
+            return@FileFilter true
+        if (fname.endsWith(".html"))
+            return@FileFilter true
+        if (fname.endsWith(".xhtml"))
+            return@FileFilter true
         false
     }
 

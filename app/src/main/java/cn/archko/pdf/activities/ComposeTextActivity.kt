@@ -86,6 +86,11 @@ class ComposeTextActivity : ComponentActivity() {
             return
         }
 
+        if (!IntentFile.isText(path) && !IntentFile.isPdf(path)) {
+            error()
+            return
+        }
+
         mStyleHelper = StyleHelper(this, preferencesRepository)
         sensorHelper = SensorHelper(this@ComposeTextActivity)
         lifecycleScope.launch {

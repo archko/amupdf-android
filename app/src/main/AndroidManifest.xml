@@ -94,6 +94,10 @@
                 <data android:pathPattern=".*\\.cbz" />
                 <data android:pathPattern=".*\\.epub" />
                 <data android:pathPattern=".*\\.fb2" />
+                <data android:pathPattern=".*\\.log" />
+                <data android:pathPattern=".*\\.xml" />
+                <data android:pathPattern=".*\\.html" />
+                <data android:pathPattern=".*\\.xhtml" />
             </intent-filter>
         </activity>
 

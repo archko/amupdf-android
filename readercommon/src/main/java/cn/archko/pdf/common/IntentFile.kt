@@ -216,5 +216,27 @@ object IntentFile {
             success
         }
     }
+
+    fun isText(path: String?): Boolean {
+        return path!!.endsWith(".txt", false)
+                || path.endsWith(".log", false)
+                || path.endsWith(".xml", false)
+                || path.endsWith(".html", false)
+                || path.endsWith(".xhtml", false)
+    }
+
+    fun isPdf(path: String?): Boolean {
+        return path!!.endsWith(".pdf", false)
+                || path.endsWith(".xps", false)
+                || path.endsWith(".cbz", false)
+                || path.endsWith(".png", false)
+                || path.endsWith(".jpe", false)
+                || path.endsWith(".jpeg", false)
+                || path.endsWith(".jfif", false)
+                || path.endsWith(".jfif-tbnl", false)
+                || path.endsWith(".tif", false)
+                || path.endsWith(".tiff", false)
+                || path.endsWith(".epub", false)
+    }
 }
 
