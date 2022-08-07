@@ -56,13 +56,13 @@ fun OutlineMenu(
     val outlines by viewModel.outlineFlow.collectAsState()
     val listState = rememberLazyListState(0)
 
-    if (outlines.list?.size == 0) {
-        coroutineScope.launch {
-            viewModel.loadOutline()
-        }
-    }
-
     if (outlineDialog.value) {
+        if (outlines.list?.size == 0) {
+            coroutineScope.launch {
+                viewModel.loadOutline()
+            }
+        }
+
         DisposableEffect(currentPage.value) {
             if (null != outlines.list) {
                 var found = -1
