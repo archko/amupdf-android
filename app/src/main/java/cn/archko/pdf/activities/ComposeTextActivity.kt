@@ -187,6 +187,7 @@ class ComposeTextActivity : ComponentActivity() {
                                             width = window.decorView.width,
                                             height = window.decorView.height,
                                             margin = margin,
+                                            finish = { finish() }
                                         )
                                     }
                                 }

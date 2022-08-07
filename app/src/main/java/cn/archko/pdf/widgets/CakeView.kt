@@ -427,18 +427,18 @@ class CakeView @JvmOverloads constructor(
                 mTmpAngle = 0f
 
                 // 如果当前已经在快速滚动
-                if (isQuickMove) {
+                /*if (isQuickMove) {
                     // 移除快速滚动的回调
                     removeCallbacks(mFlingRunnable)
                     isQuickMove = false
                     return true
-                }
+                }*/
                 isClick = true
             }
             MotionEvent.ACTION_MOVE -> {
                 Log.e(TAG, "ACTION_MOVE$isClick")
                 isClick = false
-                start = getAngle(mLastX, mLastY)
+                /*start = getAngle(mLastX, mLastY)
                 end = getAngle(x, y)
                 Log.e(TAG, "$start =start $end ,  =end")
 
@@ -450,7 +450,7 @@ class CakeView @JvmOverloads constructor(
                     //如果是一、四象限，则直接end-start，角度值都是正值
                     rotationAngle += end - start
                     mTmpAngle += end - start
-                }
+                }*/
 
                 // 重新布局
 //                postInvalidate();
@@ -459,7 +459,7 @@ class CakeView @JvmOverloads constructor(
             MotionEvent.ACTION_UP -> {
                 Log.e(TAG, "ACTION_UP$isClick")
                 // 获取每秒移动的角度
-                val anglePerSecond = mTmpAngle * 1000 / (System.currentTimeMillis() - mDownTime)
+                /*val anglePerSecond = mTmpAngle * 1000 / (System.currentTimeMillis() - mDownTime)
                 // 如果达到最大速度
                 if (Math.abs(anglePerSecond) > mMax_Speed && !isQuickMove) {
                     // 惯性滚动
@@ -472,7 +472,7 @@ class CakeView @JvmOverloads constructor(
                 // 如果当前旋转角度超过minSpeed屏蔽点击
                 if (Math.abs(mTmpAngle) > mMin_Speed) {
                     return true
-                }
+                }*/
                 if (!isQuickMove) {
                     Log.e(TAG, "ACTION_UP-点击")
                     var i = 0

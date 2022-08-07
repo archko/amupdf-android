@@ -59,9 +59,11 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.BackPressHandler
+import cn.archko.pdf.bahaviours.CustomFlingBehaviours
 import cn.archko.pdf.common.ImageWorker.DecodeParam
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.ParseTextMain
+import cn.archko.pdf.common.PdfImageDecoder
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.APage
@@ -70,9 +72,7 @@ import cn.archko.pdf.entity.OutlineItem
 import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.paging.itemsIndexed
-import cn.archko.pdf.bahaviours.CustomFlingBehaviours
 import cn.archko.pdf.ui.home.OutlineMenu
-import cn.archko.pdf.common.PdfImageDecoder
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.BaseMenu
@@ -99,6 +99,7 @@ fun ImageViewer(
     margin: Int,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     modifier: Modifier = Modifier,
+    finish: () -> Unit,
 ) {
     val list = result.list!!
     val listState = rememberLazyListState(0)
@@ -116,6 +117,8 @@ fun ImageViewer(
     val showMenu = remember { mutableStateOf(false) }
     val showOutlineDialog = remember { mutableStateOf(false) }
     val currentPage = remember { mutableStateOf(0) }
+    val cropState = remember { mutableStateOf(true) }
+    cropState.value = pdfViewModel.bookProgress?.autoCrop == 0
 
     val onSelect: (OutlineItem) -> Unit = { it ->
         Logcat.d("select OutlineItem:$it")
@@ -199,6 +202,7 @@ fun ImageViewer(
                     if (pdfViewModel.bookProgress?.reflow == 0) {
                         aPage?.let {
                             ImageItem(
+                                crop = cropState.value,
                                 mupdfDocument = mupdfDocument,
                                 width = width,
                                 height = height,
@@ -223,9 +227,20 @@ fun ImageViewer(
                 val menus = arrayListOf<BaseMenu>()
 
                 val color = Color(0xff1d84fb).toArgb()
+                val sColor = Color(0xFFAC7225).toArgb()
                 addMenu("设置", color, menus)
-                addMenu("重排", color, menus)
-                addMenu("切割", color, menus)
+                if (pdfViewModel.bookProgress?.reflow == 0) {   //不重排
+                    addMenu("重排", color, menus)
+
+                    if (pdfViewModel.bookProgress?.autoCrop == 0) {
+                        addMenu("切割", sColor, menus)
+                    } else {
+                        addMenu("切割", color, menus)
+                    }
+                } else {    //文本重排,切割不生效
+                    addMenu("重排", sColor, menus)
+                    addMenu("切割", color, menus)
+                }
                 addMenu("字体", color, menus)
                 addMenu("大纲", color, menus)
                 addMenu("退出", color, menus)
@@ -238,13 +253,31 @@ fun ImageViewer(
                     val cakeView = remember {
                         CakeView(context)
                     }
-                    //cakeView.setTextColor(Color(0xffffffff).toArgb())
                     cakeView.setCakeData(menus)
                     cakeView.viewOnclickListener = object : CakeView.ViewOnclickListener {
                         override fun onViewClick(v: View?, position: Int) {
-                            Logcat.d("click:${menus[position]}")
-                            currentPage.value = listState.firstVisibleItemIndex
-                            showOutlineDialog.value = true
+                            Logcat.d("click:$position,${menus[position]}")
+                            if (position == 4) {
+                                currentPage.value = listState.firstVisibleItemIndex
+                                showOutlineDialog.value = true
+                            } else if (position == 1) {
+                                if (pdfViewModel.bookProgress?.reflow == 0) {
+                                    pdfViewModel.bookProgress?.reflow = 1
+                                } else {
+                                    pdfViewModel.bookProgress?.reflow = 0
+                                }
+                            } else if (position == 2) {
+                                if (pdfViewModel.bookProgress?.reflow == 0) {   //文本重排:1时,切割不生效
+                                    if (pdfViewModel.bookProgress?.autoCrop == 0) {
+                                        pdfViewModel.bookProgress?.autoCrop = 1
+                                    } else {
+                                        pdfViewModel.bookProgress?.autoCrop = 0
+                                    }
+                                    cropState.value = pdfViewModel.bookProgress?.autoCrop == 0
+                                }
+                            } else if (position == 5) {
+                                finish()
+                            }
                             showMenu.value = false
                         }
 
@@ -442,6 +475,7 @@ fun scrollOnTab(
 
 @Composable
 private fun ImageItem(
+    crop: Boolean = true,
     mupdfDocument: MupdfDocument,
     width: Int,
     height: Int,
@@ -537,7 +571,7 @@ private fun ImageItem(
 
         //在DisposableEffect中使用flow异步加载
         val imageState: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-        AsyncDecodePage(aPage, mupdfDocument, imageState)
+        AsyncDecodePage(aPage, crop, mupdfDocument, imageState)
 
         if (imageState.value != null) {
             val bitmap = imageState.value
@@ -601,13 +635,14 @@ private fun LoadingView(
 @Composable
 private fun AsyncDecodePage(
     aPage: APage,
+    crop: Boolean = true,
     mupdfDocument: MupdfDocument,
     imageState: MutableState<Bitmap?>
 ) {
     DisposableEffect(aPage.getTargetWidth()) {
         val decodeParam = DecodeParam(
             aPage.toString(),
-            true,
+            crop,
             0,
             aPage,
             mupdfDocument.document,

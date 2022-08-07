@@ -50,7 +50,7 @@ class PDFViewerHelper {
             Logcat.i(Logcat.TAG, "post intent to open file $uri")
             val intent = Intent()
             intent.setDataAndType(uri, "application/pdf")
-            intent.setClass(activity, AMuPDFRecyclerViewActivity::class.java)
+            intent.setClass(activity, ComposeTextActivity::class.java)
             intent.action = Intent.ACTION_VIEW
             activity.startActivity(intent)
         }
@@ -151,7 +151,7 @@ class PDFViewerHelper {
             val map = mapOf("type" to "Document", "name" to clickedFile.name)
             MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
 
-            intent.setClass(activity, ComposeTextActivity::class.java)
+            intent.setClass(activity, AMuPDFRecyclerViewActivity::class.java)
             // API>=21: intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT); /* launch as a new document */
             activity.startActivity(intent)
         }
