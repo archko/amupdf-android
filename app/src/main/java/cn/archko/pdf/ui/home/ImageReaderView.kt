@@ -25,9 +25,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -487,10 +489,15 @@ private fun ImageItem(
             .fillMaxWidth()
     ) {
         val configuration = LocalConfiguration.current
-        val screenHeight = configuration.screenHeightDp.dp
-        val screenWidth = configuration.screenWidthDp.dp
+        val screenHeight by remember {
+            mutableStateOf(configuration.screenHeightDp.dp)
+        }
+        val screenWidth by remember {
+            mutableStateOf(configuration.screenWidthDp.dp)
+        }
 
-        val swidth = if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+        var swidth by remember { mutableStateOf(0.dp) }
+        swidth = if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             if (screenWidth < screenHeight) {
                 screenWidth
             } else {
@@ -623,7 +630,7 @@ private fun LoadingView(
                 .align(Alignment.CenterHorizontally)
                 .padding(20.dp)
         )*/
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         LinearProgressIndicator(
             modifier = Modifier
                 .height(6.dp)
@@ -681,10 +688,14 @@ fun ReflowItem(
         val reflowState: MutableState<List<ReflowBean>?> = remember { mutableStateOf(null) }
         AsyncDecodeTextPage(aPage, mupdfDocument, reflowState)
 
-        val fontSize = styleHelper?.styleBean?.textSize ?: 17f
-        val lineHeight = fontSize.sp * 1.46f
-        val bgColor = styleHelper?.styleBean?.bgColor ?: Color.White.toArgb()
-        val fgColor = styleHelper?.styleBean?.fgColor ?: Color.Black.toArgb()
+        val fontSize by remember { mutableStateOf(styleHelper?.styleBean?.textSize ?: 17f) }
+        val lineHeight by remember { mutableStateOf(fontSize.sp * 1.46f) }
+        val bgColor by remember {
+            mutableStateOf(styleHelper?.styleBean?.bgColor ?: Color.White.toArgb())
+        }
+        val fgColor by remember {
+            mutableStateOf(styleHelper?.styleBean?.fgColor ?: Color.Black.toArgb())
+        }
 
         val reflowBeans = reflowState.value
         if (reflowBeans != null) {

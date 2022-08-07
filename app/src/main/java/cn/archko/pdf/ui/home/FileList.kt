@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -111,17 +112,19 @@ private fun ItemList(
             if (index > 0) {
                 Divider(thickness = 1.dp)
             }
-            fileBean?.let {
-                FileItem(
-                    fileBean = fileBean,
-                    index = index,
-                    onOptClick = onOptClick,
-                    onClick = {
-                        viewModel.setCurrentPos(listState.firstVisibleItemIndex)
-                        onClick(it)
-                    },
-                    viewModel = viewModel
-                )
+            key(index, fileBean) {
+                fileBean?.let {
+                    FileItem(
+                        fileBean = fileBean,
+                        index = index,
+                        onOptClick = onOptClick,
+                        onClick = {
+                            viewModel.setCurrentPos(listState.firstVisibleItemIndex)
+                            onClick(it)
+                        },
+                        viewModel = viewModel
+                    )
+                }
             }
             //Logcat.d("hasMore:$hasMore,prevKey:${result.prevKey},nextKey:${result.nextKey}")
             if (hasMore && index == size - 1 && result.state != State.LOADING) {

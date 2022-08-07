@@ -33,9 +33,10 @@ import androidx.compose.runtime.Composable
 
 fun <T : Any> LazyListScope.itemsIndexed(
     list: List<T>,
-    itemContent: @Composable LazyItemScope.(index: Int, value: T?) -> Unit
+    key: ((index: Int) -> Any)? = null,
+    itemContent: @Composable LazyItemScope.(index: Int, value: T?) -> Unit,
 ) {
-    items(list.size) { index ->
+    items(list.size, key) { index ->
         val item = list[index]
         itemContent(index, item)
     }

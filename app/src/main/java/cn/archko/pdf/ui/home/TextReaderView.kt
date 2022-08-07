@@ -12,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -32,12 +31,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import cn.archko.pdf.bahaviours.CustomFlingBehaviours
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.LoadResult
 import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.paging.itemsIndexed
-import cn.archko.pdf.bahaviours.CustomFlingBehaviours
 import cn.archko.pdf.viewmodel.PDFViewModel
 import kotlinx.coroutines.launch
 
@@ -63,7 +62,10 @@ fun TextViewer(
     val screenWidth = with(LocalDensity.current) {
         configuration.screenWidthDp.dp.toPx()
     }
-    val bgColor = styleHelper?.styleBean?.bgColor ?: Color.White.toArgb()
+
+    val bgColor by remember {
+        mutableStateOf(styleHelper?.styleBean?.bgColor ?: Color.White.toArgb())
+    }
 
     Box(
         modifier = modifier
@@ -147,10 +149,14 @@ private fun TextItem(
     styleHelper: StyleHelper?,
     modifier: Modifier = Modifier
 ) {
-    val fSize = styleHelper?.styleBean?.textSize?.sp ?: 17.sp
-    var fontSize by remember { mutableStateOf(fSize) }
-    val lineHeight = fSize * 1.46f
-    val fgColor = styleHelper?.styleBean?.fgColor ?: Color.Black.toArgb()
+    val fSize by remember { mutableStateOf(styleHelper?.styleBean?.textSize?.sp ?: 17.sp) }
+    val fontSize by remember { mutableStateOf(fSize) }
+    val lineHeight by remember { mutableStateOf(fSize * 1.46f) }
+    val fgColor by remember {
+        mutableStateOf(
+            styleHelper?.styleBean?.fgColor ?: Color.Black.toArgb()
+        )
+    }
 
     /*var scale by remember { mutableStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
