@@ -98,7 +98,10 @@ fun OutlineMenu(
                     .fillMaxWidth()
                     .background(Color(0xCc202020))
             ) {
-                val count = viewModel.bookProgress?.pageCount?.toFloat() ?: 1f
+                var count = viewModel.countPages().toFloat()
+                if (count == 0f) {
+                    count = 1f
+                }
                 Text(
                     "Outline=>Page:${currentPage.value}/${count.toInt()}",
                     style = TextStyle(
