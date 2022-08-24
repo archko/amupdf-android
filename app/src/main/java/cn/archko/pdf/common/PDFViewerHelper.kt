@@ -99,6 +99,8 @@ class PDFViewerHelper {
                         mimeType = "application/pdf";
                     } else if (name.endsWith("epub", true)) {
                         mimeType = "application/epub+zip";
+                    } else if (name.endsWith("mobi", true)) {
+                        mimeType = "application/mobi+zip";
                     } else if (name.endsWith("cbz", true)) {
                         mimeType = "application/x-cbz";
                     } else if (name.endsWith("fb2", true)) {

@@ -246,17 +246,19 @@ class ACropViewController(
                 height = it.effectivePagesHeight
             }
 
-            val view = APDFPageView(context, pdfViewModel.mupdfDocument, pageSize!!, true)
+            val view = APDFPageView(context, pdfViewModel.mupdfDocument, pageSize, true)
             var lp: RecyclerView.LayoutParams? = view.layoutParams as RecyclerView.LayoutParams?
 
-            Logcat.d(
-                String.format(
-                    "create width:%s,measuredWidth:%s,targetWidth:%s",
-                    width,
-                    mRecyclerView.measuredWidth,
-                    pageSize.getTargetWidth()
+            pageSize?.let {
+                Logcat.d(
+                    String.format(
+                        "create width:%s,measuredWidth:%s,targetWidth:%s",
+                        width,
+                        mRecyclerView.measuredWidth,
+                        pageSize.getTargetWidth()
+                    )
                 )
-            )
+            }
             if (null == lp) {
                 lp = RecyclerView.LayoutParams(width, height)
                 view.layoutParams = lp
@@ -288,6 +290,9 @@ class ACropViewController(
         inner class PdfHolder(internal var view: APDFPageView) : RecyclerView.ViewHolder(view) {
             fun onBind(position: Int) {
                 val pageSize = mPageSizes.get(position)
+                if (null == pageSize) {
+                    return
+                }
                 if (pageSize.getTargetWidth() != mRecyclerView.measuredWidth) {
                     pageSize.setTargetWidth(mRecyclerView.measuredWidth)
                 }

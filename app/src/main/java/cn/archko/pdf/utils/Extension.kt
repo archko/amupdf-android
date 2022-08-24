@@ -22,6 +22,8 @@ fun FileBean.getIcon(): Int {
                     iconId = R.drawable.ic_item_book
                 } else if (ext.contains("epub")) {
                     iconId = R.drawable.ic_item_book
+                } else if (ext.contains("mobi")) {
+                    iconId = R.drawable.ic_item_book
                 } else if (ext.contains("txt")) {
                     iconId = R.drawable.ic_item_book
                 } else {
