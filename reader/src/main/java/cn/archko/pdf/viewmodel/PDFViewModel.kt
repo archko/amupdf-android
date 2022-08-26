@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import cn.archko.pdf.App
 import cn.archko.pdf.common.APageSizeLoader
 import cn.archko.pdf.common.Graph
+import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.OutlineHelper
 import cn.archko.pdf.common.PdfOptionRepository
@@ -382,7 +383,7 @@ class PDFViewModel : ViewModel() {
     }
 
     fun countPages(): Int {
-        if (!TextUtils.isEmpty(pdfPath) && pdfPath!!.endsWith("txt", true)) {
+        if (!TextUtils.isEmpty(pdfPath) && IntentFile.isText(pdfPath!!)) {
             return txtPageCount
         }
         val pc = mupdfDocument?.countPages() ?: 0
