@@ -84,8 +84,8 @@ class PDFViewModel : ViewModel() {
             bookProgress!!.autoCrop = autoCrop
             bookProgress!!._id = Graph.database.progressDao().addProgress(bookProgress!!).toInt()
         }
-        bookProgress!!.readTimes = bookProgress!!.readTimes
-        bookProgress!!.inRecent = 0
+        bookProgress!!.readTimes = bookProgress!!.readTimes + 1
+        bookProgress!!.inRecent = BookProgress.IN_RECENT
 
         bookmarks = loadBookmarks()
         Logcat.i(
@@ -251,7 +251,6 @@ class PDFViewModel : ViewModel() {
                     bookProgress = BookProgress(FileUtils.getRealPath(absolutePath))
                 } else {
                     bookProgress!!.path = FileUtils.getRealPath(absolutePath)
-                    bookProgress!!.readTimes = bookProgress!!.readTimes + 1
                 }
                 bookProgress!!.inRecent = 0
                 bookProgress!!.pageCount = pageCount
