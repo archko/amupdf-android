@@ -40,7 +40,7 @@ public class ArDkUtils {
     public static final String[] SO_OTHER_TYPES = new String[]{};
 
     public static final String[] MUPDF_TYPES = new String[]
-            {"pdf", "epub", "svg", "xps", "fb2", "cbz", "xhtml"};
+            {"pdf", "epub", "mobi", "svg", "xps", "fb2", "cbz", "xhtml"};
     public static final String[] IMG_TYPES = new String[]
             {"bmp", "jpg", "jpeg", "gif", "png"};
 

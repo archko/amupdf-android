@@ -316,23 +316,26 @@ public class Utilities
                     context, R.color.sodk_editor_header_txt_color);
             case "hwp":
                 return ContextCompat.getColor(
-                    context, R.color.sodk_editor_header_hwp_color);
+                        context, R.color.sodk_editor_header_hwp_color);
             case "svg":
                 return ContextCompat.getColor(
-                    context, R.color.sodk_editor_header_svg_color);
+                        context, R.color.sodk_editor_header_svg_color);
             case "cbz":
                 return ContextCompat.getColor(
-                    context, R.color.sodk_editor_header_cbz_color);
+                        context, R.color.sodk_editor_header_cbz_color);
             case "epub":
                 return ContextCompat.getColor(
-                    context, R.color.sodk_editor_header_epub_color);
+                        context, R.color.sodk_editor_header_epub_color);
+            case "mobi":
+                return ContextCompat.getColor(
+                        context, R.color.sodk_editor_header_epub_color);
             case "xps":
                 return ContextCompat.getColor(
-                    context, R.color.sodk_editor_header_xps_color);
+                        context, R.color.sodk_editor_header_xps_color);
             case "xhtml":
             case "fb2":
                 return ContextCompat.getColor(
-                    context, R.color.sodk_editor_header_fb2_color);
+                        context, R.color.sodk_editor_header_fb2_color);
         }
 
         return ContextCompat.getColor(context,
@@ -378,6 +381,8 @@ public class Utilities
             case "cbz":
                 return R.drawable.sodk_editor_icon_cbz;
             case "epub":
+                return R.drawable.sodk_editor_icon_epub;
+            case "mobi":
                 return R.drawable.sodk_editor_icon_epub;
             case "xps":
                 return R.drawable.sodk_editor_icon_xps;

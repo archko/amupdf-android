@@ -58,6 +58,7 @@ public class NUIView extends FrameLayout
         switch (ext) {
             case "svg":
             case "epub":
+            case "mobi":
             case "xps":
             case "fb2":
             case "xhtml":

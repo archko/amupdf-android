@@ -75,12 +75,34 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:mimeType="application/pdf" />
-                <data android:mimeType="application/vnd.ms-xpsdocument" />
-                <data android:mimeType="application/oxps" />
-                <data android:mimeType="application/x-cbz" />
-                <data android:mimeType="application/epub+zip" />
-                <data android:mimeType="text/xml" />
+                <data
+                    android:mimeType="application/pdf"
+                    android:scheme="file"
+                    android:host="*" />
+                <data
+                    android:mimeType="application/vnd.ms-xpsdocument"
+                    android:scheme="file"
+                    android:host="*" />
+                <data
+                    android:mimeType="application/oxps"
+                    android:scheme="file"
+                    android:host="*" />
+                <data
+                    android:mimeType="application/x-cbz"
+                    android:scheme="file"
+                    android:host="*" />
+                <data
+                    android:mimeType="application/epub+zip"
+                    android:scheme="file"
+                    android:host="*" />
+                <data
+                    android:mimeType="application/mobi+zip"
+                    android:scheme="file"
+                    android:host="*" />
+                <data
+                    android:mimeType="text/xml"
+                    android:scheme="file"
+                    android:host="*" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -88,16 +110,50 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:pathPattern=".*\\.pdf" />
-                <data android:pathPattern=".*\\.xps" />
-                <data android:pathPattern=".*\\.oxps" />
-                <data android:pathPattern=".*\\.cbz" />
-                <data android:pathPattern=".*\\.epub" />
-                <data android:pathPattern=".*\\.fb2" />
-                <data android:pathPattern=".*\\.log" />
-                <data android:pathPattern=".*\\.xml" />
-                <data android:pathPattern=".*\\.html" />
-                <data android:pathPattern=".*\\.xhtml" />
+                <data
+                    android:pathPattern=".*\\.pdf"
+                    android:scheme="file"
+                    android:host="*" />
+                <data
+                    android:pathPattern=".*\\.xps"
+                    android:scheme="file"
+                    android:host="*" />
+                <data
+                    android:pathPattern=".*\\.oxps"
+                    android:scheme="file"
+                    android:host="*" />
+                <data
+                    android:pathPattern=".*\\.cbz"
+                    android:scheme="file"
+                    android:host="*" />
+                <data
+                    android:pathPattern=".*\\.epub"
+                    android:scheme="file"
+                    android:host="*" />
+                <data
+                    android:pathPattern=".*\\.mobi"
+                    android:scheme="file"
+                    android:host="*" />
+                <data
+                    android:pathPattern=".*\\.fb2"
+                    android:scheme="file"
+                    android:host="*" />
+                <data
+                    android:pathPattern=".*\\.log"
+                    android:scheme="file"
+                    android:host="*" />
+                <data
+                    android:pathPattern=".*\\.xml"
+                    android:scheme="file"
+                    android:host="*" />
+                <data
+                    android:pathPattern=".*\\.html"
+                    android:scheme="file"
+                    android:host="*" />
+                <data
+                    android:pathPattern=".*\\.xhtml"
+                    android:scheme="file"
+                    android:host="*" />
             </intent-filter>
         </activity>
 

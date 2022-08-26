@@ -151,6 +151,8 @@ class FileViewModel() : ViewModel() {
             return@FileFilter true
         if (fname.endsWith(".epub"))
             return@FileFilter true
+        if (fname.endsWith(".mobi"))
+            return@FileFilter true
         if (fname.endsWith(".txt"))
             return@FileFilter true
         if (fname.endsWith(".log"))

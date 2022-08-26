@@ -237,6 +237,7 @@ object IntentFile {
                 || path.endsWith(".tif", false)
                 || path.endsWith(".tiff", false)
                 || path.endsWith(".epub", false)
+                || path.endsWith(".mobi", false)
     }
 }
 
