@@ -137,7 +137,7 @@ class ComposeTextActivity : ComponentActivity() {
                                         )
                                     )
                             ) {
-                                if (path!!.endsWith("txt", true)) {
+                                if (IntentFile.isText(path)) {
                                     val showLoading = remember { mutableStateOf(true) }
                                     val result by pdfViewModel.textFlow.collectAsState()
                                     if (State.INIT == result.state) {
