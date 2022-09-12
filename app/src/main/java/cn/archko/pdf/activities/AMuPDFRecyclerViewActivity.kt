@@ -222,13 +222,30 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         viewController?.notifyDataSetChanged()
     }
 
-    override fun loadDoc() {
+    override fun loadDoc(password: String?) {
         if (IntentFile.isText(mPath)) {
             TextActivity.start(this, mPath!!)
             finish()
         } else {
-            super.loadDoc()
+            super.loadDoc(password)
         }
+    }
+
+    override fun showPasswordDialog() {
+        PasswordDialog.show(this@AMuPDFRecyclerViewActivity,
+            object : PasswordDialog.PasswordDialogListener {
+                override fun onOK(content: String?) {
+                    loadDoc(password = content)
+                }
+
+                override fun onCancel() {
+                    Toast.makeText(
+                        this@AMuPDFRecyclerViewActivity,
+                        "error file path:$mPath",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
     }
 
     override fun doLoadDoc() {

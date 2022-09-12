@@ -87,7 +87,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         loadBookmark()
         initView()
 
-        loadDoc()
+        loadDoc(null)
     }
 
     open fun loadBookmark() {
@@ -265,10 +265,6 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         return viewController!!.getCurrentPos()
     }
 
-    open fun getPassword(): String? {
-        return null
-    }
-
     //===========================================
 
     companion object {
@@ -282,13 +278,17 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         const val TYPE_SETTINGS = 5
     }
 
-    open fun loadDoc() {
+    open fun loadDoc(password: String?) {
         progressDialog.setMessage(mPath)
         progressDialog.show()
         lifecycleScope.launch {
             val start = SystemClock.uptimeMillis()
-            pdfViewModel.loadPdfDoc(this@MuPDFRecyclerViewActivity, mPath!!, getPassword())
+            pdfViewModel.loadPdfDoc(this@MuPDFRecyclerViewActivity, mPath!!, password)
                 .collectLatest {
+                    if (it == null) {
+                        showPasswordDialog()
+                        return@collectLatest
+                    }
                     val cp = pdfViewModel.countPages()
                     if (cp > 0) {
                         Logcat.d(TAG, "open:" + (SystemClock.uptimeMillis() - start) + " cp:" + cp)
@@ -309,6 +309,8 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
                 }
         }
     }
+
+    abstract fun showPasswordDialog()
 
     open fun getPageSize(pageNum: Int): APage? {
         val p = pdfViewModel.loadPage(pageNum) ?: return null

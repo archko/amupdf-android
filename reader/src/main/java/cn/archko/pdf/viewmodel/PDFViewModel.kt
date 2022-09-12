@@ -54,6 +54,11 @@ class PDFViewModel : ViewModel() {
             mupdfDocument!!.newDocument(path, password)
             mupdfDocument!!.let {
                 if (it.document.needsPassword()) {
+                    Logcat.d(Logcat.TAG, "needsPassword")
+                    if (TextUtils.isEmpty(password)) {
+                        emit(null)
+                        return@flow
+                    }
                     it.document.authenticatePassword(password)
                 }
             }

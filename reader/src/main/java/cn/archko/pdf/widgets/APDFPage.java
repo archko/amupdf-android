@@ -42,6 +42,9 @@ class APDFPage {
     }
 
     void update(View documentView, APage aPage) {
+        if (null == aPage) {
+            return;
+        }
         if (this.aPage != aPage || this.documentView != documentView) {
             if (children != null) {
                 for (PageTreeNode node : children) {

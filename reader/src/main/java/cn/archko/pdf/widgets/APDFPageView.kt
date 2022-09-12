@@ -46,6 +46,9 @@ class APDFPageView(
     }
 
     private fun initPdfPage(crop: Boolean) {
+        if (null == pageSize) {
+            return
+        }
         pdfPage = APDFPage(this, pageSize, mupdfDocument, crop)
         if (null != pageSize) {
             pdfPage.bounds = RectF(
