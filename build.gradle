@@ -2,6 +2,7 @@ import cn.archko.mupdf.buildsrc.Libs
 
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
         google()
         maven {
@@ -33,10 +34,7 @@ buildscript {
 
 subprojects {
     repositories {
-        maven {
-            allowInsecureProtocol = true
-            url uri("file:///Users/archko/projects/PDF/mupdf_c/")
-        }
+        mavenLocal()
         mavenCentral()
         google()
         maven {

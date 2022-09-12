@@ -286,7 +286,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             }
 
             //checkout bookmark
-            changeViewMode(pos)
+            changeViewMode(pos - 1)
 
             cropModeSet(mCrop)
         } catch (e: Exception) {
@@ -404,7 +404,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         setCropButton(mCrop)
         val pos = getCurrentPos()
         if (pos > 0) {
-            viewController?.scrollToPosition(pos)
+            viewController?.scrollToPosition(pos + 1)
         }
     }
 

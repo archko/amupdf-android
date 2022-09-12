@@ -113,7 +113,11 @@ class ACropViewController(
         }
 
         if (pos > 0) {
-            (mRecyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(pos, 0)
+            (mRecyclerView.layoutManager as LinearLayoutManager).smoothScrollToPosition(
+                mRecyclerView,
+                null,
+                pos
+            )
         }
     }
 
@@ -132,7 +136,7 @@ class ACropViewController(
     override fun scrollToPosition(page: Int) {
         mRecyclerView.layoutManager?.run {
             val layoutManager: LinearLayoutManager = this as LinearLayoutManager
-            layoutManager.scrollToPositionWithOffset(page, 0)
+            layoutManager.scrollToPositionWithOffset(page - 1, 0)
         }
     }
 
@@ -211,7 +215,7 @@ class ACropViewController(
                 pdfViewModel.saveBookProgress(
                     mPath,
                     pdfViewModel.countPages(),
-                    position,
+                    position + 1,
                     pdfViewModel.bookProgress!!.zoomLevel,
                     -1,
                     0

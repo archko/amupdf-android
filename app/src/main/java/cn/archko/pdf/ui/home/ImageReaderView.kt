@@ -164,8 +164,12 @@ fun ImageViewer(
             }) {
         DisposableEffect(result) {
             coroutineScope.launch {
+                var page = pdfViewModel.getCurrentPage() - 1
+                if (page < 0) {
+                    page = 0
+                }
                 listState.scrollToItem(
-                    pdfViewModel.getCurrentPage(),
+                    page,
                     pdfViewModel.bookProgress!!.offsetY
                 )
             }
@@ -177,7 +181,7 @@ fun ImageViewer(
                         pdfViewModel.saveBookProgress(
                             pdfViewModel.pdfPath,
                             pdfViewModel.countPages(),
-                            position,
+                            position + 1,
                             pdfViewModel.bookProgress!!.zoomLevel,
                             -1,
                             listState.firstVisibleItemScrollOffset

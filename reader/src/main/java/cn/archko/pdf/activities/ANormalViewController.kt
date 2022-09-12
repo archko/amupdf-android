@@ -180,7 +180,7 @@ class ANormalViewController(
     }
 
     override fun scrollToPosition(page: Int) {
-        documentView.goToPage(page)
+        documentView.goToPage(page - 1)
     }
 
     override fun scrollPage(y: Int, top: Int, bottom: Int, margin: Int): Boolean {
@@ -244,7 +244,7 @@ class ANormalViewController(
                 pdfViewModel.saveBookProgress(
                     mPath,
                     pdfViewModel.countPages(),
-                    position,
+                    position + 1,
                     documentView.zoomModel.zoom * 1000f,
                     documentView.scrollX,
                     documentView.scrollY
