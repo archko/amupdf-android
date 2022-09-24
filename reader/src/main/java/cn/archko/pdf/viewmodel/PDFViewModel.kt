@@ -293,17 +293,15 @@ class PDFViewModel : ViewModel() {
         emit(reflowBeans)
     }.flowOn(Dispatchers.IO)
         .collectLatest {
-            if (it.isNotEmpty()) {
-                _textFlow.value = LoadResult(
-                    State.FINISHED,
-                    list = it
-                )
+            val state = if (it.isNotEmpty()) {
+                State.FINISHED
             } else {
-                _textFlow.value = LoadResult(
-                    State.ERROR,
-                    list = it
-                )
+                State.ERROR
             }
+            _textFlow.value = LoadResult(
+                state,
+                list = it
+            )
         }
 
     private val _pageFlow = MutableStateFlow<LoadResult<Any, APage>>(LoadResult(State.INIT))
@@ -339,17 +337,15 @@ class PDFViewModel : ViewModel() {
         }
     }.flowOn(Dispatchers.IO)
         .collectLatest {
-            if (it.isNotEmpty()) {
-                _pageFlow.value = LoadResult(
-                    State.FINISHED,
-                    list = it
-                )
+            val state = if (it.isNotEmpty()) {
+                State.FINISHED
             } else {
-                _pageFlow.value = LoadResult(
-                    State.ERROR,
-                    list = it
-                )
+                State.ERROR
             }
+            _pageFlow.value = LoadResult(
+                state,
+                list = it
+            )
         }
 
     suspend fun loadOutline() = flow {

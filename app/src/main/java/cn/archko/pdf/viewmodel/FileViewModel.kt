@@ -18,10 +18,10 @@ import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.entity.LoadResult
 import cn.archko.pdf.entity.State
 import cn.archko.pdf.model.SearchSuggestionGroup
-import cn.archko.pdf.utils.DateUtils
 import cn.archko.pdf.ui.home.searchTypeFavorite
 import cn.archko.pdf.ui.home.searchTypeFile
 import cn.archko.pdf.ui.home.searchTypeHistory
+import cn.archko.pdf.utils.DateUtils
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
 import cn.archko.pdf.utils.StreamUtils
@@ -32,7 +32,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
@@ -42,8 +41,10 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 import java.io.FileFilter
-import java.util.*
-import kotlin.collections.ArrayList
+import java.util.Arrays
+import java.util.Collections
+import java.util.Locale
+import java.util.Stack
 
 /**
  * @author: archko 2021/4/11 :8:14 上午
@@ -260,14 +261,7 @@ class FileViewModel() : ViewModel() {
                 }
                 val files = File(mCurrentPath).listFiles(fileFilter)
                 if (files != null) {
-                    try {
-                        Arrays.sort(files, fileComparator)
-                    } catch (e: NullPointerException) {
-                        throw RuntimeException(
-                            "failed to sort file list $files for path $mCurrentPath",
-                            e
-                        )
-                    }
+                    Arrays.sort(files, fileComparator)
 
                     for (file in files) {
                         entry = FileBean(FileBean.NORMAL, file, showExtension)
@@ -333,7 +327,7 @@ class FileViewModel() : ViewModel() {
                 }
                 Logcat.d("loadHistories, nKey:$nKey,count:$count, hasMore:$hasMore .value:${_historyFileModel.value.nextKey}")
 
-                val oldList = if (refresh) ArrayList<FileBean>() else _historyFileModel.value.list
+                val oldList = if (refresh) ArrayList() else _historyFileModel.value.list
                 val nList = ArrayList(oldList)
                 nList.addAll(entryList)
                 emit(nList)
@@ -390,7 +384,7 @@ class FileViewModel() : ViewModel() {
                     _uiFavoritiesModel.value.nextKey = null
                 }
                 Logcat.d("loadFavorities, nKey:$nKey,count:$count, hasMore:$hasMore .value:${_uiFavoritiesModel.value.nextKey}")
-                val oldList = if (refresh) ArrayList<FileBean>() else _uiFavoritiesModel.value.list
+                val oldList = if (refresh) ArrayList() else _uiFavoritiesModel.value.list
                 val nList = ArrayList(oldList)
                 nList.addAll(entryList)
                 emit(nList)
@@ -560,13 +554,11 @@ class FileViewModel() : ViewModel() {
                 val dir = FileUtils.getStorageDir("amupdf")
                 if (dir.exists()) {
                     files = dir.listFiles { pathname: File -> pathname.name.startsWith("mupdf_") }
-                    Arrays.sort(files) { f1: File?, f2: File? ->
-                        if (f1 == null) throw RuntimeException("f1 is null inside sort")
-                        if (f2 == null) throw RuntimeException("f2 is null inside sort")
-                        try {
+                    if (files != null) {
+                        Arrays.sort(files) { f1: File?, f2: File? ->
+                            if (f1 == null) throw RuntimeException("f1 is null inside sort")
+                            if (f2 == null) throw RuntimeException("f2 is null inside sort")
                             return@sort f2.lastModified().compareTo(f1.lastModified())
-                        } catch (e: NullPointerException) {
-                            throw RuntimeException("failed to compare $f1 and $f2", e)
                         }
                     }
                 }
@@ -579,7 +571,7 @@ class FileViewModel() : ViewModel() {
                 emit(list)
             }.catch { e ->
                 Logcat.d("backupFiles error:$e")
-                emit(ArrayList<File>())
+                emit(ArrayList())
             }.flowOn(Dispatchers.IO)
                 .collect { list ->
                     _uiBackupFileModel.value =
@@ -676,9 +668,11 @@ class FileViewModel() : ViewModel() {
                 searchTypeFile -> {
                     doSearchFile(fileList, query, File(homePath))
                 }
+
                 searchTypeHistory -> {
                     fileList = doSearchHistory(query)
                 }
+
                 searchTypeFavorite -> {
                     fileList = doSearchFavorite(query)
                 }
