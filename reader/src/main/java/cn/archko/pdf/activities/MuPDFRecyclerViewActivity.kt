@@ -32,7 +32,6 @@ import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -285,6 +284,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         lifecycleScope.launch {
             val start = SystemClock.uptimeMillis()
             pdfViewModel.loadPdfDoc(this@MuPDFRecyclerViewActivity, mPath!!, password)
+            pdfViewModel.pageFlow
                 .collectLatest {
                     if (it.state == State.PASS) {
                         showPasswordDialog()
@@ -294,21 +294,23 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
                     if (cp > 0) {
                         Logcat.d(TAG, "open:" + (SystemClock.uptimeMillis() - start) + " cp:" + cp)
 
-                        //val loc = mDocument!!.layout(mLayoutW, mLayoutH, mLayoutEM)
-
-                        preparePageSize(cp)
-                        Logcat.d(TAG, "open:end." + mPageSizes.size())
-                        val mill = SystemClock.uptimeMillis() - start
-                        if (mill < 500L) {
-                            delay(500L - mill)
-                        }
-
-                        doLoadDoc()
+                        postLoadDoc(cp)
                     } else {
                         finish()
                     }
                 }
         }
+    }
+
+    open fun postLoadDoc(cp: Int) {
+        preparePageSize(cp)
+        Logcat.d(TAG, "open:end." + mPageSizes.size())
+        //val mill = SystemClock.uptimeMillis() - start
+        //if (mill < 500L) {
+        //    delay(500L - mill)
+        //}
+
+        doLoadDoc()
     }
 
     abstract fun showPasswordDialog()

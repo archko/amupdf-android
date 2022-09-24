@@ -8,6 +8,7 @@ import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.RelativeLayout
 import android.widget.SeekBar
 import androidx.databinding.DataBindingUtil
@@ -137,7 +138,6 @@ class AReflowViewController(
             mStyleHelper = StyleHelper(context, optionRepository)
         }
         if (null == mRecyclerView.adapter) {
-
             mRecyclerView.adapter =
                 MuPDFReflowAdapter(
                     context,
@@ -151,11 +151,15 @@ class AReflowViewController(
         }
 
         if (pos > 0) {
-            (mRecyclerView.layoutManager as LinearLayoutManager).smoothScrollToPosition(
-                mRecyclerView,
-                null,
-                pos
-            )
+            val layoutManager = mRecyclerView.layoutManager
+            val vto: ViewTreeObserver = mRecyclerView.viewTreeObserver
+            vto.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    mRecyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    Logcat.d("onGlobalLayout:$this,pos:$pos")
+                    layoutManager!!.scrollToPosition(pos)
+                }
+            })
         }
     }
 

@@ -7,6 +7,7 @@ import android.util.SparseArray
 import android.view.GestureDetector
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.RelativeLayout
 import androidx.core.app.ComponentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -64,12 +65,11 @@ class ACropViewController(
                 }
             })
         }
-
     }
 
     override fun init(pageSizes: SparseArray<APage>, pos: Int) {
         try {
-            Logcat.d("init:$this")
+            Logcat.d("init:$this,pos:$pos")
             if (null != pdfViewModel.mupdfDocument) {
                 this.mPageSizes = pageSizes
 
@@ -113,11 +113,17 @@ class ACropViewController(
         }
 
         if (pos > 0) {
-            (mRecyclerView.layoutManager as LinearLayoutManager).smoothScrollToPosition(
-                mRecyclerView,
-                null,
-                pos
-            )
+            val layoutManager = mRecyclerView.layoutManager
+
+            val vto: ViewTreeObserver = mRecyclerView.viewTreeObserver
+            vto.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    mRecyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    Logcat.d("onGlobalLayout:$this,pos:$pos")
+                    layoutManager!!.scrollToPosition(pos)
+                    mRecyclerView.requestLayout()
+                }
+            })
         }
     }
 
@@ -250,7 +256,7 @@ class ACropViewController(
                 height = it.effectivePagesHeight
             }
 
-            val view = APDFPageView(context, pdfViewModel.mupdfDocument, pageSize, true)
+            val view = APDFPageView(context, pdfViewModel.mupdfDocument, pageSize!!, true)
             var lp: RecyclerView.LayoutParams? = view.layoutParams as RecyclerView.LayoutParams?
 
             pageSize?.let {
@@ -288,15 +294,12 @@ class ACropViewController(
         }
 
         override fun getItemCount(): Int {
-            return pdfViewModel.countPages()
+            return mPageSizes.size()
         }
 
         inner class PdfHolder(internal var view: APDFPageView) : RecyclerView.ViewHolder(view) {
             fun onBind(position: Int) {
                 val pageSize = mPageSizes.get(position)
-                if (null == pageSize) {
-                    return
-                }
                 if (pageSize.getTargetWidth() != mRecyclerView.measuredWidth) {
                     pageSize.setTargetWidth(mRecyclerView.measuredWidth)
                 }

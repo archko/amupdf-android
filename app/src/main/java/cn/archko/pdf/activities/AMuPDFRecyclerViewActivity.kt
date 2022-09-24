@@ -345,7 +345,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         }
     }
 
-    override fun preparePageSize(cp: Int) {
+    override fun postLoadDoc(cp: Int) {
         val mRecyclerView = viewController?.getDocumentView()
         val width =
             mRecyclerView?.width ?: Utils.getScreenWidthPixelWithOrientation(this)
@@ -365,9 +365,10 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                     checkPageSize(cp)
                 } else {
                     start = SystemClock.uptimeMillis()
-                    super.preparePageSize(cp)
+                    preparePageSize(cp)
                     Logcat.d("open2:" + (SystemClock.uptimeMillis() - start))
                 }
+                doLoadDoc()
             }
         }
     }
@@ -382,7 +383,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                 val pointF = getPageSize(i)
                 if (null == point) {
                     mPageSizes.clear()
-                    super.preparePageSize(cp)
+                    preparePageSize(cp)
                     break
                 }
                 mPageSizes.put(i, pointF)
@@ -622,16 +623,20 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                     mDrawerLayout.closeDrawer(mLeftDrawer)
                     mPageSeekBarControls?.show()
                 }
+
                 TYPE_ZOOM -> {
                     mDrawerLayout.closeDrawer(mLeftDrawer)
                     viewController?.showController()
                 }
+
                 TYPE_CLOSE -> {
                     this@AMuPDFRecyclerViewActivity.finish()
                 }
+
                 TYPE_SETTINGS -> {
                     PdfOptionsActivity.start(this@AMuPDFRecyclerViewActivity)
                 }
+
                 else -> {
                 }
             }

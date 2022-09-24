@@ -47,41 +47,6 @@ class PDFViewModel : ViewModel() {
     var txtPageCount: Int = 1
     var outlineHelper: OutlineHelper? = null
 
-    fun loadPdfDoc(context: Context, path: String, password: String?) =
-        flow {
-            var state: State
-            try {
-                pdfPath = path
-                if (null == mupdfDocument) {
-                    mupdfDocument = MupdfDocument(context)
-                }
-                mupdfDocument!!.newDocument(path, password)
-                mupdfDocument!!.let {
-                    if (it.document.needsPassword()) {
-                        Logcat.d(Logcat.TAG, "needsPassword")
-                        if (TextUtils.isEmpty(password)) {
-                            emit(
-                                LoadResult(
-                                    State.PASS,
-                                )
-                            )
-                            return@flow
-                        }
-                        it.document.authenticatePassword(password)
-                    }
-                }
-                state = State.FINISHED
-            } catch (e: Exception) {
-                e.printStackTrace()
-                state = State.ERROR
-            }
-            val result = LoadResult<MupdfDocument, Any>(
-                state,
-                obj = mupdfDocument,
-            )
-            emit(result)
-        }.flowOn(Dispatchers.IO)
-
     private fun loadBookmarks(): List<Bookmark>? {
         try {
             val progressDao = Graph.database.progressDao()
@@ -326,13 +291,13 @@ class PDFViewModel : ViewModel() {
     val outlineFlow: StateFlow<LoadResult<Any, OutlineItem>>
         get() = _outlineFlow
 
-    suspend fun loadPdfDoc2(context: Context, path: String, password: String?) = flow {
+    suspend fun loadPdfDoc(context: Context, path: String, password: String?) = flow {
         try {
             pdfPath = path
-            if (mupdfDocument == null) {
+            if (null == mupdfDocument) {
                 mupdfDocument = MupdfDocument(context)
             }
-            Logcat.d(Logcat.TAG, "loadPdfDoc2:$password")
+            Logcat.d(Logcat.TAG, "loadPdfDoc.password:$password")
             mupdfDocument!!.newDocument(path, password)
             mupdfDocument!!.let {
                 if (it.document.needsPassword()) {

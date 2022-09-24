@@ -20,7 +20,7 @@ import cn.archko.pdf.utils.Utils
 class APDFPageView(
     private val mContext: Context,
     private val mupdfDocument: MupdfDocument?,
-    private var pageSize: APage?,
+    private var pageSize: APage,
     crop: Boolean
 ) : View(mContext) {
 
@@ -40,28 +40,23 @@ class APDFPageView(
 
         bgpaint.setColor(Color.LTGRAY)
 
-        mZoom = pageSize?.zoom ?: 1f
+        mZoom = pageSize.zoom ?: 1f
         initPdfPage(crop)
         updateView()
     }
 
     private fun initPdfPage(crop: Boolean) {
-        if (null == pageSize) {
-            return
-        }
         pdfPage = APDFPage(this, pageSize, mupdfDocument, crop)
-        if (null != pageSize) {
-            pdfPage.bounds = RectF(
-                0f,
-                0f,
-                pageSize!!.cropScaleWidth.toFloat(),
-                pageSize!!.cropScaleHeight.toFloat()
-            )
-        }
+        pdfPage.bounds = RectF(
+            0f,
+            0f,
+            pageSize.cropScaleWidth.toFloat(),
+            pageSize.cropScaleHeight.toFloat()
+        )
     }
 
     private fun updateView() {
-        setLayerType(View.LAYER_TYPE_HARDWARE, null)
+        setLayerType(LAYER_TYPE_HARDWARE, null)
     }
 
     fun recycle() {
@@ -69,22 +64,19 @@ class APDFPageView(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        if (null == pageSize) {
-            return
-        }
-        var width = pageSize!!.cropScaleWidth
-        var height = pageSize!!.cropScaleHeight
+        var width = pageSize.cropScaleWidth
+        var height = pageSize.cropScaleHeight
 
-        val viewWidth = pageSize!!.getTargetWidth()
+        val viewWidth = pageSize.getTargetWidth()
         Logcat.d(
             String.format(
                 "onMeasure,index:%s, width:%s,height:%s, viewWidth:%s, page:%s-%s, mZoom: %s, aPage:%s",
-                pageSize!!.index,
+                pageSize.index,
                 width,
                 height,
                 viewWidth,
-                pageSize!!.effectivePagesWidth,
-                pageSize!!.effectivePagesHeight,
+                pageSize.effectivePagesWidth,
+                pageSize.effectivePagesHeight,
                 mZoom,
                 pageSize
             )
@@ -114,7 +106,7 @@ class APDFPageView(
         this.showBookmark = showBookmark
         mZoom = newZoom
         this.pageSize = pageSize
-        this.pageSize!!.zoom = newZoom
+        this.pageSize.zoom = newZoom
         var isNew = false
         if (pdfPage.bounds.width().toInt() != pageSize.effectivePagesWidth
             || pdfPage.bounds.height().toInt() != pageSize.effectivePagesHeight
@@ -122,7 +114,7 @@ class APDFPageView(
             pageSize.setCropBounds(null, 1.0f)
             isNew = true
         }
-        if (this.pageSize!!.index != pageSize.index || isNew) {
+        if (this.pageSize.index != pageSize.index || isNew) {
             this.pageSize = pageSize
             isNew = true
             pageSize.setCropBounds(null, 1.0f)
@@ -135,8 +127,8 @@ class APDFPageView(
             pdfPage.update(this, pageSize)
         }
 
-        val zoomSize = this.pageSize!!.zoomPoint
-        val xOrigin = (zoomSize.x - this.pageSize!!.getTargetWidth()) / 2
+        val zoomSize = this.pageSize.zoomPoint
+        val xOrigin = (zoomSize.x - this.pageSize.getTargetWidth()) / 2
 
         Logcat.d(
             String.format(

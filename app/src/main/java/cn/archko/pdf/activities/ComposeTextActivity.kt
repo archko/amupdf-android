@@ -165,7 +165,7 @@ class ComposeTextActivity : ComponentActivity() {
                                     val result by pdfViewModel.pageFlow.collectAsState()
                                     if (result.state == State.INIT) {
                                         lifecycleScope.launch {
-                                            pdfViewModel.loadPdfDoc2(
+                                            pdfViewModel.loadPdfDoc(
                                                 this@ComposeTextActivity,
                                                 path!!,
                                                 null
@@ -178,7 +178,7 @@ class ComposeTextActivity : ComponentActivity() {
                                             object : PasswordDialog.PasswordDialogListener {
                                                 override fun onOK(password: String?) {
                                                     lifecycleScope.launch {
-                                                        pdfViewModel.loadPdfDoc2(
+                                                        pdfViewModel.loadPdfDoc(
                                                             this@ComposeTextActivity,
                                                             path!!,
                                                             password
