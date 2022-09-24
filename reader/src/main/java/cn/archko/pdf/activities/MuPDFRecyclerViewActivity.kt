@@ -26,6 +26,7 @@ import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.entity.APage
+import cn.archko.pdf.entity.State
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
@@ -285,7 +286,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
             val start = SystemClock.uptimeMillis()
             pdfViewModel.loadPdfDoc(this@MuPDFRecyclerViewActivity, mPath!!, password)
                 .collectLatest {
-                    if (it == null) {
+                    if (it.state == State.PASS) {
                         showPasswordDialog()
                         return@collectLatest
                     }

@@ -28,4 +28,5 @@ sealed class State {
     object LOADING : State()
     object FINISHED : State()
     object ERROR : State()
+    object PASS : State()
 }

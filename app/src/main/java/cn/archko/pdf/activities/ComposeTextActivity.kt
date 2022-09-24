@@ -96,7 +96,7 @@ class ComposeTextActivity : ComponentActivity() {
         lifecycleScope.launch {
             pdfViewModel.loadBookProgressByPath(path!!, preferencesRepository)
         }
-        setView(null)
+        setView()
     }
 
     private fun error() {
@@ -110,7 +110,7 @@ class ComposeTextActivity : ComponentActivity() {
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalMaterial3Api::class)
-    private fun setView(password: String?) {
+    private fun setView() {
         var margin = window.decorView.height
         if (margin <= 0) {
             margin = ViewConfiguration.get(this).scaledTouchSlop * 2
@@ -146,10 +146,10 @@ class ComposeTextActivity : ComponentActivity() {
                                         }
                                     }
                                     showLoading.value = (result.state != State.FINISHED)
-                                    if (result.state == State.INIT || result.list == null) {
-                                        LoadingView()
-                                    } else if (State.ERROR == result.state) {
+                                    if (State.ERROR == result.state) {
                                         error()
+                                    } else if (result.state == State.INIT || result.list == null) {
+                                        LoadingView()
                                     } else {
                                         TextViewer(
                                             result = result,
@@ -164,17 +164,36 @@ class ComposeTextActivity : ComponentActivity() {
                                     val showLoading = remember { mutableStateOf(true) }
                                     val result by pdfViewModel.pageFlow.collectAsState()
                                     if (result.state == State.INIT) {
-                                        loadDoc(password)
+                                        lifecycleScope.launch {
+                                            pdfViewModel.loadPdfDoc2(
+                                                this@ComposeTextActivity,
+                                                path!!,
+                                                null
+                                            )
+                                        }
                                     }
                                     showLoading.value = (result.state != State.FINISHED)
-                                    if (result.state == State.INIT || result.list == null || pdfViewModel.mupdfDocument == null) {
-                                        LoadingView()
+                                    if (State.PASS == result.state) {
+                                        PasswordDialog.show(this@ComposeTextActivity,
+                                            object : PasswordDialog.PasswordDialogListener {
+                                                override fun onOK(password: String?) {
+                                                    lifecycleScope.launch {
+                                                        pdfViewModel.loadPdfDoc2(
+                                                            this@ComposeTextActivity,
+                                                            path!!,
+                                                            password
+                                                        )
+                                                    }
+                                                }
+
+                                                override fun onCancel() {
+                                                    error()
+                                                }
+                                            })
                                     } else if (State.ERROR == result.state) {
-                                        if (pdfViewModel.mupdfDocument?.needsPassword() == true) {
-                                            showPasswordDialog()
-                                        } else {
-                                            error()
-                                        }
+                                        error()
+                                    } else if (result.state == State.INIT || result.list == null || pdfViewModel.mupdfDocument == null) {
+                                        LoadingView()
                                     } else {
                                         ImageViewer(
                                             result = result,
@@ -194,30 +213,6 @@ class ComposeTextActivity : ComponentActivity() {
                     }
                 }
             }
-        }
-    }
-
-    private fun showPasswordDialog() {
-        PasswordDialog.show(this@ComposeTextActivity,
-            object : PasswordDialog.PasswordDialogListener {
-                override fun onOK(content: String?) {
-                    setView(password = content)
-                }
-
-                override fun onCancel() {
-                    error()
-                }
-            })
-    }
-
-    @Composable
-    private fun loadDoc(password: String?) {
-        lifecycleScope.launch {
-            pdfViewModel.loadPdfDoc2(
-                this@ComposeTextActivity,
-                path!!,
-                password
-            )
         }
     }
 

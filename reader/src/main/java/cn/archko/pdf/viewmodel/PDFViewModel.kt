@@ -47,26 +47,40 @@ class PDFViewModel : ViewModel() {
     var txtPageCount: Int = 1
     var outlineHelper: OutlineHelper? = null
 
-    fun loadPdfDoc(context: Context, path: String, password: String?) = flow {
-        try {
-            pdfPath = path
-            mupdfDocument = MupdfDocument(context)
-            mupdfDocument!!.newDocument(path, password)
-            mupdfDocument!!.let {
-                if (it.document.needsPassword()) {
-                    Logcat.d(Logcat.TAG, "needsPassword")
-                    if (TextUtils.isEmpty(password)) {
-                        emit(null)
-                        return@flow
-                    }
-                    it.document.authenticatePassword(password)
+    fun loadPdfDoc(context: Context, path: String, password: String?) =
+        flow {
+            var state: State
+            try {
+                pdfPath = path
+                if (null == mupdfDocument) {
+                    mupdfDocument = MupdfDocument(context)
                 }
+                mupdfDocument!!.newDocument(path, password)
+                mupdfDocument!!.let {
+                    if (it.document.needsPassword()) {
+                        Logcat.d(Logcat.TAG, "needsPassword")
+                        if (TextUtils.isEmpty(password)) {
+                            emit(
+                                LoadResult(
+                                    State.PASS,
+                                )
+                            )
+                            return@flow
+                        }
+                        it.document.authenticatePassword(password)
+                    }
+                }
+                state = State.FINISHED
+            } catch (e: Exception) {
+                e.printStackTrace()
+                state = State.ERROR
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        emit(mupdfDocument)
-    }.flowOn(Dispatchers.IO)
+            val result = LoadResult<MupdfDocument, Any>(
+                state,
+                obj = mupdfDocument,
+            )
+            emit(result)
+        }.flowOn(Dispatchers.IO)
 
     private fun loadBookmarks(): List<Bookmark>? {
         try {
@@ -315,13 +329,16 @@ class PDFViewModel : ViewModel() {
     suspend fun loadPdfDoc2(context: Context, path: String, password: String?) = flow {
         try {
             pdfPath = path
-            mupdfDocument = MupdfDocument(context)
+            if (mupdfDocument == null) {
+                mupdfDocument = MupdfDocument(context)
+            }
+            Logcat.d(Logcat.TAG, "loadPdfDoc2:$password")
             mupdfDocument!!.newDocument(path, password)
             mupdfDocument!!.let {
                 if (it.document.needsPassword()) {
                     Logcat.d(Logcat.TAG, "needsPassword")
                     if (TextUtils.isEmpty(password)) {
-                        emit(listOf())
+                        emit(null)
                         return@flow
                     }
                     it.document.authenticatePassword(password)
@@ -337,7 +354,9 @@ class PDFViewModel : ViewModel() {
         }
     }.flowOn(Dispatchers.IO)
         .collectLatest {
-            val state = if (it.isNotEmpty()) {
+            val state = if (null == it) {
+                State.PASS
+            } else if (it.isNotEmpty()) {
                 State.FINISHED
             } else {
                 State.ERROR
