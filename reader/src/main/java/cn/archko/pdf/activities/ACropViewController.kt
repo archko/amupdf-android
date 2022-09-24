@@ -120,8 +120,10 @@ class ACropViewController(
                 override fun onGlobalLayout() {
                     mRecyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
                     Logcat.d("onGlobalLayout:$this,pos:$pos")
-                    layoutManager!!.scrollToPosition(pos)
-                    mRecyclerView.requestLayout()
+                    mRecyclerView.postDelayed({
+                        layoutManager!!.scrollToPosition(pos)
+                        mRecyclerView.requestLayout()
+                    }, 100L)
                 }
             })
         }
