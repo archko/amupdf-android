@@ -1,13 +1,25 @@
 package cn.archko.pdf.common
 
 import android.graphics.Bitmap
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.RememberObserver
+import androidx.compose.runtime.snapshotFlow
 import cn.archko.pdf.App.Companion.instance
-import cn.archko.pdf.common.AbsAsyncPdfPainter
-import cn.archko.pdf.common.ImageLoader
-import cn.archko.pdf.common.ImageWorker
+import cn.archko.pdf.AppExecutors
+import cn.archko.pdf.entity.APage
+import cn.archko.pdf.entity.ReflowBean
+import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.utils.BitmapUtils
 import cn.archko.pdf.utils.FileUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import java.io.File
 
 /**
@@ -42,5 +54,59 @@ class AsyncPdfImagePainter internal constructor(
         }
 
         return bitmap
+    }
+}
+
+@Composable
+fun AsyncDecodePage(
+    aPage: APage,
+    crop: Boolean = true,
+    mupdfDocument: MupdfDocument,
+    imageState: MutableState<Bitmap?>
+) {
+    DisposableEffect(aPage.getTargetWidth()) {
+        val decodeParam = ImageWorker.DecodeParam(
+            aPage.toString(),
+            crop,
+            0,
+            aPage,
+            mupdfDocument.document,
+        )
+        val scope =
+            CoroutineScope(SupervisorJob() + AppExecutors.instance.diskIO().asCoroutineDispatcher())
+        scope.launch {
+            snapshotFlow {
+                PdfImageDecoder.decode(decodeParam)
+            }.flowOn(AppExecutors.instance.diskIO().asCoroutineDispatcher())
+                .collectLatest {
+                    imageState.value = it
+                }
+        }
+        onDispose {
+            scope.cancel()
+        }
+    }
+}
+
+@Composable
+fun AsyncDecodeTextPage(
+    aPage: APage,
+    mupdfDocument: MupdfDocument,
+    imageState: MutableState<List<ReflowBean>?>
+) {
+    DisposableEffect(aPage.index) {
+        val scope =
+            CoroutineScope(SupervisorJob() + AppExecutors.instance.diskIO().asCoroutineDispatcher())
+        scope.launch {
+            snapshotFlow {
+                return@snapshotFlow mupdfDocument.decodeReflow(aPage.index)
+            }.flowOn(AppExecutors.instance.diskIO().asCoroutineDispatcher())
+                .collectLatest {
+                    imageState.value = it
+                }
+        }
+        onDispose {
+            scope.cancel()
+        }
     }
 }

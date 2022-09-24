@@ -30,7 +30,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -59,13 +58,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.BackPressHandler
 import cn.archko.pdf.bahaviours.CustomFlingBehaviours
-import cn.archko.pdf.common.ImageWorker.DecodeParam
+import cn.archko.pdf.common.AsyncDecodePage
+import cn.archko.pdf.common.AsyncDecodeTextPage
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.ParseTextMain
-import cn.archko.pdf.common.PdfImageDecoder
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.APage
@@ -80,11 +78,6 @@ import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.BaseMenu
 import cn.archko.pdf.widgets.CakeView
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlin.math.cos
 import kotlin.math.sin
@@ -644,37 +637,6 @@ private fun LoadingView(
 }
 
 @Composable
-private fun AsyncDecodePage(
-    aPage: APage,
-    crop: Boolean = true,
-    mupdfDocument: MupdfDocument,
-    imageState: MutableState<Bitmap?>
-) {
-    DisposableEffect(aPage.getTargetWidth()) {
-        val decodeParam = DecodeParam(
-            aPage.toString(),
-            crop,
-            0,
-            aPage,
-            mupdfDocument.document,
-        )
-        val scope =
-            CoroutineScope(SupervisorJob() + AppExecutors.instance.diskIO().asCoroutineDispatcher())
-        scope.launch {
-            snapshotFlow {
-                PdfImageDecoder.decode(decodeParam)
-            }.flowOn(AppExecutors.instance.diskIO().asCoroutineDispatcher())
-                .collectLatest {
-                    imageState.value = it
-                }
-        }
-        onDispose {
-            scope.cancel()
-        }
-    }
-}
-
-@Composable
 fun ReflowItem(
     mupdfDocument: MupdfDocument,
     styleHelper: StyleHelper?,
@@ -757,29 +719,6 @@ fun ReflowItem(
             ) {
                 LoadingView("Decoding Page:${aPage.index + 1}")
             }
-        }
-    }
-}
-
-@Composable
-private fun AsyncDecodeTextPage(
-    aPage: APage,
-    mupdfDocument: MupdfDocument,
-    imageState: MutableState<List<ReflowBean>?>
-) {
-    DisposableEffect(aPage.index) {
-        val scope =
-            CoroutineScope(SupervisorJob() + AppExecutors.instance.diskIO().asCoroutineDispatcher())
-        scope.launch {
-            snapshotFlow {
-                return@snapshotFlow mupdfDocument.decodeReflow(aPage.index)
-            }.flowOn(AppExecutors.instance.diskIO().asCoroutineDispatcher())
-                .collectLatest {
-                    imageState.value = it
-                }
-        }
-        onDispose {
-            scope.cancel()
         }
     }
 }
