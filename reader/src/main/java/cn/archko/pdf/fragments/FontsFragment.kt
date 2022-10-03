@@ -98,7 +98,7 @@ open class FontsFragment : BaseDialogFragment<FragmentFontBinding>(R.layout.frag
 
         adapter = object : BaseRecyclerAdapter<FontBean>(activity) {
 
-            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<*> {
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<FontBean> {
                 val binding =
                     ItemOutlineBinding.inflate(
                         LayoutInflater.from(parent.context),

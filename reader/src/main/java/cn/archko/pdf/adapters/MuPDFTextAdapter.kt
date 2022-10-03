@@ -41,7 +41,7 @@ class MuPDFTextAdapter(
     }
 
     override fun onBindNormalViewHolder(
-        holder: BaseViewHolder<Any>,
+        holder: BaseViewHolder<ReflowBean>,
         position: Int,
         realPos: Int
     ) {
@@ -62,7 +62,7 @@ class MuPDFTextAdapter(
         return false
     }
 
-    override fun onViewRecycled(holder: BaseViewHolder<*>) {
+    override fun onViewRecycled(holder: BaseViewHolder<ReflowBean>) {
         super.onViewRecycled(holder)
         if (holder is ReflowTextViewHolder) {
             holder.recycleViews(reflowCache)

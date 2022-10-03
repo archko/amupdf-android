@@ -15,7 +15,7 @@ import cn.archko.pdf.utils.Utils
 class MenuAdapter public constructor(
     var menuListener: MenuListener?,
     private var context: Context?
-) : BaseRecyclerAdapter<String>(context) {
+) : BaseRecyclerAdapter<MenuBean>(context) {
 
     lateinit var binding: ItemOutlineBinding
 
