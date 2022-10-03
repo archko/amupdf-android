@@ -67,7 +67,7 @@ public abstract class HeaderAndFooterRecyclerAdapter<T> extends BaseRecyclerAdap
     public abstract BaseViewHolder<T> doCreateViewHolder(ViewGroup parent, int viewType);
 
     @Override
-    public final void onBindViewHolder(BaseViewHolder holder, int position) {
+    public final void onBindViewHolder(BaseViewHolder<T> holder, int position) {
 
         if (isHeaderViewPos(position)) {
             onBindHeaderViewHolder(holder, position);
@@ -81,15 +81,15 @@ public abstract class HeaderAndFooterRecyclerAdapter<T> extends BaseRecyclerAdap
 
     }
 
-    protected void onBindHeaderViewHolder(BaseViewHolder holder, int position) {
+    protected void onBindHeaderViewHolder(BaseViewHolder<T> holder, int position) {
         // 供子类覆盖
     }
 
-    protected void onBindFooterViewHolder(BaseViewHolder holder, int position) {
+    protected void onBindFooterViewHolder(BaseViewHolder<T> holder, int position) {
         // 供子类覆盖
     }
 
-    protected void onBindNormalViewHolder(BaseViewHolder holder, int position, int realPosition) {
+    protected void onBindNormalViewHolder(BaseViewHolder<T> holder, int position, int realPosition) {
         super.onBindViewHolder(holder, realPosition);
     }
 

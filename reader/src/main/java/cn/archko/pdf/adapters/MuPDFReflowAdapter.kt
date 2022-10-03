@@ -25,7 +25,7 @@ class MuPDFReflowAdapter(
     private var styleHelper: StyleHelper?,
     private var scope: CoroutineScope?,
     private var pdfViewModel: PDFViewModel
-) : BaseRecyclerAdapter<Any>(mContext) {
+) : BaseRecyclerAdapter<ReflowBean>(mContext) {
 
     private var screenHeight = 720
     private var screenWidth = 1080
@@ -45,7 +45,7 @@ class MuPDFReflowAdapter(
         return mupdfDocument?.countPages()!!
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<*> {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<ReflowBean> {
         val pdfView: ReflowTextViewHolder.PDFTextView =
             ReflowTextViewHolder.PDFTextView(mContext, styleHelper)
         val holder = ReflowTextViewHolder(pdfView)
@@ -62,7 +62,7 @@ class MuPDFReflowAdapter(
         return mupdfDocument?.decodeReflow(pos);
     }
 
-    override fun onBindViewHolder(holder: BaseViewHolder<Any>, pos: Int) {
+    override fun onBindViewHolder(holder: BaseViewHolder<ReflowBean>, pos: Int) {
         scope!!.launch {
             val result = decode(pos)
             withContext(Dispatchers.Main) {
@@ -92,7 +92,7 @@ class MuPDFReflowAdapter(
         return false
     }
 
-    override fun onViewRecycled(holder: BaseViewHolder<*>) {
+    override fun onViewRecycled(holder: BaseViewHolder<ReflowBean>) {
         super.onViewRecycled(holder)
         val pdfHolder = holder as ReflowTextViewHolder?
 
