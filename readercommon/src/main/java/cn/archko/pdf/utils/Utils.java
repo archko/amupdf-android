@@ -7,8 +7,6 @@ import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
@@ -152,13 +150,5 @@ public class Utils {
     public static int sp2px(float spValue) {
         final float fontScale = App.Companion.getInstance().getResources().getDisplayMetrics().scaledDensity;
         return (int) (spValue * fontScale + 0.5f);
-    }
-
-    public static void runOnUiThread(Runnable action) {
-        if (Thread.currentThread() != App.uiThread) {
-            new Handler(Looper.getMainLooper()).post(action);
-        } else {
-            action.run();
-        }
     }
 }

@@ -13,7 +13,6 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        uiThread = Thread.currentThread()
         Graph.provide(this)
 
         Thread.setDefaultUncaughtExceptionHandler(CrashHandler())
@@ -31,9 +30,6 @@ class App : Application() {
     companion object {
         var instance: App? = null
             private set
-
-        @JvmField
-        var uiThread: Thread? = null
 
         @JvmStatic
         val PDF_PREFERENCES_NAME = "amupdf_preferences"
