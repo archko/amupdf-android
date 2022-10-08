@@ -117,7 +117,7 @@ class TextActivity : AppCompatActivity() {
         val gestureDetector = GestureDetector(this, object :
             GestureDetector.SimpleOnGestureListener() {
 
-            override fun onDoubleTap(e: MotionEvent?): Boolean {
+            override fun onDoubleTap(e: MotionEvent): Boolean {
                 showReflowConfigMenu()
                 return super.onDoubleTap(e)
             }

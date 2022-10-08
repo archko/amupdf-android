@@ -43,7 +43,6 @@ import cn.archko.pdf.entity.OutlineItem
 import cn.archko.pdf.viewmodel.PDFViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutlineMenu(
     outlineDialog: MutableState<Boolean>,
@@ -144,7 +143,7 @@ fun OutlineMenu(
                             MenuItem(
                                 outlineItem = outlineItem,
                                 onSelect = {
-                                    outlineDialog.value = false
+                                    //outlineDialog.value = false
                                     onSelect(it)
                                 },
                             )
