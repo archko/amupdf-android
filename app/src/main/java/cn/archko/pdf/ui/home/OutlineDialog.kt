@@ -23,8 +23,10 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -106,7 +108,7 @@ fun OutlineMenu(
                         .padding(0.dp, 4.dp, 0.dp, 0.dp)
                         .align(Alignment.TopCenter)
                 )
-                var sliderState = currentPage.value
+                var sliderState by remember { mutableStateOf(currentPage.value) }
                 SliderWithLabel(
                     value = sliderState.toFloat(),
                     valueRange = 1f..count,
