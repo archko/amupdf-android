@@ -20,7 +20,7 @@ object Libs {
 
     object Accompanist {
         const val version = "0.25.0"
-        const val insets = "com.google.accompanist:accompanist-insets:$version"
+        //const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
         const val pagerIndicators = "com.google.accompanist:accompanist-pager-indicators:$version"
         const val swiperefresh = "com.google.accompanist:accompanist-swiperefresh:$version"

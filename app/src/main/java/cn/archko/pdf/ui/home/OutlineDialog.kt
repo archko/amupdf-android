@@ -18,16 +18,13 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -56,33 +53,31 @@ fun OutlineMenu(
     val listState = rememberLazyListState(0)
 
     if (outlineDialog.value) {
-        if (outlines.list?.size == 0) {
+        DisposableEffect(viewModel) {
             coroutineScope.launch {
                 viewModel.loadOutline()
             }
-        }
 
-        DisposableEffect(currentPage.value) {
-            if (null != outlines.list) {
-                var found = -1
-                for (i in 0 until outlines.list!!.size) {
-                    val item = outlines.list!![i]
-                    if (item.page >= currentPage.value) {
-                        found = i
-                        break
-                    }
-                }
-                Logcat.d("found:${found}, listState:$listState")
-                if (found > 0) {
-                    coroutineScope.launch {
-                        listState.scrollToItem(found, 0)
-                    }
-                }
-            }
             onDispose {
             }
         }
+        outlines.list?.run {
+            var found = -1
+            for (i in 0 until this.size) {
+                if (this[i].page >= currentPage.value) {
+                    found = i
+                    break
+                }
+            }
+            Logcat.d("found:${found}, listState:$listState")
+            if (found > 0) {
+                coroutineScope.launch {
+                    listState.scrollToItem(found, 0)
+                }
+            }
+        }
 
+        Logcat.d("currentPage:${currentPage.value}")
         Column(
             modifier = Modifier
                 .clickable(
@@ -111,7 +106,7 @@ fun OutlineMenu(
                         .padding(0.dp, 4.dp, 0.dp, 0.dp)
                         .align(Alignment.TopCenter)
                 )
-                var sliderState by remember { mutableStateOf(currentPage.value) }
+                var sliderState = currentPage.value
                 SliderWithLabel(
                     value = sliderState.toFloat(),
                     valueRange = 1f..count,
@@ -143,7 +138,7 @@ fun OutlineMenu(
                             MenuItem(
                                 outlineItem = outlineItem,
                                 onSelect = {
-                                    //outlineDialog.value = false
+                                    currentPage.value = it.page
                                     onSelect(it)
                                 },
                             )

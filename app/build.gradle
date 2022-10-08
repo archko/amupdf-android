@@ -154,7 +154,7 @@ dependencies {
     //implementation Libs.Accompanist.coil
     implementation Libs.Accompanist.pager
     implementation Libs.Accompanist.pagerIndicators
-    implementation Libs.Accompanist.insets
+    //implementation Libs.Accompanist.insets
     implementation Libs.Accompanist.swiperefresh
 
     implementation Libs.Arch.runtime
