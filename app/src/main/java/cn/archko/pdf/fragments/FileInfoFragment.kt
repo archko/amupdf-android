@@ -23,6 +23,7 @@ import com.artifex.mupdf.fitz.Document
 import com.thuypham.ptithcm.editvideo.base.BaseDialogFragment
 import com.umeng.analytics.MobclickAgent
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 /**
  * @author: archko 2016/1/16 :14:34
@@ -39,7 +40,7 @@ class FileInfoFragment : BaseDialogFragment<FragmentFileInfoBinding>(R.layout.fr
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var themeId = android.R.style.Theme_Holo_Light_Dialog
+        var themeId = android.R.style.Theme_Material_Dialog
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             themeId = android.R.style.Theme_Material_Light_Dialog
         }
@@ -59,7 +60,7 @@ class FileInfoFragment : BaseDialogFragment<FragmentFileInfoBinding>(R.layout.fr
     override fun setArguments(args: Bundle?) {
         super.setArguments(args)
         if (null != args) {
-            mEntry = args.getSerializable(FILE_LIST_ENTRY) as FileBean
+            mEntry = args.getSerializable(FILE_LIST_ENTRY, FileBean::class.java)
             bookProgress = mEntry!!.bookProgress
         }
     }
@@ -147,7 +148,7 @@ class FileInfoFragment : BaseDialogFragment<FragmentFileInfoBinding>(R.layout.fr
             var text = DateUtils.formatTime(progress.firstTimestampe, DateUtils.TIME_FORMAT_TWO)
             val percent = progress.page * 100f / progress.pageCount
             val b = BigDecimal(percent.toDouble())
-            text += "       " + b.setScale(2, BigDecimal.ROUND_HALF_UP).toFloat() + "%"
+            text += "       " + b.setScale(2, RoundingMode.HALF_UP).toFloat() + "%"
             binding.lastRead.text = text
             binding.progressbar.max = progress.pageCount
             binding.progressbar.progress = progress.page

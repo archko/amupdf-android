@@ -48,7 +48,7 @@ object PDFCreaterHelper {
         if (file.isDirectory) {
             return@FileFilter false
         }
-        val fname = file.name.toLowerCase(Locale.ROOT)
+        val fname = file.name.lowercase(Locale.ROOT)
         return@FileFilter fname.startsWith("Peter")
     }
 

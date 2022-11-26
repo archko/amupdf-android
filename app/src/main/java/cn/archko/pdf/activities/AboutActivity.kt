@@ -54,7 +54,7 @@ class AboutActivity : ComponentActivity() {
                             modifier = Modifier,
                             containerColor = Color.Transparent,
                             contentColor = MaterialTheme.colorScheme.onBackground,
-                        ) { padding ->
+                        ) {
                             Row(
                                 Modifier
                                     .fillMaxSize()

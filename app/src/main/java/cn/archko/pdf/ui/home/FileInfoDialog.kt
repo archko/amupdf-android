@@ -35,6 +35,7 @@ import cn.archko.pdf.utils.DateUtils
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.Utils
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 @Composable
 fun FileInfoDialog(
@@ -182,7 +183,7 @@ fun FileInfoDialog(
                                 )
                                 Text(
                                     "$text      ${
-                                        b.setScale(2, BigDecimal.ROUND_HALF_UP).toFloat()
+                                        b.setScale(2, RoundingMode.HALF_UP).toFloat()
                                     }%",
                                     style = TextStyle(fontSize = 14.sp),
                                 )

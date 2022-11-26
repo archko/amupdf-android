@@ -188,7 +188,7 @@ class CakeView @JvmOverloads constructor(
                     textAngle = startAngle + mList[i].percent / total * roundAngle / 2
                     textList.add(getTextPointF(textAngle)) //获取文本文本
                 }
-                startAngle += mList!![i].percent / total * roundAngle
+                startAngle += mList[i].percent / total * roundAngle
             }
 
 //            drawSpacingLine(canvas, lineList);
@@ -499,7 +499,7 @@ class CakeView @JvmOverloads constructor(
     }
 
     private val check: Unit
-        private get() {
+        get() {
             rotationAngle %= 360f
             rotation = rotationAngle
         }
@@ -649,7 +649,7 @@ class CakeView @JvmOverloads constructor(
                 Context.WINDOW_SERVICE
             ) as WindowManager
             val outMetrics = DisplayMetrics()
-            wm.defaultDisplay.getMetrics(outMetrics)
+            context.display?.getMetrics(outMetrics)
             return intArrayOf(outMetrics.widthPixels, outMetrics.heightPixels)
         }
 

@@ -126,7 +126,7 @@ class FileViewModel() : ViewModel() {
         //return (file.isDirectory() || file.getName().toLowerCase().endsWith(".pdf"));
         if (file.isDirectory)
             return@FileFilter true
-        val fname = file.name.toLowerCase(Locale.ROOT)
+        val fname = file.name.lowercase(Locale.ROOT)
 
         if (fname.endsWith(".pdf"))
             return@FileFilter true
@@ -187,7 +187,7 @@ class FileViewModel() : ViewModel() {
             )
             path = sdcardRoot
         }
-        if (path!!.length > 1 && path.endsWith("/")) {
+        if (path.length > 1 && path.endsWith("/")) {
             path = path.substring(0, path.length - 2)
         }
 
@@ -498,7 +498,7 @@ class FileViewModel() : ViewModel() {
         viewModelScope.launch {
             val now = System.currentTimeMillis()
             flow {
-                var flag = false
+                var flag: Boolean
                 try {
                     val content = StreamUtils.readStringFromFile(file)
                     Logcat.longLog(
@@ -687,7 +687,7 @@ class FileViewModel() : ViewModel() {
             if (files != null && files.size > 0) {
                 for (f in files) {
                     if (f.isFile) {
-                        if (f.name.toLowerCase().contains(keyword)) {
+                        if (f.name.lowercase(Locale.getDefault()).contains(keyword)) {
                             fileList.add(FileBean(FileBean.NORMAL, f, true))
                         }
                     } else {

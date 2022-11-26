@@ -74,7 +74,7 @@ class PdfOptionsActivity : FragmentActivity() {
 
                 toolbar?.apply {
                     setNavigationIcon(R.drawable.ic_nav)
-                    popupTheme = R.style.ThemeOverlay_MaterialComponents_ActionBar
+                    //popupTheme = R.style.ThemeOverlay_MaterialComponents_ActionBar
                     title = getString(R.string.options)
                     setNavigationOnClickListener { activity?.finish() }
                 }

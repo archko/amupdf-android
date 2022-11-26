@@ -13,10 +13,6 @@ import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.view.View
-import android.view.Window
-import android.view.WindowManager
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.ActivityDocViewBinding
@@ -24,6 +20,7 @@ import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
+import cn.archko.pdf.utils.StatusBarHelper
 import cn.archko.pdf.viewmodel.PDFViewModel
 import com.artifex.solib.ArDkLib
 import com.artifex.solib.ConfigOptions
@@ -59,11 +56,8 @@ class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.activity_
             if (mEnableDebug) {
                 Log.d(mDebugTag, "putPlainTextToClipboard: '$text'")
             }
-            if (text != null) {
-                val clip: ClipData
-                clip = ClipData.newPlainText("text", text)
-                mClipboard!!.setPrimaryClip(clip)
-            }
+            val clip: ClipData = ClipData.newPlainText("text", text)
+            mClipboard!!.setPrimaryClip(clip)
         }
 
         /**
@@ -114,9 +108,12 @@ class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.activity_
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
         super.onCreate(savedInstanceState)
-        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+
+        StatusBarHelper.hideSystemUI(this)
+        StatusBarHelper.setStatusBarImmerse(window);
+        StatusBarHelper.setImmerseBarAppearance(window, false)
+
         if (null != savedInstanceState) {
             path = savedInstanceState.getString("path", null)
         }
@@ -166,17 +163,7 @@ class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.activity_
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                window.setDecorFitsSystemWindows(false)
-                WindowCompat.setDecorFitsSystemWindows(window, false)
-            } else {
-                window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-                        View.SYSTEM_UI_FLAG_FULLSCREEN or
-                        View.SYSTEM_UI_FLAG_IMMERSIVE
-            }
+            StatusBarHelper.hideSystemUI(this)
         }
     }
 

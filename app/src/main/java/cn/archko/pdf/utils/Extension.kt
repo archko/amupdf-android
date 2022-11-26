@@ -17,7 +17,7 @@ fun FileBean.getIcon(): Int {
     } else {
         bookProgress?.let {
             if (null != bookProgress!!.ext) {
-                val ext: String = bookProgress!!.ext!!.toLowerCase(Locale.ROOT)
+                val ext: String = bookProgress!!.ext!!.lowercase(Locale.ROOT)
 
                 if (ext.contains("pdf")) {
                     //iconId = R.drawable.ic_item_book
