@@ -19,7 +19,8 @@ object Libs {
     const val androidGradlePlugin = "com.android.tools.build:gradle:7.3.0"
 
     object Accompanist {
-        const val version = "0.25.0"
+        const val version = "0.27.0"
+
         //const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
         const val pagerIndicators = "com.google.accompanist:accompanist-pager-indicators:$version"
@@ -30,11 +31,11 @@ object Libs {
     }
 
     object Coil {
-        const val coilCompose = "io.coil-kt:coil-compose:2.2.1"
+        const val coilCompose = "io.coil-kt:coil-compose:2.2.2"
     }
 
     object Kotlin {
-        private const val version = "1.7.10"
+        private const val version = "1.7.20"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
@@ -48,18 +49,18 @@ object Libs {
     }
 
     object OkHttp {
-        private const val version = "4.9.1"
+        private const val version = "4.10.0"
         const val okhttp = "com.squareup.okhttp3:okhttp:$version"
         const val logging = "com.squareup.okhttp3:logging-interceptor:$version"
     }
 
     object AndroidX {
         const val coreKtx = "androidx.core:core-ktx:1.9.0"
-        const val navigation = "androidx.navigation:navigation-compose:2.5.2"
+        const val navigation = "androidx.navigation:navigation-compose:2.5.3"
 
         object Compose {
-            const val compiler_version = "1.3.1"
-            const val version = "1.3.0-beta02"
+            const val compiler_version = "1.3.2"
+            const val version = "1.3.1"
 
             const val runtime = "androidx.compose.runtime:runtime:$version"
             const val runtimeLivedata = "androidx.compose.runtime:runtime-livedata:$version"
@@ -88,17 +89,17 @@ object Libs {
         }
 
         object Activity {
-            const val activityCompose = "androidx.activity:activity-compose:1.6.0"
-            const val activityKtx = "androidx.activity:activity-ktx:1.6.0"
+            const val activityCompose = "androidx.activity:activity-compose:1.6.1"
+            const val activityKtx = "androidx.activity:activity-ktx:1.6.1"
             const val appCompat = "androidx.appcompat:appcompat:1.5.1"
             const val annotations = "androidx.annotation:annotation:1.4.0"
         }
 
         object Lifecycle {
             const val viewModelCompose =
-                "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0-alpha01"
+                "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0-alpha03"
 
-            const val lifecycle = "2.5.0"
+            const val lifecycle = "2.6.0-alpha03"
             const val runtime = "androidx.lifecycle:lifecycle-runtime:${lifecycle}"
             const val java8 = "androidx.lifecycle:lifecycle-common-java8:${lifecycle}"
             const val compiler = "androidx.lifecycle:lifecycle-compiler:${lifecycle}"
@@ -118,7 +119,7 @@ object Libs {
         }
 
         object Navigation {
-            private const val version = "2.5.2"
+            private const val version = "2.5.3"
             const val fragment = "androidx.navigation:navigation-fragment-ktx:$version"
             const val uiKtx = "androidx.navigation:navigation-ui-ktx:$version"
             const val runtime = "androidx.navigation:navigation-runtime:$version"
@@ -133,7 +134,7 @@ object Libs {
         }
 
         object Room {
-            private const val version = "2.4.3"
+            private const val version = "2.5.0-beta02"
             const val runtime = "androidx.room:room-runtime:${version}"
             const val ktx = "androidx.room:room-ktx:${version}"
             const val compiler = "androidx.room:room-compiler:${version}"
