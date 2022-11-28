@@ -44,7 +44,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.common.BitmapCache
@@ -55,6 +54,7 @@ import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.entity.State
+import cn.archko.pdf.utils.StatusBarHelper
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
@@ -77,7 +77,7 @@ class ComposeTextActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        WindowCompat.setDecorFitsSystemWindows(window, true)
+        StatusBarHelper.hideSystemUI(this)
 
         initIntent()
 
