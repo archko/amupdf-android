@@ -1,6 +1,5 @@
 package cn.archko.pdf.activities
 
-import android.annotation.TargetApi
 import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -9,7 +8,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Rect
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -110,8 +108,7 @@ class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.activity_
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        StatusBarHelper.hideSystemUI(this)
-        StatusBarHelper.setStatusBarImmerse(window);
+        StatusBarHelper.hideSystemUI(this);
         StatusBarHelper.setImmerseBarAppearance(window, false)
 
         if (null != savedInstanceState) {
@@ -157,14 +154,6 @@ class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.activity_
         super.onResume()
         binding.documentView.onResume()
         //sensorHelper.onResume();
-    }
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) {
-            StatusBarHelper.hideSystemUI(this)
-        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

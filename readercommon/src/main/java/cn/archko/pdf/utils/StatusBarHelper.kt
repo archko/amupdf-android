@@ -123,11 +123,17 @@ object StatusBarHelper {
 
     fun hideSystemUI(activity: Activity) {
         val window = activity.window
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {   //不加这句,systemBars()调用会导致顶部有一块黑的
+            window.attributes.layoutInDisplayCutoutMode =
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
         val controller = WindowCompat.getInsetsController(window, window.decorView)
         controller.hide(WindowInsetsCompat.Type.systemBars())
-        controller.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        //controller.systemBarsBehavior =
+        //    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
 
     fun showSystemUI(activity: Activity) {

@@ -32,6 +32,7 @@ import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.State
 import cn.archko.pdf.listeners.AViewController
+import cn.archko.pdf.utils.StatusBarHelper
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -160,30 +161,9 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     }
 
     open fun initView() {
-        hideSystemUI()
+        StatusBarHelper.hideSystemUI(this)
 
         setContentView(R.layout.reader)
-    }
-
-    private fun hideSystemUI() {
-        //v27以后,要设置这个
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            window.attributes.layoutInDisplayCutoutMode =
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-        }
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        window.statusBarColor = Color.TRANSPARENT
-        window.navigationBarColor = Color.TRANSPARENT
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            window.navigationBarDividerColor = Color.TRANSPARENT
-        }
-        WindowInsetsControllerCompat(window, window.decorView).let { controller ->
-            controller.hide(WindowInsetsCompat.Type.systemBars())
-            controller.hide(WindowInsetsCompat.Type.statusBars())
-            controller.hide(WindowInsetsCompat.Type.navigationBars())
-            controller.systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
     }
 
     open fun getDocumentView(): View? {
@@ -252,7 +232,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) {
-            hideSystemUI()
+            StatusBarHelper.hideSystemUI(this)
         }
     }
 

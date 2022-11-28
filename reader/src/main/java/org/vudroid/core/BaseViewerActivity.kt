@@ -23,6 +23,7 @@ import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.listeners.SimpleGestureListener
 import cn.archko.pdf.presenter.PageViewPresenter
+import cn.archko.pdf.utils.StatusBarHelper
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
 import kotlinx.coroutines.Dispatchers
@@ -60,6 +61,8 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
      */
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        StatusBarHelper.hideSystemUI(this)
+        
         BitmapCache.getInstance().resize(BitmapCache.CAPACITY_FOR_VUDROID)
         initDecodeService()
         val zoomModel = ZoomModel()
@@ -340,18 +343,6 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         }
         documentView!!.setScrollMargin(height)
         documentView!!.setDecodePage(1 /*options.getBoolean(PdfOptionsActivity.PREF_RENDER_AHEAD, true) ? 1 : 0*/)
-    }
-
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) {
-            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_IMMERSIVE)
-        }
     }
 
     override fun onPause() {
