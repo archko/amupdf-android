@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bk_black">#000000</color>
+    <color name="bg_result">#99000000</color>
+    <color name="textColorHighlight">#F5A623</color>
+    <color name="textColor">#000</color>
+
+    <color name="bk_result_image_padding">#EEEEEE</color>
+
+    <color name="table_result_item_text_color">#F44336</color>
+    <color name="table_result_tableheader_text_color">#333333</color>
+</resources>

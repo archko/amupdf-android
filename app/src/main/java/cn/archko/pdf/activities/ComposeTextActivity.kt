@@ -45,18 +45,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
+import cn.archko.pdf.App
+import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Graph
+import cn.archko.pdf.common.ImageWorker
 import cn.archko.pdf.common.IntentFile
+import cn.archko.pdf.common.PdfImageDecoder
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.common.StyleHelper
+import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.State
+import cn.archko.pdf.mupdf.MupdfDocument
+import cn.archko.pdf.utils.BitmapUtils
+import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.StatusBarHelper
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
+import com.baidu.ai.edge.ui.activity.CameraActivity
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
 import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -204,7 +213,14 @@ class ComposeTextActivity : ComponentActivity() {
                                             width = window.decorView.width,
                                             height = window.decorView.height,
                                             margin = margin,
-                                            finish = { finish() }
+                                            finish = { finish() },
+                                            ocr = { pos: Int, mupdfDocument: MupdfDocument, aPage: APage ->
+                                                ocr(
+                                                    pos,
+                                                    mupdfDocument,
+                                                    aPage
+                                                )
+                                            }
                                         )
                                     }
                                 }
@@ -265,6 +281,28 @@ class ComposeTextActivity : ComponentActivity() {
         pageNumberToast!!.show()
     }
 
+    private fun ocr(pos: Int, mupdfDocument: MupdfDocument, aPage: APage) {
+        AppExecutors.instance.networkIO().execute {
+            val decodeParam = ImageWorker.DecodeParam(
+                aPage.toString(),
+                true,
+                0,
+                aPage,
+                mupdfDocument.document,
+            )
+            val bitmap = /*ImageLoader.decodeFromPDF(
+                decodeParam.key,
+                decodeParam.pageNum,
+                decodeParam.zoom,
+                decodeParam.screenWidth
+            )*/
+                PdfImageDecoder.decode(decodeParam)
+            val file = FileUtils.getDiskCacheDir(App.instance, pos.toString())
+            BitmapUtils.saveBitmapToFile(bitmap, file)
+            AppExecutors.instance.mainThread().execute { startCamera(this, file.absolutePath, pos) }
+        }
+    }
+
     override fun onPause() {
         super.onPause()
         sensorHelper?.onPause()
@@ -297,6 +335,13 @@ class ComposeTextActivity : ComponentActivity() {
         fun start(context: Context, path: String) {
             val intent = Intent(context, ComposeTextActivity::class.java)
             intent.putExtra("path", path)
+            context.startActivity(intent)
+        }
+
+        fun startCamera(context: Context, path: String, pos: Int) {
+            val intent = Intent(context, CameraActivity::class.java)
+            intent.putExtra("path", path)
+            intent.putExtra("pos", pos.toString())
             context.startActivity(intent)
         }
     }

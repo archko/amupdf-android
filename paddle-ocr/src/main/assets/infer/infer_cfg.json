@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "model_info": {
+    "n_type": 0,
+    "best_threshold": 0.1,
+    "model_kind": 100
+  },
+  "pre_process": {
+    "img_mean": [
+      123.675,
+      116.28,
+      103.53
+    ],
+    "scale": [
+      0.01712475383166,
+      0.01750700280112,
+      0.01742919389978
+    ],
+    "color_format": "BGR",
+    "channel_order": "CHW",
+    "resize": [
+      960,
+      960
+    ],
+    "rescale_mode": "keep_ratio",
+    "max_size": 960,
+    "ocr_rec_resize": [
+      320,
+      32
+    ]
+  },
+  "extra": {
+    "fluid": {
+      "optType": "nb"
+    }
+  }
+}

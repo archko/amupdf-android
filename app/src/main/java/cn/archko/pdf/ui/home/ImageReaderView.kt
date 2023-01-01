@@ -95,6 +95,7 @@ fun ImageViewer(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     modifier: Modifier = Modifier,
     finish: () -> Unit,
+    ocr: (pos: Int, mupdfDocument: MupdfDocument, aPage: APage) -> Unit
 ) {
     val list = result.list!!
     val listState = rememberLazyListState(0)
@@ -242,6 +243,7 @@ fun ImageViewer(
                 }
                 addMenu("字体", color, menus)
                 addMenu("大纲", color, menus)
+                addMenu("识别文本", color, menus)
                 addMenu("退出", color, menus)
                 Row(
                     modifier = Modifier
@@ -275,6 +277,10 @@ fun ImageViewer(
                                     cropState.value = pdfViewModel.bookProgress?.autoCrop == 0
                                 }
                             } else if (position == 5) {
+                                //ocr识别文本
+                                val index = listState.firstVisibleItemIndex
+                                ocr(index, mupdfDocument, list.get(index))
+                            } else if (position == 6) {
                                 finish()
                             }
                             showMenu.value = false
