@@ -218,26 +218,33 @@ object IntentFile {
     }
 
     fun isText(path: String?): Boolean {
-        return path!!.endsWith(".txt", false)
-                || path.endsWith(".log", false)
-                || path.endsWith(".xml", false)
-                || path.endsWith(".html", false)
-                || path.endsWith(".xhtml", false)
+        return path!!.endsWith(".txt", true)
+                || path.endsWith(".log", true)
+                || path.endsWith(".xml", true)
+                || path.endsWith(".html", true)
+                || path.endsWith(".xhtml", true)
+    }
+
+    fun isImage(path: String?): Boolean {
+        return path!!.endsWith(".png", true)
+                || path.endsWith(".jpg", true)
+                || path.endsWith(".jpeg", true)
+                || path.endsWith(".webp", true)
     }
 
     fun isPdf(path: String?): Boolean {
-        return path!!.endsWith(".pdf", false)
-                || path.endsWith(".xps", false)
-                || path.endsWith(".cbz", false)
-                || path.endsWith(".png", false)
-                || path.endsWith(".jpe", false)
-                || path.endsWith(".jpeg", false)
-                || path.endsWith(".jfif", false)
-                || path.endsWith(".jfif-tbnl", false)
-                || path.endsWith(".tif", false)
-                || path.endsWith(".tiff", false)
-                || path.endsWith(".epub", false)
-                || path.endsWith(".mobi", false)
+        return path!!.endsWith(".pdf", true)
+                || path.endsWith(".xps", true)
+                || path.endsWith(".cbz", true)
+                || path.endsWith(".png", true)
+                || path.endsWith(".jpg", true)
+                || path.endsWith(".jpeg", true)
+                || path.endsWith(".jfif", true)
+                || path.endsWith(".jfif-tbnl", true)
+                || path.endsWith(".tif", true)
+                || path.endsWith(".tiff", true)
+                || path.endsWith(".epub", true)
+                || path.endsWith(".mobi", true)
     }
 }
 

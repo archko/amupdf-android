@@ -1,7 +1,10 @@
 package com.baidu.ai.edge.ui.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -25,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.archko.pdf.AppExecutors;
+import cn.archko.pdf.common.IntentFile;
 import cn.archko.pdf.utils.FileUtils;
 import cn.archko.pdf.utils.StreamUtils;
 
@@ -32,7 +36,14 @@ import cn.archko.pdf.utils.StreamUtils;
  * Created by ruanshimin on 2018/10/31.
  */
 
-public class CameraActivity extends AbsCameraActivity {
+public class OcrActivity extends AbsOcrActivity {
+
+    public static void start(Context context, String path, String name) {
+        Intent intent = new Intent(context, OcrActivity.class);
+        intent.putExtra("path", path);
+        intent.putExtra("name", name);
+        context.startActivity(intent);
+    }
 
     private String serialNum;
 
@@ -44,9 +55,12 @@ public class CameraActivity extends AbsCameraActivity {
 
     // 模型加载状态
     private boolean modelLoadStatus = false;
+    private String mPath;
+    private String name = "ocr";
 
     @Override
     public void onActivityCreate() {
+        parseIntent();
         ChipConfig chipConfig = new ChipConfig(this);
         if (chipConfig.checkChip()) {
             choosePlatform(chipConfig.getSoc());
@@ -84,11 +98,35 @@ public class CameraActivity extends AbsCameraActivity {
         AppExecutors.Companion.getInstance().diskIO().execute(() -> {
             initManager();
             if (isInitializing) {
-                String path = getIntent().getStringExtra("path");
-                Bitmap bitmap = BitmapFactory.decodeFile(path);
+                mPath = getIntent().getStringExtra("path");
+                Bitmap bitmap = BitmapFactory.decodeFile(mPath);
                 showResultPage(bitmap);
             }
         });
+    }
+
+    private void parseIntent() {
+        if (TextUtils.isEmpty(mPath)) {
+            Intent intent = getIntent();
+
+            if (Intent.ACTION_VIEW == intent.getAction()) {
+                String path = IntentFile.getPath(this, intent.getData());
+                if (path == null && intent.getData() != null) {
+                    path = intent.getData().toString();
+                }
+
+                mPath = path;
+                name = getIntent().getStringExtra("name");
+            } else {
+                if (!TextUtils.isEmpty(getIntent().getStringExtra("path"))) {
+                    mPath = getIntent().getStringExtra("path");
+                }
+                name = getIntent().getStringExtra("name");
+            }
+        }
+        if (TextUtils.isEmpty(name)) {
+            name = "ocr";
+        }
     }
 
     /**
@@ -125,7 +163,7 @@ public class CameraActivity extends AbsCameraActivity {
 
     private void showError(BaseException e) {
         showMessage(e.getErrorCode(), e.getMessage());
-        Log.e("CameraActivity", e.getMessage(), e);
+        Log.e("OcrActivity", e.getMessage(), e);
     }
 
     private void releaseEasyDL() {
@@ -178,15 +216,13 @@ public class CameraActivity extends AbsCameraActivity {
     }
 
     public void save(List<BaseResultModel> models) {
-        String pos = getIntent().getStringExtra("pos");
-
         StringBuilder sb = new StringBuilder();
         for (BaseResultModel baseResultModel : models) {
             sb.append(baseResultModel.getName()).append("\n");
         }
         File dir = FileUtils.getStorageDir("amupdf");
         if (dir != null && dir.exists()) {
-            String filePath = dir.getAbsolutePath() + File.separator + pos + ".txt";
+            String filePath = dir.getAbsolutePath() + File.separator + name + ".txt";
             try {
                 StreamUtils.copyStringToFile(sb.toString(), filePath);
                 Toast.makeText(this, "保存成功:" + filePath, Toast.LENGTH_LONG).show();

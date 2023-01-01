@@ -23,13 +23,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cn.archko.pdf.AppExecutors;
-import cn.archko.pdf.utils.StreamUtils;
 
 /**
  * Created by ruanshimin on 2018/5/3.
  */
 
-public abstract class AbsCameraActivity extends BaseActivity {
+public abstract class AbsOcrActivity extends BaseActivity {
 
     public static final int MODEL_OCR = 100;
 

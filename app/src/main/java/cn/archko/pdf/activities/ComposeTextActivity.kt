@@ -65,7 +65,7 @@ import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.StatusBarHelper
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
-import com.baidu.ai.edge.ui.activity.CameraActivity
+import com.baidu.ai.edge.ui.activity.OcrActivity
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
 import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -339,10 +339,7 @@ class ComposeTextActivity : ComponentActivity() {
         }
 
         fun startCamera(context: Context, path: String, pos: Int) {
-            val intent = Intent(context, CameraActivity::class.java)
-            intent.putExtra("path", path)
-            intent.putExtra("pos", pos.toString())
-            context.startActivity(intent)
+            OcrActivity.start(context, path, pos.toString())
         }
     }
 }

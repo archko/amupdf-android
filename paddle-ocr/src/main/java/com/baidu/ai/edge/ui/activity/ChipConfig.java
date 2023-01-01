@@ -77,7 +77,7 @@ public class ChipConfig {
     }
 
     private void startUICameraActivity() {
-        Intent intent = new Intent(context, CameraActivity.class);
+        Intent intent = new Intent(context, OcrActivity.class);
         intent.putExtra("name", modelName);
         intent.putExtra("model_type", modelType);
         intent.putExtra("serial_num", SERIAL_NUM);

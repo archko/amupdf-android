@@ -34,6 +34,7 @@ class PdfOptionRepository(private val dataStore: DataStore<Preferences>) {
             }
         }.map { preferences ->
             val showExtension = preferences[PdfOptionKeys.PREF_SHOW_EXTENSION] ?: true
+            val imageOcr = preferences[PdfOptionKeys.PREF_OCR] ?: true
             val fullscreen = preferences[PdfOptionKeys.PREF_FULLSCREEN] ?: true
             val autocrop = preferences[PdfOptionKeys.PREF_AUTOCROP] ?: true
             val verticalScrollLock = preferences[PdfOptionKeys.PREF_VERTICAL_SCROLL_LOCK] ?: true
@@ -61,6 +62,7 @@ class PdfOptionRepository(private val dataStore: DataStore<Preferences>) {
                 preferences[PdfOptionKeys.STYLE_KEY_BOTTOM_PADDING] ?: Utils.dipToPixel(20f)
             val pdfPreferences = PdfOption(
                 showExtension = showExtension,
+                imageOcr = imageOcr,
                 fullscreen = fullscreen,
                 autocrop = autocrop,
                 verticalScrollLock = verticalScrollLock,
@@ -88,6 +90,12 @@ class PdfOptionRepository(private val dataStore: DataStore<Preferences>) {
     suspend fun setShowExtension(enable: Boolean) {
         dataStore.edit { preferences ->
             preferences[PdfOptionKeys.PREF_SHOW_EXTENSION] = enable
+        }
+    }
+
+    suspend fun setImageOcr(enable: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[PdfOptionKeys.PREF_OCR] = enable
         }
     }
 
@@ -209,6 +217,7 @@ class PdfOptionRepository(private val dataStore: DataStore<Preferences>) {
 
 data class PdfOption(
     val showExtension: Boolean = true,
+    val imageOcr: Boolean = true,
     val fullscreen: Boolean = true,
     val autocrop: Boolean = true,
     val verticalScrollLock: Boolean = true,
@@ -237,6 +246,7 @@ object PdfOptionKeys {
     val PREF_SHOW_EXTENSION = booleanPreferencesKey("showExtension")
 
     val PREF_ORIENTATION = stringPreferencesKey("orientation")
+    val PREF_OCR = booleanPreferencesKey("image_ocr")
     val PREF_FULLSCREEN = booleanPreferencesKey("fullscreen")
     val PREF_AUTOCROP = booleanPreferencesKey("autocrop")
     val PREF_VERTICAL_SCROLL_LOCK = booleanPreferencesKey("verticalScrollLock")

@@ -14,7 +14,44 @@
         tools:ignore="ScopedStorage" />
 
     <application>
-        <activity android:name=".activity.CameraActivity" />
+        <activity
+            android:name=".activity.OcrActivity"
+            android:label="Ocr">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="*"
+                    android:mimeType="image/*"
+                    android:pathPattern=".*\\.jpg"
+                    android:scheme="file" />
+                <data
+                    android:host="*"
+                    android:mimeType="image/*"
+                    android:pathPattern=".*\\.jpeg"
+                    android:scheme="file" />
+                <data
+                    android:host="*"
+                    android:mimeType="image/*"
+                    android:pathPattern=".*\\.png"
+                    android:scheme="file" />
+                <data
+                    android:host="*"
+                    android:mimeType="image/*"
+                    android:pathPattern=".*\\.webp"
+                    android:scheme="file" />
+                <data
+                    android:host="*"
+                    android:mimeType="image/*"
+                    android:pathPattern=".*\\.gif"
+                    android:scheme="file" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

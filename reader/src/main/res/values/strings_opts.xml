@@ -62,6 +62,7 @@
     </string-array>
     <string name="opts_viewer">PDF Viewer</string>
     <string name="opts_selector">File Chooser</string>
+    <string name="opts_ocr_view">Ocr/View</string>
     <string name="opts_fullscreen">Fullscreen</string>
     <string name="opts_autocrop">Auto Crop</string>
     <string name="opts_autocrop_summary">Auto Crop blank bounds</string>

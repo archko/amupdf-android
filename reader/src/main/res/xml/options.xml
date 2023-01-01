@@ -17,6 +17,11 @@
 
         <CheckBoxPreference
             android:defaultValue="true"
+            android:key="image_ocr"
+            android:title="@string/opts_ocr_view" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
             android:key="fullscreen"
             android:title="@string/opts_fullscreen" />
         <CheckBoxPreference

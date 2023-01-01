@@ -39,7 +39,9 @@ import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
+import com.baidu.ai.edge.ui.activity.OcrActivity
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /**
@@ -223,11 +225,21 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     override fun loadDoc(password: String?) {
-        if (IntentFile.isText(mPath)) {
-            TextActivity.start(this, mPath!!)
-            finish()
-        } else {
-            super.loadDoc(password)
+        lifecycleScope.launch {
+            val ocr = optionRepository.pdfOptionFlow.first().imageOcr
+            if (IntentFile.isText(mPath)) {
+                TextActivity.start(this@AMuPDFRecyclerViewActivity, mPath!!)
+                finish()
+            } else if (IntentFile.isImage(mPath) && ocr) {
+                OcrActivity.start(
+                    this@AMuPDFRecyclerViewActivity,
+                    mPath,
+                    System.currentTimeMillis().toString()
+                )
+                finish()
+            } else {
+                super.loadDoc(password)
+            }
         }
     }
 

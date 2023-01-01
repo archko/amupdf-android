@@ -46,6 +46,7 @@
     </string-array>
     <string name="opts_viewer">PDF 查看器</string>
     <string name="opts_selector">文件选择器</string>
+    <string name="opts_ocr_view">图片文本识别/查看</string>
     <string name="opts_fullscreen">全屏</string>
     <string name="opts_autocrop">自动切边</string>
     <string name="opts_autocrop_summary">自动切去空白边界</string>
