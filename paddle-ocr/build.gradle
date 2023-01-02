@@ -1,4 +1,5 @@
 apply from: "../gradle/library_common.gradle"
+import cn.archko.mupdf.buildsrc.*
 
 android {
     defaultConfig {
@@ -16,4 +17,7 @@ dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
     api files('libs/easyedge-sdk.jar')
     api project(":readercommon")
+    implementation(Libs.Dependency.material) {
+        exclude group: 'androidx.recyclerview'
+    }
 }

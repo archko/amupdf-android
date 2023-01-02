@@ -3,6 +3,7 @@ package com.baidu.ai.edge.ui.activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
@@ -13,6 +14,7 @@ import com.baidu.ai.edge.ui.view.model.BasePolygonResultModel;
 import com.baidu.ai.edge.ui.view.model.BaseResultModel;
 import com.baidu.ai.edge.ui.view.model.DetectResultModel;
 import com.baidu.ai.edge.ui.view.model.OcrViewResultModel;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +25,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cn.archko.pdf.AppExecutors;
+
+import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED;
+import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
 
 /**
  * Created by ruanshimin on 2018/5/3.
@@ -42,6 +47,7 @@ public abstract class AbsOcrActivity extends BaseActivity {
     private ImageView resultImage;
     private ViewGroup mResultPageView;
     private DetectResultAdapter adapter;
+    private BottomSheetBehavior mBottomSheetBehavior;
 
     boolean isRealtimeStatusRunning = false;
 
@@ -90,6 +96,11 @@ public abstract class AbsOcrActivity extends BaseActivity {
 
         resultMaskView = findViewById(R.id.result_mask);
         resultMaskView.setHandler(uiHandler);
+
+        View bottomSheet = findViewById(R.id.bottom_sheet);
+        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        mBottomSheetBehavior.setState(STATE_COLLAPSED);
+        mBottomSheetBehavior.setPeekHeight(150);
 
         adapter = new DetectResultAdapter(this);
         detectResultView = findViewById(R.id.result_list_view);
@@ -220,9 +231,11 @@ public abstract class AbsOcrActivity extends BaseActivity {
      * @param results
      */
     private void fillDetectList(List<? extends BaseResultModel> results) {
-        adapter.setData((List<BaseResultModel>) results);
-
-        uiHandler.post(() -> detectResultView.setAdapter(adapter));
+        uiHandler.post(() -> {
+            adapter.setData((List<BaseResultModel>) results);
+            detectResultView.setAdapter(adapter);
+            mBottomSheetBehavior.setState(STATE_EXPANDED);
+        });
     }
 
     /**

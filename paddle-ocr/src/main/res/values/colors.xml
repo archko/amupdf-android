@@ -7,6 +7,6 @@
 
     <color name="bk_result_image_padding">#EEEEEE</color>
 
-    <color name="table_result_item_text_color">#F44336</color>
+    <color name="table_result_item_text_color">#FF0000</color>
     <color name="table_result_tableheader_text_color">#333333</color>
 </resources>
