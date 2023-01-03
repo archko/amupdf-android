@@ -139,6 +139,8 @@ dependencies {
     }
     implementation Libs.AndroidX.Paging.pagingCompose
 
+    implementation platform(Libs.AndroidX.Compose.androidxComposeBom)
+
     implementation Libs.AndroidX.Compose.runtime
     implementation Libs.AndroidX.Compose.foundation
     implementation Libs.AndroidX.Compose.layout
@@ -148,13 +150,10 @@ dependencies {
     implementation Libs.AndroidX.Compose.Material3.material3
     implementation Libs.AndroidX.Compose.Material3.material3WindowSizeClass
     implementation Libs.AndroidX.Compose.animation
-    //implementation Libs.AndroidX.Compose.iconsExtended
     implementation Libs.AndroidX.Compose.tooling
 
-    //implementation Libs.Accompanist.coil
     implementation Libs.Accompanist.pager
     implementation Libs.Accompanist.pagerIndicators
-    //implementation Libs.Accompanist.insets
     implementation Libs.Accompanist.swiperefresh
 
     implementation Libs.Arch.runtime
@@ -172,14 +171,22 @@ dependencies {
 
     implementation Libs.Dependency.liveEventBusX
 
-    implementation Libs.Umeng.asms
-    implementation Libs.Umeng.umengCommon
+    api(Libs.Umeng.asms) {
+        exclude group: 'androidx.lifecycle'
+        exclude group: 'androidx.activity'
+        exclude group: 'androidx.fragment'
+    }
+    api(Libs.Umeng.umengCommon) {
+        exclude group: 'androidx.lifecycle'
+        exclude group: 'androidx.activity'
+        exclude group: 'androidx.fragment'
+    }
     implementation Libs.Dependency.multidex
     implementation Libs.AndroidX.ConstraintLayout.constraintLayout
     implementation(Libs.Dependency.material) {
         exclude group: 'androidx.recyclerview'
     }
-    implementation (Libs.Dependency.colorPickerDialog) {
+    implementation(Libs.Dependency.colorPickerDialog) {
         exclude group: 'androidx.recyclerview'
     }
 

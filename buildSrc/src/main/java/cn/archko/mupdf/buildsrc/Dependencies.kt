@@ -35,7 +35,7 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.7.20"
+        private const val version = "1.7.21"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
@@ -70,23 +70,23 @@ object Libs {
             const val layout = "androidx.compose.foundation:foundation-layout:$version"
             const val androidxComposeBom = "androidx.compose:compose-bom:$composeBomVersion"
 
-            const val ui = "androidx.compose.ui:ui:$version"
-            const val material = "androidx.compose.material:material:$version"
-            const val iconsExtended = "androidx.compose.material:material-icons-extended:$version"
+            const val ui = "androidx.compose.ui:ui"
+            const val material = "androidx.compose.material:material"
+            const val iconsExtended = "androidx.compose.material:material-icons-extended"
 
-            const val tooling = "androidx.compose.ui:ui-tooling:$version"
-            const val toolingPreview = "androidx.compose.ui:ui-tooling-preview:$version"
+            const val tooling = "androidx.compose.ui:ui-tooling"
+            const val toolingPreview = "androidx.compose.ui:ui-tooling-preview"
 
-            const val uiUtil = "androidx.compose.ui:ui-util:$version"
-            const val uiTest = "androidx.compose.ui:ui-test-junit4:$version"
+            const val uiUtil = "androidx.compose.ui:ui-util"
+            const val uiTest = "androidx.compose.ui:ui-test-junit4"
 
             object Material3 {
                 const val snapshot = ""
                 const val version = "1.0.0-beta03"
 
-                const val material3 = "androidx.compose.material3:material3:$version"
+                const val material3 = "androidx.compose.material3:material3"
                 const val material3WindowSizeClass =
-                    "androidx.compose.material3:material3-window-size-class:$version"
+                    "androidx.compose.material3:material3-window-size-class"
             }
         }
 
