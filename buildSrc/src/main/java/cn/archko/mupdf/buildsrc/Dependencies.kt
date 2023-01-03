@@ -14,12 +14,12 @@ object BuildConfig {
 }
 
 object Libs {
-    const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.1.5"
+    const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.2.2"
     const val flinger = "com.github.iamjosephmj:flinger:1.1.1"
     const val androidGradlePlugin = "com.android.tools.build:gradle:7.3.0"
 
     object Accompanist {
-        const val version = "0.27.0"
+        const val version = "0.28.0"
 
         //const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
@@ -35,7 +35,7 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.7.20"
+        private const val version = "1.7.21"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
@@ -59,32 +59,34 @@ object Libs {
         const val navigation = "androidx.navigation:navigation-compose:2.5.3"
 
         object Compose {
-            const val compiler_version = "1.3.2"
-            const val version = "1.3.1"
+            const val compiler_version = "1.4.0-alpha02"
+            const val version = "1.3.2"
+            const val composeBomVersion = "2022.12.00"
 
-            const val runtime = "androidx.compose.runtime:runtime:$version"
-            const val runtimeLivedata = "androidx.compose.runtime:runtime-livedata:$version"
-            const val animation = "androidx.compose.animation:animation:$version"
-            const val foundation = "androidx.compose.foundation:foundation:$version"
-            const val layout = "androidx.compose.foundation:foundation-layout:$version"
+            const val runtime = "androidx.compose.runtime:runtime"
+            const val runtimeLivedata = "androidx.compose.runtime:runtime-livedata"
+            const val animation = "androidx.compose.animation:animation"
+            const val foundation = "androidx.compose.foundation:foundation"
+            const val layout = "androidx.compose.foundation:foundation-layout"
+            const val androidxComposeBom = "androidx.compose:compose-bom:$composeBomVersion"
 
-            const val ui = "androidx.compose.ui:ui:$version"
-            const val material = "androidx.compose.material:material:$version"
-            const val iconsExtended = "androidx.compose.material:material-icons-extended:$version"
+            const val ui = "androidx.compose.ui:ui"
+            const val material = "androidx.compose.material:material"
+            const val iconsExtended = "androidx.compose.material:material-icons-extended"
 
-            const val tooling = "androidx.compose.ui:ui-tooling:$version"
-            const val toolingPreview = "androidx.compose.ui:ui-tooling-preview:$version"
+            const val tooling = "androidx.compose.ui:ui-tooling"
+            const val toolingPreview = "androidx.compose.ui:ui-tooling-preview"
 
-            const val uiUtil = "androidx.compose.ui:ui-util:$version"
-            const val uiTest = "androidx.compose.ui:ui-test-junit4:$version"
+            const val uiUtil = "androidx.compose.ui:ui-util"
+            const val uiTest = "androidx.compose.ui:ui-test-junit4"
 
             object Material3 {
                 const val snapshot = ""
                 const val version = "1.0.0-beta03"
 
-                const val material3 = "androidx.compose.material3:material3:$version"
+                const val material3 = "androidx.compose.material3:material3"
                 const val material3WindowSizeClass =
-                    "androidx.compose.material3:material3-window-size-class:$version"
+                    "androidx.compose.material3:material3-window-size-class"
             }
         }
 
@@ -115,7 +117,7 @@ object Libs {
                 "androidx.constraintlayout:constraintlayout-compose:1.0.0"
 
             const val constraintLayout =
-                "androidx.constraintlayout:constraintlayout:2.1.3"
+                "androidx.constraintlayout:constraintlayout:2.1.4"
         }
 
         object Navigation {
@@ -134,7 +136,7 @@ object Libs {
         }
 
         object Room {
-            private const val version = "2.5.0-beta02"
+            private const val version = "2.5.0-rc01"
             const val runtime = "androidx.room:room-runtime:${version}"
             const val ktx = "androidx.room:room-ktx:${version}"
             const val compiler = "androidx.room:room-compiler:${version}"
@@ -154,7 +156,7 @@ object Libs {
         private const val version = "2.9.0"
         const val retrofit = "com.squareup.retrofit2:retrofit:$version"
         const val converterGson = "com.squareup.retrofit2:converter-gson:2.9.0"
-        const val gson = "com.google.code.gson:gson:2.9.0"
+        const val gson = "com.google.code.gson:gson:2.8.9"
         const val mock = "com.squareup.retrofit2:retrofit-mock:${version}"
     }
 

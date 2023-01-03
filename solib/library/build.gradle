@@ -48,7 +48,11 @@ android {
 }
 
 dependencies {
+    implementation project(':mupdf-android-fitz')
     implementation Libs.AndroidX.Activity.appCompat
 
-    implementation project(':mupdf-android-fitz')
+    api Libs.AndroidX.Lifecycle.runtime
+    api Libs.AndroidX.Lifecycle.viewModel
+    api Libs.AndroidX.Lifecycle.liveDataKtx
+    api Libs.AndroidX.Lifecycle.viewModelKtx
 }
