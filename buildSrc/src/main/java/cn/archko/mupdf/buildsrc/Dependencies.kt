@@ -132,7 +132,7 @@ object Libs {
             const val pagingRuntime = "androidx.paging:paging-runtime:$version"
 
             // Jetpack Compose Integration
-            const val pagingCompose = "androidx.paging:paging-compose"
+            const val pagingCompose = "androidx.paging:paging-compose:1.0.0-alpha14"
         }
 
         object Room {
