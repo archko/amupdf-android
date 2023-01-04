@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.baidu.ai.edge.ui.R;
 import com.baidu.ai.edge.ui.view.ResultMaskView;
@@ -144,11 +145,9 @@ public abstract class AbsOcrActivity extends BaseActivity {
     }
 
     public void showResultPage(final Bitmap bitmap) {
-        AppExecutors.Companion.getInstance().mainThread().execute(new Runnable() {
-            @Override
-            public void run() {
-                resultImage.setImageBitmap(bitmap);
-            }
+        AppExecutors.Companion.getInstance().mainThread().execute(() -> {
+            Toast.makeText(AbsOcrActivity.this, "开始识别文本", Toast.LENGTH_SHORT).show();
+            resultImage.setImageBitmap(bitmap);
         });
         resolveDetectResult(bitmap, 0.1f,
                 (ResultListener.ListListener<DetectResultModel>) results -> {

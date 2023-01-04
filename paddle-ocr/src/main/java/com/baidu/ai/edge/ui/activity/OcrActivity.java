@@ -38,9 +38,10 @@ import cn.archko.pdf.utils.StreamUtils;
 
 public class OcrActivity extends AbsOcrActivity {
 
-    public static void start(Context context, String path, String name) {
+    public static void start(Context context, Bitmap bitmap, String path, String name) {
         Intent intent = new Intent(context, OcrActivity.class);
         intent.putExtra("path", path);
+        intent.putExtra("bitmap", bitmap);
         intent.putExtra("name", name);
         context.startActivity(intent);
     }
@@ -56,6 +57,7 @@ public class OcrActivity extends AbsOcrActivity {
     // 模型加载状态
     private boolean modelLoadStatus = false;
     private String mPath;
+    private Bitmap bitmap;
     private String name = "ocr";
 
     @Override
@@ -98,20 +100,22 @@ public class OcrActivity extends AbsOcrActivity {
         AppExecutors.Companion.getInstance().diskIO().execute(() -> {
             initManager();
             if (isInitializing) {
-                mPath = getIntent().getStringExtra("path");
-                Bitmap bitmap = BitmapFactory.decodeFile(mPath);
+                if (bitmap == null) {
+                    mPath = getIntent().getStringExtra("path");
+                    bitmap = BitmapFactory.decodeFile(mPath);
+                }
                 showResultPage(bitmap);
             }
         });
     }
 
     private void parseIntent() {
+        Intent intent = getIntent();
+        bitmap = intent.getParcelableExtra("bitmap");
         if (TextUtils.isEmpty(mPath)) {
-            Intent intent = getIntent();
-
             if (Intent.ACTION_VIEW == intent.getAction()) {
                 String path = IntentFile.getPath(this, intent.getData());
-                if (path == null && intent.getData() != null) {
+                if (TextUtils.isEmpty(path) && intent.getData() != null) {
                     path = intent.getData().toString();
                 }
 
