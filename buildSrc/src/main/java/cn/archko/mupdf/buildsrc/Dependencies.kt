@@ -59,7 +59,7 @@ object Libs {
         const val navigation = "androidx.navigation:navigation-compose:2.5.3"
 
         object Compose {
-            const val compiler_version = "1.3.3"
+            const val compiler_version = "1.4.0-alpha02"
             const val version = "1.3.1"
             const val composeBomVersion = "2022.12.00"
 
