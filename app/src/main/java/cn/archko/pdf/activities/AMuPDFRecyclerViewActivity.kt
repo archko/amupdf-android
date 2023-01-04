@@ -233,6 +233,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             } else if (IntentFile.isImage(mPath) && ocr) {
                 OcrActivity.start(
                     this@AMuPDFRecyclerViewActivity,
+                    null,
                     mPath,
                     System.currentTimeMillis().toString()
                 )

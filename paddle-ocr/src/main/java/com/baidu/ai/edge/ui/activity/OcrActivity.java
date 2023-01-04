@@ -41,7 +41,9 @@ public class OcrActivity extends AbsOcrActivity {
     public static void start(Context context, Bitmap bitmap, String path, String name) {
         Intent intent = new Intent(context, OcrActivity.class);
         intent.putExtra("path", path);
-        intent.putExtra("bitmap", bitmap);
+        if (null != bitmap) {
+            intent.putExtra("bitmap", bitmap);
+        }
         intent.putExtra("name", name);
         context.startActivity(intent);
     }
