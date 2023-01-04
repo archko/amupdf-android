@@ -91,7 +91,7 @@ object Libs {
         }
 
         object Activity {
-            const val activityCompose = "androidx.activity:activity-compose"
+            const val activityCompose = "androidx.activity:activity-compose:1.6.1"
             const val activityKtx = "androidx.activity:activity-ktx:1.6.1"
             const val appCompat = "androidx.appcompat:appcompat:1.5.1"
             const val annotations = "androidx.annotation:annotation:1.4.0"
@@ -99,7 +99,7 @@ object Libs {
 
         object Lifecycle {
             const val viewModelCompose =
-                "androidx.lifecycle:lifecycle-viewmodel-compose"
+                "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0-alpha03"
 
             const val lifecycle = "2.6.0-alpha03"
             const val runtime = "androidx.lifecycle:lifecycle-runtime:${lifecycle}"
