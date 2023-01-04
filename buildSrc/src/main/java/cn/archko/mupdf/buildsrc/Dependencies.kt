@@ -59,15 +59,15 @@ object Libs {
         const val navigation = "androidx.navigation:navigation-compose:2.5.3"
 
         object Compose {
-            const val compiler_version = "1.3.2"
+            const val compiler_version = "1.3.3"
             const val version = "1.3.1"
             const val composeBomVersion = "2022.12.00"
 
-            const val runtime = "androidx.compose.runtime:runtime:$version"
-            const val runtimeLivedata = "androidx.compose.runtime:runtime-livedata:$version"
-            const val animation = "androidx.compose.animation:animation:$version"
-            const val foundation = "androidx.compose.foundation:foundation:$version"
-            const val layout = "androidx.compose.foundation:foundation-layout:$version"
+            const val runtime = "androidx.compose.runtime:runtime"
+            const val runtimeLivedata = "androidx.compose.runtime:runtime-livedata"
+            const val animation = "androidx.compose.animation:animation"
+            const val foundation = "androidx.compose.foundation:foundation"
+            const val layout = "androidx.compose.foundation:foundation-layout"
             const val androidxComposeBom = "androidx.compose:compose-bom:$composeBomVersion"
 
             const val ui = "androidx.compose.ui:ui"
@@ -91,7 +91,7 @@ object Libs {
         }
 
         object Activity {
-            const val activityCompose = "androidx.activity:activity-compose:1.6.1"
+            const val activityCompose = "androidx.activity:activity-compose"
             const val activityKtx = "androidx.activity:activity-ktx:1.6.1"
             const val appCompat = "androidx.appcompat:appcompat:1.5.1"
             const val annotations = "androidx.annotation:annotation:1.4.0"
@@ -99,7 +99,7 @@ object Libs {
 
         object Lifecycle {
             const val viewModelCompose =
-                "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0-alpha03"
+                "androidx.lifecycle:lifecycle-viewmodel-compose"
 
             const val lifecycle = "2.6.0-alpha03"
             const val runtime = "androidx.lifecycle:lifecycle-runtime:${lifecycle}"
@@ -114,7 +114,7 @@ object Libs {
 
         object ConstraintLayout {
             const val constraintLayoutCompose =
-                "androidx.constraintlayout:constraintlayout-compose:1.0.0"
+                "androidx.constraintlayout:constraintlayout-compose"
 
             const val constraintLayout =
                 "androidx.constraintlayout:constraintlayout:2.1.4"
@@ -132,7 +132,7 @@ object Libs {
             const val pagingRuntime = "androidx.paging:paging-runtime:$version"
 
             // Jetpack Compose Integration
-            const val pagingCompose = "androidx.paging:paging-compose:1.0.0-alpha14"
+            const val pagingCompose = "androidx.paging:paging-compose"
         }
 
         object Room {
