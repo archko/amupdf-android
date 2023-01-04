@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
+import cn.archko.pdf.App
 import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.common.BitmapCache
@@ -60,6 +61,8 @@ import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.State
 import cn.archko.pdf.mupdf.MupdfDocument
+import cn.archko.pdf.utils.BitmapUtils
+import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.StatusBarHelper
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
@@ -68,6 +71,7 @@ import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
 import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
+import java.io.File
 
 /**
  * @author: archko 2022/7/11 :9:49 上午
@@ -295,9 +299,10 @@ class ComposeTextActivity : ComponentActivity() {
                 decodeParam.screenWidth
             )*/
                 PdfImageDecoder.decode(decodeParam)
-            //val file = FileUtils.getDiskCacheDir(App.instance, pos.toString())
-            //BitmapUtils.saveBitmapToFile(bitmap, file)
-            AppExecutors.instance.mainThread().execute { startOcrActivity(this, bitmap, pos) }
+            val file = FileUtils.getDiskCacheDir(App.instance, pos.toString())
+            BitmapUtils.saveBitmapToFile(bitmap, file)
+            AppExecutors.instance.mainThread()
+                .execute { startOcrActivity(this, bitmap, file.absolutePath, pos) }
         }
     }
 
@@ -336,8 +341,8 @@ class ComposeTextActivity : ComponentActivity() {
             context.startActivity(intent)
         }
 
-        fun startOcrActivity(context: Context, bitmap: Bitmap?, pos: Int) {
-            OcrActivity.start(context, bitmap, null, pos.toString())
+        fun startOcrActivity(context: Context, bitmap: Bitmap?, path: String, pos: Int) {
+            OcrActivity.start(context, bitmap, path, pos.toString())
         }
     }
 }

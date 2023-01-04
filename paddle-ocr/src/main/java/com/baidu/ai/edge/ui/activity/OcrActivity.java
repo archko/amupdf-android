@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.archko.pdf.AppExecutors;
+import cn.archko.pdf.common.BitmapCache;
 import cn.archko.pdf.common.IntentFile;
 import cn.archko.pdf.utils.FileUtils;
 import cn.archko.pdf.utils.StreamUtils;
@@ -38,11 +39,16 @@ import cn.archko.pdf.utils.StreamUtils;
 
 public class OcrActivity extends AbsOcrActivity {
 
+    public static final String INTENT_PATH = "path";
+    public static final String INTENT_NAME = "name";
+
     public static void start(Context context, Bitmap bitmap, String path, String name) {
         Intent intent = new Intent(context, OcrActivity.class);
-        intent.putExtra("path", path);
+        intent.putExtra(INTENT_PATH, path);
         if (null != bitmap) {
-            intent.putExtra("bitmap", bitmap);
+            String key = String.valueOf(System.currentTimeMillis());
+            BitmapCache.getInstance().addBitmap(key, bitmap);
+            intent.putExtra("key", key);
         }
         intent.putExtra("name", name);
         context.startActivity(intent);
@@ -103,7 +109,6 @@ public class OcrActivity extends AbsOcrActivity {
             initManager();
             if (isInitializing) {
                 if (bitmap == null) {
-                    mPath = getIntent().getStringExtra("path");
                     bitmap = BitmapFactory.decodeFile(mPath);
                 }
                 showResultPage(bitmap);
@@ -113,7 +118,10 @@ public class OcrActivity extends AbsOcrActivity {
 
     private void parseIntent() {
         Intent intent = getIntent();
-        bitmap = intent.getParcelableExtra("bitmap");
+        String key = intent.getParcelableExtra("key");
+        if (!TextUtils.isEmpty(key)) {
+            bitmap = BitmapCache.getInstance().getBitmap(key);
+        }
         if (TextUtils.isEmpty(mPath)) {
             if (Intent.ACTION_VIEW == intent.getAction()) {
                 String path = IntentFile.getPath(this, intent.getData());
@@ -124,10 +132,10 @@ public class OcrActivity extends AbsOcrActivity {
                 mPath = path;
                 name = getIntent().getStringExtra("name");
             } else {
-                if (!TextUtils.isEmpty(getIntent().getStringExtra("path"))) {
-                    mPath = getIntent().getStringExtra("path");
+                if (!TextUtils.isEmpty(getIntent().getStringExtra(INTENT_PATH))) {
+                    mPath = getIntent().getStringExtra(INTENT_PATH);
                 }
-                name = getIntent().getStringExtra("name");
+                name = getIntent().getStringExtra(INTENT_NAME);
             }
         }
         if (TextUtils.isEmpty(name)) {
