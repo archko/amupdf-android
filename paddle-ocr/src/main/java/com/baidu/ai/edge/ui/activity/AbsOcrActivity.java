@@ -146,7 +146,12 @@ public abstract class AbsOcrActivity extends BaseActivity {
 
     public void showResultPage(final Bitmap bitmap) {
         AppExecutors.Companion.getInstance().mainThread().execute(() -> {
-            Toast.makeText(AbsOcrActivity.this, "开始识别文本", Toast.LENGTH_SHORT).show();
+            if (null == bitmap) {
+                Toast.makeText(AbsOcrActivity.this, "图片为空", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(AbsOcrActivity.this, "开始识别文本", Toast.LENGTH_SHORT).show();
+            }
             resultImage.setImageBitmap(bitmap);
         });
         resolveDetectResult(bitmap, 0.1f,

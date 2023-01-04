@@ -299,10 +299,10 @@ class ComposeTextActivity : ComponentActivity() {
                 decodeParam.screenWidth
             )*/
                 PdfImageDecoder.decode(decodeParam)
-            val file = FileUtils.getDiskCacheDir(App.instance, pos.toString())
-            BitmapUtils.saveBitmapToFile(bitmap, file)
+            //val file = FileUtils.getDiskCacheDir(App.instance, pos.toString())
+            //BitmapUtils.saveBitmapToFile(bitmap, file)
             AppExecutors.instance.mainThread()
-                .execute { startOcrActivity(this, bitmap, file.absolutePath, pos) }
+                .execute { startOcrActivity(this, bitmap, null, pos) }
         }
     }
 
@@ -341,7 +341,7 @@ class ComposeTextActivity : ComponentActivity() {
             context.startActivity(intent)
         }
 
-        fun startOcrActivity(context: Context, bitmap: Bitmap?, path: String, pos: Int) {
+        fun startOcrActivity(context: Context, bitmap: Bitmap?, path: String?, pos: Int) {
             OcrActivity.start(context, bitmap, path, pos.toString())
         }
     }

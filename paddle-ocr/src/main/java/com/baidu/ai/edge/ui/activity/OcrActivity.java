@@ -108,7 +108,7 @@ public class OcrActivity extends AbsOcrActivity {
         AppExecutors.Companion.getInstance().diskIO().execute(() -> {
             initManager();
             if (isInitializing) {
-                if (bitmap == null) {
+                if (bitmap == null && !TextUtils.isEmpty(mPath)) {
                     bitmap = BitmapFactory.decodeFile(mPath);
                 }
                 showResultPage(bitmap);
@@ -118,7 +118,7 @@ public class OcrActivity extends AbsOcrActivity {
 
     private void parseIntent() {
         Intent intent = getIntent();
-        String key = intent.getParcelableExtra("key");
+        String key = intent.getStringExtra("key");
         if (!TextUtils.isEmpty(key)) {
             bitmap = BitmapCache.getInstance().getBitmap(key);
         }
