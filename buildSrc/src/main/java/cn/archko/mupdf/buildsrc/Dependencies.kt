@@ -16,7 +16,7 @@ object BuildConfig {
 object Libs {
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.2.2"
     const val flinger = "com.github.iamjosephmj:flinger:1.1.1"
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.3.0"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.4.1"
 
     object Accompanist {
         const val version = "0.28.0"
@@ -35,10 +35,14 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.7.21"
+        private const val version = "1.8.0"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
+
+
+        const val ksp = "1.8.0-1.0.9"
+        const val kspGradlePlugin = "com.google.devtools.ksp.gradle.plugin:$ksp"
     }
 
     object Coroutines {
@@ -59,9 +63,8 @@ object Libs {
         const val navigation = "androidx.navigation:navigation-compose:2.5.3"
 
         object Compose {
-            const val compiler_version = "1.4.0-alpha02"
-            const val version = "1.3.1"
-            const val composeBomVersion = "2022.12.00"
+            const val compiler_version = "1.4.1"
+            const val composeBomVersion = "2023.01.00"
 
             const val runtime = "androidx.compose.runtime:runtime"
             const val runtimeLivedata = "androidx.compose.runtime:runtime-livedata"
@@ -82,7 +85,7 @@ object Libs {
 
             object Material3 {
                 const val snapshot = ""
-                const val version = "1.0.0-beta03"
+                const val version = "1.1.0-alpha06"
 
                 const val material3 = "androidx.compose.material3:material3"
                 const val material3WindowSizeClass =
@@ -98,10 +101,10 @@ object Libs {
         }
 
         object Lifecycle {
+            const val lifecycle = "2.6.0-alpha05"
             const val viewModelCompose =
-                "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0-alpha03"
+                "androidx.lifecycle:lifecycle-viewmodel-compose:${lifecycle}"
 
-            const val lifecycle = "2.6.0-alpha03"
             const val runtime = "androidx.lifecycle:lifecycle-runtime:${lifecycle}"
             const val java8 = "androidx.lifecycle:lifecycle-common-java8:${lifecycle}"
             const val compiler = "androidx.lifecycle:lifecycle-compiler:${lifecycle}"
@@ -136,7 +139,7 @@ object Libs {
         }
 
         object Room {
-            private const val version = "2.5.0-rc01"
+            private const val version = "2.5.0"
             const val runtime = "androidx.room:room-runtime:${version}"
             const val ktx = "androidx.room:room-ktx:${version}"
             const val compiler = "androidx.room:room-compiler:${version}"

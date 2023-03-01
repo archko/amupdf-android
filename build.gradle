@@ -2,17 +2,17 @@ import cn.archko.mupdf.buildsrc.Libs
 
 buildscript {
     repositories {
-        mavenLocal()
-        mavenCentral()
-        google()
         maven {
             allowInsecureProtocol = true
-            url "https://maven.aliyun.com/repository/jcenter"
+            url "https://maven.aliyun.com/repository/public"
         }
         maven {
             allowInsecureProtocol = true
             url "https://maven.aliyun.com/repository/google"
         }
+        mavenLocal()
+        mavenCentral()
+        google()
         maven {
             allowInsecureProtocol = true
             url 'https://repo1.maven.org/maven2/'
@@ -34,17 +34,17 @@ buildscript {
 
 subprojects {
     repositories {
-        mavenLocal()
-        mavenCentral()
-        google()
         maven {
             allowInsecureProtocol = true
-            url "https://maven.aliyun.com/repository/jcenter"
+            url "https://maven.aliyun.com/repository/public"
         }
         maven {
             allowInsecureProtocol = true
             url "https://maven.aliyun.com/repository/google"
         }
+        mavenLocal()
+        mavenCentral()
+        google()
         maven {
             allowInsecureProtocol = true
             url 'https://repo1.maven.org/maven2/'

@@ -100,11 +100,9 @@ fun HomePager(
 
     LiveEventBus
         .get(Event.ACTION_STOPPED, String::class.java)
-        .observe(LocalLifecycleOwner.current, object : Observer<String> {
-            override fun onChanged(t: String?) {
-                viewModel.onReadBook(t, currentSection)
-            }
-        })
+        .observe(
+            LocalLifecycleOwner.current
+        ) { t -> viewModel.onReadBook(t, currentSection) }
 
     val onPalletChange: () -> Unit = { ->
         showMenu.value = false
@@ -134,6 +132,7 @@ fun HomePager(
                         restore(showRestoreDialog)
                     }
                 }
+
                 2 -> {
                     MenuItem(stringResource(id = R.string.options)) {
                         onPalletChange()
@@ -144,6 +143,7 @@ fun HomePager(
                         viewModel.setAsHome(context)
                     }
                 }
+
                 0, 3 -> {
                     MenuItem(stringResource(id = R.string.options)) {
                         onPalletChange()
@@ -285,14 +285,17 @@ private fun TabContent(
                     0 -> FileSearchList(
                         viewModel,
                     )
+
                     1 -> FileHistoryList(
                         viewModel,
                         navigateTo = { Logcat.d("file.navigateTo") },
                     )
+
                     2 -> FileBrowserList(
                         viewModel,
                         up,
                     )
+
                     3 -> FileFavoritiesList(
                         viewModel,
                         navigateTo = { Logcat.d("file.navigateTo") },
