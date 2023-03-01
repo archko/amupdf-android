@@ -1,9 +1,12 @@
 package com.baidu.ai.edge.ui.view.adapter;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baidu.ai.edge.ui.R;
 import com.baidu.ai.edge.ui.util.StringUtil;
@@ -12,10 +15,13 @@ import com.baidu.ai.edge.ui.view.model.BaseResultModel;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import cn.archko.pdf.App;
 import cn.archko.pdf.adapters.BaseRecyclerAdapter;
 import cn.archko.pdf.adapters.BaseViewHolder;
 
 public class DetectResultAdapter extends BaseRecyclerAdapter<BaseResultModel> {
+
+    private ClipboardManager clipboardManager;
 
     public DetectResultAdapter(Context context) {
         super(context);
@@ -33,7 +39,7 @@ public class DetectResultAdapter extends BaseRecyclerAdapter<BaseResultModel> {
         return holder;
     }
 
-    private static class Holder extends BaseViewHolder<BaseResultModel> {
+    private class Holder extends BaseViewHolder<BaseResultModel> {
 
         TextView indexText;
         TextView nameText;
@@ -51,6 +57,15 @@ public class DetectResultAdapter extends BaseRecyclerAdapter<BaseResultModel> {
             indexText.setText(String.valueOf(model.getIndex()));
             nameText.setText(String.valueOf(model.getName()));
             confidenceText.setText(StringUtil.formatFloatString(model.getConfidence()));
+            itemView.setOnClickListener(v -> saveToClip(model));
+        }
+
+        private void saveToClip(BaseResultModel model) {
+            if (null == clipboardManager) {
+                clipboardManager = (ClipboardManager) App.Companion.getInstance().getSystemService(Context.CLIPBOARD_SERVICE);
+            }
+            clipboardManager.setPrimaryClip(ClipData.newPlainText("Label", model.getName()));
+            Toast.makeText(App.Companion.getInstance(), "save text to clipboard", Toast.LENGTH_SHORT).show();
         }
     }
 }

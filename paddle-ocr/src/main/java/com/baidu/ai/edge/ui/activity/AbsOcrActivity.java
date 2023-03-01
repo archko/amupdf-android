@@ -112,6 +112,7 @@ public abstract class AbsOcrActivity extends BaseActivity {
         //((TextView) findViewById(R.id.model_name)).setText(name);
         findViewById(R.id.back).setOnClickListener(v -> finish());
         findViewById(R.id.save).setOnClickListener(v -> save(adapter.getData()));
+        findViewById(R.id.copy).setOnClickListener(v -> copy(adapter.getData()));
 
         addListener();
         updateRealtimeResultPopViewGroup();
@@ -119,6 +120,9 @@ public abstract class AbsOcrActivity extends BaseActivity {
     }
 
     public void save(List<BaseResultModel> models) {
+    }
+
+    public void copy(List<BaseResultModel> models) {
     }
 
     protected boolean canAutoRun = false;
@@ -134,7 +138,7 @@ public abstract class AbsOcrActivity extends BaseActivity {
         runOnUiThread(() -> builder.setTitle("提示")
                 .setMessage(msg)
                 .setNegativeButton("关闭", (dialog, which) -> {
-                    finish();
+                    //finish();
                 })
                 .show());
 

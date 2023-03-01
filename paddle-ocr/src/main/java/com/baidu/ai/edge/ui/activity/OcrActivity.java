@@ -1,5 +1,7 @@
 package com.baidu.ai.edge.ui.activity;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -27,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.archko.pdf.App;
 import cn.archko.pdf.AppExecutors;
 import cn.archko.pdf.common.BitmapCache;
 import cn.archko.pdf.common.IntentFile;
@@ -41,6 +44,7 @@ public class OcrActivity extends AbsOcrActivity {
 
     public static final String INTENT_PATH = "path";
     public static final String INTENT_NAME = "name";
+    private ClipboardManager clipboardManager;
 
     public static void start(Context context, Bitmap bitmap, String path, String name) {
         Intent intent = new Intent(context, OcrActivity.class);
@@ -244,5 +248,17 @@ public class OcrActivity extends AbsOcrActivity {
                 Toast.makeText(this, "保存失败:" + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public void copy(List<BaseResultModel> models) {
+        StringBuilder sb = new StringBuilder();
+        for (BaseResultModel baseResultModel : models) {
+            sb.append(baseResultModel.getName()).append("\n");
+        }
+        if (null == clipboardManager) {
+            clipboardManager = (ClipboardManager) App.Companion.getInstance().getSystemService(Context.CLIPBOARD_SERVICE);
+        }
+        clipboardManager.setPrimaryClip(ClipData.newPlainText("Label", sb));
+        Toast.makeText(App.Companion.getInstance(), "save text to clipboard", Toast.LENGTH_SHORT).show();
     }
 }
