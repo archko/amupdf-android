@@ -99,15 +99,23 @@ fun FileBrowserList(
                 MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
                 showInfoDialog.value = true
             }
+
             MenuItemType.DeleteFile -> {
                 viewModel.deleteFile(fb)
             }
+
             MenuItemType.AddToFav -> {
                 viewModel.favorite(context, fb, 1)
             }
+
             MenuItemType.DeleteFav -> {
                 viewModel.favorite(context, fb, 0)
             }
+
+            MenuItemType.Compress -> {
+                viewModel.compress(context, fb)
+            }
+
             else -> {}
         }
     }

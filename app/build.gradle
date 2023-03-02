@@ -25,7 +25,8 @@ android {
     buildToolsVersion BuildConfig.buildToolsVersion
 
     defaultConfig {
-        applicationId 'cn.archko.mupdf'
+        //applicationId 'cn.archko.mupdf'
+        applicationId "com.radaee.pdfmaster"
         minSdkVersion BuildConfig.minSdkVersion
         targetSdkVersion BuildConfig.targetSdkVersion
         versionCode BuildConfig.versionCode
@@ -202,4 +203,5 @@ dependencies {
     implementation project(':library')
     implementation project(':core-ui')
     implementation project(':paddle-ocr')
+    implementation project(':ViewLib')
 }

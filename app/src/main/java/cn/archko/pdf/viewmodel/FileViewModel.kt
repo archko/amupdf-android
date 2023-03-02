@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.archko.mupdf.R
 import cn.archko.pdf.App
+import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.activities.ChooseFileFragmentActivity
 import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.BookProgressParser
@@ -26,6 +27,8 @@ import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
 import cn.archko.pdf.utils.StreamUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.radaee.PDFUtilities
+import com.radaee.PDFUtilities.OnOperationListener
 import com.umeng.analytics.MobclickAgent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -631,6 +634,55 @@ class FileViewModel() : ViewModel() {
             if (isCurrentTab) {
             }
             loadFavorities(true)
+        }
+    }
+
+    fun compress(
+        context: Context,
+        entry: FileBean,
+    ) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val map = HashMap<String, String>()
+                map["type"] = "compress"
+                map["name"] = entry.file!!.name
+                MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
+                val filepath = FileUtils.getStoragePath(entry.bookProgress!!.path)
+                val file = File(filepath)
+
+                val pdfDoc = com.radaee.pdf.Document()
+                val fullPath: String = file.absolutePath
+                val ret = pdfDoc.Open(fullPath, "")
+                if (ret == 0) {
+                    var path = fullPath.substring(0, fullPath.lastIndexOf("/"))
+                    var name = fullPath.substring(
+                        fullPath.lastIndexOf("/") + 1,
+                        fullPath.lastIndexOf(".")
+                    )
+                    name += "_compressed.pdf"
+                    val finalPath = path + File.separatorChar + name
+                    PDFUtilities.CompressPDF(
+                        finalPath,
+                        object : OnOperationListener {
+                            override fun onDone(result: Any?, requestCode: Int) {
+                                AppExecutors.instance.mainThread().execute {
+                                    Toast.makeText(App.instance, "压缩失败", Toast.LENGTH_SHORT)
+                                        .show()
+                                }
+                                loadFiles(null, true)
+                            }
+
+                            override fun onError(error: String?, requestCode: Int) {
+                                AppExecutors.instance.mainThread().execute {
+                                    Toast.makeText(App.instance, "压缩失败", Toast.LENGTH_SHORT)
+                                        .show()
+                                }
+                            }
+                        },
+                        pdfDoc
+                    )
+                }
+            }
         }
     }
 

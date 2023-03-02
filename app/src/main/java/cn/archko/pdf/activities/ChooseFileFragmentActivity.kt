@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
+import cn.archko.pdf.App
 import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.NavGraph
 import cn.archko.pdf.common.Graph
@@ -36,6 +37,7 @@ import cn.archko.pdf.common.PdfOptionRepository
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
 import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
+import com.radaee.comm.Global
 import com.umeng.analytics.MobclickAgent
 import kotlinx.coroutines.launch
 
@@ -49,6 +51,7 @@ open class ChooseFileFragmentActivity : AnalysticActivity() {
         ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class
     )
     override fun onCreate(savedInstanceState: Bundle?) {
+        Global.Init(this)
         isLive = true
         super.onCreate(savedInstanceState)
 

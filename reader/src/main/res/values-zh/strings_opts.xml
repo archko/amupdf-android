@@ -14,6 +14,7 @@
     <string name="menu_backup">备份历史</string>
     <string name="menu_restore">恢复历史</string>
     <string name="menu_about">关于</string>
+    <string name="menu_tools">PDF工具</string>
     <string name="menu_style">样式(列表/网格)</string>
 
     <string name="menu_progress_outline">进度/目录/切割/重排</string>

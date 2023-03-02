@@ -78,6 +78,9 @@ sealed class MenuItemType {
     object AddToFav : MenuItemType()
     object DeleteFav : MenuItemType()
     object OpenWithOther : MenuItemType()
+    object Compress : MenuItemType()
+    object EncryptPDF : MenuItemType()
+    object DecryptPDF : MenuItemType()
 }
 
 sealed class FileBeanType {
@@ -141,6 +144,11 @@ fun UserOptDialog(
                         DialogItem(
                             txt = stringResource(id = R.string.menu_delete),
                             onClick = { menuOpt(MenuItemType.DeleteFile, fileBean) }
+                        )
+                        Divider(thickness = 0.5.dp)
+                        DialogItem(
+                            txt = stringResource(id = R.string.compress_pdf_label),
+                            onClick = { menuOpt(MenuItemType.Compress, fileBean) }
                         )
                         Divider(thickness = 0.5.dp)
                     }

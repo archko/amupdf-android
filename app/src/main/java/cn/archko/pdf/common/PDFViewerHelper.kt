@@ -14,12 +14,16 @@ import com.umeng.analytics.MobclickAgent
 import org.vudroid.pdfdroid.PdfViewerActivity
 import java.io.File
 
+
 /**
  * @author: archko 2020/1/4 :2:06 下午
  */
 class PDFViewerHelper {
 
     companion object {
+
+        //private const val FILE_PROVIDER = "cn.archko.mupdf.fileProvider"
+        private const val FILE_PROVIDER = "com.radaee.pdfmaster.fileProvider"
 
         const val deleteContextMenuItem = Menu.FIRST + 100
         const val removeContextMenuItem = Menu.FIRST + 101
@@ -113,7 +117,7 @@ class PDFViewerHelper {
                         intent.setDataAndType(
                             FileProvider.getUriForFile(
                                 activity,
-                                "cn.archko.mupdf.fileProvider",
+                                FILE_PROVIDER,
                                 clickedFile
                             ), mimeType
                         );
@@ -184,7 +188,7 @@ class PDFViewerHelper {
                 intent.setDataAndType(
                     FileProvider.getUriForFile(
                         activity,
-                        "cn.archko.mupdf.fileProvider",
+                        FILE_PROVIDER,
                         clickedFile
                     ), mimeType
                 );
