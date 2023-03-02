@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">AMuPDF</string>
+    <string name="app_name">AMuPDF-radaee</string>
     <string name="outline_title">Table of Contents</string>
     <string name="auto_crop">auto crop bound</string>
 

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">AMuPDF</string>
     <string name="outline_title">目录</string>
     <string name="auto_crop">自动切边</string>
 
