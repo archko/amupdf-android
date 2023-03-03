@@ -10,7 +10,7 @@ import cn.archko.pdf.adapters.BaseViewHolder
 import cn.archko.pdf.databinding.FragmentBookmarkBinding
 import cn.archko.pdf.databinding.ItemBookmarkBinding
 import cn.archko.pdf.entity.Bookmark
-import com.thuypham.ptithcm.editvideo.base.BaseFragment
+import cn.archko.pdf.base.BaseFragment
 
 /**
  * @author: archko 2019/7/11 :17:55

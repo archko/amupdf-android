@@ -22,7 +22,7 @@ import cn.archko.pdf.databinding.ItemOutlineBinding
 import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.listeners.DataListener
 import cn.archko.pdf.utils.Utils
-import com.thuypham.ptithcm.editvideo.base.BaseDialogFragment
+import cn.archko.pdf.base.BaseDialogFragment
 import com.umeng.analytics.MobclickAgent
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch

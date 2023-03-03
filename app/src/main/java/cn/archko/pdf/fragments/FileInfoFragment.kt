@@ -20,7 +20,7 @@ import cn.archko.pdf.utils.DateUtils
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.Utils
 import com.artifex.mupdf.fitz.Document
-import com.thuypham.ptithcm.editvideo.base.BaseDialogFragment
+import cn.archko.pdf.base.BaseDialogFragment
 import com.umeng.analytics.MobclickAgent
 import java.math.BigDecimal
 import java.math.RoundingMode
