@@ -26,17 +26,17 @@ import com.artifex.solib.FileUtils
 import com.artifex.solib.SOClipboardHandler
 import com.artifex.sonui.editor.DocumentListener
 import com.artifex.sonui.editor.Utilities
-import com.thuypham.ptithcm.editvideo.base.BaseActivity
+import cn.archko.pdf.base.BaseActivity
 import kotlinx.coroutines.launch
 
 /**
  * @author: archko 2020/10/31 :9:49 上午
  */
-class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.activity_doc_view) {
+open class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.activity_doc_view) {
     private var path: String? = null
-    var sensorHelper: SensorHelper? = null
-    val preferencesRepository = PdfOptionRepository(Graph.dataStore)
-    protected val pdfViewModel: PDFViewModel = PDFViewModel()
+    private var sensorHelper: SensorHelper? = null
+    private val preferencesRepository = PdfOptionRepository(Graph.dataStore)
+    private val pdfViewModel: PDFViewModel = PDFViewModel()
 
     internal class ClipboardHandler : SOClipboardHandler {
         private var mActivity // The current activity.

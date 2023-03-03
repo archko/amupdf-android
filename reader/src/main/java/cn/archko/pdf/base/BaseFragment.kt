@@ -1,4 +1,4 @@
-package com.thuypham.ptithcm.editvideo.base
+package cn.archko.pdf.base
 
 import android.os.Bundle
 import android.view.LayoutInflater

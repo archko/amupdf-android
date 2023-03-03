@@ -12,7 +12,7 @@ import cn.archko.pdf.databinding.FragmentOutlineBinding
 import cn.archko.pdf.databinding.ItemOutlineBinding
 import cn.archko.pdf.entity.OutlineItem
 import cn.archko.pdf.listeners.OutlineListener
-import com.thuypham.ptithcm.editvideo.base.BaseFragment
+import cn.archko.pdf.base.BaseFragment
 
 /**
  * @author: archko 2019/7/11 :17:55
