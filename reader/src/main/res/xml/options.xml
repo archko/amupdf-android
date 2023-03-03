@@ -22,6 +22,11 @@
 
         <CheckBoxPreference
             android:defaultValue="true"
+            android:key="override_file"
+            android:title="@string/opts_override_file_view" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
             android:key="fullscreen"
             android:title="@string/opts_fullscreen" />
         <CheckBoxPreference

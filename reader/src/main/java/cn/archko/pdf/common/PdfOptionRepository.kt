@@ -35,6 +35,7 @@ class PdfOptionRepository(private val dataStore: DataStore<Preferences>) {
         }.map { preferences ->
             val showExtension = preferences[PdfOptionKeys.PREF_SHOW_EXTENSION] ?: true
             val imageOcr = preferences[PdfOptionKeys.PREF_OCR] ?: true
+            val overrideFile = preferences[PdfOptionKeys.PREF_OVERRIDE_FILE] ?: true
             val fullscreen = preferences[PdfOptionKeys.PREF_FULLSCREEN] ?: true
             val autocrop = preferences[PdfOptionKeys.PREF_AUTOCROP] ?: true
             val verticalScrollLock = preferences[PdfOptionKeys.PREF_VERTICAL_SCROLL_LOCK] ?: true
@@ -63,6 +64,7 @@ class PdfOptionRepository(private val dataStore: DataStore<Preferences>) {
             val pdfPreferences = PdfOption(
                 showExtension = showExtension,
                 imageOcr = imageOcr,
+                overrideFile = overrideFile,
                 fullscreen = fullscreen,
                 autocrop = autocrop,
                 verticalScrollLock = verticalScrollLock,
@@ -218,6 +220,7 @@ class PdfOptionRepository(private val dataStore: DataStore<Preferences>) {
 data class PdfOption(
     val showExtension: Boolean = true,
     val imageOcr: Boolean = true,
+    val overrideFile: Boolean = true,
     val fullscreen: Boolean = true,
     val autocrop: Boolean = true,
     val verticalScrollLock: Boolean = true,
@@ -238,15 +241,14 @@ data class PdfOption(
     var topPadding: Int = Utils.dipToPixel(16f),
     var rightPadding: Int = Utils.dipToPixel(12f),
     var bottomPadding: Int = Utils.dipToPixel(20f),
-) {
-
-}
+)
 
 object PdfOptionKeys {
     val PREF_SHOW_EXTENSION = booleanPreferencesKey("showExtension")
 
     val PREF_ORIENTATION = stringPreferencesKey("orientation")
     val PREF_OCR = booleanPreferencesKey("image_ocr")
+    val PREF_OVERRIDE_FILE = booleanPreferencesKey("override_file")
     val PREF_FULLSCREEN = booleanPreferencesKey("fullscreen")
     val PREF_AUTOCROP = booleanPreferencesKey("autocrop")
     val PREF_VERTICAL_SCROLL_LOCK = booleanPreferencesKey("verticalScrollLock")

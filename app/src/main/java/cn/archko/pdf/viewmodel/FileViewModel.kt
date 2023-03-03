@@ -13,6 +13,7 @@ import cn.archko.pdf.common.BookProgressParser
 import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.Logcat
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.ProgressScaner
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
@@ -35,6 +36,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
@@ -87,6 +89,7 @@ class FileViewModel() : ViewModel() {
 
     var sdcardRoot: String = "/sdcard/"
     private var homePath: String
+    private val preferencesRepository = PdfOptionRepository(Graph.dataStore)
 
     /**
      * 存储文件目录对应当前列表显示第一个元素的位置,这样在进入下一级目录再返回可以定位到上次列表的位置.
@@ -641,6 +644,7 @@ class FileViewModel() : ViewModel() {
         context: Context,
         entry: FileBean,
     ) {
+        Toast.makeText(App.instance, "开始压缩,请稍候", Toast.LENGTH_SHORT).show()
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val map = HashMap<String, String>()
@@ -654,25 +658,37 @@ class FileViewModel() : ViewModel() {
                 val fullPath: String = file.absolutePath
                 val ret = pdfDoc.Open(fullPath, "")
                 if (ret == 0) {
-                    var path = fullPath.substring(0, fullPath.lastIndexOf("/"))
+                    val path = fullPath.substring(0, fullPath.lastIndexOf("/"))
                     var name = fullPath.substring(
                         fullPath.lastIndexOf("/") + 1,
                         fullPath.lastIndexOf(".")
                     )
-                    name += "_compressed.pdf"
-                    val finalPath = path + File.separatorChar + name
+                    val finalPath = path + File.separatorChar + name + "_compressed.pdf"
                     PDFUtilities.CompressPDF(
                         finalPath,
                         object : OnOperationListener {
                             override fun onDone(result: Any?, requestCode: Int) {
                                 AppExecutors.instance.mainThread().execute {
-                                    Toast.makeText(App.instance, "压缩失败", Toast.LENGTH_SHORT)
+                                    Toast.makeText(App.instance, "压缩成功", Toast.LENGTH_SHORT)
                                         .show()
+                                }
+
+                                viewModelScope.launch {
+                                    if (preferencesRepository.pdfOptionFlow.first().overrideFile) {
+                                        val newFile = File(finalPath)
+                                        if (newFile.length() > 0) {
+                                            file.delete()
+                                            newFile.renameTo(file)
+                                        } else {
+                                            Logcat.e("", "compress file is null:$finalPath")
+                                        }
+                                    }
                                 }
                                 loadFiles(null, true)
                             }
 
                             override fun onError(error: String?, requestCode: Int) {
+                                Logcat.e("", "compress error:$error")
                                 AppExecutors.instance.mainThread().execute {
                                     Toast.makeText(App.instance, "压缩失败", Toast.LENGTH_SHORT)
                                         .show()
