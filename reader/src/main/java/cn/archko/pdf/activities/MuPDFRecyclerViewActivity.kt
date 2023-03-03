@@ -67,6 +67,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     protected val pdfViewModel: PDFViewModel = PDFViewModel()
 
     public override fun onCreate(savedInstanceState: Bundle?) {
+        isLive = true
         super.onCreate(savedInstanceState)
 
         progressDialog = ProgressDialog(this)
