@@ -21,18 +21,19 @@
         android:xlargeScreens="true" />
 
     <application
-        android:name="cn.archko.pdf.App"
-        android:allowBackup="true"
-        android:fullBackupContent="false"
-        android:hardwareAccelerated="true"
-        android:icon="@drawable/icon"
-        android:label="@string/app_name"
-        android:largeHeap="true"
-        android:enableOnBackInvokedCallback="true"
-        android:networkSecurityConfig="@xml/network_security_config"
-        android:requestLegacyExternalStorage="true"
-        android:supportsRtl="true"
-        android:theme="@style/AppBaseTheme">
+            android:name="cn.archko.pdf.App"
+            android:allowBackup="true"
+            android:fullBackupContent="false"
+            android:hardwareAccelerated="true"
+            android:icon="@drawable/icon"
+            android:label="@string/app_name"
+            android:largeHeap="true"
+            android:testOnly="false"
+            android:enableOnBackInvokedCallback="true"
+            android:networkSecurityConfig="@xml/network_security_config"
+            android:requestLegacyExternalStorage="true"
+            android:supportsRtl="true"
+            android:theme="@style/AppBaseTheme">
 
         <provider
             android:name="androidx.core.content.FileProvider"
