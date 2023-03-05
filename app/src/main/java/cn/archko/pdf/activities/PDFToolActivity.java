@@ -395,8 +395,7 @@ public class PDFToolActivity extends Activity implements PDFUtilities.OnOperatio
     };
 
     private final View.OnClickListener mCreatePDFAClickListener = v -> {
-        PDFCreaterHelper.INSTANCE.save();
-        /*AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(getLayoutInflater().inflate(R.layout.dialog_pick_file, null));
         AlertDialog dlg = builder.create();
         dlg.setOnShowListener(dialog -> {
@@ -410,11 +409,15 @@ public class PDFToolActivity extends Activity implements PDFUtilities.OnOperatio
                     fb_view.FileGotoSubdir(item.m_item.get_name());
                 else {
                     String fullPath = item.m_item.get_path();
+                    String path = "/sdcard/book/new.pdf";
+                    List<String> list = new ArrayList<>();
+                    list.add(fullPath);
+                    PDFCreaterHelper.INSTANCE.createPdf(path, list);
                     dlg.dismiss();
                 }
             });
         });
-        dlg.show();*/
+        dlg.show();
     };
 
     private void InputPswd(String itemPath, Document document, Button button, int operationCode) {

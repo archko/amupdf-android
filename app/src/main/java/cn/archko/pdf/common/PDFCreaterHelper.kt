@@ -47,9 +47,12 @@ object PDFCreaterHelper {
     fun createPdf(pdfPath: String, imagePaths: List<String>) {
         instance.diskIO().execute {
             try {
+                d(String.format("imagePaths:%s", imagePaths))
                 val mDocument = PDFDocument()
-                val image = Image(FileUtils.getStoragePath(imgname))
-                mDocument.addImage(image)
+                for (path in imagePaths) {
+                    val image = Image(path)
+                    mDocument.insertPage(-1, mDocument.addImage(image))
+                }
                 mDocument.save(pdfPath, OPTS);
                 val newPdfDoc = PDFDocument.openDocument(pdfPath);
                 d(String.format("save,%s,%s", newPdfDoc.toString(), newPdfDoc?.countPages()))
