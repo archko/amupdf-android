@@ -172,6 +172,6 @@
             android:theme="@style/AppFullscreen"
             android:windowSoftInputMode="adjustResize"></activity>
 
-        <activity android:name="com.radaee.PDFToolActivity" />
+        <activity android:name="cn.archko.pdf.activities.PDFToolActivity"/>
     </application>
 </manifest>

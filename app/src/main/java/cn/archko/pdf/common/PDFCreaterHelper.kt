@@ -1,16 +1,12 @@
 package cn.archko.pdf.common
 
 import android.content.Context
-import cn.archko.pdf.App
 import cn.archko.pdf.AppExecutors.Companion.instance
 import cn.archko.pdf.common.Logcat.d
 import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.StreamUtils
-import com.artifex.mupdf.fitz.Buffer
-import com.artifex.mupdf.fitz.Image
-import com.artifex.mupdf.fitz.PDFDocument
-import com.artifex.mupdf.fitz.Rect
+import com.artifex.mupdf.fitz.*
 import java.io.File
 import java.io.FileFilter
 import java.util.*
@@ -19,25 +15,47 @@ import java.util.*
  * @author: archko 2018/12/21 :1:03 PM
  */
 object PDFCreaterHelper {
-    var mDocument: PDFDocument? = null
-    var imgname = "DCIM/Camera/IMG_20181221_125752.jpg"
-    var filename = "test.pdf"
+
+    var imgname = "/sdcard/DCIM/Camera/IMG_20200912_072822.jpg"
+    var filename = "/book/test.pdf"
+
     fun save() {
         instance.diskIO().execute {
             try {
-                mDocument = PDFDocument()
-                mDocument!!.addObject(mDocument!!.newString("test pdf"))
-                val pdfObject = mDocument!!.newString("test2.pdf")
-                val buffer = Buffer()
-                buffer.writeLine("test2")
-                val mediabox = Rect(0f, 0f, 1000f, 1000f)
-                val pdfPage = mDocument!!.addPage(mediabox, 0, pdfObject, buffer)
-                //mDocument.insertPage(0, pdfPage);
-                val image = Image(FileUtils.getStoragePath(imgname))
-                mDocument!!.addImage(image)
-                //int save = mDocument.save(FileUtils.getStoragePath(filename), OPTS);
-                //mDocument = (PDFDocument) PDFDocument.openDocument(FileUtils.getStoragePath(filename));
-                d(String.format("%s,%s,%s", 0, mDocument.toString(), mDocument!!.countPages()))
+                val mDocument = PDFDocument()
+                val mediabox = Rect(0f, 0f, 300f, 500f)
+                val image = Image(imgname)
+                val obj = mDocument.addImage(image)
+                mDocument.insertPage(-1, obj)
+
+                val str = "Hello, world!\n Hello, world!\n Hello, world!"
+                val contents = "BT /Tm 16 Tf 50 50 TD ($str) Tj ET\n"
+
+                val page = mDocument.addPage(mediabox, 0, null, contents)
+
+                mDocument.insertPage(-1, page)
+                val destPdfPath = FileUtils.getStoragePath(filename)
+                mDocument.save(destPdfPath, OPTS);
+                val newPdfDoc = PDFDocument.openDocument(destPdfPath)
+                d(String.format("save,%s,%s", newPdfDoc.toString(), newPdfDoc?.countPages()))
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun createPdf(pdfPath: String, imagePaths: List<String>) {
+        instance.diskIO().execute {
+            try {
+                d(String.format("imagePaths:%s", imagePaths))
+                val mDocument = PDFDocument()
+                for (path in imagePaths) {
+                    val image = Image(path)
+                    mDocument.insertPage(-1, mDocument.addImage(image))
+                }
+                mDocument.save(pdfPath, OPTS);
+                val newPdfDoc = PDFDocument.openDocument(pdfPath);
+                d(String.format("save,%s,%s", newPdfDoc.toString(), newPdfDoc?.countPages()))
             } catch (e: Exception) {
                 e.printStackTrace()
             }

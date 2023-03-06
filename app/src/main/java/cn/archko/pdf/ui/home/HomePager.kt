@@ -45,7 +45,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Observer
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import cn.archko.mupdf.R
@@ -62,7 +61,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaGradientBackground
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaTab
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.radaee.PDFToolActivity
+import cn.archko.pdf.activities.PDFToolActivity
 import kotlinx.coroutines.launch
 import java.io.File
 
