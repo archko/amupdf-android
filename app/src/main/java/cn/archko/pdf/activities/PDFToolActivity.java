@@ -403,7 +403,7 @@ public class PDFToolActivity extends Activity implements PDFUtilities.OnOperatio
             FileBrowserView fb_view = dlg.findViewById(R.id.fb_view);
             TextView txt_filter = dlg.findViewById(R.id.extension_filter);
             txt_filter.setText("*.jpg,*.jpeg,*.png");
-            fb_view.FileInit(Environment.getExternalStorageDirectory().getPath(), new String[]{".jpg", "jpeg", ".png"});
+            fb_view.FileInit(Environment.getExternalStorageDirectory().getPath(), new String[]{".jpg", ".jpeg", ".png"});
             fb_view.setOnItemClickListener((parent, view1, position, id1) -> {
                 FileBrowserAdt.SnatchItem item = (FileBrowserAdt.SnatchItem) fb_view.getItemAtPosition(position);
                 if (item.m_item.is_dir())
