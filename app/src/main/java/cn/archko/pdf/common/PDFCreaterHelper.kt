@@ -6,10 +6,12 @@ import cn.archko.pdf.common.Logcat.d
 import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.StreamUtils
-import com.artifex.mupdf.fitz.*
+import com.artifex.mupdf.fitz.Image
+import com.artifex.mupdf.fitz.PDFDocument
+import com.artifex.mupdf.fitz.Rect
 import java.io.File
 import java.io.FileFilter
-import java.util.*
+import java.util.Locale
 
 /**
  * @author: archko 2018/12/21 :1:03 PM
@@ -64,43 +66,38 @@ object PDFCreaterHelper {
         mDocument.save(destPdfPath, OPTS);
     }
 
-    fun createPdf(pdfPath: String, imagePaths: List<String>) {
-        instance.diskIO().execute {
-            try {
-                d(String.format("imagePaths:%s", imagePaths))
-                var mDocument: PDFDocument? = null
-                try {
-                    mDocument = PDFDocument.openDocument(pdfPath) as PDFDocument
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-                if (mDocument == null) {
-                    mDocument = PDFDocument()
-                }
-                for (path in imagePaths) {
-                    val image = Image(path)
-                    val resources = mDocument.newDictionary()
-                    val xobj = mDocument.newDictionary()
-                    val obj = mDocument.addImage(image)
-                    xobj.put("I", obj)
-                    resources.put("XObject", xobj)
-
-                    val w = image.width
-                    val h = image.height
-                    val mediabox = Rect(0f, 0f, w.toFloat(), h.toFloat())
-                    val contents = "q $w 0 0 $h 0 0 cm /I Do Q\n"
-                    val page = mDocument.addPage(mediabox, 0, resources, contents)
-                    d(String.format("page,%s", contents))
-
-                    mDocument.insertPage(-1, page)
-                }
-                mDocument.save(pdfPath, OPTS);
-                val newPdfDoc = PDFDocument.openDocument(pdfPath);
-                d(String.format("save,%s,%s", newPdfDoc.toString(), newPdfDoc?.countPages()))
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+    fun createPdf(pdfPath: String?, imagePaths: List<String>): Boolean {
+        d(String.format("imagePaths:%s", imagePaths))
+        var mDocument: PDFDocument? = null
+        try {
+            mDocument = PDFDocument.openDocument(pdfPath) as PDFDocument
+        } catch (e: Exception) {
+            Logcat.w(Logcat.TAG, "could not open:$pdfPath")
         }
+        if (mDocument == null) {
+            mDocument = PDFDocument()
+        }
+        var index = -1
+        for (path in imagePaths) {
+            val image = Image(path)
+            val resources = mDocument.newDictionary()
+            val xobj = mDocument.newDictionary()
+            val obj = mDocument.addImage(image)
+            xobj.put("I", obj)
+            resources.put("XObject", xobj)
+
+            val w = image.width
+            val h = image.height
+            val mediabox = Rect(0f, 0f, w.toFloat(), h.toFloat())
+            val contents = "q $w 0 0 $h 0 0 cm /I Do Q\n"
+            val page = mDocument.addPage(mediabox, 0, resources, contents)
+            d(String.format("index:%s,page,%s", index, contents))
+
+            mDocument.insertPage(index++, page)
+        }
+        mDocument.save(pdfPath, OPTS);
+        d(String.format("save,%s,%s", mDocument.toString(), mDocument.countPages()))
+        return mDocument.countPages() > 0
     }
 
     private val fileFilter: FileFilter = FileFilter { file ->

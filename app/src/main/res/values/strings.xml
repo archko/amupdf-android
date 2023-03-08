@@ -41,4 +41,11 @@
 
     <string name="empty_title">NO History</string>
     <string name="empty_subtitle">Start Reading some book</string>
+
+    <string name="create_pdf_label">Create A PDF</string>
+    <string name="menu_create">Create A PDF</string>
+    <string name="create_pdf_select_old">Select old pdf</string>
+    <string name="create_pdf_save">Save as pdf</string>
+    <string name="create_pdf_select_old_tip">if donot has an old pdf,it will create one for you.</string>
+    <string name="create_pdf_success">create pdf successfully</string>
 </resources>

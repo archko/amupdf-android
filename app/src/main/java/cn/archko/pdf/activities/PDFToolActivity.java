@@ -16,11 +16,14 @@ import android.view.ViewGroup;
 import android.widget.*;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cn.archko.mupdf.R;
 import cn.archko.pdf.common.PDFCreaterHelper;
+import cn.archko.pdf.fragments.CreatePdfFragment;
 import cn.archko.pdf.utils.PDFUtilities;
+
 import com.radaee.comm.Global;
 import com.radaee.pdf.Document;
 import com.radaee.util.FileBrowserAdt;
@@ -35,7 +38,7 @@ import java.util.zip.Inflater;
 
 import androidx.annotation.Nullable;
 
-public class PDFToolActivity extends Activity implements PDFUtilities.OnOperationListener {//, View.OnClickListener {
+public class PDFToolActivity extends FragmentActivity implements PDFUtilities.OnOperationListener {//, View.OnClickListener {
 
 
     public static void start(@NotNull Context context) {
@@ -66,7 +69,7 @@ public class PDFToolActivity extends Activity implements PDFUtilities.OnOperatio
         items.add(new Item(getString(R.string.decrypt_pdf_label), R.drawable.ic_decryption, Item.TYPE_DECRYPT));
         items.add(new Item(getString(R.string.compress_pdf_label), R.drawable.ic_compress_pdf, Item.TYPE_COMPRESS));
         items.add(new Item(getString(R.string.convert_pdfa_label), R.drawable.ic_convert_pdfa, Item.TYPE_PDFA));
-        items.add(new Item("create pdf", R.drawable.ic_convert_pdfa, Item.TYPE_CREATE_PDF));
+        items.add(new Item(getString(R.string.create_pdf_label), R.drawable.ic_convert_pdfa, Item.TYPE_CREATE_PDF));
 
         final LayoutInflater inflater = LayoutInflater.from(this);
         adapter = new RecyclerView.Adapter() {
@@ -395,8 +398,9 @@ public class PDFToolActivity extends Activity implements PDFUtilities.OnOperatio
     };
 
     private final View.OnClickListener mCreatePDFAClickListener = v -> {
+        CreatePdfFragment.Companion.showCreateDialog(this, null);
         //PDFCreaterHelper.INSTANCE.save();
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        /*AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(getLayoutInflater().inflate(R.layout.dialog_pick_file, null));
         AlertDialog dlg = builder.create();
         dlg.setOnShowListener(dialog -> {
@@ -418,7 +422,7 @@ public class PDFToolActivity extends Activity implements PDFUtilities.OnOperatio
                 }
             });
         });
-        dlg.show();
+        dlg.show();*/
     };
 
     private void InputPswd(String itemPath, Document document, Button button, int operationCode) {

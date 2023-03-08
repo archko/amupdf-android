@@ -93,4 +93,6 @@ dependencies {
         exclude group: 'androidx.activity'
         exclude group: 'androidx.fragment'
     }
+
+    api Libs.Coil.coil
 }

@@ -40,4 +40,11 @@
 
     <string name="empty_title">你还没有阅读记录</string>
     <string name="empty_subtitle">开始读书吧</string>
+
+    <string name="create_pdf_label">创建PDF</string>
+    <string name="menu_create">创建PDF</string>
+    <string name="create_pdf_select_old">选择旧的 pdf</string>
+    <string name="create_pdf_save">保存pdf</string>
+    <string name="create_pdf_select_old_tip">如果没有则创建新的pdf</string>
+    <string name="create_pdf_success">成功创建pdf</string>
 </resources>
