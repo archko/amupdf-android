@@ -395,6 +395,7 @@ public class PDFToolActivity extends Activity implements PDFUtilities.OnOperatio
     };
 
     private final View.OnClickListener mCreatePDFAClickListener = v -> {
+        //PDFCreaterHelper.INSTANCE.save();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(getLayoutInflater().inflate(R.layout.dialog_pick_file, null));
         AlertDialog dlg = builder.create();

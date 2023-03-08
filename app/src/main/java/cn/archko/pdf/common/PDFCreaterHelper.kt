@@ -16,7 +16,8 @@ import java.util.*
  */
 object PDFCreaterHelper {
 
-    var imgname = "/sdcard/DCIM/Camera/IMG_20200912_072822.jpg"
+    //var imgname = "/sdcard/DCIM/Camera/IMG_20200912_072822.jpg"
+    var imgname = "/sdcard/DCIM/Camera/IMG20230111162944.jpg"
     var filename = "/book/test.pdf"
 
     fun save() {
@@ -25,13 +26,15 @@ object PDFCreaterHelper {
                 val mDocument = PDFDocument()
                 val mediabox = Rect(0f, 0f, 300f, 500f)
                 val image = Image(imgname)
+                val resources = mDocument.newDictionary()
+                val xobj = mDocument.newDictionary()
                 val obj = mDocument.addImage(image)
-                mDocument.insertPage(-1, obj)
+                xobj.put("I", obj)
+                resources.put("XObject", xobj)
 
-                val str = "Hello, world!\n Hello, world!\n Hello, world!"
-                val contents = "BT /Tm 16 Tf 50 50 TD ($str) Tj ET\n"
+                val contents = "q 300 0 0 500 0 0 cm /I Do Q\n"
 
-                val page = mDocument.addPage(mediabox, 0, null, contents)
+                val page = mDocument.addPage(mediabox, 0, resources, contents)
 
                 mDocument.insertPage(-1, page)
                 val destPdfPath = FileUtils.getStoragePath(filename)
@@ -44,14 +47,47 @@ object PDFCreaterHelper {
         }
     }
 
+    fun createTextPage(text: String) {
+        val mDocument = PDFDocument()
+        val mediabox = Rect(0f, 0f, 300f, 500f)
+        val fontSize = 16       //字号
+        val leftPadding = 20    //左侧的距离
+        val height = 500        //这个是倒着的,如果是0,则在底部
+        val contents = "BT /Tm $fontSize Tf $leftPadding $height TD ($text) Tj ET\n"
+
+        //没有resources,则字体是默认的,resources用于存储字体与图片
+
+        val page = mDocument.addPage(mediabox, 0, null, contents)
+
+        mDocument.insertPage(-1, page)
+        val destPdfPath = FileUtils.getStoragePath(filename)
+        mDocument.save(destPdfPath, OPTS);
+    }
+
     fun createPdf(pdfPath: String, imagePaths: List<String>) {
         instance.diskIO().execute {
             try {
                 d(String.format("imagePaths:%s", imagePaths))
-                val mDocument = PDFDocument()
+                var mDocument: PDFDocument? = PDFDocument.openDocument(pdfPath) as PDFDocument
+                if (mDocument == null) {
+                    mDocument = PDFDocument()
+                }
                 for (path in imagePaths) {
                     val image = Image(path)
-                    mDocument.insertPage(-1, mDocument.addImage(image))
+                    val resources = mDocument.newDictionary()
+                    val xobj = mDocument.newDictionary()
+                    val obj = mDocument.addImage(image)
+                    xobj.put("I", obj)
+                    resources.put("XObject", xobj)
+
+                    val w = image.width
+                    val h = image.height
+                    val mediabox = Rect(0f, 0f, w.toFloat(), h.toFloat())
+                    val contents = "q $w 0 0 $h 0 0 cm /I Do Q\n"
+                    val page = mDocument.addPage(mediabox, 0, resources, contents)
+                    d(String.format("page,%s", contents))
+
+                    mDocument.insertPage(-1, page)
                 }
                 mDocument.save(pdfPath, OPTS);
                 val newPdfDoc = PDFDocument.openDocument(pdfPath);
