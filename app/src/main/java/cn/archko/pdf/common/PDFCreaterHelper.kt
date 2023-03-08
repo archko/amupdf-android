@@ -68,7 +68,12 @@ object PDFCreaterHelper {
         instance.diskIO().execute {
             try {
                 d(String.format("imagePaths:%s", imagePaths))
-                var mDocument: PDFDocument? = PDFDocument.openDocument(pdfPath) as PDFDocument
+                var mDocument: PDFDocument? = null
+                try {
+                    mDocument = PDFDocument.openDocument(pdfPath) as PDFDocument
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
                 if (mDocument == null) {
                     mDocument = PDFDocument()
                 }
