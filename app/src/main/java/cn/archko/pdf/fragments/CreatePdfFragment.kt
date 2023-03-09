@@ -100,7 +100,6 @@ class CreatePdfFragment :
     private fun createPdf() {
         val arr = arrayListOf<String>()
         arr.addAll(adapter.data)
-        arr.removeLastOrNull()
         var path = oldPdfPath
         if (TextUtils.isEmpty(path)) {
             path = FileUtils.getStorageDir("book").absolutePath + File.separator + "new.pdf"
