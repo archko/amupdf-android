@@ -13,6 +13,7 @@ import cn.archko.pdf.common.BookProgressParser
 import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.Logcat
+import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.ProgressScaner
 import cn.archko.pdf.entity.BookProgress
@@ -26,10 +27,10 @@ import cn.archko.pdf.ui.home.searchTypeHistory
 import cn.archko.pdf.utils.DateUtils
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
-import cn.archko.pdf.utils.StreamUtils
-import com.jeremyliao.liveeventbus.LiveEventBus
 import cn.archko.pdf.utils.PDFUtilities
 import cn.archko.pdf.utils.PDFUtilities.OnOperationListener
+import cn.archko.pdf.utils.StreamUtils
+import com.jeremyliao.liveeventbus.LiveEventBus
 import com.umeng.analytics.MobclickAgent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -698,6 +699,37 @@ class FileViewModel() : ViewModel() {
                         pdfDoc
                     )
                 }
+            }
+        }
+    }
+
+    fun convertToPDF(
+        context: Context,
+        entry: FileBean,
+    ) {
+        //Toast.makeText(App.instance, "开始生成,请稍候", Toast.LENGTH_SHORT).show()
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                val map = HashMap<String, String>()
+                map["type"] = "convert image"
+                map["name"] = entry.file!!.name
+                MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
+                val fullPath = entry.file!!.absolutePath
+
+                val path = fullPath.substring(0, fullPath.lastIndexOf("/"))
+                var name = fullPath.substring(
+                    fullPath.lastIndexOf("/") + 1,
+                    fullPath.lastIndexOf(".")
+                )
+                val finalPath = path + File.separatorChar + name + ".pdf"
+                val images = arrayListOf<String>()
+                images.add(fullPath)
+                PDFCreaterHelper.createPdf(finalPath, images)
+            }
+            if (result) {
+                Toast.makeText(App.instance, R.string.create_pdf_success, Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(App.instance, R.string.create_pdf_error, Toast.LENGTH_SHORT).show()
             }
         }
     }

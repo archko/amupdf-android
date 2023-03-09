@@ -81,6 +81,7 @@ sealed class MenuItemType {
     object Compress : MenuItemType()
     object EncryptPDF : MenuItemType()
     object DecryptPDF : MenuItemType()
+    object ConvertToPDF : MenuItemType()
 }
 
 sealed class FileBeanType {
@@ -151,6 +152,13 @@ fun UserOptDialog(
                             onClick = { menuOpt(MenuItemType.Compress, fileBean) }
                         )
                         Divider(thickness = 0.5.dp)
+                        if (fileBean.isImage()) {
+                            DialogItem(
+                                txt = stringResource(id = R.string.convert_pdf_label),
+                                onClick = { menuOpt(MenuItemType.ConvertToPDF, fileBean) }
+                            )
+                            Divider(thickness = 0.5.dp)
+                        }
                     }
                     if (fileBeanType == FileBeanType.History) {
                         DialogItem(

@@ -4,6 +4,7 @@ import android.text.TextUtils
 import cn.archko.pdf.utils.FileUtils
 import java.io.File
 import java.io.Serializable
+import java.util.Locale
 
 class FileBean : Serializable, Cloneable {
     var label: String? = null
@@ -63,6 +64,16 @@ class FileBean : Serializable, Cloneable {
         }
     val isUpFolder: Boolean
         get() = isDirectory && label == ".."
+
+    fun isImage(): Boolean {
+        if (null != file) {
+            val ext: String = bookProgress!!.ext!!.lowercase(Locale.ROOT)
+            if (ext.contains("jpg") || ext.contains("png") || ext.contains("jpeg")) {
+                return true
+            }
+        }
+        return false
+    }
 
     public override fun clone(): FileBean {
         try {
