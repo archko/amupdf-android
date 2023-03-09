@@ -130,7 +130,8 @@ public class DocPageView extends View implements SOPageListener
         mBorderPainter = new Paint();
         mBorderPainter.setColor(ContextCompat.getColor(getContext(), R.color.sodk_editor_page_border_color));
         mBorderPainter.setStyle(Paint.Style.STROKE);
-        mBorderPainter.setStrokeWidth(Utilities.convertDpToPixel(2));
+        mBorderPainter.setStrokeWidth(0);
+        //mBorderPainter.setStrokeWidth(Utilities.convertDpToPixel(2));
 
         mSelectedBorderPainter = new Paint();
         setSelectedBorderColor(ContextCompat.getColor(getContext(), R.color.sodk_editor_selected_page_border_color));
@@ -138,7 +139,7 @@ public class DocPageView extends View implements SOPageListener
         mSelectedBorderPainter.setStrokeWidth(Utilities.convertDpToPixel(context.getResources().getInteger(R.integer.sodk_editor_selected_page_border_width)));
 
         //  create the low res bitmap painter
-        if (lowResPainter==null) {
+        if (lowResPainter == null) {
             lowResPainter = new Paint();
             lowResPainter.setAntiAlias(true);
             lowResPainter.setFilterBitmap(true);
