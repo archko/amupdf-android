@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.BitmapRegionDecoder
+import android.graphics.Paint
+import android.text.TextUtils
 import cn.archko.pdf.App
 import cn.archko.pdf.AppExecutors.Companion.instance
 import cn.archko.pdf.common.Logcat.d
@@ -11,6 +13,8 @@ import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.utils.BitmapUtils
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.StreamUtils
+import cn.archko.pdf.utils.Utils
+import com.artifex.mupdf.fitz.Font
 import com.artifex.mupdf.fitz.Image
 import com.artifex.mupdf.fitz.PDFDocument
 import com.artifex.mupdf.fitz.PDFObject
@@ -26,28 +30,91 @@ import java.util.Locale
 object PDFCreaterHelper {
 
     private const val OPTS = "compress-images;compress;incremental;linearize;pretty;compress-fonts"
-    private const val PAPER_WITH = 1280f
-    private const val PAPER_HEIGHT = 2240f
+    private const val PAPER_WIDTH = 1280f
+    private const val PAPER_HEIGHT = 2160f
     private const val PAPER_PADDING = 40f
-    private const val PAPER_FONT_SIZE = 17
+    private const val PAPER_FONT_SIZE = 17f
 
     var filename = "/book/test.pdf"
 
     fun createTextPage(text: String) {
         val mDocument = PDFDocument()
-        val mediabox = Rect(0f, 0f, PAPER_WITH, PAPER_HEIGHT)
+        val mediabox = Rect(0f, 0f, PAPER_WIDTH, PAPER_HEIGHT)
         val fontSize = PAPER_FONT_SIZE       //字号
         val leftPadding = PAPER_PADDING      //左侧的距离
         val height = PAPER_HEIGHT           //这个是倒着的,如果是0,则在底部
-        val contents = "BT /Tm $fontSize Tf $leftPadding $height TD ($text) Tj ET\n"
 
-        //没有resources,则字体是默认的,resources用于存储字体与图片
+        // /system/fonts/DroidSans.ttf");//load from system fonts.
+        // /system/fonts/Roboto-Regular.ttf");
+        // /system/fonts/DroidSansFallback.ttf");
+        // /system/fonts/DroidSansChinese.ttf");
+        // /system/fonts/NotoSansSC-Regular.otf");
+        // /system/fonts/NotoSansTC-Regular.otf");
+        // /system/fonts/NotoSansJP-Regular.otf");
+        // /system/fonts/NotoSansKR-Regular.otf");
+        // /system/fonts/NotoSansCJK-Regular.ttc");
+        val resources = mDocument.newDictionary()
+        val xobj = mDocument.newDictionary()
+        var font = Font("/system/fonts/DroidSans.ttf")
+        var song = mDocument.addFont(font)
+        xobj.put("Tm", song)
+        resources.put("Font", song)
+
+        val str = "Hello, world!\n Hello, world!\n Hello, world!"
+        val contents = "BT /Tm $fontSize Tf $leftPadding ${height - 200} TD ($str) Tj ET\n"
 
         val page = mDocument.addPage(mediabox, 0, null, contents)
-
         mDocument.insertPage(-1, page)
+
+        val result = splitText(text, fontSize, PAPER_WIDTH - PAPER_PADDING * 2)
+
+        var maxLine = 30
+        var lineCount = 0
+        val sb = StringBuilder()
+        result.forEach {
+            val contents = "BT /Tm $fontSize Tf $leftPadding ${height - 200} TD ($it) Tj ET\n"
+            sb.append(contents)
+            //没有resources,则字体是默认的,resources用于存储字体与图片
+            val page = mDocument.addPage(mediabox, 0, resources, sb.toString())
+
+            if (lineCount >= maxLine) {
+                mDocument.insertPage(-1, page)
+                sb.clear()
+            }
+            lineCount++
+        }
+        if (sb.isNotEmpty()) {
+            val page = mDocument.addPage(mediabox, 0, resources, sb.toString())
+            mDocument.insertPage(-1, page)
+        }
+
         val destPdfPath = FileUtils.getStoragePath(filename)
         mDocument.save(destPdfPath, OPTS);
+    }
+
+    private fun splitText(text: String, fontSize: Float, width: Float): List<String> {
+        val paint = Paint()
+        paint.textSize = fontSize
+        val wordW = paint.measureText("我") * Utils.getScale()
+        val maxWord = width / wordW
+
+        val pages = arrayListOf<String>()
+        val sb = StringBuilder()
+        var line = ""
+        text.forEach {
+            line += it
+            if (line.length >= maxWord) {
+                //sb.append(line).append("\n")
+                pages.add(line)
+                d("line:$line")
+                line = ""
+            }
+        }
+        if (!TextUtils.isEmpty(line)) {
+            pages.add(line)
+        }
+
+        return pages
     }
 
     fun createPdf(pdfPath: String?, imagePaths: List<String>): Boolean {
@@ -191,10 +258,10 @@ object PDFCreaterHelper {
         val dir = "$sdcardRoot/book/股票"
 
         val files = File(dir).listFiles()
-        Logcat.d("saveBooksToHtml:$dir,${files.size}")
+        d("saveBooksToHtml:$dir,${files.size}")
         if (files != null) {
             for (file in files) {
-                Logcat.d("saveBooksToHtml:$file")
+                d("saveBooksToHtml:$file")
                 if (file.isFile &&
                     (file.name.startsWith("Peter") && !FileUtils.getExtension(file.name)
                         .equals("html"))
@@ -210,7 +277,7 @@ object PDFCreaterHelper {
     private fun saveBookToHtml(context: Context, sdcardRoot: String, file: File) {
         try {
             val path = "$sdcardRoot/amupdf/${file.name}.html"
-            Logcat.d("save book:$path")
+            d("save book:$path")
             val mMupdfDocument = MupdfDocument(context)
             mMupdfDocument.newDocument(file.absolutePath, null)
             val cp: Int = mMupdfDocument.countPages()
