@@ -64,11 +64,11 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
 
         List<Item> items = new ArrayList<>();
         items.add(new Item(getString(R.string.merge_pdf_label), R.drawable.ic_merge_pdf, Item.TYPE_MERGE));
-        items.add(new Item(getString(R.string.convert_pdf_label), R.drawable.ic_convert_pdf, Item.TYPE_MERGE));
+        //items.add(new Item(getString(R.string.convert_pdf_label), R.drawable.ic_convert_pdf, Item.TYPE_CONVERT));
         items.add(new Item(getString(R.string.encrypt_pdf_label), R.drawable.ic_encryption, Item.TYPE_ENCRYPT));
         items.add(new Item(getString(R.string.decrypt_pdf_label), R.drawable.ic_decryption, Item.TYPE_DECRYPT));
         items.add(new Item(getString(R.string.compress_pdf_label), R.drawable.ic_compress_pdf, Item.TYPE_COMPRESS));
-        items.add(new Item(getString(R.string.convert_pdfa_label), R.drawable.ic_convert_pdfa, Item.TYPE_PDFA));
+        //items.add(new Item(getString(R.string.convert_pdfa_label), R.drawable.ic_convert_pdfa, Item.TYPE_PDFA));
         items.add(new Item(getString(R.string.create_pdf_label), R.drawable.ic_convert_pdfa, Item.TYPE_CREATE_PDF));
 
         final LayoutInflater inflater = LayoutInflater.from(this);
@@ -269,7 +269,9 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
     };
 
     private final View.OnClickListener mConvertPDFAClickListener = v -> {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        String content = getString(R.string.sodk_editor_xfa_body);
+        PDFCreaterHelper.INSTANCE.createTextPage(content);
+        /*AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(getLayoutInflater().inflate(R.layout.dialog_pick_file, null));
         AlertDialog dlg = builder.create();
         dlg.setOnShowListener(dialog -> {
@@ -304,7 +306,7 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
                 }
             });
         });
-        dlg.show();
+        dlg.show();*/
     };
 
     private final View.OnClickListener mConvertPDFClickListener = v -> {

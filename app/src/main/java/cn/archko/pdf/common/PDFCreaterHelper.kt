@@ -14,11 +14,14 @@ import cn.archko.pdf.utils.BitmapUtils
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.StreamUtils
 import cn.archko.pdf.utils.Utils
+import com.artifex.mupdf.fitz.Buffer
+import com.artifex.mupdf.fitz.DocumentWriter
 import com.artifex.mupdf.fitz.Font
 import com.artifex.mupdf.fitz.Image
 import com.artifex.mupdf.fitz.PDFDocument
 import com.artifex.mupdf.fitz.PDFObject
 import com.artifex.mupdf.fitz.Rect
+import com.artifex.mupdf.fitz.Story
 import java.io.File
 import java.io.FileFilter
 import java.util.Locale
@@ -36,6 +39,55 @@ object PDFCreaterHelper {
     private const val PAPER_FONT_SIZE = 17f
 
     var filename = "/book/test.pdf"
+
+    fun createTextPageError(text: String) {
+        /*var snark = "<!DOCTYPE html>" +
+                "<style>" +
+                "#a { margin: 30px; }" +
+                "#b { margin: 20px; }" +
+                "#c { margin: 5px; }" +
+                "#a { border: 1px solid red; }" +
+                "#b { border: 1px solid green; }" +
+                "#c { border: 1px solid blue; }" +
+                "</style>" +
+                "<body>" +
+                "<div id=\"a\">" +
+                "A世界历史索罗斯中霸宠不霜erf;kad;kvj巧克力奶茶叶a;dlf" +
+                "</div>" +
+                "<p>每周构建</p>" +
+                "<p>每周构建方案是中型项目中很常见的一种管理手段。其具体做法如下：在每周的前四天 中，让所有的程序员在自己的私有库上工作，忽略其他人的修改，也不考虑互相之间的集成 问题；然后在每周五要求所有人将自己所做的变更提交，进行统一构建。</p>" +
+                "<p>上述方案确实可以让程序员们每周都有四天的时间放手干活。然而一到星期五，所有人上述方案确实可以让程序员们每周都有四天的时间放手干活。然而一到星期五，所有人上述方案确实可以让程序员们每周都有四天的时间放手干活。然而一到星期五，所有人上述方案确实可以让程序员们每周都有四天的时间放手干活。然而一到星期五，所有人 都必须要花费大量的精力来处理前四天留下来的问题。</p>" +
+                "<p>而且更不幸的是，随着项目越来越大，每周五的集成工作会越来越难以按时完成。而随 着集成任务越来越重，周六的加班也会变得越来越频繁。经历过几次这样的加班之后，就会 有人提出应该将集成任务提前到星期四开始，就这样一步一步地，集成工作慢慢地就要占用 掉差不多半周的时间。</p>" +
+                "</body></html>"
+
+        var mediabox = Rect(0f, 0f, 512f, 640f)
+        var margin = 10;
+
+        var writer = DocumentWriter("out.pdf", "PDF", "");
+        var buf = Buffer(snark.length);
+        buf.writeByte(snark.toByte());
+        var story = Story(snark, "", 17f);
+        var placed: Story? = null
+
+        do {
+            var where = Rect(
+                mediabox.x0 + margin,
+                mediabox.y0 + margin,
+                mediabox.x1 - margin,
+                mediabox.y1 - margin
+            )
+
+            var dev = writer.beginPage(mediabox);
+
+            placed = story.place(where);
+
+            story.draw(dev);
+
+            writer.endPage();
+        } while (placed.more);
+
+        writer.close();*/
+    }
 
     fun createTextPage(text: String) {
         val mDocument = PDFDocument()
