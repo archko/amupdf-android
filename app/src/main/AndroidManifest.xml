@@ -75,72 +75,40 @@
             android:screenOrientation="sensor"
             android:theme="@style/AppFullscreen"
             android:windowSoftInputMode="adjustResize">
-            <intent-filter tools:ignore="AppLinkUrlError">
-                <action android:name="android.intent.action.VIEW" />
+            <intent-filter>
+                <data android:scheme="file" />
+                <data android:scheme="content" />
 
+                <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.OPENABLE" />
 
                 <data android:mimeType="application/pdf" />
+                <data android:mimeType="text/xml" />
+                <data android:mimeType="application/epub+zip" />
+                <data android:mimeType="image/svg+xml" />
+                <data android:mimeType="application/xhtml+xml" />
+                <data android:mimeType="application/x-cbz" />
+                <data android:mimeType="application/vnd.ms-xpsdocument" />
             </intent-filter>
+
+            <!--This intent filter applies to file types where Android does-->
+            <!--not have a supported mime type.-->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:host="*"
-                    android:pathPattern=".*\\.pdf"
-                    android:scheme="http" />
-                <data
-                    android:pathPattern=".*\\.pdf"
-                    android:scheme="file" />
-                <data
-                    android:pathPattern=".*\\.pdf"
-                    android:scheme="content" />
-                <data
-                    android:pathPattern=".*\\.pdf"
-                    android:scheme="http" />
-                <data
-                    android:pathPattern=".*\\.pdf"
-                    android:scheme="https" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="*"
-                    android:mimeType="application/pdf"
-                    android:scheme="file" />
-                <data
-                    android:host="*"
-                    android:mimeType="application/vnd.ms-xpsdocument"
-                    android:scheme="file" />
-                <data
-                    android:host="*"
-                    android:mimeType="application/oxps"
-                    android:scheme="file" />
-                <data
-                    android:host="*"
-                    android:mimeType="application/x-cbz"
-                    android:scheme="file" />
-                <data
-                    android:host="*"
-                    android:mimeType="application/epub+zip"
-                    android:scheme="file" />
-                <data
-                    android:host="*"
-                    android:mimeType="application/mobi+zip"
-                    android:scheme="file" />
-                <data
-                    android:host="*"
-                    android:mimeType="text/xml"
-                    android:scheme="file" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:mimeType="*/*" />
+                <data android:host="*" />
+                <data android:pathPattern="/.*\.xps" />
+                <data android:pathPattern="/.*\.cbz" />
+                <data android:pathPattern="/.*\.epub" />
+                <data android:pathPattern="/.*\.fb2" />
+                <data android:pathPattern="/.*\.xml" />
+                <data android:pathPattern="/.*\.html" />
             </intent-filter>
         </activity>
 
