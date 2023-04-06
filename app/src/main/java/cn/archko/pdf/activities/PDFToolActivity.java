@@ -1,7 +1,6 @@
 package cn.archko.pdf.activities;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -13,16 +12,12 @@ import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import cn.archko.mupdf.R;
-import cn.archko.pdf.common.PDFCreaterHelper;
-import cn.archko.pdf.fragments.CreatePdfFragment;
-import cn.archko.pdf.utils.PDFUtilities;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.radaee.comm.Global;
 import com.radaee.pdf.Document;
@@ -34,9 +29,17 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.Inflater;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import cn.archko.mupdf.R;
+import cn.archko.pdf.AppExecutors;
+import cn.archko.pdf.common.PDFCreaterHelper;
+import cn.archko.pdf.fragments.CreatePdfFragment;
+import cn.archko.pdf.utils.PDFUtilities;
 
 public class PDFToolActivity extends FragmentActivity implements PDFUtilities.OnOperationListener {//, View.OnClickListener {
 
@@ -68,7 +71,7 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
         items.add(new Item(getString(R.string.encrypt_pdf_label), R.drawable.ic_encryption, Item.TYPE_ENCRYPT));
         items.add(new Item(getString(R.string.decrypt_pdf_label), R.drawable.ic_decryption, Item.TYPE_DECRYPT));
         items.add(new Item(getString(R.string.compress_pdf_label), R.drawable.ic_compress_pdf, Item.TYPE_COMPRESS));
-        //items.add(new Item(getString(R.string.convert_pdfa_label), R.drawable.ic_convert_pdfa, Item.TYPE_PDFA));
+        items.add(new Item(getString(R.string.convert_pdfa_label), R.drawable.ic_convert_pdfa, Item.TYPE_PDFA));
         items.add(new Item(getString(R.string.create_pdf_label), R.drawable.ic_convert_pdfa, Item.TYPE_CREATE_PDF));
 
         final LayoutInflater inflater = LayoutInflater.from(this);
@@ -269,44 +272,43 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
     };
 
     private final View.OnClickListener mConvertPDFAClickListener = v -> {
-        String content = getString(R.string.sodk_editor_xfa_body);
-        PDFCreaterHelper.INSTANCE.createTextPage(content);
-        /*AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        //String content = getString(R.string.sodk_editor_xfa_body);
+        //PDFCreaterHelper.INSTANCE.createTextPage(content);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(getLayoutInflater().inflate(R.layout.dialog_pick_file, null));
         AlertDialog dlg = builder.create();
         dlg.setOnShowListener(dialog -> {
             FileBrowserView fb_view = dlg.findViewById(R.id.fb_view);
             TextView txt_filter = dlg.findViewById(R.id.extension_filter);
-            txt_filter.setText("*.pdf");
-            fb_view.FileInit(Environment.getExternalStorageDirectory().getPath(), new String[]{".pdf"});
+            txt_filter.setText("*.txt");
+            fb_view.FileInit(Environment.getExternalStorageDirectory().getPath(), new String[]{".txt"});
             fb_view.setOnItemClickListener((parent, view1, position, id1) -> {
                 FileBrowserAdt.SnatchItem item = (FileBrowserAdt.SnatchItem) fb_view.getItemAtPosition(position);
                 if (item.m_item.is_dir())
                     fb_view.FileGotoSubdir(item.m_item.get_name());
                 else {
-                    Document pdfDoc = new Document();
                     String fullPath = item.m_item.get_path();
-                    int ret = pdfDoc.Open(fullPath, "");
-                    if (ret == 0) {
-                        String path = fullPath.substring(0, fullPath.lastIndexOf("/"));
-                        String name = fullPath.substring(fullPath.lastIndexOf("/") + 1, fullPath.lastIndexOf("."));
-                        name = name + "_PDFA.pdf";
-                        path = path + File.separatorChar + name;
-                        mHandler.sendEmptyMessage(SHOW_PROGRESS_DIALOG);
-                        String finalPath = path;
-                        Thread thread = new Thread(() -> PDFUtilities.ConvertPDFA(finalPath, this, pdfDoc));
-                        thread.start();
-                    } else if (ret == -1) {
-                        InputPswd(item.m_item.get_path(), mDestDoc, null, PDFUtilities.REQUEST_CODE_COMPRESS_PDF);
-                    } else if (ret != 0) {
-                        mDestDoc.Close();
-                        mDestDoc = null;
-                    }
+                    String path = fullPath.substring(0, fullPath.lastIndexOf("/"));
+                    String name = fullPath.substring(fullPath.lastIndexOf("/") + 1, fullPath.lastIndexOf("."));
+                    name = name + "_.pdf";
+                    path = path + File.separatorChar + name;
+                    mHandler.sendEmptyMessage(SHOW_PROGRESS_DIALOG);
+                    String finalPath = path;
+                    AppExecutors.Companion.getInstance().networkIO().execute(() -> {
+                        boolean rs = PDFCreaterHelper.INSTANCE.createTextPage(fullPath, finalPath);
+                        AppExecutors.Companion.getInstance().mainThread().execute(() -> {
+                            if (rs) {
+                                Toast.makeText(PDFToolActivity.this, "转换成功:" + finalPath, Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(PDFToolActivity.this, "转换失败", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    });
                     dlg.dismiss();
                 }
             });
         });
-        dlg.show();*/
+        dlg.show();
     };
 
     private final View.OnClickListener mConvertPDFClickListener = v -> {

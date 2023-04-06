@@ -115,6 +115,8 @@ android {
 
     packagingOptions {
         exclude("META-INF/*.kotlin_module")
+        doNotStrip "*/armeabi-v7a/*.so"
+        doNotStrip "*/arm64-v8a/*.so"
     }
 }
 

@@ -4,8 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.BitmapRegionDecoder
-import android.graphics.Paint
-import android.text.TextUtils
 import cn.archko.pdf.App
 import cn.archko.pdf.AppExecutors.Companion.instance
 import cn.archko.pdf.common.Logcat.d
@@ -13,11 +11,10 @@ import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.utils.BitmapUtils
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.StreamUtils
-import cn.archko.pdf.utils.Utils
-import com.artifex.mupdf.fitz.Buffer
+import com.artifex.mupdf.fitz.Device
 import com.artifex.mupdf.fitz.DocumentWriter
-import com.artifex.mupdf.fitz.Font
 import com.artifex.mupdf.fitz.Image
+import com.artifex.mupdf.fitz.Matrix
 import com.artifex.mupdf.fitz.PDFDocument
 import com.artifex.mupdf.fitz.PDFObject
 import com.artifex.mupdf.fitz.Rect
@@ -38,135 +35,40 @@ object PDFCreaterHelper {
     private const val PAPER_PADDING = 40f
     private const val PAPER_FONT_SIZE = 17f
 
-    var filename = "/book/test.pdf"
+    //var filename = "/sdcard/book/test.pdf"
 
-    fun createTextPageError(text: String) {
-        /*var snark = "<!DOCTYPE html>" +
-                "<style>" +
-                "#a { margin: 30px; }" +
-                "#b { margin: 20px; }" +
-                "#c { margin: 5px; }" +
-                "#a { border: 1px solid red; }" +
-                "#b { border: 1px solid green; }" +
-                "#c { border: 1px solid blue; }" +
-                "</style>" +
-                "<body>" +
-                "<div id=\"a\">" +
-                "A世界历史索罗斯中霸宠不霜erf;kad;kvj巧克力奶茶叶a;dlf" +
-                "</div>" +
-                "<p>每周构建</p>" +
-                "<p>每周构建方案是中型项目中很常见的一种管理手段。其具体做法如下：在每周的前四天 中，让所有的程序员在自己的私有库上工作，忽略其他人的修改，也不考虑互相之间的集成 问题；然后在每周五要求所有人将自己所做的变更提交，进行统一构建。</p>" +
-                "<p>上述方案确实可以让程序员们每周都有四天的时间放手干活。然而一到星期五，所有人上述方案确实可以让程序员们每周都有四天的时间放手干活。然而一到星期五，所有人上述方案确实可以让程序员们每周都有四天的时间放手干活。然而一到星期五，所有人上述方案确实可以让程序员们每周都有四天的时间放手干活。然而一到星期五，所有人 都必须要花费大量的精力来处理前四天留下来的问题。</p>" +
-                "<p>而且更不幸的是，随着项目越来越大，每周五的集成工作会越来越难以按时完成。而随 着集成任务越来越重，周六的加班也会变得越来越频繁。经历过几次这样的加班之后，就会 有人提出应该将集成任务提前到星期四开始，就这样一步一步地，集成工作慢慢地就要占用 掉差不多半周的时间。</p>" +
+    fun createTextPage(sourcePath: String, destPath: String): Boolean {
+        val text = StreamUtils.readStringFromFile(sourcePath)
+        val mediabox = Rect(0f, 0f, 512f, 640f)
+        val margin = 10f
+        var writer = DocumentWriter(destPath, "PDF", "")
+
+        var snark = "<!DOCTYPE html>" +
+                "<body>" + text +
                 "</body></html>"
+        val story = Story(snark, "", 11f)
 
-        var mediabox = Rect(0f, 0f, 512f, 640f)
-        var margin = 10;
-
-        var writer = DocumentWriter("out.pdf", "PDF", "");
-        var buf = Buffer(snark.length);
-        buf.writeByte(snark.toByte());
-        var story = Story(snark, "", 17f);
-        var placed: Story? = null
+        var more: Boolean
 
         do {
-            var where = Rect(
+            val filled = Rect()
+            val where = Rect(
                 mediabox.x0 + margin,
                 mediabox.y0 + margin,
                 mediabox.x1 - margin,
                 mediabox.y1 - margin
             )
+            val dev: Device = writer.beginPage(mediabox)
+            more = story.place(where, filled)
+            story.draw(dev, Matrix.Identity())
+            writer.endPage()
+        } while (more)
 
-            var dev = writer.beginPage(mediabox);
+        writer.close()
+        writer.destroy()
+        story.destroy()
 
-            placed = story.place(where);
-
-            story.draw(dev);
-
-            writer.endPage();
-        } while (placed.more);
-
-        writer.close();*/
-    }
-
-    fun createTextPage(text: String) {
-        val mDocument = PDFDocument()
-        val mediabox = Rect(0f, 0f, PAPER_WIDTH, PAPER_HEIGHT)
-        val fontSize = PAPER_FONT_SIZE       //字号
-        val leftPadding = PAPER_PADDING      //左侧的距离
-        val height = PAPER_HEIGHT           //这个是倒着的,如果是0,则在底部
-
-        // /system/fonts/DroidSans.ttf");//load from system fonts.
-        // /system/fonts/Roboto-Regular.ttf");
-        // /system/fonts/DroidSansFallback.ttf");
-        // /system/fonts/DroidSansChinese.ttf");
-        // /system/fonts/NotoSansSC-Regular.otf");
-        // /system/fonts/NotoSansTC-Regular.otf");
-        // /system/fonts/NotoSansJP-Regular.otf");
-        // /system/fonts/NotoSansKR-Regular.otf");
-        // /system/fonts/NotoSansCJK-Regular.ttc");
-        val resources = mDocument.newDictionary()
-        val xobj = mDocument.newDictionary()
-        var font = Font("/system/fonts/DroidSans.ttf")
-        var song = mDocument.addFont(font)
-        xobj.put("Tm", song)
-        resources.put("Font", song)
-
-        val str = "Hello, world!\n Hello, world!\n Hello, world!"
-        val contents = "BT /Tm $fontSize Tf $leftPadding ${height - 200} TD ($str) Tj ET\n"
-
-        val page = mDocument.addPage(mediabox, 0, null, contents)
-        mDocument.insertPage(-1, page)
-
-        val result = splitText(text, fontSize, PAPER_WIDTH - PAPER_PADDING * 2)
-
-        var maxLine = 30
-        var lineCount = 0
-        val sb = StringBuilder()
-        result.forEach {
-            val contents = "BT /Tm $fontSize Tf $leftPadding ${height - 200} TD ($it) Tj ET\n"
-            sb.append(contents)
-            //没有resources,则字体是默认的,resources用于存储字体与图片
-            val page = mDocument.addPage(mediabox, 0, resources, sb.toString())
-
-            if (lineCount >= maxLine) {
-                mDocument.insertPage(-1, page)
-                sb.clear()
-            }
-            lineCount++
-        }
-        if (sb.isNotEmpty()) {
-            val page = mDocument.addPage(mediabox, 0, resources, sb.toString())
-            mDocument.insertPage(-1, page)
-        }
-
-        val destPdfPath = FileUtils.getStoragePath(filename)
-        mDocument.save(destPdfPath, OPTS);
-    }
-
-    private fun splitText(text: String, fontSize: Float, width: Float): List<String> {
-        val paint = Paint()
-        paint.textSize = fontSize
-        val wordW = paint.measureText("我") * Utils.getScale()
-        val maxWord = width / wordW
-
-        val pages = arrayListOf<String>()
-        val sb = StringBuilder()
-        var line = ""
-        text.forEach {
-            line += it
-            if (line.length >= maxWord) {
-                //sb.append(line).append("\n")
-                pages.add(line)
-                d("line:$line")
-                line = ""
-            }
-        }
-        if (!TextUtils.isEmpty(line)) {
-            pages.add(line)
-        }
-
-        return pages
+        return true
     }
 
     fun createPdf(pdfPath: String?, imagePaths: List<String>): Boolean {

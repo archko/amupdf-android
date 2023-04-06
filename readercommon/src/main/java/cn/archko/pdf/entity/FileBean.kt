@@ -47,6 +47,7 @@ class FileBean : Serializable, Cloneable {
         label = bookProgress.name
         if (!TextUtils.isEmpty(bookProgress.path)) {
             file = File(bookProgress.path)
+            bookProgress.size = file!!.length()
         }
     }
 
