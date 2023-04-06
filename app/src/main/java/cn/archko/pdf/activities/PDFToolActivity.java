@@ -297,6 +297,7 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
                     AppExecutors.Companion.getInstance().networkIO().execute(() -> {
                         boolean rs = PDFCreaterHelper.INSTANCE.createTextPage(fullPath, finalPath);
                         AppExecutors.Companion.getInstance().mainThread().execute(() -> {
+                            dlg.dismiss();
                             if (rs) {
                                 Toast.makeText(PDFToolActivity.this, "转换成功:" + finalPath, Toast.LENGTH_LONG).show();
                             } else {
@@ -304,7 +305,6 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
                             }
                         });
                     });
-                    dlg.dismiss();
                 }
             });
         });
