@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -75,16 +76,16 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
         items.add(new Item(getString(R.string.create_pdf_label), R.drawable.ic_convert_pdfa, Item.TYPE_CREATE_PDF));
 
         final LayoutInflater inflater = LayoutInflater.from(this);
-        adapter = new RecyclerView.Adapter() {
+        adapter = new RecyclerView.Adapter<ToolHolder>() {
             @NonNull
             @Override
-            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            public ToolHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 View view = inflater.inflate(R.layout.pdf_tool_item, parent, false);
                 return new ToolHolder(view);
             }
 
             @Override
-            public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+            public void onBindViewHolder(@NonNull ToolHolder holder, int position) {
                 ToolHolder toolHolder = (ToolHolder) holder;
                 toolHolder.bind(items.get(position));
             }
@@ -151,7 +152,7 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
         });
     }
 
-    private Handler mHandler = new Handler() {
+    private Handler mHandler = new Handler(Looper.getMainLooper()) {
         @SuppressLint("HandlerLeak")
         @Override
         public void handleMessage(Message msg) {
@@ -272,8 +273,6 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
     };
 
     private final View.OnClickListener mConvertPDFAClickListener = v -> {
-        //String content = getString(R.string.sodk_editor_xfa_body);
-        //PDFCreaterHelper.INSTANCE.createTextPage(content);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(getLayoutInflater().inflate(R.layout.dialog_pick_file, null));
         AlertDialog dlg = builder.create();
@@ -297,12 +296,13 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
                     AppExecutors.Companion.getInstance().networkIO().execute(() -> {
                         boolean rs = PDFCreaterHelper.INSTANCE.createTextPage(fullPath, finalPath);
                         AppExecutors.Companion.getInstance().mainThread().execute(() -> {
-                            dlg.dismiss();
                             if (rs) {
                                 Toast.makeText(PDFToolActivity.this, "转换成功:" + finalPath, Toast.LENGTH_LONG).show();
                             } else {
                                 Toast.makeText(PDFToolActivity.this, "转换失败", Toast.LENGTH_LONG).show();
                             }
+                            mHandler.sendEmptyMessage(DISMISS_PROGRESS_DIALOG);
+                            dlg.dismiss();
                         });
                     });
                 }

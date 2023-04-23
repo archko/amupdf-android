@@ -36,7 +36,7 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.8.0"
+        private const val version = "1.8.10"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
@@ -64,7 +64,7 @@ object Libs {
         const val navigation = "androidx.navigation:navigation-compose:2.5.3"
 
         object Compose {
-            const val compiler_version = "1.4.1"
+            const val compiler_version = "1.4.4"
             const val composeBomVersion = "2023.01.00"
 
             const val runtime = "androidx.compose.runtime:runtime"

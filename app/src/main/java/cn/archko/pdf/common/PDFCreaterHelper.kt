@@ -39,14 +39,18 @@ object PDFCreaterHelper {
 
     fun createTextPage(sourcePath: String, destPath: String): Boolean {
         val text = StreamUtils.readStringFromFile(sourcePath)
-        val mediabox = Rect(0f, 0f, 512f, 640f)
+        val mediabox = Rect(0f, 0f, 500f, 707f) //A2
         val margin = 10f
         var writer = DocumentWriter(destPath, "PDF", "")
 
         var snark = "<!DOCTYPE html>" +
-                "<body>" + text +
+                "<style>" +
+                "#body { font-family: \"Droid Sans\", sans-serif; }" +
+                "</style>" +
+                "<body>" +
+                text +
                 "</body></html>"
-        val story = Story(snark, "", 11f)
+        val story = Story(snark, "", 12f)
 
         var more: Boolean
 
