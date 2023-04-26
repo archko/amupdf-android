@@ -30,7 +30,7 @@ public class PdfCreator {
     public static final double PDF_PAGE_HEIGHT = 11.7 * 72 * 2;
 
     public static void create(Context context, ViewGroup parent, String sourcePath, String destPath) {
-        String content = StreamUtils.readStringFromFile(sourcePath);
+        String content = EncodingDetect.readFile(sourcePath);
         try {
             createPdf(context, parent, content, destPath);
         } catch (FileNotFoundException e) {

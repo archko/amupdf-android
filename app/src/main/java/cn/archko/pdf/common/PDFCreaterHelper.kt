@@ -41,7 +41,7 @@ object PDFCreaterHelper {
      * 用这个创建,带cj字体的内容,会产生很大体积,而且字体不好看
      */
     fun createTextPage(sourcePath: String, destPath: String): Boolean {
-        val text = StreamUtils.readStringFromFile(sourcePath)
+        val text = EncodingDetect.readFile(sourcePath)
         val mediabox = Rect(0f, 0f, 500f, 707f) //A2
         val margin = 10f
         var writer = DocumentWriter(destPath, "PDF", "")
