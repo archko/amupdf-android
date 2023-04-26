@@ -15,7 +15,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import cn.archko.mupdf.R;
-import cn.archko.pdf.utils.StreamUtils;
 import cn.archko.pdf.utils.Utils;
 
 public class PdfCreator {
@@ -29,13 +28,14 @@ public class PdfCreator {
      */
     public static final double PDF_PAGE_HEIGHT = 11.7 * 72 * 2;
 
-    public static void create(Context context, ViewGroup parent, String sourcePath, String destPath) {
+    public static boolean create(Context context, ViewGroup parent, String sourcePath, String destPath) {
         String content = EncodingDetect.readFile(sourcePath);
         try {
-            createPdf(context, parent, content, destPath);
+            return createPdf(context, parent, content, destPath);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     /**
@@ -44,14 +44,20 @@ public class PdfCreator {
      * @param path    保存的文件名
      * @throws FileNotFoundException
      */
-    public static void createPdf(Context context, ViewGroup parent, String content, String path) throws FileNotFoundException {
+    public static boolean createPdf(Context context, ViewGroup parent, String content, String path) throws FileNotFoundException {
         PdfDocument pdfDocument = new PdfDocument();
 
         int pageWidth = (int) PDF_PAGE_WIDTH;
         int pageHeight = (int) PDF_PAGE_HEIGHT;
 
         TextView contentView = (TextView) LayoutInflater.from(context).inflate(R.layout.pdf_content, parent, false);
-        contentView.setText("q我");
+        contentView.setText(content);
+        int measureWidth = View.MeasureSpec.makeMeasureSpec(pageWidth, View.MeasureSpec.EXACTLY);
+        int measuredHeight = View.MeasureSpec.makeMeasureSpec(pageHeight, View.MeasureSpec.EXACTLY);
+
+        contentView.measure(measureWidth, measuredHeight);
+        contentView.layout(0, 0, pageWidth, pageHeight);
+
         //contentView.setPadding(Utils.dipToPixel(20), Utils.dipToPixel(20), Utils.dipToPixel(20), Utils.dipToPixel(20));
         //contentView.setTextSize(Utils.dipToPixel(12));
 
@@ -88,7 +94,7 @@ public class PdfCreator {
             createPage(context, parent, pdfDocument, pageWidth, (pageHeight - paddingTopAndBottom), i, sb.toString());
         }
 
-        savePdf(path, pdfDocument);
+        return savePdf(path, pdfDocument);
     }
 
     public static void createPage(Context context, ViewGroup parent, PdfDocument pdfDocument, int pageWidth, int pageHeight, int pageNo, String content) {
@@ -113,15 +119,17 @@ public class PdfCreator {
         pdfDocument.finishPage(page);
     }
 
-    public static void savePdf(String path, PdfDocument document) throws FileNotFoundException {
+    public static boolean savePdf(String path, PdfDocument document) throws FileNotFoundException {
         FileOutputStream outputStream = new FileOutputStream(path);
         try {
             document.writeTo(outputStream);
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             document.close();
         }
+        return false;
     }
 
 }

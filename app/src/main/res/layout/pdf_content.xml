@@ -9,4 +9,5 @@
     android:paddingRight="20dp"
     android:paddingBottom="20dp"
     android:text="pdf_content"
+    android:textColor="@color/black"
     android:textSize="12sp" />

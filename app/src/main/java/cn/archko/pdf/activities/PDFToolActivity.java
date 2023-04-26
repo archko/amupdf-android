@@ -33,12 +33,14 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cn.archko.mupdf.R;
 import cn.archko.pdf.AppExecutors;
 import cn.archko.pdf.common.PDFCreaterHelper;
+import cn.archko.pdf.common.PdfCreator;
 import cn.archko.pdf.fragments.CreatePdfFragment;
 import cn.archko.pdf.utils.PDFUtilities;
 
@@ -55,6 +57,7 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
     private final int SHOW_PROGRESS_DIALOG = 0;
     private final int DISMISS_PROGRESS_DIALOG = 1;
     private RecyclerView.Adapter<ToolHolder> adapter;
+    private LinearLayoutCompat layoutCompat;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,6 +67,7 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
 
         setContentView(R.layout.fragment_pdf_tool);
 
+        layoutCompat = findViewById(R.id.layout);
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
 
         List<Item> items = new ArrayList<>();
@@ -293,18 +297,19 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
                     path = path + File.separatorChar + name;
                     mHandler.sendEmptyMessage(SHOW_PROGRESS_DIALOG);
                     String finalPath = path;
-                    AppExecutors.Companion.getInstance().networkIO().execute(() -> {
-                        boolean rs = PDFCreaterHelper.INSTANCE.createTextPage(fullPath, finalPath);
-                        AppExecutors.Companion.getInstance().mainThread().execute(() -> {
-                            if (rs) {
-                                Toast.makeText(PDFToolActivity.this, "转换成功:" + finalPath, Toast.LENGTH_LONG).show();
-                            } else {
-                                Toast.makeText(PDFToolActivity.this, "转换失败", Toast.LENGTH_LONG).show();
-                            }
-                            mHandler.sendEmptyMessage(DISMISS_PROGRESS_DIALOG);
-                            dlg.dismiss();
-                        });
+                    //AppExecutors.Companion.getInstance().networkIO().execute(() -> {
+                    //boolean rs = PDFCreaterHelper.INSTANCE.createTextPage(fullPath, finalPath);
+                    boolean rs = PdfCreator.create(PDFToolActivity.this, layoutCompat, fullPath, finalPath);
+                    AppExecutors.Companion.getInstance().mainThread().execute(() -> {
+                        if (rs) {
+                            Toast.makeText(PDFToolActivity.this, "转换成功:" + finalPath, Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(PDFToolActivity.this, "转换失败", Toast.LENGTH_LONG).show();
+                        }
+                        mHandler.sendEmptyMessage(DISMISS_PROGRESS_DIALOG);
+                        dlg.dismiss();
                     });
+                    //});
                 }
             });
         });
