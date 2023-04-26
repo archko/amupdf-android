@@ -31,6 +31,8 @@ class FileBean : Serializable, Cloneable {
             if (null == bookProgress) {
                 bookProgress = BookProgress(FileUtils.getRealPath(file.absolutePath))
             }
+
+            bookProgress!!.size = file.length()
         }
     }
 
