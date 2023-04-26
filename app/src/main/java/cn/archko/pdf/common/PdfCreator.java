@@ -80,18 +80,18 @@ public class PdfCreator {
             String line = content.substring(start, end); //指定行的内容
             start = end;
 
-            Log.d("TextView", "line===" + line);
             sb.append(line);
             pageH += lineHeight;
             if (pageH >= (pageHeight - paddingTopAndBottom)) {
-                Log.d("TextView", "============page==========" + i);
-                createPage(context, parent, pdfDocument, pageWidth, (pageHeight - paddingTopAndBottom), i + 1, sb.toString());
+                Log.d("TextView", String.format("============page line:%s,lh:%s,ph:%s==========", i, lineHeight, pageHeight));
+                createPage(context, parent, pdfDocument, pageWidth, pageHeight, i + 1, sb.toString());
                 pageH = 0;
                 sb.setLength(0);
             }
         }
         if (sb.length() > 0) {
-            createPage(context, parent, pdfDocument, pageWidth, (pageHeight - paddingTopAndBottom), i, sb.toString());
+            Log.d("TextView", "last line ===");
+            createPage(context, parent, pdfDocument, pageWidth, pageHeight, i, sb.toString());
         }
 
         return savePdf(path, pdfDocument);
