@@ -29,7 +29,6 @@ import cn.archko.pdf.utils.FileUtils
 import coil.load
 import com.radaee.util.FileBrowserAdt.SnatchItem
 import com.radaee.util.FileBrowserView
-import com.umeng.analytics.MobclickAgent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -63,12 +62,12 @@ class CreatePdfFragment :
 
     override fun onResume() {
         super.onResume()
-        MobclickAgent.onPageStart(TAG)
+        //MobclickAgent.onPageStart(TAG)
     }
 
     override fun onPause() {
         super.onPause()
-        MobclickAgent.onPageEnd(TAG)
+        //MobclickAgent.onPageEnd(TAG)
     }
 
     private fun selectPdf() {

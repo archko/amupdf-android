@@ -10,7 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.entity.FileBean
@@ -18,7 +17,6 @@ import cn.archko.pdf.entity.State
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.umeng.analytics.MobclickAgent
 
 @Composable
 fun FileFavoritiesList(
@@ -63,10 +61,10 @@ fun FileFavoritiesList(
                 PDFViewerHelper.openViewerOther(fb.file!!, context)
             }
             MenuItemType.ViewBookInfo -> {
-                val map = HashMap<String, String>()
-                map["type"] = "info"
-                map["name"] = fb.file!!.name
-                MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
+                //val map = HashMap<String, String>()
+                //map["type"] = "info"
+                //map["name"] = fb.file!!.name
+                //MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
                 showInfoDialog.value = true
             }
             MenuItemType.AddToFav -> {

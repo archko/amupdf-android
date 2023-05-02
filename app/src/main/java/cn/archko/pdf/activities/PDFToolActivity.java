@@ -39,13 +39,17 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cn.archko.mupdf.R;
 import cn.archko.pdf.AppExecutors;
-import cn.archko.pdf.common.PDFCreaterHelper;
+import cn.archko.pdf.common.IntentFile;
 import cn.archko.pdf.common.PdfCreator;
 import cn.archko.pdf.fragments.CreatePdfFragment;
 import cn.archko.pdf.utils.PDFUtilities;
 
-public class PDFToolActivity extends FragmentActivity implements PDFUtilities.OnOperationListener {//, View.OnClickListener {
+public class PDFToolActivity extends FragmentActivity implements PDFUtilities.OnOperationListener {
 
+    private static final int REQUEST_CODE_ENCRYPT = 0x100;
+    private static final int REQUEST_CODE_DECRYPT = 0x101;
+    private static final int REQUEST_CODE_COMPRESS = 0x102;
+    private static final int REQUEST_CODE_CONVERT_TXT = 0x103;
 
     public static void start(@NotNull Context context) {
         context.startActivity(new Intent(context, PDFToolActivity.class));
@@ -179,141 +183,115 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
         }
     };
 
-    private final View.OnClickListener mEncryptPDFClickListener = v -> {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(getLayoutInflater().inflate(R.layout.dialog_pick_file, null));
-        AlertDialog dlg = builder.create();
-        dlg.setOnShowListener(dialog -> {
-            FileBrowserView fb_view = dlg.findViewById(R.id.fb_view);
-            TextView txt_filter = dlg.findViewById(R.id.extension_filter);
-            txt_filter.setText("*.pdf");
-            fb_view.FileInit(Environment.getExternalStorageDirectory().getPath(), new String[]{".pdf"});
-            fb_view.setOnItemClickListener((parent, view1, position, id1) -> {
-                FileBrowserAdt.SnatchItem item = (FileBrowserAdt.SnatchItem) fb_view.getItemAtPosition(position);
-                if (item.m_item.is_dir())
-                    fb_view.FileGotoSubdir(item.m_item.get_name());
-                else {
-                    Document pdfDoc = new Document();
-                    String fullPath = item.m_item.get_path();
-                    int ret = pdfDoc.Open(fullPath, "");
-                    if (ret == 0) {
-                        InputPswd(fullPath, pdfDoc, null, PDFUtilities.REQUEST_CODE_ENCRYPT_PDF);
-                    } else if (ret == -1) {
-                        InputPswd(fullPath, pdfDoc, null, PDFUtilities.REQUEST_CODE_ENCRYPT_PDF);
-                    }
-                    dlg.dismiss();
-                }
-            });
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_CODE_ENCRYPT) {
+                encrypt(data);
+            } else if (requestCode == REQUEST_CODE_DECRYPT) {
+                decrypt(data);
+            } else if (requestCode == REQUEST_CODE_COMPRESS) {
+                compress(data);
+            } else if (requestCode == REQUEST_CODE_CONVERT_TXT) {
+                convert(data);
+            }
+        }
+    }
+
+    private void encrypt(@Nullable Intent data) {
+        String path = IntentFile.getPath(PDFToolActivity.this, data.getData());
+        File file = new File(path);
+
+        Document pdfDoc = new Document();
+        String fullPath = file.getAbsolutePath();
+        int ret = pdfDoc.Open(fullPath, "");
+        if (ret == 0) {
+            InputPswd(fullPath, pdfDoc, null, PDFUtilities.REQUEST_CODE_ENCRYPT_PDF);
+        } else if (ret == -1) {
+            InputPswd(fullPath, pdfDoc, null, PDFUtilities.REQUEST_CODE_ENCRYPT_PDF);
+        }
+    }
+
+    private void decrypt(@Nullable Intent data) {
+        String fullPath = IntentFile.getPath(PDFToolActivity.this, data.getData());
+        Document pdfDoc = new Document();
+        int ret = pdfDoc.Open(fullPath, "");
+        if (ret == 0) {
+            Toast.makeText(this, R.string.not_encrypted_pdf_hint, Toast.LENGTH_LONG).show();
+        } else if (ret == -1) {
+            InputPswd(fullPath, pdfDoc, null, PDFUtilities.REQUEST_CODE_DECRYPT_PDF);
+        }
+    }
+
+    private void compress(@Nullable Intent data) {
+        String fullPath = IntentFile.getPath(PDFToolActivity.this, data.getData());
+        Document pdfDoc = new Document();
+        int ret = pdfDoc.Open(fullPath, "");
+        if (ret == 0) {
+            String path = fullPath.substring(0, fullPath.lastIndexOf("/"));
+            String name = fullPath.substring(fullPath.lastIndexOf("/") + 1, fullPath.lastIndexOf("."));
+            name = name + "_compressed.pdf";
+            path = path + File.separatorChar + name;
+            mHandler.sendEmptyMessage(SHOW_PROGRESS_DIALOG);
+            String finalPath = path;
+            Thread thread = new Thread(() -> PDFUtilities.CompressPDF(finalPath, PDFToolActivity.this, pdfDoc));
+            thread.start();
+        } else if (ret == -1) {
+            InputPswd(fullPath, mDestDoc, null, PDFUtilities.REQUEST_CODE_COMPRESS_PDF);
+        } else if (ret != 0) {
+            mDestDoc.Close();
+            mDestDoc = null;
+        }
+    }
+
+    private void convert(@Nullable Intent data) {
+        String fullPath = IntentFile.getPath(PDFToolActivity.this, data.getData());
+        String path = fullPath.substring(0, fullPath.lastIndexOf("/"));
+        String name = fullPath.substring(fullPath.lastIndexOf("/") + 1, fullPath.lastIndexOf("."));
+        name = name + "_.pdf";
+        path = path + File.separatorChar + name;
+        mHandler.sendEmptyMessage(SHOW_PROGRESS_DIALOG);
+        String finalPath = path;
+        //AppExecutors.Companion.getInstance().networkIO().execute(() -> {
+        //boolean rs = PDFCreaterHelper.INSTANCE.createTextPage(fullPath, finalPath);
+        boolean rs = PdfCreator.create(PDFToolActivity.this, layoutCompat, fullPath, finalPath);
+        AppExecutors.Companion.getInstance().mainThread().execute(() -> {
+            if (rs) {
+                Toast.makeText(PDFToolActivity.this, "转换成功:" + finalPath, Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(PDFToolActivity.this, "转换失败", Toast.LENGTH_LONG).show();
+            }
+            mHandler.sendEmptyMessage(DISMISS_PROGRESS_DIALOG);
         });
-        dlg.show();
+    }
+
+    private final View.OnClickListener mEncryptPDFClickListener = v -> {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/pdf");
+        startActivityForResult(intent, REQUEST_CODE_ENCRYPT);
     };
 
     private final View.OnClickListener mDecryptPDFClickListener = v -> {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(getLayoutInflater().inflate(R.layout.dialog_pick_file, null));
-        AlertDialog dlg = builder.create();
-        dlg.setOnShowListener(dialog -> {
-            FileBrowserView fb_view = dlg.findViewById(R.id.fb_view);
-            TextView txt_filter = dlg.findViewById(R.id.extension_filter);
-            txt_filter.setText("*.pdf");
-            fb_view.FileInit(Environment.getExternalStorageDirectory().getPath(), new String[]{".pdf"});
-            fb_view.setOnItemClickListener((parent, view1, position, id1) -> {
-                FileBrowserAdt.SnatchItem item = (FileBrowserAdt.SnatchItem) fb_view.getItemAtPosition(position);
-                if (item.m_item.is_dir())
-                    fb_view.FileGotoSubdir(item.m_item.get_name());
-                else {
-                    Document pdfDoc = new Document();
-                    String fullPath = item.m_item.get_path();
-                    int ret = pdfDoc.Open(fullPath, "");
-                    if (ret == 0) {
-                        Toast.makeText(this, R.string.not_encrypted_pdf_hint, Toast.LENGTH_LONG).show();
-                    } else if (ret == -1) {
-                        InputPswd(fullPath, pdfDoc, null, PDFUtilities.REQUEST_CODE_DECRYPT_PDF);
-                    }
-                    dlg.dismiss();
-                }
-            });
-        });
-        dlg.show();
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/pdf");
+        startActivityForResult(intent, REQUEST_CODE_DECRYPT);
     };
 
     private final View.OnClickListener mCompressPDFClickListener = v -> {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(getLayoutInflater().inflate(R.layout.dialog_pick_file, null));
-        AlertDialog dlg = builder.create();
-        dlg.setOnShowListener(dialog -> {
-            FileBrowserView fb_view = dlg.findViewById(R.id.fb_view);
-            TextView txt_filter = dlg.findViewById(R.id.extension_filter);
-            txt_filter.setText("*.pdf");
-            fb_view.FileInit(Environment.getExternalStorageDirectory().getPath(), new String[]{".pdf"});
-            fb_view.setOnItemClickListener((parent, view1, position, id1) -> {
-                FileBrowserAdt.SnatchItem item = (FileBrowserAdt.SnatchItem) fb_view.getItemAtPosition(position);
-                if (item.m_item.is_dir())
-                    fb_view.FileGotoSubdir(item.m_item.get_name());
-                else {
-                    Document pdfDoc = new Document();
-                    String fullPath = item.m_item.get_path();
-                    int ret = pdfDoc.Open(fullPath, "");
-                    if (ret == 0) {
-                        String path = fullPath.substring(0, fullPath.lastIndexOf("/"));
-                        String name = fullPath.substring(fullPath.lastIndexOf("/") + 1, fullPath.lastIndexOf("."));
-                        name = name + "_compressed.pdf";
-                        path = path + File.separatorChar + name;
-                        mHandler.sendEmptyMessage(SHOW_PROGRESS_DIALOG);
-                        String finalPath = path;
-                        Thread thread = new Thread(() -> PDFUtilities.CompressPDF(finalPath, PDFToolActivity.this, pdfDoc));
-                        thread.start();
-                    } else if (ret == -1) {
-                        InputPswd(item.m_item.get_path(), mDestDoc, null, PDFUtilities.REQUEST_CODE_COMPRESS_PDF);
-                    } else if (ret != 0) {
-                        mDestDoc.Close();
-                        mDestDoc = null;
-                    }
-                    dlg.dismiss();
-                }
-            });
-        });
-        dlg.show();
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/pdf");
+        startActivityForResult(intent, REQUEST_CODE_COMPRESS);
     };
 
     private final View.OnClickListener mConvertPDFAClickListener = v -> {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(getLayoutInflater().inflate(R.layout.dialog_pick_file, null));
-        AlertDialog dlg = builder.create();
-        dlg.setOnShowListener(dialog -> {
-            FileBrowserView fb_view = dlg.findViewById(R.id.fb_view);
-            TextView txt_filter = dlg.findViewById(R.id.extension_filter);
-            txt_filter.setText("*.txt");
-            fb_view.FileInit(Environment.getExternalStorageDirectory().getPath(), new String[]{".txt"});
-            fb_view.setOnItemClickListener((parent, view1, position, id1) -> {
-                FileBrowserAdt.SnatchItem item = (FileBrowserAdt.SnatchItem) fb_view.getItemAtPosition(position);
-                if (item.m_item.is_dir())
-                    fb_view.FileGotoSubdir(item.m_item.get_name());
-                else {
-                    String fullPath = item.m_item.get_path();
-                    String path = fullPath.substring(0, fullPath.lastIndexOf("/"));
-                    String name = fullPath.substring(fullPath.lastIndexOf("/") + 1, fullPath.lastIndexOf("."));
-                    name = name + "_.pdf";
-                    path = path + File.separatorChar + name;
-                    mHandler.sendEmptyMessage(SHOW_PROGRESS_DIALOG);
-                    String finalPath = path;
-                    //AppExecutors.Companion.getInstance().networkIO().execute(() -> {
-                    //boolean rs = PDFCreaterHelper.INSTANCE.createTextPage(fullPath, finalPath);
-                    boolean rs = PdfCreator.create(PDFToolActivity.this, layoutCompat, fullPath, finalPath);
-                    AppExecutors.Companion.getInstance().mainThread().execute(() -> {
-                        if (rs) {
-                            Toast.makeText(PDFToolActivity.this, "转换成功:" + finalPath, Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(PDFToolActivity.this, "转换失败", Toast.LENGTH_LONG).show();
-                        }
-                        mHandler.sendEmptyMessage(DISMISS_PROGRESS_DIALOG);
-                        dlg.dismiss();
-                    });
-                    //});
-                }
-            });
-        });
-        dlg.show();
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/plain");
+        startActivityForResult(intent, REQUEST_CODE_CONVERT_TXT);
     };
 
     private final View.OnClickListener mConvertPDFClickListener = v -> {
@@ -409,29 +387,6 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
     private final View.OnClickListener mCreatePDFAClickListener = v -> {
         CreatePdfFragment.Companion.showCreateDialog(this, null);
         //PDFCreaterHelper.INSTANCE.save();
-        /*AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(getLayoutInflater().inflate(R.layout.dialog_pick_file, null));
-        AlertDialog dlg = builder.create();
-        dlg.setOnShowListener(dialog -> {
-            FileBrowserView fb_view = dlg.findViewById(R.id.fb_view);
-            TextView txt_filter = dlg.findViewById(R.id.extension_filter);
-            txt_filter.setText("*.jpg,*.jpeg,*.png");
-            fb_view.FileInit(Environment.getExternalStorageDirectory().getPath(), new String[]{".jpg", ".jpeg", ".png"});
-            fb_view.setOnItemClickListener((parent, view1, position, id1) -> {
-                FileBrowserAdt.SnatchItem item = (FileBrowserAdt.SnatchItem) fb_view.getItemAtPosition(position);
-                if (item.m_item.is_dir())
-                    fb_view.FileGotoSubdir(item.m_item.get_name());
-                else {
-                    String fullPath = item.m_item.get_path();
-                    String path = "/sdcard/book/new.pdf";
-                    List<String> list = new ArrayList<>();
-                    list.add(fullPath);
-                    PDFCreaterHelper.INSTANCE.createPdf(path, list);
-                    dlg.dismiss();
-                }
-            });
-        });
-        dlg.show();*/
     };
 
     private void InputPswd(String itemPath, Document document, Button button, int operationCode) {
@@ -547,7 +502,7 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
         }
     }
 
-    private class Item {
+    private static class Item {
         static final int TYPE_MERGE = 0;
         static final int TYPE_CONVERT = 1;
         static final int TYPE_ENCRYPT = 2;

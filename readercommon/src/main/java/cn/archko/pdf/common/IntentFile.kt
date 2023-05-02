@@ -105,6 +105,8 @@ object IntentFile {
                         contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
                     } else if ("audio" == type) {
                         contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                    } else if ("document" == type) {
+                        contentUri = MediaStore.Files.getContentUri("external")
                     }
                     val selection = "_id=?"
                     val selectionArgs = arrayOf(split[1])

@@ -8,7 +8,6 @@ import cn.archko.mupdf.R
 import cn.archko.pdf.App
 import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.activities.ChooseFileFragmentActivity
-import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.BookProgressParser
 import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Graph
@@ -31,7 +30,6 @@ import cn.archko.pdf.utils.PDFUtilities
 import cn.archko.pdf.utils.PDFUtilities.OnOperationListener
 import cn.archko.pdf.utils.StreamUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.umeng.analytics.MobclickAgent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -598,14 +596,14 @@ class FileViewModel() : ViewModel() {
         isFavorited: Int,
         isCurrentTab: Boolean = false
     ) {
-        val map = HashMap<String, String>()
-        if (isFavorited == 1) {
-            map["type"] = "addToFavorite"
-        } else {
-            map["type"] = "removeFromFavorite"
-        }
-        map["name"] = entry.file!!.name
-        MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
+        //val map = HashMap<String, String>()
+        //if (isFavorited == 1) {
+        //    map["type"] = "addToFavorite"
+        //} else {
+        //    map["type"] = "removeFromFavorite"
+        //}
+        //map["name"] = entry.file!!.name
+        //MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
@@ -648,10 +646,10 @@ class FileViewModel() : ViewModel() {
         Toast.makeText(App.instance, "开始压缩,请稍候", Toast.LENGTH_SHORT).show()
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val map = HashMap<String, String>()
-                map["type"] = "compress"
-                map["name"] = entry.file!!.name
-                MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
+                //val map = HashMap<String, String>()
+                //map["type"] = "compress"
+                //map["name"] = entry.file!!.name
+                //MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
                 val filepath = FileUtils.getStoragePath(entry.bookProgress!!.path)
                 val file = File(filepath)
 
@@ -710,10 +708,10 @@ class FileViewModel() : ViewModel() {
         //Toast.makeText(App.instance, "开始生成,请稍候", Toast.LENGTH_SHORT).show()
         viewModelScope.launch {
             val result = withContext(Dispatchers.IO) {
-                val map = HashMap<String, String>()
-                map["type"] = "convert image"
-                map["name"] = entry.file!!.name
-                MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
+                //val map = HashMap<String, String>()
+                //map["type"] = "convert image"
+                //map["name"] = entry.file!!.name
+                //MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
                 val fullPath = entry.file!!.absolutePath
 
                 val path = fullPath.substring(0, fullPath.lastIndexOf("/"))

@@ -16,6 +16,7 @@
     <application>
         <activity
             android:name=".activity.OcrActivity"
+            android:exported="true"
             android:label="Ocr">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

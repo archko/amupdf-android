@@ -88,16 +88,16 @@ dependencies {
 
     kapt Libs.AndroidX.Room.compiler
 
-    api(Libs.Umeng.asms) {
-        exclude group: 'androidx.lifecycle'
-        exclude group: 'androidx.activity'
-        exclude group: 'androidx.fragment'
-    }
-    api(Libs.Umeng.umengCommon) {
-        exclude group: 'androidx.lifecycle'
-        exclude group: 'androidx.activity'
-        exclude group: 'androidx.fragment'
-    }
+    //api(Libs.Umeng.asms) {
+    //    exclude group: 'androidx.lifecycle'
+    //    exclude group: 'androidx.activity'
+    //    exclude group: 'androidx.fragment'
+    //}
+    //api(Libs.Umeng.umengCommon) {
+    //    exclude group: 'androidx.lifecycle'
+    //    exclude group: 'androidx.activity'
+    //    exclude group: 'androidx.fragment'
+    //}
 
     api Libs.Coil.coil
 }

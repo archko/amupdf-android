@@ -47,6 +47,7 @@
         </provider>
 
         <activity
+            android:exported="true"
             android:name="cn.archko.pdf.activities.ChooseFileFragmentActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_name"
