@@ -8,9 +8,9 @@ object BuildConfig {
     const val compileSdkVersion = 33
     const val buildToolsVersion = "33.0.0"
     const val minSdkVersion = 21
-    const val targetSdkVersion = 29
-    const val versionCode = 270
-    const val versionName = "5.4.0"
+    const val targetSdkVersion = 31
+    const val versionCode = 280
+    const val versionName = "5.5.0"
 }
 
 object Libs {
@@ -19,7 +19,7 @@ object Libs {
     const val androidGradlePlugin = "com.android.tools.build:gradle:7.4.1"
 
     object Accompanist {
-        const val version = "0.28.0"
+        const val version = "0.30.1"
 
         //const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
@@ -31,11 +31,12 @@ object Libs {
     }
 
     object Coil {
+        const val coil = "io.coil-kt:coil:2.2.2"
         const val coilCompose = "io.coil-kt:coil-compose:2.2.2"
     }
 
     object Kotlin {
-        private const val version = "1.8.0"
+        private const val version = "1.8.10"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
@@ -63,8 +64,8 @@ object Libs {
         const val navigation = "androidx.navigation:navigation-compose:2.5.3"
 
         object Compose {
-            const val compiler_version = "1.4.1"
-            const val composeBomVersion = "2023.01.00"
+            const val compiler_version = "1.4.4"
+            const val composeBomVersion = "2023.04.01"
 
             const val runtime = "androidx.compose.runtime:runtime"
             const val runtimeLivedata = "androidx.compose.runtime:runtime-livedata"
@@ -94,14 +95,14 @@ object Libs {
         }
 
         object Activity {
-            const val activityCompose = "androidx.activity:activity-compose:1.6.1"
+            const val activityCompose = "androidx.activity:activity-compose:1.7.1"
             const val activityKtx = "androidx.activity:activity-ktx:1.6.1"
-            const val appCompat = "androidx.appcompat:appcompat:1.5.1"
+            const val appCompat = "androidx.appcompat:appcompat:1.6.1"
             const val annotations = "androidx.annotation:annotation:1.4.0"
         }
 
         object Lifecycle {
-            const val lifecycle = "2.6.0-alpha05"
+            const val lifecycle = "2.6.1"
             const val viewModelCompose =
                 "androidx.lifecycle:lifecycle-viewmodel-compose:${lifecycle}"
 
@@ -112,12 +113,12 @@ object Libs {
             const val viewModelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:${lifecycle}"
             const val liveDataKtx = "androidx.lifecycle:lifecycle-livedata-ktx:${lifecycle}"
 
-            const val extensions = "androidx.lifecycle:lifecycle-extensions:2.2.0"
+            const val extensions = "androidx.lifecycle:lifecycle-runtime-ktx:${lifecycle}"
         }
 
         object ConstraintLayout {
             const val constraintLayoutCompose =
-                "androidx.constraintlayout:constraintlayout-compose:1.0.0"
+                "androidx.constraintlayout:constraintlayout-compose:1.0.1"
 
             const val constraintLayout =
                 "androidx.constraintlayout:constraintlayout:2.1.4"
@@ -176,16 +177,16 @@ object Libs {
         const val testing = "androidx.fragment:fragment-testing:${version}"
     }
 
-    object Umeng {
-        const val umeng_common = "9.3.8"
-        const val asms_version = "1.2.2"
-        const val umengCommon = "com.umeng.umsdk:common:${umeng_common}"
-        const val asms = "com.umeng.umsdk:asms:${asms_version}"// 必选
-    }
+    //object Umeng {
+    //    const val umeng_common = "9.3.8"
+    //    const val asms_version = "1.2.2"
+    //    const val umengCommon = "com.umeng.umsdk:common:${umeng_common}"
+    //    const val asms = "com.umeng.umsdk:asms:${asms_version}"// 必选
+    //}
 
     object Dependency {
         const val multidex = "androidx.multidex:multidex:2.0.1"
-        const val material = "com.google.android.material:material:1.6.1"
+        const val material = "com.google.android.material:material:1.9.0-rc01"
         const val liveEventBusX = "com.jeremyliao:live-event-bus-x:1.5.0"
         const val viewpager2 = "androidx.viewpager2:viewpager2:1.0.0"
         const val vectordrawable =

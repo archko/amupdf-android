@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentActivity
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.FragmentFileInfoBinding
 import cn.archko.pdf.App
+import cn.archko.pdf.base.BaseDialogFragment
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.ImageLoader
 import cn.archko.pdf.entity.BookProgress
@@ -20,8 +21,6 @@ import cn.archko.pdf.utils.DateUtils
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.Utils
 import com.artifex.mupdf.fitz.Document
-import cn.archko.pdf.base.BaseDialogFragment
-import com.umeng.analytics.MobclickAgent
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -49,12 +48,12 @@ class FileInfoFragment : BaseDialogFragment<FragmentFileInfoBinding>(R.layout.fr
 
     override fun onResume() {
         super.onResume()
-        MobclickAgent.onPageStart(TAG)
+        //MobclickAgent.onPageStart(TAG)
     }
 
     override fun onPause() {
         super.onPause()
-        MobclickAgent.onPageEnd(TAG)
+        //MobclickAgent.onPageEnd(TAG)
     }
 
     override fun setArguments(args: Bundle?) {

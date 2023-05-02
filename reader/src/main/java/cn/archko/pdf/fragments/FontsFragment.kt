@@ -14,6 +14,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.adapters.BaseViewHolder
+import cn.archko.pdf.base.BaseDialogFragment
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.StyleHelper
@@ -22,8 +23,6 @@ import cn.archko.pdf.databinding.ItemOutlineBinding
 import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.listeners.DataListener
 import cn.archko.pdf.utils.Utils
-import cn.archko.pdf.base.BaseDialogFragment
-import com.umeng.analytics.MobclickAgent
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -60,12 +59,12 @@ open class FontsFragment : BaseDialogFragment<FragmentFontBinding>(R.layout.frag
 
     override fun onResume() {
         super.onResume()
-        MobclickAgent.onPageStart(TAG)
+        //MobclickAgent.onPageStart(TAG)
     }
 
     override fun onPause() {
         super.onPause()
-        MobclickAgent.onPageEnd(TAG)
+        //MobclickAgent.onPageEnd(TAG)
     }
 
     override fun setupView() {

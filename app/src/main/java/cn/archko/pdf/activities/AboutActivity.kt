@@ -24,7 +24,6 @@ import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.ui.home.AboutScreen
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
 import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
-import com.umeng.analytics.MobclickAgent
 
 /**
  * @author: archko 2018/12/16 :9:43
@@ -77,12 +76,10 @@ class AboutActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
-        MobclickAgent.onPageEnd("about")
     }
 
     override fun onResume() {
         super.onResume()
-        MobclickAgent.onPageStart("about")
     }
 
     companion object {

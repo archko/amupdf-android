@@ -16,7 +16,6 @@ import cn.archko.pdf.common.DataStorePreferenceAdapter
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.PdfOptionRepository
 import com.google.android.material.appbar.MaterialToolbar
-import com.umeng.analytics.MobclickAgent
 
 /**
  * @author: archko 2018/12/12 :15:43
@@ -44,14 +43,14 @@ class PdfOptionsActivity : FragmentActivity() {
         override fun onResume() {
             super.onResume()
 
-            MobclickAgent.onResume(activity) // 基础指标统计，不能遗漏
-            MobclickAgent.onPageStart(TAG)
+            //MobclickAgent.onResume(activity) // 基础指标统计，不能遗漏
+            //MobclickAgent.onPageStart(TAG)
         }
 
         override fun onPause() {
             super.onPause()
-            MobclickAgent.onPause(activity) // 基础指标统计，不能遗漏
-            MobclickAgent.onPageEnd(TAG)
+            //MobclickAgent.onPause(activity) // 基础指标统计，不能遗漏
+            //MobclickAgent.onPageEnd(TAG)
         }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {

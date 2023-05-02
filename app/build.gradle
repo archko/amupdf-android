@@ -114,6 +114,8 @@ android {
 
     packagingOptions {
         exclude("META-INF/*.kotlin_module")
+        doNotStrip "*/armeabi-v7a/*.so"
+        doNotStrip "*/arm64-v8a/*.so"
     }
 }
 
@@ -171,16 +173,16 @@ dependencies {
 
     implementation Libs.Dependency.liveEventBusX
 
-    api(Libs.Umeng.asms) {
-        exclude group: 'androidx.lifecycle'
-        exclude group: 'androidx.activity'
-        exclude group: 'androidx.fragment'
-    }
-    api(Libs.Umeng.umengCommon) {
-        exclude group: 'androidx.lifecycle'
-        exclude group: 'androidx.activity'
-        exclude group: 'androidx.fragment'
-    }
+    //api(Libs.Umeng.asms) {
+    //    exclude group: 'androidx.lifecycle'
+    //    exclude group: 'androidx.activity'
+    //    exclude group: 'androidx.fragment'
+    //}
+    //api(Libs.Umeng.umengCommon) {
+    //    exclude group: 'androidx.lifecycle'
+    //    exclude group: 'androidx.activity'
+    //    exclude group: 'androidx.fragment'
+    //}
     implementation Libs.Dependency.multidex
     implementation Libs.AndroidX.ConstraintLayout.constraintLayout
     implementation(Libs.Dependency.material) {

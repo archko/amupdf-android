@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import cn.archko.mupdf.R
 import cn.archko.pdf.App
 import cn.archko.pdf.activities.ChooseFileFragmentActivity
-import cn.archko.pdf.common.AnalysticsHelper
 import cn.archko.pdf.common.BookProgressParser
 import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Graph
@@ -26,7 +25,6 @@ import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
 import cn.archko.pdf.utils.StreamUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.umeng.analytics.MobclickAgent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -591,14 +589,14 @@ class FileViewModel() : ViewModel() {
         isFavorited: Int,
         isCurrentTab: Boolean = false
     ) {
-        val map = HashMap<String, String>()
-        if (isFavorited == 1) {
-            map["type"] = "addToFavorite"
-        } else {
-            map["type"] = "removeFromFavorite"
-        }
-        map["name"] = entry.file!!.name
-        MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
+        //val map = HashMap<String, String>()
+        //if (isFavorited == 1) {
+        //    map["type"] = "addToFavorite"
+        //} else {
+        //    map["type"] = "removeFromFavorite"
+        //}
+        //map["name"] = entry.file!!.name
+        //MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {

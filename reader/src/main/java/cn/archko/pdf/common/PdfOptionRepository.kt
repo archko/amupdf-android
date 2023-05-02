@@ -238,9 +238,7 @@ data class PdfOption(
     var topPadding: Int = Utils.dipToPixel(16f),
     var rightPadding: Int = Utils.dipToPixel(12f),
     var bottomPadding: Int = Utils.dipToPixel(20f),
-) {
-
-}
+)
 
 object PdfOptionKeys {
     val PREF_SHOW_EXTENSION = booleanPreferencesKey("showExtension")

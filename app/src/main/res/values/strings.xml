@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AMuPDF</string>
+
+    <string name="grant_files_permission">grant file permission</string>
+    <string name="grant_all_files_permission">grant all files permission</string>
+    <string name="grantfailed">grant failed</string>
+    <string name="grant_cancel">cancel grant</string>
+    <string name="grant_ok">grant</string>
+
     <string name="outline_title">Table of Contents</string>
     <string name="auto_crop">auto crop bound</string>
 

@@ -31,7 +31,7 @@ fun FileBean.getIcon(): Int {
                 } else if (ext.contains("txt") || ext.contains("log")) {
                     //iconId = R.drawable.ic_item_book
                     iconId = R.drawable.sodk_editor_icon_txt
-                } else if (ext.contains("png") || ext.contains("jpg")) {
+                } else if (ext.contains("png") || ext.contains("jpg") || ext.contains("jpeg")) {
                     iconId = R.drawable.sodk_editor_icon_image
                 } else {
                     //iconId = R.drawable.ic_explorer_any

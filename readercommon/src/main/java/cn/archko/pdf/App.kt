@@ -4,7 +4,6 @@ import android.app.Application
 import cn.archko.pdf.common.CrashHandler
 import cn.archko.pdf.common.Graph
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.umeng.commonsdk.UMConfigure
 
 class App : Application() {
     private val appkey = "5c15f639f1f556978b0009c8"
@@ -19,7 +18,7 @@ class App : Application() {
         val displayMetrics = resources.displayMetrics
         screenHeight = displayMetrics.heightPixels
         screenWidth = displayMetrics.widthPixels
-        UMConfigure.init(this, appkey, "archko", UMConfigure.DEVICE_TYPE_PHONE, null)
+        //UMConfigure.init(this, appkey, "archko", UMConfigure.DEVICE_TYPE_PHONE, null)
         LiveEventBus
             .config()
             .supportBroadcast(this)
