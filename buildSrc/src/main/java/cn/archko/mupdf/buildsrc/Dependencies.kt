@@ -9,7 +9,7 @@ object BuildConfig {
     const val buildToolsVersion = "33.0.0"
     const val minSdkVersion = 21
     const val targetSdkVersion = 31
-    const val versionCode = 280
+    const val versionCode = 290
     const val versionName = "5.5.0"
 }
 
@@ -177,12 +177,12 @@ object Libs {
         const val testing = "androidx.fragment:fragment-testing:${version}"
     }
 
-    object Umeng {
-        const val umeng_common = "9.3.8"
-        const val asms_version = "1.2.2"
-        const val umengCommon = "com.umeng.umsdk:common:${umeng_common}"
-        const val asms = "com.umeng.umsdk:asms:${asms_version}"// 必选
-    }
+    //object Umeng {
+    //    const val umeng_common = "9.3.8"
+    //    const val asms_version = "1.2.2"
+    //    const val umengCommon = "com.umeng.umsdk:common:${umeng_common}"
+    //    const val asms = "com.umeng.umsdk:asms:${asms_version}"// 必选
+    //}
 
     object Dependency {
         const val multidex = "androidx.multidex:multidex:2.0.1"

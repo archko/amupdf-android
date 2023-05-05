@@ -4,6 +4,7 @@
     <string name="grant_all_files_permission">请求所有文件管理权限</string>
     <string name="grantfailed">文件管理权限请求失败</string>
     <string name="grant_cancel">取消授权</string>
+    <string name="grant_ok">授权</string>
 
     <string name="outline_title">目录</string>
     <string name="auto_crop">自动切边</string>

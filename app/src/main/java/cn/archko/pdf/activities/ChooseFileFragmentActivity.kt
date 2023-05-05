@@ -164,7 +164,7 @@ open class ChooseFileFragmentActivity : AnalysticActivity(), OnPermissionGranted
                 .setPositiveButton(R.string.grant_cancel) { _, _ ->
                     finish()
                 }
-                .setNegativeButton(R.string.ok) { _, _ ->
+                .setNegativeButton(R.string.grant_ok) { _, _ ->
                     ActivityCompat.requestPermissions(
                         this, arrayOf(permission), STORAGE_PERMISSION
                     )
@@ -187,7 +187,7 @@ open class ChooseFileFragmentActivity : AnalysticActivity(), OnPermissionGranted
                 .setPositiveButton(R.string.grant_cancel) { _, _ ->
                     finish()
                 }
-                .setNegativeButton(R.string.ok) { _, _ ->
+                .setNegativeButton(R.string.grant_ok) { _, _ ->
                     permissionCallbacks[ALL_FILES_PERMISSION] = onPermissionGranted
                     try {
                         val intent =
