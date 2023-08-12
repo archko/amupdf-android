@@ -13,7 +13,6 @@ import android.text.TextUtils
 import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import cn.archko.mupdf.R
-import cn.archko.mupdf.databinding.ActivityDocViewBinding
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.PdfOptionRepository
@@ -27,16 +26,18 @@ import com.artifex.solib.SOClipboardHandler
 import com.artifex.sonui.editor.DocumentListener
 import com.artifex.sonui.editor.Utilities
 import cn.archko.pdf.base.BaseActivity
+import com.artifex.sonui.editor.DocumentView
 import kotlinx.coroutines.launch
 
 /**
  * @author: archko 2020/10/31 :9:49 上午
  */
-open class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.activity_doc_view) {
+open class DocumentActivity : BaseActivity(R.layout.activity_doc_view) {
     private var path: String? = null
     private var sensorHelper: SensorHelper? = null
     private val preferencesRepository = PdfOptionRepository(Graph.dataStore)
     private val pdfViewModel: PDFViewModel = PDFViewModel()
+    private lateinit var documentView: DocumentView
 
     internal class ClipboardHandler : SOClipboardHandler {
         private var mActivity // The current activity.
@@ -122,7 +123,7 @@ open class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.acti
     }
 
     override fun setupView() {
-
+        documentView = findViewById(R.id.documentView)
     }
 
     private fun loadBookmark() {
@@ -134,7 +135,7 @@ open class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.acti
 
     override fun onPause() {
         super.onPause()
-        binding.documentView.onPause {
+        documentView.onPause {
             //  called when pausing is complete
         }
         //sensorHelper.onPause();
@@ -152,13 +153,13 @@ open class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.acti
 
     override fun onResume() {
         super.onResume()
-        binding.documentView.onResume()
+        documentView.onResume()
         //sensorHelper.onResume();
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        binding.documentView.onConfigurationChange(newConfig)
+        documentView.onConfigurationChange(newConfig)
     }
 
     private fun initIntent() {
@@ -171,15 +172,15 @@ open class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.acti
 
     private fun useDefaultUI() {
         //  find the DocumentView component
-        binding.documentView.setDocConfigOptions(ArDkLib.getAppConfigOptions())
-        binding.documentView.setDocDataLeakHandler(Utilities.getDataLeakHandlers())
+        documentView.setDocConfigOptions(ArDkLib.getAppConfigOptions())
+        documentView.setDocDataLeakHandler(Utilities.getDataLeakHandlers())
 
         //  set an optional listener for document events
         val page = pdfViewModel.getCurrentPage()
-        binding.documentView.setDocumentListener(object : DocumentListener {
+        documentView.setDocumentListener(object : DocumentListener {
             override fun onPageLoaded(pagesLoaded: Int) {}
             override fun onDocCompleted() {
-                binding.documentView.goToPage(page)
+                documentView.goToPage(page)
             }
 
             override fun onPasswordRequired() {}
@@ -194,26 +195,26 @@ open class DocumentActivity : BaseActivity<ActivityDocViewBinding>(R.layout.acti
 
         //  set a listener for when the document view is closed.
         //  typically you'll use it to close your activity.
-        binding.documentView.setOnDoneListener { super@DocumentActivity.finish() }
+        documentView.setOnDoneListener { super@DocumentActivity.finish() }
 
         //  get the URI for the document
         //mUri = getIntent().getData();
 
         //  open it, specifying showUI = true;
-        binding.documentView.start(Uri.parse(path), 0, true)
+        documentView.start(Uri.parse(path), 0, true)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        binding.documentView.onDestroy()
+        documentView.onDestroy()
     }
 
     override fun onBackPressed() {
-        binding.documentView.onBackPressed()
+        documentView.onBackPressed()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        binding.documentView.onActivityResult(requestCode, resultCode, data)
+        documentView.onActivityResult(requestCode, resultCode, data)
         super.onActivityResult(requestCode, resultCode, data)
     }
 

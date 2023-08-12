@@ -20,15 +20,15 @@ public class PasswordDialog {
         LayoutInflater li = LayoutInflater.from(activity);
         View mainView = li.inflate(R.layout.password_dialog, null);
         dialog.setView(mainView);
-        dialog.setTitle(activity.getResources().getString(R.string.sodk_editor_password_for_document));
+        dialog.setTitle(activity.getResources().getString(com.artifex.sonui.editor.R.string.sodk_editor_password_for_document));
         final EditText et = mainView.findViewById(R.id.editTextDialogUserInput);
 
-        dialog.setPositiveButton(activity.getResources().getString(R.string.sodk_editor_ok),
+        dialog.setPositiveButton(activity.getResources().getString(com.artifex.sonui.editor.R.string.sodk_editor_ok),
                 (dialog1, which) -> {
                     Utilities.hideKeyboard(activity);
                     String content = et.getText().toString();
                     if (TextUtils.isEmpty(content)) {
-                        Toast.makeText(activity, R.string.sodk_editor_password_for_document, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, com.artifex.sonui.editor.R.string.sodk_editor_password_for_document, Toast.LENGTH_SHORT).show();
                         return;
                     }
                     dialog1.dismiss();
@@ -37,7 +37,7 @@ public class PasswordDialog {
                     }
                 });
 
-        dialog.setNegativeButton(activity.getResources().getString(R.string.sodk_editor_cancel),
+        dialog.setNegativeButton(activity.getResources().getString(com.artifex.sonui.editor.R.string.sodk_editor_cancel),
                 (dialog12, which) -> {
                     Utilities.hideKeyboard(activity);
                     dialog12.dismiss();

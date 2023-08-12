@@ -37,7 +37,9 @@ import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import cn.archko.mupdf.R;
+
+import com.radaee.viewlib.R;
+
 import cn.archko.pdf.AppExecutors;
 import cn.archko.pdf.common.IntentFile;
 import cn.archko.pdf.common.PdfCreator;
@@ -69,10 +71,10 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
 
         Global.Init(this);
 
-        setContentView(R.layout.fragment_pdf_tool);
+        setContentView(cn.archko.mupdf.R.layout.fragment_pdf_tool);
 
-        layoutCompat = findViewById(R.id.layout);
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        layoutCompat = findViewById(cn.archko.mupdf.R.id.layout);
+        RecyclerView recyclerView = findViewById(cn.archko.mupdf.R.id.recyclerView);
 
         List<Item> items = new ArrayList<>();
         items.add(new Item(getString(R.string.merge_pdf_label), R.drawable.ic_merge_pdf, Item.TYPE_MERGE));
@@ -81,14 +83,14 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
         items.add(new Item(getString(R.string.decrypt_pdf_label), R.drawable.ic_decryption, Item.TYPE_DECRYPT));
         items.add(new Item(getString(R.string.compress_pdf_label), R.drawable.ic_compress_pdf, Item.TYPE_COMPRESS));
         items.add(new Item(getString(R.string.convert_pdfa_label), R.drawable.ic_convert_pdfa, Item.TYPE_PDFA));
-        items.add(new Item(getString(R.string.create_pdf_label), R.drawable.ic_convert_pdfa, Item.TYPE_CREATE_PDF));
+        items.add(new Item(getString(cn.archko.mupdf.R.string.create_pdf_label), R.drawable.ic_convert_pdfa, Item.TYPE_CREATE_PDF));
 
         final LayoutInflater inflater = LayoutInflater.from(this);
         adapter = new RecyclerView.Adapter<ToolHolder>() {
             @NonNull
             @Override
             public ToolHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = inflater.inflate(R.layout.pdf_tool_item, parent, false);
+                View view = inflater.inflate(cn.archko.mupdf.R.layout.pdf_tool_item, parent, false);
                 return new ToolHolder(view);
             }
 
@@ -470,8 +472,8 @@ public class PDFToolActivity extends FragmentActivity implements PDFUtilities.On
 
         public ToolHolder(@NonNull View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.img_tool_item);
-            textView = itemView.findViewById(R.id.txt_tool_item);
+            imageView = itemView.findViewById(cn.archko.mupdf.R.id.img_tool_item);
+            textView = itemView.findViewById(cn.archko.mupdf.R.id.txt_tool_item);
         }
 
         void bind(Item item) {

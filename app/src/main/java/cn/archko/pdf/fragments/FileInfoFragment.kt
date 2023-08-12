@@ -5,13 +5,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.RecyclerView
 import cn.archko.mupdf.R
-import cn.archko.mupdf.databinding.FragmentFileInfoBinding
 import cn.archko.pdf.App
-import cn.archko.pdf.base.BaseDialogFragment
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.ImageLoader
 import cn.archko.pdf.entity.BookProgress
@@ -27,11 +29,21 @@ import java.math.RoundingMode
 /**
  * @author: archko 2016/1/16 :14:34
  */
-class FileInfoFragment : BaseDialogFragment<FragmentFileInfoBinding>(R.layout.fragment_file_info) {
+class FileInfoFragment : DialogFragment() {
 
     var mEntry: FileBean? = null
     var bookProgress: BookProgress? = null
     var mDataListener: DataListener? = null
+    private var btnCancel: View? = null
+    private var location: TextView? = null
+    private var fileName: TextView? = null
+    private var fileSize: TextView? = null
+    private var pageCount: TextView? = null
+    private var layoutLastRead: View? = null
+    private var lastRead: TextView? = null
+    private var readCount: TextView? = null
+    private var progressbar: ProgressBar? = null
+    private var icon: ImageView? = null
 
     fun setListener(dataListener: DataListener?) {
         mDataListener = dataListener
@@ -59,18 +71,28 @@ class FileInfoFragment : BaseDialogFragment<FragmentFileInfoBinding>(R.layout.fr
     override fun setArguments(args: Bundle?) {
         super.setArguments(args)
         if (null != args) {
-            mEntry = args.getSerializable(FILE_LIST_ENTRY, FileBean::class.java)
+            mEntry = args.getSerializable(FILE_LIST_ENTRY) as FileBean?
             bookProgress = mEntry!!.bookProgress
         }
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        binding.btnCancel.setOnClickListener { this@FileInfoFragment.dismiss() }
-        binding.btnCancel.setOnClickListener {
+        val view = inflater.inflate(R.layout.fragment_file_info, container, false)
+        btnCancel = view.findViewById(R.id.btnCancel)
+        location = view.findViewById(R.id.location)
+        fileName = view.findViewById(R.id.fileName)
+        fileSize = view.findViewById(R.id.fileSize)
+        pageCount = view.findViewById(R.id.pageCount)
+        layoutLastRead = view.findViewById(R.id.layoutLastRead)
+        lastRead = view.findViewById(R.id.lastRead)
+        readCount = view.findViewById(R.id.readCount)
+        progressbar = view.findViewById(R.id.progressbar)
+        icon = view.findViewById(R.id.icon)
+
+        btnCancel!!.setOnClickListener { this@FileInfoFragment.dismiss() }
+        btnCancel!!.setOnClickListener {
             read()
         }
 
@@ -93,9 +115,9 @@ class FileInfoFragment : BaseDialogFragment<FragmentFileInfoBinding>(R.layout.fr
         }
 
         val file = mEntry!!.file
-        binding.location.text = FileUtils.getDir(file)
-        binding.fileName.text = file?.name
-        binding.fileSize.text = Utils.getFileSize(mEntry!!.fileSize)
+        location?.text = FileUtils.getDir(file)
+        fileName?.text = file?.name
+        fileSize?.text = Utils.getFileSize(mEntry!!.fileSize)
 
         if (null == bookProgress || bookProgress?.pageCount == 0) {
             try {
@@ -117,16 +139,14 @@ class FileInfoFragment : BaseDialogFragment<FragmentFileInfoBinding>(R.layout.fr
     }
 
     private fun showIcon(path: String) {
-        ImageLoader.getInstance().loadImage(path, 0, 1.0f, App.instance!!.screenWidth, binding.icon)
+        ImageLoader.getInstance().loadImage(path, 0, 1.0f, App.instance!!.screenWidth, icon)
     }
 
     private fun updatePageCount() {
-        binding.pageCount.setText(
-            String.format(
-                "%s/%s",
-                bookProgress!!.page,
-                bookProgress!!.pageCount
-            )
+        pageCount?.text = String.format(
+            "%s/%s",
+            bookProgress!!.page,
+            bookProgress!!.pageCount
         )
     }
 
@@ -142,17 +162,17 @@ class FileInfoFragment : BaseDialogFragment<FragmentFileInfoBinding>(R.layout.fr
 
     private fun showProgress(progress: BookProgress) {
         if (null != bookProgress && bookProgress!!.pageCount > 0) {
-            binding.layoutLastRead.visibility = View.VISIBLE
+            layoutLastRead?.visibility = View.VISIBLE
 
             var text = DateUtils.formatTime(progress.firstTimestampe, DateUtils.TIME_FORMAT_TWO)
             val percent = progress.page * 100f / progress.pageCount
             val b = BigDecimal(percent.toDouble())
             text += "       " + b.setScale(2, RoundingMode.HALF_UP).toFloat() + "%"
-            binding.lastRead.text = text
-            binding.progressbar.max = progress.pageCount
-            binding.progressbar.progress = progress.page
+            lastRead?.text = text
+            progressbar?.max = progress.pageCount
+            progressbar?.progress = progress.page
 
-            binding.readCount.text = progress.readTimes.toString()
+            readCount?.text = progress.readTimes.toString()
             updatePageCount()
         } else {
             //mLastReadLayout.visibility = View.GONE

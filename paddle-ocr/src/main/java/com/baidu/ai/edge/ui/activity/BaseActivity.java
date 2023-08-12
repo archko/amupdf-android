@@ -89,7 +89,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
             AlertDialog.Builder alertBuilder = new AlertDialog.Builder(
                     BaseActivity.this,
-                    R.style.Theme_AppCompat_Light_Dialog_Alert);
+                    androidx.appcompat.R.style.Theme_AppCompat_Dialog_Alert);
             alertBuilder.setMessage("需授权访问SD卡文件");
             alertBuilder.setCancelable(false);
             alertBuilder.setPositiveButton("去设置", (dialog, which) -> {

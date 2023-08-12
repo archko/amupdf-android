@@ -1,25 +1,30 @@
 package cn.archko.pdf.fragments
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.adapters.BaseViewHolder
-import cn.archko.pdf.databinding.FragmentBookmarkBinding
-import cn.archko.pdf.databinding.ItemBookmarkBinding
-import cn.archko.pdf.entity.Bookmark
 import cn.archko.pdf.base.BaseFragment
+import cn.archko.pdf.entity.Bookmark
 
 /**
  * @author: archko 2019/7/11 :17:55
  */
-open class BookmarkFragment : BaseFragment<FragmentBookmarkBinding>(R.layout.fragment_bookmark) {
+open class BookmarkFragment : BaseFragment() {
 
     private lateinit var adapter: BaseRecyclerAdapter<Bookmark>
     private var bookmarks = ArrayList<Bookmark>()
     private var page = 0
+
+    private var recyclerView: RecyclerView? = null
+    private var add: View? = null
+    private var nodataView: View? = null
     var itemListener: ItemListener? = null
         set(value) {
             field = value
@@ -31,17 +36,24 @@ open class BookmarkFragment : BaseFragment<FragmentBookmarkBinding>(R.layout.fra
         fun onAdd(page: Int)
     }
 
-    override fun setupView() {
-        binding.recyclerView.itemAnimator = null
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_bookmark, container, false)
+        recyclerView = view.findViewById(R.id.recyclerView)
+        add = view.findViewById(R.id.add)
+        nodataView = view.findViewById(R.id.nodataView)
+
+        recyclerView?.itemAnimator = null
         val itemDecoration = DividerItemDecoration(
             context,
             DividerItemDecoration.VERTICAL
         )
         context?.getDrawable(R.drawable.bg_divider)?.let { itemDecoration.setDrawable(it) }
-        binding.recyclerView.addItemDecoration(
+        recyclerView?.addItemDecoration(
             itemDecoration
         )
-        binding.add.setOnClickListener {
+        add?.setOnClickListener {
             itemListener?.onAdd(page)
         }
 
@@ -51,22 +63,24 @@ open class BookmarkFragment : BaseFragment<FragmentBookmarkBinding>(R.layout.fra
                 parent: ViewGroup,
                 viewType: Int
             ): BaseViewHolder<Bookmark> {
-                val binding =
-                    ItemBookmarkBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                return ViewHolder(binding)
+                val root = inflater.inflate(R.layout.item_bookmark, parent, false)
+                return ViewHolder(root)
             }
         }
-        binding.recyclerView.adapter = adapter
+        recyclerView?.adapter = adapter
 
         if (bookmarks.size == 0) {
             noBookmark()
         } else {
-            binding.nodataView.visibility = View.GONE
+            nodataView?.visibility = View.GONE
         }
+
+
+        return view
     }
 
     private fun noBookmark() {
-        binding.nodataView.visibility = View.VISIBLE
+        nodataView?.visibility = View.VISIBLE
     }
 
     open fun updateBookmark(page: Int, list: List<Bookmark>) {
@@ -78,7 +92,7 @@ open class BookmarkFragment : BaseFragment<FragmentBookmarkBinding>(R.layout.fra
             this.bookmarks.clear()
             this.bookmarks.addAll(list)
             if (this.bookmarks.size > 0) {
-                binding.nodataView.visibility = View.GONE
+                nodataView?.visibility = View.GONE
                 adapter.notifyDataSetChanged()
             } else {
                 noBookmark()
@@ -86,12 +100,20 @@ open class BookmarkFragment : BaseFragment<FragmentBookmarkBinding>(R.layout.fra
         }
     }
 
-    inner class ViewHolder(private val binding: ItemBookmarkBinding) :
-        BaseViewHolder<Bookmark>(binding.root) {
+    inner class ViewHolder(private val root: View) :
+        BaseViewHolder<Bookmark>(root) {
+
+        var page: TextView? = null
+        var delete: View? = null
+
+        init {
+            page = root.findViewById(R.id.page)
+            delete = root.findViewById(R.id.delete)
+        }
 
         override fun onBind(data: Bookmark, position: Int) {
-            binding.page.text = (data.page + 1).toString()
-            binding.delete.setOnClickListener { itemListener?.onDelete(data, position) }
+            page?.text = (data.page + 1).toString()
+            delete?.setOnClickListener { itemListener?.onDelete(data, position) }
             itemView.setOnClickListener { itemListener?.onClick(data, position) }
         }
     }

@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -88,10 +89,10 @@ fun HomePager(
 
     val navItems =
         listOf(
-            stringResource(id = R.string.tab_search),
-            stringResource(id = R.string.tab_history),
-            stringResource(id = R.string.tab_browser),
-            stringResource(id = R.string.tab_favorite),
+            stringResource(id = cn.archko.pdf.R.string.tab_search),
+            stringResource(id = cn.archko.pdf.R.string.tab_history),
+            stringResource(id = cn.archko.pdf.R.string.tab_browser),
+            stringResource(id = cn.archko.pdf.R.string.tab_favorite),
         )
 
     val (currentSection, setCurrentSection) = rememberSaveable {
@@ -119,43 +120,43 @@ fun HomePager(
         ) {
             when (currentSection) {
                 1 -> {
-                    MenuItem(stringResource(id = R.string.options)) {
+                    MenuItem(stringResource(id = cn.archko.pdf.R.string.options)) {
                         onPalletChange()
                         PdfOptionsActivity.start(context)
                     }
-                    MenuItem(stringResource(id = R.string.menu_backup)) {
+                    MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_backup)) {
                         onPalletChange()
                         backup(showLoadingDialog, viewModel)
                     }
-                    MenuItem(stringResource(id = R.string.menu_restore)) {
+                    MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_restore)) {
                         onPalletChange()
                         restore(showRestoreDialog)
                     }
                 }
 
                 2 -> {
-                    MenuItem(stringResource(id = R.string.options)) {
+                    MenuItem(stringResource(id = cn.archko.pdf.R.string.options)) {
                         onPalletChange()
                         PdfOptionsActivity.start(context)
                     }
-                    MenuItem(stringResource(id = R.string.menu_set_as_home)) {
+                    MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_set_as_home)) {
                         onPalletChange()
                         viewModel.setAsHome(context)
                     }
                 }
 
                 0, 3 -> {
-                    MenuItem(stringResource(id = R.string.options)) {
+                    MenuItem(stringResource(id = cn.archko.pdf.R.string.options)) {
                         onPalletChange()
                         PdfOptionsActivity.start(context)
                     }
                 }
             }
-            MenuItem(stringResource(id = R.string.menu_about)) {
+            MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_about)) {
                 onPalletChange()
                 AboutActivity.start(context)
             }
-            MenuItem(stringResource(id = R.string.menu_tools)) {
+            MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_tools)) {
                 onPalletChange()
                 PDFToolActivity.start(context)
             }
@@ -165,7 +166,7 @@ fun HomePager(
     NiaGradientBackground {
         Scaffold(
             topBar = {
-                SmallTopAppBar(
+                TopAppBar(
                     title = {
                         Text(
                             text = stringResource(id = R.string.app_name),

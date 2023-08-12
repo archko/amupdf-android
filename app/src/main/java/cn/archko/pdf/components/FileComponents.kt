@@ -148,13 +148,13 @@ fun UserOptDialog(
                         )
                         Divider(thickness = 0.5.dp)
                         DialogItem(
-                            txt = stringResource(id = R.string.compress_pdf_label),
+                            txt = stringResource(id = com.radaee.viewlib.R.string.compress_pdf_label),
                             onClick = { menuOpt(MenuItemType.Compress, fileBean) }
                         )
                         Divider(thickness = 0.5.dp)
                         if (fileBean.isImage()) {
                             DialogItem(
-                                txt = stringResource(id = R.string.convert_pdf_label),
+                                txt = stringResource(id = com.radaee.viewlib.R.string.convert_pdf_label),
                                 onClick = { menuOpt(MenuItemType.ConvertToPDF, fileBean) }
                             )
                             Divider(thickness = 0.5.dp)

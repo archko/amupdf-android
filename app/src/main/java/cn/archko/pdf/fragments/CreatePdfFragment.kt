@@ -10,18 +10,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import cn.archko.mupdf.R
-import cn.archko.mupdf.databinding.FragmentCreatePdfBinding
-import cn.archko.mupdf.databinding.ItemImageBinding
 import cn.archko.pdf.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.adapters.BaseViewHolder
-import cn.archko.pdf.base.BaseDialogFragment
 import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.listeners.DataListener
@@ -37,8 +36,7 @@ import java.io.File
 /**
  * @author: archko 2023/3/8 :14:34
  */
-class CreatePdfFragment :
-    BaseDialogFragment<FragmentCreatePdfBinding>(R.layout.fragment_create_pdf) {
+class CreatePdfFragment : DialogFragment() {
 
     protected lateinit var progressDialog: ProgressDialog
 
@@ -46,6 +44,13 @@ class CreatePdfFragment :
     var mDataListener: DataListener? = null
     private lateinit var adapter: BaseRecyclerAdapter<String>
     var oldPdfPath: String? = null
+
+    private var oldPdfPathView: TextView? = null
+    private var back: View? = null
+    private var btnSelect: View? = null
+    private var btnSave: View? = null
+    private var btnAdd: View? = null
+    private var recyclerView: RecyclerView? = null
 
     fun setListener(dataListener: DataListener?) {
         mDataListener = dataListener
@@ -72,12 +77,12 @@ class CreatePdfFragment :
 
     private fun selectPdf() {
         val builder = AlertDialog.Builder(activity)
-        builder.setView(layoutInflater.inflate(R.layout.dialog_pick_file, null))
+        builder.setView(layoutInflater.inflate(com.radaee.viewlib.R.layout.dialog_pick_file, null))
         val dlg = builder.create()
         dlg.setOnShowListener { dialog: DialogInterface? ->
-            val fb_view = dlg.findViewById<FileBrowserView>(R.id.fb_view)
+            val fb_view = dlg.findViewById<FileBrowserView>(com.radaee.viewlib.R.id.fb_view)
             val txt_filter =
-                dlg.findViewById<TextView>(R.id.extension_filter)
+                dlg.findViewById<TextView>(com.radaee.viewlib.R.id.extension_filter)
             txt_filter.text = "*.pdf"
             fb_view.FileInit(
                 Environment.getExternalStorageDirectory().path,
@@ -89,7 +94,7 @@ class CreatePdfFragment :
                     if (item.m_item.is_dir) fb_view.FileGotoSubdir(item.m_item._name) else {
                         val fullPath = item.m_item._path
                         oldPdfPath = fullPath
-                        binding.oldPdfPath.text = "Old pdf:$fullPath"
+                        oldPdfPathView?.text = "Old pdf:$fullPath"
                     }
                 }
         }
@@ -118,13 +123,27 @@ class CreatePdfFragment :
         }
     }
 
+    @Suppress("DEPRECATION")
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_create_pdf, container, false)
+        oldPdfPathView = view.findViewById(R.id.oldPdfPath)
+        back = view.findViewById(R.id.back)
+        btnSelect = view.findViewById(R.id.btnSelect)
+        btnSave = view.findViewById(R.id.btnSave)
+        btnAdd = view.findViewById(R.id.btnAdd)
+        recyclerView = view.findViewById(R.id.recyclerView)
+        return view
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.setTitle(R.string.menu_create)
-        binding.back.setOnClickListener { this@CreatePdfFragment.dismiss() }
-        binding.btnSelect.setOnClickListener { this@CreatePdfFragment.selectPdf() }
-        binding.btnSave.setOnClickListener { this@CreatePdfFragment.createPdf() }
-        binding.btnAdd.setOnClickListener { this@CreatePdfFragment.addItem() }
+        back?.setOnClickListener { this@CreatePdfFragment.dismiss() }
+        btnSelect?.setOnClickListener { this@CreatePdfFragment.selectPdf() }
+        btnSave?.setOnClickListener { this@CreatePdfFragment.createPdf() }
+        btnAdd?.setOnClickListener { this@CreatePdfFragment.addItem() }
 
         adapter = object : BaseRecyclerAdapter<String>(activity) {
 
@@ -132,25 +151,27 @@ class CreatePdfFragment :
                 parent: ViewGroup,
                 viewType: Int
             ): BaseViewHolder<String> {
-                val binding =
-                    ItemImageBinding.inflate(
-                        LayoutInflater.from(parent.context),
-                        parent,
-                        false
-                    )
-                return ViewHolder(binding)
+                val root = inflater.inflate(R.layout.item_image, parent, false)
+                return ViewHolder(root)
             }
         }
-        binding.recyclerView.layoutManager = GridLayoutManager(activity, 2)
-        binding.recyclerView.adapter = adapter
+        recyclerView?.layoutManager = GridLayoutManager(activity, 2)
+        recyclerView?.adapter = adapter
     }
 
-    inner class ViewHolder(private val binding: ItemImageBinding) :
-        BaseViewHolder<String>(binding.root) {
+    inner class ViewHolder(root: View) : BaseViewHolder<String>(root) {
+
+        var delete: View? = null
+        var ivImage: ImageView? = null
+
+        init {
+            delete = root.findViewById(R.id.delete)
+            ivImage = root.findViewById(R.id.ivImage)
+        }
 
         override fun onBind(data: String, position: Int) {
-            binding.delete.setOnClickListener { deleteItem(data, position) }
-            binding.ivImage.load(File(data))
+            delete?.setOnClickListener { deleteItem(data, position) }
+            ivImage?.load(File(data))
         }
     }
 
@@ -161,12 +182,12 @@ class CreatePdfFragment :
 
     private fun addItem() {
         val builder = AlertDialog.Builder(activity)
-        builder.setView(layoutInflater.inflate(R.layout.dialog_pick_file, null))
+        builder.setView(layoutInflater.inflate(com.radaee.viewlib.R.layout.dialog_pick_file, null))
         val dlg = builder.create()
         dlg.setOnShowListener { dialog: DialogInterface? ->
-            val fb_view = dlg.findViewById<FileBrowserView>(R.id.fb_view)
+            val fb_view = dlg.findViewById<FileBrowserView>(com.radaee.viewlib.R.id.fb_view)
             val txt_filter =
-                dlg.findViewById<TextView>(R.id.extension_filter)
+                dlg.findViewById<TextView>(com.radaee.viewlib.R.id.extension_filter)
             txt_filter.text = "*.jpg,*.jpeg,*.png"
             fb_view.FileInit(
                 Environment.getExternalStorageDirectory().path,

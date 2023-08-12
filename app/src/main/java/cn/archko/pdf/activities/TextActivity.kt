@@ -16,9 +16,9 @@ import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.SeekBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -34,7 +34,6 @@ import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.common.TextHelper
-import cn.archko.pdf.databinding.TextStyleBinding
 import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.fragments.FontsFragment
 import cn.archko.pdf.listeners.DataListener
@@ -59,7 +58,6 @@ class TextActivity : AppCompatActivity() {
     protected val pdfViewModel: PDFViewModel = PDFViewModel()
 
     private var mStyleControls: View? = null
-    private lateinit var binding: TextStyleBinding
     private var mControllerLayout: RelativeLayout? = null
     private var recyclerView: RecyclerView? = null
 
@@ -283,16 +281,30 @@ class TextActivity : AppCompatActivity() {
         mStyleControls?.visibility = View.VISIBLE
     }
 
+    private var fontSeekBar: SeekBar? = null
+    private var fontSizeLabel: TextView? = null
+    private var fontFaceSelected: TextView? = null
+    private var lineSpaceLabel: TextView? = null
+    private var colorLabel: TextView? = null
+    private var fontFaceChange: View? = null
+    private var linespaceMinus: View? = null
+    private var linespacePlus: View? = null
+    private var bgSetting: View? = null
+    private var fgSetting: View? = null
+
     private fun initStyleControls() {
         if (null == mStyleControls) {
-            binding = DataBindingUtil.inflate(
-                LayoutInflater.from(this),
-                R.layout.text_style,
-                null,
-                false
-            )
-            mStyleControls = binding.root
-            //LayoutInflater.from(context).inflate(R.layout.text_style, null, false)
+            mStyleControls = LayoutInflater.from(this).inflate(R.layout.text_style, null, false)
+            fontSeekBar = mStyleControls!!.findViewById(R.id.font_seek_bar)
+            fontSizeLabel = mStyleControls!!.findViewById(R.id.font_size_label)
+            fontFaceSelected = mStyleControls!!.findViewById(R.id.font_face_selected)
+            lineSpaceLabel = mStyleControls!!.findViewById(R.id.line_space_label)
+            colorLabel = mStyleControls!!.findViewById(R.id.color_label)
+            fontFaceChange = mStyleControls!!.findViewById(R.id.font_face_change)
+            linespaceMinus = mStyleControls!!.findViewById(R.id.linespace_minus)
+            linespacePlus = mStyleControls!!.findViewById(R.id.linespace_plus)
+            bgSetting = mStyleControls!!.findViewById(R.id.bg_setting)
+            fgSetting = mStyleControls!!.findViewById(R.id.fg_setting)
 
             val lp = RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -305,9 +317,9 @@ class TextActivity : AppCompatActivity() {
 
         mStyleHelper?.let {
             val progress = (it.styleBean?.textSize!! - START_PROGRESS).toInt()
-            binding.fontSizeLabel.text = String.format("%s", progress + START_PROGRESS)
-            binding.fontSeekBar.max = 10
-            binding.fontSeekBar.setOnSeekBarChangeListener(object :
+            fontSizeLabel?.text = String.format("%s", progress + START_PROGRESS)
+            fontSeekBar?.max = 10
+            fontSeekBar?.setOnSeekBarChangeListener(object :
                 SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(
                     seekBar: SeekBar?,
@@ -315,7 +327,7 @@ class TextActivity : AppCompatActivity() {
                     fromUser: Boolean
                 ) {
                     val index = (progress + START_PROGRESS)
-                    binding.fontSizeLabel.text = String.format("%s", index)
+                    fontSizeLabel?.text = String.format("%s", index)
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -327,22 +339,22 @@ class TextActivity : AppCompatActivity() {
                     updateReflowAdapter()
                 }
             })
-            binding.fontFaceSelected.text = it.fontHelper?.fontBean?.fontName
+            fontFaceSelected?.text = it.fontHelper?.fontBean?.fontName
 
-            binding.lineSpaceLabel.text = String.format("%s倍", it.styleBean?.lineSpacingMult)
-            binding.colorLabel.setBackgroundColor(it.styleBean?.bgColor!!)
-            binding.colorLabel.setTextColor(it.styleBean?.fgColor!!)
+            lineSpaceLabel?.text = String.format("%s倍", it.styleBean?.lineSpacingMult)
+            colorLabel?.setBackgroundColor(it.styleBean?.bgColor!!)
+            colorLabel?.setTextColor(it.styleBean?.fgColor!!)
             updateHeaderFooterBg()
         }
 
-        binding.fontFaceChange.setOnClickListener {
+        fontFaceChange?.setOnClickListener {
             FontsFragment.showFontsDialog(
                 this as FragmentActivity, mStyleHelper,
                 object : DataListener {
                     override fun onSuccess(vararg args: Any?) {
                         updateReflowAdapter()
                         val fBean = args[0] as FontBean
-                        binding.fontFaceSelected.text = fBean.fontName
+                        fontFaceSelected?.text = fBean.fontName
                     }
 
                     override fun onFailed(vararg args: Any?) {
@@ -350,7 +362,7 @@ class TextActivity : AppCompatActivity() {
                 })
         }
 
-        binding.linespaceMinus.setOnClickListener {
+        linespaceMinus?.setOnClickListener {
             var old = mStyleHelper?.styleBean?.lineSpacingMult
             if (old!! < 0.8f) {
                 return@setOnClickListener
@@ -358,7 +370,7 @@ class TextActivity : AppCompatActivity() {
             old = old.minus(0.1f)
             applyLineSpace(old)
         }
-        binding.linespacePlus.setOnClickListener {
+        linespacePlus?.setOnClickListener {
             var old = mStyleHelper?.styleBean?.lineSpacingMult
             if (old!! > 2.2f) {
                 return@setOnClickListener
@@ -366,11 +378,11 @@ class TextActivity : AppCompatActivity() {
             old = old?.plus(0.1f)
             applyLineSpace(old)
         }
-        binding.bgSetting.setOnClickListener {
+        bgSetting?.setOnClickListener {
             ColorPickerDialog()
                 .withColor(mStyleHelper?.styleBean?.bgColor!!)
                 .withListener { _, color ->
-                    binding.colorLabel.setBackgroundColor(color)
+                    colorLabel?.setBackgroundColor(color)
                     mStyleHelper?.styleBean?.bgColor = color
                     mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
                     updateReflowAdapter()
@@ -378,11 +390,11 @@ class TextActivity : AppCompatActivity() {
                 }
                 .show(supportFragmentManager, "colorPicker")
         }
-        binding.fgSetting.setOnClickListener {
+        fgSetting?.setOnClickListener {
             ColorPickerDialog()
                 .withColor(mStyleHelper?.styleBean?.fgColor!!)
                 .withListener { _, color ->
-                    binding.colorLabel.setTextColor(color)
+                    colorLabel?.setTextColor(color)
                     mStyleHelper?.styleBean?.fgColor = color
                     mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
                     updateReflowAdapter()
@@ -403,7 +415,7 @@ class TextActivity : AppCompatActivity() {
     }
 
     private fun applyLineSpace(old: Float?) {
-        binding.lineSpaceLabel.text = String.format("%s倍", old)
+        lineSpaceLabel?.text = String.format("%s倍", old)
         mStyleHelper?.styleBean?.lineSpacingMult = old!!
         mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
         updateReflowAdapter()

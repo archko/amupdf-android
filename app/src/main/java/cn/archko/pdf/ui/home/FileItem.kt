@@ -133,7 +133,7 @@ fun FileHeaderItem(
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
-                val path = stringResource(id = R.string.title_path) + current.label
+                val path = stringResource(id = cn.archko.pdf.R.string.title_path) + current.label
                 Text(
                     text = path,
                     maxLines = 2,

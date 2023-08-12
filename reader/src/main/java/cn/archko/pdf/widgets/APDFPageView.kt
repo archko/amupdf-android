@@ -89,7 +89,7 @@ class APDFPageView(
         setMeasuredDimension(width, height)
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         pdfPage.draw(canvas)
         if (showBookmark) {

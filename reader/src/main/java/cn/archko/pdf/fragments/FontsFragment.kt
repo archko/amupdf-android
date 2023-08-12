@@ -6,23 +6,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.adapters.BaseViewHolder
-import cn.archko.pdf.base.BaseDialogFragment
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.StyleHelper
-import cn.archko.pdf.databinding.FragmentFontBinding
-import cn.archko.pdf.databinding.ItemOutlineBinding
 import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.listeners.DataListener
 import cn.archko.pdf.utils.Utils
+import com.google.android.material.appbar.MaterialToolbar
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -30,13 +31,17 @@ import kotlinx.coroutines.launch
  * 字体列表
  * @author: archko 2019/9/29 :15:58
  */
-open class FontsFragment : BaseDialogFragment<FragmentFontBinding>(R.layout.fragment_font) {
+open class FontsFragment : DialogFragment() {
 
     lateinit var adapter: BaseRecyclerAdapter<FontBean>
     var mStyleHelper: StyleHelper? = null
     var mDataListener: DataListener? = null
     private lateinit var fontsViewModel: FontsViewModel
     protected val optionRepository = PdfOptionRepository(Graph.dataStore)
+
+    private var layoutSearch: View? = null
+    private var toolbar: MaterialToolbar? = null
+    private var recyclerView: RecyclerView? = null
 
     fun setStyleHelper(styleHelper: StyleHelper?) {
         this.mStyleHelper = styleHelper
@@ -67,12 +72,20 @@ open class FontsFragment : BaseDialogFragment<FragmentFontBinding>(R.layout.frag
         //MobclickAgent.onPageEnd(TAG)
     }
 
-    override fun setupView() {
-        binding.layoutSearch.visibility = View.GONE
-        binding.toolbar.setNavigationOnClickListener { dismiss() }
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_font, container, false)
+        layoutSearch = view.findViewById(R.id.layoutSearch)
+        recyclerView = view.findViewById(R.id.recyclerView)
 
-        binding.toolbar.setTitle(R.string.dialog_title_font)
-        binding.toolbar.setSubtitle(R.string.dialog_sub_title_font)
+        dialog?.setTitle("Fonts")
+
+        layoutSearch?.visibility = View.GONE
+        toolbar?.setNavigationOnClickListener { dismiss() }
+
+        toolbar?.setTitle(R.string.dialog_title_font)
+        toolbar?.setSubtitle(R.string.dialog_sub_title_font)
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -90,6 +103,8 @@ open class FontsFragment : BaseDialogFragment<FragmentFontBinding>(R.layout.frag
                 }
             }
         }
+
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -97,28 +112,28 @@ open class FontsFragment : BaseDialogFragment<FragmentFontBinding>(R.layout.frag
 
         adapter = object : BaseRecyclerAdapter<FontBean>(activity) {
 
-            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<FontBean> {
-                val binding =
-                    ItemOutlineBinding.inflate(
-                        LayoutInflater.from(parent.context),
-                        parent,
-                        false
-                    )
-                return FontHolder(binding)
+            override fun onCreateViewHolder(
+                parent: ViewGroup,
+                viewType: Int
+            ): BaseViewHolder<FontBean> {
+                val root = inflater.inflate(R.layout.item_outline, parent, false)
+                return FontHolder(root)
             }
         }
-        binding.recyclerView.adapter = adapter
+        recyclerView?.adapter = adapter
     }
 
-    inner class FontHolder(private val binding: ItemOutlineBinding) :
-        BaseViewHolder<FontBean>(binding.root) {
+    inner class FontHolder(private val root: View) :
+        BaseViewHolder<FontBean>(root) {
+        private var title: TextView? = null
 
         init {
             itemView.minimumHeight = Utils.dipToPixel(48f)
+            title = root.findViewById(R.id.title)
         }
 
         override fun onBind(data: FontBean?, position: Int) {
-            binding.title.setText(
+            title?.setText(
                 String.format(
                     getString(R.string.dialog_item_title_font),
                     data?.fontName
@@ -128,14 +143,14 @@ open class FontsFragment : BaseDialogFragment<FragmentFontBinding>(R.layout.frag
                 if (null != data.file) {
                     val typeface =
                         mStyleHelper?.fontHelper?.createFontByPath(data.file?.absolutePath!!)
-                    binding.title.setTypeface(typeface)
+                    title?.setTypeface(typeface)
                 }
             } else {
                 when (data?.fontType) {
-                    PdfOptionRepository.DEFAULT -> binding.title.setTypeface(Typeface.DEFAULT)
-                    PdfOptionRepository.SANS_SERIF -> binding.title.setTypeface(Typeface.SANS_SERIF)
-                    PdfOptionRepository.SERIF -> binding.title.setTypeface(Typeface.SERIF)
-                    PdfOptionRepository.MONOSPACE -> binding.title.setTypeface(Typeface.MONOSPACE)
+                    PdfOptionRepository.DEFAULT -> title?.setTypeface(Typeface.DEFAULT)
+                    PdfOptionRepository.SANS_SERIF -> title?.setTypeface(Typeface.SANS_SERIF)
+                    PdfOptionRepository.SERIF -> title?.setTypeface(Typeface.SERIF)
+                    PdfOptionRepository.MONOSPACE -> title?.setTypeface(Typeface.MONOSPACE)
                 }
             }
 

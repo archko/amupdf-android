@@ -5,8 +5,8 @@ object Versions {
 }
 
 object BuildConfig {
-    const val compileSdkVersion = 33
-    const val buildToolsVersion = "33.0.0"
+    const val compileSdkVersion = 34
+    const val buildToolsVersion = "34.0.0"
     const val minSdkVersion = 21
     const val targetSdkVersion = 31
     const val versionCode = 290
@@ -14,9 +14,9 @@ object BuildConfig {
 }
 
 object Libs {
-    const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.2.2"
+    const val jdkDesugar = "com.android.tools:desugar_jdk_libs:2.0.3"
     const val flinger = "com.github.iamjosephmj:flinger:1.1.1"
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.4.1"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:8.1.0"
 
     object Accompanist {
         const val version = "0.30.1"
@@ -36,13 +36,13 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.8.10"
+        private const val version = "1.9.0"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
 
 
-        const val ksp = "1.8.0-1.0.9"
+        const val ksp = "1.9.0-1.0.11"
         const val kspGradlePlugin = "com.google.devtools.ksp.gradle.plugin:$ksp"
     }
 
@@ -64,8 +64,8 @@ object Libs {
         const val navigation = "androidx.navigation:navigation-compose:2.5.3"
 
         object Compose {
-            const val compiler_version = "1.4.4"
-            const val composeBomVersion = "2023.04.01"
+            const val compiler_version = "1.5.0"
+            const val composeBomVersion = "2023.06.01"
 
             const val runtime = "androidx.compose.runtime:runtime"
             const val runtimeLivedata = "androidx.compose.runtime:runtime-livedata"
@@ -85,9 +85,6 @@ object Libs {
             const val uiTest = "androidx.compose.ui:ui-test-junit4"
 
             object Material3 {
-                const val snapshot = ""
-                const val version = "1.1.0-alpha06"
-
                 const val material3 = "androidx.compose.material3:material3"
                 const val material3WindowSizeClass =
                     "androidx.compose.material3:material3-window-size-class"
@@ -95,7 +92,7 @@ object Libs {
         }
 
         object Activity {
-            const val activityCompose = "androidx.activity:activity-compose:1.7.1"
+            const val activityCompose = "androidx.activity:activity-compose:1.8.0-alpha06"
             const val activityKtx = "androidx.activity:activity-ktx:1.6.1"
             const val appCompat = "androidx.appcompat:appcompat:1.6.1"
             const val annotations = "androidx.annotation:annotation:1.4.0"
@@ -140,7 +137,7 @@ object Libs {
         }
 
         object Room {
-            private const val version = "2.5.0"
+            private const val version = "2.5.2"
             const val runtime = "androidx.room:room-runtime:${version}"
             const val ktx = "androidx.room:room-ktx:${version}"
             const val compiler = "androidx.room:room-compiler:${version}"

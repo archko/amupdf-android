@@ -70,8 +70,8 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         super.initView()
 
         mPageSeekBarControls?.updateTitle(mPath)
-        mLeftDrawer = findViewById(R.id.left_drawer)
-        mDrawerLayout = findViewById(R.id.drawerLayout)
+        mLeftDrawer = findViewById(cn.archko.pdf.R.id.left_drawer)
+        mDrawerLayout = findViewById(cn.archko.pdf.R.id.drawerLayout)
 
         mControllerLayout = findViewById(R.id.layout)
 
@@ -101,7 +101,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         }
 
         mContentView = findViewById(R.id.content)
-        mDocumentView = findViewById(R.id.document_view)
+        mDocumentView = findViewById(cn.archko.pdf.R.id.document_view)
 
         initTouchParams()
     }
@@ -142,7 +142,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             }
 
             override fun onScroll(
-                e1: MotionEvent,
+                e1: MotionEvent?,
                 e2: MotionEvent,
                 distanceX: Float,
                 distanceY: Float
@@ -155,7 +155,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             }
 
             override fun onFling(
-                e1: MotionEvent,
+                e1: MotionEvent?,
                 e2: MotionEvent,
                 velocityX: Float,
                 velocityY: Float
@@ -421,7 +421,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
         Toast.makeText(
             this,
-            if (mReflow) getString(R.string.entering_reflow_mode) else getString(R.string.leaving_reflow_mode),
+            if (mReflow) getString(cn.archko.pdf.R.string.entering_reflow_mode) else getString(cn.archko.pdf.R.string.leaving_reflow_mode),
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -567,7 +567,11 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
     private fun cropModeSet(crop: Boolean): Boolean {
         if (mReflow) {
-            Toast.makeText(this, getString(R.string.in_reflow_mode), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                getString(cn.archko.pdf.R.string.in_reflow_mode),
+                Toast.LENGTH_SHORT
+            ).show()
             mPageSeekBarControls?.reflowButton!!.setColorFilter(Color.argb(0xFF, 172, 114, 37))
             mPageSeekBarControls?.autoCropButton!!.setColorFilter(Color.argb(0xFF, 255, 255, 255))
             return false

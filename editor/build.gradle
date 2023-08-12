@@ -3,6 +3,8 @@ apply from: "../gradle/library_common.gradle"
 import cn.archko.mupdf.buildsrc.*
 
 android {
+    namespace 'com.artifex.sonui.editor'
+
     defaultConfig {
         vectorDrawables {
             /*
