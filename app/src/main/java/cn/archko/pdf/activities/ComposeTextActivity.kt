@@ -52,6 +52,7 @@ import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Graph
+import cn.archko.pdf.common.ImageLoader
 import cn.archko.pdf.common.ImageWorker
 import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.PdfImageDecoder
@@ -66,6 +67,7 @@ import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.StatusBarHelper
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
+import com.baidu.ai.edge.ui.activity.OcrActivity
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
 import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -291,12 +293,12 @@ class ComposeTextActivity : ComponentActivity() {
                 aPage,
                 mupdfDocument.document,
             )
-            val bitmap = ImageLoader.decodeFromPDF(
+            val bitmap = /*ImageLoader.decodeFromPDF(
                 decodeParam.key,
                 decodeParam.pageNum,
                 decodeParam.zoom,
                 decodeParam.screenWidth
-            )
+            )*/
                 PdfImageDecoder.decode(decodeParam)
             //val file = FileUtils.getDiskCacheDir(App.instance, pos.toString())
             //BitmapUtils.saveBitmapToFile(bitmap, file)
@@ -338,6 +340,10 @@ class ComposeTextActivity : ComponentActivity() {
             val intent = Intent(context, ComposeTextActivity::class.java)
             intent.putExtra("path", path)
             context.startActivity(intent)
+        }
+
+        fun startOcrActivity(context: Context, bitmap: Bitmap?, path: String?, pos: Int) {
+            OcrActivity.start(context, bitmap, path, pos.toString())
         }
     }
 }
