@@ -283,7 +283,7 @@ class ComposeTextActivity : ComponentActivity() {
     }
 
     private fun ocr(pos: Int, mupdfDocument: MupdfDocument, aPage: APage) {
-        /*AppExecutors.instance.networkIO().execute {
+        AppExecutors.instance.networkIO().execute {
             val decodeParam = ImageWorker.DecodeParam(
                 aPage.toString(),
                 true,
@@ -291,18 +291,18 @@ class ComposeTextActivity : ComponentActivity() {
                 aPage,
                 mupdfDocument.document,
             )
-            val bitmap = *//*ImageLoader.decodeFromPDF(
+            val bitmap = ImageLoader.decodeFromPDF(
                 decodeParam.key,
                 decodeParam.pageNum,
                 decodeParam.zoom,
                 decodeParam.screenWidth
-            )*//*
+            )
                 PdfImageDecoder.decode(decodeParam)
             //val file = FileUtils.getDiskCacheDir(App.instance, pos.toString())
             //BitmapUtils.saveBitmapToFile(bitmap, file)
             AppExecutors.instance.mainThread()
                 .execute { startOcrActivity(this, bitmap, null, pos) }
-        }*/
+        }
     }
 
     override fun onPause() {

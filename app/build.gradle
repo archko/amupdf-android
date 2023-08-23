@@ -11,6 +11,8 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
+    namespace "com.radaee.pdfmaster"
+
     signingConfigs {
         release {
             v1SigningEnabled true

@@ -4,7 +4,7 @@ include ':reader'
 include ':readercommon'
 include ':vudroid'
 include ':core-ui'
-//include ':paddle-ocr'
+include ':paddle-ocr'
 
 include ':library'
 include ':editor'
