@@ -28,6 +28,7 @@ import android.widget.Scroller;
 import com.artifex.solib.ArDkBitmap;
 import com.artifex.solib.ArDkPage;
 import com.artifex.solib.ArDkSelectionLimits;
+import com.artifex.solib.BuildConfig;
 import com.artifex.solib.ConfigOptions;
 import com.artifex.solib.ArDkDoc;
 import com.artifex.solib.SODoc;

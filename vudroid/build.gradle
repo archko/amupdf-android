@@ -10,6 +10,7 @@ android {
             jniLibs.srcDirs = ['libs']
         }
     }
+    namespace 'org.vudroid'
 }
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')

@@ -1,6 +1,8 @@
 apply from: "../../gradle/library_common.gradle"
 
 android {
+    namespace 'com.artifex.mupdf.fitz.m'
+
     defaultConfig {
         consumerProguardFiles 'proguard-rules.pro'
     }

@@ -78,6 +78,10 @@ sealed class MenuItemType {
     object AddToFav : MenuItemType()
     object DeleteFav : MenuItemType()
     object OpenWithOther : MenuItemType()
+    object Compress : MenuItemType()
+    object EncryptPDF : MenuItemType()
+    object DecryptPDF : MenuItemType()
+    object ConvertToPDF : MenuItemType()
 }
 
 sealed class FileBeanType {

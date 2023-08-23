@@ -9,6 +9,8 @@ apply plugin: "kotlin-parcelize"
 apply plugin: "kotlin-kapt"
 
 android {
+    namespace 'com.google.samples.apps.nowinandroid.core.ui'
+
     compileOptions {
         encoding "UTF-8"
         sourceCompatibility JavaVersion.VERSION_1_8

@@ -1,56 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minWidth="320dp"
+    android:minHeight="300dp"
+    android:orientation="vertical">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        app:navigationIcon="@drawable/ic_nav"
+        app:popupTheme="@style/ThemeOverlay.MaterialComponents.ActionBar"
+        app:title="@string/menu_search"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:minWidth="320dp"
-        android:minHeight="300dp"
-        android:orientation="vertical">
+        android:layout_height="wrap_content" />
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+    <RelativeLayout
+        android:id="@+id/layoutSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/searchEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:navigationIcon="@drawable/ic_nav"
-            app:popupTheme="@style/ThemeOverlay.MaterialComponents.ActionBar"
-            app:title="@string/menu_search" />
+            android:paddingLeft="3dip"
+            android:paddingRight="20dp"
+            android:text="" />
 
-        <RelativeLayout
-            android:id="@+id/layoutSearch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/imgClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="4dp"
+            android:src="@drawable/ic_close_white_24dp" />
+    </RelativeLayout>
 
-            <EditText
-                android:id="@+id/searchEdit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="3dip"
-                android:paddingRight="20dp"
-                android:text="" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:itemCount="6"
+        tools:listitem="@layout/item_outline"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:cacheColorHint="#00000000"
+        android:fastScrollAlwaysVisible="false"
+        android:paddingBottom="4dp"
+        android:smoothScrollbar="false" />
 
-            <ImageView
-                android:id="@+id/imgClose"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="4dp"
-                android:src="@drawable/ic_close_white_24dp" />
-        </RelativeLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:cacheColorHint="#00000000"
-            android:fastScrollAlwaysVisible="false"
-            android:paddingBottom="4dp"
-            android:smoothScrollbar="false"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="6"
-            tools:listitem="@layout/item_outline" />
-
-    </LinearLayout>
-</layout>
+</LinearLayout>

@@ -24,6 +24,8 @@ android {
     compileSdkVersion BuildConfig.compileSdkVersion
     buildToolsVersion BuildConfig.buildToolsVersion
 
+    namespace 'cn.archko.mupdf'
+
     defaultConfig {
         applicationId 'cn.archko.mupdf'
         minSdkVersion BuildConfig.minSdkVersion
@@ -103,13 +105,6 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion Libs.AndroidX.Compose.compiler_version
-    }
-
-    dataBinding {
-        enabled = true
-    }
-    viewBinding {
-        enabled = true
     }
 
     packagingOptions {

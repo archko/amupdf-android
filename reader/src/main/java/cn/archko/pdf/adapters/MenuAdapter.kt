@@ -1,10 +1,10 @@
 package cn.archko.pdf.adapters
 
 import android.content.Context
+import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
+import android.widget.TextView
 import cn.archko.pdf.R
-import cn.archko.pdf.databinding.ItemOutlineBinding
 import cn.archko.pdf.entity.MenuBean
 import cn.archko.pdf.listeners.MenuListener
 import cn.archko.pdf.utils.Utils
@@ -17,22 +17,22 @@ class MenuAdapter public constructor(
     private var context: Context?
 ) : BaseRecyclerAdapter<MenuBean>(context) {
 
-    lateinit var binding: ItemOutlineBinding
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<MenuBean> {
-        binding = DataBindingUtil.inflate(inflater, R.layout.item_outline, parent, false)
+        val binding = inflater.inflate(R.layout.item_outline, parent, false)
         return MenuHolder(binding)
     }
 
-    inner class MenuHolder(private val binding: ItemOutlineBinding) :
-        BaseViewHolder<MenuBean>(binding.root) {
+    inner class MenuHolder(private val root: View) :
+        BaseViewHolder<MenuBean>(root) {
+        private var title: TextView? = null
 
         init {
             itemView.minimumHeight = Utils.dipToPixel(48f)
+            title = root.findViewById(R.id.title)
         }
 
         override fun onBind(data: MenuBean?, position: Int) {
-            binding.title.setText(data?.title)
+            title?.setText(data?.title)
             itemView.setOnClickListener {
                 menuListener?.onMenuSelected(data, position)
             }

@@ -3,10 +3,12 @@ package cn.archko.pdf
 import android.app.Application
 import cn.archko.pdf.common.CrashHandler
 import cn.archko.pdf.common.Graph
+import coil.ImageLoader
+import coil.ImageLoaderFactory
 import com.jeremyliao.liveeventbus.LiveEventBus
 
-class App : Application() {
-    private val appkey = "5c15f639f1f556978b0009c8"
+class App : Application(), ImageLoaderFactory {
+    //private val appkey = "5c15f639f1f556978b0009c8"
     var screenHeight = 720
     var screenWidth = 1080
     override fun onCreate() {
@@ -24,6 +26,12 @@ class App : Application() {
             .supportBroadcast(this)
             .lifecycleObserverAlwaysActive(true)
             .autoClear(false)
+    }
+
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .crossfade(true)
+            .build()
     }
 
     companion object {

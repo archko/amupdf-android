@@ -1,7 +1,6 @@
 package cn.archko.pdf.utils
 
-import androidx.compose.ui.text.toLowerCase
-import cn.archko.mupdf.R
+import com.artifex.sonui.editor.R
 import cn.archko.pdf.entity.FileBean
 import java.util.*
 

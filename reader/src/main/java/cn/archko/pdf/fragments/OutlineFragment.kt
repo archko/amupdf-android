@@ -5,23 +5,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.adapters.BaseViewHolder
-import cn.archko.pdf.databinding.FragmentOutlineBinding
-import cn.archko.pdf.databinding.ItemOutlineBinding
+import cn.archko.pdf.base.BaseFragment
 import cn.archko.pdf.entity.OutlineItem
 import cn.archko.pdf.listeners.OutlineListener
-import cn.archko.pdf.base.BaseFragment
 
 /**
  * @author: archko 2019/7/11 :17:55
  */
-open class OutlineFragment : BaseFragment<FragmentOutlineBinding>(R.layout.fragment_outline) {
+open class OutlineFragment : BaseFragment() {
 
     private lateinit var adapter: BaseRecyclerAdapter<OutlineItem>
     private var outlineItems: ArrayList<OutlineItem>? = null
     private var currentPage: Int = 0
+    private var recyclerView: RecyclerView? = null
+    private var nodataView: View? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,8 +40,12 @@ open class OutlineFragment : BaseFragment<FragmentOutlineBinding>(R.layout.fragm
         }
     }
 
-    override fun setupView() {
-        binding.recyclerView.itemAnimator = null
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_outline, container, false)
+        recyclerView = view.findViewById(R.id.recyclerView)
+        recyclerView?.itemAnimator = null
 
         //if (null != outlineItems) {
         //    val treeAdapter = TreeAdapter(activity, outlineItems)
@@ -55,7 +61,7 @@ open class OutlineFragment : BaseFragment<FragmentOutlineBinding>(R.layout.fragm
         //}
 
         if (outlineItems == null) {
-            binding.nodataView.visibility = View.VISIBLE
+            nodataView?.visibility = View.VISIBLE
         } else {
             adapter = object : BaseRecyclerAdapter<OutlineItem>(activity, outlineItems!!) {
 
@@ -63,20 +69,16 @@ open class OutlineFragment : BaseFragment<FragmentOutlineBinding>(R.layout.fragm
                     parent: ViewGroup,
                     viewType: Int
                 ): BaseViewHolder<OutlineItem> {
-                    val binding =
-                        ItemOutlineBinding.inflate(
-                            LayoutInflater.from(parent.context),
-                            parent,
-                            false
-                        )
-                    return ViewHolder(binding)
+                    val root = inflater.inflate(R.layout.item_outline, parent, false)
+                    return ViewHolder(root)
                 }
             }
-            binding.recyclerView.adapter = adapter
+            recyclerView?.adapter = adapter
             if (adapter.itemCount > 0) {
                 updateSelection(currentPage)
             }
         }
+        return view
     }
 
     open fun updateSelection(currentPage: Int) {
@@ -96,11 +98,11 @@ open class OutlineFragment : BaseFragment<FragmentOutlineBinding>(R.layout.fragm
         }
         if (found >= 0) {
             val finalFound = found
-            binding.recyclerView.viewTreeObserver.addOnGlobalLayoutListener(object :
+            recyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object :
                 ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    binding.recyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    binding.recyclerView.scrollToPosition(finalFound)
+                    recyclerView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+                    recyclerView?.scrollToPosition(finalFound)
                 }
             })
         }
@@ -111,12 +113,21 @@ open class OutlineFragment : BaseFragment<FragmentOutlineBinding>(R.layout.fragm
         ac.onSelectedOutline(item.page)
     }
 
-    inner class ViewHolder(private val binding: ItemOutlineBinding) :
-        BaseViewHolder<OutlineItem>(binding.root) {
+    inner class ViewHolder(private val root: View) :
+        BaseViewHolder<OutlineItem>(root) {
+
+
+        var title: TextView? = null
+        var page: TextView? = null
+
+        init {
+            title = root.findViewById(R.id.title)
+            page = root.findViewById(R.id.page)
+        }
 
         override fun onBind(data: OutlineItem, position: Int) {
-            binding.title.text = data.title
-            binding.page.text = (data.page.plus(1)).toString()
+            title?.text = data.title
+            page?.text = (data.page.plus(1)).toString()
             itemView.setOnClickListener { onListItemClick(data) }
         }
     }

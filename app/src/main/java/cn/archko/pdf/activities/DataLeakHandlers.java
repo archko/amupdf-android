@@ -79,7 +79,7 @@ public class DataLeakHandlers implements SODataLeakHandlers {
                                          final String message,
                                          final boolean cancelable) {
         mProgressDialog = new ProgressDialog(mActivity,
-                R.style.Theme_AppCompat_Dialog_Alert);
+                androidx.appcompat.R.style.Theme_AppCompat_Dialog_Alert);
 
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setCancelable(cancelable);
@@ -97,7 +97,7 @@ public class DataLeakHandlers implements SODataLeakHandlers {
     private void displayDialogue(final String title, final String message) {
         AlertDialog alertDialog = new AlertDialog(
                 new ContextThemeWrapper(mActivity,
-                        R.style.Theme_AppCompat_Dialog_Alert)) {
+                        androidx.appcompat.R.style.Theme_AppCompat_Dialog_Alert)) {
             @Override
             public boolean dispatchTouchEvent(MotionEvent event) {
                 /*

@@ -58,7 +58,7 @@ public class PageSeekBarControls extends LinearLayout implements BringUpZoomCont
         addView(this.mPageSlider, lp);
 
         mPageNumberView = new TextView(context);
-        mPageNumberView.setBackgroundResource(R.drawable.bg_page_num);
+        //mPageNumberView.setBackgroundResource(R.drawable.bg_page_num);
         mPageNumberView.setTextColor(getResources().getColor(android.R.color.white));
         //mPageNumberView.setTextAppearance(context, android.R.attr.textAppearanceMedium);
         lp = new LayoutParams(
