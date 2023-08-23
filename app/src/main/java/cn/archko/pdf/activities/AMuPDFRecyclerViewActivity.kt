@@ -73,7 +73,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         mLeftDrawer = findViewById(cn.archko.pdf.R.id.left_drawer)
         mDrawerLayout = findViewById(cn.archko.pdf.R.id.drawerLayout)
 
-        mControllerLayout = findViewById(R.id.layout)
+        mControllerLayout = findViewById(cn.archko.pdf.R.id.layout)
 
         mPageSeekBarControls = createSeekControls()
 
@@ -100,7 +100,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             )
         }
 
-        mContentView = findViewById(R.id.content)
+        mContentView = findViewById(cn.archko.pdf.R.id.content)
         mDocumentView = findViewById(cn.archko.pdf.R.id.document_view)
 
         initTouchParams()

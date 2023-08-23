@@ -24,8 +24,6 @@ android {
     compileSdkVersion BuildConfig.compileSdkVersion
     buildToolsVersion BuildConfig.buildToolsVersion
 
-    namespace 'cn.archko.mupdf'
-
     defaultConfig {
         //applicationId 'cn.archko.mupdf'
         applicationId "com.radaee.pdfmaster"
