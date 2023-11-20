@@ -77,7 +77,7 @@ fun TextViewer(
                     onDoubleTap = {
                     },
                     onTap = {
-                        scrollOnTab(
+                        scrollOnTap(
                             coroutineScope,
                             listState,
                             it,
