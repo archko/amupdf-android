@@ -142,7 +142,7 @@ fun ImageViewer(
                         } else if (showOutlineDialog.value) {
                             showOutlineDialog.value = false
                         } else {
-                            scrollOnTab(
+                            scrollOnTap(
                                 coroutineScope,
                                 listState,
                                 it,
@@ -437,7 +437,7 @@ fun addMenu(text: String, color: Int, list: ArrayList<BaseMenu>) {
     list.add(menu)
 }
 
-fun scrollOnTab(
+fun scrollOnTap(
     coroutineScope: CoroutineScope,
     listState: LazyListState,
     offset: Offset,
