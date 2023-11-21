@@ -1,3 +1,4 @@
+import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.view.View
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.LinearProgressIndicator
@@ -73,6 +75,7 @@ import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.paging.itemsIndexed
 import cn.archko.pdf.ui.home.OutlineMenu
+import cn.archko.pdf.utils.LinkUtils
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.BaseMenu
@@ -143,6 +146,7 @@ fun ImageViewer(
                             showOutlineDialog.value = false
                         } else {
                             scrollOnTap(
+                                context,
                                 coroutineScope,
                                 listState,
                                 it,
@@ -150,7 +154,9 @@ fun ImageViewer(
                                 screenHeight,
                                 screenWidth,
                                 margin,
-                                onClick
+                                onClick,
+                                list,
+                                mupdfDocument
                             )
                         }
                     }
@@ -438,6 +444,7 @@ fun addMenu(text: String, color: Int, list: ArrayList<BaseMenu>) {
 }
 
 fun scrollOnTap(
+    context: Context,
     coroutineScope: CoroutineScope,
     listState: LazyListState,
     offset: Offset,
@@ -445,9 +452,17 @@ fun scrollOnTap(
     screenHeight: Float,
     screenWidth: Float,
     margin: Int,
-    onClick: (pos: Int) -> Unit
+    onClick: (pos: Int) -> Unit,
+    list: List<APage>?,
+    mupdfDocument: MupdfDocument?
 ) {
+    if (null == list || null == mupdfDocument) { //textreaderview时是空
+        return
+    }
     coroutineScope.launch {
+        if (tryHyperlink(context, offset, listState, mupdfDocument, list)) {
+            return@launch
+        }
         val h = if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             if (screenWidth < screenHeight) {
                 screenHeight
@@ -476,6 +491,35 @@ fun scrollOnTap(
         }
         Logcat.d("scroll:$top, bottom:$bottom, y:$y,h:$h, screenHeight:$screenHeight, margin:$margin, scrollY:$scrollY, firstVisibleItemIndex:${listState.firstVisibleItemIndex}")
     }
+}
+
+private suspend fun tryHyperlink(
+    context: Context,
+    offset: Offset,
+    listState: LazyListState,
+    mupdfDocument: MupdfDocument,
+    list: List<APage>
+): Boolean {
+    val lazyListItemInfos = listState.layoutInfo.visibleItemsInfo
+    var lazyListItemInfo: LazyListItemInfo? = null
+    var index = listState.firstVisibleItemIndex
+    for (listItemInfo in lazyListItemInfos) {
+        //listItemInfo.offset 这个是第二个页面顶部距离顶部的当前显示的偏移量,要加上listItemInfo.size,才能确定offset.y是落在这个区间的,得到当前点击的页面.
+        if (listItemInfo.offset < offset.y && (listItemInfo.size + listItemInfo.offset) > offset.y) {
+            lazyListItemInfo = listItemInfo
+            index = listItemInfo.index
+        }
+    }
+
+    return LinkUtils.hyperLink(
+        context,
+        offset,
+        index,
+        mupdfDocument,
+        listState,
+        list[index],
+        lazyListItemInfo
+    )
 }
 
 @Composable

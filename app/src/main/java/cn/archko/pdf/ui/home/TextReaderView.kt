@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.SpanStyle
@@ -54,6 +55,7 @@ fun TextViewer(
     val list = result.list!!
     val listState = rememberLazyListState(0)
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val configuration = LocalConfiguration.current
     val screenHeight = with(LocalDensity.current) {
@@ -78,6 +80,7 @@ fun TextViewer(
                     },
                     onTap = {
                         scrollOnTap(
+                            context,
                             coroutineScope,
                             listState,
                             it,
@@ -85,7 +88,9 @@ fun TextViewer(
                             screenHeight,
                             screenWidth,
                             margin,
-                            onClick
+                            onClick,
+                            null,
+                            null
                         )
                     }
                 )
