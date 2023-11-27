@@ -5,7 +5,11 @@ import android.view.View
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +32,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -43,6 +49,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -56,6 +63,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -80,6 +88,7 @@ import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.BaseMenu
 import cn.archko.pdf.widgets.CakeView
+import cn.archko.pdf.widgets.LazyColumnScrollbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.cos
@@ -87,6 +96,7 @@ import kotlin.math.sin
 
 @Composable
 fun ImageViewer(
+    modifier: Modifier = Modifier,
     result: LoadResult<Any, APage>,
     pdfViewModel: PDFViewModel,
     styleHelper: StyleHelper?,
@@ -96,7 +106,6 @@ fun ImageViewer(
     height: Int,
     margin: Int,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-    modifier: Modifier = Modifier,
     finish: () -> Unit,
     ocr: (pos: Int, mupdfDocument: MupdfDocument, aPage: APage) -> Unit
 ) {
@@ -115,7 +124,7 @@ fun ImageViewer(
 
     val showMenu = remember { mutableStateOf(false) }
     val showOutlineDialog = remember { mutableStateOf(false) }
-    val currentPage = remember { mutableStateOf(0) }
+    val currentPage = remember { mutableIntStateOf(0) }
     val cropState = remember { mutableStateOf(true) }
     cropState.value = pdfViewModel.bookProgress?.autoCrop == 0
 
@@ -131,6 +140,17 @@ fun ImageViewer(
             showOutlineDialog.value = false
         })
     }
+
+    val scale = remember { mutableFloatStateOf(1f) }
+    val scope = rememberCoroutineScope()
+    val gestureEnd: (Boolean) -> Unit = { transformOnly ->
+        if (transformOnly) {
+            scope.launch {
+            }
+        }
+    }
+
+    var pan by remember { mutableStateOf(Offset.Zero) }
 
     Box(
         modifier = modifier
@@ -195,11 +215,50 @@ fun ImageViewer(
                 lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
-        Box(modifier = modifier) {
+        LazyColumnScrollbar(
+            listState, alwaysShowScrollBar = false,
+            /*indicatorContent = { index, isThumbSelected ->
+                IndicatorContent(index, isThumbSelected)
+            }*/
+        ) {
             LazyColumn(
                 state = listState,
                 flingBehavior = CustomFlingBehaviours.smoothScroll(),
                 modifier = modifier
+                    .pointerInput(Unit) {
+                        forEachGesture {
+                            awaitPointerEventScope {
+                                var zoom = scale.floatValue
+                                // Wait for at least one pointer to press down
+                                awaitFirstDown()
+                                var moveCount = 0
+                                do {
+                                    val event = awaitPointerEvent()
+                                    if (event.type == PointerEventType.Move) moveCount++
+                                    val canceled =
+                                        event.changes.fastAny { it.isConsumed }
+                                    if (!canceled) {
+                                        // Calculate gestures and consume pointerInputChange
+                                        // only size of pointers down is 2
+                                        val panChange = event.calculatePan()
+                                        pan += panChange
+
+                                        if (event.changes.size == 2) {
+                                            zoom *= event.calculateZoom()
+                                            // Limit zoom between 100% and 300%
+                                            zoom = zoom.coerceIn(1f, 3f)
+                                            scale.floatValue = zoom
+
+                                            event.changes.forEach {
+                                                it.consume()
+                                            }
+                                        }
+                                    }
+                                } while (event.changes.any { it.pressed })
+                                gestureEnd(moveCount != 0)
+                            }
+                        }
+                    }
             ) {
                 itemsIndexed(list) { index, aPage ->
                     if (index > 0) {
@@ -228,82 +287,82 @@ fun ImageViewer(
                     }
                 }
             }
+        }
 
-            if (showMenu.value) {
-                val menus = arrayListOf<BaseMenu>()
+        if (showMenu.value) {
+            val menus = arrayListOf<BaseMenu>()
 
-                val color = Color(0xff1d84fb).toArgb()
-                val sColor = Color(0xFFAC7225).toArgb()
-                addMenu("设置", color, menus)
-                if (pdfViewModel.bookProgress?.reflow == 0) {   //不重排
-                    addMenu("重排", color, menus)
+            val color = Color(0xff1d84fb).toArgb()
+            val sColor = Color(0xFFAC7225).toArgb()
+            addMenu("设置", color, menus)
+            if (pdfViewModel.bookProgress?.reflow == 0) {   //不重排
+                addMenu("重排", color, menus)
 
-                    if (pdfViewModel.bookProgress?.autoCrop == 0) {
-                        addMenu("切割", sColor, menus)
-                    } else {
-                        addMenu("切割", color, menus)
-                    }
-                } else {    //文本重排,切割不生效
-                    addMenu("重排", sColor, menus)
+                if (pdfViewModel.bookProgress?.autoCrop == 0) {
+                    addMenu("切割", sColor, menus)
+                } else {
                     addMenu("切割", color, menus)
                 }
-                addMenu("字体", color, menus)
-                addMenu("大纲", color, menus)
-                addMenu("识别文本", color, menus)
-                addMenu("退出", color, menus)
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .align(Alignment.Center),
-                ) {
-                    //draw(menus)
-                    val cakeView = remember {
-                        CakeView(context)
-                    }
-                    cakeView.setCakeData(menus)
-                    cakeView.viewOnclickListener = object : CakeView.ViewOnclickListener {
-                        override fun onViewClick(v: View?, position: Int) {
-                            Logcat.d("click:$position,${menus[position]}")
-                            if (position == 4) {
-                                currentPage.value = listState.firstVisibleItemIndex
-                                showOutlineDialog.value = true
-                            } else if (position == 1) {
-                                if (pdfViewModel.bookProgress?.reflow == 0) {
-                                    pdfViewModel.bookProgress?.reflow = 1
-                                } else {
-                                    pdfViewModel.bookProgress?.reflow = 0
-                                }
-                            } else if (position == 2) {
-                                if (pdfViewModel.bookProgress?.reflow == 0) {   //文本重排:1时,切割不生效
-                                    if (pdfViewModel.bookProgress?.autoCrop == 0) {
-                                        pdfViewModel.bookProgress?.autoCrop = 1
-                                    } else {
-                                        pdfViewModel.bookProgress?.autoCrop = 0
-                                    }
-                                    cropState.value = pdfViewModel.bookProgress?.autoCrop == 0
-                                }
-                            } else if (position == 5) {
-                                //ocr识别文本
-                                val index = listState.firstVisibleItemIndex
-                                ocr(index, mupdfDocument, list.get(index))
+            } else {    //文本重排,切割不生效
+                addMenu("重排", sColor, menus)
+                addMenu("切割", color, menus)
+            }
+            addMenu("字体", color, menus)
+            addMenu("大纲", color, menus)
+            addMenu("识别文本", color, menus)
+            addMenu("退出", color, menus)
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center),
+            ) {
+                //draw(menus)
+                val cakeView = remember {
+                    CakeView(context)
+                }
+                cakeView.setCakeData(menus)
+                cakeView.viewOnclickListener = object : CakeView.ViewOnclickListener {
+                    override fun onViewClick(v: View?, position: Int) {
+                        Logcat.d("click:$position,${menus[position]}")
+                        if (position == 4) {
+                            currentPage.value = listState.firstVisibleItemIndex
+                            showOutlineDialog.value = true
+                        } else if (position == 1) {
+                            if (pdfViewModel.bookProgress?.reflow == 0) {
+                                pdfViewModel.bookProgress?.reflow = 1
                             } else {
-                                finish()
+                                pdfViewModel.bookProgress?.reflow = 0
                             }
-                            showMenu.value = false
+                        } else if (position == 2) {
+                            if (pdfViewModel.bookProgress?.reflow == 0) {   //文本重排:1时,切割不生效
+                                if (pdfViewModel.bookProgress?.autoCrop == 0) {
+                                    pdfViewModel.bookProgress?.autoCrop = 1
+                                } else {
+                                    pdfViewModel.bookProgress?.autoCrop = 0
+                                }
+                                cropState.value = pdfViewModel.bookProgress?.autoCrop == 0
+                            }
+                        } else if (position == 5) {
+                            //ocr识别文本
+                            val index = listState.firstVisibleItemIndex
+                            ocr(index, mupdfDocument, list.get(index))
+                        } else {
+                            finish()
                         }
-
-                        override fun onViewCenterClick() {
-
-                        }
+                        showMenu.value = false
                     }
-                    AndroidView(
-                        { cakeView },
-                        modifier = Modifier
-                            .padding(28.dp)
-                            .width(220.dp)
-                            .height(220.dp)
-                    ) {
+
+                    override fun onViewCenterClick() {
+
                     }
+                }
+                AndroidView(
+                    { cakeView },
+                    modifier = Modifier
+                        .padding(28.dp)
+                        .width(220.dp)
+                        .height(220.dp)
+                ) {
                 }
             }
         }
