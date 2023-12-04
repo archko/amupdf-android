@@ -46,6 +46,7 @@ class PDFViewModel : ViewModel() {
     val mPageSizes = mutableListOf<APage>()
     var txtPageCount: Int = 1
     var outlineHelper: OutlineHelper? = null
+    var zoom = 1.0f
 
     private fun loadBookmarks(): List<Bookmark>? {
         try {

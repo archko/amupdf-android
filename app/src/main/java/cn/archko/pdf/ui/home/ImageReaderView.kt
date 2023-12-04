@@ -255,6 +255,7 @@ fun ImageViewer(
                                         }
                                     }
                                 } while (event.changes.any { it.pressed })
+                                pdfViewModel.zoom = zoom
                                 gestureEnd(moveCount != 0)
                             }
                         }
@@ -271,7 +272,8 @@ fun ImageViewer(
                                 mupdfDocument = mupdfDocument,
                                 width = width,
                                 height = height,
-                                aPage = aPage
+                                aPage = aPage,
+                                pdfViewModel,
                             )
                         }
                     } else {
@@ -588,6 +590,7 @@ private fun ImageItem(
     width: Int,
     height: Int,
     aPage: APage,
+    pdfViewModel: PDFViewModel,
     modifier: Modifier = Modifier
 ) {
     Box(

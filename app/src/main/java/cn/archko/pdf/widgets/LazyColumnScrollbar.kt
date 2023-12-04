@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -78,8 +79,6 @@ enum class ScrollbarSelectionActionable {
  * Scrollbar for LazyColumn
  *
  * @param rightSide true -> right,  false -> left
- * @param padding Padding of the scrollbar
- * @param thumbMinHeight Thumb minimum height proportional to total scrollbar's height (eg: 0.1 -> 10% of total)
  */
 @Composable
 fun LazyColumnScrollbar(
@@ -135,7 +134,7 @@ private fun DefaultIndicator(index: Int, isThumbSelected: Boolean) {
         //.background(Color.Red)
     ) {
         Text(
-            text = "$index",
+            text = "${index + 1}",
             maxLines = 1,
             color = Color.Black,
             overflow = TextOverflow.Ellipsis,
@@ -191,7 +190,7 @@ fun InternalLazyColumnScrollbar(
 
         val coroutineScope = rememberCoroutineScope()
 
-        var dragOffset by remember { mutableStateOf(0f) }
+        var dragOffset by remember { mutableFloatStateOf(0f) }
 
         val reverseLayout by remember { derivedStateOf { listState.layoutInfo.reverseLayout } }
 
@@ -398,10 +397,10 @@ fun InternalLazyColumnScrollbar(
                                     }
 
                                     ScrollbarSelectionMode.Thumb -> {
-                                        if (newOffset in currentOffset..(currentOffset + normalizedThumbSize)) {
-                                            setDragOffset(currentOffset)
-                                            //isSelected = true
-                                        }
+                                        //if (newOffset in currentOffset..(currentOffset + normalizedThumbSize)) {
+                                        setDragOffset(currentOffset)
+                                        //isSelected = true
+                                        //}
                                     }
 
                                     ScrollbarSelectionMode.Disabled -> Unit
