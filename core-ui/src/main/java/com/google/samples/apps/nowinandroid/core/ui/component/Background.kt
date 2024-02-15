@@ -34,13 +34,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.google.samples.apps.nowinandroid.core.ui.theme.LocalBackgroundTheme
+import com.google.samples.apps.nowinandroid.core.designsystem.theme.LocalBackgroundTheme
+import com.google.samples.apps.nowinandroid.core.ui.theme.GradientColors
+import com.google.samples.apps.nowinandroid.core.ui.theme.LocalGradientColors
 import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
 import kotlin.math.tan
 
 /**
  * The main background for the app.
- * Uses [LocalBackgroundTheme] to set the color and tonal elevation of a [Box].
+ * Uses [LocalBackgroundTheme] to set the color and tonal elevation of a [Surface].
  *
  * @param modifier Modifier to be applied to the background.
  * @param content The background content.
@@ -48,7 +50,7 @@ import kotlin.math.tan
 @Composable
 fun NiaBackground(
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val color = LocalBackgroundTheme.current.color
     val tonalElevation = LocalBackgroundTheme.current.tonalElevation
@@ -65,23 +67,28 @@ fun NiaBackground(
 
 /**
  * A gradient background for select screens. Uses [LocalBackgroundTheme] to set the gradient colors
- * of a [Box].
+ * of a [Box] within a [Surface].
  *
  * @param modifier Modifier to be applied to the background.
- * @param topColor The top gradient color to be rendered.
- * @param bottomColor The bottom gradient color to be rendered.
+ * @param gradientColors The gradient colors to be rendered.
  * @param content The background content.
  */
 @Composable
 fun NiaGradientBackground(
     modifier: Modifier = Modifier,
-    topColor: Color = LocalBackgroundTheme.current.primaryGradientColor,
-    bottomColor: Color = LocalBackgroundTheme.current.secondaryGradientColor,
-    content: @Composable () -> Unit
+    gradientColors: GradientColors = LocalGradientColors.current,
+    content: @Composable () -> Unit,
 ) {
-    val currentTopColor by rememberUpdatedState(topColor)
-    val currentBottomColor by rememberUpdatedState(bottomColor)
-    NiaBackground(modifier) {
+    val currentTopColor by rememberUpdatedState(gradientColors.top)
+    val currentBottomColor by rememberUpdatedState(gradientColors.bottom)
+    Surface(
+        color = if (gradientColors.container == Color.Unspecified) {
+            Color.Transparent
+        } else {
+            gradientColors.container
+        },
+        modifier = modifier.fillMaxSize(),
+    ) {
         Box(
             Modifier
                 .fillMaxSize()
@@ -91,7 +98,7 @@ fun NiaGradientBackground(
                     val offset = size.height * tan(
                         Math
                             .toRadians(11.06)
-                            .toFloat()
+                            .toFloat(),
                     )
 
                     val start = Offset(size.width / 2 + offset / 2, 0f)
@@ -125,33 +132,38 @@ fun NiaGradientBackground(
                         drawRect(topGradient)
                         drawRect(bottomGradient)
                     }
-                }
+                },
         ) {
             content()
         }
     }
 }
 
+/**
+ * Multipreview annotation that represents light and dark themes. Add this annotation to a
+ * composable to render the both themes.
+ */
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Light theme")
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark theme")
+annotation class ThemePreviews
+
+@ThemePreviews
 @Composable
 fun BackgroundDefault() {
-    NiaTheme {
+    NiaTheme(disableDynamicTheming = true) {
         NiaBackground(Modifier.size(100.dp), content = {})
     }
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Light theme")
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark theme")
+@ThemePreviews
 @Composable
 fun BackgroundDynamic() {
-    NiaTheme(dynamicColor = true) {
+    NiaTheme(disableDynamicTheming = false) {
         NiaBackground(Modifier.size(100.dp), content = {})
     }
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Light theme")
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark theme")
+@ThemePreviews
 @Composable
 fun BackgroundAndroid() {
     NiaTheme(androidTheme = true) {
@@ -159,26 +171,23 @@ fun BackgroundAndroid() {
     }
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Light theme")
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark theme")
+@ThemePreviews
 @Composable
 fun GradientBackgroundDefault() {
-    NiaTheme {
+    NiaTheme(disableDynamicTheming = true) {
         NiaGradientBackground(Modifier.size(100.dp), content = {})
     }
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Light theme")
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark theme")
+@ThemePreviews
 @Composable
 fun GradientBackgroundDynamic() {
-    NiaTheme(dynamicColor = true) {
+    NiaTheme(disableDynamicTheming = false) {
         NiaGradientBackground(Modifier.size(100.dp), content = {})
     }
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Light theme")
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark theme")
+@ThemePreviews
 @Composable
 fun GradientBackgroundAndroid() {
     NiaTheme(androidTheme = true) {

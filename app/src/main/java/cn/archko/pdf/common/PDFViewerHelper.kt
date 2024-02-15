@@ -84,14 +84,14 @@ class PDFViewerHelper {
                 //    intent.setClass(activity!!, PDFViewActivity::class.java)
                 //    startActivity(intent)
                 //}
-                documentContextMenuItem -> {
-                    //val map = mapOf("type" to "Document", "name" to clickedFile.name)
-                    //MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
-
-                    intent.setClass(activity, cn.archko.pdf.activities.DocumentActivity::class.java)
-                    // API>=21: intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT); /* launch as a new document */
-                    activity.startActivity(intent)
-                }
+                //documentContextMenuItem -> {
+                //    //val map = mapOf("type" to "Document", "name" to clickedFile.name)
+                //    //MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
+//
+                //    intent.setClass(activity, cn.archko.pdf.activities.DocumentActivity::class.java)
+                //    // API>=21: intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT); /* launch as a new document */
+                //    activity.startActivity(intent)
+                //}
                 otherContextMenuItem -> {
                     //val map = mapOf("type" to "other", "name" to clickedFile.name)
                     //MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
@@ -141,7 +141,8 @@ class PDFViewerHelper {
             //val map = mapOf("type" to "Document", "name" to clickedFile.name)
             //MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
 
-            intent.setClass(activity, cn.archko.pdf.activities.DocumentActivity::class.java)
+            intent.setClass(activity, PdfViewerActivity::class.java)
+            //intent.setClass(activity, cn.archko.pdf.activities.DocumentActivity::class.java)
             // API>=21: intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT); /* launch as a new document */
             activity.startActivity(intent)
         }

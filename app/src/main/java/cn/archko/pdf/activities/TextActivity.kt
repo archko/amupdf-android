@@ -249,7 +249,7 @@ class TextActivity : AppCompatActivity() {
         super.onDestroy()
         adapter?.clearCacheViews()
         LiveEventBus
-            .get(Event.ACTION_STOPPED)
+            .get<String>(Event.ACTION_STOPPED)
             .post(path)
     }
 

@@ -6,11 +6,16 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.text.TextPaint;
 
-class Page {
+import org.vudroid.core.link.Hyperlink;
+
+import java.util.List;
+
+public class Page {
     final int index;
     RectF bounds;
     private PageTreeNode node;
     private DocumentView documentView;
+    public List<Hyperlink> links;
     private final TextPaint textPaint = textPaint();
     private final Paint fillPaint = fillPaint();
     private final Paint strokePaint = strokePaint();
@@ -28,12 +33,24 @@ class Page {
         return mainWidth / getAspectRatio() * zoom;
     }
 
+    float getPageWidth(int mainHeight, float zoom) {
+        return mainHeight * getAspectRatio() * zoom;
+    }
+
     public int getTop() {
         return Math.round(bounds.top);
     }
 
     public int getBottom() {
         return Math.round(bounds.bottom);
+    }
+
+    public int getLeft() {
+        return Math.round(bounds.left);
+    }
+
+    public int getRight() {
+        return Math.round(bounds.right);
     }
 
     public void draw(Canvas canvas) {

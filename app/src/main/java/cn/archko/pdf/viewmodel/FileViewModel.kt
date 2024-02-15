@@ -735,11 +735,11 @@ class FileViewModel() : ViewModel() {
     private fun postFavoriteEvent(entry: FileBean, isFavorited: Int) {
         if (isFavorited == 1) {
             LiveEventBus
-                .get(Event.ACTION_FAVORITED)
+                .get<FileBean>(Event.ACTION_FAVORITED)
                 .post(entry)
         } else {
             LiveEventBus
-                .get(Event.ACTION_UNFAVORITED)
+                .get<FileBean>(Event.ACTION_UNFAVORITED)
                 .post(entry)
         }
     }

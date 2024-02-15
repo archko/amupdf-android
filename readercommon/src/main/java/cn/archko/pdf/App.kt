@@ -23,7 +23,6 @@ class App : Application(), ImageLoaderFactory {
         //UMConfigure.init(this, appkey, "archko", UMConfigure.DEVICE_TYPE_PHONE, null)
         LiveEventBus
             .config()
-            .supportBroadcast(this)
             .lifecycleObserverAlwaysActive(true)
             .autoClear(false)
     }

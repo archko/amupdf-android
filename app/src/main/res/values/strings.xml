@@ -56,4 +56,8 @@
     <string name="create_pdf_select_old_tip">if donot has an old pdf,it will create one for you.</string>
     <string name="create_pdf_success">create pdf successfully</string>
     <string name="create_pdf_error">create pdf error</string>
+
+    <string name="sodk_editor_password_for_document">Password</string>
+    <string name="sodk_editor_ok">OK</string>
+    <string name="sodk_editor_cancel">cancel</string>
 </resources>

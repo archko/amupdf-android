@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package com.google.samples.apps.nowinandroid.core.designsystem.theme
+package com.google.samples.apps.nowinandroid.core.ui.theme
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
 
 /**
- * A class to model background color and tonal elevation values for Now in Android.
+ * A class to model gradient color values for Now in Android.
+ *
+ * @param top The top gradient color to be rendered.
+ * @param bottom The bottom gradient color to be rendered.
+ * @param container The container gradient color over which the gradient will be rendered.
  */
 @Immutable
-data class BackgroundTheme(
-    val color: Color = Color.Unspecified,
-    val tonalElevation: Dp = Dp.Unspecified,
+data class GradientColors(
+    val top: Color = Color.Unspecified,
+    val bottom: Color = Color.Unspecified,
+    val container: Color = Color.Unspecified,
 )
 
 /**
- * A composition local for [BackgroundTheme].
+ * A composition local for [GradientColors].
  */
-val LocalBackgroundTheme = staticCompositionLocalOf { BackgroundTheme() }
+val LocalGradientColors = staticCompositionLocalOf { GradientColors() }

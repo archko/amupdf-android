@@ -14,9 +14,9 @@ object BuildConfig {
 }
 
 object Libs {
-    const val jdkDesugar = "com.android.tools:desugar_jdk_libs:2.0.3"
+    const val jdkDesugar = "com.android.tools:desugar_jdk_libs:2.0.4"
     const val flinger = "com.github.iamjosephmj:flinger:1.1.1"
-    const val androidGradlePlugin = "com.android.tools.build:gradle:8.1.0"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:8.1.2"
 
     object Accompanist {
         const val version = "0.32.0"
@@ -31,18 +31,18 @@ object Libs {
     }
 
     object Coil {
-        const val coil = "io.coil-kt:coil:2.4.0"
-        const val coilCompose = "io.coil-kt:coil-compose:2.4.0"
+        const val coil = "io.coil-kt:coil:2.5.0"
+        const val coilCompose = "io.coil-kt:coil-compose:2.5.0"
     }
 
     object Kotlin {
-        private const val version = "1.9.10"
+        private const val version = "1.9.21"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
 
 
-        const val ksp = "1.9.10-1.0.13"
+        const val ksp = "1.9.21-1.0.16"
         const val kspGradlePlugin = "com.google.devtools.ksp.gradle.plugin:$ksp"
     }
 
@@ -64,8 +64,8 @@ object Libs {
         const val navigation = "androidx.navigation:navigation-compose:2.7.4"
 
         object Compose {
-            const val compiler_version = "1.5.3"
-            const val composeBomVersion = "2023.10.01"
+            const val compiler_version = "1.5.7"
+            const val composeBomVersion = "2024.02.00"
 
             const val runtime = "androidx.compose.runtime:runtime"
             const val runtimeLivedata = "androidx.compose.runtime:runtime-livedata"
@@ -99,7 +99,7 @@ object Libs {
         }
 
         object Lifecycle {
-            const val lifecycle = "2.6.1"
+            const val lifecycle = "2.6.2"
             const val viewModelCompose =
                 "androidx.lifecycle:lifecycle-viewmodel-compose:${lifecycle}"
 
@@ -137,15 +137,15 @@ object Libs {
         }
 
         object Room {
-            private const val version = "2.6.0"
+            private const val version = "2.6.1"
             const val runtime = "androidx.room:room-runtime:${version}"
             const val ktx = "androidx.room:room-ktx:${version}"
             const val compiler = "androidx.room:room-compiler:${version}"
         }
 
         object DataStore {
-            private const val dataStoreVersion = "1.0.0"
-            const val preference_version = "1.1.1"
+            private const val dataStoreVersion = "1.1.0-beta01"
+            const val preference_version = "1.2.0"
 
             const val dataStore = "androidx.datastore:datastore-preferences:$dataStoreVersion"
 
@@ -168,7 +168,7 @@ object Libs {
     }
 
     object Fragment {
-        const val version = "1.5.0"
+        const val version = "1.6.2"
         const val runtime = "androidx.fragment:fragment:${version}"
         const val runtimeKtx = "androidx.fragment:fragment-ktx:${version}"
         const val testing = "androidx.fragment:fragment-testing:${version}"
@@ -183,11 +183,11 @@ object Libs {
 
     object Dependency {
         const val multidex = "androidx.multidex:multidex:2.0.1"
-        const val material = "com.google.android.material:material:1.9.0-rc01"
-        const val liveEventBusX = "com.jeremyliao:live-event-bus-x:1.5.0"
-        const val viewpager2 = "androidx.viewpager2:viewpager2:1.0.0"
+        const val material = "com.google.android.material:material:1.11.0"
+        const val liveEventBusX = "io.github.jeremyliao:live-event-bus-x:1.8.0"
+        const val viewpager2 = "androidx.viewpager2:viewpager2:1.1.0-beta02"
         const val vectordrawable =
-            "androidx.vectordrawable:vectordrawable:1.1.0"
+            "androidx.vectordrawable:vectordrawable:1.2.0-beta01"
         const val swiperefreshlayout =
             "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
         const val colorPickerDialog = "me.jfenn.ColorPickerDialog:base:0.2.2"

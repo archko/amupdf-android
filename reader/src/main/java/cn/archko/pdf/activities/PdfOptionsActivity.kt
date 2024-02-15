@@ -63,7 +63,7 @@ class PdfOptionsActivity : FragmentActivity() {
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-        ): View? {
+        ): View {
             val view = super.onCreateView(inflater, container, savedInstanceState)
             if (view is LinearLayout) {
                 // AppBar

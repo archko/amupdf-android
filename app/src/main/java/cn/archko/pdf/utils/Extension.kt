@@ -1,6 +1,6 @@
 package cn.archko.pdf.utils
 
-import com.artifex.sonui.editor.R
+import cn.archko.mupdf.R
 import cn.archko.pdf.entity.FileBean
 import java.util.*
 

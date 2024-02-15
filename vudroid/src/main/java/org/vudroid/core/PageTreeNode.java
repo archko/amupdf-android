@@ -10,17 +10,13 @@ import android.graphics.RectF;
 
 import java.lang.ref.SoftReference;
 import java.util.Arrays;
-
-import cn.archko.pdf.common.BitmapCache;
-import cn.archko.pdf.common.BitmapPool;
-
-class PageTreeNode {
-    private static final int SLICE_SIZE = 256 * 256 * 8;
+public class PageTreeNode {
+    private static final int SLICE_SIZE = 256 * 256 * 4;
     private Bitmap bitmap;
     private SoftReference<Bitmap> bitmapWeakReference;
     private boolean decodingNow;
     private final RectF pageSliceBounds;
-    private final Page page;
+    final Page page;
     private PageTreeNode[] children;
     private final int treeNodeDepthLevel;
     private Matrix matrix = new Matrix();
@@ -89,19 +85,26 @@ class PageTreeNode {
         targetRectF = null;
         if (children != null) {
             for (PageTreeNode child : children) {
+                //System.out.println(String.format("level:%s, page:%s, slice:%s, target:%s",treeNodeDepthLevel,page.index, pageSliceBounds, getTargetRect()));
                 child.invalidateNodeBounds();
             }
         }
     }
 
     void draw(Canvas canvas) {
+        if (!isVisible()) {
+            return;
+        }
         if (getBitmap() != null) {
+            //System.out.println(String.format("level:%s, page:%s, width:%s, %s", treeNodeDepthLevel, page.index, getBitmap().getWidth(), getBitmap().getHeight()));
             canvas.drawBitmap(getBitmap(), new Rect(0, 0, getBitmap().getWidth(), getBitmap().getHeight()), getTargetRect(), bitmapPaint);
             //canvas.drawRect(getTargetRect(), strokePaint);
         }
         if (children == null) {
             return;
         }
+
+        //System.out.println(String.format("level:%s, page:%s, %s, target:%s,%s", treeNodeDepthLevel, page.index, pageSliceBounds, getTargetRect(), documentView.getViewRect()));
         for (PageTreeNode child : children) {
             child.draw(canvas);
         }
@@ -145,14 +148,14 @@ class PageTreeNode {
 
     public Bitmap getBitmap() {
         Bitmap bitmap = bitmapWeakReference != null ? bitmapWeakReference.get() : null;
-        if (null == bitmap) {
-            bitmap = BitmapCache.getInstance().getBitmap(getCacheKey());
-        }
+        //if (null == bitmap) {
+        //    bitmap = BitmapCache.getInstance().getBitmap(getCacheKey());
+        //}
         return bitmap;
     }
 
     private String getCacheKey() {
-        return String.format("%s-%s", page.index, pageSliceBounds);
+        return String.format("%s-%s-%s", page.index, pageSliceBounds, page);
     }
 
     private void restoreBitmapReference() {
@@ -164,20 +167,19 @@ class PageTreeNode {
             return;
         }
         setDecodingNow(true);
-        documentView.decodeService.decodePage(this, page.index, new DecodeService.DecodeCallback() {
-            public void decodeComplete(final Bitmap bitmap) {
-                documentView.post(new Runnable() {
-                    public void run() {
-                        BitmapCache.getInstance().addBitmap(getCacheKey(), bitmap);
-                        setBitmap(bitmap);
-                        invalidateFlag = false;
-                        setDecodingNow(false);
-                        page.setAspectRatio(documentView.decodeService.getPageWidth(page.index), documentView.decodeService.getPageHeight(page.index));
-                        invalidateChildren();
-                    }
-                });
-            }
-        }, documentView.zoomModel.getZoom(), pageSliceBounds);
+        documentView.decodeService.decodePage(getCacheKey(),
+                this,
+                bitmap -> documentView.post(() -> {
+                    //System.out.println(String.format("DecodeService index:%s, bitmap:%s, key:%s", page.index, bitmap == null, getCacheKey()));
+                    //BitmapCache.getInstance().addBitmap(getCacheKey(), bitmap);
+                    setBitmap(bitmap);
+                    invalidateFlag = false;
+                    setDecodingNow(false);
+                    //page.setAspectRatio(documentView.decodeService.getPageWidth(page.index), documentView.decodeService.getPageHeight(page.index));
+                    invalidateChildren();
+                }),
+                documentView.zoomModel.getZoom(),
+                pageSliceBounds);
     }
 
     private RectF evaluatePageSliceBounds(RectF localPageSliceBounds, PageTreeNode parent) {
@@ -199,10 +201,10 @@ class PageTreeNode {
         if (this.bitmap != bitmap) {
             if (bitmap != null) {
                 if (this.bitmap != null) {
-                    //this.bitmap.recycle();
-                    BitmapPool.getInstance().release(this.bitmap);
+                    this.bitmap.recycle();
+                    //BitmapPool.getInstance().release(this.bitmap);
                 }
-                bitmapWeakReference = new SoftReference<Bitmap>(bitmap);
+                bitmapWeakReference = new SoftReference<>(bitmap);
                 documentView.postInvalidate();
             }
             this.bitmap = bitmap;

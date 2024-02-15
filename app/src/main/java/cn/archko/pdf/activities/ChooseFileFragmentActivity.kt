@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.consumedWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -110,7 +109,6 @@ open class ChooseFileFragmentActivity : AnalysticActivity(), OnPermissionGranted
                                     up = { finish() },
                                     modifier = Modifier
                                         .padding(padding)
-                                        .consumedWindowInsets(padding)
                                 )
                             }
                         }

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.consumedWindowInsets
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
@@ -210,7 +209,6 @@ fun HomePager(
             BoxWithConstraints(
                 modifier = modifier
                     .padding(innerPadding)
-                    .consumedWindowInsets(innerPadding)
             ) {
                 TabContent(
                     viewModel, up, navController, navItems, setCurrentSection

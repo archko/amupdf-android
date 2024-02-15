@@ -133,7 +133,7 @@ fun UserOptDialog(
                     )
                     Divider(thickness = 0.5.dp)
                     DialogItem(
-                        txt = "Mupdf new Viewer",
+                        txt = "Vudroid Viewer",
                         onClick = { menuOpt(MenuItemType.ViewBookWithMupdf, fileBean) }
                     )
                     Divider(thickness = 0.5.dp)

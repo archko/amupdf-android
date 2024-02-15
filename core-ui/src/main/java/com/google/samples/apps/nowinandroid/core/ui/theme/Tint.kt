@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package com.google.samples.apps.nowinandroid.core.designsystem.theme
+package com.google.samples.apps.nowinandroid.core.ui.theme
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
 
 /**
  * A class to model background color and tonal elevation values for Now in Android.
  */
 @Immutable
-data class BackgroundTheme(
-    val color: Color = Color.Unspecified,
-    val tonalElevation: Dp = Dp.Unspecified,
+data class TintTheme(
+    val iconTint: Color = Color.Unspecified,
 )
 
 /**
- * A composition local for [BackgroundTheme].
+ * A composition local for [TintTheme].
  */
-val LocalBackgroundTheme = staticCompositionLocalOf { BackgroundTheme() }
+val LocalTintTheme = staticCompositionLocalOf { TintTheme() }

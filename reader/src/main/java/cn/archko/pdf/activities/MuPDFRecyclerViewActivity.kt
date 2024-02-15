@@ -3,7 +3,6 @@ package cn.archko.pdf.activities
 import android.annotation.TargetApi
 import android.app.ProgressDialog
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.PointF
 import android.os.Build
 import android.os.Bundle
@@ -13,13 +12,9 @@ import android.util.SparseArray
 import android.view.GestureDetector
 import android.view.Gravity
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.Toast
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
 import cn.archko.pdf.common.BitmapCache
@@ -154,7 +149,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         super.onDestroy()
         isDocLoaded = false
         LiveEventBus
-            .get(Event.ACTION_STOPPED)
+            .get<String>(Event.ACTION_STOPPED)
             .post(mPath)
         pdfViewModel.destroy()
         progressDialog.dismiss()

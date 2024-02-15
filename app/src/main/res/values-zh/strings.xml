@@ -54,4 +54,8 @@
     <string name="create_pdf_select_old_tip">如果没有则创建新的pdf</string>
     <string name="create_pdf_success">成功创建pdf</string>
     <string name="create_pdf_error">创建pdf错误</string>
+
+    <string name="sodk_editor_password_for_document">密码</string>
+    <string name="sodk_editor_ok">确定</string>
+    <string name="sodk_editor_cancel">取消</string>
 </resources>

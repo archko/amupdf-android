@@ -1,5 +1,11 @@
 package cn.archko.pdf.utils;
 
+import android.app.Activity;
+import android.content.Context;
+import android.os.IBinder;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+
 import com.radaee.pdf.Document;
 
 import java.util.Random;
@@ -99,5 +105,24 @@ public class PDFUtilities {
             listener.onDone(path, REQUEST_CODE_CONVERT_PDFA);
         else
             listener.onError("", REQUEST_CODE_CONVERT_PDFA);
+    }
+
+
+    public static void hideKeyboard(Context context) {
+        if (Activity.class.isInstance(context)) {
+            Activity activity = (Activity) context;
+            //  fix https://bugs.ghostscript.com/show_bug.cgi?id=702763
+            //  get the window token from the activity content
+            IBinder windowToken = activity.findViewById(android.R.id.content).getRootView().getWindowToken();
+            InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(windowToken, 0);
+        }
+    }
+
+    public static void hideKeyboard(Context context, View view) {
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }

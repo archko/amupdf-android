@@ -119,13 +119,13 @@
             android:label="@string/about_title"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Nia"></activity>
-        <activity
+        <!--<activity
             android:name="cn.archko.pdf.activities.DocumentActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
             android:label="Document"
             android:screenOrientation="sensor"
             android:theme="@style/AppFullscreen"
-            android:windowSoftInputMode="adjustResize"></activity>
+            android:windowSoftInputMode="adjustResize"></activity>-->
         <activity
             android:name="cn.archko.pdf.activities.TextActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
