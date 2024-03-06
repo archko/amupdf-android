@@ -65,7 +65,7 @@ object Libs {
 
         object Compose {
             const val compiler_version = "1.5.7"
-            const val composeBomVersion = "2024.02.00"
+            const val composeBomVersion = "2024.02.01"
 
             const val runtime = "androidx.compose.runtime:runtime"
             const val runtimeLivedata = "androidx.compose.runtime:runtime-livedata"
