@@ -497,8 +497,8 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                 toggleCrop()
             }
 
-            override fun showBookmark() {
-                //this@AMuPDFRecyclerViewActivity.showBookmark()
+            override fun changeOrientation(ori: Int) {
+                viewController?.setOrientation(ori)
             }
         })
         return mPageSeekBarControls!!

@@ -21,5 +21,5 @@ public interface PageViewPresenter {
 
     void autoCrop();
 
-    void showBookmark();
+    void changeOrientation(int ori);
 }

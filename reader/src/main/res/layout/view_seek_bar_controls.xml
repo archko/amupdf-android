@@ -9,7 +9,8 @@
     <LinearLayout
         android:id="@+id/layout_title"
         android:layout_width="match_parent"
-        android:layout_height="38dp"
+        android:layout_height="42dp"
+        android:paddingRight="8dp"
         android:background="@color/menu_bg"
         android:gravity="center_vertical"
         android:orientation="horizontal">
@@ -82,13 +83,12 @@
             android:src="@drawable/ic_toc_white_24dp" />
 
         <ImageButton
-            android:id="@+id/bookmarkButton"
+            android:id="@+id/oriButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/button"
-            android:contentDescription="@string/bookmark_title"
-            android:src="@drawable/ic_bookmark"
-            tools:visibility="visible" />
+            android:contentDescription="@string/opts_orientation"
+            android:src="@drawable/viewer_menu_viewmode_vscroll" />
     </LinearLayout>
 
     <SeekBar

@@ -30,7 +30,7 @@
     <string name="opts_show_extension">显示文件扩展名</string>
     <string name="opts_new_viewer">用新阅读器打开</string>
     <string name="opts_cropper">新的切边方案</string>
-    <string name="opts_orientation">方向</string>
+    <string name="opts_orientation">屏幕方向</string>
     <string-array name="opts_orientation_labels">
         <item>自动</item>
         <item>不变</item>

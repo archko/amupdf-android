@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.os.Handler
 import android.view.View
 import android.widget.ImageView
 import cn.archko.pdf.common.BitmapCache
@@ -24,7 +23,6 @@ public class APDFView(
 ) : ImageView(mContext) {
 
     private var mZoom: Float = 0.toFloat()
-    private val mHandler: Handler = Handler()
     private val bitmapPaint = Paint()
     private val textPaint: Paint = textPaint()
     private var aPage: APage?=null
