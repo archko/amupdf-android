@@ -18,14 +18,20 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import cn.archko.pdf.R
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.ui.settings.ListPreferenceType
 import cn.archko.pdf.ui.settings.ProvidePreferenceLocals
 import cn.archko.pdf.ui.settings.checkboxPreference
@@ -34,6 +40,7 @@ import cn.archko.pdf.ui.settings.listPreference
 import cn.archko.pdf.ui.settings.multiSelectListPreference
 import cn.archko.pdf.ui.settings.preference
 import cn.archko.pdf.ui.settings.radioButtonPreference
+import cn.archko.pdf.ui.settings.rememberPreferenceState
 import cn.archko.pdf.ui.settings.sliderPreference
 import cn.archko.pdf.ui.settings.switchPreference
 import cn.archko.pdf.ui.settings.textFieldPreference
@@ -49,13 +56,42 @@ import cn.archko.pdf.ui.settings.twoTargetSwitchPreference
 fun SettingsScreen() {
     val windowInsets = WindowInsets.safeDrawing
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    var context = LocalContext.current
+    val context = LocalContext.current
+    val oriState = rememberPreferenceState(
+        key = "orientation",
+        defaultValue = PdfOptionRepository.getOrientation().toString()
+    )
+    val ocrState = rememberPreferenceState(
+        key = "image_ocr",
+        defaultValue = PdfOptionRepository.getImageOcr()
+    )
+    val fullscreenState = rememberPreferenceState(
+        key = "fullscreen",
+        defaultValue = PdfOptionRepository.getFullscreen()
+    )
+    val autocropState = rememberPreferenceState(
+        key = "autocrop",
+        defaultValue = PdfOptionRepository.getAutocrop()
+    )
+    val keepOnState = rememberPreferenceState(
+        key = "keepOn",
+        defaultValue = PdfOptionRepository.getKeepOn()
+    )
+    val dirsFirstState = rememberPreferenceState(
+        key = "dirsFirst",
+        defaultValue = PdfOptionRepository.getDirsFirst()
+    )
+    val showExtensionState = rememberPreferenceState(
+        key = "showExtension",
+        defaultValue = PdfOptionRepository.getShowExtension()
+    )
+    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            val context = LocalContext.current
             val appLabel =
                 if (LocalView.current.isInEditMode) {
                     "Sample"
@@ -74,6 +110,24 @@ fun SettingsScreen() {
         contentColor = contentColorFor(MaterialTheme.colorScheme.background),
         contentWindowInsets = windowInsets
     ) { contentPadding ->
+        DisposableEffect(oriState) {
+            val observer = LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_PAUSE) {
+                    PdfOptionRepository.setOrientation(oriState.value.toInt())
+                    PdfOptionRepository.setImageOcr(ocrState.value)
+                    PdfOptionRepository.setFullscreen(fullscreenState.value)
+                    PdfOptionRepository.setAutocrop(autocropState.value)
+                    PdfOptionRepository.setKeepOn(keepOnState.value)
+                    PdfOptionRepository.setDirsFirst(dirsFirstState.value)
+                    PdfOptionRepository.setShowExtension(showExtensionState.value)
+                }
+            }
+
+            lifecycleOwner.lifecycle.addObserver(observer)
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
         LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = contentPadding) {
             preference(
                 key = "preference",
@@ -87,6 +141,7 @@ fun SettingsScreen() {
                     .asList(),
                 title = { Text(text = stringResource(id = R.string.opts_orientation)) },
                 summary = { Text(text = context.resources.getStringArray(R.array.opts_orientation_labels)[it.toInt()]) },
+                rememberState = { oriState }
             )
             checkboxPreference(
                 key = "image_ocr",
@@ -100,7 +155,8 @@ fun SettingsScreen() {
                             context.resources.getString(R.string.opts_off)
                         }
                     )
-                }
+                },
+                rememberState = { ocrState }
             )
             checkboxPreference(
                 key = "fullscreen",
@@ -114,7 +170,8 @@ fun SettingsScreen() {
                             context.resources.getString(R.string.opts_off)
                         }
                     )
-                }
+                },
+                rememberState = { fullscreenState }
             )
             checkboxPreference(
                 key = "autocrop",
@@ -128,7 +185,8 @@ fun SettingsScreen() {
                             context.resources.getString(R.string.opts_off)
                         }
                     )
-                }
+                },
+                rememberState = { autocropState }
             )
             checkboxPreference(
                 key = "keepOn",
@@ -142,7 +200,8 @@ fun SettingsScreen() {
                             context.resources.getString(R.string.opts_off)
                         }
                     )
-                }
+                },
+                rememberState = { keepOnState }
             )
             checkboxPreference(
                 key = "dirsFirst",
@@ -156,7 +215,8 @@ fun SettingsScreen() {
                             context.resources.getString(R.string.opts_off)
                         }
                     )
-                }
+                },
+                rememberState = { dirsFirstState }
             )
             checkboxPreference(
                 key = "showExtension",
@@ -170,7 +230,8 @@ fun SettingsScreen() {
                             context.resources.getString(R.string.opts_off)
                         }
                     )
-                }
+                },
+                rememberState = { showExtensionState }
             )
 
             //footerPreference(

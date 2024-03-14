@@ -12,6 +12,14 @@ object PdfOptionRepository {
     private val TAG: String = "PdfPreferencesRepo"
     val mmkv = MMKV.defaultMMKV()
 
+    fun setOrientation(ori: Int) {
+        mmkv.encode(PdfOptionKeys.PREF_ORIENTATION, ori)
+    }
+
+    fun getOrientation(): Int {
+        return mmkv.decodeInt(PdfOptionKeys.PREF_ORIENTATION, 7)
+    }
+
     fun setShowExtension(enable: Boolean) {
         mmkv.encode(PdfOptionKeys.PREF_SHOW_EXTENSION, enable)
     }
@@ -28,8 +36,16 @@ object PdfOptionRepository {
         return mmkv.decodeBool(PdfOptionKeys.PREF_OCR)
     }
 
+    fun setFullscreen(enable: Boolean) {
+        mmkv.encode(PdfOptionKeys.PREF_FULLSCREEN, enable)
+    }
+
     fun getFullscreen(): Boolean {
         return mmkv.decodeBool(PdfOptionKeys.PREF_FULLSCREEN)
+    }
+
+    fun setAutocrop(enable: Boolean) {
+        mmkv.encode(PdfOptionKeys.PREF_AUTOCROP, enable)
     }
 
     fun getAutocrop(): Boolean {
@@ -38,6 +54,10 @@ object PdfOptionRepository {
 
     fun getVerticalScrollLock(): Boolean {
         return mmkv.decodeBool(PdfOptionKeys.PREF_VERTICAL_SCROLL_LOCK)
+    }
+
+    fun setKeepOn(enable: Boolean) {
+        mmkv.encode(PdfOptionKeys.PREF_KEEP_ON, enable)
     }
 
     fun getKeepOn(): Boolean {
@@ -132,6 +152,13 @@ object PdfOptionRepository {
         return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_BOTTOM_PADDING)
     }
 
+    fun setDirsFirst(enable: Boolean): Boolean {
+        return mmkv.encode(PdfOptionKeys.PREF_DIRS_FIRST, enable)
+    }
+
+    fun getDirsFirst(): Boolean {
+        return mmkv.decodeBool(PdfOptionKeys.PREF_DIRS_FIRST, true)
+    }
 
     @JvmField
     val FONT_DIR = "amupdf/fonts/"
@@ -197,6 +224,7 @@ object PdfOptionKeys {
     val PREF_KEEP_ON = ("keepOn")
     val PREF_LIST_STYLE = ("list_style")
     val PREF_DART_THEME = ("pref_dart_theme")
+    val PREF_DIRS_FIRST = ("dirsFirst")
 
     //============== font and style ==============
     val FONT_KEY_TYPE = ("font_key_type")
