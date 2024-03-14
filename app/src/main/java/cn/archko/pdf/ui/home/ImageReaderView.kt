@@ -196,7 +196,7 @@ fun ImageViewer(
             val observer = LifecycleEventObserver { _, event ->
                 if (event == Lifecycle.Event.ON_PAUSE) {
                     pdfViewModel.bookProgress?.run {
-                        autoCrop = 0
+                        //autoCrop = 0
                         val position = listState.firstVisibleItemIndex
                         pdfViewModel.saveBookProgress(
                             pdfViewModel.pdfPath,
@@ -743,18 +743,12 @@ private fun LoadingView(
                 .align(Alignment.CenterHorizontally)
                 .padding(12.dp)
         )
-        /*CircularProgressIndicator(
-            strokeWidth = 2.dp,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(20.dp)
-        )*/
         Spacer(modifier = Modifier.height(24.dp))
-        LinearProgressIndicator(
+        /*LinearProgressIndicator(
             modifier = Modifier
                 .height(6.dp)
                 .align(alignment = Alignment.CenterHorizontally)
-        )
+        )*/
     }
 }
 
