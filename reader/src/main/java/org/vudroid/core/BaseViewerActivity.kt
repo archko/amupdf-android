@@ -63,7 +63,6 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         StatusBarHelper.hideSystemUI(this)
         StatusBarHelper.setImmerseBarAppearance(window, true)
 
-        BitmapCache.getInstance().resize(BitmapCache.CAPACITY_FOR_VUDROID)
         initDecodeService()
         val zoomModel = ZoomModel()
         sensorHelper = SensorHelper(this)

@@ -61,7 +61,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     private var viewMode: ViewMode = ViewMode.CROP
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        BitmapCache.getInstance().resize(BitmapCache.CAPACITY_FOR_AMUPDF)
         super.onCreate(savedInstanceState)
     }
 

@@ -27,7 +27,6 @@ import cn.archko.pdf.utils.FileUtils;
  */
 public class ImageLoader extends ImageWorker {
 
-    private LruCache<Object, Bitmap> mImageCache = new LruCache<>(32);
     private LruCache<String, APage> pageLruCache = new LruCache<>(64);
 
     public static ImageLoader getInstance() {
@@ -46,30 +45,20 @@ public class ImageLoader extends ImageWorker {
 
     @Override
     public boolean isScrolling() {
-        if (mImageCache != null) {
-            //return mImageCache.isScrolling();
-        }
+        //if (mImageCache != null) {
+        //    //return mImageCache.isScrolling();
+        //}
         return false;
     }
 
     @Override
     public void addBitmapToCache(final String key, final Bitmap bitmap) {
-        if (mImageCache != null) {
-            mImageCache.put(key, bitmap);
-        }
+        BitmapCache.getInstance().addBitmap(key, bitmap);
     }
 
     @Override
     public Bitmap getBitmapFromCache(final String key) {
-        if (mImageCache != null) {
-            return mImageCache.get(key);
-        }
-        return null;
-    }
-
-    @Override
-    public LruCache<Object, Bitmap> getImageCache() {
-        return mImageCache;
+        return BitmapCache.getInstance().getBitmap(key);
     }
 
     @Override
@@ -78,7 +67,7 @@ public class ImageLoader extends ImageWorker {
     }
 
     public void loadImage(final String key, int pageNum, float zoom, int screenWidth, final ImageView imageView) {
-        if (key == null || getImageCache() == null || imageView == null) {
+        if (key == null /*|| getImageCache() == null*/ || imageView == null) {
             return;
         }
         super.loadImage(new DecodeParam(key, pageNum, zoom, screenWidth, imageView), false);
@@ -161,7 +150,7 @@ public class ImageLoader extends ImageWorker {
 
     @Override
     public void recycle() {
-        mImageCache.evictAll();
+        BitmapCache.getInstance().clear();
         pageLruCache.evictAll();
     }
 }

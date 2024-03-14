@@ -655,7 +655,7 @@ private fun ImageItem(
                 .size(swidth / 5, 0.5.dp)
                 .background(
                     androidx.compose.material3.MaterialTheme.colorScheme.secondary.copy(
-                        alpha = 0.2f
+                        alpha = 0.4f
                     )
                 )
         )

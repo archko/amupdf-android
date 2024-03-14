@@ -19,6 +19,7 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -76,7 +77,11 @@ fun AsyncDecodePage(
             CoroutineScope(SupervisorJob() + AppExecutors.instance.diskIO().asCoroutineDispatcher())
         scope.launch {
             snapshotFlow {
-                PdfImageDecoder.decode(decodeParam)
+                if (isActive) {
+                    PdfImageDecoder.decode(decodeParam)
+                } else {
+                    return@snapshotFlow null
+                }
             }.flowOn(AppExecutors.instance.diskIO().asCoroutineDispatcher())
                 .collectLatest {
                     imageState.value = it

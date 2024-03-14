@@ -15,6 +15,11 @@ import com.artifex.mupdf.fitz.RectI
 object PdfImageDecoder {
     fun decode(decodeParam: ImageWorker.DecodeParam): Bitmap? {
         try {
+            var bmp = BitmapCache.getInstance().getBitmap(decodeParam.key)
+            if (null != bmp) {
+                return bmp
+            }
+
             //long start = SystemClock.uptimeMillis();
             val page: Page = decodeParam.document.loadPage(decodeParam.pageSize.index)
             var leftBound = 0
@@ -55,12 +60,17 @@ object PdfImageDecoder {
                     )
                 )
             }
+            bmp = BitmapCache.getInstance().getBitmap(decodeParam.key)
+            if (null != bmp) {
+                return bmp
+            }
+            
             val bitmap = BitmapPool.getInstance().acquire(pageW, pageH)
             //Bitmap.createBitmap(sizeX, sizeY, Bitmap.Config.ARGB_8888);
             MupdfDocument.render(page, ctm, bitmap, decodeParam.xOrigin, leftBound, topBound)
             page.destroy()
             //Logcat.d(TAG, "decode:" + (SystemClock.uptimeMillis() - start));
-            //BitmapCache.getInstance().addBitmap(decodeParam.key, bitmap)
+            BitmapCache.getInstance().addBitmap(decodeParam.key, bitmap)
             return bitmap
         } catch (e: Exception) {
             if (Logcat.loggable) {
