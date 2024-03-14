@@ -1,5 +1,6 @@
 package cn.archko.pdf.ui.home
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -48,7 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import cn.archko.mupdf.R
 import cn.archko.pdf.activities.AboutActivity
-import cn.archko.pdf.activities.PdfOptionsActivity
+import cn.archko.pdf.activities.SettingsActivity
 import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.entity.State
@@ -119,7 +120,7 @@ fun HomePager(
                 1 -> {
                     MenuItem(stringResource(id = cn.archko.pdf.R.string.options)) {
                         onPalletChange()
-                        PdfOptionsActivity.start(context)
+                        startSetting(context)
                     }
                     MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_backup)) {
                         onPalletChange()
@@ -134,7 +135,7 @@ fun HomePager(
                 2 -> {
                     MenuItem(stringResource(id = cn.archko.pdf.R.string.options)) {
                         onPalletChange()
-                        PdfOptionsActivity.start(context)
+                        startSetting(context)
                     }
                     MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_set_as_home)) {
                         onPalletChange()
@@ -145,7 +146,7 @@ fun HomePager(
                 0, 3 -> {
                     MenuItem(stringResource(id = cn.archko.pdf.R.string.options)) {
                         onPalletChange()
-                        PdfOptionsActivity.start(context)
+                        startSetting(context)
                     }
                 }
             }
@@ -185,7 +186,7 @@ fun HomePager(
                                 contentDescription = null
                             )
                         }
-                        IconButton(onClick = { PdfOptionsActivity.start(context) }) {
+                        IconButton(onClick = { startSetting(context) }) {
                             Icon(
                                 imageVector = Icons.Default.Settings, contentDescription = null,
                             )
@@ -221,6 +222,10 @@ fun HomePager(
         RestoreDialog(showRestoreDialog, viewModel, onSelectFile)
         LoadingDialog(showLoadingDialog)
     }
+}
+
+fun startSetting(context: Context) {
+    SettingsActivity.start(context)
 }
 
 private fun backup(showLoadingDialog: MutableState<Boolean>, viewModel: FileViewModel) {

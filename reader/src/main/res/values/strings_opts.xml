@@ -105,6 +105,9 @@
     <string name="opts_list_style_list">List</string>
     <string name="opts_list_style_grid">Grid</string>
 
+    <string name="opts_on">On</string>
+    <string name="opts_off">Off</string>
+
     <string name="tab_history">History</string>
     <string name="tab_browser">Browser</string>
     <string name="tab_favorite">Fravorite</string>

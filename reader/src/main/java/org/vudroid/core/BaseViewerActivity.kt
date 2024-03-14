@@ -15,7 +15,6 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
-import cn.archko.pdf.activities.PdfOptionsActivity.Companion.start
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.listeners.SimpleGestureListener
@@ -231,7 +230,7 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         menu.add(0, MENU_EXIT, 0, "Exit")
         menu.add(1, MENU_GOTO, 0, getString(R.string.menu_goto_page))
         menu.add(2, MENU_OUTLINE, 0, getString(R.string.opts_table_of_contents))
-        menu.add(3, MENU_OPTIONS, 0, getString(R.string.options))
+        //menu.add(3, MENU_OPTIONS, 0, getString(R.string.options))
         /*final MenuItem menuItem = menu.add(0, MENU_FULL_SCREEN, 0, "Full screen").setCheckable(true).setChecked(viewerPreferences.isFullScreen());
         setFullScreenMenuItemText(menuItem);*/return true
     }
@@ -269,7 +268,6 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
                 return true
             }
 
-            MENU_OPTIONS -> start(this)
         }
         return false
     }

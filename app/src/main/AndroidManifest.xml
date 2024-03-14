@@ -58,7 +58,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="cn.archko.pdf.activities.PdfOptionsActivity"
+            android:name="cn.archko.pdf.activities.SettingsActivity"
             android:label="@string/options"
             android:screenOrientation="portrait" />
         <activity

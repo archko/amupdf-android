@@ -108,6 +108,7 @@ object Libs {
             const val liveDataKtx = "androidx.lifecycle:lifecycle-livedata-ktx:${lifecycle}"
 
             const val extensions = "androidx.lifecycle:lifecycle-runtime-ktx:${lifecycle}"
+            const val lifecycleRuntimeCompose="androidx.lifecycle:lifecycle-runtime-compose:${lifecycle}"
         }
 
         object ConstraintLayout {
