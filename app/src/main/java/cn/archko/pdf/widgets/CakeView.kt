@@ -435,6 +435,7 @@ class CakeView @JvmOverloads constructor(
                 }*/
                 isClick = true
             }
+
             MotionEvent.ACTION_MOVE -> {
                 Log.e(TAG, "ACTION_MOVE$isClick")
                 isClick = false
@@ -456,6 +457,7 @@ class CakeView @JvmOverloads constructor(
 //                postInvalidate();
                 check
             }
+
             MotionEvent.ACTION_UP -> {
                 Log.e(TAG, "ACTION_UP$isClick")
                 // 获取每秒移动的角度

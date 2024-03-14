@@ -155,9 +155,9 @@ public class PdfPage implements CodecPage {
     public synchronized void recycle() {
         if (pageHandle >= 0) {
             pageHandle = -1;
-                page.destroy();
-            }
+            page.destroy();
         }
+    }
 
     public long getPageHandle() {
         return pageHandle;

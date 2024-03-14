@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import androidx.core.app.ComponentActivity
-import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.entity.APage
@@ -40,7 +39,6 @@ class ANormalViewController(
     private var mPath: String,
     private var mPageSeekBarControls: APageSeekBarControls?,
     private var gestureDetector: GestureDetector?,
-    private var optionRepository: PdfOptionRepository
 ) :
     OutlineListener, AViewController {
 

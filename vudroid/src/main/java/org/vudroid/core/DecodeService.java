@@ -2,7 +2,6 @@ package org.vudroid.core;
 
 import android.graphics.Bitmap;
 import android.graphics.RectF;
-import android.net.Uri;
 import android.view.View;
 
 import com.artifex.mupdf.fitz.Outline;

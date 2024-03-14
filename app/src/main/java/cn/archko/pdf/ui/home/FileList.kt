@@ -144,6 +144,7 @@ private fun ItemList(
                         )
                     }
                 }
+
                 result.state is State.FINISHED -> {
                     item {
                         LoadingFooter(
@@ -153,6 +154,7 @@ private fun ItemList(
                         )
                     }
                 }
+
                 result.state is State.ERROR -> {
                     item {
                         LoadingFooter(

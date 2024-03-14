@@ -6,10 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.archko.mupdf.R
 import cn.archko.pdf.App
-import cn.archko.pdf.activities.ChooseFileFragmentActivity
 import cn.archko.pdf.common.BookProgressParser
 import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Graph
+import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.common.PdfOptionRepository
@@ -54,6 +54,12 @@ class FileViewModel() : ViewModel() {
 
         const val PAGE_SIZE = 20
         const val MAX_TIME = 1300L
+
+        @JvmField
+        val PREF_TAG = "ChooseFileActivity"
+
+        @JvmField
+        val PREF_HOME = "Home"
     }
 
     private val _uiFileModel = MutableStateFlow<LoadResult<Any, FileBean>>(LoadResult(State.INIT))
@@ -84,7 +90,6 @@ class FileViewModel() : ViewModel() {
 
     var sdcardRoot: String = "/sdcard/"
     private var homePath: String
-    private val preferencesRepository = PdfOptionRepository(Graph.dataStore)
 
     /**
      * 存储文件目录对应当前列表显示第一个元素的位置,这样在进入下一级目录再返回可以定位到上次列表的位置.
@@ -124,48 +129,13 @@ class FileViewModel() : ViewModel() {
     }
 
     private val fileFilter: FileFilter = FileFilter { file ->
-        //return (file.isDirectory() || file.getName().toLowerCase().endsWith(".pdf"));
         if (file.isDirectory)
             return@FileFilter true
         val fname = file.name.lowercase(Locale.ROOT)
 
-        if (fname.endsWith(".pdf"))
-            return@FileFilter true
-        if (fname.endsWith(".xps"))
-            return@FileFilter true
-        if (fname.endsWith(".cbz"))
-            return@FileFilter true
-        if (fname.endsWith(".png"))
-            return@FileFilter true
-        if (fname.endsWith(".jpe"))
-            return@FileFilter true
-        if (fname.endsWith(".jpeg"))
-            return@FileFilter true
-        if (fname.endsWith(".jpg"))
-            return@FileFilter true
-        if (fname.endsWith(".jfif"))
-            return@FileFilter true
-        if (fname.endsWith(".jfif-tbnl"))
-            return@FileFilter true
-        if (fname.endsWith(".tif"))
-            return@FileFilter true
-        if (fname.endsWith(".tiff"))
-            return@FileFilter true
-        if (fname.endsWith(".epub"))
-            return@FileFilter true
-        if (fname.endsWith(".mobi"))
-            return@FileFilter true
-        if (fname.endsWith(".txt"))
-            return@FileFilter true
-        if (fname.endsWith(".log"))
-            return@FileFilter true
-        if (fname.endsWith(".xml"))
-            return@FileFilter true
-        if (fname.endsWith(".html"))
-            return@FileFilter true
-        if (fname.endsWith(".xhtml"))
-            return@FileFilter true
-        false
+        return@FileFilter IntentFile.isText(fname)
+                || IntentFile.isImage(fname)
+                || IntentFile.isPdf(fname)
     }
 
     init {
@@ -178,8 +148,8 @@ class FileViewModel() : ViewModel() {
 
     private fun initHomePath(): String {
         var path: String? =
-            App.instance!!.getSharedPreferences(ChooseFileFragmentActivity.PREF_TAG, 0)!!
-                .getString(ChooseFileFragmentActivity.PREF_HOME, null)
+            App.instance!!.getSharedPreferences(PREF_TAG, 0)!!
+                .getString(PREF_HOME, null)
         if (null == path) {
             Toast.makeText(
                 App.instance,
@@ -194,10 +164,10 @@ class FileViewModel() : ViewModel() {
 
         val pathFile = File(path)
 
-        if (pathFile.exists() && pathFile.isDirectory)
-            return path
+        return if (pathFile.exists() && pathFile.isDirectory)
+            path
         else
-            return sdcardRoot
+            sdcardRoot
     }
 
     fun isHome(path: String): Boolean {
@@ -216,10 +186,10 @@ class FileViewModel() : ViewModel() {
     }
 
     fun getCurrentItem(): FileBean? {
-        if (mCurrentPath == null) {
-            return null
+        return if (mCurrentPath == null) {
+            null
         } else {
-            return FileBean(FileBean.HOME, mCurrentPath)
+            FileBean(FileBean.HOME, mCurrentPath)
         }
     }
 
@@ -469,10 +439,10 @@ class FileViewModel() : ViewModel() {
                 }
 
                 var newTime = System.currentTimeMillis() - now
-                if (newTime < MAX_TIME) {
-                    newTime = MAX_TIME - newTime
+                newTime = if (newTime < MAX_TIME) {
+                    MAX_TIME - newTime
                 } else {
-                    newTime = 0
+                    0
                 }
 
                 delay(newTime)
@@ -517,10 +487,10 @@ class FileViewModel() : ViewModel() {
                 flag = true
 
                 var newTime = System.currentTimeMillis() - now
-                if (newTime < MAX_TIME) {
-                    newTime = MAX_TIME - newTime
+                newTime = if (newTime < MAX_TIME) {
+                    MAX_TIME - newTime
                 } else {
-                    newTime = 0
+                    0
                 }
 
                 delay(newTime)
@@ -543,8 +513,8 @@ class FileViewModel() : ViewModel() {
     }
 
     fun setAsHome(activity: Context) {
-        val edit = activity.getSharedPreferences(ChooseFileFragmentActivity.PREF_TAG, 0)?.edit()
-        edit?.putString(ChooseFileFragmentActivity.PREF_HOME, mCurrentPath)
+        val edit = activity.getSharedPreferences(PREF_TAG, 0)?.edit()
+        edit?.putString(PREF_HOME, mCurrentPath)
         edit?.apply()
     }
 
@@ -635,11 +605,11 @@ class FileViewModel() : ViewModel() {
         }
     }
 
-    fun compress(
+    /*fun compress(
         context: Context,
         entry: FileBean,
     ) {
-        /*Toast.makeText(App.instance, "开始压缩,请稍候", Toast.LENGTH_SHORT).show()
+        Toast.makeText(App.instance, "开始压缩,请稍候", Toast.LENGTH_SHORT).show()
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 //val map = HashMap<String, String>()
@@ -694,8 +664,8 @@ class FileViewModel() : ViewModel() {
                     )
                 }
             }
-        }*/
-    }
+        }
+    }*/
 
     fun convertToPDF(
         context: Context,

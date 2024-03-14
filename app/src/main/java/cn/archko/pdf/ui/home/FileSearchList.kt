@@ -77,12 +77,15 @@ fun FileSearchList(
                     PDFViewerHelper.openComposeViewerMupdf(this, context)
                 }
             }
+
             MenuItemType.ViewBookWithMupdf -> {
                 PDFViewerHelper.openViewerMupdf(fb.file!!, context)
             }
+
             MenuItemType.OpenWithOther -> {
                 PDFViewerHelper.openViewerOther(fb.file!!, context)
             }
+
             MenuItemType.ViewBookInfo -> {
                 //val map = HashMap<String, String>()
                 //map["type"] = "info"
@@ -90,15 +93,19 @@ fun FileSearchList(
                 //MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
                 showInfoDialog.value = true
             }
+
             MenuItemType.DeleteFile -> {
                 viewModel.deleteFile(fb)
             }
+
             MenuItemType.AddToFav -> {
                 viewModel.favorite(context, fb, 1)
             }
+
             MenuItemType.DeleteFav -> {
                 viewModel.favorite(context, fb, 0)
             }
+
             else -> {}
         }
     }
@@ -165,12 +172,14 @@ fun FileSearchList(
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
+
                     SearchDisplay.Suggestions -> SearchSuggestions(
                         suggestions = state.suggestions,
                         onSuggestionSelect = { suggestion ->
                             state.query = TextFieldValue(suggestion)
                         }
                     )
+
                     SearchDisplay.NoResults -> Text("no results")
                     SearchDisplay.Results -> ItemList(
                         state.searchResults,

@@ -1,13 +1,9 @@
 package cn.archko.pdf.common
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import cn.archko.pdf.App
 
 object Graph {
     lateinit var database: AKDatabase
@@ -26,12 +22,4 @@ object Graph {
             .addMigrations(MIGRATION_5_6)
             .build()
     }
-
-    // 创建DataStore
-    private val App.dataStore: DataStore<Preferences> by preferencesDataStore(
-        name = App.PDF_PREFERENCES_NAME
-    )
-
-    // 对外开放的DataStore变量
-    val dataStore = App.instance!!.dataStore
 }

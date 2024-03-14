@@ -123,6 +123,7 @@ class ListMoreView : IMoreView {
                 }
                 loadingView!!.text = text[0]
             }
+
             IMoreView.STATE_LOADING -> {
                 if (progressImage != null) {
                     progressImage!!.visibility = View.VISIBLE
@@ -130,6 +131,7 @@ class ListMoreView : IMoreView {
                 }
                 loadingView!!.text = text[1]
             }
+
             IMoreView.STATE_LOAD_FAIL -> {
                 if (progressImage != null) {
                     progressImage!!.visibility = View.GONE
@@ -143,6 +145,7 @@ class ListMoreView : IMoreView {
                 }
                 loadingView!!.text = text[2]
             }
+
             IMoreView.STATE_NO_MORE -> {
                 if (progressImage != null) {
                     progressImage!!.visibility = View.GONE
@@ -156,6 +159,7 @@ class ListMoreView : IMoreView {
                 }
                 loadingView!!.text = text[3]
             }
+
             else -> {
                 if (progressImage != null) {
                     progressImage!!.visibility = View.GONE

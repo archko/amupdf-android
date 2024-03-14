@@ -16,7 +16,6 @@ import java.io.File
  */
 class FontHelper(
     private var context: ComponentActivity,
-    private var optionRepository: PdfOptionRepository
 ) {
 
     init {
@@ -35,12 +34,11 @@ class FontHelper(
 
     fun loadFont() {
         context.lifecycleScope.launch {
-            var fontType = PdfOptionRepository.DEFAULT
-            var fontName = PdfOptionRepository.SYSTEM_FONT
+            var fontType :Int
+            var fontName: String
             withContext(Dispatchers.IO) {
-                val data = optionRepository.pdfOptionFlow.first()
-                fontType = data.fontType
-                fontName = data.fontName
+                fontType = PdfOptionRepository.getFontType()
+                fontName = PdfOptionRepository.getFontName()?:PdfOptionRepository.SYSTEM_FONT
             }
             initFontBean(fontType, fontName)
         }
@@ -75,8 +73,8 @@ class FontHelper(
 
         context.lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                optionRepository.setFontType(fontBean?.fontType!!)
-                optionRepository.setFontName(fontBean?.fontName!!)
+                PdfOptionRepository.setFontType(fontBean?.fontType!!)
+                PdfOptionRepository.setFontName(fontBean?.fontName!!)
             }
         }
     }

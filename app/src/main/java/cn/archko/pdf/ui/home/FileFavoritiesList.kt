@@ -54,12 +54,15 @@ fun FileFavoritiesList(
                     PDFViewerHelper.openComposeViewerMupdf(this, context)
                 }
             }
+
             MenuItemType.ViewBookWithMupdf -> {
                 PDFViewerHelper.openViewerMupdf(fb.file!!, context)
             }
+
             MenuItemType.OpenWithOther -> {
                 PDFViewerHelper.openViewerOther(fb.file!!, context)
             }
+
             MenuItemType.ViewBookInfo -> {
                 //val map = HashMap<String, String>()
                 //map["type"] = "info"
@@ -67,12 +70,15 @@ fun FileFavoritiesList(
                 //MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
                 showInfoDialog.value = true
             }
+
             MenuItemType.AddToFav -> {
                 viewModel.favorite(context, fb, 1, true)
             }
+
             MenuItemType.DeleteFav -> {
                 viewModel.favorite(context, fb, 0, true)
             }
+
             else -> {}
         }
     }

@@ -1,8 +1,6 @@
 package cn.archko.pdf.entity
 
 import android.graphics.Color
-import cn.archko.pdf.App
-import cn.archko.pdf.R
 import cn.archko.pdf.utils.Utils
 
 /**

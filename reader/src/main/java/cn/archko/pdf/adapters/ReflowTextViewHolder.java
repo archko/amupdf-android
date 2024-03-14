@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import androidx.recyclerview.awidget.ARecyclerView;
 import cn.archko.pdf.R;
 import cn.archko.pdf.common.ParseTextMain;
 import cn.archko.pdf.common.ReflowViewCache;
@@ -23,7 +24,7 @@ import cn.archko.pdf.utils.Utils;
 /**
  * @author: archko 2019-02-21 :09:18
  */
-public class ReflowTextViewHolder extends BaseViewHolder<ReflowBean> {
+public class ReflowTextViewHolder extends ARecyclerView.ViewHolder {
 
     public PDFTextView pageView;
 

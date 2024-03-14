@@ -37,7 +37,6 @@ open class FontsFragment : DialogFragment() {
     var mStyleHelper: StyleHelper? = null
     var mDataListener: DataListener? = null
     private lateinit var fontsViewModel: FontsViewModel
-    protected val optionRepository = PdfOptionRepository(Graph.dataStore)
 
     private var layoutSearch: View? = null
     private var toolbar: MaterialToolbar? = null
@@ -59,7 +58,7 @@ open class FontsFragment : DialogFragment() {
         }
         setStyle(STYLE_NO_FRAME, themeId)
 
-        fontsViewModel = FontsViewModel(optionRepository)
+        fontsViewModel = FontsViewModel()
     }
 
     override fun onResume() {

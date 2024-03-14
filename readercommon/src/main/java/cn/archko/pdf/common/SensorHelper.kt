@@ -8,11 +8,9 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Build
 import androidx.activity.ComponentActivity
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.lifecycleScope
+import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -65,23 +63,14 @@ class SensorHelper(private val activity: ComponentActivity) {
         if (sensorManager != null) {
             sensorManager!!.unregisterListener(sensorEventListener)
             sensorManager = null
-            activity.lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    Graph.dataStore.edit { preferences ->
-                        preferences[stringPreferencesKey(PREF_PREV_ORIENTATION)] =
-                            prevOrientation.toString()
-                    }
-                }
-            }
+            MMKV.defaultMMKV().decodeString(PREF_PREV_ORIENTATION, prevOrientation.toString())
         }
     }
 
     fun onResume() {
         activity.lifecycleScope.launch {
             prevOrientation = withContext(Dispatchers.IO) {
-                val str: String? = Graph.dataStore.data.first()[stringPreferencesKey(
-                    PREF_PREV_ORIENTATION
-                )]
+                val str: String? = MMKV.defaultMMKV().decodeString(PREF_PREV_ORIENTATION)
                 if (null != str) {
                     return@withContext str.toInt()
                 } else {
@@ -93,9 +82,7 @@ class SensorHelper(private val activity: ComponentActivity) {
             }
 
             val orientation = withContext(Dispatchers.IO) {
-                val str: String? = Graph.dataStore.data.first()[stringPreferencesKey(
-                    PREF_ORIENTATION
-                )]
+                val str: String? = MMKV.defaultMMKV().decodeString(PREF_ORIENTATION)
                 if (null != str) {
                     return@withContext str.toInt()
                 } else {
@@ -135,13 +122,17 @@ class SensorHelper(private val activity: ComponentActivity) {
                     activity.requestedOrientation = prev
                     return true
                 }
+
                 4 -> activity.requestedOrientation =
                     ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
+
                 5 -> activity.requestedOrientation =
                     ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
+
                 6 -> activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
                 7 -> activity.requestedOrientation =
                     ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+
                 else -> {
                 }
             }

@@ -225,6 +225,8 @@ object IntentFile {
                 || path.endsWith(".xml", true)
                 || path.endsWith(".html", true)
                 || path.endsWith(".xhtml", true)
+                || path.endsWith(".js", true)
+                || path.endsWith(".json", true)
     }
 
     fun isImage(path: String?): Boolean {
@@ -232,6 +234,7 @@ object IntentFile {
                 || path.endsWith(".jpg", true)
                 || path.endsWith(".jpeg", true)
                 || path.endsWith(".webp", true)
+                || path.endsWith(".bmp", true)
     }
 
     fun isPdf(path: String?): Boolean {
@@ -247,6 +250,12 @@ object IntentFile {
                 || path.endsWith(".tiff", true)
                 || path.endsWith(".epub", true)
                 || path.endsWith(".mobi", true)
+                || path.endsWith(".ppt", true)
+                || path.endsWith(".pptx", true)
+                || path.endsWith(".doc", true)
+                || path.endsWith(".docx", true)
+                || path.endsWith(".xls", true)
+                || path.endsWith(".xlsx", true)
     }
 }
 

@@ -10,7 +10,6 @@ import android.widget.TextView;
 import java.util.List;
 
 import androidx.recyclerview.widget.RecyclerView;
-
 import cn.archko.pdf.R;
 import cn.archko.pdf.entity.OutlineItem;
 import cn.archko.pdf.listeners.OnItemClickListener;

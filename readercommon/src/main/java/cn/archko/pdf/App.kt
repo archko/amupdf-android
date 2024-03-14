@@ -6,6 +6,7 @@ import cn.archko.pdf.common.Graph
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.tencent.mmkv.MMKV
 
 class App : Application(), ImageLoaderFactory {
     //private val appkey = "5c15f639f1f556978b0009c8"
@@ -15,6 +16,7 @@ class App : Application(), ImageLoaderFactory {
         super.onCreate()
         instance = this
         Graph.provide(this)
+        MMKV.initialize(this)
 
         Thread.setDefaultUncaughtExceptionHandler(CrashHandler())
         val displayMetrics = resources.displayMetrics

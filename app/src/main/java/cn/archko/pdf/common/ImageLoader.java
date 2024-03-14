@@ -7,8 +7,6 @@ import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.widget.ImageView;
 
-import androidx.collection.LruCache;
-
 import com.artifex.mupdf.fitz.Document;
 import com.artifex.mupdf.fitz.Matrix;
 import com.artifex.mupdf.fitz.Page;
@@ -16,6 +14,7 @@ import com.artifex.mupdf.fitz.Rect;
 
 import java.io.File;
 
+import androidx.collection.LruCache;
 import cn.archko.pdf.App;
 import cn.archko.pdf.entity.APage;
 import cn.archko.pdf.mupdf.MupdfDocument;

@@ -1,7 +1,6 @@
 package cn.archko.pdf.activities
 
 import android.annotation.TargetApi
-import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.PointF
 import android.os.Build
@@ -19,7 +18,6 @@ import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.Event
-import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PdfOptionRepository
@@ -33,7 +31,6 @@ import cn.archko.pdf.viewmodel.PDFViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -42,9 +39,10 @@ import kotlinx.coroutines.withContext
  */
 abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
 
+    protected val OUTLINE_REQUEST = 0
     protected var mPath: String? = null
 
-    protected lateinit var progressDialog: ProgressDialog
+    //protected lateinit var progressDialog: ProgressDialog
 
     protected var gestureDetector: GestureDetector? = null
     protected var pageNumberToast: Toast? = null
@@ -58,14 +56,13 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
 
     protected var mDocumentView: FrameLayout? = null
     protected var viewController: AViewController? = null
-    protected val optionRepository = PdfOptionRepository(Graph.dataStore)
     protected val pdfViewModel: PDFViewModel = PDFViewModel()
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         isLive = true
         super.onCreate(savedInstanceState)
 
-        progressDialog = ProgressDialog(this)
+        //progressDialog = ProgressDialog(this)
 
         if (null != savedInstanceState) {
             mPath = savedInstanceState.getString("path", null)
@@ -93,9 +90,9 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
 
     open fun loadBookmark() {
         lifecycleScope.launch {
-            mCrop = optionRepository.pdfOptionFlow.first().autocrop
+            mCrop = PdfOptionRepository.getAutocrop()
             mPath?.run {
-                val bookProgress = pdfViewModel.loadBookProgressByPath(this, optionRepository)
+                val bookProgress = pdfViewModel.loadBookProgressByPath(this)
                 bookProgress?.let {
                     mCrop = it.autoCrop == 0
                     mReflow = it.reflow == 1
@@ -105,33 +102,38 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     }
 
     open fun doLoadDoc() {
-        try {
-            progressDialog.setMessage("Loading menu")
+        //try {
+        //progressDialog.setMessage("Loading menu")
 
-            isDocLoaded = true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            finish()
-        } finally {
-            progressDialog.dismiss()
-        }
+        isDocLoaded = true
+        //} catch (e: Exception) {
+        //    e.printStackTrace()
+        //    finish()
+        //} finally {
+        //    //progressDialog.dismiss()
+        //}
     }
 
     private fun parseIntent() {
         if (TextUtils.isEmpty(mPath)) {
             val intent = intent
 
+            //pos = getIntent().getIntExtra("pos", 0)
             if (Intent.ACTION_VIEW == intent.action) {
-                var path: String? = IntentFile.getPath(this, intent.data)
-                if (path == null && intent.data != null) {
-                    path = intent.data.toString()
+                val uri = getIntent().data
+                mPath = getIntent().getStringExtra("path")
+                if (TextUtils.isEmpty(mPath)) {
+                    val path = IntentFile.getPath(this, uri)
+                    mPath = path
                 }
-                mPath = path
             } else {
                 if (!TextUtils.isEmpty(getIntent().getStringExtra("path"))) {
                     mPath = getIntent().getStringExtra("path")
                 }
             }
+        }
+        if (TextUtils.isEmpty(mPath)) {
+            finish()
         }
     }
 
@@ -152,7 +154,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
             .get<String>(Event.ACTION_STOPPED)
             .post(mPath)
         pdfViewModel.destroy()
-        progressDialog.dismiss()
+        //progressDialog.dismiss()
         BitmapCache.getInstance().clear()
     }
 
@@ -201,9 +203,8 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
             var keepOn = false
             var fullscreen = true
             withContext(Dispatchers.IO) {
-                val data = optionRepository.pdfOptionFlow.first()
-                keepOn = data.keepOn
-                fullscreen = data.fullscreen
+                keepOn = PdfOptionRepository.getKeepOn()
+                fullscreen = PdfOptionRepository.getFullscreen()
             }
 
             if (keepOn) {
@@ -224,7 +225,6 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         Logcat.d("onResume ")
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) {
@@ -245,6 +245,10 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         return viewController!!.getCurrentPos()
     }
 
+    open fun getPassword(): String? {
+        return null
+    }
+
     //===========================================
 
     companion object {
@@ -259,8 +263,8 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     }
 
     open fun loadDoc(password: String?) {
-        progressDialog.setMessage(mPath)
-        progressDialog.show()
+        //progressDialog.setMessage(mPath)
+        //progressDialog.show()
         lifecycleScope.launch {
             val start = SystemClock.uptimeMillis()
             pdfViewModel.loadPdfDoc(this@MuPDFRecyclerViewActivity, mPath!!, password)

@@ -84,12 +84,15 @@ fun FileBrowserList(
                     PDFViewerHelper.openComposeViewerMupdf(this, context)
                 }
             }
+
             MenuItemType.ViewBookWithMupdf -> {
                 PDFViewerHelper.openViewerMupdf(fb.file!!, context)
             }
+
             MenuItemType.OpenWithOther -> {
                 PDFViewerHelper.openViewerOther(fb.file!!, context)
             }
+
             MenuItemType.ViewBookInfo -> {
                 //val map = HashMap<String, String>()
                 //map["type"] = "info"

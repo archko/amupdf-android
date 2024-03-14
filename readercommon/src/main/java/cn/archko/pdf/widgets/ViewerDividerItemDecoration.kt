@@ -7,16 +7,15 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.view.View
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ItemDecoration
+import androidx.recyclerview.awidget.ARecyclerView
+import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.utils.Utils
 
 class ViewerDividerItemDecoration @JvmOverloads constructor(
     orientation: Int,
     color: Int,
     itemSize: Int = Utils.dipToPixel(0.5f)
-) : ItemDecoration() {
+) : ARecyclerView.ItemDecoration() {
     /**
      * RecyclerView的布局方向，默认先赋值
      * 为纵向布局
@@ -57,7 +56,7 @@ class ViewerDividerItemDecoration @JvmOverloads constructor(
         this.leftPadding = leftPadding
     }
 
-    override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+    override fun onDraw(c: Canvas, parent: ARecyclerView, state: ARecyclerView.State) {
         if (mOrientation == LinearLayoutManager.VERTICAL) {
             drawVertical(c, parent)
         } else {
@@ -71,13 +70,13 @@ class ViewerDividerItemDecoration @JvmOverloads constructor(
      * @param canvas
      * @param parent
      */
-    private fun drawVertical(canvas: Canvas, parent: RecyclerView) {
+    private fun drawVertical(canvas: Canvas, parent: ARecyclerView) {
         val left = parent.paddingLeft + leftPadding
         val right = parent.measuredWidth - parent.paddingRight
         val childSize = parent.childCount
         for (i in 0 until childSize) {
             val child = parent.getChildAt(i)
-            val layoutParams = child.layoutParams as RecyclerView.LayoutParams
+            val layoutParams = child.layoutParams as ARecyclerView.LayoutParams
             val top = child.bottom + layoutParams.bottomMargin
             val bottom = top + mItemSize
             canvas.drawRect(
@@ -96,13 +95,13 @@ class ViewerDividerItemDecoration @JvmOverloads constructor(
      * @param canvas
      * @param parent
      */
-    private fun drawHorizontal(canvas: Canvas, parent: RecyclerView) {
+    private fun drawHorizontal(canvas: Canvas, parent: ARecyclerView) {
         val top = parent.paddingTop
         val bottom = parent.measuredHeight - parent.paddingBottom
         val childSize = parent.childCount
         for (i in 0 until childSize) {
             val child = parent.getChildAt(i)
-            val layoutParams = child.layoutParams as RecyclerView.LayoutParams
+            val layoutParams = child.layoutParams as ARecyclerView.LayoutParams
             val left = child.right + layoutParams.rightMargin
             val right = left + mItemSize
             canvas.drawRect(
@@ -126,8 +125,8 @@ class ViewerDividerItemDecoration @JvmOverloads constructor(
     override fun getItemOffsets(
         outRect: Rect,
         view: View,
-        parent: RecyclerView,
-        state: RecyclerView.State
+        parent: ARecyclerView,
+        state: ARecyclerView.State
     ) {
         if (mOrientation == LinearLayoutManager.VERTICAL) {
             outRect[0, 0, 0] = mItemSize

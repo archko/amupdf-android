@@ -46,13 +46,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
-import cn.archko.pdf.App
 import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Graph
-import cn.archko.pdf.common.ImageLoader
 import cn.archko.pdf.common.ImageWorker
 import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.PdfImageDecoder
@@ -62,8 +60,6 @@ import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.State
 import cn.archko.pdf.mupdf.MupdfDocument
-import cn.archko.pdf.utils.BitmapUtils
-import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.StatusBarHelper
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
@@ -72,7 +68,6 @@ import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
 import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
-import java.io.File
 
 /**
  * @author: archko 2022/7/11 :9:49 上午
@@ -81,7 +76,6 @@ class ComposeTextActivity : ComponentActivity() {
 
     private var path: String? = null
     private var sensorHelper: SensorHelper? = null
-    private val preferencesRepository = PdfOptionRepository(Graph.dataStore)
     private val pdfViewModel: PDFViewModel = PDFViewModel()
     private var mStyleHelper: StyleHelper? = null
     protected var pageNumberToast: Toast? = null
@@ -103,10 +97,10 @@ class ComposeTextActivity : ComponentActivity() {
             return
         }
 
-        mStyleHelper = StyleHelper(this, preferencesRepository)
+        mStyleHelper = StyleHelper(this)
         sensorHelper = SensorHelper(this@ComposeTextActivity)
         lifecycleScope.launch {
-            pdfViewModel.loadBookProgressByPath(path!!, preferencesRepository)
+            pdfViewModel.loadBookProgressByPath(path!!)
         }
         setView()
     }

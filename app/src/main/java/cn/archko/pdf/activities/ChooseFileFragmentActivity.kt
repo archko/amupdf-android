@@ -35,17 +35,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.lifecycleScope
 import cn.archko.mupdf.R
 import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.NavGraph
-import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PdfOptionRepository
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
 import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
-import kotlinx.coroutines.launch
 
 /**
  * @author archko
@@ -70,17 +67,14 @@ open class ChooseFileFragmentActivity : AnalysticActivity(), OnPermissionGranted
             return
         }
         //val windowSizeClass = calculateWindowSizeClass(this)
-        val preferencesRepository = PdfOptionRepository(Graph.dataStore)
         setContent {
             val sysDark = isSystemInDarkTheme()
             val darkTheme = remember {
                 mutableStateOf(sysDark)
             }
             val changeTheme: (Boolean) -> Unit = { it ->
-                lifecycleScope.launch {
-                    preferencesRepository.setDartTheme(it)
-                    darkTheme.value = !darkTheme.value
-                }
+                PdfOptionRepository.setDartTheme(it)
+                darkTheme.value = !darkTheme.value
             }
             NiaTheme(darkTheme = darkTheme.value) {
                 CompositionLocalProvider(

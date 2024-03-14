@@ -23,14 +23,12 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.awidget.ARecyclerView
+import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFTextAdapter
 import cn.archko.pdf.common.Event
-import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.IntentFile
-import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.common.TextHelper
@@ -54,12 +52,11 @@ class TextActivity : AppCompatActivity() {
     private var path: String? = null
     private var mUri: Uri? = null
     private var sensorHelper: SensorHelper? = null
-    private val preferencesRepository = PdfOptionRepository(Graph.dataStore)
     protected val pdfViewModel: PDFViewModel = PDFViewModel()
 
     private var mStyleControls: View? = null
     private var mControllerLayout: RelativeLayout? = null
-    private var recyclerView: RecyclerView? = null
+    private var recyclerView: ARecyclerView? = null
 
     private var mStyleHelper: StyleHelper? = null
     private var adapter: MuPDFTextAdapter? = null
@@ -83,7 +80,7 @@ class TextActivity : AppCompatActivity() {
 
         StatusBarHelper.hideSystemUI(this)
 
-        mStyleHelper = StyleHelper(this, preferencesRepository)
+        mStyleHelper = StyleHelper(this)
 
         var margin = window.decorView.height
         if (margin <= 0) {
@@ -130,7 +127,7 @@ class TextActivity : AppCompatActivity() {
             }
         })
 
-        recyclerView = RecyclerView(this)
+        recyclerView = ARecyclerView(this)
         mControllerLayout = RelativeLayout(this)
         mControllerLayout!!.addView(recyclerView)
         setContentView(mControllerLayout)
@@ -142,13 +139,13 @@ class TextActivity : AppCompatActivity() {
             //setItemViewCacheSize(0)
 
             addItemDecoration(ViewerDividerItemDecoration(context, LinearLayoutManager.VERTICAL))
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+            addOnScrollListener(object : ARecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: ARecyclerView, newState: Int) {
+                    if (newState == ARecyclerView.SCROLL_STATE_IDLE) {
                     }
                 }
 
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                override fun onScrolled(recyclerView: ARecyclerView, dx: Int, dy: Int) {
                 }
             })
 
@@ -161,10 +158,10 @@ class TextActivity : AppCompatActivity() {
         adapter = MuPDFTextAdapter(this, mStyleHelper)
         header = View(this)
         header!!.minimumHeight = Utils.dipToPixel(TextHelper.HEADER_HEIGHT)
-        adapter!!.addHeaderView(header)
+        //adapter!!.addHeaderView(header)
         footer = View(this)
         footer!!.minimumHeight = Utils.dipToPixel(TextHelper.HEADER_HEIGHT)
-        adapter!!.addFootView(footer)
+        //adapter!!.addFootView(footer)
 
         updateHeaderFooterBg()
 
@@ -200,7 +197,7 @@ class TextActivity : AppCompatActivity() {
     private fun loadBookmark() {
         lifecycleScope.launch {
             val bookProgress =
-                path!!.run { pdfViewModel.loadBookProgressByPath(this, preferencesRepository) }
+                path!!.run { pdfViewModel.loadBookProgressByPath(this) }
             bookProgress?.page?.let { scrollToPosition(it) }
         }
     }

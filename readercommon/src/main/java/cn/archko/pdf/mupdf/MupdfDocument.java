@@ -21,8 +21,6 @@ import com.artifex.mupdf.fitz.android.AndroidDrawDevice;
 import org.ebookdroid.core.crop.PageCropper;
 
 import java.io.File;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.List;
 
 import cn.archko.pdf.common.BitmapPool;

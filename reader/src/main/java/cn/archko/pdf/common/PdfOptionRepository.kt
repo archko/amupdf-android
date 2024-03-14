@@ -1,220 +1,159 @@
 package cn.archko.pdf.common
 
 import android.graphics.Color
-import android.util.Log
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.floatPreferencesKey
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 import cn.archko.pdf.utils.Utils
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
-import java.io.IOException
+import com.tencent.mmkv.MMKV
 
 /**
  * @author: archko 2021/10/4 :08:37
  */
-class PdfOptionRepository(private val dataStore: DataStore<Preferences>) {
+object PdfOptionRepository {
 
     private val TAG: String = "PdfPreferencesRepo"
+    val mmkv = MMKV.defaultMMKV()
 
-    val pdfOptionFlow: Flow<PdfOption> = dataStore.data
-        .catch { exception ->
-            // dataStore.data throws an IOException when an error is encountered when reading data
-            if (exception is IOException) {
-                Log.e(TAG, "Error reading preferences.", exception)
-                emit(emptyPreferences())
-            } else {
-                throw exception
-            }
-        }.map { preferences ->
-            val showExtension = preferences[PdfOptionKeys.PREF_SHOW_EXTENSION] ?: true
-            val imageOcr = preferences[PdfOptionKeys.PREF_OCR] ?: true
-            val overrideFile = preferences[PdfOptionKeys.PREF_OVERRIDE_FILE] ?: true
-            val fullscreen = preferences[PdfOptionKeys.PREF_FULLSCREEN] ?: true
-            val autocrop = preferences[PdfOptionKeys.PREF_AUTOCROP] ?: true
-            val verticalScrollLock = preferences[PdfOptionKeys.PREF_VERTICAL_SCROLL_LOCK] ?: true
-            val sideMargins2 = preferences[PdfOptionKeys.PREF_SIDE_MARGINS] ?: "0"
-            val topMargin = preferences[PdfOptionKeys.PREF_TOP_MARGIN] ?: "10"
-            val keepOn = preferences[PdfOptionKeys.PREF_KEEP_ON] ?: false
-            val listStyle = preferences[PdfOptionKeys.PREF_LIST_STYLE] ?: "0"
-            val dartTheme = preferences[PdfOptionKeys.PREF_DART_THEME] ?: false
-            val orientation = preferences[PdfOptionKeys.PREF_ORIENTATION] ?: "7"
-            val fontType = preferences[PdfOptionKeys.FONT_KEY_TYPE] ?: DEFAULT
-            val fontName =
-                preferences[PdfOptionKeys.FONT_KEY_NAME] ?: SYSTEM_FONT
-
-            val textSize = preferences[PdfOptionKeys.STYLE_KEY_FONT_SIZE] ?: 16f
-            val bgColor = preferences[PdfOptionKeys.STYLE_KEY_BGCOLOR] ?: Color.WHITE
-            val fgColor = preferences[PdfOptionKeys.STYLE_KEY_FGCOLOR] ?: Color.BLACK
-            val lineSpacingMult = preferences[PdfOptionKeys.STYLE_KEY_LINE_SPACEING_MULT] ?: 1.48f
-            val leftPadding =
-                preferences[PdfOptionKeys.STYLE_KEY_LEFT_PADDING] ?: Utils.dipToPixel(12f)
-            val topPadding =
-                preferences[PdfOptionKeys.STYLE_KEY_RIGHT_PADDING] ?: Utils.dipToPixel(16f)
-            val rightPadding =
-                preferences[PdfOptionKeys.STYLE_KEY_TOP_PADDING] ?: Utils.dipToPixel(12f)
-            val bottomPadding =
-                preferences[PdfOptionKeys.STYLE_KEY_BOTTOM_PADDING] ?: Utils.dipToPixel(20f)
-            val pdfPreferences = PdfOption(
-                showExtension = showExtension,
-                imageOcr = imageOcr,
-                overrideFile = overrideFile,
-                fullscreen = fullscreen,
-                autocrop = autocrop,
-                verticalScrollLock = verticalScrollLock,
-                sideMargins2 = sideMargins2,
-                topMargin = topMargin,
-                keepOn = keepOn,
-                listStyle = listStyle,
-                dartTheme = dartTheme,
-                orientation = orientation,
-                fontType = fontType,
-                textSize = textSize,
-                fontName = fontName,
-                bgColor = bgColor,
-                fgColor = fgColor,
-                lineSpacingMult = lineSpacingMult,
-                leftPadding = leftPadding,
-                topPadding = topPadding,
-                rightPadding = rightPadding,
-                bottomPadding = bottomPadding,
-            )
-            Logcat.d("pdfPreferences:$pdfPreferences ")
-            pdfPreferences
-        }
-
-    suspend fun setShowExtension(enable: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.PREF_SHOW_EXTENSION] = enable
-        }
+    fun setShowExtension(enable: Boolean) {
+        mmkv.encode(PdfOptionKeys.PREF_SHOW_EXTENSION, enable)
     }
 
-    suspend fun setImageOcr(enable: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.PREF_OCR] = enable
-        }
+    fun getShowExtension(): Boolean {
+        return mmkv.decodeBool(PdfOptionKeys.PREF_SHOW_EXTENSION)
     }
 
-    suspend fun setFullscreen(enable: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.PREF_FULLSCREEN] = enable
-        }
+    fun setImageOcr(enable: Boolean) {
+        mmkv.encode(PdfOptionKeys.PREF_OCR, enable)
     }
 
-    suspend fun setAutocrop(autocrop: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.PREF_AUTOCROP] = autocrop
-        }
+    fun getImageOcr(): Boolean {
+        return mmkv.decodeBool(PdfOptionKeys.PREF_OCR)
     }
 
-    suspend fun setVerticalScrollLock(enable: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.PREF_VERTICAL_SCROLL_LOCK] = enable
-        }
+    fun getFullscreen(): Boolean {
+        return mmkv.decodeBool(PdfOptionKeys.PREF_FULLSCREEN)
     }
 
-    suspend fun setKeepOn(keepOn: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.PREF_KEEP_ON] = keepOn
-        }
+    fun getAutocrop(): Boolean {
+        return mmkv.decodeBool(PdfOptionKeys.PREF_AUTOCROP)
     }
 
-    suspend fun setDartTheme(dartTheme: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.PREF_DART_THEME] = dartTheme
-        }
+    fun getVerticalScrollLock(): Boolean {
+        return mmkv.decodeBool(PdfOptionKeys.PREF_VERTICAL_SCROLL_LOCK)
     }
 
-    suspend fun setFontType(fontType: Int) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.FONT_KEY_TYPE] = fontType
-        }
+    fun getKeepOn(): Boolean {
+        return mmkv.decodeBool(PdfOptionKeys.PREF_KEEP_ON)
     }
 
-    suspend fun setFontName(fontName: String) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.FONT_KEY_NAME] = fontName
-        }
+    fun setDartTheme(dartTheme: Boolean) {
+        mmkv.encode(PdfOptionKeys.PREF_DART_THEME, dartTheme)
     }
 
-    suspend fun setTextSize(textSize: Float) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.STYLE_KEY_FONT_SIZE] = textSize
-        }
+    fun getDartTheme(): Boolean {
+        return mmkv.decodeBool(PdfOptionKeys.PREF_DART_THEME)
     }
 
-    suspend fun setBgColor(bgColor: Int) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.STYLE_KEY_BGCOLOR] = bgColor
-        }
+    fun setFontType(fontType: Int) {
+        mmkv.encode(PdfOptionKeys.FONT_KEY_TYPE, fontType)
     }
 
-    suspend fun setFgColor(fgColor: Int) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.STYLE_KEY_FGCOLOR] = fgColor
-        }
+    fun getFontType(): Int {
+        return mmkv.decodeInt(PdfOptionKeys.FONT_KEY_TYPE, DEFAULT)
     }
 
-    suspend fun setLineSpacingMult(lineSpacingMult: Float) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.STYLE_KEY_LINE_SPACEING_MULT] = lineSpacingMult
-        }
+    fun setFontName(fontName: String) {
+        mmkv.encode(PdfOptionKeys.FONT_KEY_NAME, fontName)
     }
 
-    suspend fun setLeftPadding(leftPadding: Int) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.STYLE_KEY_LEFT_PADDING] = leftPadding
-        }
+    fun getFontName(): String? {
+        return mmkv.decodeString(PdfOptionKeys.FONT_KEY_NAME, "")
     }
 
-    suspend fun setTopPadding(topPadding: Int) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.STYLE_KEY_RIGHT_PADDING] = topPadding
-        }
+    fun setTextSize(textSize: Float) {
+        mmkv.encode(PdfOptionKeys.STYLE_KEY_FONT_SIZE, textSize)
     }
 
-    suspend fun setRightPadding(rightPadding: Int) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.STYLE_KEY_TOP_PADDING] = rightPadding
-        }
+    fun getTextSize(): Float {
+        return mmkv.decodeFloat(PdfOptionKeys.STYLE_KEY_FONT_SIZE)
     }
 
-    suspend fun setBottomPadding(bottomPadding: Int) {
-        dataStore.edit { preferences ->
-            preferences[PdfOptionKeys.STYLE_KEY_BOTTOM_PADDING] = bottomPadding
-        }
+    fun setBgColor(bgColor: Int) {
+        mmkv.encode(PdfOptionKeys.STYLE_KEY_BGCOLOR, bgColor)
     }
 
-    companion object {
-
-        @JvmField
-        val FONT_DIR = "amupdf/fonts/"
-
-        @JvmField
-        val SYSTEM_FONT = "System Font"
-
-        @JvmField
-        val SYSTEM_FONT_SAN = "System Font SAN"
-
-        @JvmField
-        val SYSTEM_FONT_SERIF = "System Font SERIF"
-
-        @JvmField
-        val SYSTEM_FONT_MONO = "System Font MONO"
-
-        val DEFAULT = 0
-        val DEFAULT_BOLD = 1
-        val SANS_SERIF = 2
-        val SERIF = 3
-        val MONOSPACE = 4
-        val CUSTOM = 5
+    fun getBgColor(): Int {
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_BGCOLOR)
     }
+
+    fun setFgColor(fgColor: Int) {
+        mmkv.encode(PdfOptionKeys.STYLE_KEY_FGCOLOR, fgColor)
+    }
+
+    fun getFgColor(): Int {
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_FGCOLOR)
+    }
+
+    fun setLineSpacingMult(lineSpacingMult: Float) {
+        mmkv.encode(PdfOptionKeys.STYLE_KEY_LINE_SPACEING_MULT, lineSpacingMult)
+    }
+
+    fun getLineSpacingMult(): Float {
+        return mmkv.decodeFloat(PdfOptionKeys.STYLE_KEY_LINE_SPACEING_MULT)
+    }
+
+    fun setLeftPadding(leftPadding: Int) {
+        mmkv.encode(PdfOptionKeys.STYLE_KEY_LEFT_PADDING, leftPadding)
+    }
+
+    fun getLeftPadding(): Int {
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_LEFT_PADDING)
+    }
+
+    fun setTopPadding(topPadding: Int) {
+        mmkv.encode(PdfOptionKeys.STYLE_KEY_RIGHT_PADDING, topPadding)
+    }
+
+    fun getTopPadding(): Int {
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_RIGHT_PADDING)
+    }
+
+    fun setRightPadding(rightPadding: Int) {
+        mmkv.encode(PdfOptionKeys.STYLE_KEY_TOP_PADDING, rightPadding)
+    }
+
+    fun getRightPadding(): Int {
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_TOP_PADDING)
+    }
+
+    fun setBottomPadding(bottomPadding: Int) {
+        mmkv.encode(PdfOptionKeys.STYLE_KEY_BOTTOM_PADDING, bottomPadding)
+    }
+
+    fun getBottomPadding(): Int {
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_BOTTOM_PADDING)
+    }
+
+
+    @JvmField
+    val FONT_DIR = "amupdf/fonts/"
+
+    @JvmField
+    val SYSTEM_FONT = "System Font"
+
+    @JvmField
+    val SYSTEM_FONT_SAN = "System Font SAN"
+
+    @JvmField
+    val SYSTEM_FONT_SERIF = "System Font SERIF"
+
+    @JvmField
+    val SYSTEM_FONT_MONO = "System Font MONO"
+
+    val DEFAULT = 0
+    val DEFAULT_BOLD = 1
+    val SANS_SERIF = 2
+    val SERIF = 3
+    val MONOSPACE = 4
+    val CUSTOM = 5
 }
 
 data class PdfOption(
@@ -244,31 +183,31 @@ data class PdfOption(
 )
 
 object PdfOptionKeys {
-    val PREF_SHOW_EXTENSION = booleanPreferencesKey("showExtension")
+    val PREF_SHOW_EXTENSION = ("showExtension")
 
-    val PREF_ORIENTATION = stringPreferencesKey("orientation")
-    val PREF_OCR = booleanPreferencesKey("image_ocr")
-    val PREF_OVERRIDE_FILE = booleanPreferencesKey("override_file")
-    val PREF_FULLSCREEN = booleanPreferencesKey("fullscreen")
-    val PREF_AUTOCROP = booleanPreferencesKey("autocrop")
-    val PREF_VERTICAL_SCROLL_LOCK = booleanPreferencesKey("verticalScrollLock")
-    val PREF_SIDE_MARGINS = stringPreferencesKey("sideMargins2") // sideMargins was boolean
+    val PREF_ORIENTATION = ("orientation")
+    val PREF_OCR = ("image_ocr")
+    val PREF_OVERRIDE_FILE = ("override_file")
+    val PREF_FULLSCREEN = ("fullscreen")
+    val PREF_AUTOCROP = ("autocrop")
+    val PREF_VERTICAL_SCROLL_LOCK = ("verticalScrollLock")
+    val PREF_SIDE_MARGINS = ("sideMargins2") // sideMargins was boolean
 
-    val PREF_TOP_MARGIN = stringPreferencesKey("topMargin")
-    val PREF_KEEP_ON = booleanPreferencesKey("keepOn")
-    val PREF_LIST_STYLE = stringPreferencesKey("list_style")
-    val PREF_DART_THEME = booleanPreferencesKey("pref_dart_theme")
+    val PREF_TOP_MARGIN = ("topMargin")
+    val PREF_KEEP_ON = ("keepOn")
+    val PREF_LIST_STYLE = ("list_style")
+    val PREF_DART_THEME = ("pref_dart_theme")
 
     //============== font and style ==============
-    val FONT_KEY_TYPE = intPreferencesKey("font_key_type")
-    val FONT_KEY_NAME = stringPreferencesKey("font_key_name")
+    val FONT_KEY_TYPE = ("font_key_type")
+    val FONT_KEY_NAME = ("font_key_name")
 
-    val STYLE_KEY_FONT_SIZE = floatPreferencesKey("style_key_font_size")
-    val STYLE_KEY_BGCOLOR = intPreferencesKey("style_key_bgcolor")
-    val STYLE_KEY_FGCOLOR = intPreferencesKey("style_key_fgcolor")
-    val STYLE_KEY_LINE_SPACEING_MULT = floatPreferencesKey("style_key_line_spaceing_mult")
-    val STYLE_KEY_LEFT_PADDING = intPreferencesKey("style_key_left_padding")
-    val STYLE_KEY_RIGHT_PADDING = intPreferencesKey("style_key_right_padding")
-    val STYLE_KEY_TOP_PADDING = intPreferencesKey("style_key_top_padding")
-    val STYLE_KEY_BOTTOM_PADDING = intPreferencesKey("style_key_bottom_padding")
+    val STYLE_KEY_FONT_SIZE = ("style_key_font_size")
+    val STYLE_KEY_BGCOLOR = ("style_key_bgcolor")
+    val STYLE_KEY_FGCOLOR = ("style_key_fgcolor")
+    val STYLE_KEY_LINE_SPACEING_MULT = ("style_key_line_spaceing_mult")
+    val STYLE_KEY_LEFT_PADDING = ("style_key_left_padding")
+    val STYLE_KEY_RIGHT_PADDING = ("style_key_right_padding")
+    val STYLE_KEY_TOP_PADDING = ("style_key_top_padding")
+    val STYLE_KEY_BOTTOM_PADDING = ("style_key_bottom_padding")
 }

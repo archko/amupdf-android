@@ -9,12 +9,8 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceFragmentCompat
 import cn.archko.pdf.R
-import cn.archko.pdf.common.DataStorePreferenceAdapter
-import cn.archko.pdf.common.Graph
-import cn.archko.pdf.common.PdfOptionRepository
 import com.google.android.material.appbar.MaterialToolbar
 
 /**
@@ -34,7 +30,6 @@ class PdfOptionsActivity : FragmentActivity() {
 
     class PrefsFragment : PreferenceFragmentCompat() {
 
-        protected val preferencesRepository = PdfOptionRepository(Graph.dataStore)
         private var mDelegate: AppCompatDelegate? = null
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
@@ -54,8 +49,6 @@ class PdfOptionsActivity : FragmentActivity() {
         }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-            preferenceManager.preferenceDataStore =
-                DataStorePreferenceAdapter(Graph.dataStore, lifecycleScope)
             setPreferencesFromResource(R.xml.options, rootKey)
         }
 

@@ -16,8 +16,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
 import cn.archko.pdf.activities.PdfOptionsActivity.Companion.start
-import cn.archko.pdf.common.BitmapCache
-import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.listeners.SimpleGestureListener
@@ -26,7 +24,6 @@ import cn.archko.pdf.utils.StatusBarHelper
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.vudroid.core.events.CurrentPageListener
@@ -52,7 +49,6 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
     //private CurrentPageModel mPageModel;
     var pageSeekBarControls: APageSeekBarControls? = null
     var sensorHelper: SensorHelper? = null
-    val preferencesRepository = PdfOptionRepository(Graph.dataStore)
     protected val pdfViewModel: PDFViewModel = PDFViewModel()
 
     /**
@@ -69,8 +65,7 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         val uri = intent.data
         val absolutePath = Uri.decode(uri!!.encodedPath)
         lifecycleScope.launch {
-            val bookProgress =
-                pdfViewModel.loadBookProgressByPath(absolutePath, preferencesRepository)
+            val bookProgress = pdfViewModel.loadBookProgressByPath(absolutePath)
             zoomModel.zoom = bookProgress!!.zoomLevel / 1000
         }
         val progressModel = DecodingProgressModel()
@@ -295,10 +290,9 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
             var fullscreen = true
             var verticalScrollLock = true
             withContext(Dispatchers.IO) {
-                val data = preferencesRepository.pdfOptionFlow.first()
-                keepOn = data.keepOn
-                fullscreen = data.fullscreen
-                verticalScrollLock = data.verticalScrollLock
+                keepOn = PdfOptionRepository.getKeepOn()
+                fullscreen = PdfOptionRepository.getFullscreen()
+                verticalScrollLock = PdfOptionRepository.getVerticalScrollLock()
             }
             if (keepOn) {
                 window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)

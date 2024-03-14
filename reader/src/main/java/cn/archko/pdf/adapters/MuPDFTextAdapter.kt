@@ -2,6 +2,7 @@ package cn.archko.pdf.adapters
 
 import android.content.Context
 import android.view.ViewGroup
+import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.App
 import cn.archko.pdf.common.ReflowViewCache
@@ -15,19 +16,20 @@ import cn.archko.pdf.utils.Utils
 class MuPDFTextAdapter(
     private val context: Context,
     private var styleHelper: StyleHelper?,
-) : HeaderAndFooterRecyclerAdapter<ReflowBean>(context) {
+) : ARecyclerView.Adapter<ReflowTextViewHolder>() {
 
     private var screenHeight = 720
     private var screenWidth = 1080
     private val systemScale = Utils.getScale()
     private val reflowCache = ReflowViewCache()
+    var data: List<ReflowBean>? = null
 
     init {
         screenHeight = App.instance!!.screenHeight
         screenWidth = App.instance!!.screenWidth
     }
 
-    override fun doCreateViewHolder(parent: ViewGroup?, viewType: Int): BaseViewHolder<ReflowBean> {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReflowTextViewHolder {
         val pdfView: ReflowTextViewHolder.PDFTextView =
             ReflowTextViewHolder.PDFTextView(context, styleHelper)
         val holder = ReflowTextViewHolder(pdfView)
@@ -40,20 +42,20 @@ class MuPDFTextAdapter(
         return holder
     }
 
-    override fun onBindNormalViewHolder(
-        holder: BaseViewHolder<ReflowBean>,
-        position: Int,
-        realPos: Int
-    ) {
-        val result = data.get(realPos)
-        result?.run {
-            (holder as ReflowTextViewHolder).bindAsReflowBean(
+    override fun getItemCount(): Int {
+        return data?.size ?: 0
+    }
+
+    override fun onBindViewHolder(holder: ReflowTextViewHolder, position: Int) {
+        val result = data?.get(position)
+        result.run {
+            holder.bindAsReflowBean(
                 result,
                 screenHeight,
                 screenWidth,
                 systemScale,
                 reflowCache,
-                showBookmark(realPos)
+                showBookmark(position)
             )
         }
     }
@@ -62,7 +64,7 @@ class MuPDFTextAdapter(
         return false
     }
 
-    override fun onViewRecycled(holder: BaseViewHolder<ReflowBean>) {
+    override fun onViewRecycled(holder: ReflowTextViewHolder) {
         super.onViewRecycled(holder)
         if (holder is ReflowTextViewHolder) {
             holder.recycleViews(reflowCache)

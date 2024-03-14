@@ -13,7 +13,6 @@ import kotlinx.coroutines.withContext
  */
 class StyleHelper(
     private var context: ComponentActivity,
-    private var optionRepository: PdfOptionRepository
 ) {
 
     var styleBean: StyleBean? = null
@@ -24,7 +23,7 @@ class StyleHelper(
     var fontHelper: FontHelper? = null
         get() {
             if (field == null) {
-                fontHelper = FontHelper(context, optionRepository)
+                fontHelper = FontHelper(context)
             }
 
             return field
@@ -35,7 +34,7 @@ class StyleHelper(
     }
 
     private fun loadStyle() {
-        fontHelper = FontHelper(context, optionRepository)
+        fontHelper = FontHelper(context)
         fontHelper?.loadFont()
         loadStyleFromSP()
     }
@@ -43,17 +42,16 @@ class StyleHelper(
     fun loadStyleFromSP() {
         context.lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                val data = optionRepository.pdfOptionFlow.first()
 
                 styleBean = StyleBean(
-                    data.textSize,
-                    data.bgColor,
-                    data.fgColor,
-                    data.lineSpacingMult,
-                    data.leftPadding,
-                    data.topPadding,
-                    data.rightPadding,
-                    data.bottomPadding
+                    PdfOptionRepository.getTextSize(),
+                    PdfOptionRepository.getBgColor(),
+                    PdfOptionRepository.getFgColor(),
+                    PdfOptionRepository.getLineSpacingMult(),
+                    PdfOptionRepository.getLeftPadding(),
+                    PdfOptionRepository.getTopPadding(),
+                    PdfOptionRepository.getRightPadding(),
+                    PdfOptionRepository.getBottomPadding()
                 )
             }
         }
@@ -62,18 +60,14 @@ class StyleHelper(
     fun saveStyleToSP(sBean: StyleBean?) {
         sBean?.run {
             styleBean = sBean
-            context.lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    optionRepository.setTextSize(sBean.textSize)
-                    optionRepository.setBgColor(sBean.bgColor)
-                    optionRepository.setFgColor(sBean.fgColor)
-                    optionRepository.setLineSpacingMult(sBean.lineSpacingMult)
-                    optionRepository.setLeftPadding(sBean.leftPadding)
-                    optionRepository.setTopPadding(sBean.topPadding)
-                    optionRepository.setRightPadding(sBean.rightPadding)
-                    optionRepository.setBottomPadding(sBean.bottomPadding)
-                }
-            }
+            PdfOptionRepository.setTextSize(sBean.textSize)
+            PdfOptionRepository.setBgColor(sBean.bgColor)
+            PdfOptionRepository.setFgColor(sBean.fgColor)
+            PdfOptionRepository.setLineSpacingMult(sBean.lineSpacingMult)
+            PdfOptionRepository.setLeftPadding(sBean.leftPadding)
+            PdfOptionRepository.setTopPadding(sBean.topPadding)
+            PdfOptionRepository.setRightPadding(sBean.rightPadding)
+            PdfOptionRepository.setBottomPadding(sBean.bottomPadding)
         }
     }
 }

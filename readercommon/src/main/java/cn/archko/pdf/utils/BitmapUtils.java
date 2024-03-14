@@ -24,7 +24,7 @@ import cn.archko.pdf.common.Logcat;
 public class BitmapUtils {
 
     public static boolean saveBitmapToFile(Bitmap bitmap, File file) {
-        return saveBitmapToFile(bitmap, file, Bitmap.CompressFormat.PNG, 90);
+        return saveBitmapToFile(bitmap, file, Bitmap.CompressFormat.PNG, 100);
     }
 
     public static boolean saveBitmapToFile(Bitmap bitmap, File file, Bitmap.CompressFormat format, int quality) {
@@ -77,7 +77,7 @@ public class BitmapUtils {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/" + (i++) + ".png");
-            bitmap.compress(Bitmap.CompressFormat.PNG, 80, fos);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

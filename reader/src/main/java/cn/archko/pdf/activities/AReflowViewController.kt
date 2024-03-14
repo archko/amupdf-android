@@ -13,8 +13,8 @@ import android.widget.RelativeLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.awidget.ARecyclerView
+import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFReflowAdapter
@@ -48,14 +48,13 @@ class AReflowViewController(
     private var mPath: String,
     private var mPageSeekBarControls: APageSeekBarControls?,
     private var gestureDetector: GestureDetector?,
-    private var optionRepository: PdfOptionRepository
 ) :
     OutlineListener, AViewController {
 
 
     private var mStyleControls: View? = null
 
-    private lateinit var mRecyclerView: RecyclerView
+    private lateinit var mRecyclerView: ARecyclerView
     private var mStyleHelper: StyleHelper? = null
     private val START_PROGRESS = 15
     private lateinit var mPageSizes: SparseArray<APage>
@@ -66,7 +65,7 @@ class AReflowViewController(
     }
 
     private fun initView() {
-        mRecyclerView = RecyclerView(context)//contentView.findViewById(R.id.recycler_view)
+        mRecyclerView = ARecyclerView(context)//contentView.findViewById(R.id.recycler_view)
         with(mRecyclerView) {
             descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
             isNestedScrollingEnabled = false
@@ -74,14 +73,14 @@ class AReflowViewController(
             setItemViewCacheSize(0)
 
             addItemDecoration(ViewerDividerItemDecoration(context, LinearLayoutManager.VERTICAL))
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+            addOnScrollListener(object : ARecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: ARecyclerView, newState: Int) {
+                    if (newState == ARecyclerView.SCROLL_STATE_IDLE) {
                         updateProgress(getCurrentPos())
                     }
                 }
 
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                override fun onScrolled(recyclerView: ARecyclerView, dx: Int, dy: Int) {
                 }
             })
         }
@@ -132,7 +131,7 @@ class AReflowViewController(
 
     private fun setReflowMode(pos: Int) {
         if (null == mStyleHelper) {
-            mStyleHelper = StyleHelper(context, optionRepository)
+            mStyleHelper = StyleHelper(context)
         }
         if (null == mRecyclerView.adapter) {
             mRecyclerView.adapter =

@@ -65,7 +65,7 @@ public class Page {
         canvas.drawText("Page " + (index + 1), bounds.centerX(), bounds.centerY(), textPaint);
         node.draw(canvas);
         //canvas.drawLine(bounds.left, bounds.top, bounds.right, bounds.top, strokePaint);
-        canvas.drawLine(bounds.left, bounds.bottom, bounds.right/5, bounds.bottom, strokePaint);
+        canvas.drawLine(bounds.left, bounds.bottom, bounds.right / 5, bounds.bottom, strokePaint);
         drawPageLinks(canvas);
     }
 

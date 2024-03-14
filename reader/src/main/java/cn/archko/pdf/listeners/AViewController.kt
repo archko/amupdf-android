@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import android.util.SparseArray
 import android.view.View
 import cn.archko.pdf.entity.APage
-import cn.archko.pdf.mupdf.MupdfDocument
 
 /**
  * @author: archko 2020/5/15 :12:43

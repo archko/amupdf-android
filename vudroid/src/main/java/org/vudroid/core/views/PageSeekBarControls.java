@@ -10,7 +10,6 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import org.vudroid.R;
 import org.vudroid.core.events.BringUpZoomControlsListener;
 import org.vudroid.core.models.CurrentPageModel;
 

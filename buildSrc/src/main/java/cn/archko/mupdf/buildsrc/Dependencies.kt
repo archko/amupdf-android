@@ -141,10 +141,7 @@ object Libs {
         }
 
         object DataStore {
-            private const val dataStoreVersion = "1.1.0-beta01"
             const val preference_version = "1.2.0"
-
-            const val dataStore = "androidx.datastore:datastore-preferences:$dataStoreVersion"
 
             const val preference_ktx = "androidx.preference:preference-ktx:$preference_version"
         }
@@ -188,5 +185,7 @@ object Libs {
         const val swiperefreshlayout =
             "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
         const val colorPickerDialog = "me.jfenn.ColorPickerDialog:base:0.2.2"
+
+        const val recyclerview = "androidx.recyclerview:recyclerview:1.3.2"
     }
 }

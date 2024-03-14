@@ -131,11 +131,11 @@ fun UserOptDialog(
                         txt = stringResource(id = R.string.menu_mupdf),
                         onClick = { menuOpt(MenuItemType.ViewBookWithAMupdf, fileBean) }
                     )
-                    Divider(thickness = 0.5.dp)
-                    DialogItem(
-                        txt = "Vudroid Viewer",
-                        onClick = { menuOpt(MenuItemType.ViewBookWithMupdf, fileBean) }
-                    )
+                    //Divider(thickness = 0.5.dp)
+                    //DialogItem(
+                    //    txt = "Vudroid Viewer",
+                    //    onClick = { menuOpt(MenuItemType.ViewBookWithMupdf, fileBean) }
+                    //)
                     Divider(thickness = 0.5.dp)
                     DialogItem(
                         txt = stringResource(id = R.string.menu_other),

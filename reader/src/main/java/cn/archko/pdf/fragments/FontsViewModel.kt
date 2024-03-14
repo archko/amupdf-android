@@ -1,34 +1,24 @@
 package cn.archko.pdf.fragments
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.utils.FileUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.FileFilter
-import java.util.*
+import java.util.Locale
 
 /**
  * @author: archko 2020/11/16 :11:23
  */
-class FontsViewModel(private var optionRepository: PdfOptionRepository) : ViewModel() {
-    init {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val data = optionRepository.pdfOptionFlow.first()
-
-                selectedFontName = data.fontName
-            }
-        }
-    }
+class FontsViewModel() : ViewModel() {
 
     var selectedFontName: String? = null
+    init {
+        selectedFontName = PdfOptionRepository.getFontName()
+    }
 
     suspend fun loadFonts() = flow {
         val fontDir = FileUtils.getStorageDir(PdfOptionRepository.FONT_DIR)

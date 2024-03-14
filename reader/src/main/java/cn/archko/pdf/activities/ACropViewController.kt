@@ -10,11 +10,10 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.RelativeLayout
 import androidx.core.app.ComponentActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.awidget.ARecyclerView
+import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
@@ -34,11 +33,10 @@ class ACropViewController(
     private var mPath: String,
     private var mPageSeekBarControls: APageSeekBarControls?,
     private var gestureDetector: GestureDetector?,
-    private var optionRepository: PdfOptionRepository
 ) :
     OutlineListener, AViewController {
 
-    private lateinit var mRecyclerView: RecyclerView
+    private lateinit var mRecyclerView: ARecyclerView
     private lateinit var mPageSizes: SparseArray<APage>
 
     init {
@@ -46,7 +44,7 @@ class ACropViewController(
     }
 
     private fun initView() {
-        mRecyclerView = RecyclerView(context)//contentView.findViewById(R.id.recycler_view)
+        mRecyclerView = ARecyclerView(context)//contentView.findViewById(R.id.recycler_view)
         with(mRecyclerView) {
             descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
             isNestedScrollingEnabled = false
@@ -54,14 +52,14 @@ class ACropViewController(
             setItemViewCacheSize(0)
 
             addItemDecoration(ViewerDividerItemDecoration(context, LinearLayoutManager.VERTICAL))
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+            addOnScrollListener(object : ARecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: ARecyclerView, newState: Int) {
+                    if (newState == ARecyclerView.SCROLL_STATE_IDLE) {
                         updateProgress(getCurrentPos())
                     }
                 }
 
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                override fun onScrolled(recyclerView: ARecyclerView, dx: Int, dy: Int) {
                 }
             })
         }
@@ -239,10 +237,10 @@ class ACropViewController(
     override fun showController() {
     }
 
-    private inner class PDFRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private inner class PDFRecyclerAdapter : ARecyclerView.Adapter<ARecyclerView.ViewHolder>() {
 
         var pos: Int = 0
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ARecyclerView.ViewHolder {
             var pageSize: APage? = null
             if (mPageSizes.size() > pos) {
                 pageSize = mPageSizes.get(pos)
@@ -259,7 +257,7 @@ class ACropViewController(
             }
 
             val view = APDFPageView(context, pdfViewModel.mupdfDocument, pageSize!!, true)
-            var lp: RecyclerView.LayoutParams? = view.layoutParams as RecyclerView.LayoutParams?
+            var lp: ARecyclerView.LayoutParams? = view.layoutParams as ARecyclerView.LayoutParams?
 
             pageSize?.let {
                 Logcat.d(
@@ -272,7 +270,7 @@ class ACropViewController(
                 )
             }
             if (null == lp) {
-                lp = RecyclerView.LayoutParams(width, height)
+                lp = ARecyclerView.LayoutParams(width, height)
                 view.layoutParams = lp
             } else {
                 lp.width = width
@@ -281,14 +279,14 @@ class ACropViewController(
             return PdfHolder(view)
         }
 
-        override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
+        override fun onBindViewHolder(viewHolder: ARecyclerView.ViewHolder, position: Int) {
             pos = viewHolder.adapterPosition
             val pdfHolder = viewHolder as PdfHolder
 
             pdfHolder.onBind(position)
         }
 
-        override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        override fun onViewRecycled(holder: ARecyclerView.ViewHolder) {
             super.onViewRecycled(holder)
             val pdfHolder = holder as PdfHolder?
 
@@ -299,7 +297,7 @@ class ACropViewController(
             return mPageSizes.size()
         }
 
-        inner class PdfHolder(internal var view: APDFPageView) : RecyclerView.ViewHolder(view) {
+        inner class PdfHolder(internal var view: APDFPageView) : ARecyclerView.ViewHolder(view) {
             fun onBind(position: Int) {
                 val pageSize = mPageSizes.get(position)
                 if (pageSize.getTargetWidth() != mRecyclerView.measuredWidth) {

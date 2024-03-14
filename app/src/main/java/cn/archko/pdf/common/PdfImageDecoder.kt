@@ -64,7 +64,7 @@ object PdfImageDecoder {
             if (null != bmp) {
                 return bmp
             }
-            
+
             val bitmap = BitmapPool.getInstance().acquire(pageW, pageH)
             //Bitmap.createBitmap(sizeX, sizeY, Bitmap.Config.ARGB_8888);
             MupdfDocument.render(page, ctm, bitmap, decodeParam.xOrigin, leftBound, topBound)

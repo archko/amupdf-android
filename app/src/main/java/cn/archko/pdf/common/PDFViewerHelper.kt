@@ -71,6 +71,7 @@ class PDFViewerHelper {
                     intent.setClass(activity, PdfViewerActivity::class.java)
                     activity.startActivity(intent)
                 }
+
                 mupdfContextMenuItem -> {
                     //val map = mapOf("type" to "AMuPDF", "name" to clickedFile.name)
                     //MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)

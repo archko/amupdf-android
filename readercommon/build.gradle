@@ -83,8 +83,6 @@ dependencies {
 
     implementation Libs.AndroidX.Room.runtime
     implementation Libs.AndroidX.Room.ktx
-    api Libs.AndroidX.DataStore.dataStore
-    api(Libs.AndroidX.DataStore.preference_ktx)
     api project(":pdf-recyclerview")
 
     kapt Libs.AndroidX.Room.compiler
@@ -102,4 +100,7 @@ dependencies {
 
     api Libs.Coil.coil
     api Libs.Coil.coilCompose
+    api Libs.Dependency.recyclerview
+
+    api 'com.tencent:mmkv:1.3.1'
 }

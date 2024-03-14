@@ -1,8 +1,8 @@
 package cn.archko.pdf.adapters;
 
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.View;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * RecyclerView和ListView通用ViewHolder

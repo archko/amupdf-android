@@ -55,12 +55,15 @@ fun FileHistoryList(
                     PDFViewerHelper.openComposeViewerMupdf(this, context)
                 }
             }
+
             MenuItemType.ViewBookWithMupdf -> {
                 PDFViewerHelper.openViewerMupdf(fb.file!!, context)
             }
+
             MenuItemType.OpenWithOther -> {
                 PDFViewerHelper.openViewerOther(fb.file!!, context)
             }
+
             MenuItemType.ViewBookInfo -> {
                 //val map = HashMap<String, String>()
                 //map["type"] = "info"
@@ -68,16 +71,20 @@ fun FileHistoryList(
                 //MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, map)
                 showInfoDialog.value = true
             }
+
             MenuItemType.DeleteHistory -> {
                 //MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, "remove")
                 viewModel.deleteHistory(fb.file!!)
             }
+
             MenuItemType.AddToFav -> {
                 viewModel.favorite(context, fb, 1)
             }
+
             MenuItemType.DeleteFav -> {
                 viewModel.favorite(context, fb, 0)
             }
+
             else -> {}
         }
     }
