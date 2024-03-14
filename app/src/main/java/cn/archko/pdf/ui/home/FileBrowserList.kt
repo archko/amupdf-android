@@ -110,9 +110,9 @@ fun FileBrowserList(
                 viewModel.favorite(context, fb, 0)
             }
 
-            MenuItemType.Compress -> {
+            /*MenuItemType.Compress -> {
                 viewModel.compress(context, fb)
-            }
+            }*/
 
             MenuItemType.ConvertToPDF -> {
                 viewModel.convertToPDF(context, fb)

@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.archko.mupdf.R
 import cn.archko.pdf.App
-import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.activities.ChooseFileFragmentActivity
 import cn.archko.pdf.common.BookProgressParser
 import cn.archko.pdf.common.Event
@@ -26,8 +25,6 @@ import cn.archko.pdf.ui.home.searchTypeHistory
 import cn.archko.pdf.utils.DateUtils
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
-import cn.archko.pdf.utils.PDFUtilities
-import cn.archko.pdf.utils.PDFUtilities.OnOperationListener
 import cn.archko.pdf.utils.StreamUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +32,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
@@ -643,7 +639,7 @@ class FileViewModel() : ViewModel() {
         context: Context,
         entry: FileBean,
     ) {
-        Toast.makeText(App.instance, "开始压缩,请稍候", Toast.LENGTH_SHORT).show()
+        /*Toast.makeText(App.instance, "开始压缩,请稍候", Toast.LENGTH_SHORT).show()
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 //val map = HashMap<String, String>()
@@ -698,7 +694,7 @@ class FileViewModel() : ViewModel() {
                     )
                 }
             }
-        }
+        }*/
     }
 
     fun convertToPDF(

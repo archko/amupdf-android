@@ -20,8 +20,8 @@ class PDFViewerHelper {
 
     companion object {
 
-        //private const val FILE_PROVIDER = "cn.archko.mupdf.fileProvider"
-        private const val FILE_PROVIDER = "com.radaee.pdfmaster.fileProvider"
+        private const val FILE_PROVIDER = "cn.archko.mupdf.fileProvider"
+        //private const val FILE_PROVIDER = "com.radaee.pdfmaster.fileProvider"
 
         const val deleteContextMenuItem = Menu.FIRST + 100
         const val removeContextMenuItem = Menu.FIRST + 101

@@ -45,7 +45,6 @@ import cn.archko.pdf.common.PdfOptionRepository
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
 import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
-import com.radaee.comm.Global
 import kotlinx.coroutines.launch
 
 /**
@@ -61,7 +60,6 @@ open class ChooseFileFragmentActivity : AnalysticActivity(), OnPermissionGranted
         ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class
     )
     override fun onCreate(savedInstanceState: Bundle?) {
-        Global.Init(this)
         isLive = true
         super.onCreate(savedInstanceState)
 

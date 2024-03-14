@@ -61,7 +61,6 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaGradientBackground
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaTab
 import com.jeremyliao.liveeventbus.LiveEventBus
-import cn.archko.pdf.activities.PDFToolActivity
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -157,7 +156,7 @@ fun HomePager(
             }
             MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_tools)) {
                 onPalletChange()
-                PDFToolActivity.start(context)
+                //PDFToolActivity.start(context)
             }
         }
     }

@@ -9,7 +9,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import cn.archko.mupdf.R;
-import cn.archko.pdf.utils.PDFUtilities;
+//import cn.archko.pdf.utils.PDFUtilities;
 
 public class PasswordDialog {
 
@@ -24,7 +24,7 @@ public class PasswordDialog {
 
         dialog.setPositiveButton(activity.getResources().getString(R.string.sodk_editor_ok),
                 (dialog1, which) -> {
-                    PDFUtilities.hideKeyboard(activity);
+                    //PDFUtilities.hideKeyboard(activity);
                     String content = et.getText().toString();
                     if (TextUtils.isEmpty(content)) {
                         Toast.makeText(activity, R.string.sodk_editor_password_for_document, Toast.LENGTH_SHORT).show();
@@ -38,7 +38,7 @@ public class PasswordDialog {
 
         dialog.setNegativeButton(activity.getResources().getString(R.string.sodk_editor_cancel),
                 (dialog12, which) -> {
-                    PDFUtilities.hideKeyboard(activity);
+                    //PDFUtilities.hideKeyboard(activity);
                     dialog12.dismiss();
                     if (listener != null) {
                         listener.onCancel();

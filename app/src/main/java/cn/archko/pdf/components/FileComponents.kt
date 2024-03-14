@@ -146,7 +146,7 @@ fun UserOptDialog(
                             txt = stringResource(id = R.string.menu_delete),
                             onClick = { menuOpt(MenuItemType.DeleteFile, fileBean) }
                         )
-                        Divider(thickness = 0.5.dp)
+                        /*Divider(thickness = 0.5.dp)
                         DialogItem(
                             txt = stringResource(id = com.radaee.viewlib.R.string.compress_pdf_label),
                             onClick = { menuOpt(MenuItemType.Compress, fileBean) }
@@ -158,7 +158,7 @@ fun UserOptDialog(
                                 onClick = { menuOpt(MenuItemType.ConvertToPDF, fileBean) }
                             )
                             Divider(thickness = 0.5.dp)
-                        }
+                        }*/
                     }
                     if (fileBeanType == FileBeanType.History) {
                         DialogItem(

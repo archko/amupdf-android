@@ -35,10 +35,9 @@
             android:supportsRtl="true"
             android:theme="@style/AppBaseTheme">
 
-        <!--android:authorities="cn.archko.mupdf.fileProvider"-->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.radaee.pdfmaster.fileProvider"
+            android:authorities="cn.archko.mupdf.fileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

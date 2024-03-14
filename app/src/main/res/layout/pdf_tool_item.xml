@@ -10,13 +10,12 @@
             android:id="@+id/img_tool_item"
             android:layout_width="70dp"
             android:layout_height="70dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_merge_pdf"/>
+            android:layout_gravity="center"/>
 
     <TextView
             android:id="@+id/txt_tool_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="@string/merge_pdf_label"/>
+            android:text="merge_pdf_label"/>
 </LinearLayout>
