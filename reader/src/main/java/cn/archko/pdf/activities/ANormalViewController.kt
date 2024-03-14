@@ -11,9 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
-import androidx.core.app.ComponentActivity
+import androidx.fragment.app.FragmentActivity
 import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
@@ -33,8 +32,7 @@ import org.vudroid.pdfdroid.codec.PdfDocument
  * @author: archko 2020/5/15 :12:43
  */
 class ANormalViewController(
-    private var context: ComponentActivity,
-    private var contentView: View,
+    private var context: FragmentActivity,
     private val mControllerLayout: RelativeLayout,
     private var pdfViewModel: PDFViewModel,
     private var mPath: String,

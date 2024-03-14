@@ -20,7 +20,6 @@ import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFReflowAdapter
 import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.FontBean
@@ -43,7 +42,6 @@ import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
  */
 class AReflowViewController(
     private var context: FragmentActivity,
-    private var contentView: View,
     private val mControllerLayout: RelativeLayout,
     private var pdfViewModel: PDFViewModel,
     private var mPath: String,

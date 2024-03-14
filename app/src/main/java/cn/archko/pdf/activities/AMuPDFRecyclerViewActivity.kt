@@ -206,7 +206,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             viewControllerCache,
             viewMode,
             this@AMuPDFRecyclerViewActivity,
-            mContentView,
             mControllerLayout, pdfViewModel, mPath!!,
             mPageSeekBarControls!!,
             gestureDetector
@@ -671,7 +670,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             viewControllerCache: SparseArray<AViewController>,
             viewMode: ViewMode,
             context: FragmentActivity,
-            contentView: View,
             controllerLayout: RelativeLayout,
             pdfViewModel: PDFViewModel,
             path: String,
@@ -685,7 +683,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             return createViewController(
                 viewMode,
                 context,
-                contentView,
                 controllerLayout,
                 pdfViewModel,
                 path,
@@ -697,7 +694,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         fun createViewController(
             viewMode: ViewMode,
             context: FragmentActivity,
-            contentView: View,
             controllerLayout: RelativeLayout,
             pdfViewModel: PDFViewModel,
             path: String,
@@ -707,7 +703,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             if (viewMode == ViewMode.CROP) {
                 return ACropViewController(
                     context,
-                    contentView,
                     controllerLayout,
                     pdfViewModel,
                     path,
@@ -717,7 +712,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             } else if (viewMode == ViewMode.REFLOW) {
                 return AReflowViewController(
                     context,
-                    contentView,
                     controllerLayout,
                     pdfViewModel,
                     path,
@@ -727,7 +721,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             } else {
                 return ANormalViewController(
                     context,
-                    contentView,
                     controllerLayout,
                     pdfViewModel,
                     path,

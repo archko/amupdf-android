@@ -11,7 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.RelativeLayout
-import androidx.core.app.ComponentActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.common.BitmapCache
@@ -29,8 +29,7 @@ import cn.archko.pdf.widgets.ViewerDividerItemDecoration
  * @author: archko 2020/5/15 :12:43
  */
 class ACropViewController(
-    private var context: ComponentActivity,
-    private var contentView: View,
+    private var context: FragmentActivity,
     private val mControllerLayout: RelativeLayout,
     private var pdfViewModel: PDFViewModel,
     private var mPath: String,
