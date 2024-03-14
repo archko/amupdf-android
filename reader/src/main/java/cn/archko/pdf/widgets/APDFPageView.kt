@@ -70,14 +70,13 @@ class APDFPageView(
         val viewWidth = pageSize.getTargetWidth()
         Logcat.d(
             String.format(
-                "onMeasure,index:%s, width:%s,height:%s, viewWidth:%s, page:%s-%s, mZoom: %s, aPage:%s",
+                "onMeasure,index:%s, page.crop.w-h:%s-%s, viewWidth:%s, page.w-h:%s-%s, aPage:%s",
                 pageSize.index,
                 width,
                 height,
                 viewWidth,
                 pageSize.effectivePagesWidth,
                 pageSize.effectivePagesHeight,
-                mZoom,
                 pageSize
             )
         )

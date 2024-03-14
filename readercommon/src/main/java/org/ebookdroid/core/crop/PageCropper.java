@@ -77,7 +77,7 @@ public class PageCropper {
         if (bitmap.getHeight() < (30) || bitmap.getWidth() < 30) {
             return new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight());
         }
-        long start = System.currentTimeMillis();
+        //long start = System.currentTimeMillis();
         int[] pixels = getPixels(bitmap, new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight()));
 
         // 灰度化 bitmap
@@ -163,7 +163,7 @@ public class PageCropper {
             bottom -= THRESHOLD;
         }
 
-        System.out.println(String.format("crop-time:%s", (System.currentTimeMillis() - start)));
+        //System.out.println(String.format("crop-time:%s", (System.currentTimeMillis() - start)));
         return new RectF((float) left, (float) top, bitmap.getWidth() - right, bitmap.getHeight() - bottom);
     }
 
@@ -192,7 +192,7 @@ public class PageCropper {
         if (bitmap.getHeight() < (30) || bitmap.getWidth() < 30) {
             return new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight());
         }
-        long start = System.currentTimeMillis();
+        //long start = System.currentTimeMillis();
         
         //计算平均灰度不如直接设置225,效果要好的多,平均值会把红色的识别成白边
         final float avgLum = 225; //calculateAvgLum(bitmap, bitmapBounds);
@@ -206,7 +206,7 @@ public class PageCropper {
         right = right * bitmapBounds.width();
         bottom = bottom * bitmapBounds.height();
         
-        System.out.println(String.format("droid-crop-time:%s", (System.currentTimeMillis() - start)));
+        //System.out.println(String.format("droid-crop-time:%s", (System.currentTimeMillis() - start)));
         return new RectF(left, top, right, bottom);
     }
 

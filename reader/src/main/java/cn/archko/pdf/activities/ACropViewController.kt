@@ -3,8 +3,10 @@ package cn.archko.pdf.activities
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_FIRST_USER
 import android.content.res.Configuration
+import android.graphics.Rect
 import android.util.SparseArray
 import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
@@ -17,8 +19,9 @@ import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
+import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
-import cn.archko.pdf.widgets.APDFPageView
+import cn.archko.pdf.widgets.APDFView
 import cn.archko.pdf.widgets.APageSeekBarControls
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
 
@@ -38,6 +41,11 @@ class ACropViewController(
 
     private lateinit var mRecyclerView: ARecyclerView
     private lateinit var mPageSizes: SparseArray<APage>
+
+    /**
+     * 有时需要强制不切边,又不切换到normal的渲染模式,设置这个值
+     */
+    private var crop: Boolean = true
 
     init {
         initView()
@@ -63,6 +71,26 @@ class ACropViewController(
                 }
             })
         }
+        mRecyclerView.viewTreeObserver
+            .addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    mRecyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    val changed = defaultWidth != mRecyclerView.width
+                    defaultWidth = mRecyclerView.width
+                    defaultHeight = mRecyclerView.height
+                    if (Logcat.loggable) {
+                        Logcat.d(
+                            "TAG", String.format(
+                                "onGlobalLayout : w-h:%s-%s",
+                                defaultWidth, defaultHeight
+                            )
+                        )
+                    }
+                    if (changed) {
+                        mRecyclerView.adapter?.notifyDataSetChanged()
+                    }
+                }
+            })
     }
 
     override fun init(pageSizes: SparseArray<APage>, pos: Int) {
@@ -121,7 +149,7 @@ class ACropViewController(
                     mRecyclerView.postDelayed({
                         layoutManager!!.scrollToPosition(pos)
                         mRecyclerView.requestLayout()
-                    }, 100L)
+                    }, 50L)
                 }
             })
         }
@@ -137,6 +165,23 @@ class ACropViewController(
             position = 0
         }
         return position
+    }
+
+    override fun getCount(): Int {
+        return mPageSizes.size()
+    }
+
+    override fun setOrientation(ori: Int) {
+        (mRecyclerView.layoutManager as LinearLayoutManager).orientation = (ori)
+        mRecyclerView.adapter?.notifyDataSetChanged()
+    }
+
+    fun getOrientation(): Int {
+        return (mRecyclerView.layoutManager as LinearLayoutManager).orientation
+    }
+
+    override fun setCrop(crop: Boolean) {
+        this.crop = crop
     }
 
     override fun scrollToPosition(page: Int) {
@@ -161,6 +206,10 @@ class ACropViewController(
         return false
     }
 
+    override fun tryHyperlink(ev: MotionEvent): Boolean {
+        return false
+    }
+
     override fun onSingleTap() {
         //if (mPageSeekBarControls?.visibility == View.VISIBLE) {
         //    mPageSeekBarControls?.hide()
@@ -182,8 +231,36 @@ class ACropViewController(
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        BitmapCache.getInstance().clear()
         mRecyclerView.stopScroll()
+        BitmapCache.getInstance().clear()
+
+        defaultWidth = Utils.dipToPixel(newConfig.screenWidthDp.toFloat())
+        defaultHeight = Utils.dipToPixel(newConfig.screenHeightDp.toFloat())
+        if (Logcat.loggable) {
+            Logcat.d(
+                "TAG", String.format(
+                    "newConfig:w-h:%s-%s, config:%s-%s, %s",
+                    defaultWidth,
+                    defaultHeight,
+                    newConfig.screenWidthDp,
+                    newConfig.screenHeightDp,
+                    newConfig.orientation
+                )
+            )
+        }
+
+        val lm = (mRecyclerView.layoutManager as LinearLayoutManager)
+        var offset = 0
+        val first = lm.findFirstVisibleItemPosition()
+        if (first > 0) {
+            val child = lm.findViewByPosition(first)
+            child?.run {
+                val r = Rect()
+                child.getLocalVisibleRect(r)
+                offset = r.top
+            }
+        }
+        lm.scrollToPositionWithOffset(first, -offset)
         mRecyclerView.adapter?.notifyDataSetChanged()
     }
 
@@ -237,52 +314,24 @@ class ACropViewController(
     override fun showController() {
     }
 
+    var defaultWidth = 1080
+    var defaultHeight = 1080
+
     private inner class PDFRecyclerAdapter : ARecyclerView.Adapter<ARecyclerView.ViewHolder>() {
 
-        var pos: Int = 0
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ARecyclerView.ViewHolder {
-            var pageSize: APage? = null
-            if (mPageSizes.size() > pos) {
-                pageSize = mPageSizes.get(pos)
-                if (pageSize.getTargetWidth() <= 0) {
-                    //Logcat.d(String.format("create:%s", mRecyclerView.measuredWidth))
-                    pageSize.setTargetWidth(parent.width)
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+        ): ARecyclerView.ViewHolder {
+            val view = APDFView(context)
+                .apply {
+                    layoutParams = ViewGroup.LayoutParams(defaultWidth, defaultHeight)
                 }
-            }
-            var width: Int = ViewGroup.LayoutParams.MATCH_PARENT
-            var height: Int = ViewGroup.LayoutParams.MATCH_PARENT
-            pageSize?.let {
-                width = it.effectivePagesWidth
-                height = it.effectivePagesHeight
-            }
-
-            val view = APDFPageView(context, pdfViewModel.mupdfDocument, pageSize!!, true)
-            var lp: ARecyclerView.LayoutParams? = view.layoutParams as ARecyclerView.LayoutParams?
-
-            pageSize?.let {
-                Logcat.d(
-                    String.format(
-                        "create width:%s,measuredWidth:%s,targetWidth:%s",
-                        width,
-                        mRecyclerView.measuredWidth,
-                        pageSize.getTargetWidth()
-                    )
-                )
-            }
-            if (null == lp) {
-                lp = ARecyclerView.LayoutParams(width, height)
-                view.layoutParams = lp
-            } else {
-                lp.width = width
-                lp.height = height
-            }
             return PdfHolder(view)
         }
 
         override fun onBindViewHolder(viewHolder: ARecyclerView.ViewHolder, position: Int) {
-            pos = viewHolder.adapterPosition
             val pdfHolder = viewHolder as PdfHolder
-
             pdfHolder.onBind(position)
         }
 
@@ -297,11 +346,11 @@ class ACropViewController(
             return mPageSizes.size()
         }
 
-        inner class PdfHolder(internal var view: APDFPageView) : ARecyclerView.ViewHolder(view) {
+        inner class PdfHolder(internal var view: APDFView) : ARecyclerView.ViewHolder(view) {
             fun onBind(position: Int) {
                 val pageSize = mPageSizes.get(position)
-                if (pageSize.getTargetWidth() != mRecyclerView.measuredWidth) {
-                    pageSize.setTargetWidth(mRecyclerView.measuredWidth)
+                if (pageSize.getTargetWidth() != defaultWidth) {
+                    pageSize.setTargetWidth(defaultWidth)
                 }
                 Logcat.d(
                     String.format(
@@ -311,10 +360,10 @@ class ACropViewController(
                         mRecyclerView.measuredWidth
                     )
                 )
-                if (pageSize.getTargetWidth() <= 0) {
+                if (defaultWidth <= 0) {
                     return
                 }
-                view.updatePage(showBookmark(position), pageSize, 1.0f/*zoomModel!!.zoom*/, true)
+                view.updatePage(pageSize, 1.0f, pdfViewModel.mupdfDocument, true)
             }
 
             private fun showBookmark(position: Int): Boolean {

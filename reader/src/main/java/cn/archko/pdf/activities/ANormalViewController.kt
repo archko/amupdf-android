@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.util.SparseArray
 import android.view.GestureDetector
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -176,6 +177,17 @@ class ANormalViewController(
         return position
     }
 
+    override fun getCount(): Int {
+        return mPageSizes.size()
+    }
+
+    override fun setOrientation(ori: Int) {
+        documentView.oriention = ori
+    }
+
+    override fun setCrop(crop: Boolean) {
+    }
+
     override fun scrollToPosition(page: Int) {
         documentView.goToPage(page - 1)
     }
@@ -188,6 +200,10 @@ class ANormalViewController(
             //documentView.scrollPage(frameLayout.height - margin);
             return true
         }
+        return false
+    }
+
+    override fun tryHyperlink(ev: MotionEvent): Boolean {
         return false
     }
 

@@ -10,6 +10,7 @@ import com.artifex.mupdf.fitz.Page;
 import com.artifex.mupdf.fitz.RectI;
 
 import androidx.collection.LruCache;
+
 import cn.archko.pdf.App;
 import cn.archko.pdf.entity.APage;
 import cn.archko.pdf.listeners.DecodeCallback;
@@ -107,13 +108,17 @@ public class ImageDecoder extends ImageWorker {
                 //RectF cropRectf = new RectF(leftBound, topBound, leftBound + pageW, topBound + pageH);
                 //pageSize.setCropBounds(cropRectf, cropScale);
             }
+            Bitmap bitmap = BitmapCache.getInstance().getBitmap(decodeParam.key);
+            if (null != bitmap) {
+                return bitmap;
+            }
             if (Logcat.loggable) {
                 Logcat.d(TAG, String.format("decode bitmap: %s-%s,page:%s-%s,xOrigin:%s, bound(left-top):%s-%s, page:%s",
                         pageW, pageH, pageSize.getZoomPoint().x, pageSize.getZoomPoint().y,
                         decodeParam.xOrigin, leftBound, topBound, pageSize));
             }
 
-            Bitmap bitmap = BitmapPool.getInstance().acquire(pageW, pageH);//Bitmap.createBitmap(sizeX, sizeY, Bitmap.Config.ARGB_8888);
+            bitmap = BitmapPool.getInstance().acquire(pageW, pageH);//Bitmap.createBitmap(sizeX, sizeY, Bitmap.Config.ARGB_8888);
 
             MupdfDocument.render(page, ctm, bitmap, decodeParam.xOrigin, leftBound, topBound);
 

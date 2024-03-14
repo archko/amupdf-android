@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.util.SparseArray
 import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
@@ -171,6 +172,16 @@ class AReflowViewController(
         return position
     }
 
+    override fun getCount(): Int {
+        return mPageSizes.size()
+    }
+
+    override fun setOrientation(ori: Int) {
+    }
+
+    override fun setCrop(crop: Boolean) {
+    }
+
     override fun scrollToPosition(page: Int) {
         mRecyclerView.layoutManager?.run {
             val layoutManager: LinearLayoutManager = this as LinearLayoutManager
@@ -190,6 +201,10 @@ class AReflowViewController(
             mRecyclerView.scrollBy(0, scrollY - margin)
             return true
         }
+        return false
+    }
+
+    override fun tryHyperlink(ev: MotionEvent): Boolean {
         return false
     }
 

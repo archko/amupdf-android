@@ -81,14 +81,7 @@ class SensorHelper(private val activity: ComponentActivity) {
                 sensorManager = activity.getSystemService(Activity.SENSOR_SERVICE) as SensorManager
             }
 
-            val orientation = withContext(Dispatchers.IO) {
-                val str: String? = MMKV.defaultMMKV().decodeString(PREF_ORIENTATION)
-                if (null != str) {
-                    return@withContext str.toInt()
-                } else {
-                    return@withContext ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                }
-            }
+            val orientation = MMKV.defaultMMKV().decodeInt(PREF_ORIENTATION)
 
             if (setOrientation(activity, orientation, prevOrientation)) {
                 if (sensorManager!!.getSensorList(Sensor.TYPE_ACCELEROMETER).size > 0) {

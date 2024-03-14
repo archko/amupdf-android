@@ -218,19 +218,19 @@ internal class PageTreeNode(localPageSliceBounds: RectF, page: APDFPage?, pageTy
 
     @SuppressLint("StaticFieldLeak")
     fun decode(xOrigin: Int, pageSize: APage) {
-        d(
+        /*d(
             String.format(
                 "task:%s,isRecycle:%s,decoding:%s,crop:%s,size:%s",
                 scope, isRecycle, apdfPage!!.isDecodingCrop, apdfPage.cropBounds, pageSize
             )
-        )
+        )*/
         if (scope?.isActive == true) {
             scope?.cancel()
         }
         if (isRecycle) {
             return
         }
-        if (apdfPage.isDecodingCrop) {
+        if (apdfPage!!.isDecodingCrop) {
             return
         }
         scope = CoroutineScope(Job() + customerDispatcher)
