@@ -38,6 +38,7 @@ object BookProgressParser {
             tmp.put("reflow", progress.reflow)
             tmp.put("isFavorited", progress.isFavorited)
             tmp.put("inRecent", progress.inRecent)
+            tmp.put("scrollOrientation", progress.scrollOrientation)
             ja.put(tmp)
         } catch (e: JSONException) {
             e.printStackTrace()
@@ -71,6 +72,12 @@ object BookProgressParser {
             bean.reflow = jsonobject.optInt("reflow")
             bean.isFavorited = jsonobject.optInt("isFavorited")
             bean.inRecent = jsonobject.optInt("inRecent")
+            if (jsonobject.has("scrollOrientation")) {
+                bean.scrollOrientation = jsonobject.optInt("scrollOrientation")
+            } else {
+                bean.scrollOrientation = 1
+            }
+
         } catch (jsonexception: Exception) {
             throw Exception(jsonexception.message + ":" + jsonobject, jsonexception)
         }
