@@ -96,6 +96,7 @@ class ANormalViewController(
     override fun init(pageSizes: SparseArray<APage>, pos: Int, scrollOrientation: Int) {
         try {
             Logcat.d("init.pos:$pos, :$scrollOrientation")
+            this.scrollOrientation = scrollOrientation
             if (null != pdfViewModel.mupdfDocument) {
                 this.mPageSizes = pageSizes
 
