@@ -18,6 +18,7 @@ package com.google.samples.apps.nowinandroid.core.ui.component
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -25,6 +26,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.NavigationRailItemDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,12 +51,12 @@ import androidx.compose.ui.unit.dp
 fun RowScope.NiaNavigationBarItem(
     selected: Boolean,
     onClick: () -> Unit,
-    icon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    selectedIcon: @Composable () -> Unit = icon,
     enabled: Boolean = true,
+    alwaysShowLabel: Boolean = true,
+    icon: @Composable () -> Unit,
+    selectedIcon: @Composable () -> Unit = icon,
     label: @Composable (() -> Unit)? = null,
-    alwaysShowLabel: Boolean = true
 ) {
     NavigationBarItem(
         selected = selected,
@@ -69,8 +71,8 @@ fun RowScope.NiaNavigationBarItem(
             unselectedIconColor = NiaNavigationDefaults.navigationContentColor(),
             selectedTextColor = NiaNavigationDefaults.navigationSelectedItemColor(),
             unselectedTextColor = NiaNavigationDefaults.navigationContentColor(),
-            indicatorColor = NiaNavigationDefaults.navigationIndicatorColor()
-        )
+            indicatorColor = NiaNavigationDefaults.navigationIndicatorColor(),
+        ),
     )
 }
 
@@ -84,14 +86,13 @@ fun RowScope.NiaNavigationBarItem(
 @Composable
 fun NiaNavigationBar(
     modifier: Modifier = Modifier,
-    content: @Composable RowScope.() -> Unit
+    content: @Composable RowScope.() -> Unit,
 ) {
     NavigationBar(
         modifier = modifier,
-        containerColor = NiaNavigationDefaults.NavigationContainerColor,
         contentColor = NiaNavigationDefaults.navigationContentColor(),
         tonalElevation = 0.dp,
-        content = content
+        content = content,
     )
 }
 
@@ -114,12 +115,12 @@ fun NiaNavigationBar(
 fun NiaNavigationRailItem(
     selected: Boolean,
     onClick: () -> Unit,
-    icon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    selectedIcon: @Composable () -> Unit = icon,
     enabled: Boolean = true,
+    alwaysShowLabel: Boolean = true,
+    icon: @Composable () -> Unit,
+    selectedIcon: @Composable () -> Unit = icon,
     label: @Composable (() -> Unit)? = null,
-    alwaysShowLabel: Boolean = true
 ) {
     NavigationRailItem(
         selected = selected,
@@ -134,8 +135,8 @@ fun NiaNavigationRailItem(
             unselectedIconColor = NiaNavigationDefaults.navigationContentColor(),
             selectedTextColor = NiaNavigationDefaults.navigationSelectedItemColor(),
             unselectedTextColor = NiaNavigationDefaults.navigationContentColor(),
-            indicatorColor = NiaNavigationDefaults.navigationIndicatorColor()
-        )
+            indicatorColor = NiaNavigationDefaults.navigationIndicatorColor(),
+        ),
     )
 }
 
@@ -151,16 +152,96 @@ fun NiaNavigationRailItem(
 fun NiaNavigationRail(
     modifier: Modifier = Modifier,
     header: @Composable (ColumnScope.() -> Unit)? = null,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     NavigationRail(
         modifier = modifier,
-        containerColor = NiaNavigationDefaults.NavigationContainerColor,
+        containerColor = Color.Transparent,
         contentColor = NiaNavigationDefaults.navigationContentColor(),
         header = header,
-        content = content
+        content = content,
     )
 }
+
+/*@ThemePreviews
+@Composable
+fun NiaNavigationBarPreview() {
+    val items = listOf("For you", "Saved", "Interests")
+    val icons = listOf(
+        NiaIcons.UpcomingBorder,
+        NiaIcons.BookmarksBorder,
+        NiaIcons.Grid3x3,
+    )
+    val selectedIcons = listOf(
+        NiaIcons.Upcoming,
+        NiaIcons.Bookmarks,
+        NiaIcons.Grid3x3,
+    )
+
+    NiaTheme {
+        NiaNavigationBar {
+            items.forEachIndexed { index, item ->
+                NiaNavigationBarItem(
+                    icon = {
+                        Icon(
+                            imageVector = icons[index],
+                            contentDescription = item,
+                        )
+                    },
+                    selectedIcon = {
+                        Icon(
+                            imageVector = selectedIcons[index],
+                            contentDescription = item,
+                        )
+                    },
+                    label = { Text(item) },
+                    selected = index == 0,
+                    onClick = { },
+                )
+            }
+        }
+    }
+}*/
+
+/*@ThemePreviews
+@Composable
+fun NiaNavigationRailPreview() {
+    val items = listOf("For you", "Saved", "Interests")
+    val icons = listOf(
+        NiaIcons.UpcomingBorder,
+        NiaIcons.BookmarksBorder,
+        NiaIcons.Grid3x3,
+    )
+    val selectedIcons = listOf(
+        NiaIcons.Upcoming,
+        NiaIcons.Bookmarks,
+        NiaIcons.Grid3x3,
+    )
+
+    NiaTheme {
+        NiaNavigationRail {
+            items.forEachIndexed { index, item ->
+                NiaNavigationRailItem(
+                    icon = {
+                        Icon(
+                            imageVector = icons[index],
+                            contentDescription = item,
+                        )
+                    },
+                    selectedIcon = {
+                        Icon(
+                            imageVector = selectedIcons[index],
+                            contentDescription = item,
+                        )
+                    },
+                    label = { Text(item) },
+                    selected = index == 0,
+                    onClick = { },
+                )
+            }
+        }
+    }
+}*/
 
 /**
  * Now in Android navigation default values.

@@ -17,75 +17,67 @@
 package com.google.samples.apps.nowinandroid.core.ui.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
 
 @Composable
 fun NiaTopicTag(
-    followed: Boolean,
-    onFollowClick: () -> Unit,
-    onUnfollowClick: () -> Unit,
-    onBrowseClick: () -> Unit,
     modifier: Modifier = Modifier,
+    followed: Boolean,
+    onClick: () -> Unit,
     enabled: Boolean = true,
     text: @Composable () -> Unit,
-    followText: @Composable () -> Unit,
-    unFollowText: @Composable () -> Unit,
-    browseText: @Composable () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
     Box(modifier = modifier) {
         val containerColor = if (followed) {
             MaterialTheme.colorScheme.primaryContainer
         } else {
-            MaterialTheme.colorScheme.surfaceVariant
+            MaterialTheme.colorScheme.surfaceVariant.copy(
+                alpha = NiaTagDefaults.UNFOLLOWED_TOPIC_TAG_CONTAINER_ALPHA,
+            )
         }
-        NiaTextButton(
-            onClick = { expanded = true },
+        TextButton(
+            onClick = onClick,
             enabled = enabled,
-            small = true,
-            colors = NiaButtonDefaults.textButtonColors(
+            colors = ButtonDefaults.textButtonColors(
                 containerColor = containerColor,
                 contentColor = contentColorFor(backgroundColor = containerColor),
-                disabledContainerColor = if (followed) {
-                    MaterialTheme.colorScheme.onBackground.copy(
-                        alpha = NiaButtonDefaults.DisabledButtonContentAlpha
-                    )
-                } else {
-                    Color.Transparent
-                }
+                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(
+                    alpha = NiaTagDefaults.DISABLED_TOPIC_TAG_CONTAINER_ALPHA,
+                ),
             ),
-            text = text
-        )
-        NiaDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            items = if (followed) listOf(UNFOLLOW, BROWSE) else listOf(FOLLOW, BROWSE),
-            onItemClick = { item ->
-                when (item) {
-                    FOLLOW -> onFollowClick()
-                    UNFOLLOW -> onUnfollowClick()
-                    BROWSE -> onBrowseClick()
-                }
-            },
-            itemText = { item ->
-                when (item) {
-                    FOLLOW -> followText()
-                    UNFOLLOW -> unFollowText()
-                    BROWSE -> browseText()
-                }
+        ) {
+            ProvideTextStyle(value = MaterialTheme.typography.labelSmall) {
+                text()
             }
-        )
+        }
     }
 }
 
-private const val FOLLOW = 1
-private const val UNFOLLOW = 2
-private const val BROWSE = 3
+@ThemePreviews
+@Composable
+fun TagPreview() {
+    NiaTheme {
+        NiaTopicTag(followed = true, onClick = {}) {
+            Text("Topic".uppercase())
+        }
+    }
+}
+
+/**
+ * Now in Android tag default values.
+ */
+object NiaTagDefaults {
+    const val UNFOLLOWED_TOPIC_TAG_CONTAINER_ALPHA = 0.5f
+
+    // TODO: File bug
+    // Button disabled container alpha value not exposed by ButtonDefaults
+    const val DISABLED_TOPIC_TAG_CONTAINER_ALPHA = 0.12f
+}

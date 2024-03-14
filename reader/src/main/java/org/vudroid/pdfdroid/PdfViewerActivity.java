@@ -5,9 +5,9 @@ import android.view.View;
 
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
-import org.vudroid.core.AKDecodeService;
 import org.vudroid.core.BaseViewerActivity;
 import org.vudroid.core.DecodeService;
+import org.vudroid.core.DecodeServiceBase;
 import org.vudroid.pdfdroid.codec.PdfContext;
 import org.vudroid.pdfdroid.codec.PdfDocument;
 
@@ -23,7 +23,7 @@ public class PdfViewerActivity extends BaseViewerActivity implements OutlineList
 
     @Override
     protected DecodeService createDecodeService() {
-        return new AKDecodeService(new PdfContext());
+        return new DecodeServiceBase(new PdfContext());
     }
 
     @Override
@@ -38,7 +38,7 @@ public class PdfViewerActivity extends BaseViewerActivity implements OutlineList
     private MenuHelper mMenuHelper;
 
     public void openOutline() {
-        AKDecodeService service = (AKDecodeService) getDecodeService();
+        DecodeServiceBase service = (DecodeServiceBase) getDecodeService();
         PdfDocument document = (PdfDocument) service.getDocument();
         if (null == mOutlineHelper) {
             MupdfDocument mupdfDocument = new MupdfDocument(this);

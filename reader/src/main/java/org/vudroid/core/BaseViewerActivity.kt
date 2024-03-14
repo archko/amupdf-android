@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -62,7 +61,8 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StatusBarHelper.hideSystemUI(this)
-        
+        StatusBarHelper.setImmerseBarAppearance(window, true)
+
         BitmapCache.getInstance().resize(BitmapCache.CAPACITY_FOR_VUDROID)
         initDecodeService()
         val zoomModel = ZoomModel()
@@ -85,12 +85,9 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
         )
-        decodeService!!.setContentResolver(contentResolver)
         decodeService!!.setContainerView(documentView)
         documentView!!.setDecodeService(decodeService)
-        decodeService!!.open(intent.data)
-
-        //viewerPreferences = new ViewerPreferences(this);
+        decodeService!!.open(absolutePath)
         val frameLayout = createMainContainer()
         frameLayout.addView(documentView)
         pageControls = createZoomControls(zoomModel)
@@ -255,6 +252,7 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
                 finish()
                 return true
             }
+
             MENU_GOTO -> {
                 //showDialog(DIALOG_GOTO);
                 //mPageModel.setCurrentPage(currentPageModel.getCurrentPageIndex());
@@ -262,6 +260,7 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
                 pageSeekBarControls!!.fade()
                 return true
             }
+
             MENU_FULL_SCREEN -> {
                 item.isChecked = !item.isChecked
                 setFullScreenMenuItemText(item)
@@ -270,10 +269,12 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
                 startActivity(intent)
                 return true
             }
+
             MENU_OUTLINE -> {
                 openOutline()
                 return true
             }
+
             MENU_OPTIONS -> start(this)
         }
         return false
@@ -308,7 +309,7 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
 
             /*setZoomLayout(options);
             pagesView.setZoomLayout(zoomLayout);*/
-            documentView!!.setVerticalScrollLock(verticalScrollLock)
+            //documentView!!.setVerticalScrollLock(verticalScrollLock)
 
             /*int zoomAnimNumber = Integer.parseInt(options.getString(PdfOptionsActivity.PREF_ZOOM_ANIMATION, "2"));
 

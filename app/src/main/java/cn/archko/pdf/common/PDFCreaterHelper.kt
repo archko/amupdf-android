@@ -23,7 +23,6 @@ import java.io.File
 import java.io.FileFilter
 import java.util.Locale
 
-
 /**
  * @author: archko 2018/12/21 :1:03 PM
  */
@@ -39,6 +38,7 @@ object PDFCreaterHelper {
 
     /**
      * 用这个创建,带cj字体的内容,会产生很大体积,而且字体不好看
+     * 使用PdfCreator创建文本的文档
      */
     fun createTextPage(sourcePath: String, destPath: String): Boolean {
         val text = EncodingDetect.readFile(sourcePath)
@@ -78,6 +78,10 @@ object PDFCreaterHelper {
         return true
     }
 
+    /**
+     * 如果是原图的高宽,不经过缩放,pdf的页面高宽设置与图片大小一致,得到的pdf会很大.
+     * 图片是否超过指定值,都应该做一次压缩
+     */
     fun createPdf(pdfPath: String?, imagePaths: List<String>): Boolean {
         d(String.format("imagePaths:%s", imagePaths))
         var mDocument: PDFDocument? = null
@@ -90,8 +94,7 @@ object PDFCreaterHelper {
             mDocument = PDFDocument()
         }
 
-        val splitPaths = arrayListOf<File>()
-        val resultPaths = processLargeImage(imagePaths, splitPaths)
+        val resultPaths = processLargeImage(imagePaths)
 
         //空白页面必须是-1,否则会崩溃,但插入-1的位置的页面会成为最后一个,所以追加的时候就全部用-1就行了.
         var index = -1
@@ -102,10 +105,10 @@ object PDFCreaterHelper {
         }
         mDocument.save(pdfPath, OPTS);
         d(String.format("save,%s,%s", mDocument.toString(), mDocument.countPages()))
-        if (splitPaths.size > 0) {
-            splitPaths.forEach {
-                it.delete()
-            }
+        val cacheDir = FileUtils.getExternalCacheDir(App.instance).path + File.separator + "create"
+        val dir = File(cacheDir)
+        if (dir.isDirectory) {
+            dir.deleteRecursively()
         }
         return mDocument.countPages() > 0
     }
@@ -134,10 +137,7 @@ object PDFCreaterHelper {
     /**
      * 将大图片切割成小图片,以长图片切割,不处理宽图片
      */
-    private fun processLargeImage(
-        imagePaths: List<String>,
-        splitPaths: ArrayList<File>
-    ): List<String> {
+    private fun processLargeImage(imagePaths: List<String>): List<String> {
         val options = BitmapFactory.Options()
         //默认值为false，如果设置成true，那么在解码的时候就不会返回bitmap，即bitmap = null。
         options.inJustDecodeBounds = true
@@ -149,9 +149,11 @@ object PDFCreaterHelper {
                 BitmapFactory.decodeFile(path, options)
                 if (options.outHeight > maxHeight) {
                     //split image,maxheight=PAPER_HEIGHT
-                    splitImages(result, path, options.outWidth, options.outHeight, splitPaths)
+                    splitImages(result, path, options.outWidth, options.outHeight)
                 } else {
-                    result.add(path)
+                    //result.add(path)
+                    val bitmapPath = compressImageFitPage(path, options.outWidth, options.outHeight)
+                    result.add(bitmapPath)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -160,12 +162,34 @@ object PDFCreaterHelper {
         return result
     }
 
+    private fun compressImageFitPage(
+        path: String,
+        width: Int,
+        height: Int,
+    ): String {
+        val options = BitmapFactory.Options()
+        options.inJustDecodeBounds = false
+        //options.outWidth = PDF_PAGE_WIDTH.toInt()
+        //options.outHeight = (height * PDF_PAGE_WIDTH / width).toInt()
+        val bitmap = BitmapFactory.decodeFile(path, options)
+        val file =
+            File(
+                FileUtils.getExternalCacheDir(App.instance).path
+                        + File.separator + "create" + File.separator + System.currentTimeMillis() + ".jpg"
+            )
+        BitmapUtils.saveBitmapToFile(bitmap, file, Bitmap.CompressFormat.JPEG, 100)
+        Logcat.d(
+            "TAG",
+            "bitmap.width:$width, height:$height,:${options.outWidth},${options.outHeight}, path:${file.absolutePath}"
+        )
+        return file.absolutePath
+    }
+
     private fun splitImages(
         result: ArrayList<String>,
         path: String,
         width: Int,
         height: Int,
-        splitPaths: ArrayList<File>
     ) {
         var top = 0f
         val right = 0 + width
@@ -174,7 +198,7 @@ object PDFCreaterHelper {
         while (bottom < height) {
             val rect = android.graphics.Rect()
             rect.set(0, top.toInt(), right, bottom.toInt())
-            splitImage(path, rect, result, splitPaths)
+            splitImage(path, rect, result)
 
             top = bottom
             bottom += PAPER_HEIGHT
@@ -182,7 +206,7 @@ object PDFCreaterHelper {
         if (top < height) {
             val rect = android.graphics.Rect()
             rect.set(0, top.toInt(), right, height)
-            splitImage(path, rect, result, splitPaths)
+            splitImage(path, rect, result)
         }
     }
 
@@ -190,7 +214,6 @@ object PDFCreaterHelper {
         path: String,
         rect: android.graphics.Rect,
         result: ArrayList<String>,
-        splitPaths: ArrayList<File>
     ) {
         val mDecoder = BitmapRegionDecoder.newInstance(path, true)
         val bm: Bitmap = mDecoder.decodeRegion(rect, null)
@@ -198,12 +221,15 @@ object PDFCreaterHelper {
             File(
                 FileUtils.getExternalCacheDir(App.instance).path
                         //FileUtils.getStorageDirPath() + "/amupdf"
-                        + File.separator + System.currentTimeMillis() + ".jpg"
+                        + File.separator + "create" + File.separator + System.currentTimeMillis() + ".jpg"
             )
-        BitmapUtils.saveBitmapToFile(bm, file, Bitmap.CompressFormat.JPEG, 90)
-        d("new file:height:${rect.bottom - rect.top}, path:${file.absolutePath}")
-        result.add(file.absolutePath)
-        splitPaths.add(file)
+        BitmapUtils.saveBitmapToFile(bm, file, Bitmap.CompressFormat.JPEG, 100)
+        Logcat.d("TAG", "new file:height:${rect.bottom - rect.top}, path:${file.absolutePath}")
+
+        //result.add(file.absolutePath)
+        //splitPaths.add(file)
+        val bitmapPath = compressImageFitPage(file.absolutePath, bm.width, bm.height)
+        result.add(bitmapPath)
     }
 
     private val fileFilter: FileFilter = FileFilter { file ->
@@ -216,7 +242,7 @@ object PDFCreaterHelper {
 
     fun saveBooksToHtml(context: Context) {
         val sdcardRoot = FileUtils.getStorageDirPath()
-        val dir = "$sdcardRoot/book/股票"
+        val dir = "$sdcardRoot/book/"
 
         val files = File(dir).listFiles()
         d("saveBooksToHtml:$dir,${files.size}")

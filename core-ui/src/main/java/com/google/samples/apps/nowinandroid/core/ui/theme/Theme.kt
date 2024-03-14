@@ -17,22 +17,30 @@
 package com.google.samples.apps.nowinandroid.core.ui.theme
 
 import android.os.Build
+import androidx.annotation.ChecksSdkIntAtLeast
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.google.samples.apps.nowinandroid.core.designsystem.theme.GradientColors
+import com.google.samples.apps.nowinandroid.core.designsystem.theme.LocalGradientColors
+import com.google.samples.apps.nowinandroid.core.designsystem.theme.LocalTintTheme
+import com.google.samples.apps.nowinandroid.core.designsystem.theme.TintTheme
 
 /**
  * Light default theme color scheme
  */
-private val LightDefaultColorScheme = lightColorScheme(
+@VisibleForTesting
+val LightDefaultColorScheme = lightColorScheme(
     primary = Purple40,
     onPrimary = Color.White,
     primaryContainer = Purple90,
@@ -55,13 +63,16 @@ private val LightDefaultColorScheme = lightColorScheme(
     onSurface = DarkPurpleGray10,
     surfaceVariant = PurpleGray90,
     onSurfaceVariant = PurpleGray30,
-    outline = PurpleGray50
+    inverseSurface = DarkPurpleGray20,
+    inverseOnSurface = DarkPurpleGray95,
+    outline = PurpleGray50,
 )
 
 /**
  * Dark default theme color scheme
  */
-private val DarkDefaultColorScheme = darkColorScheme(
+@VisibleForTesting
+val DarkDefaultColorScheme = darkColorScheme(
     primary = Purple80,
     onPrimary = Purple20,
     primaryContainer = Purple30,
@@ -84,13 +95,16 @@ private val DarkDefaultColorScheme = darkColorScheme(
     onSurface = DarkPurpleGray90,
     surfaceVariant = PurpleGray30,
     onSurfaceVariant = PurpleGray80,
-    outline = PurpleGray60
+    inverseSurface = DarkPurpleGray90,
+    inverseOnSurface = DarkPurpleGray10,
+    outline = PurpleGray60,
 )
 
 /**
  * Light Android theme color scheme
  */
-private val LightAndroidColorScheme = lightColorScheme(
+@VisibleForTesting
+val LightAndroidColorScheme = lightColorScheme(
     primary = Green40,
     onPrimary = Color.White,
     primaryContainer = Green90,
@@ -113,13 +127,16 @@ private val LightAndroidColorScheme = lightColorScheme(
     onSurface = DarkGreenGray10,
     surfaceVariant = GreenGray90,
     onSurfaceVariant = GreenGray30,
-    outline = GreenGray50
+    inverseSurface = DarkGreenGray20,
+    inverseOnSurface = DarkGreenGray95,
+    outline = GreenGray50,
 )
 
 /**
  * Dark Android theme color scheme
  */
-private val DarkAndroidColorScheme = darkColorScheme(
+@VisibleForTesting
+val DarkAndroidColorScheme = darkColorScheme(
     primary = Green80,
     onPrimary = Green20,
     primaryContainer = Green30,
@@ -142,71 +159,96 @@ private val DarkAndroidColorScheme = darkColorScheme(
     onSurface = DarkGreenGray90,
     surfaceVariant = GreenGray30,
     onSurfaceVariant = GreenGray80,
-    outline = GreenGray60
+    inverseSurface = DarkGreenGray90,
+    inverseOnSurface = DarkGreenGray10,
+    outline = GreenGray60,
 )
+
+/**
+ * Light Android gradient colors
+ */
+val LightAndroidGradientColors = GradientColors(container = DarkGreenGray95)
+
+/**
+ * Dark Android gradient colors
+ */
+val DarkAndroidGradientColors = GradientColors(container = Color.Black)
+
+/**
+ * Light Android background theme
+ */
+val LightAndroidBackgroundTheme = BackgroundTheme(color = DarkGreenGray95)
+
+/**
+ * Dark Android background theme
+ */
+val DarkAndroidBackgroundTheme = BackgroundTheme(color = Color.Black)
 
 /**
  * Now in Android theme.
  *
- * The order of precedence for the color scheme is: Dynamic color > Android theme > Default theme.
- * Dark theme is independent as all the aforementioned color schemes have light and dark versions.
- * The default theme color scheme is used by default.
- *
  * @param darkTheme Whether the theme should use a dark color scheme (follows system by default).
- * @param dynamicColor Whether the theme should use a dynamic color scheme (Android 12+ only).
- * @param androidTheme Whether the theme should use the Android theme color scheme.
+ * @param androidTheme Whether the theme should use the Android theme color scheme instead of the
+ *        default theme.
+ * @param disableDynamicTheming If `true`, disables the use of dynamic theming, even when it is
+ *        supported. This parameter has no effect if [androidTheme] is `true`.
  */
 @Composable
 fun NiaTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false,
     androidTheme: Boolean = false,
-    content: @Composable() () -> Unit
+    disableDynamicTheming: Boolean = true,
+    content: @Composable () -> Unit,
 ) {
+    // Color scheme
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+        androidTheme -> if (darkTheme) DarkAndroidColorScheme else LightAndroidColorScheme
+        !disableDynamicTheming && supportsDynamicTheming() -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        androidTheme && darkTheme -> DarkAndroidColorScheme
-        androidTheme -> LightAndroidColorScheme
-        darkTheme -> DarkDefaultColorScheme
-        else -> LightDefaultColorScheme
-    }
 
-    val backgroundTheme = when {
-        androidTheme && darkTheme -> BackgroundTheme(
-            color = Color.Black
-        )
-        androidTheme -> BackgroundTheme(
-            color = DarkGreenGray95
-        )
-        darkTheme -> BackgroundTheme(
-            color = colorScheme.surface,
-            tonalElevation = 2.dp
-        )
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> BackgroundTheme(
-            color = colorScheme.surface,
-            tonalElevation = 2.dp,
-            primaryGradientColor = colorScheme.primary.lighten(0.95f),
-            secondaryGradientColor = colorScheme.secondary.lighten(0.95f),
-            tertiaryGradientColor = colorScheme.tertiary.lighten(0.95f),
-            neutralGradientColor = colorScheme.surface.lighten(0.95f)
-        )
-        else -> BackgroundTheme(
-            color = colorScheme.surface,
-            tonalElevation = 2.dp,
-            primaryGradientColor = Purple95,
-            secondaryGradientColor = Orange95,
-            tertiaryGradientColor = Blue95,
-            neutralGradientColor = DarkPurpleGray95
-        )
+        else -> if (darkTheme) DarkDefaultColorScheme else LightDefaultColorScheme
     }
-    CompositionLocalProvider(LocalBackgroundTheme provides backgroundTheme) {
+    // Gradient colors
+    val emptyGradientColors = GradientColors(container = colorScheme.surfaceColorAtElevation(2.dp))
+    val defaultGradientColors = GradientColors(
+        top = colorScheme.inverseOnSurface,
+        bottom = colorScheme.primaryContainer,
+        container = colorScheme.surface,
+        )
+    val gradientColors = when {
+        androidTheme -> if (darkTheme) DarkAndroidGradientColors else LightAndroidGradientColors
+        !disableDynamicTheming && supportsDynamicTheming() -> emptyGradientColors
+        else -> defaultGradientColors
+    }
+    // Background theme
+    val defaultBackgroundTheme = BackgroundTheme(
+            color = colorScheme.surface,
+            tonalElevation = 2.dp,
+        )
+    val backgroundTheme = when {
+        androidTheme -> if (darkTheme) DarkAndroidBackgroundTheme else LightAndroidBackgroundTheme
+        else -> defaultBackgroundTheme
+    }
+    val tintTheme = when {
+        androidTheme -> TintTheme()
+        !disableDynamicTheming && supportsDynamicTheming() -> TintTheme(colorScheme.primary)
+        else -> TintTheme()
+    }
+    // Composition locals
+    CompositionLocalProvider(
+        LocalGradientColors provides gradientColors,
+        LocalBackgroundTheme provides backgroundTheme,
+        LocalTintTheme provides tintTheme,
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = NiaTypography,
-            content = content
+            content = content,
         )
     }
 }
+
+@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.S)
+fun supportsDynamicTheming() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S

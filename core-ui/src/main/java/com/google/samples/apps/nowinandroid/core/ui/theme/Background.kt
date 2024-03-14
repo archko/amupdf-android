@@ -22,17 +22,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 
 /**
- * A class to model background values for Now in Android,
- * including color, tonal elevation and gradient colors.
+ * A class to model background color and tonal elevation values for Now in Android.
  */
 @Immutable
 data class BackgroundTheme(
     val color: Color = Color.Unspecified,
     val tonalElevation: Dp = Dp.Unspecified,
-    val primaryGradientColor: Color = Color.Unspecified,
-    val secondaryGradientColor: Color = Color.Unspecified,
-    val tertiaryGradientColor: Color = Color.Unspecified,
-    val neutralGradientColor: Color = Color.Unspecified
 )
 
 /**

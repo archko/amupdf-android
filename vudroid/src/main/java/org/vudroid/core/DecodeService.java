@@ -1,21 +1,25 @@
 package org.vudroid.core;
 
-import android.content.ContentResolver;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.view.View;
 
+import com.artifex.mupdf.fitz.Outline;
+
+import org.vudroid.core.codec.CodecPage;
+
 public interface DecodeService {
-    void setContentResolver(ContentResolver contentResolver);
 
     void setContainerView(View containerView);
 
-    void open(Uri fileUri);
+    void open(String fileUri);
 
-    void decodePage(Object decodeKey, int pageNum, DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds);
+    void decodePage(Object decodeKey, PageTreeNode node, DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds);
 
     void stopDecoding(Object decodeKey);
+
+    void setOriention(int oriention);
 
     int getEffectivePagesWidth();
 
@@ -26,6 +30,10 @@ public interface DecodeService {
     int getPageWidth(int pageIndex);
 
     int getPageHeight(int pageIndex);
+
+    CodecPage getPage(int pageIndex);
+
+    Outline[] getOutlines();
 
     void recycle();
 

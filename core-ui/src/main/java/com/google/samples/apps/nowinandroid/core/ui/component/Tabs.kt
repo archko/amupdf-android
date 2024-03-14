@@ -46,7 +46,7 @@ fun NiaTab(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    text: @Composable () -> Unit
+    text: @Composable () -> Unit,
 ) {
     Tab(
         selected = selected,
@@ -61,9 +61,9 @@ fun NiaTab(
                     Box(modifier = Modifier.padding(top = NiaTabDefaults.TabTopPadding)) {
                         text()
                     }
-                }
+                },
             )
-        }
+        },
     )
 }
 
@@ -79,7 +79,7 @@ fun NiaTab(
 fun NiaTabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
-    tabs: @Composable () -> Unit
+    tabs: @Composable () -> Unit,
 ) {
     TabRow(
         selectedTabIndex = selectedTabIndex,
@@ -87,13 +87,13 @@ fun NiaTabRow(
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onSurface,
         indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
+            TabRowDefaults.SecondaryIndicator(
                 modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
                 height = 2.dp,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
         },
-        tabs = tabs
+        tabs = tabs,
     )
 }
 

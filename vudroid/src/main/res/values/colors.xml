@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="link_uri">#800088FF</color>
+    <color name="link_page">#80FFFF00</color>
+</resources>

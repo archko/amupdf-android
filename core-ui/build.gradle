@@ -80,4 +80,5 @@ dependencies {
     implementation Libs.AndroidX.Compose.animation
     implementation Libs.AndroidX.Compose.iconsExtended
     implementation Libs.AndroidX.Compose.tooling
+    implementation Libs.Coil.coilCompose
 }

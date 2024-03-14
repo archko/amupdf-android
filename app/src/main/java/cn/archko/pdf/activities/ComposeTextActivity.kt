@@ -318,7 +318,7 @@ class ComposeTextActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         LiveEventBus
-            .get(Event.ACTION_STOPPED)
+            .get<String>(Event.ACTION_STOPPED)
             .post(path)
         pdfViewModel.destroy()
         BitmapCache.getInstance().clear()

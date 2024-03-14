@@ -8,10 +8,16 @@ import android.os.SystemClock;
 
 import com.artifex.mupdf.fitz.Cookie;
 import com.artifex.mupdf.fitz.Document;
+import com.artifex.mupdf.fitz.Link;
+import com.artifex.mupdf.fitz.Location;
 import com.artifex.mupdf.fitz.Page;
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice;
 
 import org.vudroid.core.codec.CodecPage;
+import org.vudroid.core.link.Hyperlink;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.archko.pdf.common.BitmapPool;
 import cn.archko.pdf.common.Logcat;
@@ -22,9 +28,11 @@ public class PdfPage implements CodecPage {
     Page page;
     int pdfPageWidth;
     int pdfPageHeight;
+    private Document doc;
 
     public PdfPage(Document core, long pageHandle) {
         this.pageHandle = pageHandle;
+        this.doc = core;
     }
 
     public boolean isDecoding() {
@@ -53,6 +61,10 @@ public class PdfPage implements CodecPage {
 
     public void setPage(Page page) {
         this.page = page;
+    }
+
+    public Page getPage() {
+        return page;
     }
 
     public Bitmap renderBitmap(int width, int height, RectF pageSliceBounds) {
@@ -104,6 +116,30 @@ public class PdfPage implements CodecPage {
         return bitmap;
     }
 
+    public List<Hyperlink> getPageLinks() {
+        List<Hyperlink> hyperlinks = new ArrayList<>();
+        Link[] links = page.getLinks();
+        if (null != links) {
+            for (Link link : links) {
+                Hyperlink hyper = new Hyperlink();
+                Location loc = doc.resolveLink(link);
+                int page = doc.pageNumberFromLocation(loc);
+                hyper.setPage(page);
+                hyper.setBbox(new Rect((int) link.getBounds().x0, (int) link.getBounds().y0, (int) link.getBounds().x1, (int) link.getBounds().y1));
+
+                if (page >= 0) {
+                    hyper.setLinkType(Hyperlink.LINKTYPE_PAGE);
+                } else {
+                    hyper.setUrl(link.getURI());
+                    hyper.setLinkType(Hyperlink.LINKTYPE_URL);
+                }
+                hyperlinks.add(hyper);
+            }
+        }
+
+        return hyperlinks;
+    }
+
     static PdfPage createPage(Document core, int pageno) {
         PdfPage pdfPage = new PdfPage(core, pageno);
         pdfPage.page = core.loadPage(pageno);
@@ -119,11 +155,9 @@ public class PdfPage implements CodecPage {
     public synchronized void recycle() {
         if (pageHandle >= 0) {
             pageHandle = -1;
-            if (page != null) {
                 page.destroy();
             }
         }
-    }
 
     public long getPageHandle() {
         return pageHandle;
