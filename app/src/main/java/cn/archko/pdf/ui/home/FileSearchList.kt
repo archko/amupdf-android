@@ -74,12 +74,16 @@ fun FileSearchList(
         when (menuType) {
             MenuItemType.ViewBookWithAMupdf -> {
                 fb.file?.run {
-                    PDFViewerHelper.openComposeViewerMupdf(this, context)
+                    PDFViewerHelper.openOldMupdf(this, context)
                 }
             }
 
-            MenuItemType.ViewBookWithMupdf -> {
-                PDFViewerHelper.openViewerMupdf(fb.file!!, context)
+            MenuItemType.ViewBookWithNewViewer -> {
+                PDFViewerHelper.openWithNewViewer(fb.file!!, context)
+            }
+
+            MenuItemType.ViewBookWithVudroid -> {
+                PDFViewerHelper.openVudroid(fb.file!!, context)
             }
 
             MenuItemType.OpenWithOther -> {

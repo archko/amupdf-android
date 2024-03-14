@@ -45,13 +45,14 @@ class PDFViewerHelper {
             //    Toast.makeText(activity, "can't load f:${f.absolutePath}", Toast.LENGTH_SHORT).show()
             //    return
             //}
-            openWithDefaultViewer(Uri.fromFile(f), activity)
+            //openWithDefaultViewer(Uri.fromFile(f), activity)
+            openOldMupdf(f, activity)
         }
 
-        fun openWithDefaultViewer(uri: Uri, activity: Context) {
-            Logcat.i(Logcat.TAG, "post intent to open file $uri")
+        fun openWithNewViewer(f: File, activity: Context) {
+            Logcat.i(Logcat.TAG, "post intent to open file ${f.absolutePath}")
             val intent = Intent()
-            intent.setDataAndType(uri, "application/pdf")
+            intent.setDataAndType(Uri.fromFile(f), "application/pdf")
             intent.setClass(activity, ComposeTextActivity::class.java)
             intent.action = Intent.ACTION_VIEW
             activity.startActivity(intent)
@@ -133,7 +134,7 @@ class PDFViewerHelper {
             }
         }
 
-        fun openViewerMupdf(clickedFile: File, activity: Context) {
+        fun openVudroid(clickedFile: File, activity: Context) {
             val uri = Uri.fromFile(clickedFile)
             val intent = Intent()
             intent.action = Intent.ACTION_VIEW
@@ -148,7 +149,7 @@ class PDFViewerHelper {
             activity.startActivity(intent)
         }
 
-        fun openComposeViewerMupdf(clickedFile: File, activity: Context) {
+        fun openOldMupdf(clickedFile: File, activity: Context) {
             val uri = Uri.fromFile(clickedFile)
             val intent = Intent()
             intent.action = Intent.ACTION_VIEW

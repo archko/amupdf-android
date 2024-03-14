@@ -71,7 +71,8 @@ fun EmptyView(modifier: Modifier) {
 
 sealed class MenuItemType {
     object ViewBookWithAMupdf : MenuItemType()
-    object ViewBookWithMupdf : MenuItemType()
+    object ViewBookWithVudroid : MenuItemType()
+    object ViewBookWithNewViewer : MenuItemType()
     object ViewBookInfo : MenuItemType()
     object DeleteHistory : MenuItemType()
     object DeleteFile : MenuItemType()
@@ -131,11 +132,11 @@ fun UserOptDialog(
                         txt = stringResource(id = R.string.menu_mupdf),
                         onClick = { menuOpt(MenuItemType.ViewBookWithAMupdf, fileBean) }
                     )
-                    //Divider(thickness = 0.5.dp)
-                    //DialogItem(
-                    //    txt = "Vudroid Viewer",
-                    //    onClick = { menuOpt(MenuItemType.ViewBookWithMupdf, fileBean) }
-                    //)
+                    Divider(thickness = 1.dp)
+                    DialogItem(
+                        txt = stringResource(id = R.string.menu_new_mupdf),
+                        onClick = { menuOpt(MenuItemType.ViewBookWithNewViewer, fileBean) }
+                    )
                     Divider(thickness = 0.5.dp)
                     DialogItem(
                         txt = stringResource(id = R.string.menu_other),

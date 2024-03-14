@@ -1,6 +1,7 @@
 package cn.archko.pdf.common
 
 import android.graphics.Color
+import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.utils.Utils
 import com.tencent.mmkv.MMKV
 
@@ -160,6 +161,24 @@ object PdfOptionRepository {
         return mmkv.decodeBool(PdfOptionKeys.PREF_DIRS_FIRST, true)
     }
 
+    fun setNewViewer(enable: Boolean) {
+        mmkv.encode(PdfOptionKeys.PREF_NEW_VIEWER, enable)
+    }
+
+    fun getNewViewer(): Boolean {
+        return mmkv.decodeBool(PdfOptionKeys.PREF_NEW_VIEWER, false)
+    }
+
+    fun setCropper(enable: Boolean) {
+        val code = if (enable) 1 else 0
+        MupdfDocument.useNewCropper = enable
+        mmkv.encode(PdfOptionKeys.PREF_CROPPER, code)
+    }
+
+    fun getCropper(): Boolean {
+        return mmkv.decodeInt(PdfOptionKeys.PREF_CROPPER, 0) == 1
+    }
+
     @JvmField
     val FONT_DIR = "amupdf/fonts/"
 
@@ -225,6 +244,8 @@ object PdfOptionKeys {
     val PREF_LIST_STYLE = ("list_style")
     val PREF_DART_THEME = ("pref_dart_theme")
     val PREF_DIRS_FIRST = ("dirsFirst")
+    val PREF_NEW_VIEWER = ("newViewer")
+    val PREF_CROPPER = ("cropper")
 
     //============== font and style ==============
     val FONT_KEY_TYPE = ("font_key_type")
