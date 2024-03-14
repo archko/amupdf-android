@@ -117,6 +117,11 @@ class BookProgress : Serializable, Comparator<BookProgress> {
     @ColumnInfo(name = "is_in_recent")
     var inRecent = 0 //0:in recent,-1:not in recent,-2:all
 
+    // defaule 1,scroll vertical
+    @JvmField
+    @ColumnInfo(name = "scroll_orientation")
+    var scrollOrientation = 1
+
     constructor(path: String?) {
         index = 0
         this.path = path
@@ -132,6 +137,7 @@ class BookProgress : Serializable, Comparator<BookProgress> {
         firstTimestampe = System.currentTimeMillis()
         lastTimestampe = System.currentTimeMillis()
         readTimes = 1
+        scrollOrientation = 1
     }
 
     /*public BookProgress(int _id, int index, String path, String name, String ext, String md5, int pageCount,
@@ -162,6 +168,7 @@ class BookProgress : Serializable, Comparator<BookProgress> {
         reflow: Int,
         isFavorited: Int,
         inRecent: Int,
+        scrollOrientation: Int,
     ) {
         this._id = _id
         this.index = index
@@ -184,6 +191,7 @@ class BookProgress : Serializable, Comparator<BookProgress> {
         this.reflow = reflow
         this.isFavorited = isFavorited
         this.inRecent = inRecent
+        this.scrollOrientation = scrollOrientation
     }
 
     override fun toString(): String {
@@ -196,6 +204,7 @@ class BookProgress : Serializable, Comparator<BookProgress> {
                 ", readTimes=" + readTimes +
                 ", progress=" + progress +
                 ", page=" + page +
+                ", scrollOrientation=" + scrollOrientation +
                 ", firstTimestampe=" + firstTimestampe +
                 ", lastTimestampe=" + lastTimestampe +
                 ", autoCrop=" + autoCrop +

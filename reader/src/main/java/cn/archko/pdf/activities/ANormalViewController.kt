@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.listeners.AViewController
@@ -49,6 +50,7 @@ class ANormalViewController(
     private var mPageControls: PageViewZoomControls? = null
 
     private lateinit var mPageSizes: SparseArray<APage>
+    private var scrollOrientation = LinearLayoutManager.VERTICAL
 
     init {
         initView()
@@ -91,9 +93,9 @@ class ANormalViewController(
         mControllerLayout.addView(mPageControls, lp)
     }
 
-    override fun init(pageSizes: SparseArray<APage>, pos: Int) {
+    override fun init(pageSizes: SparseArray<APage>, pos: Int, scrollOrientation: Int) {
         try {
-            Logcat.d("init:$this")
+            Logcat.d("init.pos:$pos, :$scrollOrientation")
             if (null != pdfViewModel.mupdfDocument) {
                 this.mPageSizes = pageSizes
 
@@ -108,7 +110,7 @@ class ANormalViewController(
 
     override fun doLoadDoc(pageSizes: SparseArray<APage>, pos: Int) {
         try {
-            Logcat.d("doLoadDoc:$this")
+            Logcat.d("doLoadDoc:$scrollOrientation")
             this.mPageSizes = pageSizes
 
             setNormalMode(pos)
@@ -153,6 +155,7 @@ class ANormalViewController(
     }
 
     private fun setNormalMode(pos: Int) {
+        setOrientation(scrollOrientation)
         val document = PdfDocument()
         document.core = pdfViewModel.mupdfDocument?.document
         (decodeService as DecodeServiceBase).document = document

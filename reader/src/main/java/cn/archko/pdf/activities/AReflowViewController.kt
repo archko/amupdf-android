@@ -85,7 +85,7 @@ class AReflowViewController(
         }
     }
 
-    override fun init(pageSizes: SparseArray<APage>, pos: Int) {
+    override fun init(pageSizes: SparseArray<APage>, pos: Int, scrollOrientation: Int) {
         try {
             if (scope == null || !scope!!.isActive) {
                 scope =

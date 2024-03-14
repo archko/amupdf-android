@@ -143,7 +143,11 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
 
                 override fun reflow() {}
                 override fun autoCrop() {}
-                override fun showBookmark() {}
+                override fun changeOrientation(ori: Int) {
+                    documentView?.oriention = ori
+                }
+
+                //override fun showBookmark() {}
             })
         frameLayout.addView(pageSeekBarControls)
         pageSeekBarControls!!.hide()

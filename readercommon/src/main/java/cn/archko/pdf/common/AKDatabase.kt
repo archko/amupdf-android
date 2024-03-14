@@ -12,7 +12,7 @@ import cn.archko.pdf.entity.Booknote
         Booknote::class,
         Bookmark::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 //@TypeConverters(DateTimeTypeConverters::class)

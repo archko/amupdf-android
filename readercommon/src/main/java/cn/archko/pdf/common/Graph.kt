@@ -16,10 +16,17 @@ object Graph {
         }
     }
 
+    private val MIGRATION_6_7: Migration = object : Migration(6, 7) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE progress ADD 'scroll_orientation' INTEGER default 1 not null")
+        }
+    }
+
     fun provide(context: Context) {
         database = Room.databaseBuilder(context, AKDatabase::class.java, "abook_progress.db")
             .fallbackToDestructiveMigration()
             .addMigrations(MIGRATION_5_6)
+            .addMigrations(MIGRATION_6_7)
             .build()
     }
 }

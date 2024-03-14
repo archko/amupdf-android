@@ -11,7 +11,7 @@ import cn.archko.pdf.entity.APage
  */
 interface AViewController {
 
-    fun init(pageSizes: SparseArray<APage>, pos: Int)
+    fun init(pageSizes: SparseArray<APage>, pos: Int, scrollOrientation: Int)
     fun doLoadDoc(pageSizes: SparseArray<APage>, pos: Int)
 
     fun getDocumentView(): View

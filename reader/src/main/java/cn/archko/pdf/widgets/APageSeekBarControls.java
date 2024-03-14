@@ -155,6 +155,7 @@ public class APageSeekBarControls extends LinearLayout implements View.OnClickLi
 
     public void show() {
         setVisibility(VISIBLE);
+        updateOrientation();
         showGotoPageView();
     }
 

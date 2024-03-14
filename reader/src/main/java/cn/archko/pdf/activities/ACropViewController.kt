@@ -45,6 +45,7 @@ class ACropViewController(
      * 有时需要强制不切边,又不切换到normal的渲染模式,设置这个值
      */
     private var crop: Boolean = true
+    private var scrollOrientation = LinearLayoutManager.VERTICAL
 
     init {
         initView()
@@ -92,9 +93,10 @@ class ACropViewController(
             })
     }
 
-    override fun init(pageSizes: SparseArray<APage>, pos: Int) {
+    override fun init(pageSizes: SparseArray<APage>, pos: Int, scrollOrientation: Int) {
         try {
-            Logcat.d("init:$this,pos:$pos")
+            Logcat.d("init.pos:$pos, :$scrollOrientation")
+            this.scrollOrientation = scrollOrientation
             if (null != pdfViewModel.mupdfDocument) {
                 this.mPageSizes = pageSizes
 
@@ -109,7 +111,7 @@ class ACropViewController(
 
     override fun doLoadDoc(pageSizes: SparseArray<APage>, pos: Int) {
         try {
-            Logcat.d("doLoadDoc:$this")
+            Logcat.d("doLoadDoc:$scrollOrientation")
             this.mPageSizes = pageSizes
 
             setCropMode(pos)
@@ -133,6 +135,7 @@ class ACropViewController(
     }
 
     private fun setCropMode(pos: Int) {
+        setOrientation(scrollOrientation)
         if (null == mRecyclerView.adapter) {
             mRecyclerView.adapter = PDFRecyclerAdapter()
         }
@@ -171,12 +174,9 @@ class ACropViewController(
     }
 
     override fun setOrientation(ori: Int) {
+        scrollOrientation = ori
         (mRecyclerView.layoutManager as LinearLayoutManager).orientation = (ori)
         mRecyclerView.adapter?.notifyDataSetChanged()
-    }
-
-    fun getOrientation(): Int {
-        return (mRecyclerView.layoutManager as LinearLayoutManager).orientation
     }
 
     override fun setCrop(crop: Boolean) {

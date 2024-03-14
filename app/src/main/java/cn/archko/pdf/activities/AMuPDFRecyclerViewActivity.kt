@@ -18,7 +18,6 @@ import android.widget.Toast
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.common.APageSizeLoader
 import cn.archko.pdf.common.BitmapCache
@@ -44,7 +43,7 @@ import kotlinx.coroutines.launch
  */
 class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener {
 
-    private lateinit var mLeftDrawer: RecyclerView
+    //private lateinit var mLeftDrawer: RecyclerView
     private lateinit var mDrawerLayout: DrawerLayout
     private lateinit var mControllerLayout: RelativeLayout
 
@@ -213,7 +212,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         viewController = aViewController
         Logcat.d("changeViewMode:$viewMode, pos:$pos, controller:$viewController")
         addDocumentView()
-        viewController?.init(mPageSizes, pos)
+        viewController?.init(mPageSizes, pos, pdfViewModel.bookProgress?.scrollOrientation ?: 1)
         viewController?.notifyDataSetChanged()
     }
 
@@ -265,6 +264,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             viewController?.doLoadDoc(mPageSizes, pos)
 
             mPageSeekBarControls?.showReflow(true)
+            mPageSeekBarControls?.orientation = pdfViewModel.bookProgress?.scrollOrientation ?: 1
 
             //outlineHelper = OutlineHelper(pdfViewModel.mupdfDocument, this)
             outlineHelper = pdfViewModel.outlineHelper
@@ -497,6 +497,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             }
 
             override fun changeOrientation(ori: Int) {
+                pdfViewModel.bookProgress?.scrollOrientation = ori
                 viewController?.setOrientation(ori)
             }
         })
