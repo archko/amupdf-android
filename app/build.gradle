@@ -181,12 +181,8 @@ dependencies {
     //}
     implementation Libs.Dependency.multidex
     implementation Libs.AndroidX.ConstraintLayout.constraintLayout
-    implementation(Libs.Dependency.material) {
-        exclude group: 'androidx.recyclerview'
-    }
-    implementation(Libs.Dependency.colorPickerDialog) {
-        exclude group: 'androidx.recyclerview'
-    }
+    implementation(Libs.Dependency.material)
+    implementation(Libs.Dependency.colorPickerDialog)
 
     implementation Libs.AndroidX.Room.runtime
     implementation Libs.AndroidX.Room.ktx

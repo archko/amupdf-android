@@ -23,7 +23,6 @@ import org.ebookdroid.core.crop.PageCropper;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
 import java.util.List;
 
 import cn.archko.pdf.common.BitmapPool;
@@ -296,7 +295,7 @@ public class MupdfDocument {
         Matrix matrix = new Matrix(ctm.a / ratio, ctm.d / ratio);
         render(page, matrix, thumb, 0, leftBound, topBound);
 
-        RectF rectF = getNativeCropRect(thumb);
+        RectF rectF = getJavaCropRect(thumb);
 
         float xscale = thumb.getWidth() / rectF.width();
         leftBound = (int) (rectF.left * ratio * xscale);
@@ -330,7 +329,7 @@ public class MupdfDocument {
         dev.destroy();
     }
 
-    public static RectF getNativeCropRect(Bitmap bitmap) {
+    /*public static RectF getNativeCropRect(Bitmap bitmap) {
         //long start = SystemClock.uptimeMillis();
         ByteBuffer byteBuffer = PageCropper.create(bitmap.getByteCount()).order(ByteOrder.nativeOrder());
         bitmap.copyPixelsToBuffer(byteBuffer);
@@ -339,11 +338,10 @@ public class MupdfDocument {
         //view: view:Point(1920, 1080) patchX:71 mss:6.260591 mZoomSize:Point(2063, 3066) zoom:1.0749608
         //test: 2063,3066,261,RectF(85.0, 320.0, 1743.0, 2736.0)
         return PageCropper.getCropBounds(byteBuffer, bitmap.getWidth(), bitmap.getHeight(), new RectF(0f, 0f, bitmap.getWidth(), bitmap.getHeight()));
-    }
+    }*/
 
     public static RectF getJavaCropRect(Bitmap bitmap) {
-        return PageCropper.getCropBounds(bitmap, new android.graphics.Rect(0, 0, bitmap.getWidth(), bitmap.getHeight()),
-                new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight()));
+        return PageCropper.getJavaCropBounds(bitmap, new android.graphics.Rect(0, 0, bitmap.getWidth(), bitmap.getHeight()));
     }
 
     public Page loadPage(int pageIndex) {

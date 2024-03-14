@@ -169,15 +169,15 @@ object PDFCreaterHelper {
     ): String {
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = false
-        options.outWidth = PdfCreator.PDF_PAGE_WIDTH.toInt()
-        options.outHeight = (height * PdfCreator.PDF_PAGE_WIDTH / width).toInt()
+        //options.outWidth = PDF_PAGE_WIDTH.toInt()
+        //options.outHeight = (height * PDF_PAGE_WIDTH / width).toInt()
         val bitmap = BitmapFactory.decodeFile(path, options)
         val file =
             File(
                 FileUtils.getExternalCacheDir(App.instance).path
                         + File.separator + "create" + File.separator + System.currentTimeMillis() + ".jpg"
             )
-        BitmapUtils.saveBitmapToFile(bitmap, file, Bitmap.CompressFormat.JPEG, 95)
+        BitmapUtils.saveBitmapToFile(bitmap, file, Bitmap.CompressFormat.JPEG, 100)
         Logcat.d(
             "TAG",
             "bitmap.width:$width, height:$height,:${options.outWidth},${options.outHeight}, path:${file.absolutePath}"
@@ -223,7 +223,7 @@ object PDFCreaterHelper {
                         //FileUtils.getStorageDirPath() + "/amupdf"
                         + File.separator + "create" + File.separator + System.currentTimeMillis() + ".jpg"
             )
-        BitmapUtils.saveBitmapToFile(bm, file, Bitmap.CompressFormat.JPEG, 95)
+        BitmapUtils.saveBitmapToFile(bm, file, Bitmap.CompressFormat.JPEG, 100)
         Logcat.d("TAG", "new file:height:${rect.bottom - rect.top}, path:${file.absolutePath}")
 
         //result.add(file.absolutePath)

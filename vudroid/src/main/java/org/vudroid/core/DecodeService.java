@@ -13,7 +13,7 @@ public interface DecodeService {
 
     void setContainerView(View containerView);
 
-    void open(Uri fileUri);
+    void open(String fileUri);
 
     void decodePage(Object decodeKey, PageTreeNode node, DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds);
 

@@ -39,22 +39,16 @@ dependencies {
     api Libs.AndroidX.Lifecycle.viewModelKtx
     api Libs.AndroidX.Lifecycle.liveDataKtx
     api Libs.AndroidX.DataStore.dataStore
-    api (Libs.AndroidX.DataStore.preference_ktx) {
-        exclude group: 'androidx.recyclerview'
-    }
+    api (Libs.AndroidX.DataStore.preference_ktx)
 
     //implementation(Libs.Dependency.viewpager2) {
     //    exclude group: 'androidx.recyclerview'
     //}
 
-    implementation(Libs.Dependency.material) {
-        exclude group: 'androidx.recyclerview'
-    }
+    implementation(Libs.Dependency.material)
     implementation Libs.AndroidX.Room.runtime
     implementation Libs.AndroidX.Room.ktx
-    implementation (Libs.Dependency.colorPickerDialog) {
-        exclude group: 'androidx.recyclerview'
-    }
+    implementation (Libs.Dependency.colorPickerDialog)
 
     api project(":vudroid")
 }

@@ -4,54 +4,202 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
-import java.nio.ByteBuffer;
-
 public class PageCropper {
 
     private PageCropper() {
     }
     //========================= native crop =========================
 
-    static {
-        System.loadLibrary("crop-lib");
-    }
+    //static {
+    //    System.loadLibrary("crop-lib");
+    //}
 
-    public static native ByteBuffer create(int size);
+    //public static native ByteBuffer create(int size);
 
-    public static synchronized RectF getCropBounds(final ByteBuffer pixels, int width, int height, final RectF psb) {
-        return nativeGetCropBounds(pixels, width, height, psb.left, psb.top, psb.right, psb.bottom);
-    }
+    //public static synchronized RectF getCropBounds(final ByteBuffer pixels, int width, int height, final RectF psb) {
+    //    return nativeGetCropBounds(pixels, width, height, psb.left, psb.top, psb.right, psb.bottom);
+    //}
 
     /*public static synchronized RectF getColumn(final ByteBufferBitmap bitmap, final float x, final float y) {
         return nativeGetColumn(bitmap.getPixels(), bitmap.getWidth(), bitmap.getHeight(), x, y);
     }*/
 
-    private static native RectF nativeGetCropBounds(ByteBuffer pixels, int width, int height, float left, float top,
-                                                    float right, float bottom);
+    //private static native RectF nativeGetCropBounds(ByteBuffer pixels, int width, int height, float left, float top,
+    //                                                float right, float bottom);
 
     //private static native RectF nativeGetColumn(ByteBuffer pixels, int width, int height, float x, float y);
 
     //========================= java =========================
 
-    private final static int LINE_SIZE = 5;
-    private final static int LINE_MARGIN = 20;
+
+    /**
+     * 灰度化 bitmap
+     *
+     * @param width
+     * @param height
+     * @param pixels
+     * @return
+     */
+    private static void setGray(Bitmap bitmap, int width, int height, int[] pixels) {
+        int alpha = 0xFF << 24;  //设置透明度
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                int gray = pixels[width * i + j];
+                int red = ((gray & 0x00FF0000) >> 16);  //获取红色灰度值
+                int green = ((gray & 0x0000FF00) >> 8); //获取绿色灰度值
+                int blue = (gray & 0x000000FF);         //获取蓝色灰度值
+                gray = (int) ((float) red * 0.3 + (float) green * 0.59 + (float) blue * 0.11);
+
+                if (gray < 180) {//如果某点像素灰度小于给定阈值,180的时候,测试页面都正常切边了.
+                    gray = 0;//将该点像素的灰度值置为0（黑色）
+                } else {//如果某点像素灰度大于或等于给定阈值
+                    gray = 255;//将该点像素的灰度值置为1（白色）
+                }
+
+                gray = alpha | (gray << 16) | (gray << 8) | gray; //添加透明度
+                pixels[width * i + j] = gray;   //更改像素色值
+            }
+        }
+        //Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+        bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+    }
+
+    private static final int THRESHOLD = 4;
+
+    /**
+     * 得到切除白边的rect.
+     * 对于黑白的比较精确,但效率低,因为全图扫描.
+     *
+     * @param bitmap
+     * @return
+     */
+    public static RectF getJavaCropRect(Bitmap bitmap) {
+        int[] pixels = getPixels(bitmap, new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight()));
+
+        // 灰度化 bitmap
+        setGray(
+                bitmap,
+                bitmap.getWidth(),
+                bitmap.getHeight(),
+                pixels);
+
+        int left = 0; // 左边框白色高度
+        int top = 0;  // 上边框白色高度
+        int right = 0; // 右边框白色高度
+        int bottom = 0; // 底边框白色高度
+
+        for (int w = 0; w < bitmap.getWidth() / 3; w++) {
+            boolean holdBlackPix = false;
+            for (int h = 0; h < bitmap.getHeight(); h++) {
+                if (bitmap.getPixel(w, h) != -1) {
+                    holdBlackPix = true;
+                    break;
+                }
+            }
+            if (holdBlackPix) {
+                break;
+            }
+            left++;
+        }
+
+        for (int h = 0; h < bitmap.getHeight() / 3; h++) {
+            boolean holdBlackPix = false;
+            for (int w = 0; w < bitmap.getWidth(); w++) {
+                int pixel = bitmap.getPixel(w, h);
+                if (pixel != -1) { // -1 是白色
+                    holdBlackPix = true; // 如果不是-1 则是其他颜色
+                    break;
+                }
+            }
+
+            if (holdBlackPix) {
+                break;
+            }
+            top++;
+        }
+
+        for (int w = bitmap.getWidth() - 1; w >= bitmap.getWidth() * 2 / 3; w--) {
+            boolean holdBlackPix = false;
+            for (int h = 0; h < bitmap.getHeight(); h++) {
+                if (bitmap.getPixel(w, h) != -1) {
+                    holdBlackPix = true;
+                    break;
+                }
+            }
+            if (holdBlackPix) {
+                break;
+            }
+            right++;
+        }
+
+        for (int h = bitmap.getHeight() - 1; h >= bitmap.getHeight() * 2 / 3; h--) {
+            boolean holdBlackPix = false;
+            for (int w = 0; w < bitmap.getWidth(); w++) {
+                if (bitmap.getPixel(w, h) != -1) {
+                    holdBlackPix = true;
+                    break;
+                }
+            }
+            if (holdBlackPix) {
+                break;
+            }
+            bottom++;
+        }
+
+        if (top > THRESHOLD) {
+            top -= THRESHOLD;
+        }
+        if (left > THRESHOLD) {
+            left -= THRESHOLD;
+        }
+        if (right > THRESHOLD) {
+            right -= THRESHOLD;
+        }
+        if (bottom > THRESHOLD) {
+            bottom -= THRESHOLD;
+        }
+
+        return new RectF((float) left, (float) top, bitmap.getWidth() - right, bitmap.getHeight() - bottom);
+    }
+
+    //=======================
+    //========================= java =========================
+
+    // 扫描步进
+    private final static int LINE_SIZE = 4;
+    //边距留白,与切割的图片大小是有关的,缩略图越小,留白应该越小,因为精度小
+    private final static int LINE_MARGIN = 8;
     private final static double WHITE_THRESHOLD = 0.005;
 
-    public static RectF getCropBounds(final Bitmap bitmap, final Rect bitmapBounds, final RectF pageSliceBounds) {
-        // final long t0 = System.currentTimeMillis();
-        final float avgLum = calculateAvgLum(bitmap, bitmapBounds);
-        // final long t1 = System.currentTimeMillis();
-        final float left = getLeftBound(bitmap, bitmapBounds, avgLum);
-        final float right = getRightBound(bitmap, bitmapBounds, avgLum);
-        final float top = getTopBound(bitmap, bitmapBounds, avgLum);
-        final float bottom = getBottomBound(bitmap, bitmapBounds, avgLum);
-        // final long t5 = System.currentTimeMillis();
+    /**
+     * 使用的是平均像素,对于有些图片切割会异常,在于精确度的调整.
+     * 扫描步进为5,平均200*200的图片1毫秒内,对于红色字,会当成无效的字
+     *
+     * @param bitmap
+     * @param bitmapBounds
+     * @return
+     */
+    public static RectF getJavaCropBounds(final Bitmap bitmap) {
+        return getJavaCropBounds(bitmap, new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight()));
+    }
 
-        // System.out.println("Crop: total=" + (t5 - t0) + "ms, avgLum=" + (t1 - t0) + "ms");
+    public static RectF getJavaCropBounds(final Bitmap bitmap, final Rect bitmapBounds) {
+        if (bitmap.getHeight() < (20) || bitmap.getWidth() < 20) {
+            return new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        }
+        //计算平均灰度不如直接设置225,效果要好的多,平均值会把红色的识别成白边
+        final float avgLum = 225; //calculateAvgLum(bitmap, bitmapBounds);
+        float left = getLeftBound(bitmap, bitmapBounds, avgLum);
+        float right = getRightBound(bitmap, bitmapBounds, avgLum);
+        float top = getTopBound(bitmap, bitmapBounds, avgLum);
+        float bottom = getBottomBound(bitmap, bitmapBounds, avgLum);
 
-        return new RectF(left * pageSliceBounds.width() + pageSliceBounds.left, top * pageSliceBounds.height()
-                + pageSliceBounds.top, right * pageSliceBounds.width() + pageSliceBounds.left, bottom
-                * pageSliceBounds.height() + pageSliceBounds.top);
+        left = left * bitmapBounds.width();
+        top = top * bitmapBounds.height();
+        right = right * bitmapBounds.width();
+        bottom = bottom * bitmapBounds.height();
+
+        return new RectF(left, top, right, bottom);
     }
 
     private static float getLeftBound(final Bitmap bmp, final Rect bitmapBounds, final float avgLum) {
@@ -183,7 +331,7 @@ public class PageCropper {
 
         final int min = Math.min(r, Math.min(g, b));
         final int max = Math.max(r, Math.max(g, b));
-        return (min + max) / 2;
+        return (1f * min + max) / 2;
     }
 
     public static int[] getPixels(Bitmap bitmap, Rect srcRect) {

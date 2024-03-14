@@ -9,6 +9,7 @@ import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import org.vudroid.core.codec.CodecPage;
 import org.vudroid.core.events.ZoomListener;
@@ -37,8 +38,8 @@ public class DocumentView extends View implements ZoomListener {
     private long lastDownEventTime;
     private static final int DOUBLE_TAP_TIME = 600;
     private MultiTouchZoom multiTouchZoom;
-    public static final int HORIZONTAL = 0;
-    public static final int VERTICAL = 1;
+    public static final int HORIZONTAL = LinearLayout.HORIZONTAL;
+    public static final int VERTICAL = LinearLayout.VERTICAL;
     private int oriention = VERTICAL;
 
     private final GestureDetector mGestureDetector;
@@ -53,6 +54,7 @@ public class DocumentView extends View implements ZoomListener {
     public void setOriention(int oriention) {
         if (this.oriention != oriention) {
             this.oriention = oriention;
+            pageToGoTo = getCurrentPage();
             requestLayout();
             if (null != decodeService) {
                 decodeService.setOriention(oriention);
@@ -109,6 +111,10 @@ public class DocumentView extends View implements ZoomListener {
 
     private void goToPageImpl(final int toPage) {
         Page page = pages.get(toPage);  //TODO ,page is not really page on the first time.
+        if (null == page) {
+            System.out.println(String.format("goToPageImpl.error:%s-%s", toPage, pages.size()));
+            return;
+        }
         int scrollX = 0;
         int scrollY = 0;
         if (oriention == VERTICAL) {
@@ -141,6 +147,7 @@ public class DocumentView extends View implements ZoomListener {
         Log.d(VIEW_LOG_TAG, "goToPageImpl:" + xToScroll + " scroll:" + scrollX + " yToScroll:" + yToScroll + " scrollY:" + scrollY + " page:" + page);
 
         scrollTo(scrollX, scrollY);
+        pageToGoTo = -1;
     }
 
     @Override
@@ -399,7 +406,11 @@ public class DocumentView extends View implements ZoomListener {
         if (page == null || page.bounds == null) {
             return;
         }
-        scrollTo((int) (getScrollX() * ratio), (int) (getScrollY() * ratio));
+        if (pageToGoTo > 0) {
+            goToPageImpl(pageToGoTo);
+        } else {
+            scrollTo((int) (getScrollX() * ratio), (int) (getScrollY() * ratio));
+        }
     }
 
     private float getScrollScaleRatio() {
@@ -435,7 +446,7 @@ public class DocumentView extends View implements ZoomListener {
         mCurrentFlingRunnable = new FlingRunnable(getContext());
         mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), 0, height, 0);
         post(mCurrentFlingRunnable);
-        Log.d(VIEW_LOG_TAG, "height:" + height);
+        //Log.d(VIEW_LOG_TAG, "height:" + height);
     }
 
     private boolean tryHyperlink(MotionEvent e) {
@@ -453,14 +464,14 @@ public class DocumentView extends View implements ZoomListener {
             //Log.d(VIEW_LOG_TAG, String.format("scrollX:%s, scrollY:%s, scale:%s, zoom:%s, index:%s, e.x:%s, e.y:%s, bound:%s",
             //        scrollX, scrollY, scale, zoomModel.getZoom(), page.index, e.getX(), e.getY(), page.bounds.top));
 
-            Hyperlink link = Hyperlink.mapPointToPage(page, x, y);
+            Hyperlink link = Hyperlink.Companion.mapPointToPage(page, x, y);
             //Log.d(VIEW_LOG_TAG, String.format("x:%s, y:%s, bounds:%s, link:%s, links:%s", x, y, page.bounds, link, page.links));
             if (link != null) {
-                if (Hyperlink.LINKTYPE_URL == link.linkType) {
-                    Hyperlink.openSystemBrowser(getContext(), link.url);
+                if (Hyperlink.LINKTYPE_URL == link.getLinkType()) {
+                    Hyperlink.Companion.openSystemBrowser(getContext(), link.getUrl());
                     return true;
                 } else {
-                    goToPage(link.page);
+                    goToPage(link.getPage());
                     return true;
                 }
             }
@@ -468,7 +479,7 @@ public class DocumentView extends View implements ZoomListener {
         return false;
     }
 
-    private float calculateScale(Page page) {
+    public float calculateScale(Page page) {
         CodecPage vuPage = decodeService.getPage(page.index);
         if (oriention == VERTICAL) {
             return zoomModel.getZoom() * (1.0f * getWidth() / vuPage.getWidth());

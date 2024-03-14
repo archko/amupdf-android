@@ -19,7 +19,5 @@ dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
     api files('libs/easyedge-sdk.jar')
     api project(":readercommon")
-    implementation(Libs.Dependency.material) {
-        exclude group: 'androidx.recyclerview'
-    }
+    implementation(Libs.Dependency.material)
 }

@@ -10,6 +10,9 @@ import android.graphics.RectF;
 
 import java.lang.ref.SoftReference;
 import java.util.Arrays;
+
+import cn.archko.pdf.common.BitmapPool;
+
 public class PageTreeNode {
     private static final int SLICE_SIZE = 256 * 256 * 4;
     private Bitmap bitmap;
@@ -175,7 +178,7 @@ public class PageTreeNode {
                     setBitmap(bitmap);
                     invalidateFlag = false;
                     setDecodingNow(false);
-                    //page.setAspectRatio(documentView.decodeService.getPageWidth(page.index), documentView.decodeService.getPageHeight(page.index));
+                    page.setAspectRatio(documentView.decodeService.getPageWidth(page.index), documentView.decodeService.getPageHeight(page.index));
                     invalidateChildren();
                 }),
                 documentView.zoomModel.getZoom(),
@@ -194,20 +197,27 @@ public class PageTreeNode {
         return sliceBounds;
     }
 
-    private void setBitmap(Bitmap bitmap) {
-        if (bitmap != null && bitmap.getWidth() == -1 && bitmap.getHeight() == -1) {
+    private void setBitmap(Bitmap newBitmap) {
+        if (newBitmap == null ||
+                (newBitmap != null && newBitmap.getWidth() == -1 && newBitmap.getHeight() == -1)) {
+            if (bitmap != null) {
+                BitmapPool.getInstance().release(bitmap);
+                bitmapWeakReference.clear();
+            }
+            bitmap = null;
             return;
         }
-        if (this.bitmap != bitmap) {
+
+        if (bitmap != newBitmap) {
             if (bitmap != null) {
-                if (this.bitmap != null) {
-                    this.bitmap.recycle();
-                    //BitmapPool.getInstance().release(this.bitmap);
-                }
-                bitmapWeakReference = new SoftReference<>(bitmap);
-                documentView.postInvalidate();
+                //this.bitmap.recycle();
+                BitmapPool.getInstance().release(bitmap);
+                bitmapWeakReference.clear();
             }
-            this.bitmap = bitmap;
+            bitmapWeakReference = new SoftReference<>(newBitmap);
+            documentView.postInvalidate();
+
+            bitmap = newBitmap;
         }
     }
 
@@ -242,7 +252,7 @@ public class PageTreeNode {
         if (!isDecodingNow()) {
             return;
         }
-        documentView.decodeService.stopDecoding(this);
+        documentView.decodeService.stopDecoding(getCacheKey());
         setDecodingNow(false);
     }
 

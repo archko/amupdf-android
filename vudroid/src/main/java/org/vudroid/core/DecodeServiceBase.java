@@ -3,7 +3,6 @@ package org.vudroid.core;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -16,7 +15,6 @@ import com.artifex.mupdf.fitz.Outline;
 import org.vudroid.core.codec.CodecContext;
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
-import org.vudroid.core.utils.PathFromUri;
 import org.vudroid.pdfdroid.codec.PdfContext;
 import org.vudroid.pdfdroid.codec.PdfDocument;
 import org.vudroid.pdfdroid.codec.PdfPage;
@@ -101,8 +99,8 @@ public class DecodeServiceBase implements DecodeService {
         this.containerView = containerView;
     }
 
-    public void open(Uri fileUri) {
-        document = codecContext.openDocument(PathFromUri.retrieve(containerView.getContext(), fileUri));
+    public void open(String filePath) {
+        document = codecContext.openDocument(filePath);
     }
 
     public CodecDocument getDocument() {
@@ -341,9 +339,11 @@ public class DecodeServiceBase implements DecodeService {
             }
             document.recycle();
             codecContext.recycle();
+
             BitmapPool.getInstance().clear();
         });
         executorService.shutdown();
+        BitmapPool.getInstance().clear();
     }
 
     //=========================

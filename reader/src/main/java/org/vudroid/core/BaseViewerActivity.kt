@@ -38,11 +38,13 @@ import org.vudroid.core.views.PageViewZoomControls
 
 abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener,
     CurrentPageListener {
+    //private static final String DOCUMENT_VIEW_STATE_PREFERENCES = "DjvuDocumentViewState";
     var decodeService: DecodeService? = null
         private set
     var documentView: DocumentView? = null
         private set
 
+    //private ViewerPreferences viewerPreferences;
     private var pageNumberToast: Toast? = null
     private var currentPageModel: CurrentPageModel? = null
     var pageControls: PageViewZoomControls? = null
@@ -59,9 +61,8 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StatusBarHelper.hideSystemUI(this)
-        StatusBarHelper.setImmerseBarAppearance(window, false)
-        
-        BitmapCache.getInstance().resize(BitmapCache.CAPACITY_FOR_VUDROID)
+        StatusBarHelper.setImmerseBarAppearance(window, true)
+
         initDecodeService()
         val zoomModel = ZoomModel()
         sensorHelper = SensorHelper(this)
@@ -85,15 +86,15 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         )
         decodeService!!.setContainerView(documentView)
         documentView!!.setDecodeService(decodeService)
-        decodeService!!.open(intent.data)
-
-        //viewerPreferences = new ViewerPreferences(this);
+        decodeService!!.open(absolutePath)
         val frameLayout = createMainContainer()
         frameLayout.addView(documentView)
         pageControls = createZoomControls(zoomModel)
         frameLayout.addView(pageControls)
         setContentView(frameLayout)
 
+        /*final SharedPreferences sharedPreferences = getSharedPreferences(DOCUMENT_VIEW_STATE_PREFERENCES, 0);
+        documentView.goToPage(sharedPreferences.getInt(getIntent().getData().toString(), 0));*/
         val currentPage = pdfViewModel.getCurrentPage(
             decodeService!!.pageCount
         )
@@ -105,6 +106,8 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
             )
         }
         documentView!!.showDocument()
+
+        //viewerPreferences.addRecent(getIntent().getData());
 
         /*mPageModel=new CurrentPageModel();
         mPageModel.addEventListener(new CurrentPageListener() {
@@ -155,6 +158,9 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
     }
 
     override fun decodingProgressChanged(currentlyDecoding: Int) {
+        runOnUiThread {
+            //getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, currentlyDecoding == 0 ? 10000 : currentlyDecoding);
+        }
     }
 
     override fun currentPageChanged(pageIndex: Int) {
@@ -166,6 +172,7 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         }
         pageNumberToast!!.setGravity(Gravity.BOTTOM or Gravity.LEFT, 30, 0)
         pageNumberToast!!.show()
+        //saveCurrentPage();
     }
 
     private fun setWindowTitle() {
@@ -179,6 +186,15 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
     }
 
     private fun setFullScreen() {
+        /*if (viewerPreferences.isFullScreen())
+        {
+            getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+        else
+        {
+            getWindow().requestFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        }*/
     }
 
     private fun createZoomControls(zoomModel: ZoomModel): PageViewZoomControls {
@@ -235,21 +251,29 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
                 finish()
                 return true
             }
+
             MENU_GOTO -> {
+                //showDialog(DIALOG_GOTO);
+                //mPageModel.setCurrentPage(currentPageModel.getCurrentPageIndex());
+                //mPageModel.setPageCount(decodeService.getPageCount());
                 pageSeekBarControls!!.fade()
                 return true
             }
+
             MENU_FULL_SCREEN -> {
                 item.isChecked = !item.isChecked
                 setFullScreenMenuItemText(item)
+                //viewerPreferences.setFullScreen(item.isChecked());
                 finish()
                 startActivity(intent)
                 return true
             }
+
             MENU_OUTLINE -> {
                 openOutline()
                 return true
             }
+
             MENU_OPTIONS -> start(this)
         }
         return false
@@ -269,10 +293,12 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         lifecycleScope.launch() {
             var keepOn = false
             var fullscreen = true
+            var verticalScrollLock = true
             withContext(Dispatchers.IO) {
                 val data = preferencesRepository.pdfOptionFlow.first()
                 keepOn = data.keepOn
                 fullscreen = data.fullscreen
+                verticalScrollLock = data.verticalScrollLock
             }
             if (keepOn) {
                 window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -280,6 +306,24 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
                 window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             }
 
+            /*setZoomLayout(options);
+            pagesView.setZoomLayout(zoomLayout);*/
+            //documentView!!.setVerticalScrollLock(verticalScrollLock)
+
+            /*int zoomAnimNumber = Integer.parseInt(options.getString(PdfOptionsActivity.PREF_ZOOM_ANIMATION, "2"));
+
+            if (zoomAnimNumber == PdfOptionsActivity.ZOOM_BUTTONS_DISABLED)
+                zoomAnim = null;
+            else
+                zoomAnim = AnimationUtils.loadAnimation(this,
+                    zoomAnimations[zoomAnimNumber]);
+            int pageNumberAnimNumber = Integer.parseInt(options.getString(PdfOptionsActivity.PREF_PAGE_ANIMATION, "3"));
+
+            if (pageNumberAnimNumber == PdfOptionsActivity.PAGE_NUMBER_DISABLED)
+                pageNumberAnim = null;
+            else
+                pageNumberAnim = AnimationUtils.loadAnimation(this,
+                    pageNumberAnimations[pageNumberAnimNumber]);*/
             if (fullscreen) {
                 //getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 window.setFlags(

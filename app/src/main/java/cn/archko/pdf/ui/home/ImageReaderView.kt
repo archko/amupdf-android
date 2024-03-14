@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListItemInfo
@@ -75,7 +76,6 @@ import cn.archko.pdf.common.AsyncDecodeTextPage
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.ParseTextMain
 import cn.archko.pdf.common.StyleHelper
-import cn.archko.pdf.components.Divider
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.LoadResult
 import cn.archko.pdf.entity.OutlineItem
@@ -262,9 +262,9 @@ fun ImageViewer(
                     }
             ) {
                 itemsIndexed(list) { index, aPage ->
-                    if (index > 0) {
+                    /*if (index > 0) {
                         Divider(thickness = 0.5.dp)
-                    }
+                    }*/
                     if (pdfViewModel.bookProgress?.reflow == 0) {
                         aPage?.let {
                             ImageItem(
@@ -711,6 +711,16 @@ private fun ImageItem(
                 LoadingView("Decoding Page:${aPage.index + 1}")
             }
         }
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .size(swidth / 5, 0.5.dp)
+                .background(
+                    androidx.compose.material3.MaterialTheme.colorScheme.secondary.copy(
+                        alpha = 0.4f
+                    )
+                )
+        )
     }
 }
 

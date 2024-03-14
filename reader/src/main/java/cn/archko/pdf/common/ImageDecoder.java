@@ -21,7 +21,6 @@ import cn.archko.pdf.mupdf.MupdfDocument;
 public class ImageDecoder extends ImageWorker {
 
     public static final String TAG = "ImageDecoder";
-    private LruCache<Object, Bitmap> mImageCache = BitmapCache.getInstance().getCache();
 
     public static ImageDecoder getInstance() {
         return Factory.instance;
@@ -40,30 +39,20 @@ public class ImageDecoder extends ImageWorker {
 
     @Override
     public boolean isScrolling() {
-        if (mImageCache != null) {
-            //return mImageCache.isScrolling();
-        }
+        //if (mImageCache != null) {
+        //    //return mImageCache.isScrolling();
+        //}
         return false;
     }
 
     @Override
     public void addBitmapToCache(final String key, final Bitmap bitmap) {
-        if (mImageCache != null) {
-            mImageCache.put(key, bitmap);
-        }
+        BitmapCache.getInstance().addBitmap(key, bitmap);
     }
 
     @Override
     public Bitmap getBitmapFromCache(final String key) {
-        if (mImageCache != null) {
-            return mImageCache.get(key);
-        }
-        return null;
-    }
-
-    @Override
-    public LruCache<Object, Bitmap> getImageCache() {
-        return mImageCache;
+        return BitmapCache.getInstance().getBitmap(key);
     }
 
     @Override
@@ -156,6 +145,6 @@ public class ImageDecoder extends ImageWorker {
 
     @Override
     public void recycle() {
-        mImageCache.evictAll();
+        BitmapCache.getInstance().clear();
     }
 }

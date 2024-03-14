@@ -31,8 +31,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.google.samples.apps.nowinandroid.core.designsystem.theme.BackgroundTheme
-import com.google.samples.apps.nowinandroid.core.designsystem.theme.LocalBackgroundTheme
+import com.google.samples.apps.nowinandroid.core.designsystem.theme.GradientColors
+import com.google.samples.apps.nowinandroid.core.designsystem.theme.LocalGradientColors
+import com.google.samples.apps.nowinandroid.core.designsystem.theme.LocalTintTheme
+import com.google.samples.apps.nowinandroid.core.designsystem.theme.TintTheme
 
 /**
  * Light default theme color scheme
@@ -214,7 +216,7 @@ fun NiaTheme(
         top = colorScheme.inverseOnSurface,
         bottom = colorScheme.primaryContainer,
         container = colorScheme.surface,
-    )
+        )
     val gradientColors = when {
         androidTheme -> if (darkTheme) DarkAndroidGradientColors else LightAndroidGradientColors
         !disableDynamicTheming && supportsDynamicTheming() -> emptyGradientColors
@@ -222,9 +224,9 @@ fun NiaTheme(
     }
     // Background theme
     val defaultBackgroundTheme = BackgroundTheme(
-        color = colorScheme.surface,
-        tonalElevation = 2.dp,
-    )
+            color = colorScheme.surface,
+            tonalElevation = 2.dp,
+        )
     val backgroundTheme = when {
         androidTheme -> if (darkTheme) DarkAndroidBackgroundTheme else LightAndroidBackgroundTheme
         else -> defaultBackgroundTheme

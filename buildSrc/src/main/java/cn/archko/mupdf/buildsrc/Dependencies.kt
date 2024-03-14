@@ -1,22 +1,19 @@
 package cn.archko.mupdf.buildsrc
 
-object Versions {
-    const val ktlint = "0.45.2"
-}
-
 object BuildConfig {
     const val compileSdkVersion = 34
     const val buildToolsVersion = "34.0.0"
     const val minSdkVersion = 21
     const val targetSdkVersion = 33
-    const val versionCode = 300
-    const val versionName = "5.6.0"
+    const val versionCode = 350
+    const val versionName = "6.0.0"
 }
 
 object Libs {
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:2.0.4"
     const val flinger = "com.github.iamjosephmj:flinger:1.1.1"
-    const val androidGradlePlugin = "com.android.tools.build:gradle:8.1.2"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:8.3.0"
+    const val androidTools = "31.3.0"
 
     object Accompanist {
         const val version = "0.32.0"
@@ -31,12 +28,12 @@ object Libs {
     }
 
     object Coil {
-        const val coil = "io.coil-kt:coil:2.5.0"
-        const val coilCompose = "io.coil-kt:coil-compose:2.5.0"
+        const val coil = "io.coil-kt:coil:2.6.0"
+        const val coilCompose = "io.coil-kt:coil-compose:2.6.0"
     }
 
     object Kotlin {
-        private const val version = "1.9.21"
+        private const val version = "1.9.22"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
@@ -47,7 +44,7 @@ object Libs {
     }
 
     object Coroutines {
-        private const val version = "1.7.3"
+        private const val version = "1.8.0"
         const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
         const val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version"
         const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
@@ -64,8 +61,8 @@ object Libs {
         const val navigation = "androidx.navigation:navigation-compose:2.7.4"
 
         object Compose {
-            const val compiler_version = "1.5.7"
-            const val composeBomVersion = "2024.02.01"
+            const val compiler_version = "1.5.8"
+            const val composeBomVersion = "2024.02.02"
 
             const val runtime = "androidx.compose.runtime:runtime"
             const val runtimeLivedata = "androidx.compose.runtime:runtime-livedata"
@@ -99,7 +96,7 @@ object Libs {
         }
 
         object Lifecycle {
-            const val lifecycle = "2.6.2"
+            const val lifecycle = "2.7.0"
             const val viewModelCompose =
                 "androidx.lifecycle:lifecycle-viewmodel-compose:${lifecycle}"
 
@@ -175,8 +172,8 @@ object Libs {
     }
 
     //object Umeng {
-    //    const val umeng_common = "9.3.8"
-    //    const val asms_version = "1.2.2"
+    //    const val umeng_common = "9.6.5"
+    //    const val asms_version = "1.8.0"
     //    const val umengCommon = "com.umeng.umsdk:common:${umeng_common}"
     //    const val asms = "com.umeng.umsdk:asms:${asms_version}"// 必选
     //}
