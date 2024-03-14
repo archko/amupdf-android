@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar
+package com.google.samples.apps.nowinandroid.core.ui.scrollbar
 
 import androidx.compose.foundation.gestures.ScrollableState
 import kotlin.math.abs

@@ -25,7 +25,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.google.samples.apps.nowinandroid.core.designsystem.component.NiaOutlinedButton
 
 /**
  * Now in Android dropdown menu button with included trailing icon as well as text label and item

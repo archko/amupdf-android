@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter.State.Loading
 import coil.compose.rememberAsyncImagePainter
-import com.google.samples.apps.nowinandroid.core.designsystem.theme.LocalTintTheme
+import com.google.samples.apps.nowinandroid.core.ui.theme.LocalTintTheme
 
 /**
  * A wrapper around [AsyncImage] which determines the colorFilter based on the theme
