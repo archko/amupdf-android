@@ -106,6 +106,7 @@ android {
         renderScript false
         resValues false
         shaders false
+        viewBinding true
     }
 
     composeOptions {

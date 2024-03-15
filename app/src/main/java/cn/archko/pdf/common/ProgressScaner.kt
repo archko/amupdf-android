@@ -23,12 +23,14 @@ class ProgressScaner {
     //    return arrayOf(currentPath, entries)
     //}
 
-    fun startScan(fileListEntries: List<FileBean>, progressDao: ProgressDao) {
-        for (entry in fileListEntries) {
-            if (!entry.isDirectory && entry.file != null) {
-                val progress = progressDao.getProgress(entry.file!!.name)
-                if (null != progress) {
-                    entry.bookProgress = progress
+    fun startScan(fileListEntries: List<FileBean>?, progressDao: ProgressDao) {
+        if (null != fileListEntries) {
+            for (entry in fileListEntries) {
+                if (!entry.isDirectory && entry.file != null) {
+                    val progress = progressDao.getProgress(entry.file!!.name)
+                    if (null != progress) {
+                        entry.bookProgress = progress
+                    }
                 }
             }
         }
