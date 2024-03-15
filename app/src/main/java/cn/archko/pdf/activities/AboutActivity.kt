@@ -47,7 +47,6 @@ class AboutActivity : AnalysticActivity() {
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
         toolbar.setNavigationOnClickListener { finish() }
         toolbar.title = text
-        setSupportActionBar(toolbar)
         val view = findViewById<View>(R.id.about_parts) as ExpandableListView
         view.setAdapter(PartsAdapter())
         view.expandGroup(0)

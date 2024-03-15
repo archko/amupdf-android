@@ -59,7 +59,7 @@ class ACropViewController(
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             setItemViewCacheSize(0)
 
-            addItemDecoration(ViewerDividerItemDecoration(context, LinearLayoutManager.VERTICAL))
+            //addItemDecoration(ViewerDividerItemDecoration(context, LinearLayoutManager.VERTICAL))
             addOnScrollListener(object : ARecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: ARecyclerView, newState: Int) {
                     if (newState == ARecyclerView.SCROLL_STATE_IDLE) {
