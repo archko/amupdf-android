@@ -29,6 +29,7 @@ import cn.archko.pdf.listeners.DataListener
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
+import cn.archko.pdf.widgets.ExtraSpaceLinearLayoutManager
 import cn.archko.pdf.widgets.ViewerDividerItemDecoration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -68,7 +69,7 @@ class AReflowViewController(
         with(mRecyclerView) {
             descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
             isNestedScrollingEnabled = false
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            layoutManager = ExtraSpaceLinearLayoutManager(context, LinearLayoutManager.VERTICAL)
             setItemViewCacheSize(0)
 
             addItemDecoration(ViewerDividerItemDecoration(context, LinearLayoutManager.VERTICAL))
