@@ -108,11 +108,15 @@
             </intent-filter>
         </activity>
 
-        <!--<activity
+        <activity
+            android:name="cn.archko.pdf.activities.PdfOptionsActivity"
+            android:label="@string/options"
+            android:screenOrientation="portrait" />
+        <activity
             android:name="cn.archko.pdf.activities.AboutActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/about_title"
-            android:screenOrientation="portrait"></activity>-->
+            android:screenOrientation="portrait"></activity>
         <!--<activity
             android:name="cn.archko.pdf.activities.DocumentActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"

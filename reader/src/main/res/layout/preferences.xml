@@ -10,8 +10,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:navigationIcon="@drawable/ic_nav"
-        app:popupTheme="@style/ThemeOverlay.MaterialComponents.ActionBar"
+        app:navigationIcon="@drawable/ic_back"
         app:title="@string/options" />
 
     <FrameLayout
@@ -24,7 +23,7 @@
             android:layout_height="4dp"
             tools:ignore="ContentDescription" />
 
-        <ListView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@android:id/list"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

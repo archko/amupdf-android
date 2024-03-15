@@ -66,14 +66,14 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
         toolbar.setOnMenuItemClickListener { item ->
             val id = item.itemId
             when (id) {
-                //R.id.action_about -> startActivity(
-                //    Intent(
-                //        this@HomeActivity,
-                //        AboutActivity::class.java
-                //    )
-                //)
+                R.id.action_about -> startActivity(
+                    Intent(
+                        this@HomeActivity,
+                        AboutActivity::class.java
+                    )
+                )
 
-                //R.id.action_options -> PdfOptionsActivity.start(this@HomeActivity)
+                R.id.action_options -> PdfOptionsActivity.start(this@HomeActivity)
                 R.id.action_search -> {
                     showSearchDialog()
                 }

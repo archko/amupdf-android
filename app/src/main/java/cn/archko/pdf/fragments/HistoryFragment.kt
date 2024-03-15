@@ -4,7 +4,6 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.IntentFilter
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -84,9 +83,9 @@ class HistoryFragment : BrowserFragment() {
 
     override fun onResume() {
         super.onResume()
-        val options = PreferenceManager.getDefaultSharedPreferences(activity)
+        //val options = PreferenceManager.getDefaultSharedPreferences(activity)
         //mStyle = Integer.parseInt(options.getString(PdfOptionsActivity.PREF_LIST_STYLE, "0")!!)
-        applyStyle()
+        //applyStyle()
     }
 
     override fun onDestroy() {

@@ -1,9 +1,7 @@
 package cn.archko.pdf.activities
 
-import android.annotation.TargetApi
 import android.content.Intent
 import android.graphics.PointF
-import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.text.TextUtils
@@ -11,13 +9,13 @@ import android.util.SparseArray
 import android.view.GestureDetector
 import android.view.Gravity
 import android.view.View
+import android.view.Window
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
 import cn.archko.pdf.common.BitmapCache
-import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PdfOptionRepository
@@ -28,7 +26,6 @@ import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.utils.StatusBarHelper
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
-import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -160,8 +157,18 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
 
     open fun initView() {
         StatusBarHelper.hideSystemUI(this)
+        StatusBarHelper.setStatusBarImmerse(window)
+        setFullScreen()
 
         setContentView(R.layout.reader)
+    }
+
+    private fun setFullScreen() {
+        window.requestFeature(Window.FEATURE_NO_TITLE)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
     }
 
     open fun getDocumentView(): View? {
@@ -229,6 +236,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) {
             StatusBarHelper.hideSystemUI(this)
+            StatusBarHelper.setStatusBarImmerse(window)
         }
     }
 
