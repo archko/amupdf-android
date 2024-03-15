@@ -46,14 +46,8 @@ public class Utils {
      * @param <T>         Task argument type
      */
     @SuppressLint("NewApi")
-    public static <T> void execute(final boolean forceSerial, final AsyncTask<T, ?, ?> task,
-                                   final T... args) {
-        final WeakReference<AsyncTask<T, ?, ?>> taskReference = new WeakReference<AsyncTask<T, ?, ?>>(
-                task);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.DONUT) {
-            throw new UnsupportedOperationException(
-                    "This class can only be used on API 4 and newer.");
-        }
+    public static <T> void execute(final boolean forceSerial, final AsyncTask<T, ?, ?> task, final T... args) {
+        final WeakReference<AsyncTask<T, ?, ?>> taskReference = new WeakReference<AsyncTask<T, ?, ?>>(task);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB || forceSerial) {
             taskReference.get().execute(args);
         } else {

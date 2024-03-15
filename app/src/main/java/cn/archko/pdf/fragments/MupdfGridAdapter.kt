@@ -1,5 +1,6 @@
 package cn.archko.pdf.fragments
 
+//import cn.archko.pdf.entity.DecodeTask
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
@@ -8,11 +9,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.GridLayoutManager
-import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.common.BitmapCache
-import cn.archko.pdf.common.Logcat
+import cn.archko.pdf.common.ImageWorker.DecodeParam
 import cn.archko.pdf.entity.APage
-//import cn.archko.pdf.entity.DecodeTask
 import cn.archko.pdf.listeners.ClickListener
 import cn.archko.pdf.listeners.DecodeCallback
 
@@ -164,7 +163,7 @@ class MupdfGridAdapter(
             return pageIndex != index
         }*/
 
-        override fun decodeComplete(bitmap: Bitmap?) {
+        override fun decodeComplete(bitmap: Bitmap?, decodeParam: DecodeParam) {
         }
     }
 

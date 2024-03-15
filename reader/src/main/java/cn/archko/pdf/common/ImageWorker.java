@@ -377,6 +377,7 @@ public abstract class ImageWorker {
         public DecodeParam(String key, ImageView imageView, boolean crop, int xOrigin,
                            APage pageSize, Document document, DecodeCallback callback) {
             this.key = key;
+            pageNum = pageSize.index;
             if (TextUtils.isEmpty(key)) {
                 this.key = String.format("%s,%s,%s,%s", imageView, crop, xOrigin, pageSize);
             }
@@ -386,17 +387,6 @@ public abstract class ImageWorker {
             this.pageSize = pageSize;
             this.document = document;
             this.decodeCallback = callback;
-        }
-
-        public DecodeParam(String key, boolean crop, int xOrigin, APage pageSize, Document document) {
-            this.key = key;
-            if (TextUtils.isEmpty(key)) {
-                this.key = String.format("%s,%s,%s", crop, xOrigin, pageSize);
-            }
-            this.crop = crop;
-            this.xOrigin = xOrigin;
-            this.pageSize = pageSize;
-            this.document = document;
         }
 
         @Override
