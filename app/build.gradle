@@ -88,7 +88,8 @@ android {
             jni.srcDirs = []
             jniLibs.srcDirs = ['libs']
             java {
-                srcDirs 'src/main/kotlin'
+                srcDirs "src/main/java",
+                        "src/compose/java"
             }
         }
     }
