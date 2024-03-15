@@ -25,7 +25,7 @@
     <string name="label_read_count">阅读次数：</string>
 
     <string name="menu_vudroid">用Vudroid打开</string>
-    <string name="menu_mupdf">用AMupdf打开</string>
+    <string name="menu_mupdf">用AMupdf打开(不切边)</string>
     <string name="menu_new_mupdf">用新阅读器打开</string>
     <string name="menu_other">用其它应用打开</string>
     <string name="menu_info">查看文件信息</string>

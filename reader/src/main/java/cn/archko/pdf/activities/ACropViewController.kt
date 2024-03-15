@@ -292,7 +292,7 @@ class ACropViewController(
     override fun onPause() {
         if (null != pdfViewModel.mupdfDocument) {
             pdfViewModel.bookProgress?.run {
-                autoCrop = 0
+                //autoCrop = 0
                 val position = getCurrentPos()
                 pdfViewModel.saveBookProgress(
                     mPath,
@@ -362,7 +362,7 @@ class ACropViewController(
                 if (defaultWidth <= 0) {
                     return
                 }
-                view.updatePage(pageSize, 1.0f, pdfViewModel.mupdfDocument, true)
+                view.updatePage(pageSize, 1.0f, pdfViewModel.mupdfDocument, crop)
             }
 
             private fun showBookmark(position: Int): Boolean {

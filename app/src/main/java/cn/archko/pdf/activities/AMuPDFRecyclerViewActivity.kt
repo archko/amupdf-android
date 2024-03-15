@@ -56,12 +56,14 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     private val viewControllerCache: SparseArray<AViewController> = SparseArray<AViewController>()
     private var viewMode: ViewMode = ViewMode.CROP
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    /**
+     * 用AMupdf打开,传入强制切边参数,如果是-1,是没有设置,如果设置1表示强制切边,如果是0不切边,让切边按钮失效
+     */
+    private var forceCropParam = -1
 
     override fun initView() {
         super.initView()
+        forceCropParam = intent.getIntExtra("forceCropParam", -1)
 
         mPageSeekBarControls?.updateTitle(mPath)
         //mLeftDrawer = findViewById(cn.archko.pdf.R.id.left_drawer)
@@ -210,7 +212,11 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             gestureDetector
         )
         viewController = aViewController
-        Logcat.d("changeViewMode:$viewMode, pos:$pos, controller:$viewController")
+        Logcat.d("changeViewMode:$viewMode, pos:$pos,forceCropParam: $forceCropParam, controller:$viewController")
+        if (forceCropParam > -1) {
+            viewController?.setCrop(forceCropParam == 1)
+        }
+
         addDocumentView()
         viewController?.init(mPageSizes, pos, pdfViewModel.bookProgress?.scrollOrientation ?: 1)
         viewController?.notifyDataSetChanged()

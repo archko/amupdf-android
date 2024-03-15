@@ -27,7 +27,7 @@
     <string name="label_read_count">Read Counts：</string>
 
     <string name="menu_vudroid">Open with Vudroid</string>
-    <string name="menu_mupdf">Open with AMupdf</string>
+    <string name="menu_mupdf">Open with AMupdf(NO Crop)</string>
     <string name="menu_new_mupdf">Open with new viewer</string>
     <string name="menu_other">Open with Other App</string>
     <string name="menu_info">View File Info</string>
