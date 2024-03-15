@@ -91,6 +91,10 @@ android {
                 srcDirs "src/main/java",
                         "src/compose/java"
             }
+            res.srcDirs = [
+                    "src/main/res",
+                    "src/compose/res"
+            ]
         }
     }
 

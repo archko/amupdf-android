@@ -45,22 +45,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
-
-        <activity
-            android:name="cn.archko.pdf.activities.ChooseFileFragmentActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Nia">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="cn.archko.pdf.activities.SettingsActivity"
-            android:label="@string/options"
-            android:screenOrientation="portrait" />
         <activity
             android:name="org.vudroid.pdfdroid.PdfViewerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -117,8 +101,7 @@
             android:name="cn.archko.pdf.activities.AboutActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/about_title"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Nia"></activity>
+            android:screenOrientation="portrait"></activity>
         <!--<activity
             android:name="cn.archko.pdf.activities.DocumentActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
@@ -126,6 +109,23 @@
             android:screenOrientation="sensor"
             android:theme="@style/AppFullscreen"
             android:windowSoftInputMode="adjustResize"></activity>-->
+
+        <activity
+            android:name="cn.archko.pdf.activities.ChooseFileFragmentActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Nia">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="cn.archko.pdf.activities.SettingsActivity"
+            android:label="@string/options"
+            android:theme="@style/Theme.Nia"
+            android:screenOrientation="portrait" />
         <activity
             android:name="cn.archko.pdf.activities.TextActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
@@ -141,6 +141,5 @@
             android:theme="@style/AppFullscreen"
             android:windowSoftInputMode="adjustResize"></activity>
 
-        <activity android:name="cn.archko.pdf.activities.PDFToolActivity" />
     </application>
 </manifest>
