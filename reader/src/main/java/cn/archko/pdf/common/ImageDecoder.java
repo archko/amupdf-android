@@ -77,7 +77,7 @@ public class ImageDecoder extends ImageWorker {
 
             int leftBound = 0;
             int topBound = 0;
-            APage pageSize = decodeParam.pageSize;
+            final APage pageSize = decodeParam.pageSize;
             int pageW = pageSize.getZoomPoint().x;
             int pageH = pageSize.getZoomPoint().y;
 
@@ -117,9 +117,9 @@ public class ImageDecoder extends ImageWorker {
                 return bitmap;
             }
             if (Logcat.loggable) {
-                Logcat.d(TAG, String.format("decode bitmap:%s, %s-%s,page:%s-%s,xOrigin:%s, bound(left-top):%s-%s, page:%s",
-                        decodeParam.xOrigin, pageW, pageH, pageSize.getZoomPoint().x, pageSize.getZoomPoint().y,
-                        decodeParam.xOrigin, leftBound, topBound, pageSize));
+                Logcat.d(TAG, String.format("decode bitmap:%s-%s, %s-%s,page:%s-%s, bound(left-top):%s-%s, page:%s",
+                        decodeParam.pageNum, decodeParam.pageSize.index, pageW, pageH, pageSize.getZoomPoint().x, pageSize.getZoomPoint().y,
+                        leftBound, topBound, pageSize));
             }
 
             bitmap = BitmapPool.getInstance().acquire(pageW, pageH);//Bitmap.createBitmap(sizeX, sizeY, Bitmap.Config.ARGB_8888);

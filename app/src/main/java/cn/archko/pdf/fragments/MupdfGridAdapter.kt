@@ -1,6 +1,5 @@
 package cn.archko.pdf.fragments
 
-//import cn.archko.pdf.entity.DecodeTask
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
@@ -10,7 +9,9 @@ import android.widget.ImageView
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.GridLayoutManager
 import cn.archko.pdf.common.BitmapCache
+import cn.archko.pdf.common.ImageDecoder
 import cn.archko.pdf.common.ImageWorker.DecodeParam
+import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.listeners.ClickListener
 import cn.archko.pdf.listeners.DecodeCallback
@@ -66,18 +67,19 @@ class MupdfGridAdapter(
         (holder as PdfHolder).view.setImageResource(android.R.color.transparent)
     }
 
-    inner class PdfHolder(internal var view: ImageView) : ARecyclerView.ViewHolder(view),
-        DecodeCallback {
+    inner class PdfHolder(internal var view: ImageView) : ARecyclerView.ViewHolder(view) {
 
         private var aPage: APage? = null
         private var pageIndex = -1
         private var resultWidth: Int = 1080
         private var resultHeight: Int = 1080
+        private var index: Int = -1
+
         fun onBind(position: Int) {
             pageIndex = position
             aPage = mupdfListener.getPageList()[position]
 
-            val key =
+            val cacheKey =
                 "${mupdfListener.getDocument()!!}_page_$position-${aPage}"
 
             var width: Int = viewWidth()
@@ -91,28 +93,43 @@ class MupdfGridAdapter(
             view.setOnClickListener { clickListener.click(view, position) }
             view.setOnLongClickListener {
                 clickListener.longClick(it, position, it)
-                //showPopupMenu(it, position)
                 return@setOnLongClickListener true
             }
 
-            val bitmap = BitmapCache.getInstance().getBitmap(key)
-            if (null != bitmap) {
-                Log.d("TAG", String.format("bind.hit cache:%s", aPage?.index))
-                view.setImageBitmap(bitmap)
-                setLayoutSize(bitmap)
+            index = aPage!!.index
+
+            val bmp = BitmapCache.getInstance().getBitmap(cacheKey)
+
+            if (null != bmp) {
+                view.setImageBitmap(bmp)
                 return
             }
-            /*val task =
-                DecodeTask(
-                    width, height, 1,
-                    position, aPage!!,
-                    false,
-                    this,
-                    mupdfListener.getDocument()
-                )
 
-            view.setImageDrawable(null)
-            AppExecutors.instance.diskIO().execute { task.run() }*/
+            val callback = DecodeCallback { bitmap, param ->
+                if (Logcat.loggable) {
+                    Logcat.d(
+                        String.format(
+                            "decode callback:index:%s-%s, decode.page:%s, key:%s, param:%s",
+                            param.pageNum, index, param.pageNum, cacheKey, param.key
+                        )
+                    )
+                }
+                if (param.pageNum == index) {
+                    view.setImageBitmap(bitmap)
+                }
+            }
+            //aPage 这个如果当参数传递,由于复用机制,后面的页面更新后会把它覆盖,导致解码并不是原来那个
+            //这里应该传递高宽值
+            val decodeParam = DecodeParam(
+                cacheKey,
+                view,
+                false,
+                0,
+                aPage!!,
+                mupdfListener.getDocument()?.document,
+                callback
+            )
+            ImageDecoder.getInstance().loadImage(decodeParam)
         }
 
         private fun setLayoutSize(bitmap: Bitmap) {
@@ -120,14 +137,6 @@ class MupdfGridAdapter(
 
             val viewWidth = resultWidth
             val viewHeight: Int = (resultWidth / ratio).toInt()
-            /*if (Logcat.loggable) {
-                Logcat.d(
-                    TAG, String.format(
-                        "decode layout:index:%s, w-h:%s-%s, %s, %s",
-                        pageIndex, viewWidth, viewHeight, resultHeight, ratio
-                    )
-                )
-            }*/
 
             var lp = view.layoutParams
             if (null == lp) {
@@ -137,33 +146,6 @@ class MupdfGridAdapter(
                 lp.width = viewWidth
                 lp.height = viewHeight
             }
-        }
-
-        /*override fun decodeComplete(bitmap: Bitmap?, position: Int, key: String) {
-            if (null != bitmap) {
-                BitmapCache.getInstance().addBitmap(key, bitmap)
-                if (Logcat.loggable) {
-                    Logcat.d(
-                        "TAG", String.format(
-                            "decode complete:index:%s,pageIndex:%s, %s, %s-%s",
-                            position, pageIndex, key, bitmap.width, bitmap.height,
-                        )
-                    )
-                }
-                if (position == pageIndex) {
-                    AppExecutors.instance.mainThread().execute {
-                        view.setImageBitmap(bitmap)
-                        setLayoutSize(bitmap!!)
-                    }
-                }
-            }
-        }
-
-        override fun shouldRender(index: Int, key: String?): Boolean {
-            return pageIndex != index
-        }*/
-
-        override fun decodeComplete(bitmap: Bitmap?, decodeParam: DecodeParam) {
         }
     }
 
