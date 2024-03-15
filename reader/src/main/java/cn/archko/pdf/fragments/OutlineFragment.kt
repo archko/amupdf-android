@@ -82,7 +82,7 @@ open class OutlineFragment : BaseFragment() {
     }
 
     open fun updateSelection(currentPage: Int) {
-        if (currentPage < 0) {
+        if (currentPage < 0 || null == outlineItems) {
             return
         }
         this.currentPage = currentPage
