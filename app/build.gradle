@@ -88,18 +88,16 @@ android {
             jni.srcDirs = []
             jniLibs.srcDirs = ['libs']
             java {
-                srcDirs "src/main/java",
-                        "src/compose/java"
+                srcDirs "src/main/java"//, "src/compose/java"
             }
             res.srcDirs = [
-                    "src/main/res",
-                    "src/compose/res"
+                    "src/main/res"//, "src/compose/res"
             ]
         }
     }
 
     buildFeatures {
-        compose true
+        //compose true
         // Disable unused AGP features
         buildConfig false
         aidl false
@@ -109,9 +107,9 @@ android {
         viewBinding true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion Libs.AndroidX.Compose.compiler_version
-    }
+    //composeOptions {
+    //    kotlinCompilerExtensionVersion Libs.AndroidX.Compose.compiler_version
+    //}
 
     packagingOptions {
         exclude("META-INF/*.kotlin_module")
@@ -128,17 +126,17 @@ dependencies {
 
     implementation Libs.AndroidX.coreKtx
     implementation Libs.AndroidX.Activity.appCompat
-    implementation Libs.AndroidX.Activity.activityCompose
-    implementation Libs.AndroidX.Lifecycle.viewModelCompose
-    implementation Libs.AndroidX.ConstraintLayout.constraintLayoutCompose
+    //implementation Libs.AndroidX.Activity.activityCompose
+    //implementation Libs.AndroidX.Lifecycle.viewModelCompose
+    //implementation Libs.AndroidX.ConstraintLayout.constraintLayoutCompose
 
     implementation Libs.AndroidX.Lifecycle.liveDataKtx
     implementation Libs.AndroidX.Lifecycle.viewModelKtx
-    implementation Libs.AndroidX.Lifecycle.lifecycleRuntimeCompose
+    //implementation Libs.AndroidX.Lifecycle.lifecycleRuntimeCompose
 
     implementation Libs.AndroidX.navigation
 
-    implementation(Libs.AndroidX.Paging.pagingRuntime) {
+    /*implementation(Libs.AndroidX.Paging.pagingRuntime) {
         exclude group: 'androidx.recyclerview'
     }
     implementation Libs.AndroidX.Paging.pagingCompose
@@ -156,9 +154,11 @@ dependencies {
     implementation Libs.AndroidX.Compose.animation
     implementation Libs.AndroidX.Compose.tooling
 
+    implementation Libs.flinger
+
     implementation Libs.Accompanist.pager
     implementation Libs.Accompanist.pagerIndicators
-    implementation Libs.Accompanist.swiperefresh
+    implementation Libs.Accompanist.swiperefresh*/
 
     implementation Libs.Arch.runtime
     implementation Libs.AndroidX.Activity.activityKtx
@@ -188,6 +188,7 @@ dependencies {
     implementation Libs.Dependency.multidex
     implementation Libs.AndroidX.ConstraintLayout.constraintLayout
     implementation(Libs.Dependency.material)
+    implementation(Libs.Dependency.swiperefreshlayout)
     implementation(Libs.Dependency.colorPickerDialog)
 
     implementation Libs.AndroidX.Room.runtime
@@ -195,12 +196,10 @@ dependencies {
 
     kapt Libs.AndroidX.Room.compiler
 
-    implementation Libs.flinger
-
     implementation project(':reader')
     //implementation project(':editor')
     //implementation project(':library')
-    implementation project(':core-ui')
+    //implementation project(':core-ui')
     implementation project(':paddle-ocr')
     //implementation project(':ViewLib')
 }

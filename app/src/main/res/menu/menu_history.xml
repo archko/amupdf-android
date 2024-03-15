@@ -17,9 +17,17 @@
         android:id="@+id/action_restore"
         android:title="@string/menu_restore"
         app:showAsAction="ifRoom" />
-    <item
+    <!--<item
         android:id="@+id/action_style"
         android:title="@string/menu_style"
+        app:showAsAction="ifRoom" />-->
+    <item
+        android:id="@+id/action_extract"
+        android:title="@string/menu_extract"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_create"
+        android:title="@string/menu_create"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_about"

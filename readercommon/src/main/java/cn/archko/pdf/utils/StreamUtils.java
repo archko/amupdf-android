@@ -9,6 +9,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -18,6 +19,16 @@ import java.io.UnsupportedEncodingException;
 public class StreamUtils {
 
     private static final Object TAG = "StreamUtils";
+
+    public static void appendStringToFile(String text, String filePath) {
+        File file = new File(filePath);
+        try {
+            FileWriter fileWriter = new FileWriter(file);
+            fileWriter.append(text);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 将字符串保存到指定的文件中

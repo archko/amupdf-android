@@ -11,17 +11,11 @@ import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.Graph
 import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.common.PDFCreaterHelper
-import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.ProgressScaner
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.entity.LoadResult
 import cn.archko.pdf.entity.State
-import cn.archko.pdf.model.SearchSuggestionGroup
-import cn.archko.pdf.ui.home.searchTypeFavorite
-import cn.archko.pdf.ui.home.searchTypeFile
-import cn.archko.pdf.ui.home.searchTypeHistory
 import cn.archko.pdf.utils.DateUtils
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.LengthUtils
@@ -672,7 +666,7 @@ class FileViewModel() : ViewModel() {
         entry: FileBean,
     ) {
         //Toast.makeText(App.instance, "开始生成,请稍候", Toast.LENGTH_SHORT).show()
-        viewModelScope.launch {
+        /*viewModelScope.launch {
             val result = withContext(Dispatchers.IO) {
                 //val map = HashMap<String, String>()
                 //map["type"] = "convert image"
@@ -695,7 +689,7 @@ class FileViewModel() : ViewModel() {
             } else {
                 Toast.makeText(App.instance, R.string.create_pdf_error, Toast.LENGTH_SHORT).show()
             }
-        }
+        }*/
     }
 
     private fun postFavoriteEvent(entry: FileBean, isFavorited: Int) {
@@ -711,38 +705,6 @@ class FileViewModel() : ViewModel() {
     }
 
     // ============================ search ==========================
-
-    fun getSuggestions(): List<SearchSuggestionGroup> = searchSuggestions
-
-    private val searchSuggestions = listOf(
-        SearchSuggestionGroup(
-            id = 0L,
-            name = "Recent searches",
-            suggestions = listOf(
-                "",
-            )
-        )
-    )
-
-    suspend fun search(query: String, searchType: Int): MutableList<FileBean> =
-        withContext(Dispatchers.Default) {
-            Logcat.d("search:$searchType,query:$query")
-            var fileList = ArrayList<FileBean>()
-            when (searchType) {
-                searchTypeFile -> {
-                    doSearchFile(fileList, query, File(homePath))
-                }
-
-                searchTypeHistory -> {
-                    fileList = doSearchHistory(query)
-                }
-
-                searchTypeFavorite -> {
-                    fileList = doSearchFavorite(query)
-                }
-            }
-            fileList
-        }
 
     private fun doSearchFile(fileList: ArrayList<FileBean>, keyword: String, dir: File) {
         if (dir.isDirectory) {

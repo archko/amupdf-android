@@ -150,9 +150,9 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     override fun onDestroy() {
         super.onDestroy()
         isDocLoaded = false
-        LiveEventBus
-            .get<String>(Event.ACTION_STOPPED)
-            .post(mPath)
+        //LiveEventBus
+        //    .get<String>(Event.ACTION_STOPPED)
+        //    .post(mPath)
         pdfViewModel.destroy()
         //progressDialog.dismiss()
         BitmapCache.getInstance().clear()

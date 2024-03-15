@@ -1,10 +1,11 @@
 package cn.archko.pdf.fragments
 
-import android.os.Build
+//import com.umeng.analytics.MobclickAgent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -12,9 +13,7 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import cn.archko.mupdf.R
-import cn.archko.pdf.App
 import cn.archko.pdf.common.Graph
-import cn.archko.pdf.common.ImageLoader
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.listeners.DataListener
@@ -23,26 +22,27 @@ import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.Utils
 import com.artifex.mupdf.fitz.Document
 import java.math.BigDecimal
-import java.math.RoundingMode
 
 /**
  * @author: archko 2016/1/16 :14:34
  */
 class FileInfoFragment : DialogFragment() {
 
+    private val progressDao by lazy { Graph.database.progressDao() }
     var mEntry: FileBean? = null
+    lateinit var mLocation: TextView
+    lateinit var mFileName: TextView
+    lateinit var mFileSize: TextView
+
+    //lateinit var mLastModified: TextView
+    lateinit var mLastReadLayout: View
+    lateinit var mLastRead: TextView
+    lateinit var mReadCount: TextView
+    lateinit var mPageCount: TextView
+    lateinit var mProgressBar: ProgressBar
+    lateinit var mIcon: ImageView
     var bookProgress: BookProgress? = null
     var mDataListener: DataListener? = null
-    private var btnCancel: View? = null
-    private var location: TextView? = null
-    private var fileName: TextView? = null
-    private var fileSize: TextView? = null
-    private var pageCount: TextView? = null
-    private var layoutLastRead: View? = null
-    private var lastRead: TextView? = null
-    private var readCount: TextView? = null
-    private var progressbar: ProgressBar? = null
-    private var icon: ImageView? = null
 
     fun setListener(dataListener: DataListener?) {
         mDataListener = dataListener
@@ -50,48 +50,48 @@ class FileInfoFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var themeId = android.R.style.Theme_Material_Dialog
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            themeId = android.R.style.Theme_Material_Light_Dialog
-        }
+        var themeId = android.R.style.Theme_Material_Light_Dialog
         setStyle(DialogFragment.STYLE_NORMAL, themeId)
     }
 
     override fun onResume() {
         super.onResume()
-        //MobclickAgent.onPageStart(TAG)
+        //MobclickAgent.onPageStart(TAG);
     }
 
     override fun onPause() {
         super.onPause()
-        //MobclickAgent.onPageEnd(TAG)
+        //MobclickAgent.onPageEnd(TAG);
     }
 
     override fun setArguments(args: Bundle?) {
         super.setArguments(args)
         if (null != args) {
-            mEntry = args.getSerializable(FILE_LIST_ENTRY) as FileBean?
+            mEntry = args.getSerializable(FILE_LIST_ENTRY) as FileBean
             bookProgress = mEntry!!.bookProgress
         }
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_file_info, container, false)
-        btnCancel = view.findViewById(R.id.btnCancel)
-        location = view.findViewById(R.id.location)
-        fileName = view.findViewById(R.id.fileName)
-        fileSize = view.findViewById(R.id.fileSize)
-        pageCount = view.findViewById(R.id.pageCount)
-        layoutLastRead = view.findViewById(R.id.layoutLastRead)
-        lastRead = view.findViewById(R.id.lastRead)
-        readCount = view.findViewById(R.id.readCount)
-        progressbar = view.findViewById(R.id.progressbar)
-        icon = view.findViewById(R.id.icon)
-
-        btnCancel!!.setOnClickListener { this@FileInfoFragment.dismiss() }
-        btnCancel!!.setOnClickListener {
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val view = inflater.inflate(R.layout.detail_book_info, container, false)
+        mLocation = view.findViewById(R.id.location)
+        mFileName = view.findViewById(R.id.fileName)
+        mFileSize = view.findViewById(R.id.fileSize)
+        mLastReadLayout = view.findViewById(R.id.lay_last_read)
+        mLastRead = view.findViewById(R.id.lastRead)
+        mReadCount = view.findViewById(R.id.readCount)
+        mProgressBar = view.findViewById(R.id.progressbar)
+        //mLastModified = view.findViewById<TextView>(R.id.lastModified)
+        mPageCount = view.findViewById(R.id.pageCount)
+        mIcon = view.findViewById(R.id.icon)
+        var button = view.findViewById<Button>(R.id.btn_cancel)
+        button.setOnClickListener { this@FileInfoFragment.dismiss() }
+        button = view.findViewById(R.id.btn_ok)
+        button.setOnClickListener {
             read()
         }
 
@@ -105,8 +105,8 @@ class FileInfoFragment : DialogFragment() {
         mDataListener?.onSuccess(mEntry)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
         if (null == mEntry || mEntry!!.file == null) {
             Toast.makeText(activity, "file is null.", Toast.LENGTH_LONG).show()
             dismiss()
@@ -114,14 +114,13 @@ class FileInfoFragment : DialogFragment() {
         }
 
         val file = mEntry!!.file
-        location?.text = FileUtils.getDir(file)
-        fileName?.text = file?.name
-        fileSize?.text = Utils.getFileSize(mEntry!!.fileSize)
+        mLocation.text = FileUtils.getDir(file)
+        mFileName.text = file?.name
+        mFileSize.text = Utils.getFileSize(mEntry!!.fileSize)
 
         if (null == bookProgress || bookProgress?.pageCount == 0) {
             try {
-                bookProgress =
-                    Graph.database.progressDao().getProgress(file!!.name, BookProgress.ALL)
+                bookProgress = progressDao.getProgress(file!!.name, BookProgress.ALL)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -138,15 +137,11 @@ class FileInfoFragment : DialogFragment() {
     }
 
     private fun showIcon(path: String) {
-        ImageLoader.getInstance().loadImage(path, 0, 1.0f, App.instance!!.screenWidth, icon)
+        //TODO ImageLoader.getInstance().loadImage(path, 0, 1.0f, App.instance!!.screenWidth, mIcon);
     }
 
     private fun updatePageCount() {
-        pageCount?.text = String.format(
-            "%s/%s",
-            bookProgress!!.page,
-            bookProgress!!.pageCount
-        )
+        mPageCount.setText(String.format("%s/%s", bookProgress!!.page, bookProgress!!.pageCount))
     }
 
     private fun loadBook() {
@@ -161,17 +156,17 @@ class FileInfoFragment : DialogFragment() {
 
     private fun showProgress(progress: BookProgress) {
         if (null != bookProgress && bookProgress!!.pageCount > 0) {
-            layoutLastRead?.visibility = View.VISIBLE
+            mLastReadLayout.visibility = View.VISIBLE
 
             var text = DateUtils.formatTime(progress.firstTimestampe, DateUtils.TIME_FORMAT_TWO)
             val percent = progress.page * 100f / progress.pageCount
             val b = BigDecimal(percent.toDouble())
-            text += "       " + b.setScale(2, RoundingMode.HALF_UP).toFloat() + "%"
-            lastRead?.text = text
-            progressbar?.max = progress.pageCount
-            progressbar?.progress = progress.page
+            text += "       " + b.setScale(2, BigDecimal.ROUND_HALF_UP).toFloat() + "%"
+            mLastRead.text = text
+            mProgressBar.max = progress.pageCount
+            mProgressBar.progress = progress.page
 
-            readCount?.text = progress.readTimes.toString()
+            mReadCount.text = progress.readTimes.toString()
             updatePageCount()
         } else {
             //mLastReadLayout.visibility = View.GONE

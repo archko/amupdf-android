@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/deleteItem"
+        android:title="删除页面"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/addItem"
+        android:title="插入图片"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/extractImagesItem"
+        android:title="导出图片"
+        app:showAsAction="never" />
+
+</menu>

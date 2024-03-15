@@ -10,6 +10,14 @@
         android:title="@string/options"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/action_extract"
+        android:title="@string/menu_extract"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_create"
+        android:title="@string/menu_create"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_about"
         android:title="@string/menu_about"
         app:showAsAction="ifRoom" />

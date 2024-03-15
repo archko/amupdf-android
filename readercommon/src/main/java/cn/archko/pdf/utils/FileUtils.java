@@ -176,6 +176,21 @@ public final class FileUtils {
         return absPath.substring(index + 1);
     }
 
+    public static final String getNameWithoutExt(final String absPath) {
+        if (absPath == null) {
+            return "";
+        }
+        final int index = absPath.lastIndexOf("/");
+        if (index == -1) {
+            return "";
+        }
+        final int end = absPath.lastIndexOf(".");
+        if (end == -1) {
+            return "";
+        }
+        return absPath.substring(index + 1, end);
+    }
+
     public static final String getExtension(final File file) {
         if (file == null) {
             return "";

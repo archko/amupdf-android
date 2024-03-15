@@ -220,8 +220,8 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         lifecycleScope.launch {
             val ocr = PdfOptionRepository.getImageOcr()
             if (IntentFile.isText(mPath)) {
-                TextActivity.start(this@AMuPDFRecyclerViewActivity, mPath!!)
-                finish()
+                //TextActivity.start(this@AMuPDFRecyclerViewActivity, mPath!!)
+                //finish()
             } else if (IntentFile.isImage(mPath) && ocr) {
                 OcrActivity.start(
                     this@AMuPDFRecyclerViewActivity,

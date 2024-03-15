@@ -24,7 +24,8 @@ open class AnalysticActivity : AppCompatActivity() {
         if (!isLive) {
             val componentName = ComponentName(
                 "cn.archko.mupdf",
-                "cn.archko.pdf.activities.ChooseFileFragmentActivity"
+                //"cn.archko.pdf.activities.ChooseFileFragmentActivity"
+                "cn.archko.pdf.activities.HomeActivity"
             )
             try {
                 val intent = Intent()

@@ -9,7 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.core.content.FileProvider
 import cn.archko.pdf.activities.AMuPDFRecyclerViewActivity
-import cn.archko.pdf.activities.ComposeTextActivity
+//import cn.archko.pdf.activities.ComposeTextActivity
 import org.vudroid.pdfdroid.PdfViewerActivity
 import java.io.File
 
@@ -51,11 +51,11 @@ class PDFViewerHelper {
 
         fun openWithNewViewer(f: File, activity: Context) {
             Logcat.i(Logcat.TAG, "post intent to open file ${f.absolutePath}")
-            val intent = Intent()
-            intent.setDataAndType(Uri.fromFile(f), "application/pdf")
-            intent.setClass(activity, ComposeTextActivity::class.java)
-            intent.action = Intent.ACTION_VIEW
-            activity.startActivity(intent)
+            //val intent = Intent()
+            //intent.setDataAndType(Uri.fromFile(f), "application/pdf")
+            //intent.setClass(activity, ComposeTextActivity::class.java)
+            //intent.action = Intent.ACTION_VIEW
+            //activity.startActivity(intent)
         }
 
         fun openViewer(clickedFile: File, item: MenuItem, activity: Activity) {
