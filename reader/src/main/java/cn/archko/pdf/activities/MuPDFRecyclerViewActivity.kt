@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
 import cn.archko.pdf.common.BitmapCache
+import cn.archko.pdf.common.Event
 import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PdfOptionRepository
@@ -26,6 +27,7 @@ import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.utils.StatusBarHelper
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
+import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -147,9 +149,9 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     override fun onDestroy() {
         super.onDestroy()
         isDocLoaded = false
-        //LiveEventBus
-        //    .get<String>(Event.ACTION_STOPPED)
-        //    .post(mPath)
+        LiveEventBus
+            .get<String>(Event.ACTION_STOPPED)
+            .post(mPath)
         pdfViewModel.destroy()
         //progressDialog.dismiss()
         BitmapCache.getInstance().clear()

@@ -50,14 +50,17 @@ class HistoryFragment : BrowserFragment() {
         filter.addAction(ACTION_STOPPED)
         filter.addAction(ACTION_FAVORITED)
         filter.addAction(ACTION_UNFAVORITED)
+        //LiveEventBus
+        //    .get(Event.ACTION_STOPPED, FileBean::class.java)
+        //    .observe(this) { loadData() }
         LiveEventBus
-            .get(Event.ACTION_STOPPED, FileBean::class.java)
+            .get(ACTION_STOPPED, String::class.java)
             .observe(this) { loadData() }
         LiveEventBus
-            .get(Event.ACTION_FAVORITED, FileBean::class.java)
+            .get(ACTION_FAVORITED, FileBean::class.java)
             .observe(this) { t -> updateItem(t) }
         LiveEventBus
-            .get(Event.ACTION_UNFAVORITED, FileBean::class.java)
+            .get(ACTION_UNFAVORITED, FileBean::class.java)
             .observe(this) { t -> updateItem(t) }
         historyViewModel = HistoryViewModel()
 
