@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:padding="10dp">
 
-    <RelativeLayout
+    <!--<RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginLeft="8dp"
@@ -28,7 +28,13 @@
             android:text="创建pdf"
             android:textSize="18sp" />
 
-    </RelativeLayout>
+    </RelativeLayout>-->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:navigationIcon="@drawable/ic_back"
+        app:title="创建pdf" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="wrap_content"
@@ -88,14 +94,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
-            android:text="生成pdf的文件名:存储于/sdcard/book/ 下,默认为new.pdf"/>
+            android:text="生成pdf的文件名:存储于/sdcard/book/ 下,默认为new.pdf" />
 
         <EditText
             android:id="@+id/pdfName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="填写生成pdf的文件名"
-            android:text="new.pdf"/>
+            android:text="new.pdf" />
 
         <Button
             android:id="@+id/btnCreateFromTxt"
@@ -139,14 +145,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
-            android:text=""/>
+            android:text="" />
 
         <EditText
             android:id="@+id/pdfPath"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="填写生成pdf的文件名"
-            android:text="new.pdf"/>
+            android:text="new.pdf" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="wrap_content"

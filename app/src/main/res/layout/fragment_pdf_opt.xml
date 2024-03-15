@@ -11,7 +11,7 @@
         android:orientation="vertical"
         android:padding="10dp">
 
-        <RelativeLayout
+        <!--<RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginLeft="8dp"
@@ -32,7 +32,13 @@
                 android:text="编辑pdf"
                 android:textSize="18sp" />
 
-        </RelativeLayout>
+        </RelativeLayout>-->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:navigationIcon="@drawable/ic_back"
+            app:title="编辑pdf" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="wrap_content"
@@ -94,8 +100,8 @@
                 android:layout_marginBottom="4dp"
                 android:text="导出的内容存储于/sdcard/xx/ 下,xx是pdf文件名, \n导出图片: 每一页为一张png.\n导出html: 对于非扫描的pdf,则生成一个html,如果里面带图片,会以base64编码图片输出,可用浏览器打开"
                 android:textColor="@color/red"
-                android:textSize="15sp"/>
-            
+                android:textSize="15sp" />
+
             <include
                 android:id="@+id/extract"
                 layout="@layout/item_extract" />

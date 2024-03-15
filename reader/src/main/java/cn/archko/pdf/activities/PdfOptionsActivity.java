@@ -16,7 +16,6 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,7 +33,6 @@ public class PdfOptionsActivity extends FragmentActivity {
 
     public final static String TAG = "PdfOptionsActivity";
 
-    private AppCompatDelegate mDelegate;
     private BaseRecyclerAdapter<Prefs> adapter;
 
     @Override
@@ -42,15 +40,8 @@ public class PdfOptionsActivity extends FragmentActivity {
         super.onCreate(icicle);
         setContentView(R.layout.preferences);
 
-        mDelegate = AppCompatDelegate.create(this, null);
-
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(view -> finish());
-        mDelegate.setSupportActionBar(toolbar);
-
-        mDelegate.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mDelegate.getSupportActionBar().setDisplayShowHomeEnabled(true);
-        mDelegate.getSupportActionBar().setTitle(R.string.options);
 
         RecyclerView recyclerView = findViewById(android.R.id.list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

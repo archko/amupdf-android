@@ -160,7 +160,9 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //dialog?.setTitle("创建pdf")
-        binding.back.setOnClickListener { dismiss() }
+        //binding.back.setOnClickListener { dismiss() }
+        binding.toolbar.setNavigationOnClickListener { dismiss() }
+
         binding.btnSelect.setOnClickListener { selectPdf() }
         binding.btnCreateFromImage.setOnClickListener { createPdfFromImage() }
         binding.btnAddImage.setOnClickListener { addImageItem() }

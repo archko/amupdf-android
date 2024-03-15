@@ -29,6 +29,7 @@ import cn.archko.pdf.listeners.DataListener
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.Utils
 import com.artifex.mupdf.fitz.Document
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.slider.RangeSlider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -232,7 +233,8 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //dialog?.setTitle("创建pdf")
-        binding.back.setOnClickListener { dismiss() }
+        //binding.back.setOnClickListener { dismiss() }
+        binding.toolbar.setNavigationOnClickListener { dismiss() }
 
         binding.btnMerge.setOnClickListener {
             type = TYPE_MERGE
