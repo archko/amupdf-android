@@ -1,18 +1,14 @@
 package cn.archko.pdf.fragments
 
-import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.IntentFilter
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,9 +26,6 @@ import cn.archko.pdf.utils.LengthUtils
 import cn.archko.pdf.widgets.IMoreView
 import cn.archko.pdf.widgets.ListMoreView
 import com.jeremyliao.liveeventbus.LiveEventBus
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
@@ -56,12 +49,9 @@ class HistoryFragment : BrowserFragment() {
         filter.addAction(ACTION_STOPPED)
         filter.addAction(ACTION_FAVORITED)
         filter.addAction(ACTION_UNFAVORITED)
-        //LiveEventBus
-        //    .get(Event.ACTION_STOPPED, FileBean::class.java)
-        //    .observe(this) { loadData() }
         LiveEventBus
             .get(ACTION_STOPPED, String::class.java)
-            .observe(this) { loadData() }
+            .observe(this) { onRefresh() }
         LiveEventBus
             .get(ACTION_FAVORITED, FileBean::class.java)
             .observe(this) { t -> updateItem(t) }

@@ -38,13 +38,13 @@ class FavoriteFragment : BrowserFragment() {
             .get(Event.ACTION_FAVORITED, FileBean::class.java)
             .observe(this) { t ->
                 Logcat.d(TAG, "FAVORITED:$t")
-                loadData()
+                onRefresh()
             }
         LiveEventBus
             .get(Event.ACTION_UNFAVORITED, FileBean::class.java)
             .observe(this) { t ->
                 Logcat.d(TAG, "UNFAVORITED:$t")
-                loadData()
+                onRefresh()
             }
         favoriteViewModel = FavoriteViewModel()
     }
