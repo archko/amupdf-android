@@ -58,7 +58,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     private var mSelectedPos = -1
     protected var currentBean: FileBean? = null
     protected lateinit var bookViewModel: BookViewModel
-    
+
     protected val beanItemCallback: DiffUtil.ItemCallback<FileBean> =
         object : DiffUtil.ItemCallback<FileBean>() {
             override fun areItemsTheSame(oldItem: FileBean, newItem: FileBean): Boolean {
@@ -82,9 +82,14 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         fileListAdapter = initAdapter()
         bookViewModel = BookViewModel()
     }
-    
+
     open fun initAdapter(): BookAdapter {
-      return  BookAdapter(activity as Context,beanItemCallback, BookAdapter.TYPE_FILE, itemClickListener)
+        return BookAdapter(
+            activity as Context,
+            beanItemCallback,
+            BookAdapter.TYPE_FILE,
+            itemClickListener
+        )
     }
 
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
@@ -203,9 +208,9 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             }
         }
 
-        bookViewModel.uiScannerModel.observe(viewLifecycleOwner, { args ->
+        bookViewModel.uiScannerModel.observe(viewLifecycleOwner) { args ->
             emitScannerBean(args)
-        })
+        }
     }
 
     override fun update() {
@@ -441,7 +446,11 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             //MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, "delete")
             if (entry.type == FileBean.NORMAL && !entry.isDirectory) {
                 entry.file?.delete()
-                update()
+                //update()
+                val list :ArrayList<FileBean> = arrayListOf()
+                list.addAll(fileListAdapter.currentList)
+                list.remove(entry)
+                fileListAdapter.submitList(list)
             }
             return true
         } else if (item.itemId == removeContextMenuItem) {
