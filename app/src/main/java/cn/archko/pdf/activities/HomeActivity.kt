@@ -15,7 +15,10 @@ import android.provider.Settings
 import android.util.Log
 import android.util.SparseArray
 import android.widget.Toast
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
 import androidx.core.app.ActivityCompat
+import androidx.core.os.BuildCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -54,10 +57,21 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
         var args: Bundle,
         var title: CharSequence
     )
-
+    private var onBackInvokedCallback: OnBackInvokedCallback? = null
     public override fun onCreate(savedInstanceState: Bundle?) {
         isLive = true
         super.onCreate(savedInstanceState)
+
+        if (BuildCompat.isAtLeastT()) {
+            onBackInvokedCallback = OnBackInvokedCallback {
+                onBackEvent()
+            }.also {
+                onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                    OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                    it
+                )
+            }
+        }
 
         setContentView(R.layout.tabs_home)
         toolbar = findViewById(R.id.toolbar)
@@ -97,6 +111,22 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
         LiveEventBus
             .get(Event.ACTION_ISFIRST, Boolean::class.java)
             .observe(this) { mViewPager.currentItem = 1 }
+    }
+
+    private fun onBackEvent() {
+        val fragment = mPagerAdapter.getItemFragment(mViewPager.currentItem) as BrowserFragment
+        if (fragment.onBackPressed()) {
+            return
+        }
+        super.onBackPressed()
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        if (BuildCompat.isAtLeastT()) {
+            onBackInvokedCallback?.let {
+                onBackInvokedDispatcher.unregisterOnBackInvokedCallback(it)
+            }
+        }
     }
 
     public override fun onResume() {
@@ -268,11 +298,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
     }
 
     override fun onBackPressed() {
-        val fragment = mPagerAdapter.getItemFragment(mViewPager.currentItem) as BrowserFragment
-        if (fragment.onBackPressed()) {
-            return
-        }
-        super.onBackPressed()
+        onBackEvent()
     }
 
     /*override fun onCreateOptionsMenu(menu: Menu): Boolean {
