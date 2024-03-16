@@ -187,7 +187,7 @@ public class APageSeekBarControls extends LinearLayout implements View.OnClickLi
         } else if (R.id.back_button == v.getId()) {
             mPageViewPresenter.back();
         } else if (R.id.reflowButton == v.getId()) {
-            mPageViewPresenter.reflow();
+            mPageViewPresenter.toggleReflow();
         } else if (R.id.autoCropButton == v.getId()) {
             mPageViewPresenter.autoCrop();
         } else if (R.id.oriButton == v.getId()) {

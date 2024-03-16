@@ -141,7 +141,7 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
                     return Uri.decode(uri!!.encodedPath)
                 }
 
-                override fun reflow() {}
+                override fun toggleReflow() {}
                 override fun autoCrop() {}
                 override fun changeOrientation(ori: Int) {
                     documentView?.oriention = ori

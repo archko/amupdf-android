@@ -49,7 +49,7 @@ interface ProgressDao {
 
     //@Delete
     @Query("Delete FROM progress where name = :name")
-    fun deleteProgress(name: String)
+    fun deleteProgress(name: String) :Int
 
     //@Delete
     @Query("Delete FROM progress")

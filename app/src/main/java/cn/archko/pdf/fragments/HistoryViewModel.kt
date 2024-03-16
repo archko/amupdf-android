@@ -176,7 +176,10 @@ class HistoryViewModel : ViewModel() {
         viewModelScope.launch {
             val args = withContext(Dispatchers.IO) {
                 val path = FileUtils.getName(absolutePath)
-                progressDao.deleteProgress(path)
+                var count = progressDao.deleteProgress(path)
+                if (count<1){ //maybe path is absolutepath,not /book/xx.pdf
+                    progressDao.deleteProgress(absolutePath)
+                }
 
                 var fb: FileBean? = null
                 list.forEach {

@@ -19,11 +19,9 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.R
 import cn.archko.pdf.common.APageSizeLoader
 import cn.archko.pdf.common.BitmapCache
-import cn.archko.pdf.common.ImageWorker
 import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.OutlineHelper
@@ -532,6 +530,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
         mReflow = !mReflow
         setReflowButton(mReflow)
+        pdfViewModel.bookProgress?.reflow = if (mReflow) 1 else 0
 
         Toast.makeText(
             this,
@@ -583,7 +582,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
     private fun createSeekControls(): APageSeekBarControls {
         mPageSeekBarControls = APageSeekBarControls(this, object : PageViewPresenter {
-            override fun reflow() {
+            override fun toggleReflow() {
                 toggleReflow()
             }
 
@@ -682,6 +681,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                 viewMode = ViewMode.NORMAL
             }
             changeViewMode(getCurrentPos())
+            pdfViewModel.bookProgress?.autoCrop = if (mCrop) 0 else 1
         }
     }
 

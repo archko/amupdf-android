@@ -17,7 +17,7 @@ public interface PageViewPresenter {
 
     String getTitle();
 
-    void reflow();
+    void toggleReflow();
 
     void autoCrop();
 
