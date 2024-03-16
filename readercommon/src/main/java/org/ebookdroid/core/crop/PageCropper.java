@@ -81,12 +81,11 @@ public class PageCropper {
         if (bitmap.getHeight() < (MIN_WIDTH) || bitmap.getWidth() < MIN_WIDTH) {
             return new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight());
         }
-        //long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         int[] pixels = getPixels(bitmap, new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight()));
 
         // 灰度化 bitmap
-        setGray(
-                bitmap,
+        setGray(bitmap,
                 bitmap.getWidth(),
                 bitmap.getHeight(),
                 pixels);
@@ -96,63 +95,13 @@ public class PageCropper {
         int right = 0; // 右边框白色高度
         int bottom = 0; // 底边框白色高度
 
-        for (int w = 0; w < bitmap.getWidth() / 3; w++) {
-            boolean holdBlackPix = false;
-            for (int h = 0; h < bitmap.getHeight(); h++) {
-                if (bitmap.getPixel(w, h) != -1) {
-                    holdBlackPix = true;
-                    break;
-                }
-            }
-            if (holdBlackPix) {
-                break;
-            }
-            left++;
-        }
+        left = getLeft(bitmap);
 
-        for (int h = 0; h < bitmap.getHeight() / 3; h++) {
-            boolean holdBlackPix = false;
-            for (int w = 0; w < bitmap.getWidth(); w++) {
-                int pixel = bitmap.getPixel(w, h);
-                if (pixel != -1) { // -1 是白色
-                    holdBlackPix = true; // 如果不是-1 则是其他颜色
-                    break;
-                }
-            }
+        top = getTop(bitmap);
 
-            if (holdBlackPix) {
-                break;
-            }
-            top++;
-        }
+        right = getRight(bitmap);
 
-        for (int w = bitmap.getWidth() - 1; w >= bitmap.getWidth() * 2 / 3; w--) {
-            boolean holdBlackPix = false;
-            for (int h = 0; h < bitmap.getHeight(); h++) {
-                if (bitmap.getPixel(w, h) != -1) {
-                    holdBlackPix = true;
-                    break;
-                }
-            }
-            if (holdBlackPix) {
-                break;
-            }
-            right++;
-        }
-
-        for (int h = bitmap.getHeight() - 1; h >= bitmap.getHeight() * 2 / 3; h--) {
-            boolean holdBlackPix = false;
-            for (int w = 0; w < bitmap.getWidth(); w++) {
-                if (bitmap.getPixel(w, h) != -1) {
-                    holdBlackPix = true;
-                    break;
-                }
-            }
-            if (holdBlackPix) {
-                break;
-            }
-            bottom++;
-        }
+        bottom = getBottom(bitmap);
 
         if (top > THRESHOLD) {
             top -= THRESHOLD;
@@ -167,8 +116,86 @@ public class PageCropper {
             bottom -= THRESHOLD;
         }
 
-        //System.out.println(String.format("crop-time:%s", (System.currentTimeMillis() - start)));
+        System.out.println(String.format("crop-time:%s", (System.currentTimeMillis() - start)));
         return new RectF((float) left, (float) top, bitmap.getWidth() - right, bitmap.getHeight() - bottom);
+    }
+
+    private static int getLeft(Bitmap bitmap) {
+        int left = 0;
+        int w = bitmap.getWidth() / 3;
+        for (int x = 0; x < w; x++) {
+            boolean holdBlackPix = false;
+            for (int h = 0; h < bitmap.getHeight(); h++) {
+                if (bitmap.getPixel(x, h) != -1) {
+                    holdBlackPix = true;
+                    break;
+                }
+            }
+            if (holdBlackPix) {
+                break;
+            }
+            left++;
+        }
+        return left;
+    }
+
+    private static int getTop(Bitmap bitmap) {
+        int top = 0;
+        int h = bitmap.getHeight() / 3;
+        for (int y = 0; y < h; y++) {
+            boolean holdBlackPix = false;
+            for (int w = 0; w < bitmap.getWidth(); w++) {
+                int pixel = bitmap.getPixel(w, y);
+                if (pixel != -1) { // -1 是白色
+                    holdBlackPix = true; // 如果不是-1 则是其他颜色
+                    break;
+                }
+            }
+
+            if (holdBlackPix) {
+                break;
+            }
+            top++;
+        }
+        return top;
+    }
+
+    private static int getRight(Bitmap bitmap) {
+        int right = 0;
+        int w = bitmap.getWidth() * 2 / 3;
+        for (int x = bitmap.getWidth() - 1; x >= w; x--) {
+            boolean holdBlackPix = false;
+            for (int h = 0; h < bitmap.getHeight(); h++) {
+                if (bitmap.getPixel(x, h) != -1) {
+                    holdBlackPix = true;
+                    break;
+                }
+            }
+            if (holdBlackPix) {
+                break;
+            }
+            right++;
+        }
+        return right;
+    }
+
+    private static int getBottom(Bitmap bitmap) {
+        int bottom = 0;
+        int h = bitmap.getHeight() * 2 / 3;
+        for (int y = bitmap.getHeight() - 1; y >= h; y--) {
+            boolean holdBlackPix = false;
+            for (int w = 0; w < bitmap.getWidth(); w++) {
+                if (bitmap.getPixel(w, y) != -1) {
+                    holdBlackPix = true;
+                    break;
+                }
+            }
+            if (holdBlackPix) {
+                break;
+            }
+            bottom++;
+        }
+        return bottom;
     }
 
     //=======================
@@ -197,7 +224,7 @@ public class PageCropper {
             return new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight());
         }
         //long start = System.currentTimeMillis();
-        
+
         //计算平均灰度不如直接设置225,效果要好的多,平均值会把红色的识别成白边
         final float avgLum = 225; //calculateAvgLum(bitmap, bitmapBounds);
         float left = getLeftBound(bitmap, bitmapBounds, avgLum);
@@ -209,7 +236,7 @@ public class PageCropper {
         top = top * bitmapBounds.height();
         right = right * bitmapBounds.width();
         bottom = bottom * bitmapBounds.height();
-        
+
         //System.out.println(String.format("droid-crop-time:%s", (System.currentTimeMillis() - start)));
         return new RectF(left, top, right, bottom);
     }
