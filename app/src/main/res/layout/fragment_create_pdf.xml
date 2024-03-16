@@ -81,7 +81,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="填写生成pdf的文件名"
-                android:text="new.pdf" />
+                android:text="" />
 
         <Button
                 android:id="@+id/btnCreateFromTxt"

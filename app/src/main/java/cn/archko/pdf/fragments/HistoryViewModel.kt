@@ -68,12 +68,9 @@ class HistoryViewModel : ViewModel() {
                 val entryList = ArrayList<FileBean>()
 
                 var entry: FileBean
-                var file: File
                 val path = Environment.getExternalStorageDirectory().path
                 progresses?.map {
-                    file = File(path + "/" + it.path)
-                    entry = FileBean(FileBean.RECENT, file, showExtension)
-                    entry.bookProgress = it
+                    entry = FileBean(it ,FileBean.RECENT, path + "/" + it.path)
                     entryList.add(entry)
                 }
                 if ((progresses?.size ?: 0) > 0) {

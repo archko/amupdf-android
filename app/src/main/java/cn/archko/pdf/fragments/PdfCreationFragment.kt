@@ -93,7 +93,7 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
         arr.addAll(adapter.data)
         var path = oldPdfPath
         if (TextUtils.isEmpty(path)) {
-            var name: String? = binding.pdfName.editableText.toString()
+            var name: String? = binding.pdfPath.editableText.toString()
             if (TextUtils.isEmpty(name)) {
                 name = "new.pdf"
             }

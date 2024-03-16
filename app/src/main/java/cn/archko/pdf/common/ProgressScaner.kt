@@ -29,7 +29,11 @@ class ProgressScaner {
                 if (!entry.isDirectory && entry.file != null) {
                     val progress = progressDao.getProgress(entry.file!!.name)
                     if (null != progress) {
+                        val size = entry.bookProgress?.size
                         entry.bookProgress = progress
+                        size?.let {
+                            entry.bookProgress!!.size = size
+                        }
                     }
                 }
             }

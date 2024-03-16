@@ -47,8 +47,15 @@ class FileBean : Serializable, Cloneable {
         this.type = type
         isDirectory = false
         label = bookProgress.name
-        if (!TextUtils.isEmpty(bookProgress.path)) {
-            file = File(bookProgress.path!!)
+    }
+
+    constructor(bookProgress: BookProgress, type: Int, path: String) {
+        this.bookProgress = bookProgress
+        this.type = type
+        isDirectory = false
+        label = bookProgress.name
+        if (!TextUtils.isEmpty(path)) {
+            file = File(path)
             bookProgress.size = file!!.length()
         }
     }
