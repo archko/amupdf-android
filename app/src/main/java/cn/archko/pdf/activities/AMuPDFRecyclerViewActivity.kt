@@ -292,6 +292,12 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                 } else {
                     onSingleTap()
                 }*/
+                
+                if (cakeView.visibility == View.VISIBLE) {
+                    cakeView.visibility = View.GONE
+                    return true
+                }
+                
                 val rs: Boolean =
                     viewController?.scrollPage(e.y.toInt(), top, bottom, finalMargin)!!
                 if (!rs) {
@@ -555,10 +561,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     override fun onSingleTap() {
-        if (cakeView.visibility == View.VISIBLE) {
-            cakeView.visibility = View.GONE
-            return
-        }
         if (mPageSeekBarControls?.visibility == View.VISIBLE) {
             mPageSeekBarControls?.hide()
             return

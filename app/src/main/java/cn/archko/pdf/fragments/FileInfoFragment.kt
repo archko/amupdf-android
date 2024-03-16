@@ -13,7 +13,9 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import cn.archko.mupdf.R
+import cn.archko.pdf.App
 import cn.archko.pdf.common.Graph
+import cn.archko.pdf.common.ImageLoader
 import cn.archko.pdf.entity.BookProgress
 import cn.archko.pdf.entity.FileBean
 import cn.archko.pdf.listeners.DataListener
@@ -29,20 +31,20 @@ import java.math.BigDecimal
 class FileInfoFragment : DialogFragment() {
 
     private val progressDao by lazy { Graph.database.progressDao() }
-    var mEntry: FileBean? = null
-    lateinit var mLocation: TextView
-    lateinit var mFileName: TextView
-    lateinit var mFileSize: TextView
+    private var mEntry: FileBean? = null
+    private lateinit var mLocation: TextView
+    private lateinit var mFileName: TextView
+    private lateinit var mFileSize: TextView
 
     //lateinit var mLastModified: TextView
-    lateinit var mLastReadLayout: View
-    lateinit var mLastRead: TextView
-    lateinit var mReadCount: TextView
-    lateinit var mPageCount: TextView
-    lateinit var mProgressBar: ProgressBar
-    lateinit var mIcon: ImageView
+    private lateinit var mLastReadLayout: View
+    private lateinit var mLastRead: TextView
+    private lateinit var mReadCount: TextView
+    private lateinit var mPageCount: TextView
+    private lateinit var mProgressBar: ProgressBar
+    private lateinit var mIcon: ImageView
     var bookProgress: BookProgress? = null
-    var mDataListener: DataListener? = null
+    private var mDataListener: DataListener? = null
 
     fun setListener(dataListener: DataListener?) {
         mDataListener = dataListener
@@ -50,8 +52,8 @@ class FileInfoFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var themeId = android.R.style.Theme_Material_Light_Dialog
-        setStyle(DialogFragment.STYLE_NORMAL, themeId)
+        val themeId = android.R.style.Theme_Material_Light_Dialog
+        setStyle(STYLE_NORMAL, themeId)
     }
 
     override fun onResume() {
@@ -105,8 +107,8 @@ class FileInfoFragment : DialogFragment() {
         mDataListener?.onSuccess(mEntry)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         if (null == mEntry || mEntry!!.file == null) {
             Toast.makeText(activity, "file is null.", Toast.LENGTH_LONG).show()
             dismiss()
@@ -137,11 +139,11 @@ class FileInfoFragment : DialogFragment() {
     }
 
     private fun showIcon(path: String) {
-        //TODO ImageLoader.getInstance().loadImage(path, 0, 1.0f, App.instance!!.screenWidth, mIcon);
+        ImageLoader.getInstance().loadImage(path, 0, 1.0f, App.instance!!.screenWidth, mIcon)
     }
 
     private fun updatePageCount() {
-        mPageCount.setText(String.format("%s/%s", bookProgress!!.page, bookProgress!!.pageCount))
+        mPageCount.text = String.format("%s/%s", bookProgress!!.page, bookProgress!!.pageCount)
     }
 
     private fun loadBook() {
@@ -195,7 +197,7 @@ class FileInfoFragment : DialogFragment() {
 
             val fileInfoFragment = FileInfoFragment()
             val bundle = Bundle()
-            bundle.putSerializable(FileInfoFragment.FILE_LIST_ENTRY, entry)
+            bundle.putSerializable(FILE_LIST_ENTRY, entry)
             fileInfoFragment.arguments = bundle
             fileInfoFragment.setListener(dataListener)
             fileInfoFragment.show(ft!!, "diaLog")

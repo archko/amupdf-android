@@ -23,7 +23,6 @@ import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
-import cn.archko.pdf.widgets.APDFView
 import cn.archko.pdf.widgets.APageSeekBarControls
 import cn.archko.pdf.widgets.ExtraSpaceLinearLayoutManager
 
@@ -48,6 +47,9 @@ class ACropViewController(
      */
     private var crop: Boolean = true
     private var scrollOrientation = LinearLayoutManager.VERTICAL
+
+    var defaultWidth = 1080
+    var defaultHeight = 1080
 
     init {
         initView()
@@ -139,7 +141,7 @@ class ACropViewController(
     private fun setCropMode(pos: Int) {
         setOrientation(scrollOrientation)
         if (null == mRecyclerView.adapter) {
-            mRecyclerView.adapter = PDFRecyclerAdapter()
+            mRecyclerView.adapter = PDFRecyclerAdapter(context, pdfViewModel, mPageSizes)
         }
 
         if (pos > 0) {
@@ -189,6 +191,9 @@ class ACropViewController(
 
     override fun setCrop(crop: Boolean) {
         this.crop = crop
+        if (null != mRecyclerView.adapter) {
+            (mRecyclerView.adapter as PDFRecyclerAdapter).setCrop(crop)
+        }
     }
 
     override fun scrollToPosition(page: Int) {
@@ -252,6 +257,11 @@ class ACropViewController(
             )
         }
 
+        if (null != mRecyclerView.adapter) {
+            (mRecyclerView.adapter as PDFRecyclerAdapter).defaultWidth = defaultWidth
+            (mRecyclerView.adapter as PDFRecyclerAdapter).defaultHeight = defaultHeight
+        }
+        
         val lm = (mRecyclerView.layoutManager as LinearLayoutManager)
         var offset = 0
         val first = lm.findFirstVisibleItemPosition()
@@ -317,70 +327,4 @@ class ACropViewController(
     override fun showController() {
     }
 
-    var defaultWidth = 1080
-    var defaultHeight = 1080
-
-    private inner class PDFRecyclerAdapter : ARecyclerView.Adapter<ARecyclerView.ViewHolder>() {
-
-        override fun onCreateViewHolder(
-            parent: ViewGroup,
-            viewType: Int
-        ): ARecyclerView.ViewHolder {
-            val view = APDFView(context)
-                .apply {
-                    layoutParams = ViewGroup.LayoutParams(defaultWidth, defaultHeight)
-                }
-            return PdfHolder(view)
-        }
-
-        override fun onBindViewHolder(viewHolder: ARecyclerView.ViewHolder, position: Int) {
-            val pdfHolder = viewHolder as PdfHolder
-            pdfHolder.onBind(position)
-        }
-
-        override fun onViewRecycled(holder: ARecyclerView.ViewHolder) {
-            super.onViewRecycled(holder)
-            val pdfHolder = holder as PdfHolder?
-
-            pdfHolder?.view?.recycle()
-        }
-
-        override fun getItemCount(): Int {
-            return mPageSizes.size()
-        }
-
-        inner class PdfHolder(internal var view: APDFView) : ARecyclerView.ViewHolder(view) {
-            fun onBind(position: Int) {
-                val pageSize = mPageSizes.get(position)
-                if (pageSize.getTargetWidth() != defaultWidth) {
-                    pageSize.setTargetWidth(defaultWidth)
-                }
-                Logcat.d(
-                    String.format(
-                        "bind:position:%s,targetWidth:%s, measuredWidth:%s",
-                        position,
-                        pageSize.getTargetWidth(),
-                        mRecyclerView.measuredWidth
-                    )
-                )
-                if (defaultWidth <= 0) {
-                    return
-                }
-                view.updatePage(pageSize, 1.0f, pdfViewModel.mupdfDocument, crop)
-            }
-
-            private fun showBookmark(position: Int): Boolean {
-                val bookmarks = pdfViewModel.bookmarks
-                if (null != bookmarks) {
-                    for (bookmark in bookmarks) {
-                        if (position == bookmark.page) {
-                            return true
-                        }
-                    }
-                }
-                return false
-            }
-        }
-
-    }
 }
