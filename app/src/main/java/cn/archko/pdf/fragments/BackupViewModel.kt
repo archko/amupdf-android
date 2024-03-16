@@ -22,7 +22,7 @@ class BackupViewModel : ViewModel() {
 
     fun backupFiles() =
         viewModelScope.launch {
-            val files: List<File>? = withContext(Dispatchers.IO) {
+            val files: List<File> = withContext(Dispatchers.IO) {
                 var files: Array<File>? = null
                 val dir = FileUtils.getStorageDir("amupdf")
                 if (dir.exists()) {
