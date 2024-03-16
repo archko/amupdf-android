@@ -3,6 +3,7 @@ package cn.archko.pdf.activities
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.os.SystemClock
@@ -13,14 +14,16 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.Toast
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.R
 import cn.archko.pdf.common.APageSizeLoader
 import cn.archko.pdf.common.BitmapCache
+import cn.archko.pdf.common.ImageWorker
 import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.OutlineHelper
@@ -34,6 +37,15 @@ import cn.archko.pdf.presenter.PageViewPresenter
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
+import cn.archko.pdf.widgets.BaseMenu
+import cn.archko.pdf.widgets.CakeView
+import cn.archko.pdf.widgets.type_crop
+import cn.archko.pdf.widgets.type_exit
+import cn.archko.pdf.widgets.type_ocr
+import cn.archko.pdf.widgets.type_outline
+import cn.archko.pdf.widgets.type_reflow
+import cn.archko.pdf.widgets.type_scroll_ori
+import cn.archko.pdf.widgets.type_seek
 import com.baidu.ai.edge.ui.activity.OcrActivity
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -43,14 +55,11 @@ import kotlinx.coroutines.launch
  */
 class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener {
 
-    //private lateinit var mLeftDrawer: RecyclerView
-    private lateinit var mDrawerLayout: DrawerLayout
     private lateinit var mControllerLayout: RelativeLayout
 
     private var mPageSeekBarControls: APageSeekBarControls? = null
     private var outlineHelper: OutlineHelper? = null
 
-    //private var mMenuHelper: MenuHelper? = null
     private var outlineFragment: OutlineFragment? = null
     private lateinit var mContentView: View
     private val viewControllerCache: SparseArray<AViewController> = SparseArray<AViewController>()
@@ -61,15 +70,52 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
      */
     private var forceCropParam = -1
 
+    private val menus: MutableList<BaseMenu> = mutableListOf()
+    private var color = Color.parseColor("#3783f6") //圆形菜单颜色
+    private val selectedColor = Color.parseColor("#AC7225")
+
+    private fun initMenus() {
+        menus.clear()
+        var menu: BaseMenu
+        if (pdfViewModel.bookProgress?.reflow == 0) {   //不重排
+            menu = BaseMenu(color, 1f, "重排", -1, type_reflow)
+            menus.add(menu)
+            menu = BaseMenu(color, 1f, "识别文本", -1, type_ocr)
+            menus.add(menu)
+
+            if (pdfViewModel.bookProgress?.autoCrop == 0) {
+                menu = BaseMenu(selectedColor, 1f, "切割", -1, type_crop)
+                menus.add(menu)
+            } else {
+                menu = BaseMenu(color, 1f, "切割", -1, type_crop)
+                menus.add(menu)
+            }
+        } else {    //文本重排时,切割不生效
+            menu = BaseMenu(selectedColor, 1f, "重排", -1, type_reflow)
+            menus.add(menu)
+            menu = BaseMenu(color, 1f, "切割", -1, type_crop)
+            menus.add(menu)
+        }
+        //addMenu("字体", color, menus)
+
+        menu = BaseMenu(color, 1f, "大纲", -1, type_outline)
+        menus.add(menu)
+        menu = BaseMenu(color, 1f, "进度", -1, type_seek)
+        menus.add(menu)
+        menu = BaseMenu(color, 1f, "滚动方向", -1, type_scroll_ori)
+        menus.add(menu)
+        menu = BaseMenu(color, 1f, "退出", -1, type_exit)
+        menus.add(menu)
+    }
+
+    private lateinit var cakeView: CakeView
+
     override fun initView() {
         super.initView()
         forceCropParam = intent.getIntExtra("forceCropParam", -1)
 
         mPageSeekBarControls?.updateTitle(mPath)
-        //mLeftDrawer = findViewById(cn.archko.pdf.R.id.left_drawer)
-        mDrawerLayout = findViewById(cn.archko.pdf.R.id.drawerLayout)
-
-        mControllerLayout = findViewById(cn.archko.pdf.R.id.layout)
+        mControllerLayout = findViewById(R.id.layout)
 
         mPageSeekBarControls = createSeekControls()
 
@@ -82,24 +128,70 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
         mPageSeekBarControls?.autoCropButton!!.visibility = View.VISIBLE
 
-        /*with(mLeftDrawer) {
-            layoutManager = LinearLayoutManager(
-                this@AMuPDFRecyclerViewActivity,
-                LinearLayoutManager.VERTICAL,
-                false
-            )
-            //addItemDecoration(
-            //    ViewerDividerItemDecoration(
-            //        this@AMuPDFRecyclerViewActivity,
-            //        LinearLayoutManager.VERTICAL
-            //    )
-            //)
-        }*/
+        cakeView = findViewById(R.id.cakeView)
+        cakeView.setCakeData(menus)
+        cakeView.viewOnclickListener = object : CakeView.ViewOnclickListener {
+            override fun onViewClick(v: View?, position: Int) {
+                Logcat.d(TAG, "click:pos:$position, ${menus[position]}")
+                cakeClick(position)
+            }
 
-        mContentView = findViewById(cn.archko.pdf.R.id.content)
-        mDocumentView = findViewById(cn.archko.pdf.R.id.document_view)
+            override fun onViewCenterClick() {
+            }
+
+        }
+
+        mContentView = findViewById(R.id.content)
+        mDocumentView = findViewById(R.id.document_view)
 
         initTouchParams()
+    }
+
+    private fun cakeClick(position: Int) {
+        val menu = menus[position]
+        when (menu.type) {
+            type_reflow -> toggleReflow()
+            type_ocr -> ocr()
+            type_outline -> {
+                mPageSeekBarControls?.show()
+                showOutline()
+            }
+
+            type_seek -> mPageSeekBarControls?.show()
+            type_scroll_ori -> {
+                val ori = pdfViewModel.bookProgress?.scrollOrientation ?: 1
+                val result = if (ori == LinearLayout.VERTICAL) {
+                    LinearLayout.HORIZONTAL
+                } else {
+                    LinearLayout.VERTICAL
+                }
+                changeOri(result)
+            }
+
+            type_crop -> toggleCrop()
+            type_exit -> finish()
+        }
+        cakeView.visibility = View.GONE
+    }
+
+    private fun ocr() {
+        if (mReflow) {
+            Toast.makeText(
+                this@AMuPDFRecyclerViewActivity,
+                "已经是文本",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        val pos = viewController?.getCurrentPos()
+        if (pos != null) {
+            startOcrActivity(
+                this@AMuPDFRecyclerViewActivity,
+                viewController?.getCurrentBitmap(),
+                null,
+                pos
+            )
+        }
     }
 
     override fun getDocumentView(): View? {
@@ -313,7 +405,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         }
     }
 
-    fun setupOutline(currentPos: Int?) {
+    private fun setupOutline(currentPos: Int?) {
         if (null == outlineFragment) {
             outlineFragment = OutlineFragment()
             val bundle = Bundle()
@@ -443,6 +535,10 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     override fun onSingleTap() {
+        if (cakeView.visibility == View.VISIBLE) {
+            cakeView.visibility = View.GONE
+            return
+        }
         if (mPageSeekBarControls?.visibility == View.VISIBLE) {
             mPageSeekBarControls?.hide()
             return
@@ -456,15 +552,14 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         if (!isDocLoaded) {
             return
         }
-        //if (!mDrawerLayout.isDrawerOpen(mLeftDrawer)) {
-        //    mDrawerLayout.openDrawer(mLeftDrawer)
-        //} else {
-        //    mDrawerLayout.closeDrawer(mLeftDrawer)
-        //}
 
-        mPageSeekBarControls?.show()
-        showOutline()
+        mPageSeekBarControls?.hide()
+        //showOutline()
         viewController?.onDoubleTap()
+
+        initMenus()
+        cakeView.setCakeData(menus)
+        cakeView.visibility = View.VISIBLE
     }
 
     private fun createSeekControls(): APageSeekBarControls {
@@ -503,11 +598,15 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             }
 
             override fun changeOrientation(ori: Int) {
-                pdfViewModel.bookProgress?.scrollOrientation = ori
-                viewController?.setOrientation(ori)
+                changeOri(ori)
             }
         })
         return mPageSeekBarControls!!
+    }
+
+    private fun changeOri(ori: Int) {
+        pdfViewModel.bookProgress?.scrollOrientation = ori
+        viewController?.setOrientation(ori)
     }
 
     private fun showOutline() {
@@ -621,7 +720,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         super.onResume()
 
         mPageSeekBarControls?.hide()
-        mDrawerLayout.closeDrawers()
 
         viewController?.onResume()
     }
@@ -640,6 +738,10 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         private const val TAG = "AMuPDFRecyclerViewActivity"
         const val PREF_READER = "pref_reader_amupdf"
         const val PREF_READER_KEY_FIRST = "pref_reader_key_first"
+
+        fun startOcrActivity(context: Context, bitmap: Bitmap?, path: String?, pos: Int) {
+            OcrActivity.start(context, bitmap, path, pos.toString())
+        }
     }
 
     //===========================================

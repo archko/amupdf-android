@@ -23,6 +23,7 @@ import cn.archko.pdf.utils.Utils
 class APDFView(mContext: Context) : ImageView(mContext) {
 
     private val textPaint: Paint = textPaint()
+    private val strokePaint: Paint = strokePaint()
     private var aPage: APage? = null
     private var index: Int = -1
     private var cacheKey: String? = null
@@ -39,6 +40,14 @@ class APDFView(mContext: Context) : ImageView(mContext) {
         paint.textSize = Utils.sp2px(30f).toFloat()
         paint.textAlign = Paint.Align.CENTER
         return paint
+    }
+
+    private fun strokePaint(): Paint {
+        val strokePaint = Paint()
+        strokePaint.setColor(Color.BLACK)
+        strokePaint.style = Paint.Style.STROKE
+        strokePaint.strokeWidth = 1f
+        return strokePaint
     }
 
     fun recycle() {
@@ -84,6 +93,14 @@ class APDFView(mContext: Context) : ImageView(mContext) {
             )
         }
         super.onDraw(canvas)
+        //draw page line,not full width
+        canvas.drawLine(
+            0f,
+            measuredHeight * 1f,
+            measuredWidth * 1f / 5,
+            measuredHeight * 1f,
+            strokePaint
+        )
     }
 
     fun updatePage(pageSize: APage, newZoom: Float, mupdfDocument: MupdfDocument?, crop: Boolean) {

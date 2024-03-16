@@ -203,8 +203,8 @@ class CakeView @JvmOverloads constructor(
                 drawText(
                     rectF,
                     radius,
-                    startAngle + 10f,
-                    swapAngle - +10f,
+                    startAngle + 0f,
+                    swapAngle - +0f,
                     mList[i],
                     canvas,
                     mList.size

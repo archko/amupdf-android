@@ -3,6 +3,7 @@ package cn.archko.pdf.activities
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_FIRST_USER
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.graphics.Rect
 import android.util.SparseArray
 import android.view.GestureDetector
@@ -15,6 +16,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.common.BitmapCache
+import cn.archko.pdf.common.ImageDecoder
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.listeners.AViewController
@@ -157,6 +159,12 @@ class ACropViewController(
         }
     }
 
+    override fun getCurrentBitmap(): Bitmap? {
+        val aPage = mPageSizes[getCurrentPos()]
+        val cacheKey = ImageDecoder.getCacheKey(aPage!!.index, crop, aPage.scaleZoom)
+        return BitmapCache.getInstance().getBitmap(cacheKey)
+    }
+
     override fun getCurrentPos(): Int {
         if (null == mRecyclerView.layoutManager) {
             return 0
@@ -217,11 +225,7 @@ class ACropViewController(
     }
 
     override fun onDoubleTap() {
-        //if (mMupdfDocument == null) {
-        //    return
-        //}
-        //mPageSeekBarControls?.hide()
-        //showOutline()
+
     }
 
     override fun onSelectedOutline(index: Int) {

@@ -1,6 +1,7 @@
 package cn.archko.pdf.listeners
 
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.view.MotionEvent
 import android.util.SparseArray
 import android.view.View
@@ -19,6 +20,7 @@ interface AViewController {
     fun onDoubleTap()
 
     fun getCurrentPos(): Int
+    fun getCurrentBitmap(): Bitmap?
     fun getCount(): Int
     fun setOrientation(ori: Int)
     fun setCrop(crop: Boolean)

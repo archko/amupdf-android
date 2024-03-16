@@ -3,6 +3,7 @@ package cn.archko.pdf.activities
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_FIRST_USER
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.util.SparseArray
 import android.view.GestureDetector
 import android.view.LayoutInflater
@@ -157,6 +158,10 @@ class AReflowViewController(
                 }
             })
         }
+    }
+
+    override fun getCurrentBitmap(): Bitmap? {
+        return null
     }
 
     override fun getCurrentPos(): Int {
