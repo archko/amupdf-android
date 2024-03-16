@@ -345,7 +345,7 @@ public class DocumentView extends View implements ZoomListener {
 
     RectF getViewRect() {
         if (viewRect == null) {
-            viewRect = new RectF(getScrollX(), getScrollY(), getScrollX() + getWidth(), getScrollY() + getHeight());
+            viewRect = new RectF(getScrollX(), getScrollY(), getScrollX() + getWidth(), getScrollY() + getHeight() * 2);
         }
         return viewRect;
     }
