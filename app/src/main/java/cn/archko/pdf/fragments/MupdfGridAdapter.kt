@@ -89,6 +89,9 @@ class MupdfGridAdapter(
             val height: Int = (width * 4 / 3f).toInt()
             resultWidth = width
             resultHeight = height
+            if (aPage!!.getTargetWidth() != resultWidth) {
+                aPage!!.setTargetWidth(resultWidth)
+            }
 
             view.setOnClickListener { clickListener.click(view, position) }
             view.setOnLongClickListener {

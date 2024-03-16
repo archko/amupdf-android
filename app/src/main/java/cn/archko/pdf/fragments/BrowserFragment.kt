@@ -113,6 +113,12 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         PdfCreationFragment.showCreateDialog(requireActivity(), null)
     }
 
+    private fun editPdf(path: String?) {
+        if (path != null) {
+            PdfEditFragment.showCreateDialog(path, requireActivity(), null)
+        }
+    }
+
     private fun setAsHome() {
         val edit = activity?.getSharedPreferences(PREF_TAG, 0)?.edit()
         edit?.putString(PREF_HOME, mCurrentPath)
@@ -394,7 +400,11 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         //menuBuilder.menu.add(0, documentContextMenuItem, 0, "Mupdf new Viewer")
         menuBuilder.menu.add(0, infoContextMenuItem, 0, getString(R.string.menu_info))
         menuBuilder.menu.add(0, otherContextMenuItem, 0, getString(R.string.menu_other))
-
+        
+        if (entry.type==FileBean.NORMAL) {
+            menuBuilder.menu.add(0, editContextMenuItem, 0, getString(R.string.menu_edit))
+        }
+        
         if (entry.type == FileBean.RECENT) {
             menuBuilder.menu.add(
                 0,
@@ -447,7 +457,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             if (entry.type == FileBean.NORMAL && !entry.isDirectory) {
                 entry.file?.delete()
                 //update()
-                val list :ArrayList<FileBean> = arrayListOf()
+                val list: ArrayList<FileBean> = arrayListOf()
                 list.addAll(fileListAdapter.currentList)
                 list.remove(entry)
                 fileListAdapter.submitList(list)
@@ -455,6 +465,8 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             return true
         } else if (item.itemId == removeContextMenuItem) {
             remove(entry)
+        } else if (item.itemId == editContextMenuItem) {
+            editPdf(entry.file?.absolutePath)
         } else {
             val clickedFile: File = entry.file!!
 
@@ -532,5 +544,6 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         const val addToFavoriteContextMenuItem = Menu.FIRST + 116
         const val removeFromFavoriteContextMenuItem = Menu.FIRST + 117
         //protected const val bartekscViewContextMenuItem = Menu.FIRST + 118
+        const val editContextMenuItem = Menu.FIRST + 119
     }
 }

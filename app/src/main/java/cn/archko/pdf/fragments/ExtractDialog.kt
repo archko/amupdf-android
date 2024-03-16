@@ -31,8 +31,10 @@ class ExtractDialog(
         binding = DialogExtractBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupRangeSlider()
-
-        binding.back.setOnClickListener { dismiss() }
+        
+        binding.toolbar.setNavigationOnClickListener { dismiss() }
+        //binding.back.setOnClickListener { dismiss() }
+        
         binding.btnExtract.setOnClickListener {
             extractListener.exportRange(
                 binding.extract.rangeSlider.values[0].toInt(),

@@ -8,7 +8,7 @@
     android:padding="16dp"
     tools:minWidth="380dp">
 
-    <RelativeLayout
+    <!--<RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginLeft="8dp"
@@ -31,7 +31,13 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-    </RelativeLayout>
+    </RelativeLayout>-->
+    <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:navigationIcon="@drawable/ic_back"
+            app:title="导出图片" />
 
     <include
         android:id="@+id/extract"
