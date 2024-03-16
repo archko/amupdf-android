@@ -64,6 +64,10 @@ public class PageCropper {
         bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
     }
 
+    /**
+     * min width/height,if a bitmap is to small, don't crop
+     */
+    public static final int MIN_WIDTH = 30;
     private static final int THRESHOLD = 4;
 
     /**
@@ -74,7 +78,7 @@ public class PageCropper {
      * @return
      */
     public static RectF getJavaCropRect(Bitmap bitmap) {
-        if (bitmap.getHeight() < (30) || bitmap.getWidth() < 30) {
+        if (bitmap.getHeight() < (MIN_WIDTH) || bitmap.getWidth() < MIN_WIDTH) {
             return new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight());
         }
         //long start = System.currentTimeMillis();
@@ -189,7 +193,7 @@ public class PageCropper {
     }
 
     public static RectF getJavaCropBounds(final Bitmap bitmap, final Rect bitmapBounds) {
-        if (bitmap.getHeight() < (30) || bitmap.getWidth() < 30) {
+        if (bitmap.getHeight() < (MIN_WIDTH) || bitmap.getWidth() < MIN_WIDTH) {
             return new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight());
         }
         //long start = System.currentTimeMillis();

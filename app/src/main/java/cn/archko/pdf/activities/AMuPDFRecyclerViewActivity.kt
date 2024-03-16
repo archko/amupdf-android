@@ -73,45 +73,64 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     private val menus: MutableList<BaseMenu> = mutableListOf()
     private var color = Color.parseColor("#3783f6") //圆形菜单颜色
     private val selectedColor = Color.parseColor("#AC7225")
+    private lateinit var reflowStr: String
+    private lateinit var ocrStr: String
+    private lateinit var autoCropStr: String
+    private lateinit var outlineStr: String
+    private lateinit var seekStr: String
+    private lateinit var scrollOriStr: String
+    private lateinit var exitStr: String
 
     private fun initMenus() {
         menus.clear()
         var menu: BaseMenu
         if (pdfViewModel.bookProgress?.reflow == 0) {   //不重排
-            menu = BaseMenu(color, 1f, "重排", -1, type_reflow)
+            menu = BaseMenu(color, 1f, reflowStr, -1, type_reflow)
             menus.add(menu)
-            menu = BaseMenu(color, 1f, "识别文本", -1, type_ocr)
+            menu = BaseMenu(color, 1f, ocrStr, -1, type_ocr)
             menus.add(menu)
 
             if (pdfViewModel.bookProgress?.autoCrop == 0) {
-                menu = BaseMenu(selectedColor, 1f, "切割", -1, type_crop)
+                menu = BaseMenu(selectedColor, 1f, autoCropStr, -1, type_crop)
                 menus.add(menu)
             } else {
-                menu = BaseMenu(color, 1f, "切割", -1, type_crop)
+                menu = BaseMenu(color, 1f, autoCropStr, -1, type_crop)
                 menus.add(menu)
             }
-        } else {    //文本重排时,切割不生效
-            menu = BaseMenu(selectedColor, 1f, "重排", -1, type_reflow)
+        } else {    //文本重排时,自动切边不生效
+            menu = BaseMenu(selectedColor, 1f, reflowStr, -1, type_reflow)
             menus.add(menu)
-            menu = BaseMenu(color, 1f, "切割", -1, type_crop)
+            menu = BaseMenu(color, 1f, autoCropStr, -1, type_crop)
             menus.add(menu)
         }
         //addMenu("字体", color, menus)
 
-        menu = BaseMenu(color, 1f, "大纲", -1, type_outline)
+        menu = BaseMenu(color, 1f, outlineStr, -1, type_outline)
         menus.add(menu)
-        menu = BaseMenu(color, 1f, "进度", -1, type_seek)
+        menu = BaseMenu(color, 1f, seekStr, -1, type_seek)
         menus.add(menu)
-        menu = BaseMenu(color, 1f, "滚动方向", -1, type_scroll_ori)
+        menu = BaseMenu(color, 1f, scrollOriStr, -1, type_scroll_ori)
         menus.add(menu)
-        menu = BaseMenu(color, 1f, "退出", -1, type_exit)
+        menu = BaseMenu(color, 1f, exitStr, -1, type_exit)
         menus.add(menu)
     }
 
     private lateinit var cakeView: CakeView
 
+    private fun initStr() {
+        reflowStr = resources.getString(R.string.cake_menu_reflow)
+        ocrStr = resources.getString(R.string.cake_menu_ocr)
+        autoCropStr = resources.getString(R.string.cake_menu_auto_crop)
+        outlineStr = resources.getString(R.string.cake_menu_ourline)
+        seekStr = resources.getString(R.string.cake_menu_seek)
+        scrollOriStr = resources.getString(R.string.cake_menu_scroll_ori)
+        exitStr = resources.getString(R.string.cake_menu_exit)
+    }
+
     override fun initView() {
         super.initView()
+        initStr()
+
         forceCropParam = intent.getIntExtra("forceCropParam", -1)
 
         mPageSeekBarControls?.updateTitle(mPath)
@@ -500,7 +519,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     private fun toggleReflow() {
-        if (mReflow) {  //如果原来是文本重排模式,则切换为切割或普通模式
+        if (mReflow) {  //如果原来是文本重排模式,则切换为自动切边或普通模式
             if (mCrop) {
                 viewMode = ViewMode.CROP
             } else {

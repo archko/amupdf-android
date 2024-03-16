@@ -23,6 +23,14 @@
     <string name="menu_exit">退出</string>
     <string name="menu_font">字体</string>
     <string name="menu_settings">设置</string>
+    
+    <string name="cake_menu_reflow">文本重排</string>
+    <string name="cake_menu_ocr">识别文本</string>
+    <string name="cake_menu_auto_crop">自动切边</string>
+    <string name="cake_menu_ourline">查看大纲</string>
+    <string name="cake_menu_seek">查看进度</string>
+    <string name="cake_menu_scroll_ori">滚动方向</string>
+    <string name="cake_menu_exit">退出App</string>
 
     <string name="go_home">主目录</string>
 

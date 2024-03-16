@@ -175,7 +175,8 @@ public class PdfOptionsActivity extends FragmentActivity {
         private void showListDialog(View v, Prefs data, TextView summary) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(PdfOptionsActivity.this);
             builder.setTitle("请选择");
-            builder.setItems(data.labels,
+            builder.setSingleChoiceItems(data.labels,
+                    data.index,
                     (dialog, which) -> {
                         dialog.dismiss();
                         summary.setText(data.labels[which]);

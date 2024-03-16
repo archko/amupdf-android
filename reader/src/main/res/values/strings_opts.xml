@@ -23,6 +23,14 @@
     <string name="menu_exit">Exit</string>
     <string name="menu_font">Font</string>
     <string name="menu_settings">Settings</string>
+    
+    <string name="cake_menu_reflow">Reflow</string>
+    <string name="cake_menu_ocr">Ocr</string>
+    <string name="cake_menu_auto_crop">Crop</string>
+    <string name="cake_menu_ourline">Outline</string>
+    <string name="cake_menu_seek">Seek</string>
+    <string name="cake_menu_scroll_ori">Direction</string>
+    <string name="cake_menu_exit">ExitApp</string>
 
     <string name="go_home">Home</string>
 
