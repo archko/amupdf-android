@@ -26,7 +26,7 @@ object PdfOptionRepository {
     }
 
     fun getShowExtension(): Boolean {
-        return mmkv.decodeBool(PdfOptionKeys.PREF_SHOW_EXTENSION)
+        return mmkv.decodeBool(PdfOptionKeys.PREF_SHOW_EXTENSION, true)
     }
 
     fun setImageOcr(enable: Boolean) {
@@ -34,7 +34,7 @@ object PdfOptionRepository {
     }
 
     fun getImageOcr(): Boolean {
-        return mmkv.decodeBool(PdfOptionKeys.PREF_OCR)
+        return mmkv.decodeBool(PdfOptionKeys.PREF_OCR, true)
     }
 
     fun setFullscreen(enable: Boolean) {
@@ -42,7 +42,7 @@ object PdfOptionRepository {
     }
 
     fun getFullscreen(): Boolean {
-        return mmkv.decodeBool(PdfOptionKeys.PREF_FULLSCREEN)
+        return mmkv.decodeBool(PdfOptionKeys.PREF_FULLSCREEN, true)
     }
 
     fun setAutocrop(enable: Boolean) {
@@ -50,11 +50,11 @@ object PdfOptionRepository {
     }
 
     fun getAutocrop(): Boolean {
-        return mmkv.decodeBool(PdfOptionKeys.PREF_AUTOCROP)
+        return mmkv.decodeBool(PdfOptionKeys.PREF_AUTOCROP, true)
     }
 
     fun getVerticalScrollLock(): Boolean {
-        return mmkv.decodeBool(PdfOptionKeys.PREF_VERTICAL_SCROLL_LOCK)
+        return mmkv.decodeBool(PdfOptionKeys.PREF_VERTICAL_SCROLL_LOCK, true)
     }
 
     fun setKeepOn(enable: Boolean) {
@@ -62,7 +62,7 @@ object PdfOptionRepository {
     }
 
     fun getKeepOn(): Boolean {
-        return mmkv.decodeBool(PdfOptionKeys.PREF_KEEP_ON)
+        return mmkv.decodeBool(PdfOptionKeys.PREF_KEEP_ON, true)
     }
 
     fun setDartTheme(dartTheme: Boolean) {
@@ -70,7 +70,7 @@ object PdfOptionRepository {
     }
 
     fun getDartTheme(): Boolean {
-        return mmkv.decodeBool(PdfOptionKeys.PREF_DART_THEME)
+        return mmkv.decodeBool(PdfOptionKeys.PREF_DART_THEME, false)
     }
 
     fun setFontType(fontType: Int) {
@@ -94,7 +94,7 @@ object PdfOptionRepository {
     }
 
     fun getTextSize(): Float {
-        return mmkv.decodeFloat(PdfOptionKeys.STYLE_KEY_FONT_SIZE)
+        return mmkv.decodeFloat(PdfOptionKeys.STYLE_KEY_FONT_SIZE, 16f)
     }
 
     fun setBgColor(bgColor: Int) {
@@ -118,7 +118,7 @@ object PdfOptionRepository {
     }
 
     fun getLineSpacingMult(): Float {
-        return mmkv.decodeFloat(PdfOptionKeys.STYLE_KEY_LINE_SPACEING_MULT)
+        return mmkv.decodeFloat(PdfOptionKeys.STYLE_KEY_LINE_SPACEING_MULT, 1.48f)
     }
 
     fun setLeftPadding(leftPadding: Int) {
@@ -126,7 +126,7 @@ object PdfOptionRepository {
     }
 
     fun getLeftPadding(): Int {
-        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_LEFT_PADDING)
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_LEFT_PADDING, Utils.dipToPixel(12f))
     }
 
     fun setTopPadding(topPadding: Int) {
@@ -134,7 +134,7 @@ object PdfOptionRepository {
     }
 
     fun getTopPadding(): Int {
-        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_RIGHT_PADDING)
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_RIGHT_PADDING, Utils.dipToPixel(16f))
     }
 
     fun setRightPadding(rightPadding: Int) {
@@ -142,7 +142,7 @@ object PdfOptionRepository {
     }
 
     fun getRightPadding(): Int {
-        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_TOP_PADDING)
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_TOP_PADDING, Utils.dipToPixel(12f))
     }
 
     fun setBottomPadding(bottomPadding: Int) {
@@ -150,7 +150,7 @@ object PdfOptionRepository {
     }
 
     fun getBottomPadding(): Int {
-        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_BOTTOM_PADDING)
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_BOTTOM_PADDING, Utils.dipToPixel(16f))
     }
 
     fun setDirsFirst(enable: Boolean): Boolean {

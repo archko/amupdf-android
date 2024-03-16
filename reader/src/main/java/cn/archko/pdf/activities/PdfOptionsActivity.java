@@ -101,8 +101,8 @@ public class PdfOptionsActivity extends FragmentActivity {
         prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_show_extension), getString(R.string.opts_show_extension), PdfOptionKeys.PREF_SHOW_EXTENSION, PdfOptionRepository.INSTANCE.getShowExtension());
         prefsList.add(prefs);
 
-        prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_new_viewer), getString(R.string.opts_new_viewer), PdfOptionKeys.PREF_NEW_VIEWER, PdfOptionRepository.INSTANCE.getNewViewer());
-        prefsList.add(prefs);
+        //prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_new_viewer), getString(R.string.opts_new_viewer), PdfOptionKeys.PREF_NEW_VIEWER, PdfOptionRepository.INSTANCE.getNewViewer());
+        //prefsList.add(prefs);
 
         prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_cropper), getString(R.string.opts_cropper), PdfOptionKeys.PREF_CROPPER, PdfOptionRepository.INSTANCE.getCropper());
         prefsList.add(prefs);
