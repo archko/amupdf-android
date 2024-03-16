@@ -95,15 +95,8 @@ class APage {
 
         this.zoom = zoom
         setTargetWidth(targetWidth)
-        initSourceBounds(1.0f)
     }
-
-    private fun initSourceBounds(cropScale: Float) {
-        sourceBounds = RectF()
-        sourceBounds!!.right = effectivePagesWidth * cropScale * zoom
-        sourceBounds!!.bottom = effectivePagesHeight * cropScale * zoom
-    }
-
+    
     fun getTargetWidth(): Int {
         return targetWidth
     }
@@ -132,19 +125,6 @@ class APage {
         return Point((scaleZoom * pageSize!!.x).toInt(), (scaleZoom * pageSize!!.y).toInt())
     }
 
-    fun setCropBounds(cropBounds: RectF?, cropScale: Float) {
-        this.cropBounds = cropBounds
-        this.cropScale = cropScale
-        if (null == cropBounds) {
-            cropWidth = 0
-            cropHeight = 0
-            return
-        }
-        initSourceBounds(cropScale)
-        setCropWidth(cropBounds.width().toInt())
-        setCropHeight(cropBounds.height().toInt())
-    }
-
     fun getCropWidth(): Int {
         if (cropWidth == 0) {
             cropWidth = effectivePagesWidth
@@ -169,28 +149,7 @@ class APage {
     fun setCropHeight(cropHeight: Int) {
         this.cropHeight = cropHeight
     }
-
-    val cropScaleWidth: Int
-        get() {
-            if (cropBounds != null) {
-                return cropBounds!!.width().toInt()
-            }
-            if (cropWidth == 0) {
-                return effectivePagesWidth
-            }
-            return cropWidth
-        }
-    val cropScaleHeight: Int
-        get() {
-            if (cropBounds != null) {
-                return cropBounds!!.height().toInt()
-            }
-            if (cropHeight == 0) {
-                return effectivePagesHeight
-            }
-            return cropHeight
-        }
-
+    
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

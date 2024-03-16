@@ -13,15 +13,16 @@ import android.graphics.Region
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import android.util.DisplayMetrics
 import android.util.Log
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import java.text.DecimalFormat
-
-private const val fl = 360f
+import kotlin.math.abs
+import kotlin.math.atan
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 /**
  * @author: archko 2022/7/30 :08:13
@@ -88,17 +89,25 @@ class CakeView @JvmOverloads constructor(
     /**
      * 每秒最大移动角度
      */
-    private val mMax_Speed = 0
+    private val maxSpeed = 0
 
     /**
      * 如果移动角度达到该值，则屏蔽点击
      */
-    private val mMin_Speed = 0
+    private val minSpeed = 0
 
     /**
      * 判断是否正在自动滚动
      */
     private var isQuickMove = false
+    private var path = Path() //路径
+    private val fontSize = dip2px(context, 35f)
+    private val angleMap: HashMap<Int, Float> = hashMapOf() //记录每个Itme的角度值
+
+    init {
+        init(context)
+    }
+
     private fun init(context: Context) {
         ctx = context
         format = DecimalFormat("##0.00")
@@ -106,19 +115,19 @@ class CakeView @JvmOverloads constructor(
         arcPaint!!.isAntiAlias = true
         arcPaint!!.isDither = true
         arcPaint!!.style = Paint.Style.STROKE
-        //        this.arcPaint.setColor(Color.parseColor("#FFFFFF"));
+        //this.arcPaint.setColor(Color.parseColor("#FFFFFF"));
         linePaint = Paint()
         linePaint!!.isAntiAlias = true
         linePaint!!.isDither = true
         linePaint!!.style = Paint.Style.STROKE
         //this.linePaint.setStrokeWidth(dip2px(ctx, 20));
-        linePaint!!.color = Color.parseColor("#FFFFFF")
+        linePaint!!.color = Color.parseColor("#ffFFFFFF")
         textPaint = Paint()
         textPaint!!.isAntiAlias = true
         textPaint!!.isDither = true
         textPaint!!.textSize = 36f
         textPaint!!.style = Paint.Style.FILL
-        textPaint!!.color = Color.parseColor("#FFFFFF")
+        textPaint!!.color = Color.parseColor("#ffFFFFFF")
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -136,7 +145,8 @@ class CakeView @JvmOverloads constructor(
             width = widthSpecSize
             height = Math.min(widthSpecSize, Math.min(getScreenSize(ctx)[0], getScreenSize(ctx)[1]))
         } else if (widthSpecMode == MeasureSpec.AT_MOST && heightSpecMode == MeasureSpec.AT_MOST) {
-            height = Math.min(getScreenSize(ctx)[0], getScreenSize(ctx)[1])
+            //未处理高宽,使用3/5
+            height = Math.min(getScreenSize(ctx)[0], getScreenSize(ctx)[1]) * 3 / 5
             width = height
         } else {
             width = widthSpecSize
@@ -150,7 +160,7 @@ class CakeView @JvmOverloads constructor(
         super.onSizeChanged(w, h, oldw, oldh)
         centerX = (w / 2).toFloat()
         centerY = (h / 2).toFloat()
-        radius = Math.min(centerX, centerY) * 0.725f //0.725f
+        radius = centerX.coerceAtMost(centerY) * 0.725f //0.725f
         arcPaint!!.strokeWidth = radius / 3 * 2
         //textPaint.setTextSize(radius / 10);
     }
@@ -167,10 +177,11 @@ class CakeView @JvmOverloads constructor(
                 RectF(centerX - radius, centerY - radius, centerX + radius, centerY + radius)
             for (i in mList.indices) {
                 arcPaint!!.color = mList[i].color
+                val swapAngle = mList[i].percent / total * roundAngle
                 canvas.drawArc(
                     rectF,
                     startAngle,
-                    mList[i].percent / total * roundAngle,
+                    swapAngle,
                     false,
                     arcPaint!!
                 )
@@ -185,15 +196,26 @@ class CakeView @JvmOverloads constructor(
                 }*/
                 if (isAddText) {
                     lineList.add(getLinePointFs(startAngle)) //获取直线 开始坐标 结束坐标
-                    textAngle = startAngle + mList[i].percent / total * roundAngle / 2
+                    textAngle = startAngle + swapAngle / 2
                     textList.add(getTextPointF(textAngle)) //获取文本文本
                 }
-                startAngle += mList[i].percent / total * roundAngle
+                //偏移了,修正一下旋转
+                drawText(
+                    rectF,
+                    radius,
+                    startAngle + 10f,
+                    swapAngle - +10f,
+                    mList[i],
+                    canvas,
+                    mList.size
+                )
+                startAngle += swapAngle
+                angleMap.put(i, startAngle)
             }
 
 //            drawSpacingLine(canvas, lineList);
             // 绘制文字
-//            drawText(canvas);
+            drawText(canvas);
         }
         if (roundAngle < 360f) {
             H.postDelayed({
@@ -204,9 +226,10 @@ class CakeView @JvmOverloads constructor(
             }, 0)
         } else {
             // 绘制间隔空白线
-            drawSpacingLine(canvas, lineList)
+            //drawSpacingLine(canvas, lineList)
             // 绘制文字
-            drawText(canvas)
+            //drawText(canvas)
+            //drawTexts(canvas)
         }
         if (!isRefesh || isFling) {
             postInvalidate()
@@ -256,7 +279,7 @@ class CakeView @JvmOverloads constructor(
     }
 
     /**
-     * 画文本
+     * 画文本,无法居中
      *
      * @param canvas
      */
@@ -265,7 +288,7 @@ class CakeView @JvmOverloads constructor(
         for (i in textList.indices) {
             textPaint!!.textAlign = Paint.Align.CENTER
             val text = mList[i].content
-            canvas.drawText(text!!, textList[i].x, textList[i].y, textPaint!!)
+            //canvas.drawText(text!!, textList[i].x, textList[i].y, textPaint!!)
             //Paint.FontMetrics fm = textPaint.getFontMetrics();
             //canvas.drawText(format.format(mList.get(i).percent * 100 / total) + "%", textList.get(i).x, textList.get(i).y + (fm.descent - fm.ascent), textPaint);
             // 设置绘制图片的区域
@@ -276,23 +299,19 @@ class CakeView @JvmOverloads constructor(
                     (int) textList.get(i).x + (bitmap.getWidth() / 2),
                     (int) textList.get(i).y - (bitmap.getHeight() / 4) + dip2px(getContext(), 20));*/
 
-            val re = Region();
+            val region = Region();
             val path = Path();
             path.moveTo(
-                (textList.get(i).x - dip2px(getContext(), 35f)),
-                textList.get(i).y - dip2px(getContext(), 35f)
+                (textList[i].x - fontSize), textList[i].y - fontSize
             );
             path.lineTo(
-                (textList.get(i).x + dip2px(getContext(), 35f)),
-                textList.get(i).y - dip2px(getContext(), 35f)
+                (textList[i].x + fontSize), textList[i].y - fontSize
             );
             path.lineTo(
-                (textList.get(i).x + dip2px(getContext(), 35f)),
-                textList.get(i).y + dip2px(getContext(), 35f)
+                (textList[i].x + fontSize), textList[i].y + fontSize
             );
             path.lineTo(
-                (textList.get(i).x - dip2px(getContext(), 35f)),
-                textList.get(i).y + dip2px(getContext(), 35f)
+                (textList[i].x - fontSize), textList[i].y + fontSize
             );
             path.close();
 
@@ -300,15 +319,54 @@ class CakeView @JvmOverloads constructor(
             //计算控制点的边界
             path.computeBounds(r, true);
             //设置区域路径和剪辑描述的区域
-            re.setPath(
+            region.setPath(
                 path, Region(
                     r.left.toInt(), r.top.toInt(), r.right.toInt(),
                     r.bottom.toInt()
                 )
             );
-            regionList[i] = re;
+            regionList[i] = region;
             //canvas.drawBitmap(bitmap, null, rect, null);
         }
+    }
+
+    //居中画文字
+    private fun drawTexts(canvas: Canvas) {
+        //计算每个占位的角度
+        val itemSize: Int = mList.size
+        var angle = 360f / itemSize
+        var offsetAngle = 0f
+        //计算添加文字的区域
+        val textf = RectF(
+            centerX - radius,
+            centerY - radius,
+            centerX + radius,
+            centerY + radius
+        )
+        for (i in 0 until itemSize) {
+            //计算扇形中间点的位子
+            val baseMenu: BaseMenu = mList[i]
+            if (baseMenu.type == 0) {
+                drawText(textf, radius, offsetAngle, angle, baseMenu, canvas, itemSize)
+            }
+            offsetAngle += angle
+        }
+    }
+
+    /**
+     * 绘制文本
+     */
+    private fun drawText(
+        range: RectF, radius: Float, startAngle: Float, sweepAngle: Float,
+        menu: BaseMenu, canvas: Canvas, itemCount: Int
+    ) {
+        path.reset()
+        path.addArc(range, startAngle, sweepAngle)
+        val textWidth = textPaint!!.measureText(menu.content)
+        // 利用水平偏移让文字居中
+        val hOffset = (radius * Math.PI / itemCount / 2 - textWidth / 2).toFloat() // 水平偏移
+        val vOffset = radius / 2 / 6 // 垂直偏移
+        canvas.drawTextOnPath(menu.content!!, path, hOffset, vOffset, textPaint!!)
     }
 
     /**
@@ -420,26 +478,26 @@ class CakeView @JvmOverloads constructor(
         val y = event.y
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                Log.e(TAG, "ACTION_DOWN$isClick")
+                Log.e(TAG, "ACTION_DOWN:$isClick")
                 mLastX = x
                 mLastY = y
                 mDownTime = System.currentTimeMillis()
                 mTmpAngle = 0f
 
                 // 如果当前已经在快速滚动
-                /*if (isQuickMove) {
+                if (isQuickMove) {
                     // 移除快速滚动的回调
                     removeCallbacks(mFlingRunnable)
                     isQuickMove = false
                     return true
-                }*/
+                }
                 isClick = true
             }
 
             MotionEvent.ACTION_MOVE -> {
                 Log.e(TAG, "ACTION_MOVE$isClick")
                 isClick = false
-                /*start = getAngle(mLastX, mLastY)
+                start = getAngle(mLastX, mLastY)
                 end = getAngle(x, y)
                 Log.e(TAG, "$start =start $end ,  =end")
 
@@ -451,19 +509,19 @@ class CakeView @JvmOverloads constructor(
                     //如果是一、四象限，则直接end-start，角度值都是正值
                     rotationAngle += end - start
                     mTmpAngle += end - start
-                }*/
+                }
 
                 // 重新布局
-//                postInvalidate();
+                postInvalidate();
                 check
             }
 
             MotionEvent.ACTION_UP -> {
-                Log.e(TAG, "ACTION_UP$isClick")
+                Log.e(TAG, "ACTION_UP:$isClick")
                 // 获取每秒移动的角度
-                /*val anglePerSecond = mTmpAngle * 1000 / (System.currentTimeMillis() - mDownTime)
+                val anglePerSecond = mTmpAngle * 1000 / (System.currentTimeMillis() - mDownTime)
                 // 如果达到最大速度
-                if (Math.abs(anglePerSecond) > mMax_Speed && !isQuickMove) {
+                if (Math.abs(anglePerSecond) > maxSpeed && !isQuickMove) {
                     // 惯性滚动
                     if (Math.abs(start - end) >= 1) { //放手时大于1度才惯性滚动
                         post(AngleRunnable(anglePerSecond).also { mFlingRunnable = it })
@@ -472,11 +530,12 @@ class CakeView @JvmOverloads constructor(
                 }
 
                 // 如果当前旋转角度超过minSpeed屏蔽点击
-                if (Math.abs(mTmpAngle) > mMin_Speed) {
+                if (Math.abs(mTmpAngle) > minSpeed) {
                     return true
-                }*/
+                }
                 if (!isQuickMove) {
                     Log.e(TAG, "ACTION_UP-点击")
+                    
                     var i = 0
                     while (i < regionList.size) {
                         val rect = regionList[i]
@@ -647,11 +706,8 @@ class CakeView @JvmOverloads constructor(
         }
 
         fun getScreenSize(context: Context?): IntArray {
-            val wm = context!!.getSystemService(
-                Context.WINDOW_SERVICE
-            ) as WindowManager
-            val outMetrics = DisplayMetrics()
-            context.display?.getMetrics(outMetrics)
+            context!!.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            val outMetrics = context.resources.displayMetrics
             return intArrayOf(outMetrics.widthPixels, outMetrics.heightPixels)
         }
 
@@ -665,9 +721,5 @@ class CakeView @JvmOverloads constructor(
          */
         private const val NOCLICK_VALUE = 3
         private const val TAG = "CakeView"
-    }
-
-    init {
-        init(context)
     }
 }

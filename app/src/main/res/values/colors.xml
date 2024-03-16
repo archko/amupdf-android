@@ -17,4 +17,6 @@
 
     <!-- Status bar -->
     <color name="black30">#4D000000</color>
+    
+    <color name="cake_bg">#AC7225</color>
 </resources>

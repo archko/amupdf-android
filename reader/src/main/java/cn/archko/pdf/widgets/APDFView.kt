@@ -20,21 +20,15 @@ import cn.archko.pdf.utils.Utils
  * @author: archko 2018/7/25 :12:43
  */
 @SuppressLint("AppCompatCustomView")
-public class APDFView(
-    mContext: Context,
-) : ImageView(mContext) {
+class APDFView(mContext: Context) : ImageView(mContext) {
 
-    private var mZoom: Float = 0.toFloat()
     private val textPaint: Paint = textPaint()
     private var aPage: APage? = null
     private var index: Int = -1
+    private var cacheKey: String? = null
 
     init {
-        updateView()
-    }
-
-    private fun updateView() {
-        scaleType = ImageView.ScaleType.MATRIX
+        scaleType = ScaleType.MATRIX
         setLayerType(View.LAYER_TYPE_HARDWARE, null)
     }
 
@@ -72,19 +66,18 @@ public class APDFView(
         setMeasuredDimension(mwidth, mheight)
         Logcat.d(
             String.format(
-                "onMeasure,width:%s,height:%s, page:%s-%s, mZoom: %s, aPage:%s",
+                "onMeasure,width:%s,height:%s, page:%s-%s, aPage:%s",
                 mwidth,
                 mheight,
                 aPage!!.effectivePagesWidth,
                 aPage!!.effectivePagesHeight,
-                mZoom,
                 aPage
             )
         )
     }
 
     override fun onDraw(canvas: Canvas) {
-        if (/*mBitmap == null &&*/ drawable == null && null != aPage) {
+        if (drawable == null && null != aPage) {
             canvas.drawText(
                 String.format("Page %s", aPage!!.index + 1), (measuredWidth / 2).toFloat(),
                 (measuredHeight / 2).toFloat(), textPaint
@@ -99,7 +92,7 @@ public class APDFView(
         aPage = pageSize
         aPage!!.zoom = newZoom
 
-        val cacheKey = ImageDecoder.getCacheKey(aPage!!.index, crop, aPage!!.scaleZoom)
+        cacheKey = ImageDecoder.getCacheKey(aPage!!.index, crop, aPage!!.scaleZoom)
         Logcat.d(
             String.format(
                 "updatePage:%s, key:%s, oldZoom:%s, newScaleZoom:%s,newZoom:%s,",
@@ -107,7 +100,7 @@ public class APDFView(
             )
         )
 
-        val bmp = BitmapCache.getInstance().getBitmap(cacheKey)
+        val bmp = BitmapCache.getInstance().getBitmap(cacheKey!!)
 
         if (null != bmp) {
             setImageBitmap(bmp)
@@ -128,7 +121,7 @@ public class APDFView(
             }
         }
         //aPage 这个如果当参数传递,由于复用机制,后面的页面更新后会把它覆盖,导致解码并不是原来那个
-        //这里应该传递高宽值
+        //这里应该传递页码与key,不是引用
         val decodeParam = DecodeParam(
             cacheKey,
             this,
