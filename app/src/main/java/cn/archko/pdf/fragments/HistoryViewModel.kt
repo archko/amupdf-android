@@ -1,6 +1,7 @@
 package cn.archko.pdf.fragments
 
 import android.os.Environment
+import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -61,7 +62,7 @@ class HistoryViewModel : ViewModel() {
                     PAGE_SIZE * (page),
                     PAGE_SIZE
                 )
-                
+
                 Logcat.d("loadFiles:$page, $curPage, total:$totalCount, ${progresses?.size}")
 
                 val entryList = ArrayList<FileBean>()
@@ -75,7 +76,7 @@ class HistoryViewModel : ViewModel() {
                     entry.bookProgress = it
                     entryList.add(entry)
                 }
-                if ((progresses?.size ?: 0) > 0){
+                if ((progresses?.size ?: 0) > 0) {
                     curPage++
                 }
                 list.addAll(entryList)
@@ -170,6 +171,31 @@ class HistoryViewModel : ViewModel() {
             }
             withContext(Dispatchers.Main) {
                 _uiRestorepModel.value = flag
+            }
+        }
+    }
+
+    fun removeRecent(absolutePath: String) {
+        viewModelScope.launch {
+            val args = withContext(Dispatchers.IO) {
+                val path = FileUtils.getName(absolutePath)
+                progressDao.deleteProgress(path)
+
+                var fb: FileBean? = null
+                list.forEach {
+                    if (TextUtils.equals(it.label, path)) {
+                        fb = it
+                        return@forEach
+                    }
+                }
+                fb?.let {
+                    list.remove(fb)
+                }
+
+                return@withContext arrayOf<Any>(list.size + 1, list)
+            }
+            withContext(Dispatchers.Main) {
+                _uiFileModel.value = args
             }
         }
     }

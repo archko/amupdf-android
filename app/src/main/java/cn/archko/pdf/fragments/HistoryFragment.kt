@@ -237,12 +237,7 @@ class HistoryFragment : BrowserFragment() {
     override fun remove(entry: FileBean) {
         if (entry.type == FileBean.RECENT) {
             //MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, "remove")
-            lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    bookViewModel.removeRecent(entry.file!!.absolutePath)
-                }
-                update()
-            }
+            historyViewModel.removeRecent(entry.file!!.absolutePath)
         }
     }
 
