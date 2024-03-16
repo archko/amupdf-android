@@ -1,14 +1,18 @@
 package cn.archko.pdf.fragments
 
+import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.IntentFilter
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +30,9 @@ import cn.archko.pdf.utils.LengthUtils
 import cn.archko.pdf.widgets.IMoreView
 import cn.archko.pdf.widgets.ListMoreView
 import com.jeremyliao.liveeventbus.LiveEventBus
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
@@ -35,7 +42,6 @@ import java.io.File
  */
 class HistoryFragment : BrowserFragment() {
 
-    private var curPage = 0
     private lateinit var mListMoreView: ListMoreView
     private var mStyle: Int = STYLE_LIST
 
@@ -69,13 +75,17 @@ class HistoryFragment : BrowserFragment() {
         progressDialog.setMessage("Waiting...")
     }
 
+    override fun initAdapter(): BookAdapter {
+        return  BookAdapter(activity as Context,beanItemCallback, BookAdapter.TYPE_RENCENT, itemClickListener)
+    }
+
     override fun updateItem() {
         currentBean = null
     }
 
     private fun updateItem(fileBean: FileBean?) {
         if (fileBean?.bookProgress != null) {
-            for (fb in fileListAdapter.data) {
+            for (fb in fileListAdapter.currentList) {
                 if (null != fb.bookProgress && fb.bookProgress!!._id == fileBean.bookProgress!!._id) {
                     fb.bookProgress!!.isFavorited = fileBean.bookProgress!!.isFavorited
                     break
@@ -150,14 +160,14 @@ class HistoryFragment : BrowserFragment() {
         this.pathTextView.visibility = View.GONE
         filesListView.setOnScrollListener(onScrollListener)
         mListMoreView = ListMoreView(filesListView)
-        fileListAdapter.addFootView(mListMoreView.getLoadMoreView())
+        //fileListAdapter.addFootView(mListMoreView.getLoadMoreView())
 
         addObserver()
         return view
     }
 
     private fun applyStyle() {
-        if (mStyle == STYLE_LIST) {
+        /*if (mStyle == STYLE_LIST) {
             fileListAdapter.setMode(BookAdapter.TYPE_RENCENT)
             filesListView.layoutManager =
                 LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
@@ -167,15 +177,20 @@ class HistoryFragment : BrowserFragment() {
 
             filesListView.layoutManager = GridLayoutManager(activity, 3)
             fileListAdapter.notifyDataSetChanged()
-        }
+        }*/
     }
 
     private fun reset() {
-        curPage = 0
+        historyViewModel.reset()
         currentBean = null
     }
 
-    override fun loadData() {
+    private fun getHistory() {
+        mListMoreView.onLoadingStateChanged(IMoreView.STATE_LOADING)
+        historyViewModel.loadFiles(historyViewModel.curPage, showExtension)
+    }
+
+    override fun onRefresh() {
         reset()
         getHistory()
     }
@@ -202,7 +217,7 @@ class HistoryFragment : BrowserFragment() {
                 progressDialog.dismiss()
                 if (flag) {
                     Toast.makeText(App.instance, "恢复成功:$flag", Toast.LENGTH_LONG).show()
-                    loadData()
+                    getHistory()
                 } else {
                     Toast.makeText(App.instance, "恢复失败", Toast.LENGTH_LONG).show()
                 }
@@ -210,31 +225,25 @@ class HistoryFragment : BrowserFragment() {
         }
     }
 
-    private fun getHistory() {
-        mListMoreView.onLoadingStateChanged(IMoreView.STATE_LOADING)
-
-        historyViewModel.loadFiles(curPage, showExtension)
-    }
-
-    private fun updateHistoryBeans(args: Array<Any?>) {
+    private fun updateHistoryBeans(args: Array<Any>) {
         val totalCount = args[0] as Int
         val entryList = args[1] as ArrayList<FileBean>
         mSwipeRefreshWidget.isRefreshing = false
-        fileListAdapter.apply {
-            if (entryList.size > 0) {
-                if (curPage == 0) {
-                    data = entryList
-                    notifyDataSetChanged()
-                } else {
-                    val index = itemCount
-                    addData(entryList)
-                    notifyItemRangeInserted(index, entryList.size)
-                }
+        fileListAdapter.submitList(entryList)
+        fileListAdapter.notifyDataSetChanged()
+        updateLoadingStatus(totalCount)
+    }
 
-                curPage++
+    override fun remove(entry: FileBean) {
+        if (entry.type == FileBean.RECENT) {
+            //MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, "remove")
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    bookViewModel.removeRecent(entry.file!!.absolutePath)
+                }
+                update()
             }
         }
-        updateLoadingStatus(totalCount)
     }
 
     private fun updateLoadingStatus(totalCount: Int) {
@@ -242,11 +251,11 @@ class HistoryFragment : BrowserFragment() {
             String.format(
                 "total count:%s, adapter count:%s",
                 totalCount,
-                fileListAdapter.normalCount
+                fileListAdapter.currentList.size
             )
         )
-        if (fileListAdapter.normalCount > 0) {
-            if (fileListAdapter.normalCount < totalCount) {
+        if (fileListAdapter.currentList.size > 0) {
+            if (fileListAdapter.currentList.size < totalCount) {
                 mListMoreView.onLoadingStateChanged(IMoreView.STATE_NORMAL)
             } else {
                 Logcat.d("fileListAdapter!!.normalCount < totalCount")
@@ -289,7 +298,7 @@ class HistoryFragment : BrowserFragment() {
                                 layoutManager.findLastVisibleItemPosition()
                             val rowCount = fileListAdapter.getItemCount()
                             isReachBottom =
-                                lastVisibleItemPosition >= rowCount - fileListAdapter.headersCount - fileListAdapter.footersCount
+                                lastVisibleItemPosition >= rowCount -1//- fileListAdapter.headersCount - fileListAdapter.footersCount
                         }
                         if (isReachBottom) {
                             mListMoreView.onLoadingStateChanged(IMoreView.STATE_LOADING)

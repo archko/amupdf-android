@@ -1,5 +1,7 @@
 package cn.archko.pdf.fragments
 
+//import com.umeng.analytics.MobclickAgent
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.Environment
@@ -12,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.mupdf.R
@@ -23,10 +26,8 @@ import cn.archko.pdf.listeners.DataListener
 import cn.archko.pdf.listeners.OnItemClickListener
 import cn.archko.pdf.widgets.ColorItemDecoration
 import com.google.android.material.appbar.MaterialToolbar
-//import com.umeng.analytics.MobclickAgent
 import java.io.File
 import java.io.FileFilter
-import java.util.*
 
 /**
  * @author: archko 2016/2/14 :15:58
@@ -108,7 +109,7 @@ open class SearchFragment : DialogFragment() {
     }
 
     private fun clearList() {
-        fileListAdapter?.data?.clear()
+        fileListAdapter?.submitList(listOf())
         fileListAdapter?.notifyDataSetChanged()
     }
 
@@ -117,10 +118,31 @@ open class SearchFragment : DialogFragment() {
         clearList()
     }
 
+    protected val beanItemCallback: DiffUtil.ItemCallback<FileBean> =
+        object : DiffUtil.ItemCallback<FileBean>() {
+            override fun areItemsTheSame(oldItem: FileBean, newItem: FileBean): Boolean {
+                return oldItem == newItem
+            }
+
+            @SuppressLint("DiffUtilEquals")
+            override fun areContentsTheSame(oldItem: FileBean, newItem: FileBean): Boolean {
+                return if (null == oldItem.bookProgress) {
+                    false
+                } else {
+                    oldItem.bookProgress!!.equals(newItem.bookProgress)
+                }
+            }
+        }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         if (null == fileListAdapter) {
-            fileListAdapter = BookAdapter(activity as Context, itemClickListener)
+            fileListAdapter = BookAdapter(
+                activity as Context,
+                beanItemCallback,
+                BookAdapter.TYPE_SEARCH,
+                itemClickListener
+            )
             this.fileListAdapter!!.setMode(BookAdapter.TYPE_SEARCH)
         }
         filesListView.adapter = this.fileListAdapter
@@ -135,7 +157,7 @@ open class SearchFragment : DialogFragment() {
         val home = getHome()
         doSearch(fileList, keyword, File(home))
 
-        fileListAdapter?.setData(fileList)
+        fileListAdapter?.submitList(fileList)
         fileListAdapter?.notifyDataSetChanged()
     }
 
@@ -181,7 +203,8 @@ open class SearchFragment : DialogFragment() {
     private val itemClickListener: OnItemClickListener<FileBean> =
         object : OnItemClickListener<FileBean> {
             override fun onItemClick(view: View?, data: FileBean?, position: Int) {
-                val clickedEntry = this@SearchFragment.fileListAdapter!!.data[position] as FileBean
+                val clickedEntry =
+                    this@SearchFragment.fileListAdapter!!.currentList[position] as FileBean
                 val clickedFile = clickedEntry.file
 
                 if (null == clickedFile || !clickedFile.exists()) {
@@ -192,7 +215,7 @@ open class SearchFragment : DialogFragment() {
             }
 
             override fun onItemClick2(view: View?, data: FileBean?, position: Int) {
-                val entry = this@SearchFragment.fileListAdapter!!.data[position] as FileBean
+                val entry = this@SearchFragment.fileListAdapter!!.currentList[position] as FileBean
                 showFileInfoDialog(entry)
             }
         }

@@ -1,6 +1,8 @@
 package cn.archko.pdf.fragments
 
 //import com.umeng.analytics.MobclickAgent
+import android.annotation.SuppressLint
+import android.app.backup.BackupAgent
 import android.content.Context
 import android.os.Bundle
 import android.os.Environment
@@ -14,11 +16,13 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cn.archko.mupdf.R
+import cn.archko.pdf.adapters.BaseViewHolder
 import cn.archko.pdf.adapters.BookAdapter
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFViewerHelper
@@ -29,9 +33,6 @@ import cn.archko.pdf.listeners.DataListener
 import cn.archko.pdf.listeners.OnItemClickListener
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.widgets.ColorItemDecoration
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
@@ -48,7 +49,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     protected lateinit var mSwipeRefreshWidget: SwipeRefreshLayout
     protected lateinit var pathTextView: TextView
     protected lateinit var filesListView: RecyclerView
-    protected lateinit var fileListAdapter: BookAdapter
+    protected lateinit var fileListAdapter: ListAdapter<FileBean, BaseViewHolder<FileBean>>
 
     private val dirsFirst = true
     protected var showExtension: Boolean = true
@@ -57,13 +58,33 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     private var mSelectedPos = -1
     protected var currentBean: FileBean? = null
     protected lateinit var bookViewModel: BookViewModel
+    
+    protected val beanItemCallback: DiffUtil.ItemCallback<FileBean> =
+        object : DiffUtil.ItemCallback<FileBean>() {
+            override fun areItemsTheSame(oldItem: FileBean, newItem: FileBean): Boolean {
+                return oldItem == newItem
+            }
+
+            @SuppressLint("DiffUtilEquals")
+            override fun areContentsTheSame(oldItem: FileBean, newItem: FileBean): Boolean {
+                return if (null == oldItem.bookProgress) {
+                    false
+                } else {
+                    oldItem.bookProgress!!.equals(newItem.bookProgress)
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         mCurrentPath = getHome()
-        fileListAdapter = BookAdapter(activity as Context, itemClickListener)
+        fileListAdapter = initAdapter()
         bookViewModel = BookViewModel()
+    }
+    
+    open fun initAdapter(): BookAdapter {
+      return  BookAdapter(activity as Context,beanItemCallback, BookAdapter.TYPE_FILE, itemClickListener)
     }
 
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
@@ -168,7 +189,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         super.onActivityCreated(savedInstanceState)
 
         this.filesListView.adapter = this.fileListAdapter
-        mHandler.postDelayed({ loadData() }, 80L)
+        mHandler.postDelayed({ onRefresh() }, 80L)
     }
 
     private fun addObserver() {
@@ -199,7 +220,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         val file = currentBean!!.file
 
         file?.let {
-            bookViewModel.updateItem(it, fileListAdapter.data)
+            bookViewModel.updateItem(it, fileListAdapter.currentList)
         }
     }
 
@@ -213,8 +234,8 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     }
 
     open fun emitFileBeans(fileList: List<FileBean>) {
-        fileListAdapter.data = fileList
-        fileListAdapter.notifyDataSetChanged()
+        fileListAdapter.submitList(fileList)
+        //fileListAdapter.notifyDataSetChanged()
         if (null != mPathMap[mCurrentPath!!]) {
             val pos = mPathMap[mCurrentPath!!]
             if (pos!! < fileList.size) {
@@ -235,8 +256,8 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     private fun emitScannerBean(args: Array<Any?>) {
         val path = args[0] as String
         if (mCurrentPath.equals(path)) {
-            fileListAdapter.data = args[1] as ArrayList<FileBean>
-            fileListAdapter.notifyDataSetChanged()
+            fileListAdapter.submitList(args[1] as ArrayList<FileBean>)
+            //fileListAdapter.notifyDataSetChanged()
         }
     }
 
@@ -264,7 +285,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             return defaultHome
     }
 
-    private val itemClickListener: OnItemClickListener<FileBean> =
+    val itemClickListener: OnItemClickListener<FileBean> =
         object : OnItemClickListener<FileBean> {
             override fun onItemClick(view: View?, data: FileBean?, position: Int) {
                 clickItem(position)
@@ -276,7 +297,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         }
 
     private fun clickItem(position: Int) {
-        val clickedEntry = fileListAdapter.data[position]
+        val clickedEntry = fileListAdapter.currentList[position]
         val clickedFile: File?
 
         if (clickedEntry.type == FileBean.HOME) {
@@ -314,7 +335,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     }
 
     private fun clickItem2(position: Int, view: View) {
-        val entry = this.fileListAdapter.data.get(position) as FileBean
+        val entry = this.fileListAdapter.currentList.get(position) as FileBean
         if (!entry.isDirectory && entry.type != FileBean.HOME) {
             mSelectedPos = position
             prepareMenu(view, entry)
@@ -414,7 +435,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             return true
         }
         val position = mSelectedPos
-        val entry = fileListAdapter.data[position]
+        val entry = fileListAdapter.currentList[position]
         if (item.itemId == deleteContextMenuItem) {
             Logcat.d(TAG, "delete:$entry")
             //MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, "delete")
@@ -424,15 +445,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             }
             return true
         } else if (item.itemId == removeContextMenuItem) {
-            if (entry.type == FileBean.RECENT) {
-                //MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, "remove")
-                lifecycleScope.launch {
-                    withContext(Dispatchers.IO) {
-                        bookViewModel.removeRecent(entry.file!!.absolutePath)
-                    }
-                    update()
-                }
-            }
+            remove(entry)
         } else {
             val clickedFile: File = entry.file!!
 
@@ -470,6 +483,9 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             }
         }
         return false
+    }
+
+    open fun remove(entry: FileBean) {
     }
 
     private fun showFileInfoDiaLog(entry: FileBean) {

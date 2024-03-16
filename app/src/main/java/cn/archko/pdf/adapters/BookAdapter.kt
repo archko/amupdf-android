@@ -1,11 +1,14 @@
 package cn.archko.pdf.adapters
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import cn.archko.mupdf.R
 import cn.archko.pdf.App
 import cn.archko.pdf.entity.FileBean
@@ -16,13 +19,18 @@ import java.util.Locale
 
 /**
  * @author: archko 2018/12/12 :15:43
- */
-class BookAdapter(context: Context, itemClickListener: OnItemClickListener<FileBean>) :
-    HeaderAndFooterRecyclerAdapter<FileBean>(context) {
+ */ 
+class BookAdapter(
+    context: Context,
+    diffCallback: DiffUtil.ItemCallback<FileBean>,
+   private var mMode:Int,
+    itemClickListener: OnItemClickListener<FileBean>
+) :
+    ListAdapter<FileBean, BaseViewHolder<FileBean>>(diffCallback) {
 
-    private var mMode = TYPE_FILE
     private var itemClickListener: OnItemClickListener<FileBean>? = itemClickListener
-    var screenWidth = 1080
+    private var screenWidth = 1080
+    protected var mInflater: LayoutInflater
 
     internal fun setMode(mMode: Int) {
         this.mMode = mMode
@@ -30,35 +38,40 @@ class BookAdapter(context: Context, itemClickListener: OnItemClickListener<FileB
 
     init {
         screenWidth = App.instance!!.screenWidth
+        mInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     }
 
-    override fun doGetItemViewType(position: Int): Int {
-        return mMode
-    }
-
-    override fun doCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<FileBean> {
-        when (viewType) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<FileBean> {
+        when (mMode) {
             TYPE_FILE -> {
                 val view = mInflater.inflate(R.layout.item_book_normal, parent, false)
                 return ViewHolder(view)
             }
+
             TYPE_RENCENT -> {
                 val view = mInflater.inflate(R.layout.item_book_normal, parent, false)
                 return ViewHolder(view)
             }
+
             TYPE_SEARCH -> {
                 val view = mInflater.inflate(R.layout.item_book_search, parent, false)
                 return SearchViewHolder(view)
             }
+
             TYPE_GRID -> {
                 val view = mInflater.inflate(R.layout.item_book_grid, parent, false)
                 return GridViewHolder(view)
             }
+
             else -> return BaseViewHolder(parent)
         }
     }
 
-    private inner class ViewHolder(itemView: View) : BaseViewHolder<FileBean>(itemView) {
+    override fun onBindViewHolder(holder: BaseViewHolder<FileBean>, position: Int) {
+        holder.onBind(currentList[position], position)
+    }
+    
+    inner class ViewHolder(itemView: View) : BaseViewHolder<FileBean>(itemView) {
 
         var mName: TextView? = null
         var mIcon: ImageView? = null

@@ -115,7 +115,7 @@ class ListMoreView : IMoreView {
 
     override fun onLoadingStateChanged(state: Int) {
         this.state = state
-        when (state) {
+        /*when (state) {
             IMoreView.STATE_NORMAL -> {
                 if (progressImage != null) {
                     progressImage!!.visibility = View.GONE
@@ -167,6 +167,6 @@ class ListMoreView : IMoreView {
                 }
                 loadingView!!.text = text[0]
             }
-        }
+        }*/
     }
 }

@@ -31,10 +31,13 @@ class HistoryViewModel : ViewModel() {
         const val MAX_TIME = 1300L
     }
 
+    var curPage = 0
+    var list: MutableList<FileBean> = mutableListOf()
+
     private val progressDao by lazy { Graph.database.progressDao() }
 
-    private val _uiFileModel = MutableLiveData<Array<Any?>>()
-    val uiFileModel: LiveData<Array<Any?>>
+    private val _uiFileModel = MutableLiveData<Array<Any>>()
+    val uiFileModel: LiveData<Array<Any>>
         get() = _uiFileModel
 
     private val _uiBackupModel = MutableLiveData<String?>()
@@ -45,16 +48,21 @@ class HistoryViewModel : ViewModel() {
     val uiRestorepModel: LiveData<Boolean>
         get() = _uiRestorepModel
 
-    fun loadFiles(curPage: Int, showExtension: Boolean) =
+    fun reset() {
+        curPage = 0
+        list.clear()
+    }
+
+    fun loadFiles(page: Int, showExtension: Boolean) =
         viewModelScope.launch {
             val args = withContext(Dispatchers.IO) {
-                var totalCount = 0
-
-                totalCount = progressDao.progressCount()
+                val totalCount: Int = progressDao.progressCount()
                 val progresses = progressDao.getProgresses(
-                    PAGE_SIZE * (curPage),
+                    PAGE_SIZE * (page),
                     PAGE_SIZE
                 )
+                
+                Logcat.d("loadFiles:$page, $curPage, total:$totalCount, ${progresses?.size}")
 
                 val entryList = ArrayList<FileBean>()
 
@@ -67,7 +75,11 @@ class HistoryViewModel : ViewModel() {
                     entry.bookProgress = it
                     entryList.add(entry)
                 }
-                return@withContext arrayOf<Any?>(totalCount, entryList)
+                if ((progresses?.size ?: 0) > 0){
+                    curPage++
+                }
+                list.addAll(entryList)
+                return@withContext arrayOf<Any>(totalCount, list)
             }
 
             withContext(Dispatchers.Main) {

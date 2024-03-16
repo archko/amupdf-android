@@ -24,7 +24,6 @@ import java.util.*
  */
 class FavoriteFragment : BrowserFragment() {
 
-    private var curPage = 0
     private lateinit var mListMoreView: ListMoreView
     private var mStyle: Int = HistoryFragment.STYLE_LIST
     protected lateinit var favoriteViewModel: FavoriteViewModel
@@ -37,20 +36,16 @@ class FavoriteFragment : BrowserFragment() {
         filter.addAction(Event.ACTION_UNFAVORITED)
         LiveEventBus
             .get(Event.ACTION_FAVORITED, FileBean::class.java)
-            .observe(this, object : Observer<FileBean> {
-                override fun onChanged(t: FileBean) {
-                    Logcat.d(TAG, "FAVORITED:$t")
-                    loadData()
-                }
-            })
+            .observe(this) { t ->
+                Logcat.d(TAG, "FAVORITED:$t")
+                loadData()
+            }
         LiveEventBus
             .get(Event.ACTION_UNFAVORITED, FileBean::class.java)
-            .observe(this, object : Observer<FileBean> {
-                override fun onChanged(t: FileBean) {
-                    Logcat.d(TAG, "UNFAVORITED:$t")
-                    loadData()
-                }
-            })
+            .observe(this) { t ->
+                Logcat.d(TAG, "UNFAVORITED:$t")
+                loadData()
+            }
         favoriteViewModel = FavoriteViewModel()
     }
 
@@ -68,23 +63,23 @@ class FavoriteFragment : BrowserFragment() {
         this.pathTextView.visibility = View.GONE
         filesListView.addOnScrollListener(onScrollListener)
         mListMoreView = ListMoreView(filesListView)
-        fileListAdapter.addFootView(mListMoreView.getLoadMoreView())
+        //fileListAdapter.addFootView(mListMoreView.getLoadMoreView())
 
         addObserver()
         return view
     }
 
     private fun reset() {
-        curPage = 0
+        favoriteViewModel.reset()
     }
 
     private fun addObserver() {
-        favoriteViewModel.uiFileModel.observe(viewLifecycleOwner, { it ->
+        favoriteViewModel.uiFileModel.observe(viewLifecycleOwner) { it ->
             updateHistoryBeans(it)
-        })
+        }
     }
 
-    override fun loadData() {
+    override fun onRefresh() {
         reset()
         getFavorities()
     }
@@ -92,25 +87,15 @@ class FavoriteFragment : BrowserFragment() {
     private fun getFavorities() {
         mListMoreView.onLoadingStateChanged(IMoreView.STATE_LOADING)
 
-        favoriteViewModel.loadFavorities(curPage, showExtension)
+        favoriteViewModel.loadFavorities(favoriteViewModel.curPage, showExtension)
     }
 
     private fun updateHistoryBeans(args: Array<Any?>) {
         val totalCount = args[0] as Int
         val entryList = args[1] as ArrayList<FileBean>
         mSwipeRefreshWidget.isRefreshing = false
-        if (entryList.size > 0) {
-            if (curPage == 0) {
-                fileListAdapter.data = entryList
-                fileListAdapter.notifyDataSetChanged()
-            } else {
-                val index = fileListAdapter.itemCount
-                fileListAdapter.addData(entryList)
-                fileListAdapter.notifyItemRangeInserted(index, entryList.size)
-            }
-
-            curPage++
-        }
+        fileListAdapter.submitList(entryList)
+        fileListAdapter.notifyDataSetChanged()
         updateLoadingStatus(totalCount)
     }
 
@@ -119,11 +104,11 @@ class FavoriteFragment : BrowserFragment() {
             String.format(
                 "$this, total count:%s, adapter count:%s",
                 totalCount,
-                fileListAdapter.normalCount
+                fileListAdapter.currentList.size
             )
         )
-        if (fileListAdapter.normalCount > 0) {
-            if (fileListAdapter.normalCount < totalCount) {
+        if (fileListAdapter.currentList.size > 0) {
+            if (fileListAdapter.currentList.size < totalCount) {
                 mListMoreView.onLoadingStateChanged(IMoreView.STATE_NORMAL)
             } else {
                 Logcat.d("fileListAdapter!!.normalCount < totalCount")
@@ -157,7 +142,7 @@ class FavoriteFragment : BrowserFragment() {
                                 layoutManager.findLastVisibleItemPosition()
                             val rowCount = fileListAdapter.getItemCount()
                             isReachBottom =
-                                lastVisibleItemPosition >= rowCount - fileListAdapter.headersCount - fileListAdapter.footersCount
+                                lastVisibleItemPosition >= rowCount - 1 //- fileListAdapter.headersCount - fileListAdapter.footersCount
                         }
                         if (isReachBottom) {
                             mListMoreView.onLoadingStateChanged(IMoreView.STATE_LOADING)
