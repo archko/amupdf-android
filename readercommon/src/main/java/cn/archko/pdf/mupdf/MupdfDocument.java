@@ -299,7 +299,7 @@ public class MupdfDocument {
         float xscale = thumb.getWidth() / rectF.width();
         leftBound = (int) (rectF.left * ratio * xscale);
         topBound = (int) (rectF.top * ratio * xscale);
-
+        
         int height = (int) (rectF.height() * ratio * xscale);
         ctm.scale(xscale, xscale);
         if (Logcat.loggable) {
@@ -307,8 +307,8 @@ public class MupdfDocument {
             float th = (thumb.getHeight() * ratio);
             float sw = (xscale * pageW);
             float sh = (xscale * pageH);
-            Logcat.d(TAG, String.format("decode crop.bitmap tw-th:%s-:%s, sw-sh:%s-%s,xscale:%s, rect:%s-%s",
-                    tw, th, sw, sh, xscale, rectF.width() * ratio, rectF.height() * ratio));
+            Logcat.d(TAG, String.format("decode crop.bitmap tw-th:%s-:%s, crop.w-h:%s-%s, sw-sh:%s-%s,xscale:%s, rect:%s-%s",
+                    tw, th, sw, sh, xscale, rectF.width(), rectF.height(), rectF.width() * ratio, rectF.height() * ratio));
 
             //Logcat.d(TAG, String.format("bitmap:%s-%s,height:%s,thumb:%s-%s, crop rect:%s, xscale:%s,yscale:%s",
             //        pageW, pageH, height, thumb.getWidth(), thumb.getHeight(), rectF, xscale, yscale));

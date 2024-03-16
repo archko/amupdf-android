@@ -192,8 +192,6 @@ class APage {
                 ", targetWidth=" + targetWidth +
                 ", scale=" + scale +
                 ", cropScale=" + cropScale +
-                ", sourceBounds=" + sourceBounds +
-                ", cropBounds=" + cropBounds +
                 ", cropWidth=" + cropWidth +
                 ", cropHeight=" + cropHeight +
                 '}'

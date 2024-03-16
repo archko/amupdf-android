@@ -18,6 +18,7 @@ import cn.archko.pdf.R
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.listeners.SimpleGestureListener
+import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.presenter.PageViewPresenter
 import cn.archko.pdf.utils.StatusBarHelper
 import cn.archko.pdf.viewmodel.PDFViewModel
@@ -57,7 +58,8 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         super.onCreate(savedInstanceState)
         StatusBarHelper.hideSystemUI(this)
         StatusBarHelper.setImmerseBarAppearance(window, true)
-
+        
+        MupdfDocument.useNewCropper = PdfOptionRepository.getCropper()
         initDecodeService()
         val zoomModel = ZoomModel()
         sensorHelper = SensorHelper(this)

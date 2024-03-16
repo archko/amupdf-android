@@ -31,6 +31,7 @@ import cn.archko.pdf.entity.Bookmark
 import cn.archko.pdf.fragments.OutlineFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
+import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.presenter.PageViewPresenter
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
@@ -128,6 +129,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     override fun initView() {
         super.initView()
         initStr()
+        MupdfDocument.useNewCropper = PdfOptionRepository.getCropper()
 
         forceCropParam = intent.getIntExtra("forceCropParam", -1)
 
