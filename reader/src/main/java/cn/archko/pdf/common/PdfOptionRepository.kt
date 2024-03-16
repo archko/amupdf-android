@@ -102,7 +102,7 @@ object PdfOptionRepository {
     }
 
     fun getBgColor(): Int {
-        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_BGCOLOR)
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_BGCOLOR, Color.WHITE)
     }
 
     fun setFgColor(fgColor: Int) {
@@ -110,7 +110,7 @@ object PdfOptionRepository {
     }
 
     fun getFgColor(): Int {
-        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_FGCOLOR)
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_FGCOLOR, Color.BLACK)
     }
 
     fun setLineSpacingMult(lineSpacingMult: Float) {

@@ -1,10 +1,9 @@
 package cn.archko.pdf.common
 
-import androidx.core.app.ComponentActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.entity.StyleBean
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -12,7 +11,7 @@ import kotlinx.coroutines.withContext
  * @author: archko 2019-06-19 :12:27
  */
 class StyleHelper(
-    private var context: ComponentActivity,
+    private var context: FragmentActivity,
 ) {
 
     var styleBean: StyleBean? = null
@@ -39,7 +38,7 @@ class StyleHelper(
         loadStyleFromSP()
     }
 
-    fun loadStyleFromSP() {
+    private fun loadStyleFromSP() {
         context.lifecycleScope.launch {
             withContext(Dispatchers.IO) {
 
