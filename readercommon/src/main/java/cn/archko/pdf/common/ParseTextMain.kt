@@ -4,8 +4,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.text.Html
 import android.text.TextUtils
-import cn.archko.pdf.common.Logcat.d
-import cn.archko.pdf.common.Logcat.i
 import cn.archko.pdf.entity.BitmapBean
 import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.utils.BitmapUtils
@@ -73,7 +71,7 @@ object ParseTextMain {
         internal fun parse(lists: List<String>): String {
             val sb = StringBuilder()
             var isImage = false
-            var lastBreak = false;
+            var lastBreak = false
             for (s in lists) {
                 val ss = s.trim { it <= ' ' }
                 if (ss.isNotEmpty()) {
@@ -88,7 +86,7 @@ object ParseTextMain {
                     }
 
                     if (ss.endsWith("</p>")) {
-                        isImage = false;
+                        isImage = false
                     }
                 }
             }
@@ -121,7 +119,7 @@ object ParseTextMain {
             var isImage = false
             val reflowBeans = ArrayList<ReflowBean>()
             var reflowBean: ReflowBean? = null
-            var lastBreak = true;
+            var lastBreak = true
             for (s in lists) {
                 val ss = s.trim()
                 if (ss.isNotEmpty()) {
@@ -177,8 +175,8 @@ object ParseTextMain {
             pageIndex: Int,
             lastBreak: Boolean
         ): Boolean {
-            var headBreak = false;
-            var tailBreak = false;
+            var headBreak = false
+            var tailBreak = false
             //1.处理结尾字符,如果是前几页,且一行字符<LINE_LENGTH,有可能是目录.添加尾部换行符.
             val end = ss.substring(ss.length - 1)
             //if (lastBreak && (ss.length < LINE_LENGTH && pageIndex < MAX_PAGEINDEX)) {
@@ -199,7 +197,7 @@ object ParseTextMain {
             //3.从前面开始,如果以START_MARK开头,则可能需要在之前添加换行符.
             var lineLength = ss.length
             if (lineLength > 6) {
-                lineLength = 6;
+                lineLength = 6
             }
             val start = ss.substring(0, lineLength)
             var find = START_MARK.matcher(start).find()
@@ -361,13 +359,13 @@ object ParseTextMain {
             || (bitmap.width < minImgHeight
                     && bitmap.height < minImgHeight)
         ) {
-            i("text", "bitmap decode failed.")
+            Logcat.i("text", "bitmap decode failed.")
             return null
         }
         var width = bitmap.width * systemScale
         var height = bitmap.height * systemScale
         if (Logcat.loggable) {
-            d(
+            Logcat.d(
                 String.format(
                     "width:%s, height:%s systemScale:%s",
                     bitmap.width,

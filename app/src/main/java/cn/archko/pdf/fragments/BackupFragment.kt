@@ -35,8 +35,8 @@ open class BackupFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var themeId = android.R.style.Theme_Material_Dialog
-        setStyle(DialogFragment.STYLE_NO_FRAME, themeId)
+        val themeId = android.R.style.Theme_Material_Dialog
+        setStyle(STYLE_NO_FRAME, themeId)
         backupViewModel = BackupViewModel()
     }
 
@@ -79,8 +79,8 @@ open class BackupFragment : DialogFragment() {
         return view
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(v: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(v, savedInstanceState)
 
         adapter = object : BaseRecyclerAdapter<File>(activity) {
 
@@ -91,7 +91,7 @@ open class BackupFragment : DialogFragment() {
         }
         recyclerView.adapter = adapter
 
-        loadBackups();
+        loadBackups()
     }
 
     private fun loadBackups() {

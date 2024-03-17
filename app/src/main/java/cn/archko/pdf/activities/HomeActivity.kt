@@ -18,7 +18,6 @@ import android.widget.Toast
 import android.window.OnBackInvokedCallback
 import android.window.OnBackInvokedDispatcher
 import androidx.core.app.ActivityCompat
-import androidx.core.os.BuildCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -121,7 +120,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
     }
     override fun onDestroy() {
         super.onDestroy()
-        if (BuildCompat.isAtLeastT()) {
+        if (Build.VERSION.SDK_INT >= 33) {
             onBackInvokedCallback?.let {
                 onBackInvokedDispatcher.unregisterOnBackInvokedCallback(it)
             }
@@ -275,7 +274,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
                     toolbar.inflateMenu(R.menu.menu_favorite)
                 }
             }
-        });
+        })
     }
 
     private fun addTab() {

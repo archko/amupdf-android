@@ -1,6 +1,7 @@
 package cn.archko.pdf.viewmodel
 
 import android.content.Context
+import android.os.Environment
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -82,7 +83,7 @@ class FileViewModel() : ViewModel() {
     private var dirsFirst: Boolean = true
     private var showExtension: Boolean = true
 
-    var sdcardRoot: String = "/sdcard/"
+    private var sdcardRoot: String = Environment.getExternalStorageDirectory().getPath()
     private var homePath: String
 
     /**

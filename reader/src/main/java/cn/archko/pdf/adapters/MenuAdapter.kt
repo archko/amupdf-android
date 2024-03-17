@@ -12,9 +12,9 @@ import cn.archko.pdf.utils.Utils
 /**
  * @author: archko 2019/7/12 :19:52
  */
-class MenuAdapter public constructor(
+class MenuAdapter(
     var menuListener: MenuListener?,
-    private var context: Context?
+    context: Context?
 ) : BaseRecyclerAdapter<MenuBean>(context) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<MenuBean> {
@@ -22,7 +22,7 @@ class MenuAdapter public constructor(
         return MenuHolder(binding)
     }
 
-    inner class MenuHolder(private val root: View) :
+    inner class MenuHolder(root: View) :
         BaseViewHolder<MenuBean>(root) {
         private var title: TextView? = null
 
@@ -32,7 +32,7 @@ class MenuAdapter public constructor(
         }
 
         override fun onBind(data: MenuBean?, position: Int) {
-            title?.setText(data?.title)
+            title?.text = data?.title
             itemView.setOnClickListener {
                 menuListener?.onMenuSelected(data, position)
             }

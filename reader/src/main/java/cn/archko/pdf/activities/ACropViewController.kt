@@ -139,7 +139,7 @@ class ACropViewController(
 
     @SuppressLint("ClickableViewAccessibility")
     private fun addGesture() {
-        mRecyclerView.setOnTouchListener { v, event ->
+        mRecyclerView.setOnTouchListener { _, event ->
             gestureDetector!!.onTouchEvent(event)
             false
         }
@@ -310,11 +310,7 @@ class ACropViewController(
     override fun onResume() {
         //mPageSeekBarControls?.hide()
 
-        mRecyclerView.postDelayed(object : Runnable {
-            override fun run() {
-                mRecyclerView.adapter?.notifyDataSetChanged()
-            }
-        }, 250L)
+        mRecyclerView.postDelayed({ mRecyclerView.adapter?.notifyDataSetChanged() }, 250L)
     }
 
     override fun onPause() {

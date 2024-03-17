@@ -42,7 +42,7 @@ class ViewerDividerItemDecoration @JvmOverloads constructor(
      * @param context
      * @param orientation
      */
-    constructor(context: Context?, orientation: Int) : this(
+    constructor(orientation: Int) : this(
         orientation,
         Color.parseColor("#dddddd"),
         Utils.dipToPixel(0.5f)

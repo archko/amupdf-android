@@ -2,5 +2,4 @@
 <resources>
     <color name="menu_bg">#Cc202020</color>
     <color name="extract_dialog_bg">#CCBCB8B8</color>
-    <color name="divider" >#33000000</color>
 </resources>

@@ -72,7 +72,7 @@ class AReflowViewController(
             layoutManager = ExtraSpaceLinearLayoutManager(context, LinearLayoutManager.VERTICAL)
             setItemViewCacheSize(0)
 
-            addItemDecoration(ViewerDividerItemDecoration(context, LinearLayoutManager.VERTICAL))
+            addItemDecoration(ViewerDividerItemDecoration(LinearLayoutManager.VERTICAL))
             addOnScrollListener(object : ARecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: ARecyclerView, newState: Int) {
                     if (newState == ARecyclerView.SCROLL_STATE_IDLE) {
@@ -384,7 +384,7 @@ class AReflowViewController(
 
         fontFaceChange?.setOnClickListener {
             FontsFragment.showFontsDialog(
-                context as FragmentActivity, mStyleHelper,
+                context, mStyleHelper,
                 object : DataListener {
                     override fun onSuccess(vararg args: Any?) {
                         updateReflowAdapter()

@@ -86,7 +86,6 @@ object BookProgressParser {
 
     /**
      * @return
-     * @throws WeiboException
      */
     @JvmStatic
     fun parseProgresses(jo: String): ArrayList<BookProgress> {
@@ -96,7 +95,7 @@ object BookProgressParser {
             val json = JSONObject(jo)
             val jsonarray = json.optJSONArray("root")
             val len = jsonarray.length()
-            var bean: BookProgress? = null
+            var bean: BookProgress?
             while (i < len) {
                 bean = parseProgress(jsonarray.optJSONObject(i))
                 arraylist.add(bean!!)

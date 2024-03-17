@@ -65,7 +65,7 @@ object IntentFile {
                     if (columnIndex > -1) {
                         path = cursor.getString(columnIndex)
                     }
-                    columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
+                    //columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
                 }
                 cursor.close()
             }

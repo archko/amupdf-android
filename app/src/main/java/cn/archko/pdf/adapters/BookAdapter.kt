@@ -73,10 +73,10 @@ class BookAdapter(
     
     inner class ViewHolder(itemView: View) : BaseViewHolder<FileBean>(itemView) {
 
-        var mName: TextView? = null
-        var mIcon: ImageView? = null
-        var mSize: TextView? = null
-        var mProgressBar: ProgressBar? = null
+        private var mName: TextView? = null
+        private var mIcon: ImageView? = null
+        private var mSize: TextView? = null
+        private var mProgressBar: ProgressBar? = null
 
         init {
             mIcon = itemView.findViewById(R.id.icon)

@@ -52,7 +52,7 @@ public class ReflowViewCache {
 
     companion object {
 
-        const val TEXT_THRESHOLD = 20;
-        const val IMAGE_THRESHOLD = 8;
+        const val TEXT_THRESHOLD = 20
+        const val IMAGE_THRESHOLD = 8
     }
 }

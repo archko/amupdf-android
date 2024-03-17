@@ -113,7 +113,7 @@ open class OutlineFragment : BaseFragment() {
         ac.onSelectedOutline(item.page)
     }
 
-    inner class ViewHolder(private val root: View) :
+    inner class ViewHolder(root: View) :
         BaseViewHolder<OutlineItem>(root) {
 
 

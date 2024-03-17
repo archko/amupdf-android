@@ -47,7 +47,7 @@ open class SearchFragment : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val themeId = R.style.AppTheme
-        setStyle(DialogFragment.STYLE_NO_TITLE, themeId)
+        setStyle(STYLE_NO_TITLE, themeId)
     }
 
     override fun onResume() {
@@ -67,7 +67,7 @@ open class SearchFragment : DialogFragment() {
     ): View? {
         val view = inflater.inflate(R.layout.list_book_search, container, false)
         val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
-        toolbar.setNavigationOnClickListener(View.OnClickListener { dismiss() })
+        toolbar.setNavigationOnClickListener({ dismiss() })
 
         dialog?.setTitle(cn.archko.pdf.R.string.menu_search)
         editView = view.findViewById(R.id.searchEdit)
@@ -118,7 +118,7 @@ open class SearchFragment : DialogFragment() {
         clearList()
     }
 
-    protected val beanItemCallback: DiffUtil.ItemCallback<FileBean> =
+    private val beanItemCallback: DiffUtil.ItemCallback<FileBean> =
         object : DiffUtil.ItemCallback<FileBean>() {
             override fun areItemsTheSame(oldItem: FileBean, newItem: FileBean): Boolean {
                 return oldItem == newItem
@@ -134,8 +134,8 @@ open class SearchFragment : DialogFragment() {
             }
         }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         if (null == fileListAdapter) {
             fileListAdapter = BookAdapter(
                 activity as Context,
@@ -165,7 +165,7 @@ open class SearchFragment : DialogFragment() {
         if (dir.isDirectory) {
             val files = dir.listFiles(this.fileFilter)
 
-            if (files != null && files.size > 0) {
+            if (files != null && files.isNotEmpty()) {
                 for (f in files) {
                     if (f.isFile) {
                         if (f.name.toLowerCase().contains(keyword)) {

@@ -8,7 +8,7 @@ import com.artifex.mupdf.fitz.Outline
 /**
  * @author: archko 2018/12/15 :9:11
  */
-class OutlineHelper public constructor(
+class OutlineHelper(
     private var mupdfDocument: MupdfDocument?,
     private var activity: Activity?
 ) {

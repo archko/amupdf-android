@@ -13,7 +13,7 @@ import java.util.Locale
 /**
  * @author: archko 2020/11/16 :11:23
  */
-class FontsViewModel() : ViewModel() {
+class FontsViewModel : ViewModel() {
 
     var selectedFontName: String? = null
     init {

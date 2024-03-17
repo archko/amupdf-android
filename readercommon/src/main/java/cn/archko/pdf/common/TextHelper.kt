@@ -55,7 +55,7 @@ object TextHelper {
 
     private fun addLargeLine(temp: String, reflowBeans: MutableList<ReflowBean>) {
         val length = temp.length
-        var start = 0;
+        var start = 0
         while (start < length) {
             var end = start + READ_CHAR_COUNT
             if (end > length) {

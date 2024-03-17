@@ -542,7 +542,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
         Toast.makeText(
             this,
-            if (mReflow) getString(cn.archko.pdf.R.string.entering_reflow_mode) else getString(cn.archko.pdf.R.string.leaving_reflow_mode),
+            if (mReflow) getString(R.string.entering_reflow_mode) else getString(R.string.leaving_reflow_mode),
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -692,7 +692,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         if (mReflow) {
             Toast.makeText(
                 this,
-                getString(cn.archko.pdf.R.string.in_reflow_mode),
+                getString(R.string.in_reflow_mode),
                 Toast.LENGTH_SHORT
             ).show()
             mPageSeekBarControls?.reflowButton!!.setColorFilter(Color.argb(0xFF, 172, 114, 37))

@@ -141,7 +141,7 @@ public class PdfOptionsActivity extends FragmentActivity {
         }
     }
 
-    private class AbsPrefsHolder extends BaseViewHolder<Prefs> {
+    private static class AbsPrefsHolder extends BaseViewHolder<Prefs> {
 
         TextView title;
         TextView summary;
@@ -169,10 +169,10 @@ public class PdfOptionsActivity extends FragmentActivity {
         public void onBind(Prefs data, int position) {
             super.onBind(data, position);
             summary.setText(data.labels[data.index]);
-            itemView.setOnClickListener(v -> showListDialog(v, data, summary));
+            itemView.setOnClickListener(v -> showListDialog(data, summary));
         }
 
-        private void showListDialog(View v, Prefs data, TextView summary) {
+        private void showListDialog(Prefs data, TextView summary) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(PdfOptionsActivity.this);
             builder.setTitle("请选择");
             builder.setSingleChoiceItems(data.labels,
@@ -192,7 +192,7 @@ public class PdfOptionsActivity extends FragmentActivity {
         }
     }
 
-    private class PrefsCheckHolder extends AbsPrefsHolder {
+    private static class PrefsCheckHolder extends AbsPrefsHolder {
 
         private CheckBox checkBox;
 

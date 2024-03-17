@@ -1,12 +1,11 @@
 package cn.archko.pdf.common
 
 import android.graphics.Typeface
-import androidx.core.app.ComponentActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.utils.FileUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -15,7 +14,7 @@ import java.io.File
  * @author: archko 2019-06-19 :12:27
  */
 class FontHelper(
-    private var context: ComponentActivity,
+    private var context: FragmentActivity,
 ) {
 
     init {

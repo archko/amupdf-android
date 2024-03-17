@@ -77,7 +77,7 @@ class MuPDFReflowAdapter(
     }
 
     fun decode(pos: Int): List<ReflowBean>? {
-        return mupdfDocument?.decodeReflow(pos);
+        return mupdfDocument?.decodeReflow(pos)
     }
 
     private fun showBookmark(position: Int): Boolean {

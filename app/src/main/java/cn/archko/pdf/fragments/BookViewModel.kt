@@ -1,5 +1,6 @@
 package cn.archko.pdf.fragments
 
+import android.os.Environment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -59,7 +60,7 @@ class BookViewModel : ViewModel() {
     val uiFavoritiesModel: StateFlow<LoadResult<Any, FileBean>>
         get() = _uiFavoritiesModel
 
-    var sdcardRoot: String = "/sdcard/"
+    private var sdcardRoot: String = Environment.getExternalStorageDirectory().getPath()
     private var dirsFirst: Boolean = true
     private var showExtension: Boolean = true
     private val fileFilter: FileFilter = FileFilter { file ->

@@ -28,7 +28,7 @@ class PDFRecyclerAdapter(
     }
     
     override fun getSectionName(position: Int): String {
-        return String.format("%d", position + 1);
+        return String.format("%d", position + 1)
     }
 
     override fun onCreateViewHolder(
