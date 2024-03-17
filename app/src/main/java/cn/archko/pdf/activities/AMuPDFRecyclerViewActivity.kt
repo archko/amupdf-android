@@ -17,6 +17,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.Toast
+import androidx.core.util.forEach
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
@@ -796,10 +797,10 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             pageSeekBarControls: APageSeekBarControls,
             gestureDetector: GestureDetector?,
         ): AViewController {
-            val aViewController = viewControllerCache.get(viewMode.ordinal)
-            if (null != aViewController) {
-                return aViewController
-            }
+            //val aViewController = viewControllerCache.get(viewMode.ordinal)
+            //if (null != aViewController) {
+            //    return aViewController
+            //}
             return createViewController(
                 viewMode,
                 context,

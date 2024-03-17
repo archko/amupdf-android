@@ -4,14 +4,15 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
+import androidx.collection.LruCache;
+
 import com.artifex.mupdf.fitz.Matrix;
 import com.artifex.mupdf.fitz.Page;
 import com.artifex.mupdf.fitz.RectI;
 
-import androidx.collection.LruCache;
-
 import cn.archko.pdf.App;
 import cn.archko.pdf.entity.APage;
+import cn.archko.pdf.entity.DecodeParam;
 import cn.archko.pdf.mupdf.MupdfDocument;
 
 /**

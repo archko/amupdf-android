@@ -334,6 +334,7 @@ class ACropViewController(
     }
 
     override fun onDestroy() {
+        Logcat.d("crop.onDestroy")
     }
 
     //===========================================

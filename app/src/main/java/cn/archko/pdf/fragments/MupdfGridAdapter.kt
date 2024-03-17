@@ -10,9 +10,9 @@ import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.GridLayoutManager
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.ImageDecoder
-import cn.archko.pdf.common.ImageWorker.DecodeParam
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.entity.APage
+import cn.archko.pdf.entity.DecodeParam
 import cn.archko.pdf.listeners.ClickListener
 import cn.archko.pdf.listeners.DecodeCallback
 

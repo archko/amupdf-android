@@ -337,9 +337,7 @@ public class DecodeServiceBase implements DecodeService {
                     page.recycle();
                 }
             }
-            
-            //这里不销毁document,由于在同一时期可能vm中有它的引用.在activity统一销毁
-            //document.recycle();
+            document.recycle();
             codecContext.recycle();
 
             BitmapPool.getInstance().clear();

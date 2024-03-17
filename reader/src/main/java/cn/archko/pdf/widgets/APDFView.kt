@@ -10,9 +10,9 @@ import android.view.View
 import android.widget.ImageView
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.ImageDecoder
-import cn.archko.pdf.common.ImageWorker.DecodeParam
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.entity.APage
+import cn.archko.pdf.entity.DecodeParam
 import cn.archko.pdf.listeners.DecodeCallback
 import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.utils.Utils
@@ -45,7 +45,7 @@ class APDFView(mContext: Context) : ImageView(mContext) {
 
     private fun strokePaint(): Paint {
         val strokePaint = Paint()
-        strokePaint.setColor(Color.BLACK)
+        strokePaint.color = Color.BLACK
         strokePaint.style = Paint.Style.STROKE
         strokePaint.strokeWidth = 1f
         return strokePaint

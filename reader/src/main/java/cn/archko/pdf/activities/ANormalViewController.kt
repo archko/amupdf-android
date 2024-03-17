@@ -29,6 +29,7 @@ import org.vudroid.core.DocumentView
 import org.vudroid.core.models.CurrentPageModel
 import org.vudroid.core.models.DecodingProgressModel
 import org.vudroid.core.models.ZoomModel
+import org.vudroid.pdfdroid.codec.PdfContext
 import org.vudroid.pdfdroid.codec.PdfDocument
 
 /**
@@ -52,7 +53,7 @@ class ANormalViewController(
 
     private lateinit var mPageSizes: SparseArray<APage>
     private var scrollOrientation = LinearLayoutManager.VERTICAL
-    protected var pageNumberToast: Toast? = null
+    private var pageNumberToast: Toast? = null
 
     private var simpleGestureListener: SimpleGestureListener = object : SimpleGestureListener {
         override fun onSingleTapConfirmed(currentPage: Int) {
@@ -69,7 +70,6 @@ class ANormalViewController(
     }
 
     private fun initView() {
-        initDecodeService()
         val zoomModel = ZoomModel()
 
         pdfViewModel.bookProgress?.run {
@@ -81,6 +81,11 @@ class ANormalViewController(
         currentPageModel.addEventListener(this)
         documentView =
             DocumentView(context, zoomModel, progressModel, currentPageModel, simpleGestureListener)
+        initDecodeService()
+
+        documentView.setDecodeService(decodeService)
+        decodeService!!.open(pdfViewModel.pdfPath)
+        
         zoomModel.addEventListener(documentView)
         documentView.layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -98,11 +103,11 @@ class ANormalViewController(
         try {
             Logcat.d("init.pos:$pos, :$scrollOrientation")
             this.scrollOrientation = scrollOrientation
-            if (null != pdfViewModel.mupdfDocument) {
+            //if (null != pdfViewModel.mupdfDocument) {
                 this.mPageSizes = pageSizes
 
                 setNormalMode(pos)
-            }
+            //}
             addGesture()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -134,7 +139,7 @@ class ANormalViewController(
     }
 
     private fun createDecodeService(): DecodeService {
-        return DecodeServiceBase()
+        return DecodeServiceBase(PdfContext())
     }
 
     override fun getDocumentView(): View {
@@ -151,9 +156,9 @@ class ANormalViewController(
 
     private fun setNormalMode(pos: Int) {
         setOrientation(scrollOrientation)
-        val document = PdfDocument()
-        document.core = pdfViewModel.mupdfDocument?.document
-        (decodeService as DecodeServiceBase).document = document
+        //val document = PdfDocument()
+        //document.core = pdfViewModel.mupdfDocument?.document
+        //(decodeService as DecodeServiceBase).document = document
         if (pos > 0) {
             documentView.goToPage(
                 pos,
@@ -235,7 +240,7 @@ class ANormalViewController(
     }
 
     private fun updateProgress(index: Int) {
-        if (pdfViewModel.mupdfDocument != null && mPageSeekBarControls?.visibility == View.VISIBLE) {
+        if (/*pdfViewModel.mupdfDocument != null &&*/ mPageSeekBarControls?.visibility == View.VISIBLE) {
             mPageSeekBarControls?.updatePageProgress(index)
         }
     }
@@ -266,7 +271,7 @@ class ANormalViewController(
     }
 
     override fun onPause() {
-        if (null != pdfViewModel.mupdfDocument) {
+        //if (null != pdfViewModel.mupdfDocument) {
             pdfViewModel.bookProgress?.run {
                 val position = documentView.currentPage
                 pdfViewModel.saveBookProgress(
@@ -278,10 +283,12 @@ class ANormalViewController(
                     documentView.scrollY
                 )
             }
-        }
+        //}
     }
 
     override fun onDestroy() {
+        Logcat.d("normal.onDestroy")
+        decodeService?.recycle()
     }
 
     //===========================================

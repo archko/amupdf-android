@@ -152,7 +152,7 @@ class CakeView @JvmOverloads constructor(
             width = widthSpecSize
             height = heightSpecSize
         }
-        Log.e("宽高", "$width,$height")
+        //Log.e("宽高", "$width,$height")
         setMeasuredDimension(width + dpToPx(20f), height + dpToPx(20f))
     }
 
@@ -168,7 +168,7 @@ class CakeView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         refeshNum++
-        Log.e("onDraw--->>", "重绘次数=$refeshNum")
+        //Log.e("onDraw--->>", "重绘次数=$refeshNum")
         textList.clear()
         lineList.clear()
         mCanvas = canvas
@@ -478,7 +478,7 @@ class CakeView @JvmOverloads constructor(
         val y = event.y
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                Log.e(TAG, "ACTION_DOWN:$isClick")
+                //Log.e(TAG, "ACTION_DOWN:$isClick")
                 mLastX = x
                 mLastY = y
                 mDownTime = System.currentTimeMillis()
@@ -495,11 +495,11 @@ class CakeView @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_MOVE -> {
-                Log.e(TAG, "ACTION_MOVE$isClick")
+                //Log.e(TAG, "ACTION_MOVE$isClick")
                 isClick = false
                 start = getAngle(mLastX, mLastY)
                 end = getAngle(x, y)
-                Log.e(TAG, "$start =start $end ,  =end")
+                //Log.e(TAG, "$start =start $end ,  =end")
 
                 //  二、三象限，色角度值是付值
                 if (getQuadrant(x, y) == 3 || getQuadrant(x, y) == 2) {
@@ -517,7 +517,7 @@ class CakeView @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_UP -> {
-                Log.e(TAG, "ACTION_UP:$isClick")
+                //Log.e(TAG, "ACTION_UP:$isClick")
                 // 获取每秒移动的角度
                 val anglePerSecond = mTmpAngle * 1000 / (System.currentTimeMillis() - mDownTime)
                 // 如果达到最大速度
@@ -534,7 +534,7 @@ class CakeView @JvmOverloads constructor(
                     return true
                 }
                 if (!isQuickMove) {
-                    Log.e(TAG, "ACTION_UP-点击")
+                    //Log.e(TAG, "ACTION_UP-点击")
                     
                     var i = 0
                     while (i < regionList.size) {

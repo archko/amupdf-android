@@ -17,6 +17,7 @@ import java.lang.ref.WeakReference;
 
 import androidx.collection.LruCache;
 import cn.archko.pdf.entity.APage;
+import cn.archko.pdf.entity.DecodeParam;
 import cn.archko.pdf.listeners.DecodeCallback;
 import cn.archko.pdf.utils.Utils;
 
@@ -352,58 +353,5 @@ public abstract class ImageWorker {
 
     public void recycle() {
     }
-
-    public static class DecodeParam {
-        public String key;
-        public int pageNum;
-        public float zoom;
-        public int screenWidth;
-        public ImageView imageView;
-        public boolean crop;
-        public int xOrigin;
-        public APage pageSize;
-        public Document document;
-        public int targetWidth;
-        DecodeCallback decodeCallback;
-
-        public DecodeParam(String key, int pageNum, float zoom, int screenWidth, ImageView imageView) {
-            this.key = key;
-            this.pageNum = pageNum;
-            this.zoom = zoom;
-            this.screenWidth = screenWidth;
-            this.imageView = imageView;
-        }
-
-        public DecodeParam(String key, ImageView imageView, boolean crop, int xOrigin,
-                           APage pageSize, Document document, DecodeCallback callback) {
-            this.key = key;
-            pageNum = pageSize.index;
-            if (TextUtils.isEmpty(key)) {
-                this.key = String.format("%s,%s,%s,%s", imageView, crop, xOrigin, pageSize);
-            }
-            this.imageView = imageView;
-            this.crop = crop;
-            this.xOrigin = xOrigin;
-            this.pageSize = pageSize;
-            this.document = document;
-            this.decodeCallback = callback;
-        }
-
-        @Override
-        public String toString() {
-            return "DecodeParam{" +
-                    "key='" + key + '\'' +
-                    ", pageNum=" + pageNum +
-                    ", zoom=" + zoom +
-                    ", screenWidth=" + screenWidth +
-                    ", imageView=" + imageView +
-                    ", crop=" + crop +
-                    ", xOrigin=" + xOrigin +
-                    ", pageSize=" + pageSize +
-                    ", document=" + document +
-                    ", targetWidth=" + targetWidth +
-                    ", decodeCallback=" + decodeCallback +
-                    '}';
-        }
-    }
+    
 }
