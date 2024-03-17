@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.Rect
 import android.util.SparseArray
 import android.view.GestureDetector
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.ImageDecoder
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.entity.APage
+import cn.archko.pdf.fastscroll.FastScrollRecyclerView
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.utils.Utils
@@ -39,7 +41,7 @@ class ACropViewController(
 ) :
     OutlineListener, AViewController {
 
-    private lateinit var mRecyclerView: ARecyclerView
+    private lateinit var mRecyclerView: FastScrollRecyclerView
     private lateinit var mPageSizes: SparseArray<APage>
 
     /**
@@ -56,7 +58,12 @@ class ACropViewController(
     }
 
     private fun initView() {
-        mRecyclerView = ARecyclerView(context)//contentView.findViewById(R.id.recycler_view)
+        //mRecyclerView = FastScrollRecyclerView(context)//contentView.findViewById(R.id.recycler_view)
+        val view = LayoutInflater.from(context)
+            .inflate(cn.archko.pdf.R.layout.reader_crop, mControllerLayout, false)
+        mRecyclerView = view.findViewById(cn.archko.pdf.R.id.recycler)
+        (mRecyclerView.parent as ViewGroup).removeView(mRecyclerView)
+
         with(mRecyclerView) {
             descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
             isNestedScrollingEnabled = false
@@ -261,7 +268,7 @@ class ACropViewController(
             (mRecyclerView.adapter as PDFRecyclerAdapter).defaultWidth = defaultWidth
             (mRecyclerView.adapter as PDFRecyclerAdapter).defaultHeight = defaultHeight
         }
-        
+
         val lm = (mRecyclerView.layoutManager as LinearLayoutManager)
         var offset = 0
         val first = lm.findFirstVisibleItemPosition()

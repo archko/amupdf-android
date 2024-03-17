@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.awidget.ARecyclerView
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.entity.APage
+import cn.archko.pdf.fastscroll.FastScrollRecyclerView
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APDFView
 
@@ -16,7 +17,7 @@ class PDFRecyclerAdapter(
     var context: Context,
     val pdfViewModel: PDFViewModel,
     val mPageSizes: SparseArray<APage>
-) : ARecyclerView.Adapter<ARecyclerView.ViewHolder>() {
+) : ARecyclerView.Adapter<ARecyclerView.ViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
     var defaultWidth = 1080
     var defaultHeight = 1080
@@ -24,6 +25,10 @@ class PDFRecyclerAdapter(
 
     fun setCrop(crop: Boolean) {
         this.crop = crop
+    }
+    
+    override fun getSectionName(position: Int): String {
+        return String.format("%d", position + 1);
     }
 
     override fun onCreateViewHolder(
