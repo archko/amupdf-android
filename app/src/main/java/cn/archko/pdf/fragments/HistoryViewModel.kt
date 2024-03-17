@@ -51,7 +51,6 @@ class HistoryViewModel : ViewModel() {
 
     fun reset() {
         curPage = 0
-        list.clear()
     }
 
     fun loadFiles(page: Int, showExtension: Boolean) =
@@ -70,14 +69,18 @@ class HistoryViewModel : ViewModel() {
                 var entry: FileBean
                 val path = Environment.getExternalStorageDirectory().path
                 progresses?.map {
-                    entry = FileBean(it ,FileBean.RECENT, path + "/" + it.path)
+                    entry = FileBean(it, FileBean.RECENT, path + "/" + it.path)
                     entryList.add(entry)
                 }
+
+                val nList = arrayListOf<FileBean>()
+
                 if ((progresses?.size ?: 0) > 0) {
                     curPage++
                 }
-                list.addAll(entryList)
-                return@withContext arrayOf<Any>(totalCount, list)
+                nList.addAll(list)
+                nList.addAll(entryList)
+                return@withContext arrayOf<Any>(totalCount, nList)
             }
 
             withContext(Dispatchers.Main) {
@@ -177,7 +180,7 @@ class HistoryViewModel : ViewModel() {
             val args = withContext(Dispatchers.IO) {
                 val path = FileUtils.getName(absolutePath)
                 var count = progressDao.deleteProgress(path)
-                if (count<1){ //maybe path is absolutepath,not /book/xx.pdf
+                if (count < 1) { //maybe path is absolutepath,not /book/xx.pdf
                     progressDao.deleteProgress(absolutePath)
                 }
 
