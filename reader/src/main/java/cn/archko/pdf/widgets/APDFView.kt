@@ -53,6 +53,7 @@ class APDFView(mContext: Context) : ImageView(mContext) {
 
     fun recycle() {
         setImageBitmap(null)
+        index = -1
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
