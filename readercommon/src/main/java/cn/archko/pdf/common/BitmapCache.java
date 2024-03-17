@@ -25,51 +25,9 @@ public class BitmapCache {
     private BitmapCache() {
     }
 
-    private static final int mMaxPoolSizeInBytes = 100 * 1024 * 1024;
+    private static final int mMaxPoolSizeInBytes = 160 * 1024 * 1024;
 
     private int mPoolSizeInBytes = 0;
-    /*
-    private int capacity = 8;
-    private LruCache<Object, Bitmap> cacheKt = new RecycleLruCache(capacity);
-
-    public LruCache<Object, Bitmap> getCache() {
-        return cacheKt;
-    }
-
-    public void resize(int maxSize) {
-        capacity = maxSize;
-        cacheKt.resize(maxSize);
-    }
-
-    public void clear() {
-        cacheKt.evictAll();
-    }
-
-    public void addBitmap(Object key, Bitmap val) {
-        cacheKt.put(key, val);
-    }
-
-    public Bitmap getBitmap(Object key) {
-        return cacheKt.get(key);
-    }
-
-    public Bitmap removeBitmap(Object key) {
-        Bitmap bitmap = cacheKt.get(key);
-        cacheKt.remove(key);
-        return bitmap;
-    }
-
-    private static class RecycleLruCache extends LruCache<Object, Bitmap> {
-
-        public RecycleLruCache(int maxSize) {
-            super(maxSize);
-        }
-
-        @Override
-        protected void entryRemoved(boolean evicted, @NonNull Object key, @NonNull Bitmap oldValue, @Nullable Bitmap newValue) {
-            //BitmapPool.getInstance().release(oldValue);
-        }
-    }*/
 
     private final LinkedHashMap<String, Bitmap> map = new LinkedHashMap<>(16, 0.75f, true);
 
