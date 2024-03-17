@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.common.Logcat
@@ -19,6 +20,7 @@ import cn.archko.pdf.entity.APage
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.listeners.SimpleGestureListener
+import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
 import org.vudroid.core.DecodeService
@@ -27,7 +29,6 @@ import org.vudroid.core.DocumentView
 import org.vudroid.core.models.CurrentPageModel
 import org.vudroid.core.models.DecodingProgressModel
 import org.vudroid.core.models.ZoomModel
-import org.vudroid.core.views.PageViewZoomControls
 import org.vudroid.pdfdroid.codec.PdfDocument
 
 /**
@@ -48,10 +49,20 @@ class ANormalViewController(
     private var decodeService: DecodeService? = null
 
     private lateinit var currentPageModel: CurrentPageModel
-    ///private var mPageControls: PageViewZoomControls? = null
 
     private lateinit var mPageSizes: SparseArray<APage>
     private var scrollOrientation = LinearLayoutManager.VERTICAL
+    protected var pageNumberToast: Toast? = null
+
+    private var simpleGestureListener: SimpleGestureListener = object : SimpleGestureListener {
+        override fun onSingleTapConfirmed(currentPage: Int) {
+            showPageToast(currentPage)
+        }
+
+        override fun onDoubleTapEvent(currentPage: Int) {
+            //mPageSeekBarControls!!.toggleSeekControls()
+        }
+    }
 
     init {
         initView()
@@ -71,27 +82,16 @@ class ANormalViewController(
         documentView =
             DocumentView(context, zoomModel, progressModel, currentPageModel, simpleGestureListener)
         zoomModel.addEventListener(documentView)
-        documentView.setLayoutParams(
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
+        documentView.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
         )
         decodeService?.setContainerView(documentView)
         documentView.setDecodeService(decodeService)
 
         frameLayout = createMainContainer()
         frameLayout.addView(documentView)
-        //mPageControls = createZoomControls(zoomModel)
-        //frameLayout.addView(mPageControls)
         zoomModel.addEventListener(this)
-
-        //val lp = RelativeLayout.LayoutParams(
-        //    ViewGroup.LayoutParams.MATCH_PARENT,
-        //    ViewGroup.LayoutParams.WRAP_CONTENT
-        //)
-        //lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-        //mControllerLayout.addView(mPageControls, lp)
     }
 
     override fun init(pageSizes: SparseArray<APage>, pos: Int, scrollOrientation: Int) {
@@ -122,14 +122,7 @@ class ANormalViewController(
         } finally {
         }
     }
-
-    private fun createZoomControls(zoomModel: ZoomModel): PageViewZoomControls {
-        val controls = PageViewZoomControls(context, zoomModel)
-        controls.gravity = Gravity.END or Gravity.BOTTOM
-        zoomModel.addEventListener(controls)
-        return controls
-    }
-
+    
     private fun createMainContainer(): FrameLayout {
         return FrameLayout(context)
     }
@@ -211,17 +204,23 @@ class ANormalViewController(
     }
 
     override fun tryHyperlink(ev: MotionEvent): Boolean {
-        return false
+        return documentView.tryHyperlink(ev)
     }
 
-    override fun onSingleTap(e: MotionEvent, margin: Int):Boolean {
-        /*val documentView = getDocumentView()
+    //完全忽略点击事件
+    override fun onSingleTap(e: MotionEvent, margin: Int): Boolean {
+        /*if (tryHyperlink(e)) {
+            return true
+        }
+        val documentView = getDocumentView()
         val height =
             if (scrollOrientation == LinearLayoutManager.VERTICAL) documentView.height else documentView.width
         val top = height / 4
         val bottom = height * 3 / 4
-        scrollPage(e.y.toInt(), top, bottom, margin)*/
-        return false
+        if (scrollPage(e.y.toInt(), top, bottom, margin)) {
+            return true
+        }*/
+        return true
     }
 
     override fun onDoubleTap() {
@@ -245,6 +244,19 @@ class ANormalViewController(
     }
 
     override fun notifyItemChanged(pos: Int) {
+    }
+
+    fun showPageToast(currentPage: Int) {
+        val pos = currentPage
+        val pageText = (pos + 1).toString() + "/" + pdfViewModel.countPages()
+        if (pageNumberToast != null) {
+            pageNumberToast!!.setText(pageText)
+        } else {
+            pageNumberToast =
+                Toast.makeText(context, pageText, Toast.LENGTH_SHORT)
+        }
+        pageNumberToast!!.setGravity(Gravity.BOTTOM or Gravity.START, Utils.dipToPixel(15f), 0)
+        pageNumberToast!!.show()
     }
 
     //--------------------------------------
@@ -276,17 +288,4 @@ class ANormalViewController(
     override fun showController() {
         //mPageControls?.show()
     }
-
-    private var simpleGestureListener: SimpleGestureListener = object : SimpleGestureListener {
-        override fun onSingleTapConfirmed(currentPage: Int) {
-            //currentPageChanged(currentPage)
-            //gestureDetector?.onTouchEvent()
-        }
-
-        override fun onDoubleTapEvent(currentPage: Int) {
-            mPageSeekBarControls!!.toggleSeekControls()
-            //mPageControls!!.toggleZoomControls()
-        }
-    }
-
 }

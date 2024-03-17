@@ -65,7 +65,7 @@ public class DocumentView extends View implements ZoomListener {
         this.mPageModel = mPageModel;
     }*/
 
-    public DocumentView(Context context, final ZoomModel zoomModel, DecodingProgressModel progressModel, CurrentPageModel currentPageModel, SimpleGestureListener simpleGestureListener) {
+    public DocumentView(Context context, final ZoomModel zoomModel, DecodingProgressModel progressModel, CurrentPageModel currentPageModel, SimpleGestureListener gestureListener) {
         super(context);
         this.zoomModel = zoomModel;
         this.progressModel = progressModel;
@@ -76,7 +76,7 @@ public class DocumentView extends View implements ZoomListener {
         setFocusableInTouchMode(true);
         initMultiTouchZoomIfAvailable(zoomModel);
         mGestureDetector = new GestureDetector(context, new MySimpleOnGestureListener());
-        this.simpleGestureListener = simpleGestureListener;
+        this.simpleGestureListener = gestureListener;
     }
 
     private void initMultiTouchZoomIfAvailable(ZoomModel zoomModel) {
@@ -449,7 +449,7 @@ public class DocumentView extends View implements ZoomListener {
         //Log.d(VIEW_LOG_TAG, "height:" + height);
     }
 
-    private boolean tryHyperlink(MotionEvent e) {
+    public boolean tryHyperlink(MotionEvent e) {
         if (decodeService.getPageCount() < 1) {
             return false;
         }
