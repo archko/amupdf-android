@@ -74,7 +74,7 @@ class HistoryViewModel : ViewModel() {
                 }
 
                 val nList = arrayListOf<FileBean>()
-                if (curPage>0) {
+                if (page>0) {
                     nList.addAll(list)
                 }
                 if ((progresses?.size ?: 0) > 0) {
