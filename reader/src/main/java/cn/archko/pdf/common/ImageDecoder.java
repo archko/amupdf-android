@@ -71,7 +71,7 @@ public class ImageDecoder extends ImageWorker {
             //if (decodeParam.pageNum != decodeParam.pageSize.index) {
             if (!decodeParam.decodeCallback.shouldRender(decodeParam.pageNum, decodeParam)) {
                 if (Logcat.loggable) {
-                    Logcat.d(TAG, String.format("decode cancel1,index changed: %s-%s,page:%s",
+                    Logcat.w(TAG, String.format("decode cancel1,index changed: %s-%s,page:%s",
                             decodeParam.pageNum, decodeParam.pageSize.index, decodeParam.pageSize));
                 }
                 return null;
@@ -94,7 +94,7 @@ public class ImageDecoder extends ImageWorker {
             }
 
             if (decodeParam.crop) {
-                if (pageSize.getCropWidth() > 0 && pageSize.getCropHeight() > 0) {
+                if (pageSize.getCropWidth() != pageW && pageSize.getCropHeight() != pageH) {
                 } else {
                     float[] arr = MupdfDocument.getArrByCrop(page, ctm, pageW, pageH, leftBound, topBound);
                     leftBound = (int) arr[0];
@@ -104,6 +104,7 @@ public class ImageDecoder extends ImageWorker {
 
                     pageSize.setCropHeight(pageH);
                     pageSize.setCropWidth(pageW);
+                    pageSize.setCropScale(cropScale);
                     //RectF cropRectf = new RectF(leftBound, topBound, leftBound + pageW, topBound + pageH);
                     //pageSize.setCropBounds(cropRectf, cropScale);
                 }
@@ -112,7 +113,7 @@ public class ImageDecoder extends ImageWorker {
             //if (decodeParam.pageNum != decodeParam.pageSize.index) {
             if (!decodeParam.decodeCallback.shouldRender(decodeParam.pageNum, decodeParam)) {
                 if (Logcat.loggable) {
-                    Logcat.d(TAG, String.format("decode cancel2,index changed: %s-%s,page:%s",
+                    Logcat.w(TAG, String.format("decode cancel2,index changed: %s-%s,page:%s",
                             decodeParam.pageNum, decodeParam.pageSize.index, decodeParam.pageSize));
                 }
                 return null;
@@ -133,7 +134,7 @@ public class ImageDecoder extends ImageWorker {
             //if (decodeParam.pageNum != decodeParam.pageSize.index) {
             if (!decodeParam.decodeCallback.shouldRender(decodeParam.pageNum, decodeParam)) {
                 if (Logcat.loggable) {
-                    Logcat.d(TAG, String.format("decode cancel3,index changed: %s-%s,page:%s",
+                    Logcat.w(TAG, String.format("decode cancel3,index changed: %s-%s,page:%s",
                             decodeParam.pageNum, decodeParam.pageSize.index, decodeParam.pageSize));
                 }
                 addBitmapToCache(decodeParam.key, bitmap);

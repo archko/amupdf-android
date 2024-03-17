@@ -78,7 +78,6 @@ class APage {
     //val bitmap = BitmapPool.getInstance().acquire(width, height)
     // MupdfDocument.render(page, ctm, bitmap, xOrigin, leftBound, topBound)
     var cropScale = 1.0f
-        private set
     var sourceBounds: RectF? = null
         private set
     var cropBounds: RectF? = null
