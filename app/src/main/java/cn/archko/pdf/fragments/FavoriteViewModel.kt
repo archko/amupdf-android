@@ -70,6 +70,7 @@ class FavoriteViewModel : ViewModel() {
             }
 
             withContext(Dispatchers.Main) {
+                list = args[1] as MutableList<FileBean>
                 _uiFileModel.value = args
             }
         }

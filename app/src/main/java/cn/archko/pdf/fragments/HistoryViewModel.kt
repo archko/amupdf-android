@@ -74,7 +74,7 @@ class HistoryViewModel : ViewModel() {
                 }
 
                 val nList = arrayListOf<FileBean>()
-                if (page>0) {
+                if (page > 0) {
                     nList.addAll(list)
                 }
                 if ((progresses?.size ?: 0) > 0) {
@@ -85,6 +85,7 @@ class HistoryViewModel : ViewModel() {
             }
 
             withContext(Dispatchers.Main) {
+                list = args[1] as MutableList<FileBean>
                 _uiFileModel.value = args
             }
         }
@@ -143,7 +144,6 @@ class HistoryViewModel : ViewModel() {
         val now = System.currentTimeMillis()
         viewModelScope.launch {
             val flag = withContext(Dispatchers.IO) {
-                var flag: Boolean
                 try {
                     val content = StreamUtils.readStringFromFile(file)
                     Logcat.longLog(
@@ -158,7 +158,6 @@ class HistoryViewModel : ViewModel() {
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-                flag = true
 
                 var newTime = System.currentTimeMillis() - now
                 if (newTime < MAX_TIME) {
@@ -168,7 +167,7 @@ class HistoryViewModel : ViewModel() {
                 }
 
                 delay(newTime)
-                return@withContext flag
+                return@withContext true
             }
             withContext(Dispatchers.Main) {
                 _uiRestorepModel.value = flag
@@ -180,14 +179,14 @@ class HistoryViewModel : ViewModel() {
         viewModelScope.launch {
             val args = withContext(Dispatchers.IO) {
                 val path = FileUtils.getName(absolutePath)
-                var count = progressDao.deleteProgress(path)
+                val count = progressDao.deleteProgress(path)
                 if (count < 1) { //maybe path is absolutepath,not /book/xx.pdf
                     progressDao.deleteProgress(absolutePath)
                 }
 
                 var fb: FileBean? = null
                 list.forEach {
-                    if (TextUtils.equals(it.label, path)) {
+                    if (null != it.file && TextUtils.equals(it.file!!.absolutePath, absolutePath)) {
                         fb = it
                         return@forEach
                     }
