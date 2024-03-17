@@ -275,24 +275,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         gestureDetector!!.setOnDoubleTapListener(object : GestureDetector.OnDoubleTapListener {
 
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                /*val documentView = getDocumentView()!!
-                val top = documentView.height / 4
-                val bottom = documentView.height * 3 / 4*/
-
-                /*if (e.y.toInt() < top) {
-                    var scrollY = documentView.scrollY
-                    scrollY -= documentView.height
-                    documentView.scrollBy(0, scrollY + finalMargin)
-                    return true
-                } else if (e.y.toInt() > bottom) {
-                    var scrollY = documentView.scrollY
-                    scrollY += documentView.height
-                    documentView.scrollBy(0, scrollY - finalMargin)
-                    return true
-                } else {
-                    onSingleTap()
-                }*/
-
                 if (cakeView.visibility == View.VISIBLE) {
                     cakeView.visibility = View.GONE
                     return true
@@ -303,7 +285,10 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                 }
 
                 //return viewController?.scrollPage(e.y.toInt(), top, bottom, finalMargin)!!
-                return viewController?.onSingleTap(e, finalMargin) == true
+                if (viewController?.onSingleTap(e, finalMargin) == false) {
+                    showPageToast()
+                }
+                return true
             }
 
             override fun onDoubleTap(e: MotionEvent): Boolean {
@@ -578,6 +563,10 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         //showOutline()
         viewController?.onDoubleTap()
 
+        if (cakeView.visibility == View.VISIBLE) {
+            cakeView.visibility = View.GONE
+            return
+        }
         initMenus()
         cakeView.setCakeData(menus)
         cakeView.visibility = View.VISIBLE
