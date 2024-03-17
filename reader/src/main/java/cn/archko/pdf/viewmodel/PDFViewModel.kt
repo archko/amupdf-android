@@ -366,6 +366,7 @@ class PDFViewModel : ViewModel() {
     }
 
     fun destroy() {
+        Logcat.d(Logcat.TAG, "destroy:$mupdfDocument")
         mupdfDocument?.destroy()
     }
 
