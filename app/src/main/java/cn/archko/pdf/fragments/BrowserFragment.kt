@@ -2,7 +2,6 @@ package cn.archko.pdf.fragments
 
 //import com.umeng.analytics.MobclickAgent
 import android.annotation.SuppressLint
-import android.app.backup.BackupAgent
 import android.content.Context
 import android.os.Bundle
 import android.os.Environment
@@ -70,7 +69,8 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
                 return if (null == oldItem.bookProgress) {
                     false
                 } else {
-                    oldItem.bookProgress!!.equals(newItem.bookProgress)
+                    oldItem.bookProgress!!.equals(newItem.bookProgress) 
+                            && oldItem.file?.equals(newItem.file) ?: false
                 }
             }
         }
@@ -177,7 +177,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         filesListView.addItemDecoration(ColorItemDecoration(requireContext()))
 
-        mSwipeRefreshWidget = view.findViewById(R.id.swipe_refresh_widget) as SwipeRefreshLayout
+        mSwipeRefreshWidget = view.findViewById(R.id.swipe_refresh_widget)!!
         mSwipeRefreshWidget.apply {
             setColorSchemeResources(
                 cn.archko.pdf.R.color.text_border_pressed,
@@ -196,8 +196,8 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         loadData()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         this.filesListView.adapter = this.fileListAdapter
         mHandler.postDelayed({ onRefresh() }, 80L)
@@ -278,7 +278,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
                 activity,
                 resources.getString(R.string.toast_set_as_home),
                 Toast.LENGTH_SHORT
-            )
+            ).show()
             path = defaultHome
         }
         if (path!!.length > 1 && path.endsWith("/")) {

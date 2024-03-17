@@ -102,6 +102,30 @@ class FileBean : Serializable, Cloneable {
                 '}'
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as FileBean
+
+        if (label != other.label) return false
+        if (file != other.file) return false
+        if (isDirectory != other.isDirectory) return false
+        if (type != other.type) return false
+        if (bookProgress != other.bookProgress) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = label?.hashCode() ?: 0
+        result = 31 * result + (file?.hashCode() ?: 0)
+        result = 31 * result + isDirectory.hashCode()
+        result = 31 * result + type
+        result = 31 * result + (bookProgress?.hashCode() ?: 0)
+        return result
+    }
+
     companion object {
         const val NORMAL = 0
         const val HOME = 1

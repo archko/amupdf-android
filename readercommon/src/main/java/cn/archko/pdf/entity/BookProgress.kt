@@ -230,6 +230,64 @@ class BookProgress : Serializable, Comparator<BookProgress> {
         return 0
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as BookProgress
+
+        if (_id != other._id) return false
+        if (index != other.index) return false
+        if (path != other.path) return false
+        if (name != other.name) return false
+        if (ext != other.ext) return false
+        if (md5 != other.md5) return false
+        if (pageCount != other.pageCount) return false
+        if (size != other.size) return false
+        if (firstTimestampe != other.firstTimestampe) return false
+        if (lastTimestampe != other.lastTimestampe) return false
+        if (readTimes != other.readTimes) return false
+        if (progress != other.progress) return false
+        if (page != other.page) return false
+        if (zoomLevel != other.zoomLevel) return false
+        if (rotation != other.rotation) return false
+        if (offsetX != other.offsetX) return false
+        if (offsetY != other.offsetY) return false
+        if (autoCrop != other.autoCrop) return false
+        if (reflow != other.reflow) return false
+        if (isFavorited != other.isFavorited) return false
+        if (inRecent != other.inRecent) return false
+        if (scrollOrientation != other.scrollOrientation) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = _id
+        result = 31 * result + index
+        result = 31 * result + (path?.hashCode() ?: 0)
+        result = 31 * result + (name?.hashCode() ?: 0)
+        result = 31 * result + (ext?.hashCode() ?: 0)
+        result = 31 * result + (md5?.hashCode() ?: 0)
+        result = 31 * result + pageCount
+        result = 31 * result + size.hashCode()
+        result = 31 * result + firstTimestampe.hashCode()
+        result = 31 * result + lastTimestampe.hashCode()
+        result = 31 * result + readTimes
+        result = 31 * result + progress
+        result = 31 * result + page
+        result = 31 * result + zoomLevel.hashCode()
+        result = 31 * result + rotation
+        result = 31 * result + offsetX
+        result = 31 * result + offsetY
+        result = 31 * result + autoCrop
+        result = 31 * result + reflow
+        result = 31 * result + isFavorited
+        result = 31 * result + inRecent
+        result = 31 * result + scrollOrientation
+        return result
+    }
+
     companion object {
         const val IN_RECENT = 0
         const val NOT_IN_RECENT = -1
