@@ -54,24 +54,24 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     protected var showExtension: Boolean = true
 
     private var mPathMap: MutableMap<String, Int> = HashMap()
-    private var mSelectedPos = -1
+    private var selectedBean: FileBean? = null
     protected var currentBean: FileBean? = null
     protected lateinit var bookViewModel: BookViewModel
 
     protected val beanItemCallback: DiffUtil.ItemCallback<FileBean> =
         object : DiffUtil.ItemCallback<FileBean>() {
             override fun areItemsTheSame(oldItem: FileBean, newItem: FileBean): Boolean {
-                return oldItem == newItem
+                return oldItem.equals(newItem)
             }
 
             @SuppressLint("DiffUtilEquals")
             override fun areContentsTheSame(oldItem: FileBean, newItem: FileBean): Boolean {
-                return if (null == oldItem.bookProgress) {
-                    false
-                } else {
-                    oldItem.bookProgress!!.equals(newItem.bookProgress) 
-                            && oldItem.file?.equals(newItem.file) ?: false
+                if (null == oldItem.bookProgress || null == newItem.bookProgress) {
+                    return false
                 }
+                return oldItem.bookProgress!!.equals(newItem.bookProgress)
+                        && oldItem.fileSize == newItem.fileSize
+                        && oldItem.label == newItem.label
             }
         }
 
@@ -295,17 +295,17 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
 
     val itemClickListener: OnItemClickListener<FileBean> =
         object : OnItemClickListener<FileBean> {
-            override fun onItemClick(view: View?, data: FileBean?, position: Int) {
-                clickItem(position)
+            override fun onItemClick(view: View?, data: FileBean, position: Int) {
+                clickItem(data)
             }
 
-            override fun onItemClick2(view: View?, data: FileBean?, position: Int) {
-                clickItem2(position, view!!)
+            override fun onItemClick2(view: View?, data: FileBean, position: Int) {
+                clickItem2(data, view!!)
             }
         }
 
-    private fun clickItem(position: Int) {
-        val clickedEntry = fileListAdapter.currentList[position]
+    //点击后,位置不对,这是listadapter交换对比的结果,不想修正了.
+    private fun clickItem(clickedEntry: FileBean) {
         val clickedFile: File?
 
         if (clickedEntry.type == FileBean.HOME) {
@@ -342,14 +342,13 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         }
     }
 
-    private fun clickItem2(position: Int, view: View) {
-        val entry = this.fileListAdapter.currentList.get(position) as FileBean
+    private fun clickItem2(entry: FileBean, view: View) {
         if (!entry.isDirectory && entry.type != FileBean.HOME) {
-            mSelectedPos = position
+            selectedBean = entry
             prepareMenu(view, entry)
             return
         }
-        mSelectedPos = -1
+        selectedBean = null
     }
 
     //--------------------- popupMenu ---------------------
@@ -443,11 +442,10 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
-        if (fileListAdapter.itemCount <= 0 || mSelectedPos == -1) {
+        if (selectedBean == null) {
             return true
         }
-        val position = mSelectedPos
-        val entry = fileListAdapter.currentList[position]
+        val entry = selectedBean!!
         if (item.itemId == deleteContextMenuItem) {
             Logcat.d(TAG, "delete:$entry")
             //MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, "delete")

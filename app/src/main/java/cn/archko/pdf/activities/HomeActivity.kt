@@ -113,7 +113,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
 
     private fun onBackEvent() {
         val fragment = mPagerAdapter.getItemFragment(mViewPager.currentItem) as BrowserFragment
-        if (fragment.onBackPressed()) {
+        if (fragment?.onBackPressed() == true) {
             return
         }
         super.onBackPressed()

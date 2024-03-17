@@ -19,16 +19,15 @@ import java.util.Locale
 
 /**
  * @author: archko 2018/12/12 :15:43
- */ 
+ */
 class BookAdapter(
     context: Context,
     diffCallback: DiffUtil.ItemCallback<FileBean>,
-   private var mMode:Int,
-    itemClickListener: OnItemClickListener<FileBean>
+    private var mMode: Int,
+    private var itemClickListener: OnItemClickListener<FileBean>?
 ) :
     ListAdapter<FileBean, BaseViewHolder<FileBean>>(diffCallback) {
 
-    private var itemClickListener: OnItemClickListener<FileBean>? = itemClickListener
     private var screenWidth = 1080
     protected var mInflater: LayoutInflater
 
@@ -70,7 +69,7 @@ class BookAdapter(
     override fun onBindViewHolder(holder: BaseViewHolder<FileBean>, position: Int) {
         holder.onBind(currentList[position], position)
     }
-    
+
     inner class ViewHolder(itemView: View) : BaseViewHolder<FileBean>(itemView) {
 
         private var mName: TextView? = null
@@ -86,24 +85,22 @@ class BookAdapter(
         }
 
         override fun onBind(entry: FileBean, position: Int) {
-            itemClickListener?.let {
-                itemView.setOnClickListener {
-                    itemClickListener!!.onItemClick(
-                        itemView,
-                        entry,
-                        position
-                    )
-                }
-                itemView.setOnLongClickListener {
-                    if (entry.type != FileBean.HOME
-                        && !entry.isDirectory
-                        && !entry.isUpFolder
-                    ) {
-                        itemClickListener!!.onItemClick2(itemView, entry, position)
-                        return@setOnLongClickListener true
-                    } else {
-                        return@setOnLongClickListener false
-                    }
+            itemView.setOnClickListener {
+                itemClickListener?.onItemClick(
+                    itemView,
+                    entry,
+                    position
+                )
+            }
+            itemView.setOnLongClickListener {
+                if (entry.type != FileBean.HOME
+                    && !entry.isDirectory
+                    && !entry.isUpFolder
+                ) {
+                    itemClickListener?.onItemClick2(itemView, entry, position)
+                    return@setOnLongClickListener true
+                } else {
+                    return@setOnLongClickListener false
                 }
             }
             mName!!.text = entry.label
@@ -153,24 +150,22 @@ class BookAdapter(
         }
 
         override fun onBind(entry: FileBean, position: Int) {
-            itemClickListener?.let {
-                itemView.setOnClickListener {
-                    itemClickListener!!.onItemClick(
-                        itemView,
-                        entry,
-                        position
-                    )
-                }
-                itemView.setOnLongClickListener {
-                    if (entry.type != FileBean.HOME
-                        && !entry.isDirectory
-                        && !entry.isUpFolder
-                    ) {
-                        itemClickListener!!.onItemClick2(itemView, entry, position)
-                        return@setOnLongClickListener true
-                    } else {
-                        return@setOnLongClickListener false
-                    }
+            itemView.setOnClickListener {
+                itemClickListener?.onItemClick(
+                    itemView,
+                    entry,
+                    position
+                )
+            }
+            itemView.setOnLongClickListener {
+                if (entry.type != FileBean.HOME
+                    && !entry.isDirectory
+                    && !entry.isUpFolder
+                ) {
+                    itemClickListener?.onItemClick2(itemView, entry, position)
+                    return@setOnLongClickListener true
+                } else {
+                    return@setOnLongClickListener false
                 }
             }
             mName!!.text = entry.label
@@ -204,24 +199,22 @@ class BookAdapter(
         }
 
         override fun onBind(entry: FileBean, position: Int) {
-            itemClickListener?.let {
-                itemView.setOnClickListener {
-                    itemClickListener!!.onItemClick(
-                        itemView,
-                        entry,
-                        position
-                    )
-                }
-                itemView.setOnLongClickListener {
-                    if (entry.type != FileBean.HOME
-                        && !entry.isDirectory
-                        && !entry.isUpFolder
-                    ) {
-                        itemClickListener!!.onItemClick2(itemView, entry, position)
-                        return@setOnLongClickListener true
-                    } else {
-                        return@setOnLongClickListener false
-                    }
+            itemView.setOnClickListener {
+                itemClickListener?.onItemClick(
+                    itemView,
+                    entry,
+                    position
+                )
+            }
+            itemView.setOnLongClickListener {
+                if (entry.type != FileBean.HOME
+                    && !entry.isDirectory
+                    && !entry.isUpFolder
+                ) {
+                    itemClickListener?.onItemClick2(itemView, entry, position)
+                    return@setOnLongClickListener true
+                } else {
+                    return@setOnLongClickListener false
                 }
             }
             mName!!.text = entry.label
