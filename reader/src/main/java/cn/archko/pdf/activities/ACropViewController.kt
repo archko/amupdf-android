@@ -149,6 +149,7 @@ class ACropViewController(
         setOrientation(scrollOrientation)
         if (null == mRecyclerView.adapter) {
             mRecyclerView.adapter = PDFRecyclerAdapter(context, pdfViewModel, mPageSizes)
+            (mRecyclerView.adapter as PDFRecyclerAdapter).setCrop(crop)
         }
 
         if (pos > 0) {
