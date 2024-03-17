@@ -230,11 +230,17 @@ class ACropViewController(
         return false
     }
 
-    override fun onSingleTap() {
-        //if (mPageSeekBarControls?.visibility == View.VISIBLE) {
-        //    mPageSeekBarControls?.hide()
-        //    return
-        //}
+    override fun onSingleTap(e: MotionEvent, margin: Int): Boolean {
+        if (tryHyperlink(e)) {
+            return true
+        }
+        val documentView = getDocumentView()
+        val height =
+            if (scrollOrientation == LinearLayoutManager.VERTICAL) documentView.height else documentView.width
+        val top = height / 4
+        val bottom = height * 3 / 4
+        scrollPage(e.y.toInt(), top, bottom, margin)
+        return true
     }
 
     override fun onDoubleTap() {

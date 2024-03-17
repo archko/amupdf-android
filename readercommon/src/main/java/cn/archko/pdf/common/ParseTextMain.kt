@@ -76,7 +76,7 @@ object ParseTextMain {
             var lastBreak = false;
             for (s in lists) {
                 val ss = s.trim { it <= ' ' }
-                if (ss.length > 0) {
+                if (ss.isNotEmpty()) {
                     if (ss.startsWith(IMAGE_START_MARK)) {
                         isImage = true
                         sb.append("&nbsp;<br>")
@@ -100,8 +100,8 @@ object ParseTextMain {
             val sb = StringBuilder()
             val list = ArrayList<String>()
             var aChar: Char
-            for (i in 0 until content.length) {
-                aChar = content[i]
+            for (element in content) {
+                aChar = element
                 if (aChar == '\n') {
                     list.add(sb.toString())
                     sb.setLength(0)
@@ -116,7 +116,7 @@ object ParseTextMain {
         /**
          * parse text as List<ReflowBean>
          */
-        internal fun parseList(lists: List<String>, pageIndex: Int): List<ReflowBean> {
+        private fun parseList(lists: List<String>, pageIndex: Int): List<ReflowBean> {
             val sb = StringBuilder()
             var isImage = false
             val reflowBeans = ArrayList<ReflowBean>()
@@ -124,7 +124,7 @@ object ParseTextMain {
             var lastBreak = true;
             for (s in lists) {
                 val ss = s.trim()
-                if (ss.length > 0) {
+                if (ss.isNotEmpty()) {
                     //if (Logcat.loggable) {
                     //    Logcat.longLog("text", ss)
                     //}

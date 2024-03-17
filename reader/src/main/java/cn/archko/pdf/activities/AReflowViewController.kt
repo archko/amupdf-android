@@ -52,7 +52,6 @@ class AReflowViewController(
 ) :
     OutlineListener, AViewController {
 
-
     private var mStyleControls: View? = null
 
     private lateinit var mRecyclerView: ARecyclerView
@@ -212,12 +211,19 @@ class AReflowViewController(
         return false
     }
 
-    override fun onSingleTap() {
-        //if (mPageSeekBarControls?.visibility == View.VISIBLE) {
-        //    mPageSeekBarControls?.hide()
-        //    return
-        //}
+    override fun onSingleTap(e: MotionEvent, margin: Int): Boolean {
+        if (tryHyperlink(e)) {
+            return true
+        }
+        val documentView = getDocumentView()
+        val height = documentView.height
+        val top = height / 4
+        val bottom = height * 3 / 4
+        if (scrollPage(e.y.toInt(), top, bottom, margin)) {
+            return true
+        }
         showReflowConfigMenu()
+        return true
     }
 
     override fun onDoubleTap() {

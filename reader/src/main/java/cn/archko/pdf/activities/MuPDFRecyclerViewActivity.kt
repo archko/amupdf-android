@@ -177,10 +177,11 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         return null
     }
 
-    open fun onSingleTap() {
-        if (!isDocLoaded) {
-            return
-        }
+    open fun onSingleTap():Boolean {
+        return false
+    }
+
+    fun showPageToast() {
         val pos = getCurrentPos()
         val pageText = (pos + 1).toString() + "/" + pdfViewModel.countPages()
         if (pageNumberToast != null) {

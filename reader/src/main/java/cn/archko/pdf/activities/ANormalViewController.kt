@@ -48,7 +48,7 @@ class ANormalViewController(
     private var decodeService: DecodeService? = null
 
     private lateinit var currentPageModel: CurrentPageModel
-    private var mPageControls: PageViewZoomControls? = null
+    ///private var mPageControls: PageViewZoomControls? = null
 
     private lateinit var mPageSizes: SparseArray<APage>
     private var scrollOrientation = LinearLayoutManager.VERTICAL
@@ -82,16 +82,16 @@ class ANormalViewController(
 
         frameLayout = createMainContainer()
         frameLayout.addView(documentView)
-        mPageControls = createZoomControls(zoomModel)
+        //mPageControls = createZoomControls(zoomModel)
         //frameLayout.addView(mPageControls)
         zoomModel.addEventListener(this)
 
-        val lp = RelativeLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-        mControllerLayout.addView(mPageControls, lp)
+        //val lp = RelativeLayout.LayoutParams(
+        //    ViewGroup.LayoutParams.MATCH_PARENT,
+        //    ViewGroup.LayoutParams.WRAP_CONTENT
+        //)
+        //lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        //mControllerLayout.addView(mPageControls, lp)
     }
 
     override fun init(pageSizes: SparseArray<APage>, pos: Int, scrollOrientation: Int) {
@@ -169,7 +169,7 @@ class ANormalViewController(
             )
         }
         documentView.showDocument()
-        mPageControls?.hide()
+        //mPageControls?.hide()
     }
 
     override fun getCurrentBitmap(): Bitmap? {
@@ -201,10 +201,10 @@ class ANormalViewController(
 
     override fun scrollPage(y: Int, top: Int, bottom: Int, margin: Int): Boolean {
         if (y < top) {
-            //documentView.scrollPage(-frameLayout.height + margin);
+            documentView.scrollPage(-frameLayout.height + margin);
             return true
         } else if (y > bottom) {
-            //documentView.scrollPage(frameLayout.height - margin);
+            documentView.scrollPage(frameLayout.height - margin);
             return true
         }
         return false
@@ -214,20 +214,17 @@ class ANormalViewController(
         return false
     }
 
-    override fun onSingleTap() {
-        //if (mPageSeekBarControls?.visibility == View.VISIBLE) {
-        //    mPageSeekBarControls?.hide()
-        //    return
-        //}
-        mPageControls?.hide()
+    override fun onSingleTap(e: MotionEvent, margin: Int):Boolean {
+        /*val documentView = getDocumentView()
+        val height =
+            if (scrollOrientation == LinearLayoutManager.VERTICAL) documentView.height else documentView.width
+        val top = height / 4
+        val bottom = height * 3 / 4
+        scrollPage(e.y.toInt(), top, bottom, margin)*/
+        return false
     }
 
     override fun onDoubleTap() {
-        //if (mMupdfDocument == null) {
-        //    return
-        //}
-        //mPageSeekBarControls?.hide()
-        //showOutline()
     }
 
     override fun onSelectedOutline(index: Int) {
@@ -253,8 +250,7 @@ class ANormalViewController(
     //--------------------------------------
 
     override fun onResume() {
-        //mPageSeekBarControls?.hide()
-        mPageControls?.hide()
+        //mPageControls?.hide()
     }
 
     override fun onPause() {
@@ -278,7 +274,7 @@ class ANormalViewController(
 
     //===========================================
     override fun showController() {
-        mPageControls?.show()
+        //mPageControls?.show()
     }
 
     private var simpleGestureListener: SimpleGestureListener = object : SimpleGestureListener {
@@ -289,7 +285,7 @@ class ANormalViewController(
 
         override fun onDoubleTapEvent(currentPage: Int) {
             mPageSeekBarControls!!.toggleSeekControls()
-            mPageControls!!.toggleZoomControls()
+            //mPageControls!!.toggleZoomControls()
         }
     }
 
