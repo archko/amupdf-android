@@ -9,4 +9,5 @@ import cn.archko.pdf.common.ImageWorker;
  */
 public interface DecodeCallback {
     void decodeComplete(Bitmap bitmap, ImageWorker.DecodeParam param);
+    boolean shouldRender(int index, ImageWorker.DecodeParam param);
 }

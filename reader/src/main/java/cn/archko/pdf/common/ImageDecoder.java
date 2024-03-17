@@ -9,6 +9,7 @@ import com.artifex.mupdf.fitz.Page;
 import com.artifex.mupdf.fitz.RectI;
 
 import androidx.collection.LruCache;
+
 import cn.archko.pdf.App;
 import cn.archko.pdf.entity.APage;
 import cn.archko.pdf.mupdf.MupdfDocument;
@@ -67,7 +68,8 @@ public class ImageDecoder extends ImageWorker {
         try {
             //long start = SystemClock.uptimeMillis();
             Page page = decodeParam.document.loadPage(decodeParam.pageNum);
-            if (decodeParam.pageNum != decodeParam.pageSize.index) {
+            //if (decodeParam.pageNum != decodeParam.pageSize.index) {
+            if (!decodeParam.decodeCallback.shouldRender(decodeParam.pageNum, decodeParam)) {
                 if (Logcat.loggable) {
                     Logcat.d(TAG, String.format("decode cancel1,index changed: %s-%s,page:%s",
                             decodeParam.pageNum, decodeParam.pageSize.index, decodeParam.pageSize));
@@ -92,19 +94,23 @@ public class ImageDecoder extends ImageWorker {
             }
 
             if (decodeParam.crop) {
-                float[] arr = MupdfDocument.getArrByCrop(page, ctm, pageW, pageH, leftBound, topBound);
-                leftBound = (int) arr[0];
-                topBound = (int) arr[1];
-                pageH = (int) arr[2];
-                float cropScale = arr[3];
+                if (pageSize.getCropWidth() > 0 && pageSize.getCropHeight() > 0) {
+                } else {
+                    float[] arr = MupdfDocument.getArrByCrop(page, ctm, pageW, pageH, leftBound, topBound);
+                    leftBound = (int) arr[0];
+                    topBound = (int) arr[1];
+                    pageH = (int) arr[2];
+                    float cropScale = arr[3];
 
-                pageSize.setCropHeight(pageH);
-                pageSize.setCropWidth(pageW);
-                //RectF cropRectf = new RectF(leftBound, topBound, leftBound + pageW, topBound + pageH);
-                //pageSize.setCropBounds(cropRectf, cropScale);
+                    pageSize.setCropHeight(pageH);
+                    pageSize.setCropWidth(pageW);
+                    //RectF cropRectf = new RectF(leftBound, topBound, leftBound + pageW, topBound + pageH);
+                    //pageSize.setCropBounds(cropRectf, cropScale);
+                }
             }
 
-            if (decodeParam.pageNum != decodeParam.pageSize.index) {
+            //if (decodeParam.pageNum != decodeParam.pageSize.index) {
+            if (!decodeParam.decodeCallback.shouldRender(decodeParam.pageNum, decodeParam)) {
                 if (Logcat.loggable) {
                     Logcat.d(TAG, String.format("decode cancel2,index changed: %s-%s,page:%s",
                             decodeParam.pageNum, decodeParam.pageSize.index, decodeParam.pageSize));
@@ -124,7 +130,8 @@ public class ImageDecoder extends ImageWorker {
 
             bitmap = BitmapPool.getInstance().acquire(pageW, pageH);//Bitmap.createBitmap(sizeX, sizeY, Bitmap.Config.ARGB_8888);
             MupdfDocument.render(page, ctm, bitmap, decodeParam.xOrigin, leftBound, topBound);
-            if (decodeParam.pageNum != decodeParam.pageSize.index) {
+            //if (decodeParam.pageNum != decodeParam.pageSize.index) {
+            if (!decodeParam.decodeCallback.shouldRender(decodeParam.pageNum, decodeParam)) {
                 if (Logcat.loggable) {
                     Logcat.d(TAG, String.format("decode cancel3,index changed: %s-%s,page:%s",
                             decodeParam.pageNum, decodeParam.pageSize.index, decodeParam.pageSize));

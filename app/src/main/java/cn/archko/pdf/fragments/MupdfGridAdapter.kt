@@ -108,17 +108,23 @@ class MupdfGridAdapter(
                 return
             }
 
-            val callback = DecodeCallback { bitmap, param ->
-                if (Logcat.loggable) {
-                    Logcat.d(
-                        String.format(
-                            "decode callback:index:%s-%s, decode.page:%s, key:%s, param:%s",
-                            param.pageNum, index, param.pageNum, cacheKey, param.key
+            val callback = object : DecodeCallback {
+                override fun decodeComplete(bitmap: Bitmap?, param: DecodeParam) {
+                    if (Logcat.loggable) {
+                        Logcat.d(
+                            String.format(
+                                "decode callback:index:%s-%s, decode.page:%s, key:%s, param:%s",
+                                param.pageNum, index, param.pageNum, cacheKey, param.key
+                            )
                         )
-                    )
+                    }
+                    if (param.pageNum == index) {
+                        view.setImageBitmap(bitmap)
+                    }
                 }
-                if (param.pageNum == index) {
-                    view.setImageBitmap(bitmap)
+
+                override fun shouldRender(index: Int, param: DecodeParam): Boolean {
+                    return this@PdfHolder.index == index
                 }
             }
             //aPage 这个如果当参数传递,由于复用机制,后面的页面更新后会把它覆盖,导致解码并不是原来那个
