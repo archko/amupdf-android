@@ -20,7 +20,6 @@ import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.listeners.ClickListener
 import cn.archko.pdf.listeners.DataListener
 import cn.archko.pdf.utils.FileUtils
-import cn.archko.pdf.utils.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -74,9 +73,14 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //dialog?.setTitle("编辑pdf")
-        //binding.back.setOnClickListener { dismiss() }
         binding.toolbar.setNavigationOnClickListener { dismiss() }
+        binding.toolbar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.saveItem -> pdfEditViewModel.save()
+                R.id.extractImagesItem -> extractImage(0)
+            }
+            return@setOnMenuItemClickListener true
+        }
 
         /*binding.save.setOnClickListener {
             pdfEditViewModel.save()
@@ -105,10 +109,6 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
         }
     }
 
-    private fun viewWidth(): Int {
-        return Utils.getScreenWidthPixelWithOrientation(requireActivity())
-    }
-
     private fun showPopupMenu(view: View, position: Int) {
         val popupMenu = PopupMenu(requireActivity(), view)
         popupMenu.menuInflater.inflate(R.menu.edit_menus, popupMenu.menu)
@@ -118,26 +118,30 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
                 pdfAdapter.notifyDataSetChanged()
             } else if (R.id.addItem == item.itemId) {
             } else if (R.id.extractImagesItem == item.itemId) {
-                val width = pdfEditViewModel.aPageList[0].width.toInt()
-                val dialog = ExtractDialog(requireActivity(),
-                    width,
-                    position,
-                    pdfEditViewModel.countPages(),
-                    object : ExtractDialog.ExtractListener {
-                        override fun export(index: Int, width: Int) {
-                            extract(index - 1, index, width)
-                        }
-
-                        override fun exportRange(start: Int, end: Int, width: Int) {
-                            extract(start - 1, end, width)
-                        }
-
-                    })
-                dialog.show()
+                extractImage(position)
             }
             true
         }
         popupMenu.show()
+    }
+
+    private fun extractImage(position: Int) {
+        val width = pdfEditViewModel.aPageList[0].width.toInt()
+        val dialog = ExtractDialog(requireActivity(),
+            width,
+            position,
+            pdfEditViewModel.countPages(),
+            object : ExtractDialog.ExtractListener {
+                override fun export(index: Int, width: Int) {
+                    extract(index - 1, index, width)
+                }
+
+                override fun exportRange(start: Int, end: Int, width: Int) {
+                    extract(start - 1, end, width)
+                }
+
+            })
+        dialog.show()
     }
 
     private fun extract(start: Int, end: Int, width: Int) {

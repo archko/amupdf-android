@@ -41,9 +41,9 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:menu="@menu/edit_menus"
+        app:menu="@menu/edit_toolbar_menus"
         app:navigationIcon="@drawable/ic_back"
-        app:title="编辑pdf" />
+        app:title="@string/edit_title" />
 
     <androidx.recyclerview.awidget.ARecyclerView
         android:id="@+id/recyclerView"

@@ -14,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:navigationIcon="@drawable/ic_back"
-            app:title="创建pdf" />
+            app:title="@string/create_title" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="wrap_content"
@@ -27,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="使用图片" />
+                android:text="@string/create_use_image" />
 
         <Button
                 android:id="@+id/btnTxt"
@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_marginLeft="4dp"
-                android:text="使用文本" />
+                android:text="@string/create_use_txt" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <LinearLayout
@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="4dp"
-                android:text="选择用于生成pdf的文本文件" />
+                android:text="@string/create_pdf_tip" />
 
         <Button
                 android:id="@+id/btnAddTxt"
@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="4dp"
-                android:text="选择文本文件" />
+                android:text="@string/create_btn_select_text" />
 
         <TextView
                 android:id="@+id/txt_path"
@@ -74,13 +74,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="4dp"
-                android:text="生成pdf的文件名:存储于/sdcard/book/ 下,默认为new.pdf" />
+                android:text="@string/create_text_path_tip" />
 
         <EditText
                 android:id="@+id/pdfName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="填写生成pdf的文件名"
+                android:hint="@string/create_text_name"
                 android:text="" />
 
         <Button
@@ -89,7 +89,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="4dp"
-                android:text="开始生成" />
+                android:text="@string/create_btn_text" />
 
         <LinearLayout
                 android:id="@+id/layout_tmp"
@@ -112,12 +112,12 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_marginRight="4dp"
-                android:text="旧的pdf" />
+                android:text="@string/create_btn_old_pdf" />
 
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="如果有旧的pdf,新文档采用追加文档后边,如果没有旧的pdf则创建新的pdf" />
+                android:hint="@string/create_old_pdf_tip" />
 
         <TextView
                 android:id="@+id/oldPdfPath"
@@ -131,7 +131,7 @@
                 android:id="@+id/pdfPath"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="填写生成pdf的文件名"
+                android:hint="@string/create_image_name_hint"
                 android:text="new.pdf" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -146,7 +146,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:layout_marginLeft="4dp"
-                    android:text="添加图片" />
+                    android:text="@string/create_image_btn_add_image" />
 
             <Button
                     android:id="@+id/btnCreateFromImage"
@@ -154,7 +154,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:layout_marginLeft="4dp"
-                    android:text="保存" />
+                    android:text="@string/create_image_btn_save" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.recyclerview.widget.RecyclerView

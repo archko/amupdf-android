@@ -204,14 +204,11 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     }
 
     private fun addObserver() {
-        bookViewModel.uiFileModel.observe(viewLifecycleOwner,
-            { fileList -> emitFileBeans(fileList) })
+        bookViewModel.uiFileModel.observe(viewLifecycleOwner) { fileList -> emitFileBeans(fileList) }
 
-        bookViewModel.uiItemModel.observe(viewLifecycleOwner) { flag ->
-            run {
-                fileListAdapter.notifyDataSetChanged()
-                currentBean = null
-            }
+        bookViewModel.uiItemModel.observe(viewLifecycleOwner) {
+            fileListAdapter.notifyDataSetChanged()
+            currentBean = null
         }
 
         bookViewModel.uiScannerModel.observe(viewLifecycleOwner) { args ->
@@ -268,7 +265,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         val path = args[0] as String
         if (mCurrentPath.equals(path)) {
             fileListAdapter.submitList(args[1] as ArrayList<FileBean>)
-            //fileListAdapter.notifyDataSetChanged()
+            fileListAdapter.notifyDataSetChanged()
         }
     }
 
@@ -400,11 +397,11 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         //menuBuilder.menu.add(0, documentContextMenuItem, 0, "Mupdf new Viewer")
         menuBuilder.menu.add(0, infoContextMenuItem, 0, getString(R.string.menu_info))
         menuBuilder.menu.add(0, otherContextMenuItem, 0, getString(R.string.menu_other))
-        
-        if (entry.type==FileBean.NORMAL) {
+
+        if (entry.type == FileBean.NORMAL) {
             menuBuilder.menu.add(0, editContextMenuItem, 0, getString(R.string.menu_edit))
         }
-        
+
         if (entry.type == FileBean.RECENT) {
             menuBuilder.menu.add(
                 0,
@@ -543,6 +540,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         const val documentContextMenuItem = Menu.FIRST + 115
         const val addToFavoriteContextMenuItem = Menu.FIRST + 116
         const val removeFromFavoriteContextMenuItem = Menu.FIRST + 117
+
         //protected const val bartekscViewContextMenuItem = Menu.FIRST + 118
         const val editContextMenuItem = Menu.FIRST + 119
     }

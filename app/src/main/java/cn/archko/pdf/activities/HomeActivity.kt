@@ -62,7 +62,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
         isLive = true
         super.onCreate(savedInstanceState)
 
-        if (BuildCompat.isAtLeastT()) {
+        if (Build.VERSION.SDK_INT >= 33) {
             onBackInvokedCallback = OnBackInvokedCallback {
                 onBackEvent()
             }.also {
@@ -78,8 +78,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
 
         toolbar.inflateMenu(R.menu.menu_history)
         toolbar.setOnMenuItemClickListener { item ->
-            val id = item.itemId
-            when (id) {
+            when (item.itemId) {
                 R.id.action_about -> startActivity(
                     Intent(
                         this@HomeActivity,
@@ -94,7 +93,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
 
                 else -> {
                     val fragment: Fragment? = mPagerAdapter.getItemFragment(mViewPager.currentItem)
-                    Logcat.d("menu:" + id + " fragment:" + fragment + " index:" + mViewPager.currentItem)
+                    Logcat.d("menu:" + item.itemId + " fragment:" + fragment + " index:" + mViewPager.currentItem)
                     fragment?.onOptionsItemSelected(item)
                 }
             }
@@ -279,7 +278,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
         });
     }
 
-    protected fun addTab() {
+    private fun addTab() {
         titles[0] = getString(cn.archko.pdf.R.string.tab_history)
         titles[1] = getString(cn.archko.pdf.R.string.tab_browser)
         titles[2] = getString(cn.archko.pdf.R.string.tab_favorite)
@@ -297,9 +296,9 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
         mTabs.add(SamplePagerItem(FavoriteFragment::class.java, bundle, title!!))
     }
 
-    override fun onBackPressed() {
-        onBackEvent()
-    }
+    //override fun onBackPressed() {
+    //    onBackEvent()
+    //}
 
     /*override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val flag = super.onCreateOptionsMenu(menu)
@@ -361,10 +360,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
     }
 
     companion object {
-
-        /**
-         * Logging tag.
-         */
+        
         private val TAG = "ChooseFile"
 
         @JvmField

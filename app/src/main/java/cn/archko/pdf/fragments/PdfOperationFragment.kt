@@ -297,7 +297,7 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
     }
 
     private fun merge() {
-        Toast.makeText(activity, "未实现功能", Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity, "not implemented", Toast.LENGTH_SHORT).show()
     }
 
     inner class ViewHolder(root: View) : BaseViewHolder<String>(root) {

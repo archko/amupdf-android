@@ -59,4 +59,38 @@
     <string name="sodk_editor_password_for_document">密码</string>
     <string name="sodk_editor_ok">确定</string>
     <string name="sodk_editor_cancel">取消</string>
+
+    <string name="extract_title">导出图片</string>
+    <string name="extract_selection">导出选中范围</string>
+    <string name="extract_current">导出当前页</string>
+    <string name="extract_tip">选择导出的分辨率,默认为1080宽,最小为原始图片宽,图片最大宽可达3600</string>
+    <string name="extract_resolution">导出分辨率</string>
+    <string name="extract_page_range">页面范围</string>
+    <string name="extract_range">范围</string>
+
+    <string name="edit_title">编辑pdf</string>
+    <string name="edit_item_save">保存</string>
+    <string name="edit_item_extract">导出图片</string>
+    
+    <string name="create_title">创建pdf</string>
+    <string name="create_use_image">使用图片</string>
+    <string name="create_use_txt">使用文本</string>
+    <string name="create_pdf_tip">选择用于生成pdf的文本文件</string>
+    <string name="create_btn_select_text">选择文本文件</string>
+    <string name="create_text_path_tip">生成pdf的文件名:存储于/sdcard/book/ 下,默认为new.pdf</string>
+    <string name="create_text_name">填写生成pdf的文件名</string>
+    <string name="create_btn_text">开始生成</string>
+    <string name="create_btn_old_pdf">选择旧的pdf</string>
+    <string name="create_old_pdf_tip">如果有旧的pdf,新文档采用追加文档后边,如果没有旧的pdf则创建新的pdf</string>
+    <string name="create_image_name_hint">填写生成pdf的文件名</string>
+    <string name="create_image_btn_add_image">添加图片</string>
+    <string name="create_image_btn_save">保存</string>
+    <string name="edit_btn_image">导出为图片</string>
+    <string name="edit_btn_merge">合并</string>
+    <string name="edit_btn_select">选择pdf文件</string>
+    <string name="edit_select_tip">选择用于导出图片的pdf文件</string>
+    <string name="edit_save_tip">导出的内容存储于/sdcard/xx/ 下,xx是pdf文件名, \\n导出图片: 每一页为一张png.\\n导出html: 对于非扫描的pdf,则生成一个html,如果里面带图片,会以base64编码图片输出,可用浏览器打开</string>
+    <string name="edit_extract_btn_image">导出选中范围图片</string>
+    <string name="edit_extract_btn_html">开始导出所有Html</string>
+    <string name="extract_btn_merge">合并文件</string>
 </resources>

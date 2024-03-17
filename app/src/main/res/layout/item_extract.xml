@@ -14,7 +14,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginRight="8dp"
-        android:text="选择导出的分辨率,默认为1080宽,最小为原始图片宽,图片最大宽可达3600" />
+        android:text="@string/extract_tip" />
 
     <com.google.android.material.slider.Slider
         android:id="@+id/resolutionSlider"
@@ -24,7 +24,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginRight="8dp"
         android:stepSize="1"
-        android:text="分辨率"
+        android:text="@string/extract_resolution"
         android:theme="@style/Theme.RangeSlider"
         android:valueFrom="1080.0"
         android:valueTo="3600.0"
@@ -46,7 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="页面范围" />
+            android:text="@string/extract_page_range" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvEnd"
@@ -65,7 +65,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginRight="8dp"
         android:stepSize="1"
-        android:text="范围"
+        android:text="@string/extract_range"
         android:theme="@style/Theme.RangeSlider"
         app:labelBehavior="visible"
         app:tickVisible="false" />

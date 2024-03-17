@@ -5,6 +5,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:background="@color/extract_dialog_bg"
     android:padding="16dp"
     tools:minWidth="380dp">
 
@@ -36,8 +37,8 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:navigationIcon="@drawable/ic_back"
-            app:title="导出图片" />
+            app:navigationIcon="@drawable/ic_nav"
+            app:title="@string/extract_title" />
 
     <include
         android:id="@+id/extract"
@@ -61,7 +62,7 @@
             android:gravity="center"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="导出选中范围" />
+            android:text="@string/extract_selection" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnExtractSingle"
@@ -73,7 +74,7 @@
             android:gravity="center"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="导出当前页" />
+            android:text="@string/extract_current" />
     </LinearLayout>
 
 </LinearLayout>
