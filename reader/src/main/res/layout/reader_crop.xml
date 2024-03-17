@@ -13,12 +13,12 @@
             app:fastScrollAutoHideDelay="1500"
             app:fastScrollEnableThumbInactiveColor="true"
             app:fastScrollPopupBackgroundSize="62dp"
-            app:fastScrollPopupBgColor="@color/link_uri"
+            app:fastScrollPopupBgColor="@color/bg_fastscroll"
             app:fastScrollPopupPosition="adjacent"
             app:fastScrollPopupTextColor="@android:color/primary_text_dark"
             app:fastScrollPopupTextSize="32dp"
             app:fastScrollPopupTextVerticalAlignmentMode="font_metrics"
-            app:fastScrollThumbColor="@color/link_uri"
+            app:fastScrollThumbColor="@color/bg_fastscroll"
             app:fastScrollThumbEnabled="true"
             tools:listitem="@layout/item_outline" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -114,7 +114,7 @@ public class FastScroller {
         mPopup.setBgColor(0xff000000);
         mPopup.setBackgroundSize(Utils.toPixels(resources, 62));
         mPopup.setPopupTextVerticalAlignmentMode(PopupTextVerticalAlignmentMode.TEXT_BOUNDS);
-        mPopup.setPopupPosition(PopupPosition.ADJACENT);
+        mPopup.setPopupPosition(PopupPosition.CENTER);
 
         mThumbHeight = Utils.toPixels(resources, 52);
         mThumbWidth = Utils.toPixels(resources, 8);

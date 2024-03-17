@@ -27,4 +27,6 @@
 
     <color name="page_indicator">#C0202020</color>
     <color name="toolbar">#C0202020</color>
+
+    <color name="bg_fastscroll">#E60088FF</color>
 </resources>
