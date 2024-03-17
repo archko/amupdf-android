@@ -74,11 +74,12 @@ class HistoryViewModel : ViewModel() {
                 }
 
                 val nList = arrayListOf<FileBean>()
-
+                if (curPage>0) {
+                    nList.addAll(list)
+                }
                 if ((progresses?.size ?: 0) > 0) {
                     curPage++
                 }
-                nList.addAll(list)
                 nList.addAll(entryList)
                 return@withContext arrayOf<Any>(totalCount, nList)
             }

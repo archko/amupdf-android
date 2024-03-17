@@ -20,7 +20,7 @@ class FavoriteViewModel : ViewModel() {
 
     var curPage = 0
     var list: MutableList<FileBean> = mutableListOf()
-    
+
     private val progressDao by lazy { Graph.database.progressDao() }
 
     private val _uiFileModel = MutableLiveData<Array<Any?>>()
@@ -29,7 +29,6 @@ class FavoriteViewModel : ViewModel() {
 
     fun reset() {
         curPage = 0
-        list.clear()
     }
 
     fun loadFavorities(page: Int, showExtension: Boolean) =
@@ -45,7 +44,7 @@ class FavoriteViewModel : ViewModel() {
                 )
 
                 Logcat.d("loadFavorities:$page, $curPage, total:$totalCount, ${progresses?.size}")
-                
+
                 val entryList = ArrayList<FileBean>()
 
                 var entry: FileBean
@@ -57,12 +56,17 @@ class FavoriteViewModel : ViewModel() {
                     entry.bookProgress = it
                     entryList.add(entry)
                 }
-                if ((progresses?.size ?: 0) > 0){
+
+                val nList = arrayListOf<FileBean>()
+                if (curPage > 0) {
+                    nList.addAll(list)
+                }
+                if ((progresses?.size ?: 0) > 0) {
                     curPage++
                 }
-                list.addAll(entryList)
-                
-                return@withContext arrayOf<Any?>(totalCount, list)
+                nList.addAll(entryList)
+
+                return@withContext arrayOf<Any?>(totalCount, nList)
             }
 
             withContext(Dispatchers.Main) {
