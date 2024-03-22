@@ -14,7 +14,7 @@ import org.vudroid.core.models.ZoomModel;
 public class PageViewZoomControls extends LinearLayout implements BringUpZoomControlsListener {
     public PageViewZoomControls(Context context, final ZoomModel zoomModel) {
         super(context);
-        show();
+        hide();
         setOrientation(LinearLayout.HORIZONTAL);
         setGravity(Gravity.BOTTOM);
         addView(new ZoomRoll(context, zoomModel));

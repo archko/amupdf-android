@@ -21,7 +21,7 @@ import cn.archko.pdf.entity.LoadResult
 import cn.archko.pdf.entity.OutlineItem
 import cn.archko.pdf.entity.ReflowBean
 import cn.archko.pdf.entity.State
-import cn.archko.pdf.mupdf.MupdfDocument
+import cn.archko.pdf.common.MupdfDocument
 import cn.archko.pdf.utils.FileUtils
 import com.artifex.mupdf.fitz.Page
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +46,7 @@ class PDFViewModel : ViewModel() {
     var txtPageCount: Int = 1
     var outlineHelper: OutlineHelper? = null
     var zoom = 1.0f
+    var isDestroy = false
 
     private fun loadBookmarks(): List<Bookmark>? {
         try {
@@ -297,13 +298,13 @@ class PDFViewModel : ViewModel() {
             Logcat.d(Logcat.TAG, "loadPdfDoc.password:$password")
             mupdfDocument!!.newDocument(path, password)
             mupdfDocument!!.let {
-                if (it.document.needsPassword()) {
+                if (it.getDocument()!!.needsPassword()) {
                     Logcat.d(Logcat.TAG, "needsPassword")
                     if (TextUtils.isEmpty(password)) {
                         emit(null)
                         return@flow
                     }
-                    it.document.authenticatePassword(password)
+                    it.getDocument()!!.authenticatePassword(password)
                 }
             }
 
@@ -367,7 +368,9 @@ class PDFViewModel : ViewModel() {
 
     fun destroy() {
         Logcat.d(Logcat.TAG, "destroy:$mupdfDocument")
+        isDestroy = true
         mupdfDocument?.destroy()
+        mupdfDocument = null
     }
 
     fun countPages(): Int {

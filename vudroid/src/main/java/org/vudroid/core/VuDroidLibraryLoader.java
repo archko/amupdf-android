@@ -8,6 +8,7 @@ public class VuDroidLibraryLoader {
             return;
         }
         //System.loadLibrary("vudroid");
+        //System.loadLibrary("ebook_bitmap");
         alreadyLoaded = true;
     }
 }

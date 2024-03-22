@@ -12,7 +12,7 @@ public class ZoomModel extends EventDispatcher {
     private boolean isCommited;
 
     public void setZoom(float zoom) {
-        zoom = Math.min(Math.max(zoom, 1.0f), 3.0f);
+        zoom = Math.min(Math.max(zoom, 1.0f), 4.0f);
         if (this.zoom != zoom) {
             float oldZoom = this.zoom;
             this.zoom = zoom;
