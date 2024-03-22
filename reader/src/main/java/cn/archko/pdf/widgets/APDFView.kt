@@ -114,7 +114,7 @@ class APDFView(
         )
     }
 
-    private fun getCacheKey(index: Int, w: Int, h: Int, crop: Boolean): String {
+    private fun generateCacheKey(index: Int, w: Int, h: Int, crop: Boolean): String {
         return String.format("%s-%s-%s-%s", index, w, h, crop)
     }
 
@@ -145,7 +145,7 @@ class APDFView(
             )
         )
 
-        val key = getCacheKey(aPage!!.index, resultWidth, resultHeight, crop)
+        val key = generateCacheKey(aPage!!.index, resultWidth, resultHeight, crop)
         cacheKey = key
         val bmp = BitmapCache.getInstance().getBitmap(key)
 
@@ -212,7 +212,7 @@ class APDFView(
     private fun updateImage(view: ImageView, bitmap: Bitmap, width: Int, height: Int, index: Int) {
         val bmpWidth = bitmap.width
         val bmpHeight = bitmap.height
-        var lp = view.layoutParams as ARecyclerView.LayoutParams?
+        var lp = view.layoutParams
         if (null == lp) {
             lp = ARecyclerView.LayoutParams(width, height)
             view.layoutParams = lp
@@ -239,6 +239,10 @@ class APDFView(
             }
         }
         view.setImageBitmap(bitmap)
+    }
+
+    fun getCacheKey(): String? {
+        return cacheKey
     }
 
     // =================== decode ===================

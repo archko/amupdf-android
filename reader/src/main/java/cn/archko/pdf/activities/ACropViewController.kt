@@ -24,6 +24,7 @@ import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
+import cn.archko.pdf.widgets.APDFView
 import cn.archko.pdf.widgets.APageSeekBarControls
 import cn.archko.pdf.widgets.ExtraSpaceLinearLayoutManager
 
@@ -171,9 +172,17 @@ class ACropViewController(
     }
 
     override fun getCurrentBitmap(): Bitmap? {
-        val aPage = mPageSizes[getCurrentPos()]
-        //val cacheKey = ImageDecoder.getCacheKey(aPage!!.index, crop, aPage.scaleZoom)
+        //val aPage = mPageSizes[getCurrentPos()]
+        //val cacheKey = getCacheKey(aPage!!.index, crop, aPage.scaleZoom)
         //return BitmapCache.getInstance().getBitmap(cacheKey)
+        val child =
+            (mRecyclerView.layoutManager as LinearLayoutManager).findViewByPosition(getCurrentPos())
+        if (child is APDFView) {
+            val key = child.getCacheKey()
+            if (key != null) {
+                return BitmapCache.getInstance().getBitmap(key)
+            }
+        }
         return null
     }
 
