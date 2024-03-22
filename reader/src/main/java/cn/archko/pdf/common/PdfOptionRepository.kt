@@ -1,7 +1,6 @@
 package cn.archko.pdf.common
 
 import android.graphics.Color
-import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.utils.Utils
 import com.tencent.mmkv.MMKV
 
