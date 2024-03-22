@@ -37,6 +37,9 @@ public class BitmapPool {
     }
 
     public void release(Bitmap bitmap) {
+        if (null == bitmap) {
+            return;
+        }
         boolean isRelease = simplePool.release(bitmap);
         if (!isRelease) {
             bitmap.recycle();
