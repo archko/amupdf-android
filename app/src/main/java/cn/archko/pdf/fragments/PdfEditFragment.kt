@@ -96,7 +96,7 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
                 }
 
                 override fun longClick(t: View?, pos: Int, view: View) {
-                    showPopupMenu(view, pos + 1)
+                    showPopupMenu(view, pos)
                 }
             })
         binding.recyclerView.layoutManager = GridLayoutManager(activity, 2)

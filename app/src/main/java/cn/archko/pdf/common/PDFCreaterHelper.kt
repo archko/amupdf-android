@@ -11,7 +11,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import cn.archko.mupdf.R
 import cn.archko.pdf.App
+import cn.archko.pdf.adapters.AdapterUtils
+import cn.archko.pdf.utils.BitmapUtils
+import cn.archko.pdf.utils.FileUtils
+import cn.archko.pdf.utils.StreamUtils
+import cn.archko.pdf.utils.Utils
 import com.artifex.mupdf.fitz.Device
 import com.artifex.mupdf.fitz.DocumentWriter
 import com.artifex.mupdf.fitz.Image
@@ -24,12 +30,6 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
-import cn.archko.mupdf.R
-import cn.archko.pdf.mupdf.MupdfDocument
-import cn.archko.pdf.utils.BitmapUtils
-import cn.archko.pdf.utils.FileUtils
-import cn.archko.pdf.utils.StreamUtils
-import cn.archko.pdf.utils.Utils
 
 /**
  * @author: archko 2018/12/21 :1:03 PM
@@ -146,7 +146,7 @@ object PDFCreaterHelper {
         val options = BitmapFactory.Options()
         //默认值为false，如果设置成true，那么在解码的时候就不会返回bitmap，即bitmap = null。
         options.inJustDecodeBounds = true
-        val maxHeight = PAPER_HEIGHT
+        val maxHeight = 6000
 
         val result = arrayListOf<String>()
         for (path in imagePaths) {
@@ -156,9 +156,11 @@ object PDFCreaterHelper {
                     //split image,maxheight=PAPER_HEIGHT
                     splitImages(result, path, options.outWidth, options.outHeight)
                 } else {
-                    //result.add(path)
-                    val bitmapPath = compressImageFitPage(path, options.outWidth, options.outHeight)
-                    result.add(bitmapPath)
+                    if (AdapterUtils.supportImage(path)) {
+                        result.add(path)
+                    } else {
+                        convertImageToJpeg(result, path)
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -167,27 +169,21 @@ object PDFCreaterHelper {
         return result
     }
 
-    private fun compressImageFitPage(
-        path: String,
-        width: Int,
-        height: Int,
-    ): String {
-        val options = BitmapFactory.Options()
-        options.inJustDecodeBounds = false
-        options.outWidth = PDF_PAGE_WIDTH.toInt()
-        options.outHeight = (height * PDF_PAGE_WIDTH / width).toInt()
-        val bitmap = BitmapFactory.decodeFile(path, options)
+    /**
+     * 默认不支持bmp,svg,heic,webp这些直接转换,所以先解析为jpg
+     */
+    private fun convertImageToJpeg(result: java.util.ArrayList<String>, path: String) {
+        val bm: Bitmap = BitmapFactory.decodeFile(path)
         val file =
             File(
                 FileUtils.getExternalCacheDir(App.instance).path
+                        //FileUtils.getStorageDirPath() + "/amupdf"
                         + File.separator + "create" + File.separator + System.currentTimeMillis() + ".jpg"
             )
-        BitmapUtils.saveBitmapToFile(bitmap, file, Bitmap.CompressFormat.JPEG, 100)
-        Log.d(
-            "TAG",
-            "bitmap.width:$width, height:$height,:${options.outWidth},${options.outHeight}, path:${file.absolutePath}"
-        )
-        return file.absolutePath
+        BitmapUtils.saveBitmapToFile(bm, file, Bitmap.CompressFormat.JPEG, 100)
+        Log.d("TAG", "convertImageToJpeg path:${file.absolutePath}")
+
+        result.add(file.absolutePath)
     }
 
     private fun splitImages(
@@ -200,10 +196,12 @@ object PDFCreaterHelper {
         val right = 0 + width
         var bottom = PAPER_HEIGHT
 
+        val decoder = BitmapRegionDecoder.newInstance(path, true)
+
         while (bottom < height) {
             val rect = android.graphics.Rect()
             rect.set(0, top.toInt(), right, bottom.toInt())
-            splitImage(path, rect, result)
+            splitImage(path, rect, result, decoder)
 
             top = bottom
             bottom += PAPER_HEIGHT
@@ -211,17 +209,18 @@ object PDFCreaterHelper {
         if (top < height) {
             val rect = android.graphics.Rect()
             rect.set(0, top.toInt(), right, height)
-            splitImage(path, rect, result)
+            splitImage(path, rect, result, decoder)
         }
+        decoder.recycle()
     }
 
     private fun splitImage(
         path: String,
         rect: android.graphics.Rect,
         result: ArrayList<String>,
+        decoder: BitmapRegionDecoder
     ) {
-        val mDecoder = BitmapRegionDecoder.newInstance(path, true)
-        val bm: Bitmap = mDecoder.decodeRegion(rect, null)
+        val bm: Bitmap = decoder.decodeRegion(rect, null)
         val file =
             File(
                 FileUtils.getExternalCacheDir(App.instance).path
@@ -231,10 +230,9 @@ object PDFCreaterHelper {
         BitmapUtils.saveBitmapToFile(bm, file, Bitmap.CompressFormat.JPEG, 100)
         Log.d("TAG", "new file:height:${rect.bottom - rect.top}, path:${file.absolutePath}")
 
-        //result.add(file.absolutePath)
-        //splitPaths.add(file)
-        val bitmapPath = compressImageFitPage(file.absolutePath, bm.width, bm.height)
-        result.add(bitmapPath)
+        result.add(file.absolutePath)
+        //val bitmapPath = compressImageFitPage(file.absolutePath, bm.width, bm.height)
+        //result.add(bitmapPath)
     }
 
     var canExtract: Boolean = true
@@ -253,9 +251,9 @@ object PDFCreaterHelper {
                 "TAG",
                 "extractToImages:$screenWidth, start:$start, end:$end dir:$dir, dst:$pdfPath"
             )
-            val mMupdfDocument = MupdfDocument(context)
-            mMupdfDocument.newDocument(pdfPath, null)
-            val count: Int = mMupdfDocument.countPages()
+            val mupdfDocument = MupdfDocument(context)
+            mupdfDocument.newDocument(pdfPath, null)
+            val count: Int = mupdfDocument.countPages()
             var startPage = start
             if (startPage < 0) {
                 startPage = 0
@@ -273,23 +271,25 @@ object PDFCreaterHelper {
                     Log.d("TAG", "extractToImages.stop")
                     return i
                 }
-                val loadPage = mMupdfDocument.loadPage(i)
-                val pageWidth = loadPage.bounds.x1 - loadPage.bounds.x0
-                val pageHeight = loadPage.bounds.y1 - loadPage.bounds.y0
+                val page = mupdfDocument.loadPage(i)
+                if (null != page) {
+                    val pageWidth = page.bounds.x1 - page.bounds.x0
+                    val pageHeight = page.bounds.y1 - page.bounds.y0
 
-                var exportWidth = screenWidth
-                if (exportWidth == -1) {
-                    exportWidth = pageWidth.toInt()
+                    var exportWidth = screenWidth
+                    if (exportWidth == -1) {
+                        exportWidth = pageWidth.toInt()
+                    }
+                    val scale = exportWidth / pageWidth
+                    val width = exportWidth
+                    val height = pageHeight * scale
+                    val bitmap = BitmapPool.getInstance().acquire(width, height.toInt())
+                    val ctm = Matrix(scale)
+                    MupdfDocument.render(page, ctm, bitmap, 0, 0, 0)
+                    page.destroy()
+                    BitmapUtils.saveBitmapToFile(bitmap, File("$dir/${i + 1}.png"))
+                    BitmapPool.getInstance().release(bitmap)
                 }
-                val scale = exportWidth / pageWidth
-                val width = exportWidth
-                val height = pageHeight * scale
-                val bitmap = BitmapPool.getInstance().acquire(width, height.toInt())
-                val ctm = Matrix(scale)
-                MupdfDocument.render(loadPage, ctm, bitmap, 0, 0, 0)
-                loadPage.destroy()
-                BitmapUtils.saveBitmapToFile(bitmap, File("$dir/${i + 1}.png"))
-                BitmapPool.getInstance().release(bitmap)
                 Log.d("TAG", "extractToImages:page:${i + 1}.png")
             }
         } catch (e: Exception) {
@@ -301,17 +301,19 @@ object PDFCreaterHelper {
 
     fun extractToHtml(context: Context, path: String, pdfPath: String): Boolean {
         try {
-            val mMupdfDocument = MupdfDocument(context)
-            mMupdfDocument.newDocument(pdfPath, null)
-            val cp: Int = mMupdfDocument.countPages()
+            val mupdfDocument = MupdfDocument(context)
+            mupdfDocument.newDocument(pdfPath, null)
+            val cp: Int = mupdfDocument.countPages()
             val stringBuilder = StringBuilder()
             for (i in 0 until cp) {
-                val loadPage = mMupdfDocument.loadPage(i)
-                val content =
-                    String(loadPage.textAsHtml2("preserve-whitespace,inhibit-spaces,preserve-images"))
-                stringBuilder.append(content)
-                loadPage.destroy()
-                StreamUtils.appendStringToFile(stringBuilder.toString(), path)
+                val page = mupdfDocument.loadPage(i)
+                if (null != page) {
+                    val content =
+                        String(page.textAsHtml2("preserve-whitespace,inhibit-spaces,preserve-images"))
+                    stringBuilder.append(content)
+                    page.destroy()
+                    StreamUtils.appendStringToFile(stringBuilder.toString(), path)
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
