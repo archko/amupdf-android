@@ -129,7 +129,7 @@ class BookAdapter(
                 if (bookProgress?.ext != null) {
                     val ext = bookProgress.ext!!.lowercase(Locale.ROOT)
 
-                    AdapterUtils.setIcon(ext, mIcon)
+                    AdapterUtils.setIcon(ext, mIcon!!)
                 }
             }
         }
@@ -178,7 +178,7 @@ class BookAdapter(
             if (null != entry.bookProgress && null != entry.bookProgress!!.ext) {
                 val ext = entry.bookProgress!!.ext!!.lowercase(Locale.ROOT)
 
-                AdapterUtils.setIcon(ext, mIcon)
+                AdapterUtils.setIcon(ext, mIcon!!)
             }
         }
     }
@@ -236,7 +236,7 @@ class BookAdapter(
             if (bookProgress?.ext != null) {
                 val ext = bookProgress.ext!!.lowercase(Locale.ROOT)
 
-                AdapterUtils.setIcon(ext, mIcon)
+                AdapterUtils.setIcon(ext, mIcon!!)
 
                 //ImageLoader.getInstance()
                 //    .loadImage(entry.file?.absolutePath, 0, 1.0f, screenWidth, mIcon!!)
