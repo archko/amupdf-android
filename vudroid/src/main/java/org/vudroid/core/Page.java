@@ -1,16 +1,22 @@
 package org.vudroid.core;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.TextPaint;
+import android.util.Log;
 
 import org.vudroid.R;
-import org.vudroid.core.link.Hyperlink;
 
+import java.lang.ref.SoftReference;
 import java.util.List;
+
+import cn.archko.pdf.common.BitmapCache;
+import cn.archko.pdf.common.BitmapPool;
 
 public class Page {
     final int index;
@@ -23,6 +29,10 @@ public class Page {
     private final Paint strokePaint = strokePaint();
     private final Paint linkPaint = linkPaint();
     public static final int ZOOM_THRESHOLD = 2;
+    private boolean decodingNow;
+    private Bitmap bitmap;
+    private SoftReference<Bitmap> bitmapWeakReference;
+    private boolean invalidateFlag;
 
     Page(DocumentView documentView, int index) {
         this.documentView = documentView;
@@ -60,13 +70,33 @@ public class Page {
         if (!isVisible()) {
             return;
         }
-        canvas.drawRect(bounds, fillPaint);
+        //canvas.drawRect(bounds, fillPaint);
+        Bitmap thumb = getBitmap();
+        if (thumb != null && !thumb.isRecycled()) {
+            //Matrix matrix = new Matrix();
+            //matrix.postTranslate(bounds.left, bounds.top);
+            //matrix.postScale(bounds.width()/thumb.getWidth(), bounds.height()/thumb.getHeight());
+            //canvas.drawBitmap(thumb, matrix, null);
+            Rect src = new Rect(0, 0, thumb.getWidth(), thumb.getHeight());
+            Rect dst = new Rect((int) bounds.left, (int) bounds.top, (int) bounds.right, (int) bounds.bottom);
+            canvas.drawBitmap(thumb, src, dst, null);
 
-        canvas.drawText("Page " + (index + 1), bounds.centerX(), bounds.centerY(), textPaint);
+            //String text = String.format("Page%s,%s-%s,%s-%s,%s-%s, w-h:%s-%s",
+            //        (index + 1), src.width(), src.height(),
+            //        dst.left, dst.top, dst.right, bounds.bottom, dst.width(), dst.height());
+            //canvas.drawText(text, bounds.centerX(), bounds.centerY(), textPaint);
+        } else {
+            canvas.drawText("Page:" + (index + 1), bounds.centerX(), bounds.centerY(), textPaint);
+        }
+
         node.draw(canvas);
         //canvas.drawLine(bounds.left, bounds.top, bounds.right, bounds.top, strokePaint);
         canvas.drawLine(bounds.left, bounds.bottom, bounds.right / 5, bounds.bottom, strokePaint);
         drawPageLinks(canvas);
+    }
+
+    protected String getKey() {
+        return String.format("%s-%s", index, documentView.decodeService);
     }
 
     private Paint strokePaint() {
@@ -107,7 +137,7 @@ public class Page {
 
     public void setAspectRatio(float aspectRatio) {
         if (this.aspectRatio != aspectRatio) {
-            boolean changed = aspectRatio - this.aspectRatio > 0.01;
+            boolean changed = Math.abs(aspectRatio - this.aspectRatio) > 0.005;
             this.aspectRatio = aspectRatio;
             if (changed) {
                 documentView.invalidatePageSizes();
@@ -116,7 +146,7 @@ public class Page {
     }
 
     public boolean isVisible() {
-        return RectF.intersects(documentView.getViewRect(), bounds);
+        return RectF.intersects(documentView.getViewRectForPage(), bounds);
     }
 
     public void setAspectRatio(int width, int height) {
@@ -129,11 +159,122 @@ public class Page {
     }
 
     public void updateVisibility() {
+        if (isVisible()) {
+            if (getBitmap() != null && !invalidateFlag) {
+                restoreBitmapReference();
+            } else {
+                decodePageThumb();
+            }
+        } else {
+            recycle();
+        }
         node.updateVisibility();
+    }
+
+    private void recycle() {
+        stopDecodingThisNode();
+        setBitmap(null);
+    }
+
+    public Bitmap getBitmap() {
+        Bitmap bitmap = bitmapWeakReference != null ? bitmapWeakReference.get() : null;
+        if (null == bitmap) {
+            bitmap = BitmapCache.getInstance().getBitmap(getKey());
+        }
+        return bitmap;
+    }
+
+    private void restoreBitmapReference() {
+        setBitmap(getBitmap());
+    }
+
+    private final DecodeService.DecodeCallback decodeCallback = new DecodeService.DecodeCallback() {
+        @Override
+        public void decodeComplete(Bitmap bitmap, boolean isThumb) {
+            setBitmap(bitmap);
+            invalidateFlag = false;
+            setDecodingNow(false);
+            //postInvalidate(bitmap);
+        }
+
+        @Override
+        public boolean shouldRender(int pageNumber, boolean isFullPage) {
+            if (getBitmap() != null) {
+                return false;
+            }
+            Log.d("TAG", "shouldRender:" + pageNumber);
+            boolean isVisible = isVisible();
+            if (!isVisible) {
+                setBitmap(null);
+                setDecodingNow(false);
+            }
+            return isVisible;
+        }
+    };
+
+    private void decodePageThumb() {
+        if (isDecodingNow()) {
+            return;
+        }
+        setDecodingNow(true);
+        documentView.decodeService.decodePage(
+                getKey(),
+                null,
+                index,
+                decodeCallback,
+                documentView.zoomModel.getZoom(),
+                null,
+                getKey());
+    }
+
+    private void setBitmap(Bitmap newBitmap) {
+        if (newBitmap == null ||
+                (newBitmap != null && newBitmap.getWidth() == -1 && newBitmap.getHeight() == -1)) {
+            if (bitmap != null) {
+                bitmapWeakReference.clear();
+            }
+            bitmap = null;
+            return;
+        }
+
+        if (bitmap != newBitmap) {
+            if (bitmap != null) {
+                BitmapCache.getInstance().remove(getKey());
+                BitmapPool.getInstance().release(bitmap);
+                bitmapWeakReference.clear();
+            }
+            bitmapWeakReference = new SoftReference<>(newBitmap);
+            documentView.postInvalidate();
+
+            bitmap = newBitmap;
+        }
+    }
+
+    private boolean isDecodingNow() {
+        return decodingNow;
+    }
+
+    private void setDecodingNow(boolean decodingNow) {
+        if (this.decodingNow != decodingNow) {
+            this.decodingNow = decodingNow;
+        }
+    }
+
+    private void stopDecodingThisNode() {
+        if (!isDecodingNow()) {
+            return;
+        }
+        documentView.decodeService.stopDecoding(getKey());
+        setDecodingNow(false);
     }
 
     public void invalidate() {
         node.invalidate();
+    }
+
+    public void postInvalidate(Bitmap bitmap) {
+        setAspectRatio(documentView.decodeService.getPageWidth(index), documentView.decodeService.getPageHeight(index));
+        documentView.postInvalidate();
     }
 
     private void drawPageLinks(Canvas canvas) {

@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.os.SystemClock;
 
 import com.artifex.mupdf.fitz.Cookie;
 import com.artifex.mupdf.fitz.Document;
@@ -13,14 +12,14 @@ import com.artifex.mupdf.fitz.Location;
 import com.artifex.mupdf.fitz.Page;
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice;
 
+import org.vudroid.core.Hyperlink;
 import org.vudroid.core.codec.CodecPage;
-import org.vudroid.core.link.Hyperlink;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.archko.pdf.common.BitmapPool;
-import cn.archko.pdf.common.Logcat;
+
 
 public class PdfPage implements CodecPage {
 
@@ -33,14 +32,6 @@ public class PdfPage implements CodecPage {
     public PdfPage(Document core, long pageHandle) {
         this.pageHandle = pageHandle;
         this.doc = core;
-    }
-
-    public boolean isDecoding() {
-        return false;  //TODO
-    }
-
-    public void waitForDecode() {
-        //TODO
     }
 
     public int getWidth() {
@@ -59,6 +50,10 @@ public class PdfPage implements CodecPage {
         return pdfPageHeight;
     }
 
+    public void loadPage(int pageno) {
+        page = doc.loadPage(pageno);
+    }
+
     public void setPage(Page page) {
         this.page = page;
     }
@@ -67,13 +62,10 @@ public class PdfPage implements CodecPage {
         return page;
     }
 
-    public Bitmap renderBitmap(int width, int height, RectF pageSliceBounds) {
-        Matrix matrix = new Matrix();
-        //matrix.postScale(width/getMediaBox().width(), -height/getMediaBox().height());
-        matrix.postTranslate(0, height);
-        matrix.postTranslate(-pageSliceBounds.left * width, -pageSliceBounds.top * height);
-        matrix.postScale(1 / pageSliceBounds.width(), 1 / pageSliceBounds.height());
-        return render(new Rect(0, 0, width, height), matrix);
+    static PdfPage createPage(Document core, int pageno) {
+        PdfPage pdfPage = new PdfPage(core, pageno);
+        pdfPage.page = core.loadPage(pageno);
+        return pdfPage;
     }
 
     /**
@@ -140,10 +132,18 @@ public class PdfPage implements CodecPage {
         return hyperlinks;
     }
 
-    static PdfPage createPage(Document core, int pageno) {
-        PdfPage pdfPage = new PdfPage(core, pageno);
-        pdfPage.page = core.loadPage(pageno);
-        return pdfPage;
+    public synchronized void recycle() {
+        if (pageHandle >= 0) {
+            pageHandle = -1;
+            if (page != null) {
+                page.destroy();
+            }
+        }
+    }
+
+    @Override
+    public boolean isRecycle() {
+        return pageHandle == -1;
     }
 
     @Override
@@ -152,15 +152,13 @@ public class PdfPage implements CodecPage {
         super.finalize();
     }
 
-    public synchronized void recycle() {
-        if (pageHandle >= 0) {
-            pageHandle = -1;
-            page.destroy();
-        }
-    }
-
-    public long getPageHandle() {
-        return pageHandle;
+    public Bitmap renderBitmap(int width, int height, RectF pageSliceBounds) {
+        Matrix matrix = new Matrix();
+        //matrix.postScale(width/getMediaBox().width(), -height/getMediaBox().height());
+        matrix.postTranslate(0, height);
+        matrix.postTranslate(-pageSliceBounds.left * width, -pageSliceBounds.top * height);
+        matrix.postScale(1 / pageSliceBounds.width(), 1 / pageSliceBounds.height());
+        return render(new Rect(0, 0, width, height), matrix);
     }
 
     public Bitmap render(Rect viewbox, Matrix matrix) {
@@ -187,16 +185,4 @@ public class PdfPage implements CodecPage {
         return Bitmap.createBitmap(bufferarray, width, height, Bitmap.Config.RGB_565);
     }
 
-    public byte[] asHtml(int pageno) {
-        return page.textAsHtml();
-    }
-
-    static long time;
-    static int count;
-
-    static void add(long start) {
-        count++;
-        time += (SystemClock.uptimeMillis() - start);
-        Logcat.d("decode time:" + time / count);
-    }
 }

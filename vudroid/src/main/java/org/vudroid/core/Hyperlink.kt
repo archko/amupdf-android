@@ -1,4 +1,4 @@
-package org.vudroid.core.link
+package org.vudroid.core
 
 import android.content.Context
 import android.content.Intent
@@ -8,7 +8,7 @@ import android.text.TextUtils
 import com.artifex.mupdf.fitz.Document
 import com.artifex.mupdf.fitz.Link
 import com.artifex.mupdf.fitz.Location
-import org.vudroid.core.Page
+import com.artifex.mupdf.fitz.Page
 
 class Hyperlink {
     var linkType = LINKTYPE_PAGE
@@ -30,7 +30,7 @@ class Hyperlink {
         const val LINKTYPE_URL = 1
 
         //documentview
-        fun mapPointToPage(page: Page, atX: Float, atY: Float): Hyperlink? {
+        fun mapPointToPage(page: org.vudroid.core.Page, atX: Float, atY: Float): Hyperlink? {
             if (null == page.links) {
                 return null
             }
@@ -45,7 +45,7 @@ class Hyperlink {
         //controller
         fun mapPointToPage(
             doc: Document?,
-            pdfPage: com.artifex.mupdf.fitz.Page,
+            pdfPage: Page,
             atX: Float,
             atY: Float
         ): Hyperlink? {
@@ -65,11 +65,11 @@ class Hyperlink {
                     if (page >= 0) {
                         hyper.bbox = Rect(0, 0, 0, 0)
                         hyper.url = null
-                        hyper.linkType = Hyperlink.LINKTYPE_PAGE
+                        hyper.linkType = LINKTYPE_PAGE
                     } else {
                         hyper.bbox = null
                         hyper.url = link.uri
-                        hyper.linkType = Hyperlink.LINKTYPE_URL
+                        hyper.linkType = LINKTYPE_URL
                     }
                     return hyper
                 }

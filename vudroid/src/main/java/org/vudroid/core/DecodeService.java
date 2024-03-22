@@ -14,15 +14,15 @@ public interface DecodeService {
 
     void open(String fileUri);
 
-    void decodePage(Object decodeKey, PageTreeNode node, DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds);
+    void decodePage(String decodeKey, PageTreeNode node, int pageNumber, DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds, String thumbKey);
 
-    void stopDecoding(Object decodeKey);
+    void stopDecoding(String decodeKey);
 
     void setOriention(int oriention);
 
-    int getEffectivePagesWidth();
+    int getEffectivePagesWidth(int page);
 
-    int getEffectivePagesHeight();
+    int getEffectivePagesHeight(int index);
 
     int getPageCount();
 
@@ -37,6 +37,8 @@ public interface DecodeService {
     void recycle();
 
     public interface DecodeCallback {
-        void decodeComplete(Bitmap bitmap);
+        void decodeComplete(Bitmap bitmap, boolean isThumb);
+
+        boolean shouldRender(int pageNumber, boolean isFullPage);
     }
 }

@@ -1,6 +1,7 @@
 package org.vudroid.pdfdroid.codec;
 
 import com.artifex.mupdf.fitz.Document;
+import com.artifex.mupdf.fitz.Outline;
 
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
@@ -50,5 +51,10 @@ public class PdfDocument implements CodecDocument {
         if (null != core) {
             core.destroy();
         }
+    }
+
+    @Override
+    public Outline[] loadOutline() {
+        return core.loadOutline();
     }
 }

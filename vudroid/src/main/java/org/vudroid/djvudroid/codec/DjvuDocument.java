@@ -1,5 +1,7 @@
 package org.vudroid.djvudroid.codec;
 
+import com.artifex.mupdf.fitz.Outline;
+
 import org.vudroid.core.codec.CodecDocument;
 
 public class DjvuDocument implements CodecDocument {
@@ -43,5 +45,10 @@ public class DjvuDocument implements CodecDocument {
         }
         free(documentHandle);
         documentHandle = 0;
+    }
+
+    @Override
+    public Outline[] loadOutline() {
+        return new Outline[0];
     }
 }

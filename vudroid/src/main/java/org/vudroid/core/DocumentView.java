@@ -13,7 +13,6 @@ import android.widget.LinearLayout;
 
 import org.vudroid.core.codec.CodecPage;
 import org.vudroid.core.events.ZoomListener;
-import org.vudroid.core.link.Hyperlink;
 import org.vudroid.core.models.CurrentPageModel;
 import org.vudroid.core.models.DecodingProgressModel;
 import org.vudroid.core.models.ZoomModel;
@@ -23,6 +22,8 @@ import cn.archko.pdf.listeners.SimpleGestureListener;
 import cn.archko.pdf.widgets.Flinger;
 
 public class DocumentView extends View implements ZoomListener {
+
+    public static final String TAG = "DocumentView";
     final ZoomModel zoomModel;
     private final CurrentPageModel currentPageModel;
     DecodeService decodeService;
@@ -65,7 +66,7 @@ public class DocumentView extends View implements ZoomListener {
         this.mPageModel = mPageModel;
     }*/
 
-    public DocumentView(Context context, final ZoomModel zoomModel, DecodingProgressModel progressModel, CurrentPageModel currentPageModel, SimpleGestureListener gestureListener) {
+    public DocumentView(Context context, final ZoomModel zoomModel, DecodingProgressModel progressModel, CurrentPageModel currentPageModel, SimpleGestureListener simpleGestureListener) {
         super(context);
         this.zoomModel = zoomModel;
         this.progressModel = progressModel;
@@ -76,14 +77,14 @@ public class DocumentView extends View implements ZoomListener {
         setFocusableInTouchMode(true);
         initMultiTouchZoomIfAvailable(zoomModel);
         mGestureDetector = new GestureDetector(context, new MySimpleOnGestureListener());
-        this.simpleGestureListener = gestureListener;
+        this.simpleGestureListener = simpleGestureListener;
     }
 
     private void initMultiTouchZoomIfAvailable(ZoomModel zoomModel) {
         try {
             multiTouchZoom = (MultiTouchZoom) Class.forName("org.vudroid.core.multitouch.MultiTouchZoomImpl").getConstructor(ZoomModel.class).newInstance(zoomModel);
         } catch (Exception e) {
-            System.out.println("Multi touch zoom is not available: " + e);
+            Log.d(TAG, "Multi touch zoom is not available: " + e);
         }
     }
 
@@ -93,16 +94,16 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void init() {
-        if (isInitialized) {
+        if (isInitialized || decodeService.getPageCount() < 1) {
             return;
         }
-        final int width = decodeService.getEffectivePagesWidth();
-        final int height = decodeService.getEffectivePagesHeight();
         for (int i = 0; i < decodeService.getPageCount(); i++) {
+            final int width = decodeService.getEffectivePagesWidth(i);
+            final int height = decodeService.getEffectivePagesHeight(i);
             pages.put(i, new Page(this, i));
             pages.get(i).setAspectRatio(width, height);
         }
-        System.out.println("DecodeService:" + pages.size() + " pageToGoTo:" + pageToGoTo);
+        Log.d(TAG, "DecodeService:" + pages.size() + " pageToGoTo:" + pageToGoTo);
         isInitialized = true;
         currentPageModel.setPageCount(decodeService.getPageCount());
         invalidatePageSizes();
@@ -112,7 +113,7 @@ public class DocumentView extends View implements ZoomListener {
     private void goToPageImpl(final int toPage) {
         Page page = pages.get(toPage);  //TODO ,page is not really page on the first time.
         if (null == page) {
-            System.out.println(String.format("goToPageImpl.error:%s-%s", toPage, pages.size()));
+            Log.d(TAG, String.format("goToPageImpl.error:%s-%s", toPage, pages.size()));
             return;
         }
         int scrollX = 0;
@@ -248,6 +249,9 @@ public class DocumentView extends View implements ZoomListener {
     public void zoomChanged(float newZoom, float oldZoom) {
         inZoom = true;
         stopScroller();
+        if (!isInitialized) {
+            return;
+        }
         final float ratio = newZoom / oldZoom;
         invalidatePageSizes();
         scrollTo((int) ((getScrollX() + getWidth() / 2) * ratio - getWidth() / 2), (int) ((getScrollY() + getHeight() / 2) * ratio - getHeight() / 2));
@@ -345,7 +349,31 @@ public class DocumentView extends View implements ZoomListener {
 
     RectF getViewRect() {
         if (viewRect == null) {
-            viewRect = new RectF(getScrollX(), getScrollY(), getScrollX() + getWidth(), getScrollY() + getHeight() * 2);
+            viewRect = new RectF(getScrollX(), getScrollY(), getScrollX() + getWidth(), getScrollY() + getHeight());
+        }
+        return viewRect;
+    }
+
+    /**
+     * 对于缩图,需要更多的预期高度,两个方向都要处理.
+     * 有了缩略图,getViewRect()就可以不用预加载空间了.
+     *
+     * @return
+     */
+    RectF getViewRectForPage() {
+        if (viewRect == null) {
+            float width = getWidth();
+            float height = getHeight();
+            float left = getScrollX();
+            float top = getScrollY();
+            if (oriention == HORIZONTAL) {
+                width = width * 1.8f;
+                left = left - width * 0.2f;
+            } else {
+                height = height * 1.8f;
+                top = top - height * 0.2f;
+            }
+            viewRect = new RectF(left, top, getScrollX() + width, getScrollY() + height);
         }
         return viewRect;
     }

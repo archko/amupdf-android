@@ -3,7 +3,10 @@ package org.vudroid.djvudroid.codec;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
 
+import org.vudroid.core.Hyperlink;
 import org.vudroid.core.codec.CodecPage;
+
+import java.util.List;
 
 public class DjvuPage implements CodecPage {
     private long pageHandle;
@@ -13,11 +16,6 @@ public class DjvuPage implements CodecPage {
     DjvuPage(long pageHandle, Object waitObject) {
         this.pageHandle = pageHandle;
         this.waitObject = waitObject;
-    }
-
-    public boolean isDecoding() {
-        return false;
-//        return !isDecodingDone(pageHandle);
     }
 
     private static native int getWidth(long pageHandle);
@@ -33,9 +31,6 @@ public class DjvuPage implements CodecPage {
 
     private static native void free(long pageHandle);
 
-    public void waitForDecode() {
-    }
-
     public int getWidth() {
         return getWidth(pageHandle);
     }
@@ -50,6 +45,10 @@ public class DjvuPage implements CodecPage {
         return Bitmap.createBitmap(buffer, width, height, Bitmap.Config.RGB_565);
     }
 
+    public Bitmap renderBitmap(int width, int height, RectF pageSliceBounds, float scale) {
+        return renderBitmap(width, height, pageSliceBounds);
+    }
+
     @Override
     protected void finalize() throws Throwable {
         recycle();
@@ -62,5 +61,20 @@ public class DjvuPage implements CodecPage {
         }
         free(pageHandle);
         pageHandle = 0;
+    }
+
+    @Override
+    public boolean isRecycle() {
+        return pageHandle == -1;
+    }
+
+    @Override
+    public List<Hyperlink> getPageLinks() {
+        return null;
+    }
+
+    @Override
+    public void loadPage(int pageNumber) {
+
     }
 }
