@@ -31,8 +31,6 @@ public class ImageDecoder extends ImageWorker {
 
     private ImageDecoder(final Context context) {
         super(context);
-        mContext = context.getApplicationContext();
-        mResources = mContext.getResources();
     }
 
     @Override

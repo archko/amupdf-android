@@ -39,7 +39,6 @@ public class ImageLoader extends ImageWorker {
 
     private ImageLoader(final Context context) {
         super(context);
-        mContext = context.getApplicationContext();
     }
 
     @Override

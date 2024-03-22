@@ -1,7 +1,6 @@
 package cn.archko.pdf.common;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -15,78 +14,16 @@ import java.lang.ref.WeakReference;
 import androidx.collection.LruCache;
 import cn.archko.pdf.entity.APage;
 import cn.archko.pdf.entity.DecodeParam;
+import cn.archko.pdf.utils.Utils;
 
 /**
  * @author: archko 2019/8/30 :16:17
  */
 public abstract class ImageWorker {
 
-    /**
-     * Default transition drawable fade time
-     */
-    protected static final int FADE_IN_TIME = 200;
-
-    /**
-     * Default artwork
-     */
-    //protected BitmapDrawable mDefaultArtwork;
-
-    /**
-     * Default album art
-     */
-    //protected Bitmap mDefault;
-
-    /**
-     * The resources to use
-     */
-    protected Resources mResources;
-
-    /**
-     * First layer of the transition drawable
-     */
-    protected ColorDrawable mCurrentDrawable;
-
-    /**
-     * Layer drawable used to cross fade the result from the worker
-     */
-    protected Drawable[] mArrayDrawable;
-
-    /**
-     * The Context to use
-     */
-    protected Context mContext;
-
-    /**
-     * Disk and memory caches
-     */
-
-    private int mFadeInTime = FADE_IN_TIME;
-
-    public void setFadeInTime(int fadeInTime) {
-        if (fadeInTime > 100) {
-            this.mFadeInTime = fadeInTime;
-        }
-    }
-
-    /**
-     * Constructor of <code>ImageWorker</code>
-     *
-     * @param context The {@link Context} to use
-     */
     protected ImageWorker(final Context context) {
-        mContext = context.getApplicationContext();
-        mResources = mContext.getResources();
-        // Create the transparent layer for the transition drawable
-        mCurrentDrawable = new ColorDrawable(mResources.getColor(android.R.color.transparent));
-        // A transparent image (layer 0) and the new result (layer 1)
-        mArrayDrawable = new Drawable[2];
-        mArrayDrawable[0] = mCurrentDrawable;
-        // XXX The second layer is set in the worker task.
     }
 
-    /**
-     * @return True if the user is scrolling, false otherwise
-     */
     public boolean isScrolling() {
         //if (getImageCache() != null) {
         //    //return mImageCache.isScrolling();
@@ -106,42 +43,16 @@ public abstract class ImageWorker {
 
     public abstract LruCache<String, APage> getPageLruCache();
 
-    /**
-     * @return The deafult artwork
-     */
-    /*public Bitmap getDefaultArtwork() {
-        return mDefault;
-    }*/
-
-    /**
-     * The actual {@link AsyncTask} that will process the image.
-     */
     protected final class BitmapWorkerTask extends AsyncTask<DecodeParam, Void, Bitmap> {
 
-        /**
-         * The {@link ImageView} used to set the result
-         */
         private final WeakReference<ImageView> mImageReference;
 
-        /**
-         * The key used to store cached entries
-         */
         DecodeParam decodeParam;
 
-        /**
-         * Constructor of <code>BitmapWorkerTask</code>
-         *
-         * @param imageView   The {@link ImageView} to use.
-         * @param imageOption
-         */
-        @SuppressWarnings("deprecation")
         public BitmapWorkerTask(final ImageView imageView) {
             mImageReference = new WeakReference<ImageView>(imageView);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         protected Bitmap doInBackground(final DecodeParam... params) {
             // Define the key
@@ -163,16 +74,8 @@ public abstract class ImageWorker {
                 bitmap = getBitmapFromCache(decodeParam.getKey());
             }
 
-            // Define the album id now
-            // Second, if we're fetching artwork, check the device for the image
-
-            // Third, by now we need to download the image
-            //Log.d("", "scheme:"+scheme+" url:"+url);
             if (bitmap == null && !isCancelled()
                     && getAttachedImageView() != null) {
-                // Now define what the artist name, album name, and url are.
-                //mUrl = processImageUrl();
-                //bitmap = processBitmap(mUrl);
                 bitmap = processBitmap(decodeParam);
             }
 
@@ -185,9 +88,6 @@ public abstract class ImageWorker {
             return bitmap;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             postBitmap(this, bitmap, this.decodeParam);
@@ -225,11 +125,6 @@ public abstract class ImageWorker {
         //}
     }
 
-    /**
-     * Calls {@code cancel()} in the worker task
-     *
-     * @param imageView the {@link ImageView} to use
-     */
     public static final void cancelWork(final ImageView imageView) {
         final BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
         if (bitmapWorkerTask != null) {
@@ -311,27 +206,24 @@ public abstract class ImageWorker {
     }
 
     public void loadImage(DecodeParam decodeParam, boolean forceSerial) {
-        /*if (decodeParam.getKey() == null *//*|| getImageCache() == null*//* || decodeParam.imageView == null) {
+        if (decodeParam.getKey() == null /*|| decodeParam.imageView == null*/) {
             return;
         }
-        // First, check the memory for the image
         final Bitmap lruBitmap = getBitmapFromCache(decodeParam.getKey());
-        if (lruBitmap != null && decodeParam.imageView != null) {
-            // Bitmap found in memory cache
-            decodeParam.imageView.setImageBitmap(lruBitmap);
-        } else if (executePotentialWork(decodeParam.getKey(), decodeParam.imageView) && decodeParam.imageView != null && !isScrolling()) {
+        if (lruBitmap != null /*&& decodeParam.imageView != null*/) {
+            decodeParam.getImageView().setImageBitmap(lruBitmap);
+        } else if (executePotentialWork(decodeParam.getKey(), decodeParam.getImageView()) && decodeParam.getImageView() != null && !isScrolling()) {
             // Otherwise run the worker task
-            final BitmapWorkerTask bitmapWorkerTask = new BitmapWorkerTask(decodeParam.imageView);
+            final BitmapWorkerTask bitmapWorkerTask = new BitmapWorkerTask(decodeParam.getImageView());
             final AsyncDrawable asyncDrawable = new AsyncDrawable(bitmapWorkerTask);
-            //imageView.setImageDrawable(asyncDrawable);
-            decodeParam.imageView.setTag(asyncDrawable);
+            decodeParam.getImageView().setTag(asyncDrawable);
             // Don't execute the BitmapWorkerTask while scrolling
             if (isScrolling()) {
-                cancelWork(decodeParam.imageView);
+                cancelWork(decodeParam.getImageView());
             } else {
                 Utils.execute(forceSerial, bitmapWorkerTask, decodeParam);
             }
-        }*/
+        }
     }
 
     /**
@@ -348,5 +240,5 @@ public abstract class ImageWorker {
 
     public void recycle() {
     }
-    
+
 }
