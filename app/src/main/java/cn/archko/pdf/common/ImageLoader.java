@@ -19,7 +19,6 @@ import java.io.File;
 import cn.archko.pdf.App;
 import cn.archko.pdf.entity.APage;
 import cn.archko.pdf.entity.DecodeParam;
-import cn.archko.pdf.mupdf.MupdfDocument;
 import cn.archko.pdf.utils.BitmapUtils;
 import cn.archko.pdf.utils.FileUtils;
 
@@ -77,12 +76,12 @@ public class ImageLoader extends ImageWorker {
     protected Bitmap processBitmap(DecodeParam decodeParam) {
         Bitmap bitmap = null;
         try {
-            File thumb = FileUtils.getDiskCacheDir(App.Companion.getInstance(), FileUtils.getRealPath(decodeParam.key));
+            File thumb = FileUtils.getDiskCacheDir(App.Companion.getInstance(), FileUtils.getRealPath(decodeParam.getKey()));
             bitmap = decodeFromFile(thumb);
             if (null == bitmap) {
-                File file = new File(decodeParam.key);
+                File file = new File(decodeParam.getKey());
                 if (file.exists()) {
-                    bitmap = decodeFromPDF(decodeParam.key, decodeParam.pageNum, decodeParam.zoom, decodeParam.screenWidth);
+                    bitmap = decodeFromPDF(decodeParam.getKey(), decodeParam.getPageNum(), decodeParam.getZoom(), decodeParam.getScreenWidth());
                     if (bitmap != null) {
                         BitmapUtils.saveBitmapToFile(bitmap, thumb);
                     }
@@ -125,7 +124,7 @@ public class ImageLoader extends ImageWorker {
         int topBound = 0;
         Matrix ctm = new Matrix(aPage.getScaleZoom() * scale);
         Bitmap bm = Bitmap.createBitmap(zoomSize.x, zoomSize.y, Bitmap.Config.ARGB_8888);
-        MupdfDocument.render(p, ctm, bm, 0, leftBound, topBound);
+        MupdfDocument.Companion.render(p, ctm, bm, 0, leftBound, topBound);
         page.destroy();
         return bm;
     }
@@ -140,7 +139,7 @@ public class ImageLoader extends ImageWorker {
             if (null == imageView.getDrawable() || imageView.getDrawable() instanceof BitmapDrawable) {
                 imageView.setImageBitmap(result);
             } else {
-                Bitmap bitmap = getBitmapFromCache(decodeParam.key);
+                Bitmap bitmap = getBitmapFromCache(decodeParam.getKey());
                 if (null != bitmap) {
                     imageView.setImageBitmap(bitmap);
                 }

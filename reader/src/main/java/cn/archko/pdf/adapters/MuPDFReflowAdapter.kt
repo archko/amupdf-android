@@ -8,7 +8,7 @@ import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.ReflowViewCache
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.entity.ReflowBean
-import cn.archko.pdf.mupdf.MupdfDocument
+import cn.archko.pdf.common.MupdfDocument
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import kotlinx.coroutines.CoroutineScope

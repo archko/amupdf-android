@@ -6,25 +6,34 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import androidx.recyclerview.awidget.ARecyclerView
+import androidx.recyclerview.awidget.LinearLayoutManager
+import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.common.BitmapCache
-import cn.archko.pdf.common.ImageDecoder
 import cn.archko.pdf.common.Logcat
+import cn.archko.pdf.common.MupdfDocument
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.entity.DecodeParam
 import cn.archko.pdf.listeners.DecodeCallback
-import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.utils.Utils
+import cn.archko.pdf.viewmodel.PDFViewModel
 
 /**
  * @author: archko 2018/7/25 :12:43
  */
 @SuppressLint("AppCompatCustomView")
-class APDFView(mContext: Context) : ImageView(mContext) {
+class APDFView(
+    private var ctx: Context,
+    private var pdfViewModel: PDFViewModel,
+) : ImageView(ctx) {
 
     private val textPaint: Paint = textPaint()
     private val strokePaint: Paint = strokePaint()
+    private var resultWidth: Int = 1080
+    private var resultHeight: Int = 1080
     private var aPage: APage? = null
     private var index: Int = -1
     private var cacheKey: String? = null
@@ -58,7 +67,7 @@ class APDFView(mContext: Context) : ImageView(mContext) {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         if (null == aPage) {
-            return super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+            return setMeasuredDimension(resultWidth, resultHeight)
         }
         var mwidth = aPage!!.getCropWidth()
         var mheight = aPage!!.getCropHeight()
@@ -105,57 +114,136 @@ class APDFView(mContext: Context) : ImageView(mContext) {
         )
     }
 
-    fun updatePage(pageSize: APage, newZoom: Float, mupdfDocument: MupdfDocument?, crop: Boolean) {
-        index = pageSize.index
-        val oldZoom = aPage?.scaleZoom ?: 1f
-        aPage = pageSize
-        aPage!!.zoom = newZoom
+    private fun getCacheKey(index: Int, w: Int, h: Int, crop: Boolean): String {
+        return String.format("%s-%s-%s-%s", index, w, h, crop)
+    }
 
-        cacheKey = ImageDecoder.getCacheKey(aPage!!.index, crop, aPage!!.scaleZoom)
-        Logcat.d(
+    fun updatePage(
+        pageSize: APage?,
+        orientation: Int,
+        crop: Boolean,
+        screenWidth: Int,
+        defaultHeight: Int,
+    ) {
+        aPage = pageSize
+        if (aPage == null && pdfViewModel.isDestroy) {
+            return
+        }
+        index = pageSize!!.index
+
+        resultWidth = screenWidth
+        resultHeight = defaultHeight
+        caculateWidth(orientation, crop)
+        //setLayoutSize()
+        Log.d(
+            "TAG",
             String.format(
-                "updatePage:%s, key:%s, oldZoom:%s, newScaleZoom:%s,newZoom:%s,",
-                aPage!!.index, cacheKey, oldZoom, aPage!!.scaleZoom, newZoom
+                "updatePage.page:%s, size w-h:%s-%s",
+                pageSize!!.index,
+                resultWidth,
+                resultHeight
             )
         )
 
-        val bmp = BitmapCache.getInstance().getBitmap(cacheKey!!)
+        val key = getCacheKey(aPage!!.index, resultWidth, resultHeight, crop)
+        cacheKey = key
+        val bmp = BitmapCache.getInstance().getBitmap(key)
 
         if (null != bmp) {
-            setImageBitmap(bmp)
+            Log.d("TAG", String.format("hit the cache:%s", aPage?.index))
+            updateImage(this, bmp, resultWidth, resultHeight, aPage!!.index)
             return
         }
 
-        val callback = object : DecodeCallback {
-            override fun decodeComplete(bitmap: Bitmap?, param: DecodeParam) {
-                if (Logcat.loggable) {
-                    Logcat.d(
-                        String.format(
-                            "decode callback:index:%s-%s, decode.page:%s, key:%s, param:%s",
-                            param.pageNum, index, param.pageNum, cacheKey, param.key
-                        )
-                    )
-                }
-                if (param.pageNum == index) {
-                    setImageBitmap(bitmap)
-                }
-            }
-
-            override fun shouldRender(index: Int, param: DecodeParam): Boolean {
-                return this@APDFView.index == index
-            }
-        }
         //aPage 这个如果当参数传递,由于复用机制,后面的页面更新后会把它覆盖,导致解码并不是原来那个
-        //这里应该传递页码与key,不是引用
+        //这里应该传递高宽值
         val decodeParam = DecodeParam(
-            cacheKey,
+            key,
             this,
             crop,
             0,
             aPage!!,
-            mupdfDocument?.document,
-            callback
+            pdfViewModel.mupdfDocument,
+            callback,
+            resultWidth,
+            resultHeight
         )
-        ImageDecoder.getInstance().loadImage(decodeParam)
+        AppExecutors.instance.diskIO().execute {
+            MupdfDocument.decode(aPage!!, decodeParam)
+        }
+    }
+
+    private val callback = object : DecodeCallback {
+        override fun decodeComplete(bitmap: Bitmap?, param: DecodeParam) {
+            if (param.pageNum == index) {
+                updateImage(this@APDFView, bitmap!!, width, height, param.pageNum)
+            } else {
+                Log.d(
+                    "TAG",
+                    String.format(
+                        "decode callback:cancel:%s-%s, decode.page:%s, key:%s, param:%s",
+                        param.pageNum, index, param.pageNum, cacheKey, param.key
+                    )
+                )
+            }
+        }
+
+        override fun shouldRender(index: Int, param: DecodeParam): Boolean {
+            return this@APDFView.index == index
+        }
+    }
+
+    private fun caculateWidth(orientation: Int, crop: Boolean) {
+        if (orientation == LinearLayoutManager.VERTICAL) {//垂直方向,以宽为准
+            resultHeight = /*if (crop && aPage!!.cropBounds != null) {
+                (resultWidth * aPage!!.cropBounds!!.height() / aPage!!.width).toInt()
+            } else {*/
+                (resultWidth * aPage!!.height / aPage!!.width).toInt()
+            //}
+        } else {    //水平滚动,以高为准
+            resultWidth = /*if (crop && aPage!!.cropBounds != null) {
+                (resultHeight * aPage!!.cropBounds!!.width() / aPage!!.height).toInt()
+            } else {*/
+                (resultHeight * aPage!!.width / aPage!!.height).toInt()
+            //}
+        }
+    }
+
+    private fun updateImage(view: ImageView, bitmap: Bitmap, width: Int, height: Int, index: Int) {
+        val bmpWidth = bitmap.width
+        val bmpHeight = bitmap.height
+        var lp = view.layoutParams as ARecyclerView.LayoutParams?
+        if (null == lp) {
+            lp = ARecyclerView.LayoutParams(width, height)
+            view.layoutParams = lp
+        } else {
+            //解码的页面与实际显示的高宽不一定一样,有些细微差别,不必重新布局测量
+            //而重新测量布局是在旋转屏幕时比较重要
+            if (Math.abs(bmpWidth - lp.width) > 5 || Math.abs(bmpHeight - lp.height) > 5) {
+                Log.d(
+                    "TAG",
+                    String.format(
+                        "draw:position:%s, view.w:%s-h:%s, bitmap.w::%s-h:%s, lp.w:%s-%s",
+                        index,
+                        width,
+                        height,
+                        bmpWidth,
+                        bmpHeight,
+                        lp.width,
+                        lp.height
+                    )
+                )
+                lp.width = bmpWidth
+                lp.height = bmpHeight
+                view.layoutParams = lp
+            }
+        }
+        view.setImageBitmap(bitmap)
+    }
+
+    // =================== decode ===================
+
+    companion object {
+        private val TAG: String = "APDFView"
     }
 }

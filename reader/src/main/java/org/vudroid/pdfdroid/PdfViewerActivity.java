@@ -15,7 +15,7 @@ import cn.archko.pdf.common.Event;
 import cn.archko.pdf.common.MenuHelper;
 import cn.archko.pdf.common.OutlineHelper;
 import cn.archko.pdf.listeners.OutlineListener;
-import cn.archko.pdf.mupdf.MupdfDocument;
+import cn.archko.pdf.common.MupdfDocument;
 
 public class PdfViewerActivity extends BaseViewerActivity implements OutlineListener {
 

@@ -1,7 +1,7 @@
 package cn.archko.pdf.fragments
 
 import cn.archko.pdf.entity.APage
-import cn.archko.pdf.mupdf.MupdfDocument
+import cn.archko.pdf.common.MupdfDocument
 
 interface MupdfListener {
 

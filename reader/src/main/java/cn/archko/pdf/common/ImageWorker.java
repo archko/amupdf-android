@@ -8,18 +8,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.text.TextUtils;
 import android.widget.ImageView;
-
-import com.artifex.mupdf.fitz.Document;
 
 import java.lang.ref.WeakReference;
 
 import androidx.collection.LruCache;
 import cn.archko.pdf.entity.APage;
 import cn.archko.pdf.entity.DecodeParam;
-import cn.archko.pdf.listeners.DecodeCallback;
-import cn.archko.pdf.utils.Utils;
 
 /**
  * @author: archko 2019/8/30 :16:17
@@ -163,9 +158,9 @@ public abstract class ImageWorker {
             }
 
             // First, check the disk cache for the image
-            if (decodeParam.key != null /*&& getImageCache() != null*/ && !isCancelled()
+            if (decodeParam.getKey() != null /*&& getImageCache() != null*/ && !isCancelled()
                     && getAttachedImageView() != null) {
-                bitmap = getBitmapFromCache(decodeParam.key);
+                bitmap = getBitmapFromCache(decodeParam.getKey());
             }
 
             // Define the album id now
@@ -182,8 +177,8 @@ public abstract class ImageWorker {
             }
 
             // Fourth, add the new image to the cache
-            if (bitmap != null && decodeParam.key != null /*&& getImageCache() != null*/) {
-                addBitmapToCache(decodeParam.key, bitmap);
+            if (bitmap != null && decodeParam.getKey() != null /*&& getImageCache() != null*/) {
+                addBitmapToCache(decodeParam.getKey(), bitmap);
             }
 
             // Add the second layer to the transiation drawable
@@ -251,7 +246,7 @@ public abstract class ImageWorker {
         final BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
         if (bitmapWorkerTask != null) {
             final DecodeParam decodeParam = bitmapWorkerTask.decodeParam;
-            if (decodeParam == null || decodeParam.key == null || !decodeParam.key.equals(data)) {
+            if (decodeParam == null || decodeParam.getKey() == null || !decodeParam.getKey().equals(data)) {
                 bitmapWorkerTask.cancel(true);
             } else {
                 // The same work is already in progress
@@ -316,15 +311,15 @@ public abstract class ImageWorker {
     }
 
     public void loadImage(DecodeParam decodeParam, boolean forceSerial) {
-        if (decodeParam.key == null /*|| getImageCache() == null*/ || decodeParam.imageView == null) {
+        /*if (decodeParam.getKey() == null *//*|| getImageCache() == null*//* || decodeParam.imageView == null) {
             return;
         }
         // First, check the memory for the image
-        final Bitmap lruBitmap = getBitmapFromCache(decodeParam.key);
+        final Bitmap lruBitmap = getBitmapFromCache(decodeParam.getKey());
         if (lruBitmap != null && decodeParam.imageView != null) {
             // Bitmap found in memory cache
             decodeParam.imageView.setImageBitmap(lruBitmap);
-        } else if (executePotentialWork(decodeParam.key, decodeParam.imageView) && decodeParam.imageView != null && !isScrolling()) {
+        } else if (executePotentialWork(decodeParam.getKey(), decodeParam.imageView) && decodeParam.imageView != null && !isScrolling()) {
             // Otherwise run the worker task
             final BitmapWorkerTask bitmapWorkerTask = new BitmapWorkerTask(decodeParam.imageView);
             final AsyncDrawable asyncDrawable = new AsyncDrawable(bitmapWorkerTask);
@@ -336,7 +331,7 @@ public abstract class ImageWorker {
             } else {
                 Utils.execute(forceSerial, bitmapWorkerTask, decodeParam);
             }
-        }
+        }*/
     }
 
     /**

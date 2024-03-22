@@ -8,10 +8,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.GridLayoutManager
+import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.common.BitmapCache
-import cn.archko.pdf.common.ImageDecoder
 import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.entity.APage
+import cn.archko.pdf.common.MupdfDocument
 import cn.archko.pdf.entity.DecodeParam
 import cn.archko.pdf.listeners.ClickListener
 import cn.archko.pdf.listeners.DecodeCallback
@@ -26,6 +26,9 @@ class MupdfGridAdapter(
     var clickListener: ClickListener<View>
 ) :
     ARecyclerView.Adapter<ARecyclerView.ViewHolder>() {
+
+    private var resultWidth: Int = 1080
+    private var resultHeight: Int = 1080
 
     override fun getItemCount(): Int {
         return mupdfListener.getPageCount()
@@ -69,29 +72,25 @@ class MupdfGridAdapter(
 
     inner class PdfHolder(internal var view: ImageView) : ARecyclerView.ViewHolder(view) {
 
-        private var aPage: APage? = null
-        private var pageIndex = -1
-        private var resultWidth: Int = 1080
-        private var resultHeight: Int = 1080
-        private var index: Int = -1
+        private var index = -1
 
         fun onBind(position: Int) {
-            pageIndex = position
-            aPage = mupdfListener.getPageList()[position]
+            index = position
+            val aPage = mupdfListener.getPageList()[position]
 
             val cacheKey =
                 "${mupdfListener.getDocument()!!}_page_$position-${aPage}"
 
-            var width: Int = viewWidth()
+            var width: Int = viewWidth() / 2
             if (width == 0) {
                 width = 1080
             }
             val height: Int = (width * 4 / 3f).toInt()
             resultWidth = width
             resultHeight = height
-            if (aPage!!.getTargetWidth() != resultWidth) {
-                aPage!!.setTargetWidth(resultWidth)
-            }
+            //if (aPage.getTargetWidth() != resultWidth) {
+            //    aPage.setTargetWidth(resultWidth)
+            //}
 
             view.setOnClickListener { clickListener.click(view, position) }
             view.setOnLongClickListener {
@@ -99,11 +98,9 @@ class MupdfGridAdapter(
                 return@setOnLongClickListener true
             }
 
-            index = aPage!!.index
-
             val bmp = BitmapCache.getInstance().getBitmap(cacheKey)
-
             if (null != bmp) {
+                Log.d("TAG", String.format("bind.hit cache:%s", aPage.index))
                 view.setImageBitmap(bmp)
                 return
             }
@@ -134,11 +131,15 @@ class MupdfGridAdapter(
                 view,
                 false,
                 0,
-                aPage!!,
-                mupdfListener.getDocument()?.document,
-                callback
+                aPage,
+                mupdfListener.getDocument(),
+                callback,
+                resultWidth,
+                resultHeight
             )
-            ImageDecoder.getInstance().loadImage(decodeParam)
+            AppExecutors.instance.diskIO().execute {
+                MupdfDocument.decode(aPage, decodeParam)
+            }
         }
 
         private fun setLayoutSize(bitmap: Bitmap) {

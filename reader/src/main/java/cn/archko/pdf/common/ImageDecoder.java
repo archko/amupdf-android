@@ -4,16 +4,14 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
-import androidx.collection.LruCache;
-
 import com.artifex.mupdf.fitz.Matrix;
 import com.artifex.mupdf.fitz.Page;
 import com.artifex.mupdf.fitz.RectI;
 
+import androidx.collection.LruCache;
 import cn.archko.pdf.App;
 import cn.archko.pdf.entity.APage;
 import cn.archko.pdf.entity.DecodeParam;
-import cn.archko.pdf.mupdf.MupdfDocument;
 
 /**
  * @author: archko 2019/8/30 :16:17
@@ -68,23 +66,23 @@ public class ImageDecoder extends ImageWorker {
     protected Bitmap processBitmap(DecodeParam decodeParam) {
         try {
             //long start = SystemClock.uptimeMillis();
-            Page page = decodeParam.document.loadPage(decodeParam.pageNum);
+            Page page = decodeParam.getDocument().loadPage(decodeParam.getPageNum());
             //if (decodeParam.pageNum != decodeParam.pageSize.index) {
-            if (!decodeParam.decodeCallback.shouldRender(decodeParam.pageNum, decodeParam)) {
+            if (!decodeParam.getDecodeCallback().shouldRender(decodeParam.getPageNum(), decodeParam)) {
                 if (Logcat.loggable) {
                     Logcat.w(TAG, String.format("decode cancel1,index changed: %s-%s,page:%s",
-                            decodeParam.pageNum, decodeParam.pageSize.index, decodeParam.pageSize));
+                            decodeParam.getPageNum(), decodeParam.getPageSize().index, decodeParam.getPageSize()));
                 }
                 return null;
             }
 
             int leftBound = 0;
             int topBound = 0;
-            final APage pageSize = decodeParam.pageSize;
+            final APage pageSize = decodeParam.getPageSize();
             int pageW = pageSize.getZoomPoint().x;
             int pageH = pageSize.getZoomPoint().y;
 
-            Matrix ctm = new Matrix(MupdfDocument.ZOOM);
+            Matrix ctm = new Matrix(2);
             RectI bbox = new RectI(page.getBounds().transform(ctm));
             float xscale = (float) pageW / (float) (bbox.x1 - bbox.x0);
             float yscale = (float) pageH / (float) (bbox.y1 - bbox.y0);
@@ -94,10 +92,10 @@ public class ImageDecoder extends ImageWorker {
                 pageW = pageSize.getTargetWidth();
             }
 
-            if (decodeParam.crop) {
+            if (decodeParam.getCrop()) {
                 if (pageSize.getCropWidth() != pageW && pageSize.getCropHeight() != pageH) {
                 } else {
-                    float[] arr = MupdfDocument.getArrByCrop(page, ctm, pageW, pageH, leftBound, topBound);
+                    float[] arr = MupdfDocument.Companion.getArrByCrop(page, ctm, pageW, pageH, leftBound, topBound);
                     leftBound = (int) arr[0];
                     topBound = (int) arr[1];
                     pageH = (int) arr[2];
@@ -112,33 +110,33 @@ public class ImageDecoder extends ImageWorker {
             }
 
             //if (decodeParam.pageNum != decodeParam.pageSize.index) {
-            if (!decodeParam.decodeCallback.shouldRender(decodeParam.pageNum, decodeParam)) {
+            if (!decodeParam.getDecodeCallback().shouldRender(decodeParam.getPageNum(), decodeParam)) {
                 if (Logcat.loggable) {
                     Logcat.w(TAG, String.format("decode cancel2,index changed: %s-%s,page:%s",
-                            decodeParam.pageNum, decodeParam.pageSize.index, decodeParam.pageSize));
+                            decodeParam.getPageNum(), decodeParam.getPageSize().index, decodeParam.getPageSize()));
                 }
                 return null;
             }
 
-            Bitmap bitmap = BitmapCache.getInstance().getBitmap(decodeParam.key);
+            Bitmap bitmap = BitmapCache.getInstance().getBitmap(decodeParam.getKey());
             if (null != bitmap) {
                 return bitmap;
             }
             if (Logcat.loggable) {
                 Logcat.d(TAG, String.format("decode bitmap:%s-%s, %s-%s,page:%s-%s, bound(left-top):%s-%s, page:%s",
-                        decodeParam.pageNum, decodeParam.pageSize.index, pageW, pageH, pageSize.getZoomPoint().x, pageSize.getZoomPoint().y,
+                        decodeParam.getPageNum(), decodeParam.getPageSize().index, pageW, pageH, pageSize.getZoomPoint().x, pageSize.getZoomPoint().y,
                         leftBound, topBound, pageSize));
             }
 
             bitmap = BitmapPool.getInstance().acquire(pageW, pageH);//Bitmap.createBitmap(sizeX, sizeY, Bitmap.Config.ARGB_8888);
-            MupdfDocument.render(page, ctm, bitmap, decodeParam.xOrigin, leftBound, topBound);
+            MupdfDocument.Companion.render(page, ctm, bitmap, decodeParam.getXOrigin(), leftBound, topBound);
             //if (decodeParam.pageNum != decodeParam.pageSize.index) {
-            if (!decodeParam.decodeCallback.shouldRender(decodeParam.pageNum, decodeParam)) {
+            if (!decodeParam.getDecodeCallback().shouldRender(decodeParam.getPageNum(), decodeParam)) {
                 if (Logcat.loggable) {
                     Logcat.w(TAG, String.format("decode cancel3,index changed: %s-%s,page:%s",
-                            decodeParam.pageNum, decodeParam.pageSize.index, decodeParam.pageSize));
+                            decodeParam.getPageNum(), decodeParam.getPageSize().index, decodeParam.getPageSize()));
                 }
-                addBitmapToCache(decodeParam.key, bitmap);
+                addBitmapToCache(decodeParam.getKey(), bitmap);
                 return null;
             }
 
@@ -159,8 +157,8 @@ public class ImageDecoder extends ImageWorker {
         }
         final ImageView imageView = bitmapWorkerTask.getAttachedImageView();
         if (imageView != null) {
-            if (null != decodeParam.decodeCallback) {
-                decodeParam.decodeCallback.decodeComplete(bitmap, decodeParam);
+            if (null != decodeParam.getDecodeCallback()) {
+                decodeParam.getDecodeCallback().decodeComplete(bitmap, decodeParam);
             }
         }
     }

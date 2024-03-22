@@ -1,10 +1,11 @@
 package cn.archko.pdf.activities
 
 import android.content.Context
+import android.util.Log
 import android.util.SparseArray
 import android.view.ViewGroup
 import androidx.recyclerview.awidget.ARecyclerView
-import cn.archko.pdf.common.Logcat
+import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.fastscroll.FastScrollRecyclerView
 import cn.archko.pdf.viewmodel.PDFViewModel
@@ -16,17 +17,51 @@ import cn.archko.pdf.widgets.APDFView
 class PDFRecyclerAdapter(
     var context: Context,
     val pdfViewModel: PDFViewModel,
-    val mPageSizes: SparseArray<APage>
+    val mPageSizes: SparseArray<APage>,
+    val recyclerView: ARecyclerView
 ) : ARecyclerView.Adapter<ARecyclerView.ViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
+
+    private var orientation: Int = LinearLayoutManager.VERTICAL
+    private var crop = true
 
     var defaultWidth = 1080
     var defaultHeight = 1080
-    private var crop: Boolean = true
+
+    init {
+        initWidthAndHeight()
+    }
+
+    private fun initWidthAndHeight() {
+        if (mPageSizes != null && mPageSizes.size() > 0 && viewWidth() > 0) {
+            val aPage = mPageSizes[0]
+            defaultWidth = viewWidth()
+            defaultHeight = defaultWidth
+            if (orientation == LinearLayoutManager.VERTICAL) {//垂直方向,以宽为准
+                defaultHeight = (defaultWidth * aPage.height / aPage.width).toInt()
+            } else {//水平滚动,以高为准
+                defaultHeight = defaultWidth
+                defaultWidth = (defaultHeight * aPage.width / aPage.height).toInt()
+            }
+        }
+    }
+
+    fun setOriention(ori: Int) {
+        orientation = ori
+        initWidthAndHeight()
+    }
 
     fun setCrop(crop: Boolean) {
         this.crop = crop
     }
-    
+
+    fun viewWidth(): Int {
+        return if (orientation == LinearLayoutManager.VERTICAL) {
+            recyclerView.width
+        } else {
+            recyclerView.height
+        }
+    }
+
     override fun getSectionName(position: Int): String {
         return String.format("%d", position + 1)
     }
@@ -35,7 +70,7 @@ class PDFRecyclerAdapter(
         parent: ViewGroup,
         viewType: Int
     ): ARecyclerView.ViewHolder {
-        val view = APDFView(context)
+        val view = APDFView(context, pdfViewModel)
             .apply {
                 layoutParams = ViewGroup.LayoutParams(defaultWidth, defaultHeight)
             }
@@ -60,23 +95,15 @@ class PDFRecyclerAdapter(
 
     inner class PdfHolder(internal var view: APDFView) : ARecyclerView.ViewHolder(view) {
         fun onBind(position: Int) {
-            val pageSize = mPageSizes.get(position)
-            if (pageSize.getTargetWidth() != defaultWidth) {
-                pageSize.setTargetWidth(defaultWidth)
-            }
-            Logcat.d(
-                String.format(
-                    "bind:position:%s,targetWidth:%s, measuredWidth:%s-%s",
-                    position,
-                    pageSize.getTargetWidth(),
-                    defaultWidth,
-                    defaultHeight
-                )
-            )
-            if (defaultWidth <= 0) {
+            val aPage = mPageSizes.get(position)
+            var screenWidth = defaultWidth
+            if (screenWidth == 0) {
+                Log.d("TAG", String.format("onBind.size is 0 %s--%s", position, defaultWidth))
+                screenWidth = defaultWidth
                 return
             }
-            view.updatePage(pageSize, 1.0f, pdfViewModel.mupdfDocument, crop)
+
+            view.updatePage(aPage, orientation, crop, screenWidth, defaultHeight)
         }
 
         /*private fun showBookmark(position: Int): Boolean {

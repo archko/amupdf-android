@@ -14,11 +14,12 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import cn.archko.pdf.AppExecutors
 import cn.archko.pdf.R
+import cn.archko.pdf.common.MupdfDocument
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.listeners.SimpleGestureListener
-import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.presenter.PageViewPresenter
 import cn.archko.pdf.utils.StatusBarHelper
 import cn.archko.pdf.viewmodel.PDFViewModel
@@ -58,7 +59,7 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         super.onCreate(savedInstanceState)
         StatusBarHelper.hideSystemUI(this)
         StatusBarHelper.setImmerseBarAppearance(window, true)
-        
+
         MupdfDocument.useNewCropper = PdfOptionRepository.getCropper()
         initDecodeService()
         val zoomModel = ZoomModel()
@@ -82,7 +83,7 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         )
         decodeService!!.setContainerView(documentView)
         documentView!!.setDecodeService(decodeService)
-        decodeService!!.open(absolutePath)
+
         val frameLayout = createMainContainer()
         frameLayout.addView(documentView)
         pageControls = createZoomControls(zoomModel)
@@ -101,22 +102,14 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
                 pdfViewModel.bookProgress!!.offsetY
             )
         }
-        documentView!!.showDocument()
 
-        //viewerPreferences.addRecent(getIntent().getData());
+        AppExecutors.instance.diskIO().execute {
+            decodeService!!.open(absolutePath)
+            AppExecutors.instance.mainThread()
+                .execute { documentView!!.showDocument() }
+        }
 
-        /*mPageModel=new CurrentPageModel();
-        mPageModel.addEventListener(new CurrentPageListener() {
-            @Override
-            public void currentPageChanged(int pageIndex) {
-                Log.d(TAG, "currentPageChanged:"+pageIndex);
-                if (documentView.getCurrentPage()!=pageIndex) {
-                    documentView.goToPage(pageIndex);
-                }
-            }
-        });
-        documentView.setPageModel(mPageModel);
-        mPageSeekBarControls=createSeekControls(mPageModel);*/pageSeekBarControls =
+        pageSeekBarControls =
             APageSeekBarControls(this, object : PageViewPresenter {
                 override fun getPageCount(): Int {
                     return decodeService!!.pageCount

@@ -17,7 +17,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.common.BitmapCache
-import cn.archko.pdf.common.ImageDecoder
 import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.entity.APage
 import cn.archko.pdf.fastscroll.FastScrollRecyclerView
@@ -43,6 +42,7 @@ class ACropViewController(
 
     private lateinit var mRecyclerView: FastScrollRecyclerView
     private lateinit var mPageSizes: SparseArray<APage>
+    private var pdfAdapter: PDFRecyclerAdapter? = null
 
     /**
      * 有时需要强制不切边,又不切换到normal的渲染模式,设置这个值
@@ -147,9 +147,10 @@ class ACropViewController(
 
     private fun setCropMode(pos: Int) {
         setOrientation(scrollOrientation)
-        if (null == mRecyclerView.adapter) {
-            mRecyclerView.adapter = PDFRecyclerAdapter(context, pdfViewModel, mPageSizes)
-            (mRecyclerView.adapter as PDFRecyclerAdapter).setCrop(crop)
+        if (null == pdfAdapter) {
+            pdfAdapter = PDFRecyclerAdapter(context, pdfViewModel, mPageSizes, mRecyclerView)
+            mRecyclerView.adapter = pdfAdapter
+            pdfAdapter!!.setCrop(crop)
         }
 
         if (pos > 0) {
@@ -163,7 +164,7 @@ class ACropViewController(
                     mRecyclerView.postDelayed({
                         layoutManager!!.scrollToPosition(pos)
                         mRecyclerView.requestLayout()
-                    }, 50L)
+                    }, 10L)
                 }
             })
         }
@@ -171,8 +172,9 @@ class ACropViewController(
 
     override fun getCurrentBitmap(): Bitmap? {
         val aPage = mPageSizes[getCurrentPos()]
-        val cacheKey = ImageDecoder.getCacheKey(aPage!!.index, crop, aPage.scaleZoom)
-        return BitmapCache.getInstance().getBitmap(cacheKey)
+        //val cacheKey = ImageDecoder.getCacheKey(aPage!!.index, crop, aPage.scaleZoom)
+        //return BitmapCache.getInstance().getBitmap(cacheKey)
+        return null
     }
 
     override fun getCurrentPos(): Int {
@@ -194,6 +196,7 @@ class ACropViewController(
     override fun setOrientation(ori: Int) {
         scrollOrientation = ori
         (mRecyclerView.layoutManager as LinearLayoutManager).orientation = (ori)
+        pdfAdapter?.setOriention(ori)
         mRecyclerView.adapter?.notifyDataSetChanged()
     }
 
@@ -242,7 +245,7 @@ class ACropViewController(
         if (scrollPage(e.y.toInt(), top, bottom, margin)) {
             return true
         }
-        
+
         return false
     }
 

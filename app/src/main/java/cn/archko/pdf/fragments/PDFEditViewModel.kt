@@ -8,7 +8,7 @@ import android.widget.Toast
 import cn.archko.pdf.App
 import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.entity.APage
-import cn.archko.pdf.mupdf.MupdfDocument
+import cn.archko.pdf.common.MupdfDocument
 import com.artifex.mupdf.fitz.Outline
 import com.artifex.mupdf.fitz.PDFDocument
 import com.artifex.mupdf.fitz.Page
@@ -30,12 +30,12 @@ class PDFEditViewModel : MupdfListener {
             Log.d("TAG", "loadPdfDoc.password:$password")
             mupdfDocument!!.newDocument(path, password)
             mupdfDocument!!.let {
-                if (it.document.needsPassword()) {
+                if (it.getDocument()!!.needsPassword()) {
                     Log.d("TAG", "needsPassword")
                     if (TextUtils.isEmpty(password)) {
                         return null
                     }
-                    it.document.authenticatePassword(password)
+                    it.getDocument()!!.authenticatePassword(password)
                 }
             }
 
@@ -95,7 +95,7 @@ class PDFEditViewModel : MupdfListener {
     fun deletePage(page: Int) {
         if (null != mupdfDocument) {
             isEdit = true
-            val pdfDocument = mupdfDocument!!.document as PDFDocument
+            val pdfDocument = mupdfDocument!!.getDocument() as PDFDocument
             pdfDocument.deletePage(page)
             aPageList.removeAt(page)
             Log.d(
@@ -108,7 +108,7 @@ class PDFEditViewModel : MupdfListener {
     fun insertPage(page: Int, path: String) {
         if (null != mupdfDocument) {
             isEdit = true
-            val pdfDocument = mupdfDocument!!.document as PDFDocument
+            val pdfDocument = mupdfDocument!!.getDocument() as PDFDocument
             Log.d(
                 "TAG",
                 "insertPage.$page, cp:${pdfDocument.countPages()}, size:${aPageList.size}"
@@ -118,7 +118,7 @@ class PDFEditViewModel : MupdfListener {
 
     fun save() {
         if (null != mupdfDocument && isEdit) {
-            val pdfDocument = mupdfDocument!!.document as PDFDocument
+            val pdfDocument = mupdfDocument!!.getDocument() as PDFDocument
             pdfDocument.save(pdfPath, PDFCreaterHelper.OPTS)
             Toast.makeText(App.instance, "保存成功", Toast.LENGTH_SHORT).show()
             isEdit = false

@@ -2,7 +2,6 @@ package cn.archko.pdf.listeners;
 
 import android.graphics.Bitmap;
 
-import cn.archko.pdf.common.ImageWorker;
 import cn.archko.pdf.entity.DecodeParam;
 
 /**

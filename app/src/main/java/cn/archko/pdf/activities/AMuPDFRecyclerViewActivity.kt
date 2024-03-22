@@ -17,7 +17,6 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.Toast
-import androidx.core.util.forEach
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
@@ -25,6 +24,7 @@ import cn.archko.pdf.common.APageSizeLoader
 import cn.archko.pdf.common.BitmapCache
 import cn.archko.pdf.common.IntentFile
 import cn.archko.pdf.common.Logcat
+import cn.archko.pdf.common.MupdfDocument
 import cn.archko.pdf.common.OutlineHelper
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.entity.APage
@@ -32,7 +32,6 @@ import cn.archko.pdf.entity.Bookmark
 import cn.archko.pdf.fragments.OutlineFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
-import cn.archko.pdf.mupdf.MupdfDocument
 import cn.archko.pdf.presenter.PageViewPresenter
 import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
@@ -90,17 +89,21 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             menu = BaseMenu(color, 1f, ocrStr, -1, type_ocr)
             menus.add(menu)
 
-            if (pdfViewModel.bookProgress?.autoCrop == 0) {
-                menu = BaseMenu(selectedColor, 1f, autoCropStr, -1, type_crop)
-                menus.add(menu)
-            } else {
-                menu = BaseMenu(color, 1f, autoCropStr, -1, type_crop)
-                menus.add(menu)
+            if (forceCropParam != 0) {
+                if (pdfViewModel.bookProgress?.autoCrop == 0) {
+                    menu = BaseMenu(selectedColor, 1f, autoCropStr, -1, type_crop)
+                    menus.add(menu)
+                } else {
+                    menu = BaseMenu(color, 1f, autoCropStr, -1, type_crop)
+                    menus.add(menu)
+                }
             }
         } else {    //文本重排时,自动切边不生效
             menu = BaseMenu(selectedColor, 1f, reflowStr, -1, type_reflow)
             menus.add(menu)
-            menu = BaseMenu(color, 1f, autoCropStr, -1, type_crop)
+            if (forceCropParam != 0) {
+                menu = BaseMenu(color, 1f, autoCropStr, -1, type_crop)
+            }
             menus.add(menu)
         }
         //addMenu("字体", color, menus)
