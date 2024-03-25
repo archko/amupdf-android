@@ -62,6 +62,9 @@ class PDFViewModel : ViewModel() {
 
     private fun loadProgressAndBookmark(absolutePath: String?, autoCrop: Int) {
         val file = File(absolutePath)
+        if (file.isDirectory) {
+            return
+        }
         val progress = Graph.database.progressDao().getProgress(file.name)
         bookProgress = progress
         if (null == bookProgress) {

@@ -208,12 +208,12 @@ class HistoryFragment : BrowserFragment() {
             }
         }
 
-        historyViewModel.uiRestorepModel.observe(viewLifecycleOwner) { flag ->
+        historyViewModel.uiRestoreModel.observe(viewLifecycleOwner) { flag ->
             kotlin.run {
                 progressDialog.dismiss()
                 if (flag) {
                     Toast.makeText(App.instance, "恢复成功:$flag", Toast.LENGTH_LONG).show()
-                    getHistory()
+                    onRefresh()
                 } else {
                     Toast.makeText(App.instance, "恢复失败", Toast.LENGTH_LONG).show()
                 }

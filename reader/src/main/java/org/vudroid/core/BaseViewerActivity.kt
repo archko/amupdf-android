@@ -66,7 +66,7 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         val absolutePath = Uri.decode(uri!!.encodedPath)
         lifecycleScope.launch {
             val bookProgress = pdfViewModel.loadBookProgressByPath(absolutePath)
-            zoomModel.zoom = bookProgress!!.zoomLevel / 1000
+            zoomModel.zoom = bookProgress?.zoomLevel?.div(1000) ?: 1f
         }
         val progressModel = DecodingProgressModel()
         progressModel.addEventListener(this)

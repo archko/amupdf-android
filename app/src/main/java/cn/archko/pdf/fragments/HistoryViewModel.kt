@@ -46,7 +46,7 @@ class HistoryViewModel : ViewModel() {
         get() = _uiBackupModel
 
     private val _uiRestorepModel = MutableLiveData<Boolean>()
-    val uiRestorepModel: LiveData<Boolean>
+    val uiRestoreModel: LiveData<Boolean>
         get() = _uiRestorepModel
 
     fun reset() {
