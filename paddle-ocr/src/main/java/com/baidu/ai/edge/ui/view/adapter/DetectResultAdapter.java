@@ -15,9 +15,9 @@ import com.baidu.ai.edge.ui.view.model.BaseResultModel;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import cn.archko.pdf.App;
-import cn.archko.pdf.adapters.BaseRecyclerAdapter;
-import cn.archko.pdf.adapters.BaseViewHolder;
+import cn.archko.pdf.core.App;
+import cn.archko.pdf.core.adapters.BaseRecyclerAdapter;
+import cn.archko.pdf.core.adapters.BaseViewHolder;
 
 public class DetectResultAdapter extends BaseRecyclerAdapter<BaseResultModel> {
 

@@ -10,10 +10,10 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.mupdf.R
-import cn.archko.pdf.adapters.BaseRecyclerAdapter
-import cn.archko.pdf.adapters.BaseViewHolder
-import cn.archko.pdf.listeners.DataListener
-import cn.archko.pdf.utils.Utils
+import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
+import cn.archko.pdf.core.adapters.BaseViewHolder
+import cn.archko.pdf.core.listeners.DataListener
+import cn.archko.pdf.core.utils.Utils
 import com.google.android.material.appbar.MaterialToolbar
 //import com.umeng.analytics.MobclickAgent
 import java.io.File

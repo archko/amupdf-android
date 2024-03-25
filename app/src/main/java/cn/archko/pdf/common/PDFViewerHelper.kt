@@ -9,6 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.core.content.FileProvider
 import cn.archko.pdf.activities.AMuPDFRecyclerViewActivity
+import cn.archko.pdf.core.common.Logcat
 //import cn.archko.pdf.activities.ComposeTextActivity
 import org.vudroid.pdfdroid.PdfViewerActivity
 import java.io.File

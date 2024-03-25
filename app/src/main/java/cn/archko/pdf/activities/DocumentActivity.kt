@@ -17,7 +17,7 @@
 //import cn.archko.pdf.common.IntentFile
 //import cn.archko.pdf.common.PdfOptionRepository
 //import cn.archko.pdf.common.SensorHelper
-//import cn.archko.pdf.utils.StatusBarHelper
+//import cn.archko.pdf.core.common.StatusBarHelper
 //import cn.archko.pdf.viewmodel.PDFViewModel
 //import com.artifex.solib.ArDkLib
 //import com.artifex.solib.ConfigOptions

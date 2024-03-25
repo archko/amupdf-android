@@ -5,9 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cn.archko.pdf.common.Graph
-import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.entity.FileBean
+import cn.archko.pdf.core.common.Graph
+import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.entity.FileBean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

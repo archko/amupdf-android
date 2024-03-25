@@ -8,10 +8,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
-import cn.archko.pdf.adapters.BaseRecyclerAdapter
-import cn.archko.pdf.adapters.BaseViewHolder
+import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
+import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.base.BaseFragment
-import cn.archko.pdf.entity.Bookmark
+import cn.archko.pdf.core.entity.Bookmark
 
 /**
  * @author: archko 2019/7/11 :17:55

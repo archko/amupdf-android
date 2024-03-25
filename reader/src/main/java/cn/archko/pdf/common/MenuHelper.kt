@@ -6,14 +6,14 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.activities.MuPDFRecyclerViewActivity
-import cn.archko.pdf.adapters.BaseRecyclerAdapter
+import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.adapters.MenuAdapter
-import cn.archko.pdf.entity.Bookmark
+import cn.archko.pdf.core.entity.Bookmark
 import cn.archko.pdf.entity.MenuBean
 import cn.archko.pdf.fragments.BookmarkFragment
 import cn.archko.pdf.fragments.OutlineFragment
 import cn.archko.pdf.listeners.MenuListener
-import cn.archko.pdf.utils.FileUtils
+import cn.archko.pdf.core.utils.FileUtils
 
 /**
  * @author: archko 2019/7/12 :19:47

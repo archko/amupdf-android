@@ -10,11 +10,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import cn.archko.mupdf.R
-import cn.archko.pdf.App
-import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.listeners.OnItemClickListener
-import cn.archko.pdf.utils.FileUtils
-import cn.archko.pdf.utils.Utils
+import cn.archko.pdf.core.App
+import cn.archko.pdf.core.adapters.BaseViewHolder
+import cn.archko.pdf.core.entity.FileBean
+import cn.archko.pdf.core.listeners.OnItemClickListener
+import cn.archko.pdf.core.utils.FileUtils
+import cn.archko.pdf.core.utils.Utils
 import java.util.Locale
 
 /**

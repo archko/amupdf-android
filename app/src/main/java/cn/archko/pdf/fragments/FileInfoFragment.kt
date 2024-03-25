@@ -13,15 +13,15 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import cn.archko.mupdf.R
-import cn.archko.pdf.App
-import cn.archko.pdf.common.Graph
+import cn.archko.pdf.core.App
+import cn.archko.pdf.core.common.Graph
 import cn.archko.pdf.common.ImageLoader
-import cn.archko.pdf.entity.BookProgress
-import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.listeners.DataListener
-import cn.archko.pdf.utils.DateUtils
-import cn.archko.pdf.utils.FileUtils
-import cn.archko.pdf.utils.Utils
+import cn.archko.pdf.core.entity.BookProgress
+import cn.archko.pdf.core.entity.FileBean
+import cn.archko.pdf.core.listeners.DataListener
+import cn.archko.pdf.core.utils.DateUtils
+import cn.archko.pdf.core.utils.FileUtils
+import cn.archko.pdf.core.utils.Utils
 import com.artifex.mupdf.fitz.Document
 import java.math.BigDecimal
 

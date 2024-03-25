@@ -13,16 +13,16 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.mupdf.R
-import cn.archko.pdf.App
+import cn.archko.pdf.core.App
 import cn.archko.pdf.adapters.BookAdapter
-import cn.archko.pdf.common.Event
-import cn.archko.pdf.common.Event.Companion.ACTION_FAVORITED
-import cn.archko.pdf.common.Event.Companion.ACTION_STOPPED
-import cn.archko.pdf.common.Event.Companion.ACTION_UNFAVORITED
-import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.listeners.DataListener
-import cn.archko.pdf.utils.LengthUtils
+import cn.archko.pdf.core.common.Event
+import cn.archko.pdf.core.common.Event.Companion.ACTION_FAVORITED
+import cn.archko.pdf.core.common.Event.Companion.ACTION_STOPPED
+import cn.archko.pdf.core.common.Event.Companion.ACTION_UNFAVORITED
+import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.entity.FileBean
+import cn.archko.pdf.core.listeners.DataListener
+import cn.archko.pdf.core.utils.LengthUtils
 import cn.archko.pdf.widgets.IMoreView
 import cn.archko.pdf.widgets.ListMoreView
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -128,7 +128,8 @@ class HistoryFragment : BrowserFragment() {
     }
 
     private fun restore() {
-        BackupFragment.showBackupDialog(activity, object : DataListener {
+        BackupFragment.showBackupDialog(activity, object :
+            DataListener {
             override fun onSuccess(vararg args: Any?) {
                 val file = args[0] as File
                 progressDialog.show()

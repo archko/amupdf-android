@@ -14,12 +14,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.awidget.GridLayoutManager
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.FragmentPdfEditBinding
-import cn.archko.pdf.common.BitmapCache
-import cn.archko.pdf.common.BitmapPool
+import cn.archko.pdf.core.cache.BitmapCache
+import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.common.PDFCreaterHelper
-import cn.archko.pdf.listeners.ClickListener
-import cn.archko.pdf.listeners.DataListener
-import cn.archko.pdf.utils.FileUtils
+import cn.archko.pdf.core.listeners.ClickListener
+import cn.archko.pdf.core.listeners.DataListener
+import cn.archko.pdf.core.utils.FileUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch

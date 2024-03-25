@@ -8,9 +8,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import cn.archko.pdf.common.Event
-import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.entity.FileBean
+import cn.archko.pdf.core.common.Event
+import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.widgets.IMoreView
 import cn.archko.pdf.widgets.ListMoreView
 import com.jeremyliao.liveeventbus.LiveEventBus

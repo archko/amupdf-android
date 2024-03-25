@@ -23,8 +23,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import cn.archko.mupdf.R
-import cn.archko.pdf.common.Event
-import cn.archko.pdf.common.Logcat
+import cn.archko.pdf.core.common.Event
+import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.fragments.BrowserFragment
 import cn.archko.pdf.fragments.FavoriteFragment
 import cn.archko.pdf.fragments.HistoryFragment

@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import android.view.MotionEvent
 import android.util.SparseArray
 import android.view.View
-import cn.archko.pdf.entity.APage
+import cn.archko.pdf.core.entity.APage
 
 /**
  * @author: archko 2020/5/15 :12:43

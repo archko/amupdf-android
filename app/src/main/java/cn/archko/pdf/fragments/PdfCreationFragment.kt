@@ -19,12 +19,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.FragmentCreatePdfBinding
-import cn.archko.pdf.adapters.BaseRecyclerAdapter
-import cn.archko.pdf.adapters.BaseViewHolder
-import cn.archko.pdf.common.IntentFile
+import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
+import cn.archko.pdf.core.adapters.BaseViewHolder
+import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.common.PDFCreaterHelper
-import cn.archko.pdf.listeners.DataListener
-import cn.archko.pdf.utils.FileUtils
+import cn.archko.pdf.core.listeners.DataListener
+import cn.archko.pdf.core.utils.FileUtils
 import coil.load
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

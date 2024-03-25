@@ -14,14 +14,14 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import cn.archko.pdf.AppExecutors
+import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.R
-import cn.archko.pdf.common.MupdfDocument
+import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.common.PdfOptionRepository
-import cn.archko.pdf.common.SensorHelper
-import cn.archko.pdf.listeners.SimpleGestureListener
+import cn.archko.pdf.core.common.SensorHelper
+import cn.archko.pdf.core.listeners.SimpleGestureListener
 import cn.archko.pdf.presenter.PageViewPresenter
-import cn.archko.pdf.utils.StatusBarHelper
+import cn.archko.pdf.core.common.StatusBarHelper
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
 import kotlinx.coroutines.Dispatchers
@@ -363,7 +363,8 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    var simpleGestureListener: SimpleGestureListener = object : SimpleGestureListener {
+    var simpleGestureListener: SimpleGestureListener = object :
+        SimpleGestureListener {
         override fun onSingleTapConfirmed(currentPage: Int) {
             currentPageChanged(currentPage)
         }

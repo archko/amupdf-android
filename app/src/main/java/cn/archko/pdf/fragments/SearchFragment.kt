@@ -21,10 +21,10 @@ import cn.archko.mupdf.R
 import cn.archko.pdf.activities.HomeActivity
 import cn.archko.pdf.adapters.BookAdapter
 import cn.archko.pdf.common.PDFViewerHelper
-import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.listeners.DataListener
-import cn.archko.pdf.listeners.OnItemClickListener
-import cn.archko.pdf.widgets.ColorItemDecoration
+import cn.archko.pdf.core.entity.FileBean
+import cn.archko.pdf.core.listeners.DataListener
+import cn.archko.pdf.core.listeners.OnItemClickListener
+import cn.archko.pdf.core.widgets.ColorItemDecoration
 import com.google.android.material.appbar.MaterialToolbar
 import java.io.File
 import java.io.FileFilter
@@ -234,7 +234,8 @@ open class SearchFragment : DialogFragment() {
         bundle.putSerializable(FileInfoFragment.FILE_LIST_ENTRY, entry)
         fileInfoFragment.arguments = bundle
 
-        fileInfoFragment.setListener(object : DataListener {
+        fileInfoFragment.setListener(object :
+            DataListener {
             override fun onSuccess(vararg args: Any?) {
                 val fileEntry = args[0] as FileBean
                 PDFViewerHelper.openWithDefaultViewer(fileEntry.file!!, activity!!)

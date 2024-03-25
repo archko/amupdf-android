@@ -1,7 +1,7 @@
 package cn.archko.pdf.entity
 
 import android.graphics.Color
-import cn.archko.pdf.utils.Utils
+import cn.archko.pdf.core.utils.Utils
 
 /**
  * @author: archko 2019/7/12 :19:50

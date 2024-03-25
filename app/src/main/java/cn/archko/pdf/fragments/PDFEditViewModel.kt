@@ -5,10 +5,10 @@ import android.graphics.PointF
 import android.text.TextUtils
 import android.util.Log
 import android.widget.Toast
-import cn.archko.pdf.App
+import cn.archko.pdf.core.App
 import cn.archko.pdf.common.PDFCreaterHelper
-import cn.archko.pdf.entity.APage
-import cn.archko.pdf.common.MupdfDocument
+import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.decode.MupdfDocument
 import com.artifex.mupdf.fitz.Outline
 import com.artifex.mupdf.fitz.PDFDocument
 import com.artifex.mupdf.fitz.Page

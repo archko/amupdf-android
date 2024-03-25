@@ -11,14 +11,14 @@ import android.view.View
 import android.widget.ImageView
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
-import cn.archko.pdf.AppExecutors
-import cn.archko.pdf.common.BitmapCache
-import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.common.MupdfDocument
-import cn.archko.pdf.entity.APage
-import cn.archko.pdf.entity.DecodeParam
-import cn.archko.pdf.listeners.DecodeCallback
-import cn.archko.pdf.utils.Utils
+import cn.archko.pdf.core.common.AppExecutors
+import cn.archko.pdf.core.cache.BitmapCache
+import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.decode.MupdfDocument
+import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.decode.DecodeParam
+import cn.archko.pdf.core.decode.DecodeCallback
+import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 
 /**

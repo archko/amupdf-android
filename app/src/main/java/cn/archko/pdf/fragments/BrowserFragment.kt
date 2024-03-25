@@ -21,17 +21,17 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cn.archko.mupdf.R
-import cn.archko.pdf.adapters.BaseViewHolder
+import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.adapters.BookAdapter
-import cn.archko.pdf.common.Logcat
+import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.common.PdfOptionRepository
-import cn.archko.pdf.entity.BookProgress
-import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.listeners.DataListener
-import cn.archko.pdf.listeners.OnItemClickListener
-import cn.archko.pdf.utils.FileUtils
-import cn.archko.pdf.widgets.ColorItemDecoration
+import cn.archko.pdf.core.entity.BookProgress
+import cn.archko.pdf.core.entity.FileBean
+import cn.archko.pdf.core.listeners.DataListener
+import cn.archko.pdf.core.listeners.OnItemClickListener
+import cn.archko.pdf.core.utils.FileUtils
+import cn.archko.pdf.core.widgets.ColorItemDecoration
 import java.io.File
 
 /**
@@ -505,7 +505,8 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     }
 
     private fun showFileInfoDiaLog(entry: FileBean) {
-        FileInfoFragment.showInfoDialog(activity, entry, object : DataListener {
+        FileInfoFragment.showInfoDialog(activity, entry, object :
+            DataListener {
             override fun onSuccess(vararg args: Any?) {
                 val fileEntry = args[0] as FileBean
                 filesListView.let { prepareMenu(it, fileEntry) }

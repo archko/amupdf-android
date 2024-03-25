@@ -18,7 +18,7 @@ import org.vudroid.core.models.DecodingProgressModel;
 import org.vudroid.core.models.ZoomModel;
 import org.vudroid.core.multitouch.MultiTouchZoom;
 
-import cn.archko.pdf.listeners.SimpleGestureListener;
+import cn.archko.pdf.core.listeners.SimpleGestureListener;
 import cn.archko.pdf.widgets.Flinger;
 
 public class DocumentView extends View implements ZoomListener {

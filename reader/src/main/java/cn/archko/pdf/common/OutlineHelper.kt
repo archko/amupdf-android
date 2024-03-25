@@ -1,6 +1,7 @@
 package cn.archko.pdf.common
 
 import android.app.Activity
+import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.entity.OutlineItem
 import com.artifex.mupdf.fitz.Outline
 

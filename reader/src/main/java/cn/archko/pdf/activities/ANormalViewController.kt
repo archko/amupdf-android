@@ -15,12 +15,12 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.LinearLayoutManager
-import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.entity.APage
+import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
-import cn.archko.pdf.listeners.SimpleGestureListener
-import cn.archko.pdf.utils.Utils
+import cn.archko.pdf.core.listeners.SimpleGestureListener
+import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
 import org.vudroid.core.DecodeService
@@ -30,7 +30,6 @@ import org.vudroid.core.models.CurrentPageModel
 import org.vudroid.core.models.DecodingProgressModel
 import org.vudroid.core.models.ZoomModel
 import org.vudroid.pdfdroid.codec.PdfContext
-import org.vudroid.pdfdroid.codec.PdfDocument
 
 /**
  * @author: archko 2020/5/15 :12:43
@@ -55,7 +54,8 @@ class ANormalViewController(
     private var scrollOrientation = LinearLayoutManager.VERTICAL
     private var pageNumberToast: Toast? = null
 
-    private var simpleGestureListener: SimpleGestureListener = object : SimpleGestureListener {
+    private var simpleGestureListener: SimpleGestureListener = object :
+        SimpleGestureListener {
         override fun onSingleTapConfirmed(currentPage: Int) {
             showPageToast(currentPage)
         }

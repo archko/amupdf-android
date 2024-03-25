@@ -29,12 +29,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.archko.pdf.App;
-import cn.archko.pdf.AppExecutors;
-import cn.archko.pdf.common.BitmapCache;
-import cn.archko.pdf.common.IntentFile;
-import cn.archko.pdf.utils.FileUtils;
-import cn.archko.pdf.utils.StreamUtils;
+import cn.archko.pdf.core.App;
+import cn.archko.pdf.core.common.AppExecutors;
+import cn.archko.pdf.core.cache.BitmapCache;
+import cn.archko.pdf.core.common.IntentFile;
+import cn.archko.pdf.core.utils.FileUtils;
+import cn.archko.pdf.core.utils.StreamUtils;
 
 /**
  * Created by ruanshimin on 2018/10/31.

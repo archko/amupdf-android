@@ -9,7 +9,7 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import cn.archko.mupdf.R
-import cn.archko.pdf.utils.Utils
+import cn.archko.pdf.core.utils.Utils
 
 /**
  * @author: archko 2018/12/21 :17:23

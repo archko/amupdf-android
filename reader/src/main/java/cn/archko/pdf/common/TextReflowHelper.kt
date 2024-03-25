@@ -1,6 +1,6 @@
 package cn.archko.pdf.common
 
-import cn.archko.pdf.utils.FileUtils
+import cn.archko.pdf.core.utils.FileUtils
 import com.artifex.mupdf.fitz.Document
 import java.io.File
 import java.io.FileWriter

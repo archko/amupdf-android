@@ -11,8 +11,8 @@ import android.graphics.RectF;
 import java.lang.ref.SoftReference;
 import java.util.Arrays;
 
-import cn.archko.pdf.common.BitmapCache;
-import cn.archko.pdf.common.BitmapPool;
+import cn.archko.pdf.core.cache.BitmapCache;
+import cn.archko.pdf.core.cache.BitmapPool;
 
 public class PageTreeNode {
     private static final int SLICE_SIZE = 256 * 256 * 4;

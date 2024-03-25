@@ -14,12 +14,12 @@ import java.util.List;
 
 import androidx.recyclerview.awidget.ARecyclerView;
 import cn.archko.pdf.R;
-import cn.archko.pdf.common.ParseTextMain;
-import cn.archko.pdf.common.ReflowViewCache;
+import cn.archko.pdf.core.common.ParseTextMain;
+import cn.archko.pdf.core.cache.ReflowViewCache;
 import cn.archko.pdf.common.StyleHelper;
-import cn.archko.pdf.entity.BitmapBean;
-import cn.archko.pdf.entity.ReflowBean;
-import cn.archko.pdf.utils.Utils;
+import cn.archko.pdf.core.entity.BitmapBean;
+import cn.archko.pdf.core.entity.ReflowBean;
+import cn.archko.pdf.core.utils.Utils;
 
 /**
  * @author: archko 2019-02-21 :09:18

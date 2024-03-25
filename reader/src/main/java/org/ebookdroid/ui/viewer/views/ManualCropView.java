@@ -16,7 +16,7 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 
 import cn.archko.pdf.R;
-import cn.archko.pdf.utils.MathUtils;
+import cn.archko.pdf.core.utils.MathUtils;
 
 public class ManualCropView extends View {
 

@@ -16,11 +16,13 @@ import com.artifex.mupdf.fitz.Rect;
 
 import java.io.File;
 
-import cn.archko.pdf.App;
-import cn.archko.pdf.entity.APage;
-import cn.archko.pdf.entity.DecodeParam;
-import cn.archko.pdf.utils.BitmapUtils;
-import cn.archko.pdf.utils.FileUtils;
+import cn.archko.pdf.core.App;
+import cn.archko.pdf.core.cache.BitmapCache;
+import cn.archko.pdf.core.decode.MupdfDocument;
+import cn.archko.pdf.core.entity.APage;
+import cn.archko.pdf.core.decode.DecodeParam;
+import cn.archko.pdf.core.utils.BitmapUtils;
+import cn.archko.pdf.core.utils.FileUtils;
 
 /**
  * @author: archko 2019/8/30 :16:17

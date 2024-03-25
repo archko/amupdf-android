@@ -12,9 +12,9 @@ import android.widget.ImageView;
 import java.lang.ref.WeakReference;
 
 import androidx.collection.LruCache;
-import cn.archko.pdf.entity.APage;
-import cn.archko.pdf.entity.DecodeParam;
-import cn.archko.pdf.utils.Utils;
+import cn.archko.pdf.core.entity.APage;
+import cn.archko.pdf.core.decode.DecodeParam;
+import cn.archko.pdf.core.utils.Utils;
 
 /**
  * @author: archko 2019/8/30 :16:17

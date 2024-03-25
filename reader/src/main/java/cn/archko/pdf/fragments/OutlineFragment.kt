@@ -8,8 +8,8 @@ import android.view.ViewTreeObserver
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
-import cn.archko.pdf.adapters.BaseRecyclerAdapter
-import cn.archko.pdf.adapters.BaseViewHolder
+import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
+import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.base.BaseFragment
 import cn.archko.pdf.entity.OutlineItem
 import cn.archko.pdf.listeners.OutlineListener

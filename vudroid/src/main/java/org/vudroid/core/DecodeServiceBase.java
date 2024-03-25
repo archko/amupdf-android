@@ -25,9 +25,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import cn.archko.pdf.common.BitmapCache;
-import cn.archko.pdf.common.BitmapPool;
-import cn.archko.pdf.entity.APage;
+import cn.archko.pdf.core.cache.BitmapCache;
+import cn.archko.pdf.core.cache.BitmapPool;
+import cn.archko.pdf.core.entity.APage;
 
 public class DecodeServiceBase implements DecodeService {
     private static final int PAGE_POOL_SIZE = 6;

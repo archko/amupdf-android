@@ -12,7 +12,7 @@ import java.util.List;
 import androidx.recyclerview.widget.RecyclerView;
 import cn.archko.pdf.R;
 import cn.archko.pdf.entity.OutlineItem;
-import cn.archko.pdf.listeners.OnItemClickListener;
+import cn.archko.pdf.core.listeners.OnItemClickListener;
 
 /**
  * @author kanade on 2016/11/15.

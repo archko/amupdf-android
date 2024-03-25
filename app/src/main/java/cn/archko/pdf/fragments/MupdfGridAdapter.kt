@@ -8,13 +8,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.GridLayoutManager
-import cn.archko.pdf.AppExecutors
-import cn.archko.pdf.common.BitmapCache
-import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.common.MupdfDocument
-import cn.archko.pdf.entity.DecodeParam
-import cn.archko.pdf.listeners.ClickListener
-import cn.archko.pdf.listeners.DecodeCallback
+import cn.archko.pdf.core.common.AppExecutors
+import cn.archko.pdf.core.cache.BitmapCache
+import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.decode.MupdfDocument
+import cn.archko.pdf.core.decode.DecodeParam
+import cn.archko.pdf.core.listeners.ClickListener
+import cn.archko.pdf.core.decode.DecodeCallback
 
 /**
  * @author: archko 2023/3/8 :14:34

@@ -6,7 +6,7 @@ import android.util.SparseArray
 import android.view.ViewGroup
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
-import cn.archko.pdf.entity.APage
+import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.fastscroll.FastScrollRecyclerView
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APDFView

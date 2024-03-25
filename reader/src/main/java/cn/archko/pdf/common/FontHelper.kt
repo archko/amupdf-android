@@ -4,7 +4,7 @@ import android.graphics.Typeface
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.entity.FontBean
-import cn.archko.pdf.utils.FileUtils
+import cn.archko.pdf.core.utils.FileUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

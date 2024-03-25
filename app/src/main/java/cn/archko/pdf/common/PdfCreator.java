@@ -15,7 +15,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import cn.archko.mupdf.R;
-import cn.archko.pdf.utils.Utils;
+import cn.archko.pdf.core.common.EncodingDetect;
+import cn.archko.pdf.core.utils.Utils;
 
 public class PdfCreator {
 

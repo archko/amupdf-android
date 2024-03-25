@@ -15,8 +15,8 @@ import org.vudroid.R;
 import java.lang.ref.SoftReference;
 import java.util.List;
 
-import cn.archko.pdf.common.BitmapCache;
-import cn.archko.pdf.common.BitmapPool;
+import cn.archko.pdf.core.cache.BitmapCache;
+import cn.archko.pdf.core.cache.BitmapPool;
 
 public class Page {
     final int index;

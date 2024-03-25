@@ -20,11 +20,11 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cn.archko.pdf.R;
-import cn.archko.pdf.adapters.BaseRecyclerAdapter;
-import cn.archko.pdf.adapters.BaseViewHolder;
+import cn.archko.pdf.core.adapters.BaseRecyclerAdapter;
+import cn.archko.pdf.core.adapters.BaseViewHolder;
 import cn.archko.pdf.common.PdfOptionKeys;
 import cn.archko.pdf.common.PdfOptionRepository;
-import cn.archko.pdf.widgets.ColorItemDecoration;
+import cn.archko.pdf.core.widgets.ColorItemDecoration;
 
 /**
  * @author: archko 2018/12/12 :15:43

@@ -18,7 +18,7 @@ import org.vudroid.core.codec.CodecPage;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.archko.pdf.common.BitmapPool;
+import cn.archko.pdf.core.cache.BitmapPool;
 
 
 public class PdfPage implements CodecPage {

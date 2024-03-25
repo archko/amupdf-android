@@ -9,9 +9,13 @@ import com.artifex.mupdf.fitz.Page;
 import com.artifex.mupdf.fitz.RectI;
 
 import androidx.collection.LruCache;
-import cn.archko.pdf.App;
-import cn.archko.pdf.entity.APage;
-import cn.archko.pdf.entity.DecodeParam;
+import cn.archko.pdf.core.App;
+import cn.archko.pdf.core.cache.BitmapCache;
+import cn.archko.pdf.core.cache.BitmapPool;
+import cn.archko.pdf.core.common.Logcat;
+import cn.archko.pdf.core.decode.MupdfDocument;
+import cn.archko.pdf.core.entity.APage;
+import cn.archko.pdf.core.decode.DecodeParam;
 
 /**
  * @author: archko 2019/8/30 :16:17

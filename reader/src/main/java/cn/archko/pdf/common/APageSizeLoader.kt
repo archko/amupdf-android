@@ -2,10 +2,10 @@ package cn.archko.pdf.common
 
 import android.text.TextUtils
 import android.util.SparseArray
-import cn.archko.pdf.common.Logcat.d
-import cn.archko.pdf.entity.APage
-import cn.archko.pdf.entity.APage.Companion.fromJson
-import cn.archko.pdf.utils.StreamUtils
+import cn.archko.pdf.core.common.Logcat.d
+import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.entity.APage.Companion.fromJson
+import cn.archko.pdf.core.utils.StreamUtils
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File

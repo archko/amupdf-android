@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import cn.archko.pdf.R;
 import cn.archko.pdf.presenter.PageViewPresenter;
-import cn.archko.pdf.utils.FileUtils;
+import cn.archko.pdf.core.utils.FileUtils;
 
 /**
  * page seek controls

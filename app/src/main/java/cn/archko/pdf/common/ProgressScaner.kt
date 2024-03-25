@@ -1,6 +1,7 @@
 package cn.archko.pdf.common
 
-import cn.archko.pdf.entity.FileBean
+import cn.archko.pdf.core.common.ProgressDao
+import cn.archko.pdf.core.entity.FileBean
 
 /**
  * @author: archko 2018/2/24 :14:58

@@ -16,17 +16,17 @@ import android.widget.RelativeLayout
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
-import cn.archko.pdf.common.BitmapCache
-import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.entity.APage
+import cn.archko.pdf.core.cache.BitmapCache
+import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.fastscroll.FastScrollRecyclerView
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
-import cn.archko.pdf.utils.Utils
+import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APDFView
 import cn.archko.pdf.widgets.APageSeekBarControls
-import cn.archko.pdf.widgets.ExtraSpaceLinearLayoutManager
+import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
 
 /**
  * @author: archko 2020/5/15 :12:43

@@ -4,11 +4,11 @@ import android.content.Context
 import android.view.ViewGroup
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.widget.RecyclerView
-import cn.archko.pdf.App
-import cn.archko.pdf.common.ReflowViewCache
+import cn.archko.pdf.core.App
+import cn.archko.pdf.core.cache.ReflowViewCache
 import cn.archko.pdf.common.StyleHelper
-import cn.archko.pdf.entity.ReflowBean
-import cn.archko.pdf.utils.Utils
+import cn.archko.pdf.core.entity.ReflowBean
+import cn.archko.pdf.core.utils.Utils
 
 /**
  * @author: archko 2022/7/13 :11:03
