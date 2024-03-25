@@ -1,6 +1,7 @@
 package org.vudroid.pdfdroid;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.view.View;
 
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -8,14 +9,15 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 import org.vudroid.core.BaseViewerActivity;
 import org.vudroid.core.DecodeService;
 import org.vudroid.core.DecodeServiceBase;
+import org.vudroid.core.DocumentView;
 import org.vudroid.pdfdroid.codec.PdfContext;
 import org.vudroid.pdfdroid.codec.PdfDocument;
 
-import cn.archko.pdf.core.common.Event;
 import cn.archko.pdf.common.MenuHelper;
 import cn.archko.pdf.common.OutlineHelper;
-import cn.archko.pdf.listeners.OutlineListener;
+import cn.archko.pdf.core.common.Event;
 import cn.archko.pdf.core.decode.MupdfDocument;
+import cn.archko.pdf.listeners.OutlineListener;
 
 public class PdfViewerActivity extends BaseViewerActivity implements OutlineListener {
 
@@ -24,6 +26,22 @@ public class PdfViewerActivity extends BaseViewerActivity implements OutlineList
     @Override
     protected DecodeService createDecodeService() {
         return new DecodeServiceBase(new PdfContext());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Uri uri = getIntent().getData();
+        String filePath = Uri.decode(uri.getEncodedPath());
+        DocumentView documentView = getDocumentView();
+        getPdfViewModel().saveBookProgress(
+                filePath,
+                getDecodeService().getPageCount(),
+                documentView.getCurrentPage(),
+                documentView.getZoomModel().getZoom() * 1000f,
+                documentView.getScrollX(),
+                documentView.getScrollY()
+        );
     }
 
     @Override

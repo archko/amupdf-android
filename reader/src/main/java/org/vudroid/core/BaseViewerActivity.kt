@@ -14,14 +14,14 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.R
-import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.common.PdfOptionRepository
+import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.core.common.SensorHelper
+import cn.archko.pdf.core.common.StatusBarHelper
+import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.listeners.SimpleGestureListener
 import cn.archko.pdf.presenter.PageViewPresenter
-import cn.archko.pdf.core.common.StatusBarHelper
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
 import kotlinx.coroutines.Dispatchers
@@ -38,9 +38,7 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
     CurrentPageListener {
     //private static final String DOCUMENT_VIEW_STATE_PREFERENCES = "DjvuDocumentViewState";
     var decodeService: DecodeService? = null
-        private set
     var documentView: DocumentView? = null
-        private set
 
     //private ViewerPreferences viewerPreferences;
     private var pageNumberToast: Toast? = null
@@ -50,7 +48,7 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
     //private CurrentPageModel mPageModel;
     var pageSeekBarControls: APageSeekBarControls? = null
     var sensorHelper: SensorHelper? = null
-    protected val pdfViewModel: PDFViewModel = PDFViewModel()
+    val pdfViewModel: PDFViewModel = PDFViewModel()
 
     /**
      * Called when the activity is first created.
@@ -338,16 +336,6 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
 
     override fun onPause() {
         super.onPause()
-        val uri = intent.data
-        val filePath = Uri.decode(uri!!.encodedPath)
-        pdfViewModel.saveBookProgress(
-            filePath,
-            decodeService!!.pageCount,
-            documentView!!.currentPage,
-            documentView!!.getZoomModel().zoom * 1000f,
-            documentView!!.scrollX,
-            documentView!!.scrollY
-        )
         sensorHelper!!.onPause()
     }
 
