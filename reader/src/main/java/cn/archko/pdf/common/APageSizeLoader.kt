@@ -4,7 +4,6 @@ import android.text.TextUtils
 import android.util.SparseArray
 import cn.archko.pdf.core.common.Logcat.d
 import cn.archko.pdf.core.entity.APage
-import cn.archko.pdf.core.entity.APage.Companion.fromJson
 import cn.archko.pdf.core.utils.StreamUtils
 import org.json.JSONArray
 import org.json.JSONObject
@@ -63,7 +62,7 @@ object APageSizeLoader {
     fun fromJson(targetWidth: Int, ja: JSONArray): SparseArray<APage> {
         val sparseArray = SparseArray<APage>()
         for (i in 0 until ja.length()) {
-            sparseArray.put(i, fromJson(targetWidth, ja.optJSONObject(i)))
+            sparseArray.put(i, APage.fromJson(targetWidth, ja.optJSONObject(i)))
         }
         return sparseArray
     }

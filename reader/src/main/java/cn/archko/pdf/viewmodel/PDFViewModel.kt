@@ -1,28 +1,27 @@
 package cn.archko.pdf.viewmodel
 
 import android.content.Context
-import android.graphics.PointF
 import android.text.TextUtils
 import android.util.SparseArray
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cn.archko.pdf.core.App
 import cn.archko.pdf.common.APageSizeLoader
+import cn.archko.pdf.common.OutlineHelper
+import cn.archko.pdf.common.PdfOptionRepository
+import cn.archko.pdf.core.App
 import cn.archko.pdf.core.common.Graph
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
-import cn.archko.pdf.common.OutlineHelper
-import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.common.TextHelper
+import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.Bookmark
 import cn.archko.pdf.core.entity.LoadResult
-import cn.archko.pdf.entity.OutlineItem
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.entity.State
-import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.utils.FileUtils
+import cn.archko.pdf.entity.OutlineItem
 import com.artifex.mupdf.fitz.Page
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -361,9 +360,8 @@ class PDFViewModel : ViewModel() {
         val b = p.bounds
         val w = b.x1 - b.x0
         val h = b.y1 - b.y0
-        val pointf = PointF(w, h)
         p.destroy()
-        return APage(pageNum, pointf, 1.0f/*zoomModel!!.zoom*/, 0)
+        return APage(pageNum, w, h, 1.0f/*zoomModel!!.zoom*/)
     }
 
     fun destroy() {

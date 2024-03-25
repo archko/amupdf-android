@@ -86,16 +86,15 @@ class APage {
     private var cropHeight = 0
 
     constructor()
-    constructor(pageNumber: Int, pageSize: PointF, zoom: Float, targetWidth: Int) {
+    constructor(pageNumber: Int, width: Float, height: Float, zoom: Float) {
         index = pageNumber
         this.pageSize = pageSize
-        this.width = pageSize.x
-        this.height = pageSize.y
+        this.width = width
+        this.height = height
 
         this.zoom = zoom
-        setTargetWidth(targetWidth)
     }
-    
+
     fun getTargetWidth(): Int {
         return targetWidth
     }
@@ -148,7 +147,7 @@ class APage {
     fun setCropHeight(cropHeight: Int) {
         this.cropHeight = cropHeight
     }
-    
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

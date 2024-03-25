@@ -1,14 +1,13 @@
 package cn.archko.pdf.fragments
 
 import android.content.Context
-import android.graphics.PointF
 import android.text.TextUtils
 import android.util.Log
 import android.widget.Toast
-import cn.archko.pdf.core.App
 import cn.archko.pdf.common.PDFCreaterHelper
-import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.App
 import cn.archko.pdf.core.decode.MupdfDocument
+import cn.archko.pdf.core.entity.APage
 import com.artifex.mupdf.fitz.Outline
 import com.artifex.mupdf.fitz.PDFDocument
 import com.artifex.mupdf.fitz.Page
@@ -53,8 +52,7 @@ class PDFEditViewModel : MupdfListener {
         val aPage = loadPageSize(0)
         if (aPage != null) {
             for (i in 0 until cp) {
-                val pointf = PointF(aPage.width, aPage.height)
-                val page = APage(i, pointf, 1f, 0)
+                val page = APage(i, aPage.width, aPage.height, 1f)
                 aPageList.add(page)
             }
         }
@@ -69,7 +67,7 @@ class PDFEditViewModel : MupdfListener {
         val w = b.x1 - b.x0
         val h = b.y1 - b.y0
         p.destroy()
-        return APage(page, PointF(w, h), 1.0f, 0)
+        return APage(page, w, h, 1.0f)
     }
 
     fun destroy() {

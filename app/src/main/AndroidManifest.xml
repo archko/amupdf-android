@@ -117,6 +117,13 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/about_title"
             android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name="cn.archko.pdf.imagedroid.AlbumViewerActivity"
+            tools:ignore="DiscouragedApi"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="fullSensor" />
+
         <!--<activity
             android:name="cn.archko.pdf.activities.DocumentActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"

@@ -14,7 +14,7 @@ public interface DecodeService {
 
     void open(String fileUri);
 
-    void decodePage(String decodeKey, PageTreeNode node, int pageNumber, DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds, String thumbKey);
+    void decodePage(String decodeKey, PageTreeNode node, int pageNumber, DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds);
 
     void stopDecoding(String decodeKey);
 

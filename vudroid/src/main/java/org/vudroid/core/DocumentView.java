@@ -227,6 +227,17 @@ public class DocumentView extends View implements ZoomListener {
         return 0;
     }
 
+    public int getLastVisiblePage() {
+        Page page;
+        for (int i = pages.size() - 1; i >= 0; i--) {
+            page = pages.valueAt(i);
+            if (page.isVisible()) {
+                return pages.keyAt(i);
+            }
+        }
+        return 0;
+    }
+
     public Page getEventPage(MotionEvent e) {
         Page page = null;
         for (int i = 0; i < pages.size(); i++) {

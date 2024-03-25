@@ -11,48 +11,56 @@ import androidx.core.util.Pools;
 
 public class BitmapPool {
 
-    private static BitmapPool sInstance = new BitmapPool();
     private FixedSimplePool<Bitmap> simplePool;
+
+    public static BitmapPool getInstance() {
+        return BitmapPool.Factory.instance;
+    }
+
+    private static final class Factory {
+
+        private static final BitmapPool instance = new BitmapPool();
+    }
 
     private BitmapPool() {
         simplePool = new FixedSimplePool<>(16);
     }
 
-    public static BitmapPool getInstance() {
-        return sInstance;
-    }
-
     public Bitmap acquire(int width, int height) {
-        Bitmap b = simplePool.acquire();
-        if (null == b) {
-            b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = simplePool.acquire();
+        if (null != bitmap && bitmap.isRecycled()) {
+            bitmap = simplePool.acquire();
+        }
+        if (null == bitmap) {
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         } else {
-            if (b.getHeight() == height && b.getWidth() == width) {
-                b.eraseColor(0);
+            if (bitmap.getHeight() == height && bitmap.getWidth() == width) {
+                //Log.d("TAG", String.format("use cache:%s-%s-%s%n", width, height, simplePool.mPoolSize));
+                bitmap.eraseColor(0);
             } else {
-                b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             }
         }
-        return b;
+        return bitmap;
     }
 
     public void release(Bitmap bitmap) {
-        if (null == bitmap) {
+        if (null == bitmap || bitmap.isRecycled()) {
             return;
         }
         boolean isRelease = simplePool.release(bitmap);
         if (!isRelease) {
+            System.out.println("recycle bitmap:" + bitmap);
             bitmap.recycle();
         }
     }
 
     public synchronized void clear() {
-        if (null == simplePool) {
-            return;
-        }
-        Bitmap bitmap;
-        while ((bitmap = simplePool.acquire()) != null) {
-            bitmap.recycle();
+        if (null != simplePool) {
+            Bitmap bitmap;
+            while ((bitmap = simplePool.acquire()) != null) {
+                bitmap.recycle();
+            }
         }
         //simplePool = null;
     }

@@ -72,7 +72,8 @@ class PDFRecyclerAdapter(
     ): ARecyclerView.ViewHolder {
         val view = APDFView(context, pdfViewModel)
             .apply {
-                layoutParams = ViewGroup.LayoutParams(defaultWidth, defaultHeight)
+                layoutParams = ARecyclerView.LayoutParams(defaultWidth, defaultHeight)
+                adjustViewBounds = true
             }
         return PdfHolder(view)
     }

@@ -10,6 +10,7 @@ import android.view.MenuItem
 import androidx.core.content.FileProvider
 import cn.archko.pdf.activities.AMuPDFRecyclerViewActivity
 import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.imagedroid.AlbumViewerActivity
 //import cn.archko.pdf.activities.ComposeTextActivity
 import org.vudroid.pdfdroid.PdfViewerActivity
 import java.io.File
@@ -203,6 +204,14 @@ class PDFViewerHelper {
                 intent.setDataAndType(uri, mimeType)
             }
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            activity.startActivity(intent)
+        }
+
+        fun openAlbum(file: File, activity: Context) {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.setClass(activity, AlbumViewerActivity::class.java)
+            intent.setData(Uri.parse(file.absolutePath))
+            intent.putExtra("path", file.absoluteFile)
             activity.startActivity(intent)
         }
     }

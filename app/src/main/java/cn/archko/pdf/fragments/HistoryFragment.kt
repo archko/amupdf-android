@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.mupdf.R
-import cn.archko.pdf.core.App
 import cn.archko.pdf.adapters.BookAdapter
+import cn.archko.pdf.core.App
 import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.Event.Companion.ACTION_FAVORITED
 import cn.archko.pdf.core.common.Event.Companion.ACTION_STOPPED
@@ -66,7 +66,12 @@ class HistoryFragment : BrowserFragment() {
     }
 
     override fun initAdapter(): BookAdapter {
-        return  BookAdapter(activity as Context,beanItemCallback, BookAdapter.TYPE_RENCENT, itemClickListener)
+        return BookAdapter(
+            activity as Context,
+            beanItemCallback,
+            BookAdapter.TYPE_RENCENT,
+            itemClickListener
+        )
     }
 
     override fun updateItem() {
@@ -232,6 +237,15 @@ class HistoryFragment : BrowserFragment() {
         }
     }
 
+    override fun clickItem2(entry: FileBean, view: View) {
+        if (!!entry.isDirectory && entry.type != FileBean.HOME) {
+            selectedBean = entry
+            prepareMenu(view, entry)
+            return
+        }
+        selectedBean = null
+    }
+
     private fun updateLoadingStatus(totalCount: Int) {
         Logcat.d(
             String.format(
@@ -284,7 +298,7 @@ class HistoryFragment : BrowserFragment() {
                                 layoutManager.findLastVisibleItemPosition()
                             val rowCount = fileListAdapter.getItemCount()
                             isReachBottom =
-                                lastVisibleItemPosition >= rowCount -1//- fileListAdapter.headersCount - fileListAdapter.footersCount
+                                lastVisibleItemPosition >= rowCount - 1//- fileListAdapter.headersCount - fileListAdapter.footersCount
                         }
                         if (isReachBottom) {
                             mListMoreView.onLoadingStateChanged(IMoreView.STATE_LOADING)

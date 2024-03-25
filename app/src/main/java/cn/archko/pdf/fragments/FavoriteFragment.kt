@@ -14,7 +14,6 @@ import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.widgets.IMoreView
 import cn.archko.pdf.widgets.ListMoreView
 import com.jeremyliao.liveeventbus.LiveEventBus
-import java.util.*
 
 /**
  * @description:favorite list
@@ -117,6 +116,15 @@ class FavoriteFragment : BrowserFragment() {
             Logcat.d("fileListAdapter!!.normalCount <= 0")
             mListMoreView.onLoadingStateChanged(IMoreView.STATE_NO_MORE)
         }
+    }
+
+    override fun clickItem2(entry: FileBean, view: View) {
+        if (!!entry.isDirectory && entry.type != FileBean.HOME) {
+            selectedBean = entry
+            prepareMenu(view, entry)
+            return
+        }
+        selectedBean = null
     }
 
     private val onScrollListener: RecyclerView.OnScrollListener =

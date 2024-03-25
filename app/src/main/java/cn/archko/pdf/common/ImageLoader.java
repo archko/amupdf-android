@@ -3,11 +3,8 @@ package cn.archko.pdf.common;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
-import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.widget.ImageView;
-
-import androidx.collection.LruCache;
 
 import com.artifex.mupdf.fitz.Document;
 import com.artifex.mupdf.fitz.Matrix;
@@ -16,11 +13,12 @@ import com.artifex.mupdf.fitz.Rect;
 
 import java.io.File;
 
+import androidx.collection.LruCache;
 import cn.archko.pdf.core.App;
 import cn.archko.pdf.core.cache.BitmapCache;
+import cn.archko.pdf.core.decode.DecodeParam;
 import cn.archko.pdf.core.decode.MupdfDocument;
 import cn.archko.pdf.core.entity.APage;
-import cn.archko.pdf.core.decode.DecodeParam;
 import cn.archko.pdf.core.utils.BitmapUtils;
 import cn.archko.pdf.core.utils.FileUtils;
 
@@ -111,10 +109,9 @@ public class ImageLoader extends ImageWorker {
         Rect b = p.getBounds();
         float w = b.x1 - b.x0;
         float h = b.y1 - b.y0;
-        PointF pointf = new PointF(w, h);
         APage aPage = ImageLoader.getInstance().getPageLruCache().get(key);
         if (null == aPage) {
-            aPage = new APage(pageNum, pointf, zoom, screenWidth / 3);
+            aPage = new APage(pageNum, w, h, zoom);
             ImageLoader.getInstance().getPageLruCache().put(key, aPage);
         }
 

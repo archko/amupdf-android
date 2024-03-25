@@ -116,11 +116,7 @@ public class PageTreeNode {
     }
 
     private boolean isVisible() {
-        //if (documentView.zoomModel.getZoom() >= 1.5) {
         return RectF.intersects(documentView.getViewRect(), getTargetRectF());
-        //} else {
-        //    return RectF.intersects(documentView.getViewRectForPage(), getTargetRectF());
-        //}
     }
 
     private RectF getTargetRectF() {
@@ -164,7 +160,7 @@ public class PageTreeNode {
     }
 
     private String getCacheKey() {
-        return String.format("%s-%s-%s", page.index, pageSliceBounds, page);
+        return String.format("%s-%s-%s-%s", page.index, treeNodeDepthLevel, pageSliceBounds, page);
     }
 
     private void restoreBitmapReference() {
@@ -185,7 +181,8 @@ public class PageTreeNode {
 
         @Override
         public boolean shouldRender(int pageNumber, boolean isFullPage) {
-            if (getBitmap() != null) {
+            Bitmap bmp = getBitmap();
+            if (bmp != null && !bmp.isRecycled()) {
                 return false;
             }
             boolean isVisible = isVisible();
@@ -208,8 +205,7 @@ public class PageTreeNode {
                 page.index,
                 decodeCallback,
                 documentView.zoomModel.getZoom(),
-                pageSliceBounds,
-                page.getKey());
+                pageSliceBounds);
     }
 
     private RectF evaluatePageSliceBounds(RectF localPageSliceBounds, PageTreeNode parent) {
@@ -227,23 +223,24 @@ public class PageTreeNode {
     private void setBitmap(Bitmap newBitmap) {
         if (newBitmap == null ||
                 (newBitmap != null && newBitmap.getWidth() == -1 && newBitmap.getHeight() == -1)) {
-            if (bitmap != null) {
-                bitmapWeakReference.clear();
-            }
-            bitmap = null;
+            release();
             return;
         }
 
         if (bitmap != newBitmap) {
-            if (bitmap != null) {
-                BitmapCache.getInstance().remove(getCacheKey());
-                BitmapPool.getInstance().release(bitmap);
-                bitmapWeakReference.clear();
-            }
+            release();
             bitmapWeakReference = new SoftReference<>(newBitmap);
-            documentView.postInvalidate();
-
             bitmap = newBitmap;
+            documentView.postInvalidate();
+        }
+    }
+
+    private void release() {
+        if (bitmap != null) {
+            BitmapCache.getInstance().remove(getCacheKey());
+            BitmapPool.getInstance().release(bitmap);
+            bitmapWeakReference.clear();
+            bitmap = null;
         }
     }
 

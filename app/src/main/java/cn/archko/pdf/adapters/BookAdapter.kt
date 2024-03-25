@@ -95,7 +95,7 @@ class BookAdapter(
             }
             itemView.setOnLongClickListener {
                 if (entry.type != FileBean.HOME
-                    && !entry.isDirectory
+                    //&& !entry.isDirectory
                     && !entry.isUpFolder
                 ) {
                     itemClickListener?.onItemClick2(itemView, entry, position)

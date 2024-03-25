@@ -83,7 +83,7 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
             if (result?.resultCode == Activity.RESULT_OK) {
                 val path = IntentFile.getPath(
-                    requireActivity(),
+                    requireContext(),
                     result.data?.data
                 )
                 if (type == TYPE_EXTRACT_IMAGES) {

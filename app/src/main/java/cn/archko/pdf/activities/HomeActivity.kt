@@ -56,6 +56,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
         var args: Bundle,
         var title: CharSequence
     )
+
     private var onBackInvokedCallback: OnBackInvokedCallback? = null
     public override fun onCreate(savedInstanceState: Bundle?) {
         isLive = true
@@ -118,6 +119,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
         }
         super.onBackPressed()
     }
+
     override fun onDestroy() {
         super.onDestroy()
         if (Build.VERSION.SDK_INT >= 33) {
@@ -295,9 +297,9 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
         mTabs.add(SamplePagerItem(FavoriteFragment::class.java, bundle, title!!))
     }
 
-    //override fun onBackPressed() {
-    //    onBackEvent()
-    //}
+    override fun onBackPressed() {
+        onBackEvent()
+    }
 
     /*override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val flag = super.onCreateOptionsMenu(menu)
@@ -359,7 +361,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
     }
 
     companion object {
-        
+
         private val TAG = "ChooseFile"
 
         @JvmField

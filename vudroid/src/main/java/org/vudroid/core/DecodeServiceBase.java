@@ -1,7 +1,6 @@
 package org.vudroid.core;
 
 import android.graphics.Bitmap;
-import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Handler;
@@ -64,7 +63,7 @@ public class DecodeServiceBase implements DecodeService {
         private void addDecodeTask(Message msg) {
             final DecodeTask decodeTask = (DecodeTask) msg.obj;
             if (decodeTask.type == DecodeTask.TYPE_PAGE) {
-                DecodeTask old = pageTasks.put(decodeTask.thumbKey, decodeTask);
+                DecodeTask old = pageTasks.put(decodeTask.decodeKey, decodeTask);
                 if (old != null) {
                     Log.d(TAG, String.format("old page task:%s-%s", pageTasks.size(), old));
                 }
@@ -85,7 +84,7 @@ public class DecodeServiceBase implements DecodeService {
             DecodeTask selectTask = null;
             if (!pageTasks.isEmpty()) {
                 selectTask = pageTasks.entrySet().iterator().next().getValue();
-                pageTasks.remove(selectTask.thumbKey);
+                pageTasks.remove(selectTask.decodeKey);
             }
             if (selectTask == null) {
                 if (!nodeTasks.isEmpty()) {
@@ -144,8 +143,7 @@ public class DecodeServiceBase implements DecodeService {
         int count = document.getPageCount();
         for (int i = 0; i < count; i++) {
             CodecPage codecPage = document.getPage(i);
-            PointF pointF = new PointF(codecPage.getWidth(), codecPage.getHeight());
-            APage aPage = new APage(i, pointF, 1f, 0);
+            APage aPage = new APage(i, codecPage.getWidth(), codecPage.getHeight(), 1f);
             aPageList.add(aPage);
             codecPage.recycle();
         }
@@ -165,8 +163,8 @@ public class DecodeServiceBase implements DecodeService {
         initDecodeThread();
     }
 
-    public void decodePage(String decodeKey, PageTreeNode node, int pageNumber, final DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds, String thumbKey) {
-        final DecodeTask decodeTask = new DecodeTask(node, pageNumber, decodeCallback, zoom, decodeKey, pageSliceBounds, thumbKey);
+    public void decodePage(String decodeKey, PageTreeNode node, int pageNumber, final DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds) {
+        final DecodeTask decodeTask = new DecodeTask(node, pageNumber, decodeCallback, zoom, decodeKey, pageSliceBounds);
         Message message = Message.obtain();
         message.obj = decodeTask;
         message.what = MSG_DECODE_START;
@@ -174,6 +172,9 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     public void stopDecoding(String decodeKey) {
+        if (isRecycled) {
+            return;
+        }
         pageTasks.remove(decodeKey);
         Message message = Message.obtain();
         message.obj = decodeKey;
@@ -203,6 +204,7 @@ public class DecodeServiceBase implements DecodeService {
             return;
         }
 
+        //如果直接取,有可能在release池中,被换成其它的图片了
         Bitmap bitmap = BitmapCache.getInstance().getNodeBitmap(task.decodeKey);
         if (null != bitmap) {
             finishDecoding(task, bitmap);
@@ -237,7 +239,7 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     private void decodeThumb(DecodeTask task, CodecPage vuPage) {
-        Bitmap thumb = BitmapCache.getInstance().getBitmap(task.thumbKey);
+        Bitmap thumb = BitmapCache.getInstance().getBitmap(task.decodeKey);
         if (null != thumb) {
             updateThumb(task, thumb);
         } else {
@@ -249,7 +251,7 @@ public class DecodeServiceBase implements DecodeService {
             }
             int width = (int) (xs * vuPage.getWidth());
             int height = (int) (xs * vuPage.getHeight());
-            Log.d(TAG, String.format("decodeThumb:%s, w-h:%s-%s-%s, %s", task.pageNumber, width, height, xs, task.thumbKey));
+            Log.d(TAG, String.format("decodeThumb:%s, w-h:%s-%s-%s, %s", task.pageNumber, width, height, xs, task.decodeKey));
             thumb = vuPage.renderBitmap(
                     width,
                     height,
@@ -257,7 +259,7 @@ public class DecodeServiceBase implements DecodeService {
                     xs);
             //PDFUtils.saveBitmapToFile(thumb, new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/book/" + task.pageNumber + "-" + System.currentTimeMillis() + ".png"));
             if (null != thumb) {
-                BitmapCache.getInstance().addBitmap(task.thumbKey, thumb);
+                BitmapCache.getInstance().addBitmap(task.decodeKey, thumb);
             }
             //if (isTaskDead(task)) {
             //    return;
@@ -399,10 +401,7 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     private boolean isTaskDead(DecodeTask task) {
-        boolean isPage = false;
-        if (task.node == null) {
-            isPage = true;
-        }
+        boolean isPage = task.type == DecodeTask.TYPE_PAGE;
         if (skipInvisible(task, isPage)) {
             return true;
         }
@@ -426,9 +425,8 @@ public class DecodeServiceBase implements DecodeService {
         private final float zoom;
         private final DecodeCallback decodeCallback;
         private final RectF pageSliceBounds;
-        private String thumbKey;
 
-        private DecodeTask(PageTreeNode node, int pageNumber, DecodeCallback decodeCallback, float zoom, String decodeKey, RectF pageSliceBounds, String thumbKey) {
+        private DecodeTask(PageTreeNode node, int pageNumber, DecodeCallback decodeCallback, float zoom, String decodeKey, RectF pageSliceBounds) {
             this.node = node;
             this.type = node == null ? TYPE_PAGE : TYPE_NODE;
             this.pageNumber = pageNumber;
@@ -436,7 +434,6 @@ public class DecodeServiceBase implements DecodeService {
             this.zoom = zoom;
             this.decodeKey = decodeKey;
             this.pageSliceBounds = pageSliceBounds;
-            this.thumbKey = thumbKey;
         }
 
         @Override

@@ -19,10 +19,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.FragmentCreatePdfBinding
+import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.common.IntentFile
-import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.FileUtils
 import coil.load
@@ -225,8 +225,7 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
                 try {
                     val oneUri = result.data?.data
                     if (oneUri != null) {
-                        val parseParams =
-                            IntentFile.getPath(requireActivity(), oneUri)
+                        val parseParams = IntentFile.getPath(requireContext(), oneUri)
                         if (parseParams != null) {
                             paths.add(parseParams)
                         }
@@ -234,7 +233,7 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
                         for (index in 0 until (result.data?.clipData?.itemCount ?: 0)) {
                             val uri = result.data?.clipData?.getItemAt(index)?.uri
                             if (uri != null) {
-                                val parseParams = IntentFile.getPath(requireActivity(), uri)
+                                val parseParams = IntentFile.getPath(requireContext(), uri)
                                 if (parseParams != null) {
                                     paths.add(parseParams)
                                 }
@@ -260,7 +259,7 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
     private val pickTxt =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
             if (result?.resultCode == Activity.RESULT_OK) {
-                val path = result.data?.data?.let { IntentFile.getPath(requireActivity(), it) }
+                val path = result.data?.data?.let { IntentFile.getPath(requireContext(), it) }
                 txtPath = path
                 binding.txtPath.text = txtPath
             }

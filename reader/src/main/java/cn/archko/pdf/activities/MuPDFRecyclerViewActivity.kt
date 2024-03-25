@@ -1,7 +1,6 @@
 package cn.archko.pdf.activities
 
 import android.content.Intent
-import android.graphics.PointF
 import android.os.Bundle
 import android.os.SystemClock
 import android.text.TextUtils
@@ -15,17 +14,17 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
-import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.common.SensorHelper
+import cn.archko.pdf.core.common.StatusBarHelper
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.State
-import cn.archko.pdf.listeners.AViewController
-import cn.archko.pdf.core.common.StatusBarHelper
 import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.viewmodel.PDFViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.Dispatchers
@@ -177,7 +176,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         return null
     }
 
-    open fun onSingleTap():Boolean {
+    open fun onSingleTap(): Boolean {
         return false
     }
 
@@ -317,9 +316,8 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         val b = p.bounds
         val w = b.x1 - b.x0
         val h = b.y1 - b.y0
-        val pointf = PointF(w, h)
         p.destroy()
-        return APage(pageNum, pointf, 1.0f/*zoomModel!!.zoom*/, 0)
+        return APage(pageNum, w, h, 1.0f/*zoomModel!!.zoom*/)
     }
 
     open fun preparePageSize(cp: Int) {

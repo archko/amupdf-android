@@ -69,8 +69,8 @@ class APDFView(
         if (null == aPage) {
             return setMeasuredDimension(resultWidth, resultHeight)
         }
-        var mwidth = aPage!!.getCropWidth()
-        var mheight = aPage!!.getCropHeight()
+        var mwidth = resultWidth
+        var mheight = resultHeight
 
         val d = drawable
         if (null != d) {
@@ -84,16 +84,6 @@ class APDFView(
         }
 
         setMeasuredDimension(mwidth, mheight)
-        Logcat.d(
-            String.format(
-                "onMeasure,width:%s,height:%s, page:%s-%s, aPage:%s",
-                mwidth,
-                mheight,
-                aPage!!.effectivePagesWidth,
-                aPage!!.effectivePagesHeight,
-                aPage
-            )
-        )
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -212,7 +202,7 @@ class APDFView(
     private fun updateImage(view: ImageView, bitmap: Bitmap, width: Int, height: Int, index: Int) {
         val bmpWidth = bitmap.width
         val bmpHeight = bitmap.height
-        var lp = view.layoutParams
+        var lp = view.layoutParams as ARecyclerView.LayoutParams?
         if (null == lp) {
             lp = ARecyclerView.LayoutParams(width, height)
             view.layoutParams = lp

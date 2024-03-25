@@ -19,14 +19,14 @@ import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
 import cn.archko.pdf.fastscroll.FastScrollRecyclerView
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
-import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APDFView
 import cn.archko.pdf.widgets.APageSeekBarControls
-import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
 
 /**
  * @author: archko 2020/5/15 :12:43
@@ -198,6 +198,18 @@ class ACropViewController(
         return position
     }
 
+    fun getLastPos(): Int {
+        if (null == mRecyclerView.layoutManager) {
+            return 0
+        }
+        var position =
+            (mRecyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
+        if (position < 0) {
+            position = 0
+        }
+        return position
+    }
+
     override fun getCount(): Int {
         return mPageSizes.size()
     }
@@ -330,13 +342,17 @@ class ACropViewController(
 
     override fun onPause() {
         if (null != pdfViewModel.mupdfDocument) {
+            var savePos = getCurrentPos() + 1
+            val lastPos = getLastPos()
+            if (lastPos == mPageSizes.size() - 1) {
+                savePos = lastPos
+            }
             pdfViewModel.bookProgress?.run {
                 //autoCrop = 0
-                val position = getCurrentPos()
                 pdfViewModel.saveBookProgress(
                     mPath,
                     pdfViewModel.countPages(),
-                    position + 1,
+                    savePos,
                     pdfViewModel.bookProgress!!.zoomLevel,
                     -1,
                     0

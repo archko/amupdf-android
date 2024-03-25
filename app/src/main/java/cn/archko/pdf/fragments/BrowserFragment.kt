@@ -21,11 +21,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cn.archko.mupdf.R
-import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.adapters.BookAdapter
-import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.common.PdfOptionRepository
+import cn.archko.pdf.core.adapters.BaseViewHolder
+import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.listeners.DataListener
@@ -54,7 +54,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     protected var showExtension: Boolean = true
 
     private var mPathMap: MutableMap<String, Int> = HashMap()
-    private var selectedBean: FileBean? = null
+    var selectedBean: FileBean? = null
     protected var currentBean: FileBean? = null
     protected lateinit var bookViewModel: BookViewModel
 
@@ -342,8 +342,8 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         }
     }
 
-    private fun clickItem2(entry: FileBean, view: View) {
-        if (!entry.isDirectory && entry.type != FileBean.HOME) {
+    open fun clickItem2(entry: FileBean, view: View) {
+        if (entry.type != FileBean.HOME) {
             selectedBean = entry
             prepareMenu(view, entry)
             return
@@ -387,6 +387,10 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         /*menuBuilder.add(0, 1, 0, "title1");*/
         if (entry.type == FileBean.HOME) {
             //menuBuilder.getMenu().add(R.string.set_as_home);
+            return
+        }
+        if (entry.isDirectory) {
+            menuBuilder.menu.add(0, albumContextMenuItem, 0, getString(R.string.menu_album))
             return
         }
 
@@ -462,6 +466,8 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             remove(entry)
         } else if (item.itemId == editContextMenuItem) {
             editPdf(entry.file?.absolutePath)
+        } else if (item.itemId == albumContextMenuItem) {
+            PDFViewerHelper.openAlbum(entry.file!!, requireActivity())
         } else {
             val clickedFile: File = entry.file!!
 
@@ -542,5 +548,6 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
 
         //protected const val bartekscViewContextMenuItem = Menu.FIRST + 118
         const val editContextMenuItem = Menu.FIRST + 119
+        const val albumContextMenuItem = Menu.FIRST + 120
     }
 }

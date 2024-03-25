@@ -16,7 +16,6 @@ import java.lang.ref.SoftReference;
 import java.util.List;
 
 import cn.archko.pdf.core.cache.BitmapCache;
-import cn.archko.pdf.core.cache.BitmapPool;
 
 public class Page {
     final int index;
@@ -194,7 +193,6 @@ public class Page {
             setBitmap(bitmap);
             invalidateFlag = false;
             setDecodingNow(false);
-            //postInvalidate(bitmap);
         }
 
         @Override
@@ -223,8 +221,7 @@ public class Page {
                 index,
                 decodeCallback,
                 documentView.zoomModel.getZoom(),
-                null,
-                getKey());
+                null);
     }
 
     private void setBitmap(Bitmap newBitmap) {
@@ -239,8 +236,7 @@ public class Page {
 
         if (bitmap != newBitmap) {
             if (bitmap != null) {
-                BitmapCache.getInstance().remove(getKey());
-                BitmapPool.getInstance().release(bitmap);
+                //BitmapPool.getInstance().release(bitmap);
                 bitmapWeakReference.clear();
             }
             bitmapWeakReference = new SoftReference<>(newBitmap);
