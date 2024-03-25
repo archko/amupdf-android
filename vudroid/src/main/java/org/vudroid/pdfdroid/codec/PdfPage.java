@@ -100,7 +100,14 @@ public class PdfPage implements CodecPage {
         com.artifex.mupdf.fitz.Matrix ctm = new com.artifex.mupdf.fitz.Matrix(scale);
         AndroidDrawDevice dev = new AndroidDrawDevice(bitmap, patchX, patchY, 0, 0, width, height);
 
-        page.run(dev, ctm, (Cookie) null);
+        if (pageHandle == -1) {
+            return bitmap;
+        }
+        try {
+            page.run(dev, ctm, (Cookie) null);
+        } catch (Exception e) {
+
+        }
         dev.close();
         dev.destroy();
         //add(start);
