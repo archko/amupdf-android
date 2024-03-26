@@ -101,12 +101,6 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
             )
         }
 
-        AppExecutors.instance.diskIO().execute {
-            decodeService!!.open(absolutePath)
-            AppExecutors.instance.mainThread()
-                .execute { documentView!!.showDocument() }
-        }
-
         pageSeekBarControls =
             APageSeekBarControls(this, object : PageViewPresenter {
                 override fun getPageCount(): Int {
@@ -146,6 +140,16 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         pageSeekBarControls!!.hide()
         pageSeekBarControls!!.showReflow(true)
         pageSeekBarControls!!.updateTitle(absolutePath)
+
+        loadDocument(absolutePath)
+    }
+
+    open fun loadDocument(path: String) {
+        AppExecutors.instance.diskIO().execute {
+            decodeService!!.open(path)
+            AppExecutors.instance.mainThread()
+                .execute { documentView!!.showDocument() }
+        }
     }
 
     override fun decodingProgressChanged(currentlyDecoding: Int) {

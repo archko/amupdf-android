@@ -238,7 +238,7 @@ class HistoryFragment : BrowserFragment() {
     }
 
     override fun clickItem2(entry: FileBean, view: View) {
-        if (!!entry.isDirectory && entry.type != FileBean.HOME) {
+        if (!entry.isDirectory && entry.type != FileBean.HOME) {
             selectedBean = entry
             prepareMenu(view, entry)
             return

@@ -94,9 +94,15 @@ public class AlbumPage implements CodecPage {
 
             int patchX = Math.round(pageSliceBounds.left * pageWidth);
             int patchY = Math.round(pageSliceBounds.top * pageHeight);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            if (pageW > 4000) {
+                options.inSampleSize = 4;
+            } else if (pageW > 2000) {
+                options.inSampleSize = 2;
+            }
 
             Rect rect = new Rect(patchX, patchY, patchX + pageW, patchY + pageH);
-            Bitmap bitmap = decoder.decodeRegion(rect, null);
+            Bitmap bitmap = decoder.decodeRegion(rect, options);
             return bitmap;
         }
     }

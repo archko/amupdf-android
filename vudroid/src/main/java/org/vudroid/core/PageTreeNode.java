@@ -11,7 +11,6 @@ import android.graphics.RectF;
 import java.lang.ref.SoftReference;
 import java.util.Arrays;
 
-import cn.archko.pdf.core.cache.BitmapCache;
 import cn.archko.pdf.core.cache.BitmapPool;
 
 public class PageTreeNode {
@@ -101,8 +100,8 @@ public class PageTreeNode {
         }
         Bitmap bmp = getBitmap();
         if (bmp != null && !bmp.isRecycled()) {
-            //System.out.println(String.format("level:%s, page:%s, width:%s, %s", treeNodeDepthLevel, page.index, bmp.getWidth(), bmp.getHeight()));
-            canvas.drawBitmap(bmp, new Rect(0, 0, bmp.getWidth(), bmp.getHeight()), getTargetRect(), bitmapPaint);
+            //System.out.println(String.format("level:%s, page:%s, width:%s, %s", treeNodeDepthLevel, page.index, getBitmap().getWidth(), getBitmap().getHeight()));
+            canvas.drawBitmap(bmp, new Rect(0, 0, getBitmap().getWidth(), getBitmap().getHeight()), getTargetRect(), bitmapPaint);
             //canvas.drawRect(getTargetRect(), strokePaint);
         }
         if (children == null) {
@@ -237,7 +236,6 @@ public class PageTreeNode {
 
     private void release() {
         if (bitmap != null) {
-            //BitmapCache.getInstance().remove(getCacheKey());
             BitmapPool.getInstance().release(bitmap);
             bitmapWeakReference.clear();
             bitmap = null;

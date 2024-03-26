@@ -28,7 +28,7 @@ public class BitmapCache {
     }
 
     public static void setMaxMemory(float maxMemory) {
-        MAX_PAGE_SIZE_IN_BYTES = (int) (maxMemory * 0.7);
+        MAX_PAGE_SIZE_IN_BYTES = (int) (maxMemory * 0.8);
         MAX_NODE_SIZE_IN_BYTES = (int) (maxMemory - MAX_PAGE_SIZE_IN_BYTES);
     }
 

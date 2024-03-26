@@ -73,7 +73,9 @@ public class DecodeServiceBase implements DecodeService {
                     Log.d(TAG, String.format("old node task:%s-%s", nodeTasks.size(), old));
                 }
             }
-            mHandler.sendEmptyMessage(MSG_DECODE_SELECT);
+            if (pageTasks.size() + nodeTasks.size() <= 1) {
+                mHandler.sendEmptyMessage(MSG_DECODE_SELECT);
+            }
         }
 
         private void selectDecodeTask(Message msg) {
@@ -205,7 +207,7 @@ public class DecodeServiceBase implements DecodeService {
         }
 
         //如果直接取,有可能在release池中,被换成其它的图片了
-        Bitmap bitmap = BitmapCache.getInstance().getNodeBitmap(task.decodeKey);
+        Bitmap bitmap = null;//BitmapCache.getInstance().getNodeBitmap(task.decodeKey);
         if (null != bitmap) {
             finishDecoding(task, bitmap);
             return;
@@ -226,9 +228,9 @@ public class DecodeServiceBase implements DecodeService {
 
         Log.d(TAG, String.format("renderBitmap:%s, w-h:%s", task.pageNumber, rect));
         bitmap = vuPage.renderBitmap(rect.width(), rect.height(), task.pageSliceBounds, scale);
-        if (null != bitmap) {
-            BitmapCache.getInstance().addNodeBitmap(task.decodeKey, bitmap);
-        }
+        //if (null != bitmap) {
+        //    BitmapCache.getInstance().addNodeBitmap(task.decodeKey, bitmap);
+        //}
         if (isTaskDead(task)) {
             //Log.d(TAG, "decode bitmap dead:" + task);
             BitmapPool.getInstance().release(bitmap);
