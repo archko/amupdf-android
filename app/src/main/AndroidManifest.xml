@@ -117,12 +117,19 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/about_title"
             android:screenOrientation="portrait"></activity>
+        <activity
+            android:name="cn.archko.pdf.activities.TextActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
+            android:label="Text"
+            android:screenOrientation="sensor"
+            android:theme="@style/AppFullscreen"
+            android:windowSoftInputMode="adjustResize"></activity>
 
         <activity
             android:name="cn.archko.pdf.imagedroid.AlbumViewerActivity"
-            tools:ignore="DiscouragedApi"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:screenOrientation="fullSensor" />
+            android:screenOrientation="fullSensor"
+            tools:ignore="DiscouragedApi" />
 
         <!--<activity
             android:name="cn.archko.pdf.activities.DocumentActivity"
@@ -148,13 +155,6 @@
             android:label="@string/options"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Nia" />
-        <activity
-            android:name="cn.archko.pdf.activities.TextActivity"
-            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
-            android:label="Text"
-            android:screenOrientation="sensor"
-            android:theme="@style/AppFullscreen"
-            android:windowSoftInputMode="adjustResize"></activity>
         <activity
             android:name="cn.archko.pdf.activities.ComposeTextActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"

@@ -27,22 +27,21 @@ import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFTextAdapter
-import cn.archko.pdf.common.Event
-import cn.archko.pdf.common.IntentFile
-import cn.archko.pdf.common.SensorHelper
 import cn.archko.pdf.common.StyleHelper
-import cn.archko.pdf.common.TextHelper
+import cn.archko.pdf.core.common.Event
+import cn.archko.pdf.core.common.IntentFile
+import cn.archko.pdf.core.common.SensorHelper
+import cn.archko.pdf.core.common.StatusBarHelper
+import cn.archko.pdf.core.common.TextHelper
+import cn.archko.pdf.core.listeners.DataListener
+import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.core.widgets.ViewerDividerItemDecoration
 import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.fragments.FontsFragment
-import cn.archko.pdf.listeners.DataListener
-import cn.archko.pdf.utils.StatusBarHelper
-import cn.archko.pdf.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
-import cn.archko.pdf.widgets.ViewerDividerItemDecoration
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
-
 
 /**
  * @author: archko 2022/7/11 :9:49 上午
@@ -138,7 +137,7 @@ class TextActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             //setItemViewCacheSize(0)
 
-            addItemDecoration(ViewerDividerItemDecoration(context, LinearLayoutManager.VERTICAL))
+            addItemDecoration(ViewerDividerItemDecoration(LinearLayoutManager.VERTICAL))
             addOnScrollListener(object : ARecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: ARecyclerView, newState: Int) {
                     if (newState == ARecyclerView.SCROLL_STATE_IDLE) {

@@ -237,8 +237,12 @@ class PDFViewModel : ViewModel() {
                 } else {
                     bookProgress!!.path = FileUtils.getRealPath(absolutePath)
                 }
+                var pc = pageCount
+                if (pc < 1) {
+                    pc = 1
+                }
                 bookProgress!!.inRecent = 0
-                bookProgress!!.pageCount = pageCount
+                bookProgress!!.pageCount = pc
                 bookProgress!!.page = currentPage
                 //if (zoom != 1000f) {
                 bookProgress!!.zoomLevel = zoom
@@ -247,7 +251,7 @@ class PDFViewModel : ViewModel() {
                     bookProgress!!.offsetX = scrollX
                 }
                 bookProgress!!.offsetY = scrollY
-                bookProgress!!.progress = currentPage * 100 / pageCount
+                bookProgress!!.progress = currentPage * 100 / pc
                 Logcat.i(
                     Logcat.TAG,
                     String.format(
