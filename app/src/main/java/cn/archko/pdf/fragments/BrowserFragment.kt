@@ -103,7 +103,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
 
     fun extractImage() {
         PdfOperationFragment.showCreateDialog(
-            PdfOperationFragment.TYPE_MERGE,
+            PdfOperationFragment.TYPE_EXTRACT_IMAGES,
             requireActivity(),
             null
         )

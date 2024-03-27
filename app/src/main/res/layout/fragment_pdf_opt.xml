@@ -24,20 +24,20 @@
             android:layout_marginLeft="8dp"
             android:orientation="horizontal">
 
-            <Button
+            <TextView
                 android:id="@+id/btnExtract"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text="@string/edit_btn_image" />
 
-            <Button
+            <!--<Button
                 android:id="@+id/btnMerge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_marginLeft="4dp"
-                android:text="@string/edit_btn_merge" />
+                android:text="@string/edit_btn_merge" />-->
 
             <Button
                 android:id="@+id/btnAddPdf"
@@ -115,13 +115,13 @@
             android:orientation="vertical"
             android:padding="10dp">
 
-            <Button
+            <!--<Button
                 android:id="@+id/btnMergePdf"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="4dp"
-                android:text="@string/extract_btn_merge" />
+                android:text="@string/extract_btn_merge" />-->
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"

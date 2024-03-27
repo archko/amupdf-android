@@ -51,7 +51,7 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
     private lateinit var adapter: BaseRecyclerAdapter<String>
     private var txtPath: String? = null
 
-    private var type: Int = TYPE_MERGE
+    private var type: Int = TYPE_EXTRACT_IMAGES
     private var scope: CoroutineScope? = null
     private val customerDispatcher = AppExecutors.instance.diskIO().asCoroutineDispatcher()
 
@@ -235,10 +235,10 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
         //binding.back.setOnClickListener { dismiss() }
         binding.toolbar.setNavigationOnClickListener { dismiss() }
 
-        binding.btnMerge.setOnClickListener {
-            type = TYPE_MERGE
-            updateUi()
-        }
+        //binding.btnMerge.setOnClickListener {
+        //    type = TYPE_MERGE
+        //    updateUi()
+        //}
         binding.btnExtract.setOnClickListener {
             type = TYPE_EXTRACT_IMAGES
             updateUi()
@@ -247,7 +247,7 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
         binding.btnAddPdf.setOnClickListener { selectPdf() }
         binding.btnExtractImage.setOnClickListener { extractImages() }
         binding.btnExtractHtml.setOnClickListener { extractHtml() }
-        binding.btnMergePdf.setOnClickListener { merge() }
+        //binding.btnMergePdf.setOnClickListener { merge() }
 
         adapter = object : BaseRecyclerAdapter<String>(activity) {
 
