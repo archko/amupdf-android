@@ -99,8 +99,8 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
         var name = binding.pdfPath.editableText.toString()
         if (TextUtils.isEmpty(name)) {
             name = "new.pdf"
-            path = FileUtils.getStorageDir("book").absolutePath + File.separator + name
         }
+        path = FileUtils.getStorageDir("book").absolutePath + File.separator + name
 
         progressDialog.show()
         lifecycleScope.launch {
