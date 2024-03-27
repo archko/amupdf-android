@@ -115,7 +115,7 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
         popupMenu.setOnMenuItemClickListener { item: MenuItem ->
             if (R.id.deleteItem == item.itemId) {
                 pdfEditViewModel.deletePage(position)
-                pdfAdapter.notifyDataSetChanged()
+                pdfAdapter.notifyItemRemoved(position)
             } else if (R.id.addItem == item.itemId) {
             } else if (R.id.extractImagesItem == item.itemId) {
                 extractImage(position)
