@@ -14,12 +14,10 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/delete"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:src="@drawable/ic_delete"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_blue_delete"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

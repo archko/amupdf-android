@@ -17,6 +17,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.FragmentCreatePdfBinding
 import cn.archko.pdf.common.PDFCreaterHelper
@@ -30,6 +32,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.Collections
+
 
 /**
  * @author: archko 2023/3/8 :14:34
@@ -77,7 +81,7 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
                     result.data?.data
                 )
                 oldPdfPath = path
-                binding.oldPdfPath.text = "Old pdf:$path"
+                //binding.oldPdfPath.text = "Old pdf:$path"
             }
         }
 
@@ -91,9 +95,10 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
     private fun createPdfFromImage() {
         val arr = arrayListOf<String>()
         arr.addAll(adapter.data)
-        var path = oldPdfPath
-        if (TextUtils.isEmpty(path)) {
-            val name = binding.pdfPath.editableText.toString()
+        var path: String? = null
+        var name = binding.pdfPath.editableText.toString()
+        if (TextUtils.isEmpty(name)) {
+            name = "new.pdf"
             path = FileUtils.getStorageDir("book").absolutePath + File.separator + name
         }
 
@@ -164,17 +169,21 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
         //binding.back.setOnClickListener { dismiss() }
         binding.toolbar.setNavigationOnClickListener { dismiss() }
 
-        binding.btnSelect.setOnClickListener { selectPdf() }
+        //binding.btnSelect.setOnClickListener { selectPdf() }
         binding.btnCreateFromImage.setOnClickListener { createPdfFromImage() }
         binding.btnAddImage.setOnClickListener { addImageItem() }
 
-        binding.btnTxt.setOnClickListener {
-            type = TYPE_TXT
-            updateUi()
+        binding.btnTxt.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                type = TYPE_TXT
+                updateUi()
+            }
         }
-        binding.btnImage.setOnClickListener {
-            type = TYPE_IMAGE
-            updateUi()
+        binding.btnImage.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                type = TYPE_IMAGE
+                updateUi()
+            }
         }
 
         binding.btnAddTxt.setOnClickListener { addTxtItem() }
@@ -192,6 +201,9 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
         }
         binding.recyclerView.layoutManager = GridLayoutManager(activity, 2)
         binding.recyclerView.adapter = adapter
+
+        val itemTouchHelper = ItemTouchHelper(MyItemTouchHelperCallBack())
+        itemTouchHelper.attachToRecyclerView(binding.recyclerView)
 
         updateUi()
     }
@@ -275,6 +287,42 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
     private fun setType(type: Int) {
         this.type = type
     }
+
+    inner class MyItemTouchHelperCallBack : ItemTouchHelper.Callback() {
+        override fun getMovementFlags(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+        ): Int {
+            // 长按拖动，不可删除,可换位使用
+            val dragFlags =
+                ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+            return makeMovementFlags(dragFlags, 0)
+        }
+
+        // 拖拽 排序item时调用
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            val form = viewHolder.absoluteAdapterPosition
+            val to = target.absoluteAdapterPosition
+
+            var isMove = false
+
+            if (adapter.data != null) {
+                Collections.swap(adapter.data, form, to)
+                adapter.notifyItemMoved(form, to)
+                isMove = true
+            }
+            return isMove
+        }
+
+        // 轻拖滑动出recyclerview后调用（可做删除item）
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        }
+    }
+
 
     companion object {
 
