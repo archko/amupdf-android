@@ -95,11 +95,10 @@ public class AlbumPage implements CodecPage {
             int patchX = Math.round(pageSliceBounds.left * pageWidth);
             int patchY = Math.round(pageSliceBounds.top * pageHeight);
             BitmapFactory.Options options = new BitmapFactory.Options();
-            if (pageW > 4000) {
-                options.inSampleSize = 4;
-            } else if (pageW > 2000) {
-                options.inSampleSize = 2;
-            }
+            final int heightRatio = Math.round((float) pageW / 1080);
+            final int widthRatio = Math.round((float) pageH / 1080);
+            options.inSampleSize = Math.min(heightRatio, widthRatio);
+            //Log.d("TAG", String.format("h-w.ratio:%s-%s,w-h:%s-%s, %s", heightRatio, widthRatio, pageW, pageH, pageSliceBounds));
 
             Rect rect = new Rect(patchX, patchY, patchX + pageW, patchY + pageH);
             Bitmap bitmap = decoder.decodeRegion(rect, options);

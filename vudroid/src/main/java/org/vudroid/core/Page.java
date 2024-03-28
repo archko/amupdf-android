@@ -200,7 +200,7 @@ public class Page {
             if (getBitmap() != null) {
                 return false;
             }
-            Log.d("TAG", "shouldRender:" + pageNumber);
+            //Log.d("TAG", "shouldRender:" + pageNumber);
             boolean isVisible = isVisible();
             if (!isVisible) {
                 setBitmap(null);
