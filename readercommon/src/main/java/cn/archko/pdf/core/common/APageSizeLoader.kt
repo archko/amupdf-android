@@ -14,6 +14,8 @@ import java.io.File
  */
 object APageSizeLoader {
 
+    val PAGE_COUNT = 20
+
     fun loadPageSizeFromFile(
         pageCount: Int,
         file: File

@@ -20,20 +20,20 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
-import cn.archko.pdf.core.common.APageSizeLoader
+import cn.archko.pdf.common.OutlineHelper
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.cache.BitmapCache
+import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.decode.MupdfDocument
-import cn.archko.pdf.common.OutlineHelper
-import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.Bookmark
+import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.fragments.OutlineFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.presenter.PageViewPresenter
-import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
 import cn.archko.pdf.widgets.BaseMenu
@@ -458,7 +458,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         super.onDestroy()
         viewController?.onDestroy()
         mPageSizes.let {
-            if (it.size() < 0 || it.size() < APageSizeLoader.PAGE_COUNT) {
+            if (it.size < 0 || it.size < APageSizeLoader.PAGE_COUNT) {
                 return
             }
             lifecycleScope.launch {
@@ -477,13 +477,14 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             pdfViewModel.preparePageSize(width).collectLatest { pageSizeBean ->
                 Logcat.d("open3:" + (SystemClock.uptimeMillis() - start))
 
-                var pageSizes: SparseArray<APage>? = null
+                var pageSizes: List<APage>? = null
                 if (pageSizeBean != null) {
-                    pageSizes = pageSizeBean.sparseArray
+                    pageSizes = pageSizeBean.List
                 }
-                if (pageSizes != null && pageSizes.size() > 0) {
-                    Logcat.d("open3:pageSizes>0:" + pageSizes.size())
-                    mPageSizes = pageSizes
+                if (pageSizes != null && pageSizes.size > 0) {
+                    Logcat.d("open3:pageSizes>0:" + pageSizes.size)
+                    mPageSizes.clear()
+                    mPageSizes.addAll(pageSizes)
                     checkPageSize(cp)
                 } else {
                     start = SystemClock.uptimeMillis()
@@ -499,17 +500,19 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
      * if scale=1.0f,reload it from mupdf
      */
     private fun checkPageSize(cp: Int) {
-        for (i in 0 until mPageSizes.size()) {
-            val point = mPageSizes.valueAt(i)
-            if (point.scale == 1.0f) {
-                val pointF = getPageSize(i)
-                if (null == point) {
-                    mPageSizes.clear()
-                    preparePageSize(cp)
-                    break
-                }
-                mPageSizes.put(i, pointF)
+        for (i in 0 until mPageSizes.size) {
+            val point = mPageSizes[i]
+            //if (point.scale == 1.0f) {
+            val pointF = getPageSize(i)
+            if (null == point) {
+                mPageSizes.clear()
+                preparePageSize(cp)
+                break
             }
+            if (pointF != null) {
+                mPageSizes.add(pointF)
+            }
+            //}
         }
     }
 
