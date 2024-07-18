@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity.RESULT_FIRST_USER
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.util.SparseArray
 import android.view.GestureDetector
 import android.view.Gravity
 import android.view.MotionEvent
@@ -17,10 +16,10 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
-import cn.archko.pdf.listeners.AViewController
-import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.core.listeners.SimpleGestureListener
 import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.listeners.AViewController
+import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
 import org.vudroid.core.DecodeService
@@ -50,7 +49,7 @@ class ANormalViewController(
 
     private lateinit var currentPageModel: CurrentPageModel
 
-    private lateinit var mPageSizes: SparseArray<APage>
+    private lateinit var mPageSizes: List<APage>
     private var scrollOrientation = LinearLayoutManager.VERTICAL
     private var pageNumberToast: Toast? = null
 
@@ -72,20 +71,33 @@ class ANormalViewController(
     private fun initView() {
         val zoomModel = ZoomModel()
 
+        var offsetX = 0
+        var offsetY = 0
         pdfViewModel.bookProgress?.run {
             zoomModel.zoom = this.zoomLevel / 1000
+            offsetX = this.offsetX
+            offsetY = this.offsetY
         }
         val progressModel = DecodingProgressModel()
         progressModel.addEventListener(this)
         currentPageModel = CurrentPageModel()
         currentPageModel.addEventListener(this)
         documentView =
-            DocumentView(context, zoomModel, progressModel, currentPageModel, simpleGestureListener)
+            DocumentView(
+                context,
+                zoomModel,
+                DocumentView.VERTICAL,
+                offsetX,
+                offsetY,
+                progressModel,
+                currentPageModel,
+                simpleGestureListener
+            )
         initDecodeService()
 
         documentView.setDecodeService(decodeService)
-        decodeService!!.open(pdfViewModel.pdfPath)
-        
+        decodeService!!.open(pdfViewModel.pdfPath, false, true)
+
         zoomModel.addEventListener(documentView)
         documentView.layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -99,14 +111,14 @@ class ANormalViewController(
         zoomModel.addEventListener(this)
     }
 
-    override fun init(pageSizes: SparseArray<APage>, pos: Int, scrollOrientation: Int) {
+    override fun init(pageSizes: List<APage>, pos: Int, scrollOrientation: Int) {
         try {
             Logcat.d("init.pos:$pos, :$scrollOrientation")
             this.scrollOrientation = scrollOrientation
             //if (null != pdfViewModel.mupdfDocument) {
-                this.mPageSizes = pageSizes
+            this.mPageSizes = pageSizes
 
-                setNormalMode(pos)
+            setNormalMode(pos)
             //}
             addGesture()
         } catch (e: Exception) {
@@ -115,7 +127,7 @@ class ANormalViewController(
         }
     }
 
-    override fun doLoadDoc(pageSizes: SparseArray<APage>, pos: Int) {
+    override fun doLoadDoc(pageSizes: List<APage>, pos: Int) {
         try {
             Logcat.d("doLoadDoc:$scrollOrientation")
             this.mPageSizes = pageSizes
@@ -127,7 +139,7 @@ class ANormalViewController(
         } finally {
         }
     }
-    
+
     private fun createMainContainer(): FrameLayout {
         return FrameLayout(context)
     }
@@ -166,7 +178,7 @@ class ANormalViewController(
                 pdfViewModel.bookProgress!!.offsetY
             )
         }
-        documentView.showDocument()
+        documentView.showDocument(false)
         //mPageControls?.hide()
     }
 
@@ -183,7 +195,7 @@ class ANormalViewController(
     }
 
     override fun getCount(): Int {
-        return mPageSizes.size()
+        return mPageSizes.size
     }
 
     override fun setOrientation(ori: Int) {
@@ -209,7 +221,8 @@ class ANormalViewController(
     }
 
     override fun tryHyperlink(ev: MotionEvent): Boolean {
-        return documentView.tryHyperlink(ev)
+        //return documentView.tryHyperlink(ev)
+        return false //TODO
     }
 
     //完全忽略点击事件
@@ -272,17 +285,17 @@ class ANormalViewController(
 
     override fun onPause() {
         //if (null != pdfViewModel.mupdfDocument) {
-            pdfViewModel.bookProgress?.run {
-                val position = documentView.currentPage
-                pdfViewModel.saveBookProgress(
-                    mPath,
-                    pdfViewModel.countPages(),
-                    position + 1,
-                    documentView.zoomModel.zoom * 1000f,
-                    documentView.scrollX,
-                    documentView.scrollY
-                )
-            }
+        pdfViewModel.bookProgress?.run {
+            val position = documentView.currentPage
+            pdfViewModel.saveBookProgress(
+                mPath,
+                pdfViewModel.countPages(),
+                position + 1,
+                documentView.zoomModel.zoom * 1000f,
+                documentView.scrollX,
+                documentView.scrollY
+            )
+        }
         //}
     }
 

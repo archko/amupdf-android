@@ -5,20 +5,19 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
-import com.artifex.mupdf.fitz.Cookie;
 import com.artifex.mupdf.fitz.Document;
 import com.artifex.mupdf.fitz.Link;
 import com.artifex.mupdf.fitz.Location;
 import com.artifex.mupdf.fitz.Page;
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice;
 
-import org.vudroid.core.Hyperlink;
 import org.vudroid.core.codec.CodecPage;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.archko.pdf.core.cache.BitmapPool;
+import cn.archko.pdf.core.link.Hyperlink;
 
 
 public class PdfPage implements CodecPage {
@@ -77,25 +76,26 @@ public class PdfPage implements CodecPage {
      * @param scale           缩放级别
      * @return 位图
      */
-    public Bitmap renderBitmap(int width, int height, RectF pageSliceBounds, float scale) {
+    public Bitmap renderBitmap(Rect cropBound, int width, int height, RectF pageSliceBounds, float scale) {
         //Matrix matrix=new Matrix();
         //matrix.postScale(width/getWidth(), -height/getHeight());
         //matrix.postTranslate(0, height);
         //matrix.postTranslate(-pageSliceBounds.left*width, -pageSliceBounds.top*height);
         //matrix.postScale(1/pageSliceBounds.width(), 1/pageSliceBounds.height());
 
-        //long start= SystemClock.uptimeMillis();
         int pageW;
         int pageH;
         int patchX;
         int patchY;
-        pageW = (int) (getWidth() * scale);
-        pageH = (int) (getHeight() * scale);
+        //如果页面的缩放为1,那么这时的pageW就是view的宽.
+        pageW = (int) (cropBound.width() * scale);
+        pageH = (int) (cropBound.height() * scale);
 
-        patchX = (int) (pageSliceBounds.left * pageW);
-        patchY = (int) (pageSliceBounds.top * pageH);
-        //Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        patchX = (int) ((int) (pageSliceBounds.left * pageW) + cropBound.left * scale);
+        patchY = (int) ((int) (pageSliceBounds.top * pageH) + cropBound.top * scale);
         Bitmap bitmap = BitmapPool.getInstance().acquire(width, height);
+
+        //Log.d("TAG", String.format("page:%s, patchX:%s, patchY:%s, width:%s, height:%s, %s",pageHandle, patchX, patchY, width, height, cropBound));
 
         com.artifex.mupdf.fitz.Matrix ctm = new com.artifex.mupdf.fitz.Matrix(scale);
         AndroidDrawDevice dev = new AndroidDrawDevice(bitmap, patchX, patchY, 0, 0, width, height);
@@ -104,13 +104,11 @@ public class PdfPage implements CodecPage {
             return bitmap;
         }
         try {
-            page.run(dev, ctm, (Cookie) null);
+            page.run(dev, ctm, null);
         } catch (Exception e) {
-
         }
         dev.close();
         dev.destroy();
-        //add(start);
 
         return bitmap;
     }

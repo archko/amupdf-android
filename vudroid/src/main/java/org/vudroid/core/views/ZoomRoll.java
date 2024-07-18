@@ -30,10 +30,10 @@ public class ZoomRoll extends View {
     public ZoomRoll(Context context, ZoomModel zoomModel) {
         super(context);
         this.zoomModel = zoomModel;
-        left = BitmapFactory.decodeResource(context.getResources(), R.drawable.zoom_left);
-        right = BitmapFactory.decodeResource(context.getResources(), R.drawable.zoom_right);
-        center = BitmapFactory.decodeResource(context.getResources(), R.drawable.zoom_center);
-        serifs = BitmapFactory.decodeResource(context.getResources(), R.drawable.zoom_serifs);
+        left = BitmapFactory.decodeResource(context.getResources(), R.drawable.left);
+        right = BitmapFactory.decodeResource(context.getResources(), R.drawable.right);
+        center = BitmapFactory.decodeResource(context.getResources(), R.drawable.center);
+        serifs = BitmapFactory.decodeResource(context.getResources(), R.drawable.serifs);
 
         scroller = new Scroller(context);
 

@@ -23,7 +23,7 @@ public class BitmapPool {
     }
 
     private BitmapPool() {
-        simplePool = new FixedSimplePool<>(16);
+        simplePool = new FixedSimplePool<>(18);
     }
 
     public Bitmap acquire(int width, int height) {
@@ -39,6 +39,28 @@ public class BitmapPool {
                 bitmap.eraseColor(0);
             } else {
                 bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            }
+        }
+        return bitmap;
+    }
+
+    public Bitmap acquire(int width, int height, Bitmap.Config config) {
+        Bitmap bitmap = simplePool.acquire();
+        if (null != bitmap && bitmap.isRecycled()) {
+            bitmap = simplePool.acquire();
+        }
+        if (null == bitmap) {
+            bitmap = Bitmap.createBitmap(width, height, config);
+        } else {
+            if (bitmap.getConfig() == config) {
+                if (bitmap.getHeight() == height && bitmap.getWidth() == width) {
+                    //Log.d("TAG", String.format("use cache:%s-%s-%s%n", width, height, simplePool.mPoolSize));
+                    bitmap.eraseColor(0);
+                } else {
+                    bitmap = Bitmap.createBitmap(width, height, config);
+                }
+            } else {
+                bitmap = Bitmap.createBitmap(width, height, config);
             }
         }
         return bitmap;
@@ -99,7 +121,7 @@ public class BitmapPool {
         @Override
         public boolean release(@NonNull T instance) {
             if (isInPool(instance)) {
-                return false;
+                return true;
             }
             if (mPoolSize < mPool.length) {
                 mPool[mPoolSize] = instance;

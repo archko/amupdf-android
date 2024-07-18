@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity.RESULT_FIRST_USER
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.util.SparseArray
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -57,7 +56,7 @@ class AReflowViewController(
     private lateinit var mRecyclerView: ARecyclerView
     private var mStyleHelper: StyleHelper? = null
     private val START_PROGRESS = 15
-    private lateinit var mPageSizes: SparseArray<APage>
+    private lateinit var mPageSizes: List<APage>
     private var scope: CoroutineScope? = null
 
     init {
@@ -86,7 +85,7 @@ class AReflowViewController(
         }
     }
 
-    override fun init(pageSizes: SparseArray<APage>, pos: Int, scrollOrientation: Int) {
+    override fun init(pageSizes: List<APage>, pos: Int, scrollOrientation: Int) {
         try {
             if (scope == null || !scope!!.isActive) {
                 scope =
@@ -105,7 +104,7 @@ class AReflowViewController(
         }
     }
 
-    override fun doLoadDoc(pageSizes: SparseArray<APage>, pos: Int) {
+    override fun doLoadDoc(pageSizes: List<APage>, pos: Int) {
         try {
             Logcat.d("doLoadDoc:$this")
             this.mPageSizes = pageSizes
@@ -176,7 +175,7 @@ class AReflowViewController(
     }
 
     override fun getCount(): Int {
-        return mPageSizes.size()
+        return mPageSizes.size
     }
 
     override fun setOrientation(ori: Int) {

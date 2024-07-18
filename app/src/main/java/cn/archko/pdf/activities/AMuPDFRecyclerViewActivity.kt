@@ -20,7 +20,7 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
-import cn.archko.pdf.common.APageSizeLoader
+import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat

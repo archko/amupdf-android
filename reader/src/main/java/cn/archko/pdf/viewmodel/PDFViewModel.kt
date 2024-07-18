@@ -2,13 +2,12 @@ package cn.archko.pdf.viewmodel
 
 import android.content.Context
 import android.text.TextUtils
-import android.util.SparseArray
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cn.archko.pdf.common.APageSizeLoader
 import cn.archko.pdf.common.OutlineHelper
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.App
+import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.Graph
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
@@ -193,15 +192,14 @@ class PDFViewModel : ViewModel() {
         }
     }
 
-    suspend fun savePageSize(crop: Boolean, pageSizes: SparseArray<APage>) = flow {
+    suspend fun savePageSize(crop: Boolean, pageSizes: List<APage>) = flow {
         APageSizeLoader.savePageSizeToFile(
             crop,
-            bookProgress!!.size,
-            pageSizes,
             FileUtils.getDiskCacheDir(
                 App.instance,
                 bookProgress?.name
-            )
+            ),
+            pageSizes
         )
         emit(null)
     }.flowOn(Dispatchers.IO)
@@ -210,9 +208,7 @@ class PDFViewModel : ViewModel() {
         var pageSizeBean: APageSizeLoader.PageSizeBean? = null
         if (bookProgress != null) {
             pageSizeBean = APageSizeLoader.loadPageSizeFromFile(
-                width,
                 bookProgress!!.pageCount,
-                bookProgress!!.size,
                 FileUtils.getDiskCacheDir(
                     App.instance,
                     bookProgress?.name

@@ -26,7 +26,9 @@ import java.util.Queue;
 
 import cn.archko.pdf.core.cache.BitmapCache;
 import cn.archko.pdf.core.cache.BitmapPool;
+import cn.archko.pdf.core.common.APageSizeLoader;
 import cn.archko.pdf.core.entity.APage;
+import cn.archko.pdf.core.utils.CropUtils;
 
 public class DecodeServiceBase implements DecodeService {
     private static final int PAGE_POOL_SIZE = 6;
@@ -139,17 +141,59 @@ public class DecodeServiceBase implements DecodeService {
         this.containerView = containerView;
     }
 
-    public void open(String filePath) {
+    public CodecDocument open(String path, boolean crop, boolean cachePage) {
         long start = System.currentTimeMillis();
-        document = codecContext.openDocument(filePath);
+        document = codecContext.openDocument(path);
+        if (null == document) {
+            return null;
+        }
         int count = document.getPageCount();
+        APageSizeLoader.PageSizeBean pageSizeBean = APageSizeLoader.INSTANCE.loadPageSizeFromFile(count, path);
+        if (null != pageSizeBean) {
+            if (!crop || (crop && pageSizeBean.getCrop())) {
+                aPageList.addAll(pageSizeBean.getList());
+            }
+            return document;
+        }
         for (int i = 0; i < count; i++) {
             CodecPage codecPage = document.getPage(i);
             APage aPage = new APage(i, codecPage.getWidth(), codecPage.getHeight(), 1f);
+            if (crop) {
+                cropPage(codecPage, aPage);
+            }
             aPageList.add(aPage);
             codecPage.recycle();
         }
+        if (cachePage) {
+            APageSizeLoader.INSTANCE.savePageSizeToFile(true, path, aPageList);
+        }
         Log.d(TAG, String.format("open.cos:%s", (System.currentTimeMillis() - start)));
+        return document;
+    }
+
+    private void cropPage(CodecPage vuPage, APage page) {
+        int width = 240;
+        float ratio = 1f * vuPage.getWidth() / width;
+        int height = (int) (vuPage.getHeight() / ratio);
+        Bitmap thumb = vuPage.renderBitmap(
+                new Rect(0, 0, 1, 1),
+                width,
+                height,
+                new RectF(0, 0, 1, 1),
+                1 / ratio);
+
+        RectF cropBounds = CropUtils.getJavaCropBounds(
+                thumb,
+                new Rect(0, 0, thumb.getWidth(), thumb.getHeight())
+        );
+        int leftBound = (int) (cropBounds.left * ratio);
+        int topBound = (int) (cropBounds.top * ratio);
+        int resultW = (int) (cropBounds.width() * ratio);
+        int resultH = (int) (cropBounds.height() * ratio);
+        Rect rect = new Rect(leftBound, topBound, leftBound + resultW, topBound + resultH);
+        page.setCropBounds(rect);
+
+        BitmapPool.getInstance().release(thumb);
     }
 
     public CodecDocument getDocument() {
@@ -165,8 +209,8 @@ public class DecodeServiceBase implements DecodeService {
         initDecodeThread();
     }
 
-    public void decodePage(String decodeKey, PageTreeNode node, int pageNumber, final DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds) {
-        final DecodeTask decodeTask = new DecodeTask(node, pageNumber, decodeCallback, zoom, decodeKey, pageSliceBounds);
+    public void decodePage(String decodeKey, PageTreeNode node, boolean crop, int pageNumber, final DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds) {
+        final DecodeTask decodeTask = new DecodeTask(node, crop, pageNumber, decodeCallback, zoom, decodeKey, pageSliceBounds);
         Message message = Message.obtain();
         message.obj = decodeTask;
         message.what = MSG_DECODE_START;
@@ -207,7 +251,7 @@ public class DecodeServiceBase implements DecodeService {
         }
 
         //如果直接取,有可能在release池中,被换成其它的图片了
-        Bitmap bitmap = null;//BitmapCache.getInstance().getNodeBitmap(task.decodeKey);
+        Bitmap bitmap = null;//BitmapCache.getInstance().removeNode(task.decodeKey);
         if (null != bitmap) {
             finishDecoding(task, bitmap);
             return;
@@ -217,17 +261,26 @@ public class DecodeServiceBase implements DecodeService {
             return;
         }
 
-        //Log.d(TAG, "Start converting map to bitmap");
-        float scale = calculateScale(vuPage) * task.zoom;
-        //Log.d(TAG, "scale:"+scale+" vuPage.getWidth():"+vuPage.getWidth());
-        Rect rect = getScaledSize(task, vuPage, scale);
+        APage aPage = aPageList.get(task.pageNumber);
+        float scale = calculateScale(aPage, task.crop) * task.zoom;
+        Rect rect = getScaledSize(task, aPage, scale, task.crop);
 
         if (null != task.node && task.node.page.links == null) {
             task.node.page.links = vuPage.getPageLinks();
         }
 
-        Log.d(TAG, String.format("renderBitmap:%s, w-h:%s", task.pageNumber, rect));
-        bitmap = vuPage.renderBitmap(rect.width(), rect.height(), task.pageSliceBounds, scale);
+        //Log.d(TAG, String.format("renderBitmap:%s, slice:%s, rect:%s", task.pageNumber, task.pageSliceBounds, rect));
+        Rect cropBounds = aPage.getCropBounds();
+        if (task.crop) {
+            if (cropBounds == null) {
+                cropBounds = new Rect(0, 0, (int) aPage.getWidth(), (int) aPage.getHeight());
+            }
+        } else {
+            cropBounds = new Rect(0, 0, (int) aPage.getWidth(), (int) aPage.getHeight());
+        }
+        bitmap = vuPage.renderBitmap(
+                cropBounds,
+                rect.width(), rect.height(), task.pageSliceBounds, scale);
         //if (null != bitmap) {
         //    BitmapCache.getInstance().addNodeBitmap(task.decodeKey, bitmap);
         //}
@@ -255,6 +308,7 @@ public class DecodeServiceBase implements DecodeService {
             int height = (int) (xs * vuPage.getHeight());
             Log.d(TAG, String.format("decodeThumb:%s, w-h:%s-%s-%s, %s", task.pageNumber, width, height, xs, task.decodeKey));
             thumb = vuPage.renderBitmap(
+                    new Rect(0, 0, vuPage.getWidth(), vuPage.getHeight()),
                     width,
                     height,
                     new RectF(0, 0, 1, 1),
@@ -270,51 +324,35 @@ public class DecodeServiceBase implements DecodeService {
         }
     }
 
-    Rect getScaledSize(final DecodeTask task, final CodecPage vuPage, float scale) {
+    Rect getScaledSize(final DecodeTask task, final APage vuPage, float scale, boolean crop) {
         Rect rect = new Rect();
-        rect.right = getScaledWidth(task, vuPage, scale);
-        rect.bottom = getScaledHeight(task, vuPage, scale);
+        rect.right = getScaledWidth(task, vuPage, scale, crop);
+        rect.bottom = getScaledHeight(task, vuPage, scale, crop);
 
         return rect;
     }
 
-    private int getScaledHeight(DecodeTask task, CodecPage vuPage, float scale) {
-        return Math.round(getScaledHeight(vuPage, scale) * task.pageSliceBounds.height());
+    private int getScaledHeight(DecodeTask task, APage vuPage, float scale, boolean crop) {
+        return Math.round(getScaledHeight(vuPage, scale, crop) * task.pageSliceBounds.height());
     }
 
-    private int getScaledWidth(DecodeTask task, CodecPage vuPage, float scale) {
-        return Math.round(getScaledWidth(vuPage, scale) * task.pageSliceBounds.width());
+    private int getScaledWidth(DecodeTask task, APage vuPage, float scale, boolean crop) {
+        return Math.round(getScaledWidth(vuPage, scale, crop) * task.pageSliceBounds.width());
     }
 
-    private int getScaledHeight(CodecPage vuPage, float scale) {
-        return (int) (scale * vuPage.getHeight());
+    private int getScaledHeight(APage vuPage, float scale, boolean crop) {
+        return (int) (scale * vuPage.getHeight(crop));
     }
 
-    private int getScaledHeight(APage vuPage, float scale) {
-        return (int) (scale * vuPage.getHeight());
+    private int getScaledWidth(APage vuPage, float scale, boolean crop) {
+        return (int) (scale * vuPage.getWidth(crop));
     }
 
-    private int getScaledWidth(CodecPage vuPage, float scale) {
-        return (int) (scale * vuPage.getWidth());
-    }
-
-    private int getScaledWidth(APage vuPage, float scale) {
-        return (int) (scale * vuPage.getWidth());
-    }
-
-    private float calculateScale(CodecPage codecPage) {
+    private float calculateScale(APage codecPage, boolean crop) {
         if (oriention == DocumentView.VERTICAL) {
-            return 1.0f * getTargetWidth() / codecPage.getWidth();
+            return 1.0f * getTargetWidth() / codecPage.getWidth(crop);
         } else {
-            return 1.0f * getTargetHeight() / codecPage.getHeight();
-        }
-    }
-
-    private float calculateScale(APage codecPage) {
-        if (oriention == DocumentView.VERTICAL) {
-            return 1.0f * getTargetWidth() / codecPage.getWidth();
-        } else {
-            return 1.0f * getTargetHeight() / codecPage.getHeight();
+            return 1.0f * getTargetHeight() / codecPage.getHeight(crop);
         }
     }
 
@@ -348,6 +386,10 @@ public class DecodeServiceBase implements DecodeService {
         return pages.get(pageIndex).get();
     }
 
+    public APage getAPage(int pageIndex) {
+        return aPageList.get(pageIndex);
+    }
+
     public Outline[] getOutlines() {
         return document.loadOutline();
     }
@@ -364,24 +406,26 @@ public class DecodeServiceBase implements DecodeService {
         return containerView.getHeight();
     }
 
-    public int getEffectivePagesWidth(int index) {
+    public int getEffectivePagesWidth(int index, boolean crop) {
         //final CodecPage page = getPage();
         final APage page = aPageList.get(index);
-        return getScaledWidth(page, calculateScale(page));
+        return getScaledWidth(page, calculateScale(page, crop), crop);
     }
 
-    public int getEffectivePagesHeight(int index) {
+    public int getEffectivePagesHeight(int index, boolean crop) {
         //final CodecPage page = getPage(0);
         final APage page = aPageList.get(index);
-        return getScaledHeight(page, calculateScale(page));
+        return getScaledHeight(page, calculateScale(page, crop), crop);
     }
 
-    public int getPageWidth(int pageIndex) {
-        return getPage(pageIndex).getWidth();
+    public int getPageWidth(int pageIndex, boolean crop) {
+        //return getPage(pageIndex).getWidth();
+        return (int) aPageList.get(pageIndex).getWidth(crop);
     }
 
-    public int getPageHeight(int pageIndex) {
-        return getPage(pageIndex).getHeight();
+    public int getPageHeight(int pageIndex, boolean crop) {
+        //return getPage(pageIndex).getHeight();
+        return (int) aPageList.get(pageIndex).getHeight(crop);
     }
 
     private void updateImage(final DecodeTask task, Bitmap bitmap) {
@@ -390,7 +434,6 @@ public class DecodeServiceBase implements DecodeService {
 
     private void updateThumb(final DecodeTask task, Bitmap bitmap) {
         task.decodeCallback.decodeComplete(bitmap, true);
-        //stopDecoding(task.decodeKey);
     }
 
     private boolean skipInvisible(DecodeTask task, boolean isFullPage) {
@@ -427,9 +470,11 @@ public class DecodeServiceBase implements DecodeService {
         private final float zoom;
         private final DecodeCallback decodeCallback;
         private final RectF pageSliceBounds;
+        private boolean crop = true;
 
-        private DecodeTask(PageTreeNode node, int pageNumber, DecodeCallback decodeCallback, float zoom, String decodeKey, RectF pageSliceBounds) {
+        private DecodeTask(PageTreeNode node, boolean crop, int pageNumber, DecodeCallback decodeCallback, float zoom, String decodeKey, RectF pageSliceBounds) {
             this.node = node;
+            this.crop = crop;
             this.type = node == null ? TYPE_PAGE : TYPE_NODE;
             this.pageNumber = pageNumber;
             this.decodeCallback = decodeCallback;
@@ -461,7 +506,6 @@ public class DecodeServiceBase implements DecodeService {
             stopDecoding(key);
         }
         new Thread(() -> {
-            //for (SoftReference<CodecPage> codecPageSoftReference : pages.values()) {
             int len = pages.size();
             SoftReference<CodecPage> codecPageSoftReference;
             for (int i = 0; i < len; i++) {
@@ -471,8 +515,12 @@ public class DecodeServiceBase implements DecodeService {
                     page.recycle();
                 }
             }
-            document.recycle();
-            codecContext.recycle();
+            if (null != document) {
+                document.recycle();
+            }
+            if (null != codecContext) {
+                codecContext.recycle();
+            }
             BitmapPool.getInstance().clear();
         }).start();
     }

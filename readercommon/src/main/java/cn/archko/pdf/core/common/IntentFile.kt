@@ -6,13 +6,16 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Log
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 
 object IntentFile {
 
@@ -51,7 +54,7 @@ object IntentFile {
             return path
         }
         // 以 content:// 开头的，比如 content://media/extenral/images/media/17766
-        if (ContentResolver.SCHEME_CONTENT == uri.scheme && Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+        /*if (ContentResolver.SCHEME_CONTENT == uri.scheme && Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             val cursor = context.contentResolver.query(
                 uri,
                 arrayOf(MediaStore.Images.Media.DATA, MediaStore.Video.Media.DURATION),
@@ -70,9 +73,9 @@ object IntentFile {
                 cursor.close()
             }
             return path
-        }
+        }*/
         // 4.4及之后的 是以 content:// 开头的，比如 content://com.android.providers.media.documents/document/image%3A235700
-        if (ContentResolver.SCHEME_CONTENT == uri.scheme && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        if (ContentResolver.SCHEME_CONTENT == uri.scheme /*&& Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT*/) {
             if (DocumentsContract.isDocumentUri(context, uri)) {
                 if (isExternalStorageDocument(uri)) {
                     // ExternalStorageProvider
@@ -121,13 +124,14 @@ object IntentFile {
     }
 
     @JvmStatic
+    //content://cn.archko.mupdf.fileProvider/external_files/book/%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%20Rust%20(%E8%8C%83%E9%95%BF%E6%98%A5)%20.pdf
     // 由系统文件管理器选择的是,content://com.android.fileexplorer.myprovider/external_files/DCIM/Camera/VID_20211029_091852.mp4 这种的DURATION是没有的
     // 其它管理器是content://com.speedsoftware.rootexplorer.fileprovider/root/storage/emulated/0/book/
     fun getRealPathFromURI(context: Context, contentUri: Uri): String? {
         var cursor: Cursor? = null
         try {
             val proj = arrayOf(MediaStore.Images.Media.DATA)
-            cursor = context.contentResolver.query(contentUri!!, proj, null, null, null)
+            cursor = context.contentResolver.query(contentUri, proj, null, null, null)
             val column_index = cursor!!.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
             cursor.moveToFirst()
             val path = cursor.getString(column_index)
@@ -146,6 +150,9 @@ object IntentFile {
             val sb = StringBuilder()
             for (index in 1 until pathSegments.size) {
                 sb.append("/").append(pathSegments[index])
+            }
+            if (contentUri.toString().contains("external_files")) {
+                sb.insert(0, Environment.getExternalStorageDirectory().path)
             }
             return sb.toString()
         }
@@ -216,6 +223,47 @@ object IntentFile {
             success
         } else {
             success
+        }
+    }
+
+    @JvmStatic
+    @Throws(IOException::class)
+    fun createTempFile(uri: Uri, context: Context): File {
+        val ext = uri.lastPathSegment
+        val extension = getExtensionName(ext)
+        val tempfile = File.createTempFile("temp", "content.$extension")
+        tempfile.deleteOnExit()
+        val source = context.contentResolver.openInputStream(uri)
+        copy(source, tempfile)
+        return tempfile
+    }
+
+    fun getExtensionName(filename: String?): String? {
+        if (filename != null && filename.length > 0) {
+            val dot = filename.lastIndexOf('.')
+            if (dot > -1 && dot < filename.length - 1) {
+                return filename.substring(dot + 1)
+            }
+        }
+        return filename
+    }
+
+    @Throws(IOException::class)
+    fun copy(inputStream: InputStream?, output: File?) {
+        var outputStream: OutputStream? = null
+        try {
+            outputStream = FileOutputStream(output)
+            var read = 0
+            val bytes = ByteArray(1024)
+            while (inputStream!!.read(bytes).also { read = it } != -1) {
+                outputStream.write(bytes, 0, read)
+            }
+        } finally {
+            try {
+                inputStream?.close()
+            } finally {
+                outputStream?.close()
+            }
         }
     }
 

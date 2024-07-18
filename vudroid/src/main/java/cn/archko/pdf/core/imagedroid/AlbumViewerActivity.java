@@ -1,15 +1,15 @@
-package cn.archko.pdf.imagedroid;
+package cn.archko.pdf.core.imagedroid;
 
 import android.app.ProgressDialog;
 import android.widget.Toast;
 
-import org.vudroid.core.BaseViewerActivity;
 import org.vudroid.core.DecodeService;
 import org.vudroid.core.DecodeServiceBase;
 import org.vudroid.core.codec.CodecDocument;
 
 import cn.archko.pdf.core.common.AppExecutors;
-import cn.archko.pdf.imagedroid.codec.AlbumContext;
+import cn.archko.pdf.core.imagedroid.codec.AlbumContext;
+import cn.archko.pdf.core.ui.BaseViewerActivity;
 
 public class AlbumViewerActivity extends BaseViewerActivity {
 
@@ -27,7 +27,7 @@ public class AlbumViewerActivity extends BaseViewerActivity {
         progressDialog.show();
 
         AppExecutors.Companion.getInstance().diskIO().execute(() -> {
-            CodecDocument document = getDecodeService().open(path, autoCrop, false);
+            CodecDocument document = decodeService.open(path, autoCrop, false);
             AppExecutors.Companion.getInstance().mainThread().execute(() -> {
                 progressDialog.dismiss();
                 if (null == document) {
@@ -36,7 +36,7 @@ public class AlbumViewerActivity extends BaseViewerActivity {
                     return;
                 }
                 isDocLoaded = true;
-                getDocumentView().showDocument(autoCrop);
+                documentView.showDocument(autoCrop);
             });
         });
     }

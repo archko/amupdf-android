@@ -5,7 +5,6 @@ import android.app.Activity.RESULT_FIRST_USER
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Rect
-import android.util.SparseArray
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -42,7 +41,7 @@ class ACropViewController(
     OutlineListener, AViewController {
 
     private lateinit var mRecyclerView: FastScrollRecyclerView
-    private lateinit var mPageSizes: SparseArray<APage>
+    private lateinit var mPageSizes: List<APage>
     private var pdfAdapter: PDFRecyclerAdapter? = null
 
     /**
@@ -105,7 +104,7 @@ class ACropViewController(
             })
     }
 
-    override fun init(pageSizes: SparseArray<APage>, pos: Int, scrollOrientation: Int) {
+    override fun init(pageSizes: List<APage>, pos: Int, scrollOrientation: Int) {
         try {
             Logcat.d("init.pos:$pos, :$scrollOrientation")
             this.scrollOrientation = scrollOrientation
@@ -121,7 +120,7 @@ class ACropViewController(
         }
     }
 
-    override fun doLoadDoc(pageSizes: SparseArray<APage>, pos: Int) {
+    override fun doLoadDoc(pageSizes: List<APage>, pos: Int) {
         try {
             Logcat.d("doLoadDoc:$scrollOrientation")
             this.mPageSizes = pageSizes
@@ -211,7 +210,7 @@ class ACropViewController(
     }
 
     override fun getCount(): Int {
-        return mPageSizes.size()
+        return mPageSizes.size
     }
 
     override fun setOrientation(ori: Int) {
@@ -344,7 +343,7 @@ class ACropViewController(
         if (null != pdfViewModel.mupdfDocument) {
             var savePos = getCurrentPos() + 1
             val lastPos = getLastPos()
-            if (lastPos == mPageSizes.size() - 1) {
+            if (lastPos == mPageSizes.size - 1) {
                 savePos = lastPos
             }
             pdfViewModel.bookProgress?.run {

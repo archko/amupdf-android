@@ -59,35 +59,39 @@ object AdapterUtils {
     }
 
     fun setIcon(ext: String?, imageView: ImageView) {
-        var drawableId = R.drawable.browser_icon_any
-        if ("pdf".equals(ext, ignoreCase = true)) {
-            drawableId = R.drawable.browser_icon_pdf
-        } else if ("epub".equals(ext, ignoreCase = true) || "mobi".equals(ext, ignoreCase = true)) {
-            drawableId = R.drawable.browser_icon_epub
-        } else if ("png".equals(ext, ignoreCase = true) || "jpg".equals(
-                ext,
-                ignoreCase = true
-            ) || "jpeg".equals(ext, ignoreCase = true)
+        var drawableId = R.drawable.app_pdf
+        if (".pdf".equals(ext)) {
+            drawableId = R.drawable.app_pdf
+        } else if (".djvu".equals(ext) || ".djv".equals(ext)) {
+            drawableId = R.drawable.image_djvu
+        } else if (".epub".equals(ext) || ".mobi".equals(ext)
         ) {
-            drawableId = R.drawable.browser_icon_image
-        } else if ("txt".equals(ext, ignoreCase = true) || "log".equals(ext, ignoreCase = true)
-            || "js".equals(ext, ignoreCase = true) || "json".equals(ext, ignoreCase = true)
-            || "html".equals(ext, ignoreCase = true) || "xhtml".equals(ext, ignoreCase = true)
+            drawableId = R.drawable.app_epub_zip
+        } else if (".png".equals(ext) || ".jpg".equals(ext) || ".jpeg".equals(ext)
+            || ".bmp".equals(ext) || ".svg".equals(ext) || ".gif".equals(ext)
+            || ".jfif".equals(ext) || ".jfif-tbnl".equals(ext)
+            || ".tif".equals(ext) || ".tiff".equals(ext)
+            || ".heic".equals(ext) || ".webp".equals(ext)
+        ) {
+            drawableId = R.drawable.image
+        } /*else if ("txt".equals(ext) || "log".equals(ext)
+            || "js".equals(ext) || "json".equals(ext)
+            || "html".equals(ext) || "xhtml".equals(ext)
         ) {
             drawableId = R.drawable.browser_icon_txt
-        } /*else if ("ppt".equalsIgnoreCase(ext)) {
-            drawableId = R.drawable.browser_icon_ppt;
-        } else if ("pptx".equalsIgnoreCase(ext)) {
-            drawableId = R.drawable.browser_icon_pptx;
-        } else if ("doc".equalsIgnoreCase(ext)) {
-            drawableId = R.drawable.browser_icon_doc;
-        } else if ("docx".equalsIgnoreCase(ext)) {
-            drawableId = R.drawable.browser_icon_docx;
-        } else if ("xls".equalsIgnoreCase(ext)) {
-            drawableId = R.drawable.browser_icon_xls;
-        } else if ("xlsx".equalsIgnoreCase(ext)) {
-            drawableId = R.drawable.browser_icon_xlsx;
-        } */
+        }*/ else if (".ppt".equals(ext)) {
+            drawableId = R.drawable.office_ppt
+        } else if (".pptx".equals(ext)) {
+            drawableId = R.drawable.office_ppt
+        } else if (".doc".equals(ext)) {
+            drawableId = R.drawable.office_word
+        } else if (".docx".equals(ext)) {
+            drawableId = R.drawable.office_word
+        } else if (".xls".equals(ext)) {
+            drawableId = R.drawable.office_excel
+        } else if (".xlsx".equals(ext)) {
+            drawableId = R.drawable.office_excel
+        }
         imageView.setImageResource(drawableId)
     }
 

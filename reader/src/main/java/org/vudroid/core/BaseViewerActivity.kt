@@ -1,5 +1,6 @@
 package org.vudroid.core
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -16,7 +17,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
 import cn.archko.pdf.common.PdfOptionRepository
-import cn.archko.pdf.core.common.AppExecutors
+import cn.archko.pdf.core.common.AppExecutors.Companion.instance
 import cn.archko.pdf.core.common.SensorHelper
 import cn.archko.pdf.core.common.StatusBarHelper
 import cn.archko.pdf.core.decode.MupdfDocument
@@ -49,6 +50,8 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
     var pageSeekBarControls: APageSeekBarControls? = null
     var sensorHelper: SensorHelper? = null
     val pdfViewModel: PDFViewModel = PDFViewModel()
+    protected var progressDialog: ProgressDialog? = null
+    protected var isDocLoaded: Boolean = false
 
     /**
      * Called when the activity is first created.
@@ -64,16 +67,26 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         sensorHelper = SensorHelper(this)
         val uri = intent.data
         val absolutePath = Uri.decode(uri!!.encodedPath)
+        var scrollX = 0
+        var scrollY = 0
+        var crop = true
         lifecycleScope.launch {
             val bookProgress = pdfViewModel.loadBookProgressByPath(absolutePath)
             zoomModel.zoom = bookProgress?.zoomLevel?.div(1000) ?: 1f
+            scrollX = pdfViewModel.bookProgress!!.offsetX
+            scrollY = pdfViewModel.bookProgress!!.offsetY
+            crop = pdfViewModel.bookProgress!!.autoCrop == 0
         }
         val progressModel = DecodingProgressModel()
         progressModel.addEventListener(this)
         currentPageModel = CurrentPageModel()
         currentPageModel!!.addEventListener(this)
         documentView =
-            DocumentView(this, zoomModel, progressModel, currentPageModel, simpleGestureListener)
+            DocumentView(
+                this, zoomModel,
+                DocumentView.VERTICAL, scrollX, scrollY,
+                progressModel, currentPageModel, simpleGestureListener
+            )
         zoomModel.addEventListener(documentView)
         documentView!!.layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -141,14 +154,26 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
         pageSeekBarControls!!.showReflow(true)
         pageSeekBarControls!!.updateTitle(absolutePath)
 
-        loadDocument(absolutePath)
+        loadDocument(absolutePath, crop)
     }
 
-    open fun loadDocument(path: String) {
-        AppExecutors.instance.diskIO().execute {
-            decodeService!!.open(path)
-            AppExecutors.instance.mainThread()
-                .execute { documentView!!.showDocument() }
+    open fun loadDocument(path: String, crop: Boolean) {
+        progressDialog = ProgressDialog(this)
+        progressDialog!!.setMessage("Loading")
+        progressDialog!!.show()
+
+        instance.diskIO().execute {
+            val document = decodeService!!.open(path, crop, true)
+            instance.mainThread().execute {
+                progressDialog!!.dismiss()
+                if (null == document) {
+                    Toast.makeText(this, "Open Failed", Toast.LENGTH_LONG).show()
+                    finish()
+                    return@execute
+                }
+                isDocLoaded = true
+                documentView!!.showDocument(crop)
+            }
         }
     }
 
@@ -328,14 +353,13 @@ abstract class BaseViewerActivity : FragmentActivity(), DecodingProgressListener
             }
         }
         pageControls!!.hide()
-        var height = documentView!!.height
+        /*var height = documentView!!.height
         height = if (height <= 0) {
             ViewConfiguration().scaledTouchSlop * 2
         } else {
             (height * 0.03).toInt()
         }
-        documentView!!.setScrollMargin(height)
-        documentView!!.setDecodePage(1 /*options.getBoolean(PdfOptionsActivity.PREF_RENDER_AHEAD, true) ? 1 : 0*/)
+        documentView!!.setScrollMargin(height)*/
     }
 
     override fun onPause() {

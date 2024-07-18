@@ -3,6 +3,7 @@ package org.vudroid.core;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -23,12 +24,19 @@ public class PageTreeNode {
     private PageTreeNode[] children;
     private final int treeNodeDepthLevel;
     private Matrix matrix = new Matrix();
-    private final Paint bitmapPaint = new Paint();
+    private Paint bitmapPaint = null;
     private DocumentView documentView;
     private boolean invalidateFlag;
     private Rect targetRect;
     private RectF targetRectF;
     private final Paint strokePaint = strokePaint();
+    private ColorMatrixColorFilter filter;
+
+    private Paint bmPaint() {
+        final Paint paint = new Paint();
+        paint.setColorFilter(filter);
+        return paint;
+    }
 
     private Paint strokePaint() {
         final Paint strokePaint = new Paint();
@@ -38,11 +46,13 @@ public class PageTreeNode {
         return strokePaint;
     }
 
-    PageTreeNode(DocumentView documentView, RectF localPageSliceBounds, Page page, int treeNodeDepthLevel, PageTreeNode parent) {
+    PageTreeNode(DocumentView documentView, RectF localPageSliceBounds, Page page, int treeNodeDepthLevel, PageTreeNode parent, ColorMatrixColorFilter filter) {
         this.documentView = documentView;
         this.pageSliceBounds = evaluatePageSliceBounds(localPageSliceBounds, parent);
         this.page = page;
         this.treeNodeDepthLevel = treeNodeDepthLevel;
+        this.filter = filter;
+        bitmapPaint = bmPaint();
     }
 
     public void updateVisibility() {
@@ -100,8 +110,8 @@ public class PageTreeNode {
         }
         Bitmap bmp = getBitmap();
         if (bmp != null && !bmp.isRecycled()) {
-            //System.out.println(String.format("level:%s, page:%s, width:%s, %s", treeNodeDepthLevel, page.index, getBitmap().getWidth(), getBitmap().getHeight()));
-            canvas.drawBitmap(bmp, new Rect(0, 0, getBitmap().getWidth(), getBitmap().getHeight()), getTargetRect(), bitmapPaint);
+            //System.out.println(String.format("level:%s, page:%s, width:%s, %s", treeNodeDepthLevel, page.index, bmp.getWidth(), bmp.getHeight()));
+            canvas.drawBitmap(bmp, new Rect(0, 0, bmp.getWidth(), bmp.getHeight()), getTargetRect(), bitmapPaint);
             //canvas.drawRect(getTargetRect(), strokePaint);
         }
         if (children == null) {
@@ -132,10 +142,10 @@ public class PageTreeNode {
             final int newThreshold = treeNodeDepthLevel * 2;
             children = new PageTreeNode[]
                     {
-                            new PageTreeNode(documentView, new RectF(0, 0, 0.5f, 0.5f), page, newThreshold, this),
-                            new PageTreeNode(documentView, new RectF(0.5f, 0, 1.0f, 0.5f), page, newThreshold, this),
-                            new PageTreeNode(documentView, new RectF(0, 0.5f, 0.5f, 1.0f), page, newThreshold, this),
-                            new PageTreeNode(documentView, new RectF(0.5f, 0.5f, 1.0f, 1.0f), page, newThreshold, this)
+                            new PageTreeNode(documentView, new RectF(0, 0, 0.5f, 0.5f), page, newThreshold, this, filter),
+                            new PageTreeNode(documentView, new RectF(0.5f, 0, 1.0f, 0.5f), page, newThreshold, this, filter),
+                            new PageTreeNode(documentView, new RectF(0, 0.5f, 0.5f, 1.0f), page, newThreshold, this, filter),
+                            new PageTreeNode(documentView, new RectF(0.5f, 0.5f, 1.0f, 1.0f), page, newThreshold, this, filter)
                     };
         }
         if (!isThresholdHit && getBitmap() != null || !isVisible) {
@@ -174,7 +184,7 @@ public class PageTreeNode {
             setBitmap(bitmap);
             invalidateFlag = false;
             setDecodingNow(false);
-            page.setAspectRatio(documentView.decodeService.getPageWidth(page.index), documentView.decodeService.getPageHeight(page.index));
+            page.setAspectRatio(documentView.decodeService.getPageWidth(page.index, page.crop), documentView.decodeService.getPageHeight(page.index, page.crop));
             invalidateChildren();
         }
 
@@ -194,6 +204,11 @@ public class PageTreeNode {
         }
     };
 
+    public void applyFilter(ColorMatrixColorFilter filter) {
+        this.filter = filter;
+        bitmapPaint.setColorFilter(filter);
+    }
+
     private void decodePageTreeNode() {
         if (isDecodingNow()) {
             return;
@@ -201,6 +216,7 @@ public class PageTreeNode {
         setDecodingNow(true);
         documentView.decodeService.decodePage(getCacheKey(),
                 this,
+                page.crop,
                 page.index,
                 decodeCallback,
                 documentView.zoomModel.getZoom(),
@@ -236,8 +252,8 @@ public class PageTreeNode {
 
     private void release() {
         if (bitmap != null) {
-            BitmapPool.getInstance().release(bitmap);
             bitmapWeakReference.clear();
+            BitmapPool.getInstance().release(bitmap);
             bitmap = null;
         }
     }

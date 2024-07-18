@@ -3,12 +3,12 @@ package org.vudroid.core;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.TextPaint;
-import android.util.Log;
 
 import org.vudroid.R;
 
@@ -16,6 +16,7 @@ import java.lang.ref.SoftReference;
 import java.util.List;
 
 import cn.archko.pdf.core.cache.BitmapCache;
+import cn.archko.pdf.core.link.Hyperlink;
 
 public class Page {
     final int index;
@@ -24,7 +25,7 @@ public class Page {
     private DocumentView documentView;
     public List<Hyperlink> links;
     private final TextPaint textPaint = textPaint();
-    private final Paint fillPaint = fillPaint();
+    private Paint fillPaint = null;
     private final Paint strokePaint = strokePaint();
     private final Paint linkPaint = linkPaint();
     public static final int ZOOM_THRESHOLD = 2;
@@ -32,11 +33,16 @@ public class Page {
     private Bitmap bitmap;
     private SoftReference<Bitmap> bitmapWeakReference;
     private boolean invalidateFlag;
+    protected boolean crop = true;
+    private ColorMatrixColorFilter filter;
 
-    Page(DocumentView documentView, int index) {
+    Page(DocumentView documentView, int index, boolean crop, ColorMatrixColorFilter filter) {
         this.documentView = documentView;
         this.index = index;
-        node = new PageTreeNode(documentView, new RectF(0, 0, 1, 1), this, ZOOM_THRESHOLD, null);
+        this.crop = crop;
+        this.filter = filter;
+        fillPaint = fillPaint();
+        node = new PageTreeNode(documentView, new RectF(0, 0, 1, 1), this, ZOOM_THRESHOLD, null, filter);
     }
 
     private float aspectRatio;
@@ -78,7 +84,7 @@ public class Page {
             //canvas.drawBitmap(thumb, matrix, null);
             Rect src = new Rect(0, 0, thumb.getWidth(), thumb.getHeight());
             Rect dst = new Rect((int) bounds.left, (int) bounds.top, (int) bounds.right, (int) bounds.bottom);
-            canvas.drawBitmap(thumb, src, dst, null);
+            canvas.drawBitmap(thumb, src, dst, fillPaint);
 
             //String text = String.format("Page%s,%s-%s,%s-%s,%s-%s, w-h:%s-%s",
             //        (index + 1), src.width(), src.height(),
@@ -118,6 +124,7 @@ public class Page {
         //fillPaint.setColor(Color.GRAY);
         fillPaint.setColor(Color.WHITE);    //scroll back show white bg
         fillPaint.setStyle(Paint.Style.FILL);
+        fillPaint.setColorFilter(filter);
         return fillPaint;
     }
 
@@ -130,13 +137,19 @@ public class Page {
         return paint;
     }
 
+    public void applyFilter(ColorMatrixColorFilter filter) {
+        this.filter = filter;
+        fillPaint.setColorFilter(filter);
+        node.applyFilter(filter);
+    }
+
     public float getAspectRatio() {
         return aspectRatio;
     }
 
     public void setAspectRatio(float aspectRatio) {
         if (this.aspectRatio != aspectRatio) {
-            boolean changed = Math.abs(aspectRatio - this.aspectRatio) > 0.005;
+            boolean changed = this.aspectRatio != 0f && Math.abs(aspectRatio - this.aspectRatio) > 0.005;
             this.aspectRatio = aspectRatio;
             if (changed) {
                 documentView.invalidatePageSizes();
@@ -157,12 +170,18 @@ public class Page {
         node.invalidateNodeBounds();
     }
 
+    private boolean isBitmapTooLarge() {
+        return documentView.getZoomModel().getZoom() > 1.5f;
+    }
+
     public void updateVisibility() {
-        if (isVisible()) {
+        if (isVisible() && !isBitmapTooLarge()) {
             if (getBitmap() != null && !invalidateFlag) {
                 restoreBitmapReference();
             } else {
-                decodePageThumb();
+                if (!crop) {
+                    decodePageThumb();
+                }
             }
         } else {
             recycle();
@@ -218,6 +237,7 @@ public class Page {
         documentView.decodeService.decodePage(
                 getKey(),
                 null,
+                crop,
                 index,
                 decodeCallback,
                 documentView.zoomModel.getZoom(),
@@ -269,7 +289,7 @@ public class Page {
     }
 
     public void postInvalidate(Bitmap bitmap) {
-        setAspectRatio(documentView.decodeService.getPageWidth(index), documentView.decodeService.getPageHeight(index));
+        setAspectRatio(documentView.decodeService.getPageWidth(index, crop), documentView.decodeService.getPageHeight(index, crop));
         documentView.postInvalidate();
     }
 
@@ -314,6 +334,12 @@ public class Page {
     public RectF getPageRegion(final RectF pageBounds, final RectF sourceRect) {
         final Matrix m = new Matrix();
         float scale = documentView.calculateScale(this);
+
+        if (crop) {
+            Rect rect = documentView.getBounds(this);
+            sourceRect.offset(-rect.left, -rect.top);
+        }
+
         m.postScale(scale, scale);
         m.mapRect(sourceRect);
 

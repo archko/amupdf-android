@@ -2,7 +2,6 @@ package cn.archko.pdf.activities
 
 import android.content.Context
 import android.util.Log
-import android.util.SparseArray
 import android.view.ViewGroup
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
@@ -17,7 +16,7 @@ import cn.archko.pdf.widgets.APDFView
 class PDFRecyclerAdapter(
     var context: Context,
     val pdfViewModel: PDFViewModel,
-    val mPageSizes: SparseArray<APage>,
+    val mPageSizes: List<APage>,
     val recyclerView: ARecyclerView
 ) : ARecyclerView.Adapter<ARecyclerView.ViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
@@ -32,7 +31,7 @@ class PDFRecyclerAdapter(
     }
 
     private fun initWidthAndHeight() {
-        if (mPageSizes != null && mPageSizes.size() > 0 && viewWidth() > 0) {
+        if (mPageSizes != null && mPageSizes.size > 0 && viewWidth() > 0) {
             val aPage = mPageSizes[0]
             defaultWidth = viewWidth()
             defaultHeight = defaultWidth
@@ -91,7 +90,7 @@ class PDFRecyclerAdapter(
     }
 
     override fun getItemCount(): Int {
-        return mPageSizes.size()
+        return mPageSizes.size
     }
 
     inner class PdfHolder(internal var view: APDFView) : ARecyclerView.ViewHolder(view) {

@@ -27,10 +27,10 @@ android {
 
     signingConfigs {
         named("debug") {
-            storeFile = rootProject.file(".jks")
-            storePassword = ""
-            keyAlias = ""
-            keyPassword = ""
+            storeFile = rootProject.file("mupdf_release_key.jks")
+            storePassword = "Abc123456"
+            keyAlias = "mupdf_release_key"
+            keyPassword = "Abc123456"
         }
     }
 

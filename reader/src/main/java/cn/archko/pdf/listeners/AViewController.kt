@@ -3,7 +3,6 @@ package cn.archko.pdf.listeners
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.view.MotionEvent
-import android.util.SparseArray
 import android.view.View
 import cn.archko.pdf.core.entity.APage
 
@@ -12,8 +11,8 @@ import cn.archko.pdf.core.entity.APage
  */
 interface AViewController {
 
-    fun init(pageSizes: SparseArray<APage>, pos: Int, scrollOrientation: Int)
-    fun doLoadDoc(pageSizes: SparseArray<APage>, pos: Int)
+    fun init(pageSizes: List<APage>, pos: Int, scrollOrientation: Int)
+    fun doLoadDoc(pageSizes: List<APage>, pos: Int)
 
     fun getDocumentView(): View
     fun onSingleTap(e: MotionEvent, margin: Int): Boolean

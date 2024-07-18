@@ -1,11 +1,12 @@
 package org.vudroid.core.codec;
 
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.graphics.RectF;
 
-import org.vudroid.core.Hyperlink;
-
 import java.util.List;
+
+import cn.archko.pdf.core.link.Hyperlink;
 
 public interface CodecPage {
 
@@ -14,7 +15,7 @@ public interface CodecPage {
     int getHeight();
 
     //Bitmap renderBitmap(int width, int height, RectF pageSliceBounds);
-    Bitmap renderBitmap(int width, int height, RectF pageSliceBounds, float scale);
+    Bitmap renderBitmap(Rect cropBound, int width, int height, RectF pageSliceBounds, float scale);
 
     void recycle();
 
