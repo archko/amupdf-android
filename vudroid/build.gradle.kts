@@ -9,7 +9,12 @@ android {
 
     defaultConfig {
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 dependencies {
     api(project(":readercommon"))
+    api("com.davemorrissey.labs:subsampling-scale-image-view:3.10.0")
 }

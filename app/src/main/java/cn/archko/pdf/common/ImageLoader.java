@@ -2,7 +2,6 @@ package cn.archko.pdf.common;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.widget.ImageView;
 
@@ -116,12 +115,11 @@ public class ImageLoader extends ImageWorker {
         }
 
         Page page = mDocument.loadPage(aPage.index);
-        Point zoomSize = aPage.getZoomPoint();
         float scale = 1.0f;
         int leftBound = 0;
         int topBound = 0;
-        Matrix ctm = new Matrix(aPage.getScaleZoom() * scale);
-        Bitmap bm = Bitmap.createBitmap(zoomSize.x, zoomSize.y, Bitmap.Config.ARGB_8888);
+        Matrix ctm = new Matrix(aPage.getZoom() * scale);
+        Bitmap bm = Bitmap.createBitmap((int) aPage.getWidth(), (int) aPage.getHeight(), Bitmap.Config.ARGB_8888);
         MupdfDocument.Companion.render(p, ctm, bm, 0, leftBound, topBound);
         page.destroy();
         return bm;

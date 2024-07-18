@@ -20,36 +20,46 @@ public class AlbumDocument implements CodecDocument {
     int count = 0;
 
     private static FileFilter createFileFilter() {
-        return pathname -> {
-            if (pathname.isHidden()) {
+        return file -> {
+            if (file.length() > 10_000_000) {
+                return false;
+            }
+            if (file.isHidden()) {
                 return false;
             }
 
-            if (pathname.isDirectory())
+            if (file.isDirectory())
                 return false;
-            String fname = pathname.getName().toLowerCase(Locale.ROOT);
+            String fname = file.getName().toLowerCase(Locale.ROOT);
 
             return IntentFile.INSTANCE.isImage(fname);
         };
     }
 
     public static AlbumDocument openDocument(String fname) {
-        File[] fileArray = new File(fname).listFiles(createFileFilter());
-        ArrayList<File> files = new ArrayList<>(fileArray != null ? Arrays.asList(fileArray) : Collections.<File>emptyList());
-        Collections.sort(files, (o1, o2) -> {
-            if (o1 == null && o2 == null) {
-                return 0;
-            }
-            if (o1.isDirectory() && o2.isFile()) return -1;
-            if (o1.isFile() && o2.isDirectory()) return 1;
-            if (o1.lastModified() - o2.lastModified() > 0) {
-                return -1;
-            } else if (o1.lastModified() - o2.lastModified() < 0) { //jdk7以上需要对称,自反,传递性.
-                return 1;
-            } else {
-                return 0;
-            }
-        });
+        ArrayList<File> files;
+        File file = new File(fname);
+        if (file.isDirectory()) {
+            File[] fileArray = file.listFiles(createFileFilter());
+            files = new ArrayList<>(fileArray != null ? Arrays.asList(fileArray) : Collections.<File>emptyList());
+            Collections.sort(files, (o1, o2) -> {
+                if (o1 == null && o2 == null) {
+                    return 0;
+                }
+                if (o1.isDirectory() && o2.isFile()) return -1;
+                if (o1.isFile() && o2.isDirectory()) return 1;
+                if (o1.lastModified() - o2.lastModified() > 0) {
+                    return -1;
+                } else if (o1.lastModified() - o2.lastModified() < 0) { //jdk7以上需要对称,自反,传递性.
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
+        } else {
+            files = new ArrayList<>();
+            files.add(file);
+        }
         AlbumDocument document = new AlbumDocument(files);
         return document;
     }

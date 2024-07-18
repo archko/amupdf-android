@@ -7,12 +7,13 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.Log;
 
-import org.vudroid.core.Hyperlink;
 import org.vudroid.core.codec.CodecPage;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.archko.pdf.core.link.Hyperlink;
 
 public class AlbumPage implements CodecPage {
 
@@ -73,9 +74,12 @@ public class AlbumPage implements CodecPage {
      * @param scale           缩放级别
      * @return 位图
      */
-    public Bitmap renderBitmap(int width, int height, RectF pageSliceBounds, float scale) {
+    public Bitmap renderBitmap(Rect cropBound, int width, int height, RectF pageSliceBounds, float scale) {
         if (null == decoder || decoder.isRecycled()) {
             loadPage(0);
+        }
+        if (pageHeight == 0 || pageWidth == 0) {
+            decodeBound();
         }
 
         //缩略图
@@ -85,8 +89,10 @@ public class AlbumPage implements CodecPage {
             final int widthRatio = Math.round((float) pageHeight / (float) width);
             // 选择宽和高中最小的比率作为inSampleSize的值，这样可以保证最终图片的宽和高
             // 一定都会大于等于目标的宽和高。
-            options.inSampleSize = Math.min(heightRatio, widthRatio);
+            options.inSampleSize = Math.max(heightRatio, widthRatio);
             Bitmap bitmap = BitmapFactory.decodeFile(path, options);
+            Log.d("TAG", String.format("page:%s, h-w.ratio:%s-%s, w-h:%s-%s, sample:%s",
+                    pageHandle, heightRatio, widthRatio, width, height, options.inSampleSize));
             return bitmap;
         } else {
             int pageW = Math.round(width / scale);
@@ -97,11 +103,12 @@ public class AlbumPage implements CodecPage {
             BitmapFactory.Options options = new BitmapFactory.Options();
             final int heightRatio = Math.round((float) pageW / 1080);
             final int widthRatio = Math.round((float) pageH / 1080);
-            options.inSampleSize = Math.min(heightRatio, widthRatio);
-            //Log.d("TAG", String.format("h-w.ratio:%s-%s,w-h:%s-%s, %s", heightRatio, widthRatio, pageW, pageH, pageSliceBounds));
+            options.inSampleSize = Math.max(heightRatio, widthRatio);
 
             Rect rect = new Rect(patchX, patchY, patchX + pageW, patchY + pageH);
             Bitmap bitmap = decoder.decodeRegion(rect, options);
+            Log.d("TAG", String.format("page:%s, h-w.ratio:%s-%s, w-h:%s-%s, patch:%s-%s, %s, w-h:%s-%s",
+                    pageHandle, heightRatio, widthRatio, pageW, pageH, patchX, patchY, pageSliceBounds, bitmap.getWidth(), bitmap.getHeight()));
             return bitmap;
         }
     }

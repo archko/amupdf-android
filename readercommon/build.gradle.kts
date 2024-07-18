@@ -38,11 +38,11 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.lifecycle.viewModelCompose)
-    implementation(libs.androidx.navigation.compose)
+    api(libs.androidx.core.ktx)
+    api(libs.androidx.appcompat)
+    //implementation(libs.androidx.activity.compose)
+    //implementation(libs.androidx.lifecycle.viewModelCompose)
+    //implementation(libs.androidx.navigation.compose)
 
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)

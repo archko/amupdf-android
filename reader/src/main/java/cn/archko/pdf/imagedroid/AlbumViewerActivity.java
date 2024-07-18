@@ -20,7 +20,7 @@ public class AlbumViewerActivity extends BaseViewerActivity {
         return new DecodeServiceBase(new AlbumContext());
     }
 
-    protected void loadDocument(String path, boolean crop) {
+    public void loadDocument(String path, boolean crop) {
         boolean autoCrop = false;
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading");
@@ -35,7 +35,7 @@ public class AlbumViewerActivity extends BaseViewerActivity {
                     finish();
                     return;
                 }
-                isDocLoaded = true;
+                setDocLoaded(true);
                 getDocumentView().showDocument(autoCrop);
             });
         });

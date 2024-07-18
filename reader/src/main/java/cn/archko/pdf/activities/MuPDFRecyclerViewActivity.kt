@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
 import android.text.TextUtils
-import android.util.SparseArray
 import android.view.GestureDetector
 import android.view.Gravity
 import android.view.View
@@ -46,7 +45,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     protected var pageNumberToast: Toast? = null
 
     protected var sensorHelper: SensorHelper? = null
-    protected var mPageSizes = SparseArray<APage>()
+    protected var mPageSizes = mutableListOf<APage>()
 
     protected var mReflow = false
     protected var mCrop: Boolean = true
@@ -298,7 +297,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
 
     open fun postLoadDoc(cp: Int) {
         preparePageSize(cp)
-        Logcat.d(TAG, "open:end." + mPageSizes.size())
+        Logcat.d(TAG, "open:end." + mPageSizes.size)
         //val mill = SystemClock.uptimeMillis() - start
         //if (mill < 500L) {
         //    delay(500L - mill)
@@ -323,7 +322,9 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     open fun preparePageSize(cp: Int) {
         for (i in 0 until cp) {
             val pointF = getPageSize(i)
-            mPageSizes.put(i, pointF)
+            if (pointF != null) {
+                mPageSizes.add(pointF)
+            }
         }
     }
 }
