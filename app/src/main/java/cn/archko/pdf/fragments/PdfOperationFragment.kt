@@ -17,14 +17,12 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
-import androidx.recyclerview.widget.GridLayoutManager
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.FragmentPdfOptBinding
-import cn.archko.pdf.core.common.AppExecutors
-import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
-import cn.archko.pdf.core.adapters.BaseViewHolder
-import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.common.PDFCreaterHelper
+import cn.archko.pdf.core.adapters.BaseViewHolder
+import cn.archko.pdf.core.common.AppExecutors
+import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.Utils
@@ -48,10 +46,9 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
     protected lateinit var progressDialog: ProgressDialog
 
     private var mDataListener: DataListener? = null
-    private lateinit var adapter: BaseRecyclerAdapter<String>
     private var txtPath: String? = null
 
-    private var type: Int = TYPE_EXTRACT_IMAGES
+    private var type: Int = TYPE_MERGE
     private var scope: CoroutineScope? = null
     private val customerDispatcher = AppExecutors.instance.diskIO().asCoroutineDispatcher()
 
@@ -61,7 +58,7 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var themeId = android.R.style.Theme_Material_Light
+        var themeId = R.style.AppTheme
         setStyle(DialogFragment.STYLE_NO_TITLE, themeId)
 
         progressDialog = ProgressDialog(activity)
@@ -91,8 +88,8 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
                     binding.pdfPath.text = path
                     loadPdf(path)
                 } else {
-                    adapter.data.add(adapter.itemCount, path)
-                    adapter.notifyDataSetChanged()
+                    //adapter.data.add(adapter.itemCount, path)
+                    //adapter.notifyDataSetChanged()
                 }
             }
         }
@@ -106,7 +103,8 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
             setupRangeSlider(count)
         } catch (e: Exception) {
             binding.extract.extractLayout.visibility = View.GONE
-            Toast.makeText(requireActivity(), "无法加载pdf", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireActivity(), R.string.edit_cannot_load_pdf, Toast.LENGTH_LONG)
+                .show()
         }
     }
 
@@ -119,7 +117,7 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
 
     private fun extractImages() {
         if (TextUtils.isEmpty(txtPath)) {
-            Toast.makeText(activity, "请先选择pdf文件", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity, R.string.edit_create_select_file, Toast.LENGTH_SHORT).show()
             return
         }
         val name = FileUtils.getNameWithoutExt(txtPath)
@@ -157,12 +155,16 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
             )
             withContext(Dispatchers.Main) {
                 if (result == 0) {
-                    Toast.makeText(activity, "导出成功", Toast.LENGTH_SHORT).show()
-                } else if (result == -2) {
-                    Toast.makeText(activity, "导出错误!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(activity, "取消导出,已导出${result}张", Toast.LENGTH_SHORT)
+                    Toast.makeText(activity, R.string.edit_extract_success, Toast.LENGTH_SHORT)
                         .show()
+                } else if (result == -2) {
+                    Toast.makeText(activity, R.string.edit_extract_error, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(
+                        activity,
+                        String.format(getString(R.string.edit_extract_cancel_pages, result)),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 progressDialog.dismiss()
             }
@@ -171,11 +173,11 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
 
     private fun extractHtml() {
         if (TextUtils.isEmpty(txtPath)) {
-            Toast.makeText(activity, "请先选择pdf文件", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity, R.string.edit_create_select_file, Toast.LENGTH_SHORT).show()
             return
         }
-        var name = FileUtils.getNameWithoutExt(txtPath)
-        var dir = FileUtils.getStorageDir(name).absolutePath
+        val name = FileUtils.getNameWithoutExt(txtPath)
+        val dir = FileUtils.getStorageDir(name).absolutePath
 
         progressDialog.show()
 
@@ -186,14 +188,15 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
         scope!!.launch {
             val result = PDFCreaterHelper.extractToHtml(
                 requireActivity(),
-                dir + "/" + name + ".html",
+                "$dir/$name.html",
                 txtPath!!
             )
             withContext(Dispatchers.Main) {
                 if (result) {
-                    Toast.makeText(activity, "导出成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, R.string.edit_extract_success, Toast.LENGTH_SHORT)
+                        .show()
                 } else {
-                    Toast.makeText(activity, "导出错误!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, R.string.edit_extract_error, Toast.LENGTH_SHORT).show()
                 }
                 progressDialog.dismiss()
             }
@@ -220,25 +223,19 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
     }
 
     private fun updateUi() {
-        if (type == TYPE_MERGE) {
+        /*if (type == TYPE_MERGE) {
             binding.layoutMerge.visibility = View.VISIBLE
             binding.layoutExtract.visibility = View.GONE
         } else {
             binding.layoutMerge.visibility = View.GONE
             binding.layoutExtract.visibility = View.VISIBLE
-        }
+        }*/
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //dialog?.setTitle("创建pdf")
-        //binding.back.setOnClickListener { dismiss() }
         binding.toolbar.setNavigationOnClickListener { dismiss() }
 
-        //binding.btnMerge.setOnClickListener {
-        //    type = TYPE_MERGE
-        //    updateUi()
-        //}
         binding.btnExtract.setOnClickListener {
             type = TYPE_EXTRACT_IMAGES
             updateUi()
@@ -247,9 +244,7 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
         binding.btnAddPdf.setOnClickListener { selectPdf() }
         binding.btnExtractImage.setOnClickListener { extractImages() }
         binding.btnExtractHtml.setOnClickListener { extractHtml() }
-        //binding.btnMergePdf.setOnClickListener { merge() }
-
-        adapter = object : BaseRecyclerAdapter<String>(activity) {
+        /*adapter = object : BaseRecyclerAdapter<String>(activity) {
 
             override fun onCreateViewHolder(
                 parent: ViewGroup,
@@ -260,15 +255,16 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
             }
         }
         binding.recyclerView.layoutManager = GridLayoutManager(activity, 2)
-        binding.recyclerView.adapter = adapter
+        binding.recyclerView.adapter = adapter*/
 
         updateUi()
         binding.extract.extractLayout.visibility = View.GONE
     }
 
     private fun setupRangeSlider(count: Int) {
-        binding.extract.tvStart.text = "从1页"
-        binding.extract.tvEnd.text = "到${count}页"
+        binding.extract.tvStart.text = String.format(getString(R.string.edit_from_page), "1")
+        binding.extract.tvEnd.text =
+            String.format(getString(R.string.edit_to_page), count.toString())
 
         binding.extract.rangeSlider.valueFrom = 1f
         binding.extract.rangeSlider.valueTo = count.toFloat()
@@ -296,7 +292,7 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
     }
 
     private fun merge() {
-        Toast.makeText(activity, "not implemented", Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity, R.string.edit_extract_not_impl, Toast.LENGTH_SHORT).show()
     }
 
     inner class ViewHolder(root: View) : BaseViewHolder<String>(root) {
@@ -316,8 +312,8 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
     }
 
     private fun deleteItem(data: String, position: Int) {
-        adapter.data.remove(data)
-        adapter.notifyDataSetChanged()
+        //adapter.data.remove(data)
+        //adapter.notifyDataSetChanged()
     }
 
     private fun setType(type: Int) {

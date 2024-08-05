@@ -161,4 +161,7 @@ dependencies {
     //implementation project(":core-ui")
     implementation(project(":paddle-ocr"))
     //implementation project(":ViewLib")
+
+    // https://mvnrepository.com/artifact/com.github.axet/k2pdfopt
+    implementation("com.github.axet:k2pdfopt:0.1.6")
 }

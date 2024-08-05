@@ -24,6 +24,14 @@
     <string name="menu_font">Font</string>
     <string name="menu_settings">Settings</string>
     
+    <string name="menu_opt_album">View as Album</string>
+    <string name="menu_opt_delete_page">Delete Page</string>
+    <string name="menu_opt_insert_image">Insert Image</string>
+    <string name="menu_opt_extract_image">Extract Image</string>
+    <string name="menu_opt_crop">Auto crop bound</string>
+    <string name="menu_opt_no_crop">no crop</string>
+    <string name="menu_opt_edit">Edit</string>
+
     <string name="cake_menu_reflow">Reflow</string>
     <string name="cake_menu_ocr">Ocr</string>
     <string name="cake_menu_auto_crop">Crop</string>
@@ -40,6 +48,7 @@
     <string name="opts_new_viewer">Open with new viewer</string>
     <string name="opts_cropper">New Croper</string>
     <string name="opts_orientation">Orientation</string>
+    <string name="opts_color_mode">Color Mode</string>
     <string name="opts_default_orientation">7</string>
     <string-array name="opts_orientation_labels">
         <item>automatic</item>
@@ -62,7 +71,16 @@
         <item>7</item>
     </string-array>
 
-    <string name="opts_default_list_style">1</string>
+    <string-array name="opts_color_modes">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="opts_color_mode_labels">
+        <item>Normal</item>
+        <item>Invert</item>
+    </string-array>
+
+    <string name="opts_default_list_style" translatable="false">1</string>
     <string name="opts_list_style">List Style</string>
     <string-array name="opts_list_style_labels">
         <item>List</item>
@@ -78,13 +96,15 @@
     <string name="opts_override_file_view">Override File After Compressed</string>
     <string name="opts_fullscreen">Fullscreen</string>
     <string name="opts_autocrop">Auto Crop</string>
+    <string name="opts_fastscroll">Fast scroll</string>
     <string name="opts_autocrop_summary">Auto Crop blank bounds</string>
+    <string name="opts_fastscroll_summary">Show Fast scroll bar</string>
 
     <string name="opts_vertical_scroll_lock">Vertical scroll lock</string>
     <string name="opts_vertical_scroll_lock_sub">To scroll horizontally, you must first move horizontally 1/5 of the screen width.</string>
 
     <string name="opts_side_margin">Extra side margins</string>
-    <string name="opts_default_side_margin">0</string>
+    <string name="opts_default_side_margin" translatable="false">0</string>
     <string-array name="opts_margins">
         <item>0</item>
         <item>5</item>
@@ -123,6 +143,7 @@
     <string name="tab_browser">Browser</string>
     <string name="tab_favorite">Fravorite</string>
     <string name="tab_search">Search</string>
+    <string name="tab_mine">Mine</string>
 
     <string name="menu_font_size">Font Size</string>
     <string name="menu_font_face">Font Face</string>

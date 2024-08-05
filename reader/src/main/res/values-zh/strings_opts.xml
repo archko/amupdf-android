@@ -24,6 +24,14 @@
     <string name="menu_font">字体</string>
     <string name="menu_settings">设置</string>
     
+    <string name="menu_opt_album">查看相册</string>
+    <string name="menu_opt_delete_page">删除页面</string>
+    <string name="menu_opt_insert_image">插入图片</string>
+    <string name="menu_opt_extract_image">导出图片</string>
+    <string name="menu_opt_crop">自动切边</string>
+    <string name="menu_opt_no_crop">不切边</string>
+    <string name="menu_opt_edit">编辑</string>
+
     <string name="cake_menu_reflow">文本重排</string>
     <string name="cake_menu_ocr">识别文本</string>
     <string name="cake_menu_auto_crop">自动切边</string>
@@ -40,6 +48,8 @@
     <string name="opts_new_viewer">用新阅读器打开</string>
     <string name="opts_cropper">新的切边方案</string>
     <string name="opts_orientation">屏幕方向</string>
+    <string name="opts_color_mode">颜色模式</string>
+    <string name="opts_default_orientation">7</string>
     <string-array name="opts_orientation_labels">
         <item>自动</item>
         <item>不变</item>
@@ -49,6 +59,15 @@
         <item>反向横屏</item>
         <item>感应竖屏</item>
         <item>感应横屏</item>
+    </string-array>
+
+    <string-array name="opts_color_modes">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="opts_color_mode_labels">
+        <item>原色</item>
+        <item>反色</item>
     </string-array>
 
     <string name="opts_list_style">列表风格</string>
@@ -66,6 +85,8 @@
 
     <string name="opts_vertical_scroll_lock">垂直滚动锁定</string>
     <string name="opts_vertical_scroll_lock_sub">要水平滚动,你要先滚动屏幕的1/5.</string>
+    <string name="opts_fastscroll">快速滚动</string>
+    <string name="opts_fastscroll_summary">显示快速滚动滑块</string>
 
     <string name="opts_side_margin">额外的间距</string>
     <string-array name="opts_margin_labels">
@@ -96,6 +117,7 @@
     <string name="tab_browser">浏览器</string>
     <string name="tab_favorite">收藏</string>
     <string name="tab_search">搜索</string>
+    <string name="tab_mine">我的</string>
 
     <string name="menu_font_size">字号</string>
     <string name="menu_font_face">字体</string>

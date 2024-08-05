@@ -19,4 +19,7 @@
     <color name="black30">#4D000000</color>
     
     <color name="cake_bg">#AC7225</color>
+
+    <color name="progress_color">#CCFF8D8D</color>
+    <color name="toc_color_bg">#CCD2D2D2</color>
 </resources>

@@ -8,13 +8,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.GridLayoutManager
-import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.core.cache.BitmapCache
-import cn.archko.pdf.core.common.Logcat
-import cn.archko.pdf.core.decode.MupdfDocument
-import cn.archko.pdf.core.decode.DecodeParam
-import cn.archko.pdf.core.listeners.ClickListener
+import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.core.decode.DecodeCallback
+import cn.archko.pdf.core.decode.DecodeParam
+import cn.archko.pdf.core.decode.MupdfDocument
+import cn.archko.pdf.core.listeners.ClickListener
+import cn.archko.pdf.core.listeners.MupdfListener
 
 /**
  * @author: archko 2023/3/8 :14:34
@@ -51,7 +51,6 @@ class MupdfGridAdapter(
             .apply {
                 layoutParams = ViewGroup.LayoutParams(width, width)
                 adjustViewBounds = true
-                scaleType = ImageView.ScaleType.CENTER_CROP
             }
 
         return PdfHolder(view)
@@ -66,7 +65,7 @@ class MupdfGridAdapter(
     override fun onViewRecycled(holder: ARecyclerView.ViewHolder) {
         super.onViewRecycled(holder)
         val pos = holder.absoluteAdapterPosition
-        Log.d("TAG", String.format("decode.onViewRecycled:%s", pos))
+        //Log.d("TAG", String.format("decode.onViewRecycled:%s", pos))
         (holder as PdfHolder).view.setImageResource(android.R.color.transparent)
     }
 
@@ -79,18 +78,15 @@ class MupdfGridAdapter(
             val aPage = mupdfListener.getPageList()[position]
 
             val cacheKey =
-                "${mupdfListener.getDocument()!!}_page_$position-${aPage}"
+                "page_$position-${aPage}"
 
-            var width: Int = viewWidth() / 2
+            var width: Int = viewWidth()
             if (width == 0) {
                 width = 1080
             }
             val height: Int = (width * 4 / 3f).toInt()
             resultWidth = width
             resultHeight = height
-            //if (aPage.getTargetWidth() != resultWidth) {
-            //    aPage.setTargetWidth(resultWidth)
-            //}
 
             view.setOnClickListener { clickListener.click(view, position) }
             view.setOnLongClickListener {
@@ -107,15 +103,25 @@ class MupdfGridAdapter(
 
             val callback = object : DecodeCallback {
                 override fun decodeComplete(bitmap: Bitmap?, param: DecodeParam) {
-                    if (Logcat.loggable) {
-                        Logcat.d(
-                            String.format(
-                                "decode callback:index:%s-%s, decode.page:%s, key:%s, param:%s",
-                                param.pageNum, index, param.pageNum, cacheKey, param.key
-                            )
+                    Log.d(
+                        "TAG",
+                        String.format(
+                            "decode callback:index:%s-%s, decode.page:%s, w-h:%s-%s, key:%s, param:%s",
+                            param.pageNum,
+                            index,
+                            param.pageNum,
+                            bitmap?.width,
+                            bitmap?.height,
+                            cacheKey,
+                            param.key
                         )
-                    }
+                    )
                     if (param.pageNum == index) {
+                        if (null != bitmap && resultHeight != bitmap.height) {
+                            val lp = view.layoutParams
+                            lp.width = bitmap.width
+                            lp.height = bitmap.height
+                        }
                         view.setImageBitmap(bitmap)
                     }
                 }
@@ -141,22 +147,5 @@ class MupdfGridAdapter(
                 MupdfDocument.decode(aPage, decodeParam)
             }
         }
-
-        private fun setLayoutSize(bitmap: Bitmap) {
-            val ratio = bitmap.width * 1f / bitmap.height
-
-            val viewWidth = resultWidth
-            val viewHeight: Int = (resultWidth / ratio).toInt()
-
-            var lp = view.layoutParams
-            if (null == lp) {
-                lp = ViewGroup.LayoutParams(viewWidth, viewHeight)
-                view.layoutParams = lp
-            } else {
-                lp.width = viewWidth
-                lp.height = viewHeight
-            }
-        }
     }
-
 }

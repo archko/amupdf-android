@@ -70,8 +70,22 @@
     <string name="extract_resolution">Extract Resolution</string>
     <string name="extract_page_range">Page Rang</string>
     <string name="extract_range">Rang</string>
+
+    <string name="edit_save_success">Save success</string>
+    <string name="edit_no_modification">No modification</string>
+    <string name="edit_create_success">Create success</string>
+    <string name="edit_create_error">Create pdf Failed!</string>
+    <string name="edit_create_select_file">Select a file</string>
+    <string name="edit_page">Page:%s</string>
+    <string name="edit_cannot_load_pdf">Can not load pdf</string>
+    <string name="edit_extract_success">Extract Success</string>
+    <string name="edit_extract_error">Extract failed</string>
+    <string name="edit_extract_cancel_pages">Cancel extract,already extract:%s"</string>
+    <string name="edit_extract_not_impl">No implemention</string>
+    <string name="edit_back">Back</string>
     
     <string name="edit_title">Edit pdf</string>
+    <string name="reflow_title">Reflow pdf</string>
     <string name="edit_item_save">Save</string>
     <string name="edit_item_extract">Extract Images</string>
     
@@ -95,5 +109,12 @@
     <string name="edit_save_tip">extract images will be saved to /sdcard/pdfname/ , \\nExtrace image: a image for a page.\\nExtract html: generate a html,image will be encode with base64,can be open by browser</string>
     <string name="edit_extract_btn_image">Extract selection</string>
     <string name="edit_extract_btn_html">Extract Html</string>
+    <string name="edit_extract_html">Extract Html</string>
     <string name="extract_btn_merge">Merge</string>
+    <string name="edit_reflow_btn">Reflow</string>
+    <string name="edit_reflow_page_range">Reflow range</string>
+    <string name="edit_reflow_preview">Preview</string>
+
+    <string name="edit_from_page">From:%s</string>
+    <string name="edit_to_page">To:%s</string>
 </resources>

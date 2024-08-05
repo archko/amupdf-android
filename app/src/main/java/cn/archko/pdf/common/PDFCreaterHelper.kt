@@ -10,10 +10,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import cn.archko.mupdf.R
-import cn.archko.pdf.core.App
 import cn.archko.pdf.adapters.AdapterUtils
+import cn.archko.pdf.core.App
 import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.common.EncodingDetect
 import cn.archko.pdf.core.decode.MupdfDocument
@@ -111,13 +112,40 @@ object PDFCreaterHelper {
 
             mDocument.insertPage(-1, page)
         }
-        mDocument.save(pdfPath, OPTS);
+        mDocument.save(pdfPath, OPTS)
         Log.d("TAG", String.format("save,%s,%s", mDocument.toString(), mDocument.countPages()))
         val cacheDir = FileUtils.getExternalCacheDir(App.instance).path + File.separator + "create"
         val dir = File(cacheDir)
         if (dir.isDirectory) {
             dir.deleteRecursively()
         }
+        return mDocument.countPages() > 0
+    }
+
+    fun createPdfFromFormatedImages(
+        context: Context,
+        parent: ViewGroup,
+        pdfPath: String?, imagePaths: List<String>
+    ): Boolean {
+        Log.d("TAG", String.format("imagePaths:%s", imagePaths))
+        var mDocument: PDFDocument? = null
+        try {
+            mDocument = PDFDocument.openDocument(pdfPath) as PDFDocument
+        } catch (e: Exception) {
+            Log.d("TAG", "could not open:$pdfPath")
+        }
+        if (mDocument == null) {
+            mDocument = PDFDocument()
+        }
+
+        var index = 0
+        for (path in imagePaths) {
+            val page = addPage(path, mDocument, index++)
+
+            mDocument.insertPage(-1, page)
+            index++
+        }
+        mDocument.save(pdfPath, OPTS)
         return mDocument.countPages() > 0
     }
 
@@ -290,10 +318,10 @@ object PDFCreaterHelper {
                     val ctm = Matrix(scale)
                     MupdfDocument.render(page, ctm, bitmap, 0, 0, 0)
                     page.destroy()
-                    BitmapUtils.saveBitmapToFile(bitmap, File("$dir/${i + 1}.png"))
+                    BitmapUtils.saveBitmapToFile(bitmap, File("$dir/${i + 1}.jpg"))
                     BitmapPool.getInstance().release(bitmap)
                 }
-                Log.d("TAG", "extractToImages:page:${i + 1}.png")
+                Log.d("TAG", "extractToImages:page:${i + 1}.jpg")
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -314,6 +342,14 @@ object PDFCreaterHelper {
                     val content =
                         String(page.textAsHtml2("preserve-whitespace,inhibit-spaces,preserve-images"))
                     stringBuilder.append(content)
+                    Log.d(
+                        "extractToHtml",
+                        String.format(
+                            "============%s-content:%s==========",
+                            i,
+                            content,
+                        )
+                    )
                     page.destroy()
                     StreamUtils.appendStringToFile(stringBuilder.toString(), path)
                 }
@@ -325,7 +361,7 @@ object PDFCreaterHelper {
         return true
     }
 
-    //==================
+    //================== 系统创建的api,通过打印的方式来创建 ==================
 
 
     /**
@@ -422,7 +458,7 @@ object PDFCreaterHelper {
             }
             i++
         }
-        if (sb.length > 0) {
+        if (sb.isNotEmpty()) {
             Log.d("TextView", "last line ===")
             createTxtPage(context, parent, pdfDocument, pageWidth, pageHeight, i, sb.toString())
         }
@@ -445,12 +481,50 @@ object PDFCreaterHelper {
             PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNo)
                 .create()
         val page: PdfDocument.Page = pdfDocument.startPage(pageInfo)
-        val pageCanvas: Canvas = page.getCanvas()
+        val canvas: Canvas = page.getCanvas()
         val measureWidth = View.MeasureSpec.makeMeasureSpec(pageWidth, View.MeasureSpec.EXACTLY)
         val measuredHeight = View.MeasureSpec.makeMeasureSpec(pageHeight, View.MeasureSpec.EXACTLY)
         contentView.measure(measureWidth, measuredHeight)
         contentView.layout(0, 0, pageWidth, pageHeight)
-        contentView.draw(pageCanvas)
+        contentView.draw(canvas)
+
+        // finish the page
+        pdfDocument.finishPage(page)
+    }
+
+    private fun createImagePage(
+        context: Context?,
+        parent: ViewGroup?,
+        pdfDocument: PdfDocument,
+        pageWidth: Int,
+        pageNo: Int,
+        path: String
+    ) {
+        val contentView =
+            LayoutInflater.from(context)
+                .inflate(R.layout.pdf_image_content, parent, false) as ImageView
+        val bitmap = BitmapFactory.decodeFile(path)
+        contentView.setImageBitmap(bitmap)
+        val pageHeight = bitmap.height * pageWidth / bitmap.width
+        val pageInfo: PdfDocument.PageInfo = PdfDocument.PageInfo
+            .Builder(pageWidth, pageHeight, pageNo)
+            .create()
+        val page: PdfDocument.Page = pdfDocument.startPage(pageInfo)
+        val canvas: Canvas = page.getCanvas()
+        val measureWidth = View.MeasureSpec.makeMeasureSpec(pageWidth, View.MeasureSpec.EXACTLY)
+        val measuredHeight = View.MeasureSpec.makeMeasureSpec(pageHeight, View.MeasureSpec.EXACTLY)
+        contentView.measure(measureWidth, measuredHeight)
+        contentView.layout(0, 0, pageWidth, pageHeight)
+        contentView.draw(canvas)
+        Log.d(
+            "TAG",
+            String.format(
+                "createImagePage:%s-%s",
+                pageWidth,
+                pageHeight,
+            )
+        )
+        BitmapPool.getInstance().release(bitmap)
 
         // finish the page
         pdfDocument.finishPage(page)
@@ -468,5 +542,46 @@ object PDFCreaterHelper {
             document.close()
         }
         return false
+    }
+
+    /**
+     * 通过系统api创建pdf,比mupdf创建的要小不少,测试中,14m对10m.
+     */
+    fun createPdfUseSystemFromImages(
+        context: Context,
+        parent: ViewGroup,
+        pdfPath: String?, imagePaths: List<String>
+    ): Boolean {
+        Log.d("TAG", String.format("imagePaths:%s", imagePaths))
+        val pdfDocument = PdfDocument()
+
+        val resultPaths = processLargeImage(imagePaths)
+
+        var index = 0
+        for (path in resultPaths) {
+            createImagePage(context, parent, pdfDocument, PDF_PAGE_WIDTH.toInt(), index, path)
+            index++
+        }
+        return savePdf(pdfPath, pdfDocument)
+    }
+
+    /**
+     * 会有内存溢出的可能,图片数量过多时.所以这个方法尽量用图片少的情况.目前无法通过追加形式添加
+     * 已经处理好的图片,不再处理切割,因为切割需要再解析一次
+     */
+    fun createPdfUseSystemFromFormatedImages(
+        context: Context,
+        parent: ViewGroup,
+        pdfPath: String?, imagePaths: List<String>
+    ): Boolean {
+        Log.d("TAG", String.format("imagePaths:%s", imagePaths))
+        val pdfDocument = PdfDocument()
+
+        var index = 0
+        for (path in imagePaths) {
+            createImagePage(context, parent, pdfDocument, PDF_PAGE_WIDTH.toInt(), index, path)
+            index++
+        }
+        return savePdf(pdfPath, pdfDocument)
     }
 }

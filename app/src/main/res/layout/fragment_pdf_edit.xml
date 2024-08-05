@@ -5,45 +5,39 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!--<RelativeLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/back"
-            android:layout_width="wrap_content"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:text="返回"
-            android:textSize="18sp" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="编辑pdf"
-            android:textSize="18sp" />
+            app:navigationIcon="@drawable/ic_back"
+            app:title="@string/edit_title" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:text="保存"
-            android:textColor="@android:color/white"
+            android:layout_marginRight="8dp"
+            android:layout_toLeftOf="@id/btnExtractHtml"
+            android:text="@string/create_image_btn_save"
             android:textSize="18sp" />
-    </RelativeLayout>-->
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:menu="@menu/edit_toolbar_menus"
-        app:navigationIcon="@drawable/ic_back"
-        app:title="@string/edit_title" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnExtractHtml"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="4dp"
+            android:text="@string/edit_extract_html"
+            android:textSize="18sp" />
+    </RelativeLayout>
 
     <androidx.recyclerview.awidget.ARecyclerView
         android:id="@+id/recyclerView"

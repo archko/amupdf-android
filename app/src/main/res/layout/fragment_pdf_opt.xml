@@ -8,8 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:orientation="vertical">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -21,7 +20,7 @@
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
             android:orientation="horizontal">
 
             <TextView
@@ -31,19 +30,11 @@
                 android:layout_centerInParent="true"
                 android:text="@string/edit_btn_image" />
 
-            <!--<Button
-                android:id="@+id/btnMerge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginLeft="4dp"
-                android:text="@string/edit_btn_merge" />-->
-
             <Button
                 android:id="@+id/btnAddPdf"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginBottom="4dp"
                 android:text="@string/edit_btn_select" />
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -101,6 +92,7 @@
                     android:id="@+id/btnExtractHtml"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="4dp"
                     android:text="@string/edit_extract_btn_html" />
@@ -108,30 +100,5 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/layout_merge"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="10dp">
-
-            <!--<Button
-                android:id="@+id/btnMergePdf"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:text="@string/extract_btn_merge" />-->
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="4dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:itemCount="2"
-                tools:listitem="@layout/item_opt_pdf" />
-
-        </LinearLayout>
     </LinearLayout>
 </ScrollView>

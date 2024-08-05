@@ -20,7 +20,6 @@ import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
-import cn.archko.pdf.fastscroll.FastScrollRecyclerView
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.PDFViewModel
@@ -40,7 +39,7 @@ class ACropViewController(
 ) :
     OutlineListener, AViewController {
 
-    private lateinit var mRecyclerView: FastScrollRecyclerView
+    private lateinit var mRecyclerView: ARecyclerView
     private lateinit var mPageSizes: List<APage>
     private var pdfAdapter: PDFRecyclerAdapter? = null
 

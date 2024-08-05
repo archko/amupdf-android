@@ -7,7 +7,7 @@
         <!-- Customize your theme here. -->
         <!--<item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
-        <item name="colorAccent">@color/colorAccent</item>
+        <!--<item name="colorAccent">@color/colorAccent</item>-->
     </style>
 
     <style name="AppFullscreen" parent="Theme.Material3.Light.NoActionBar">
@@ -20,6 +20,19 @@
         <!--<item name="android:windowBackground">@drawable/bg_window_tiled</item>-->
     </style>
 
-    <style name="Theme.RangeSlider" parent="Theme.MaterialComponents.Light.BottomSheetDialog"></style>
+    <style name="Theme.RangeSlider" parent="Theme.Material3.DayNight.BottomSheetDialog"></style>
 
+    <style name="Dialog.Bottom" parent="Theme.AppCompat.DayNight.Dialog">
+        <!--使 Dialog 全屏-->
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <!--去掉标题栏-->
+        <item name="android:windowNoTitle">true</item>
+        <!--背景透明-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--状态栏透明-->
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowIsTranslucent">true</item><!-- 是否半透明 -->
+        <item name="android:backgroundDimEnabled">false</item><!-- dim:模糊的 阴影效果 -->
+    </style>
 </resources>

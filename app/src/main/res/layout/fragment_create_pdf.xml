@@ -19,23 +19,21 @@
     <RadioGroup
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:orientation="horizontal">
 
         <RadioButton
-            android:checked="true"
             android:id="@+id/btnImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:checked="true"
             android:text="@string/create_use_image" />
 
         <RadioButton
             android:id="@+id/btnTxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
             android:text="@string/create_use_txt" />
     </RadioGroup>
 
@@ -81,7 +79,9 @@
             android:id="@+id/pdfName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:hint="@string/create_text_name"
+            android:inputType="text"
             android:text="" />
 
         <Button
@@ -132,13 +132,14 @@
             android:id="@+id/pdfPath"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:hint="@string/create_image_name_hint"
+            android:inputType="text"
             android:text="" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
             android:orientation="horizontal">
 
             <Button
@@ -146,7 +147,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:layout_marginLeft="4dp"
+                android:layout_marginStart="4dp"
                 android:text="@string/create_image_btn_add_image" />
 
             <Button
@@ -154,7 +155,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:layout_marginLeft="4dp"
+                android:layout_marginStart="4dp"
                 android:text="@string/create_image_btn_save" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 

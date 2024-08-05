@@ -14,9 +14,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.awidget.GridLayoutManager
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.FragmentPdfEditBinding
+import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.BitmapPool
-import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.core.listeners.ClickListener
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.FileUtils
@@ -46,7 +46,7 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var themeId = android.R.style.Theme_Material_Light
+        var themeId = R.style.AppTheme
         setStyle(DialogFragment.STYLE_NO_TITLE, themeId)
 
         progressDialog = ProgressDialog(activity)
@@ -74,17 +74,33 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.toolbar.setNavigationOnClickListener { dismiss() }
-        binding.toolbar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.saveItem -> pdfEditViewModel.save()
-                R.id.extractImagesItem -> extractImage(0)
-            }
-            return@setOnMenuItemClickListener true
-        }
-
-        /*binding.save.setOnClickListener {
+        binding.save.setOnClickListener {
             pdfEditViewModel.save()
-        }*/
+        }
+        binding.btnExtractHtml.setOnClickListener {
+            val name = FileUtils.getNameWithoutExt(path)
+            val dir = FileUtils.getStorageDir(name).absolutePath
+
+            progressDialog.show()
+            progressDialog.setCanceledOnTouchOutside(false)
+
+            job = lifecycleScope.launch {
+                val result = withContext(Dispatchers.IO) {
+                    PDFCreaterHelper.extractToHtml(
+                        requireActivity(),
+                        "$dir/$name.html",
+                        path!!
+                    )
+                }
+                if (result) {
+                    Toast.makeText(activity, R.string.edit_extract_success, Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    Toast.makeText(activity, R.string.edit_extract_error, Toast.LENGTH_SHORT).show()
+                }
+                progressDialog.dismiss()
+            }
+        }
 
         pdfAdapter = MupdfGridAdapter(
             pdfEditViewModel,
@@ -92,12 +108,17 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
             binding.recyclerView,
             object : ClickListener<View> {
                 override fun click(t: View?, pos: Int) {
-                    Toast.makeText(requireActivity(), "第${pos + 1}页", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireActivity(),
+                        String.format(getString(R.string.edit_page), (pos + 1)),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
                 override fun longClick(t: View?, pos: Int, view: View) {
                     showPopupMenu(view, pos)
                 }
+
             })
         binding.recyclerView.layoutManager = GridLayoutManager(activity, 2)
         binding.recyclerView.adapter = pdfAdapter
@@ -118,30 +139,26 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
                 pdfAdapter.notifyItemRemoved(position)
             } else if (R.id.addItem == item.itemId) {
             } else if (R.id.extractImagesItem == item.itemId) {
-                extractImage(position)
+                val width = pdfEditViewModel.aPageList[0].width.toInt()
+                val dialog = ExtractDialog(requireActivity(),
+                    width,
+                    position,
+                    pdfEditViewModel.countPages(),
+                    object : ExtractDialog.ExtractListener {
+                        override fun export(index: Int, width: Int) {
+                            extract(index - 1, index, width)
+                        }
+
+                        override fun exportRange(start: Int, end: Int, width: Int) {
+                            extract(start - 1, end, width)
+                        }
+
+                    })
+                dialog.show()
             }
             true
         }
         popupMenu.show()
-    }
-
-    private fun extractImage(position: Int) {
-        val width = pdfEditViewModel.aPageList[0].width.toInt()
-        val dialog = ExtractDialog(requireActivity(),
-            width,
-            position,
-            pdfEditViewModel.countPages(),
-            object : ExtractDialog.ExtractListener {
-                override fun export(index: Int, width: Int) {
-                    extract(index - 1, index, width)
-                }
-
-                override fun exportRange(start: Int, end: Int, width: Int) {
-                    extract(start - 1, end, width)
-                }
-
-            })
-        dialog.show()
     }
 
     private fun extract(start: Int, end: Int, width: Int) {
@@ -168,9 +185,12 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
                 )
             }
             if (result == 0) {
-                Toast.makeText(activity, "导出成功到$dir", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, R.string.edit_extract_success, Toast.LENGTH_SHORT)
+                    .show()
+                //Toast.makeText(activity, "导出成功到$dir", Toast.LENGTH_SHORT).show()
             } else if (result == -2) {
-                Toast.makeText(activity, "导出错误!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, R.string.edit_extract_error, Toast.LENGTH_SHORT).show()
+                //Toast.makeText(activity, "导出错误!", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(activity, "取消导出,已导出:${result}张", Toast.LENGTH_SHORT)
                     .show()

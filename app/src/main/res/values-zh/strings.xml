@@ -69,7 +69,21 @@
     <string name="extract_page_range">页面范围</string>
     <string name="extract_range">范围</string>
 
+    <string name="edit_save_success">保存成功</string>
+    <string name="edit_no_modification">未修改pdf</string>
+    <string name="edit_create_success">创建pdf成功</string>
+    <string name="edit_create_error">创建pdf失败</string>
+    <string name="edit_create_select_file">请先选择文本文件</string>
+    <string name="edit_page">"第%s页"</string>
+    <string name="edit_cannot_load_pdf">无法加载pdf</string>
+    <string name="edit_extract_success">导出成功</string>
+    <string name="edit_extract_error">导出错误!</string>
+    <string name="edit_extract_cancel_pages">取消导出,已导出%s张</string>
+    <string name="edit_extract_not_impl">未实现功能</string>
+    <string name="edit_back">返回</string>
+
     <string name="edit_title">编辑pdf</string>
+    <string name="reflow_title">重排 pdf</string>
     <string name="edit_item_save">保存</string>
     <string name="edit_item_extract">导出图片</string>
     
@@ -90,8 +104,14 @@
     <string name="edit_btn_merge">合并</string>
     <string name="edit_btn_select">选择pdf文件</string>
     <string name="edit_select_tip">选择用于导出图片的pdf文件</string>
-    <string name="edit_save_tip">导出的内容存储于/sdcard/xx/ 下,xx是pdf文件名, \\n导出图片: 每一页为一张png.\\n导出html: 对于非扫描的pdf,则生成一个html,如果里面带图片,会以base64编码图片输出,可用浏览器打开</string>
+    <string name="edit_save_tip">导出的内容存储于/sdcard/xx/ 下,xx是pdf文件名, \\n导出图片: 每一页为一张jpg.\\n导出html: 对于非扫描的pdf,则生成一个html,如果里面带图片,会以base64编码图片输出,可用浏览器打开</string>
     <string name="edit_extract_btn_image">导出选中范围图片</string>
     <string name="edit_extract_btn_html">开始导出所有Html</string>
+    <string name="edit_extract_html">导出Html</string>
     <string name="extract_btn_merge">合并文件</string>
+    <string name="edit_reflow_btn">重排页面</string>
+    <string name="edit_reflow_page_range">重排页面范围</string>
+    <string name="edit_reflow_preview">预览</string>
+    <string name="edit_from_page">从%s页</string>
+    <string name="edit_to_page">到%s页</string>
 </resources>

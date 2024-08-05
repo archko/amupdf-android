@@ -56,7 +56,7 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var themeId = android.R.style.Theme_Material_Light
+        var themeId = R.style.AppTheme
         setStyle(DialogFragment.STYLE_NO_TITLE, themeId)
 
         progressDialog = ProgressDialog(activity)
@@ -81,7 +81,6 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
                     result.data?.data
                 )
                 oldPdfPath = path
-                //binding.oldPdfPath.text = "Old pdf:$path"
             }
         }
 
@@ -105,12 +104,15 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
         progressDialog.show()
         lifecycleScope.launch {
             val result = withContext(Dispatchers.IO) {
-                PDFCreaterHelper.createPdfFromImages(path, arr)
+                PDFCreaterHelper.createPdfFromImages(
+                    path,
+                    arr
+                )
             }
             if (result) {
-                Toast.makeText(activity, "创建pdf成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, R.string.edit_create_success, Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(activity, "create pdf error!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, R.string.edit_create_error, Toast.LENGTH_SHORT).show()
             }
             progressDialog.dismiss()
         }
@@ -118,7 +120,7 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
 
     private fun createPdfFromTxt() {
         if (TextUtils.isEmpty(txtPath)) {
-            Toast.makeText(activity, "请先选择文本文件", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity, R.string.edit_create_select_file, Toast.LENGTH_SHORT).show()
             return
         }
         var name: String? = binding.pdfName.editableText.toString()
@@ -138,9 +140,9 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
                 )
             }
             if (result) {
-                Toast.makeText(activity, "创建pdf成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, R.string.edit_create_success, Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(activity, "创建pdf错误!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, R.string.edit_create_error, Toast.LENGTH_SHORT).show()
             }
             progressDialog.dismiss()
         }
@@ -165,10 +167,7 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //dialog?.setTitle("创建pdf")
-        //binding.back.setOnClickListener { dismiss() }
         binding.toolbar.setNavigationOnClickListener { dismiss() }
-
         //binding.btnSelect.setOnClickListener { selectPdf() }
         binding.btnCreateFromImage.setOnClickListener { createPdfFromImage() }
         binding.btnAddImage.setOnClickListener { addImageItem() }
