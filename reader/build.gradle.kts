@@ -7,6 +7,10 @@ android {
     namespace = "cn.archko.pdf"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
+    defaultConfig {
+        minSdk = libs.versions.minSdk.get().toInt()
+    }
+
     compileOptions {
         encoding = "UTF-8"
         sourceCompatibility = JavaVersion.VERSION_17

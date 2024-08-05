@@ -9,6 +9,7 @@ android {
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
+        minSdk = libs.versions.minSdk.get().toInt()
         ndk {
             abiFilters += listOf("arm64-v8a")
         }

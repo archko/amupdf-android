@@ -26,7 +26,6 @@ import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
-import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.Bookmark
 import cn.archko.pdf.core.utils.Utils
@@ -133,8 +132,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     override fun initView() {
         super.initView()
         initStr()
-        MupdfDocument.useNewCropper = PdfOptionRepository.getCropper()
-
         forceCropParam = intent.getIntExtra("forceCropParam", -1)
 
         mPageSeekBarControls?.updateTitle(mPath)
