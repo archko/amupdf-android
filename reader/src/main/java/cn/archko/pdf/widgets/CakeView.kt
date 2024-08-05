@@ -121,7 +121,7 @@ class CakeView @JvmOverloads constructor(
         textPaint = Paint()
         textPaint!!.isAntiAlias = true
         textPaint!!.isDither = true
-        textPaint!!.textSize = Utils.px2sp(40f).toFloat()
+        textPaint!!.textSize = Utils.sp2px(16f).toFloat()
         textPaint!!.style = Paint.Style.FILL
         textPaint!!.color = Color.parseColor("#ffFFFFFF")
     }
