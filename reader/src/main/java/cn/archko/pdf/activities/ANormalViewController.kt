@@ -183,7 +183,7 @@ class ANormalViewController(
     }
 
     override fun getCurrentBitmap(): Bitmap? {
-        return null
+        return decodeService?.decodeThumb(getCurrentPos())
     }
 
     override fun getCurrentPos(): Int {

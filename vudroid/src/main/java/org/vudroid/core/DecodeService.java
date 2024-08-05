@@ -42,6 +42,8 @@ public interface DecodeService {
 
     void recycle();
 
+    Bitmap decodeThumb(int page);
+
     interface DecodeCallback {
         void decodeComplete(Bitmap bitmap, boolean isThumb);
 

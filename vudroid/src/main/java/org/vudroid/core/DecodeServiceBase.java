@@ -359,6 +359,26 @@ public class DecodeServiceBase implements DecodeService {
         }
     }
 
+    public Bitmap decodeThumb(int page) {
+        CodecPage vuPage = getPage(page);
+        float xs = 1f;
+        if (oriention == DocumentView.VERTICAL) {
+            xs = 1.0f * getTargetWidth() / vuPage.getWidth();
+        } else {
+            xs = 1.0f * getTargetHeight() / vuPage.getHeight();
+        }
+        int width = (int) (xs * vuPage.getWidth());
+        int height = (int) (xs * vuPage.getHeight());
+        Log.d(TAG, String.format("decodeThumb:%s, w-h:%s-%s-%s", page, width, height, xs));
+        Bitmap thumb = vuPage.renderBitmap(
+                new Rect(0, 0, vuPage.getWidth(), vuPage.getHeight()),
+                width,
+                height,
+                new RectF(0, 0, 1, 1),
+                xs);
+        return thumb;
+    }
+
     Rect getScaledSize(final DecodeTask task, final APage vuPage, float scale, boolean crop) {
         Rect rect = new Rect();
         rect.right = getScaledWidth(task, vuPage, scale, crop);

@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.archko.pdf.core.App;
-import cn.archko.pdf.core.common.AppExecutors;
 import cn.archko.pdf.core.cache.BitmapCache;
+import cn.archko.pdf.core.common.AppExecutors;
 import cn.archko.pdf.core.common.IntentFile;
 import cn.archko.pdf.core.utils.FileUtils;
 import cn.archko.pdf.core.utils.StreamUtils;
@@ -115,7 +115,9 @@ public class OcrActivity extends AbsOcrActivity {
                 if (bitmap == null && !TextUtils.isEmpty(mPath)) {
                     bitmap = BitmapFactory.decodeFile(mPath);
                 }
-                showResultPage(bitmap);
+                if (null != bitmap) {
+                    showResultPage(bitmap);
+                }
             }
         });
     }
