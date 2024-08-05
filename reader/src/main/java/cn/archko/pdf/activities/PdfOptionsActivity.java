@@ -83,8 +83,8 @@ public class PdfOptionsActivity extends FragmentActivity {
                 PdfOptionRepository.INSTANCE.getOrientation());
         prefsList.add(prefs);
 
-        prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_ocr_view), getString(R.string.opts_ocr_view), PdfOptionKeys.PREF_OCR, PdfOptionRepository.INSTANCE.getImageOcr());
-        prefsList.add(prefs);
+        //prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_ocr_view), getString(R.string.opts_ocr_view), PdfOptionKeys.PREF_OCR, PdfOptionRepository.INSTANCE.getImageOcr());
+        //prefsList.add(prefs);
 
         prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_fullscreen), getString(R.string.opts_fullscreen), PdfOptionKeys.PREF_FULLSCREEN, PdfOptionRepository.INSTANCE.getFullscreen());
         prefsList.add(prefs);
@@ -104,8 +104,8 @@ public class PdfOptionsActivity extends FragmentActivity {
         //prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_new_viewer), getString(R.string.opts_new_viewer), PdfOptionKeys.PREF_NEW_VIEWER, PdfOptionRepository.INSTANCE.getNewViewer());
         //prefsList.add(prefs);
 
-        prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_cropper), getString(R.string.opts_cropper), PdfOptionKeys.PREF_CROPPER, PdfOptionRepository.INSTANCE.getCropper());
-        prefsList.add(prefs);
+        //prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_cropper), getString(R.string.opts_cropper), PdfOptionKeys.PREF_CROPPER, PdfOptionRepository.INSTANCE.getCropper());
+        //prefsList.add(prefs);
     }
 
     private static final int TYPE_CHECK = 0;
