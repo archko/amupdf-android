@@ -172,6 +172,7 @@
 #======================== =======================
 -keep class cn.archko.pdf.entity.**{*;}
 -keep class cn.archko.pdf.widgets.**{*;}
+-keep class cn.archko.pdf.core.**{*;}
 -keep class org.vudroid.core.**{*;}
 -keep class org.vudroid.core.codec.**{*;}
 -keep class org.vudroid.core.events.**{*;}
@@ -181,6 +182,9 @@
 -keep class org.vudroid.core.views.**{*;}
 -keep class org.vudroid.djvudroid.**{*;}
 -keep class org.vudroid.pdfdroid.**{*;}
+-keep class com.archko.pdfium.**{*;}
+
+-keep class com.github.barteksc.pdfviewer.**{*;}
 
 -keep class com.umeng.** {*;}
 
@@ -206,6 +210,8 @@ public static final int *;
 -keep class **.R.* { *; }
 -keep class **.R$* { *; }
 -keep class cn.archko.pdf.**{*;}
+-keep class org.vudroid.**{*;}
+-keep class com.archko.pdfium.**{*;}
 
 -keep class io.iamjosephmj.flinger.**{*;}
 -keep class com.google.accompanist.insets.**{*;}
@@ -213,3 +219,5 @@ public static final int *;
 -keep class com.google.accompanist.swiperefresh.**{*;}
 -keep class com.jeremyliao.liveeventbus.**{*;}
 -keep class com.jeremyliao.liveeventbus.ipc.**{*;}
+
+-keep class com.davemorrissey.labs.subscaleview.** { *; }
