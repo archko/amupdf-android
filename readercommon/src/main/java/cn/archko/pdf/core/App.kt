@@ -5,12 +5,14 @@ import android.app.Application
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.CrashHandler
 import cn.archko.pdf.core.common.Graph
+import coil.ComponentRegistry
 import coil.ImageLoader
 import coil.ImageLoaderFactory
-import com.jeremyliao.liveeventbus.LiveEventBus
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
 import com.tencent.mmkv.MMKV
 
-class App : Application(), ImageLoaderFactory {
+open class App : Application(), ImageLoaderFactory {
     //private val appkey = "5c15f639f1f556978b0009c8"
     var screenHeight = 720
     var screenWidth = 1080
@@ -25,9 +27,9 @@ class App : Application(), ImageLoaderFactory {
         screenHeight = displayMetrics.heightPixels
         screenWidth = displayMetrics.widthPixels
         //UMConfigure.init(this, appkey, "archko", UMConfigure.DEVICE_TYPE_PHONE, null)
-        LiveEventBus.config()
-            .lifecycleObserverAlwaysActive(true)
-            .autoClear(false)
+        //LiveEventBus.config()
+        //    .lifecycleObserverAlwaysActive(true)
+        //    .autoClear(false)
 
         val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
         //获取整个手机内存
@@ -64,20 +66,35 @@ class App : Application(), ImageLoaderFactory {
                 freeMemory
             )
         )
-        BitmapCache.setMaxMemory(totalMemory * 1024 * 1024 / 2)
-    }
-
-    override fun newImageLoader(): ImageLoader {
-        return ImageLoader.Builder(this)
-            .crossfade(true)
-            .build()
+        BitmapCache.setMaxMemory(totalMemory * 1024 * 1024 * 4 / 5)
     }
 
     companion object {
+        private const val MAX_MEMORY_CACHE_SIZE_PERCENTAGE = 0.3
+        private const val MAX_DISK_CACHE_SIZE_PERCENTAGE = 0.2
         var instance: App? = null
             private set
+    }
 
-        @JvmStatic
-        val PDF_PREFERENCES_NAME = "amupdf_preferences"
+    override fun newImageLoader(): ImageLoader {
+        val imageLoader = ImageLoader.Builder(this)
+            .components(fun ComponentRegistry.Builder.() {
+                //add(PdfiumFetcher.Factory())
+                //add(MupdfFetcher.Factory())
+            })
+            .allowRgb565(true)
+            .memoryCache {
+                MemoryCache.Builder(this)
+                    .maxSizePercent(MAX_MEMORY_CACHE_SIZE_PERCENTAGE)
+                    .build()
+            }
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(cacheDir.resolve("image_cache"))
+                    .maxSizePercent(MAX_DISK_CACHE_SIZE_PERCENTAGE)
+                    .build()
+            }
+            .build()
+        return imageLoader
     }
 }

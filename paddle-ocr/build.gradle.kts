@@ -13,6 +13,17 @@ android {
             abiFilters += listOf("arm64-v8a")
         }
     }
+
+    compileOptions {
+        encoding = "UTF-8"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+    }
 }
 dependencies {
     //api fileTree(include: ["*.jar"], dir: "libs")

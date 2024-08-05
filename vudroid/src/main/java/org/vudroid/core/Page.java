@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.TextPaint;
+import android.util.Log;
 
 import org.vudroid.R;
 
@@ -149,9 +150,11 @@ public class Page {
 
     public void setAspectRatio(float aspectRatio) {
         if (this.aspectRatio != aspectRatio) {
-            boolean changed = this.aspectRatio != 0f && Math.abs(aspectRatio - this.aspectRatio) > 0.005;
+            float abs = Math.abs(aspectRatio - this.aspectRatio);
+            boolean changed = this.aspectRatio != 0f && abs > 0.08;
             this.aspectRatio = aspectRatio;
             if (changed) {
+                Log.d("TAG", "setAspectRatio:" + this.aspectRatio + ", " + aspectRatio + ", " + abs);
                 documentView.invalidatePageSizes();
             }
         }
@@ -175,7 +178,8 @@ public class Page {
     }
 
     public void updateVisibility() {
-        if (isVisible() && !isBitmapTooLarge()) {
+        if (isVisible()) {
+            //if (!isBitmapTooLarge()) {
             if (getBitmap() != null && !invalidateFlag) {
                 restoreBitmapReference();
             } else {
@@ -183,15 +187,17 @@ public class Page {
                     decodePageThumb();
                 }
             }
+            //}
+            node.updateVisibility();
         } else {
             recycle();
         }
-        node.updateVisibility();
     }
 
     private void recycle() {
         stopDecodingThisNode();
         setBitmap(null);
+        node.recycleChildren();
     }
 
     public Bitmap getBitmap() {

@@ -169,7 +169,7 @@ public class PageTreeNode {
     }
 
     private String getCacheKey() {
-        return String.format("%s-%s-%s-%s", page.index, treeNodeDepthLevel, pageSliceBounds, page);
+        return String.format("page:%s-level:%s-%s", page.index, treeNodeDepthLevel, pageSliceBounds);
     }
 
     private void restoreBitmapReference() {
@@ -305,7 +305,7 @@ public class PageTreeNode {
         return true;
     }
 
-    private void recycleChildren() {
+    void recycleChildren() {
         if (children == null) {
             return;
         }

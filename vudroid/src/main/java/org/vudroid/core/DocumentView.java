@@ -23,10 +23,13 @@ import org.vudroid.core.models.DecodingProgressModel;
 import org.vudroid.core.models.ZoomModel;
 import org.vudroid.core.multitouch.MultiTouchZoom;
 
+//import cn.archko.pdf.core.common.PdfOptionRepository;
 import cn.archko.pdf.core.entity.APage;
+import cn.archko.pdf.core.link.Hyperlink;
 import cn.archko.pdf.core.listeners.SimpleGestureListener;
 import cn.archko.pdf.core.utils.ColorUtil;
 import cn.archko.pdf.core.utils.Utils;
+//import cn.archko.pdf.core.viewer.DefaultScrollHandle;
 
 public class DocumentView extends View implements ZoomListener {
 
@@ -126,9 +129,9 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void init() {
-        //if (PdfOptionRepository.INSTANCE.getFastscroll()) {
-        //    setupHandle();
-        //}
+        /*if (PdfOptionRepository.INSTANCE.getFastscroll()) {
+            setupHandle();
+        }*/
 
         if (isInitialized || decodeService.getPageCount() < 1) {
             return;
@@ -228,10 +231,9 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void currentPageChanged() {
-        post(() -> {
-            //currentPageModel.setCurrentPageIndex(getCurrentPage());
-            currentPageModel.setCurrentPage(getCurrentPage());
-        });
+        //post(() -> {
+        //    currentPageModel.setCurrentPage(getCurrentPage());
+        //});
     }
 
     private void updatePageVisibility() {
@@ -281,12 +283,28 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     public int getCurrentPage() {
-        //for (Map.Entry<Integer, Page> entry : pages.entrySet()) {
         Page page;
-        for (int i = 0; i < pages.size(); i++) {
-            page = pages.valueAt(i);
-            if (page.isVisible()) {
-                return pages.keyAt(i);
+        int current = binarySearchCurrentPage();
+        if (current == -1) {
+            for (int i = 0; i < pages.size(); i++) {
+                page = pages.valueAt(i);
+                if (page.isVisible()) {
+                    return pages.keyAt(i);
+                }
+            }
+        } else {
+            for (int i = current; i >= 0; i--) {
+                page = pages.valueAt(i);
+                if (page.isVisible()) {
+                    return pages.keyAt(i);
+                }
+            }
+
+            for (int i = current; i < pages.size(); i++) {
+                page = pages.valueAt(i);
+                if (page.isVisible()) {
+                    return pages.keyAt(i);
+                }
             }
         }
         return 0;
@@ -303,22 +321,110 @@ public class DocumentView extends View implements ZoomListener {
         return 0;
     }
 
+    public int binarySearchCurrentPage() {
+        int low = 0;
+        int high = pages.size() - 1;
+        int middle = 0;
+
+        if (low > high) {
+            return -1;
+        }
+
+        Page page = null;
+        int scrollX = getScrollX();
+        int scrollY = getScrollY();
+        if (oriention == VERTICAL) {
+            while (low <= high) {
+                middle = (low + high) / 2;
+                page = pages.valueAt(middle);
+                if (page.bounds.top > scrollY) {
+                    high = middle - 1;
+                } else if (page.bounds.top < scrollY) {
+                    if (page.bounds.bottom > scrollY) {
+                        return middle;
+                    }
+                    low = middle + 1;
+                } else {
+                    return middle;
+                }
+            }
+        } else {
+            while (low <= high) {
+                middle = (low + high) / 2;
+                page = pages.valueAt(middle);
+                if (page.bounds.left > scrollX) {
+                    high = middle - 1;
+                } else if (page.bounds.left < scrollX) {
+                    if (page.bounds.right > scrollX) {
+                        return middle;
+                    }
+                    low = middle + 1;
+                } else {
+                    return middle;
+                }
+            }
+        }
+
+        return -1;
+    }
+
     public Page getEventPage(MotionEvent e) {
         Page page = null;
-        for (int i = 0; i < pages.size(); i++) {
-            page = pages.valueAt(i);
-            if (page.isVisible()) {
-                if (oriention == VERTICAL) {
-                    if ((page.bounds.top - getScrollY()) < e.getY() && (page.bounds.bottom - getScrollY()) > e.getY()) {
-                        return page;
+
+        float evtX = e.getX();
+        float evtY = e.getY();
+
+        int scrollX = getScrollX();
+        int scrollY = getScrollY();
+
+        int current = binarySearchCurrentPage();
+        if (current == -1) {
+            for (int i = 0; i < pages.size(); i++) {
+                page = pages.valueAt(i);
+                if (page.isVisible()) {
+                    if (oriention == VERTICAL) {
+                        if ((page.bounds.top - scrollY) < evtY && (page.bounds.bottom - scrollY) > evtY) {
+                            return page;
+                        }
+                    } else {
+                        if ((page.bounds.left - scrollX) < evtX && (page.bounds.right - scrollX) > evtX) {
+                            return page;
+                        }
                     }
-                } else {
-                    if ((page.bounds.left - getScrollX()) < e.getX() && (page.bounds.right - getScrollX()) > e.getX()) {
-                        return page;
+                }
+            }
+        } else {
+            for (int i = current; i >= 0; i--) {
+                page = pages.valueAt(i);
+                if (page.isVisible()) {
+                    if (oriention == VERTICAL) {
+                        if ((page.bounds.top - scrollY) < evtY && (page.bounds.bottom - scrollY) > evtY) {
+                            return page;
+                        }
+                    } else {
+                        if ((page.bounds.left - scrollX) < evtX && (page.bounds.right - scrollX) > evtX) {
+                            return page;
+                        }
+                    }
+                }
+            }
+
+            for (int i = current; i < pages.size(); i++) {
+                page = pages.valueAt(i);
+                if (page.isVisible()) {
+                    if (oriention == VERTICAL) {
+                        if ((page.bounds.top - scrollY) < evtY && (page.bounds.bottom - scrollY) > evtY) {
+                            return page;
+                        }
+                    } else {
+                        if ((page.bounds.left - scrollX) < evtX && (page.bounds.right - scrollX) > evtX) {
+                            return page;
+                        }
                     }
                 }
             }
         }
+
         return page;
     }
 
@@ -458,9 +564,30 @@ public class DocumentView extends View implements ZoomListener {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         Page page;
-        for (int i = 0; i < pages.size(); i++) {
-            page = pages.valueAt(i);
-            page.draw(canvas);
+        int current = binarySearchCurrentPage();
+        if (current == -1) {
+            for (int i = 0; i < pages.size(); i++) {
+                page = pages.valueAt(i);
+                page.draw(canvas);
+            }
+        } else {
+            for (int i = current; i >= 0; i--) {
+                page = pages.valueAt(i);
+                if (page.isVisible()) {
+                    page.draw(canvas);
+                } else {
+                    break;
+                }
+            }
+
+            for (int i = current; i < pages.size(); i++) {
+                page = pages.valueAt(i);
+                if (page.isVisible()) {
+                    page.draw(canvas);
+                } else {
+                    break;
+                }
+            }
         }
     }
 
@@ -676,16 +803,16 @@ public class DocumentView extends View implements ZoomListener {
         return -1;
     }
 
-    //public void addView(DefaultScrollHandle scrollHandle, RelativeLayout.LayoutParams lp) {
-    //    removeView(scrollHandle);
-    //    RelativeLayout frameLayout = (RelativeLayout) getParent();
-    //    frameLayout.addView(scrollHandle, lp);
-    //}
+    /*public void addView(DefaultScrollHandle scrollHandle, RelativeLayout.LayoutParams lp) {
+        removeView(scrollHandle);
+        RelativeLayout frameLayout = (RelativeLayout) getParent();
+        frameLayout.addView(scrollHandle, lp);
+    }
 
-    //public void removeView(DefaultScrollHandle scrollHandle) {
-    //    ViewGroup parent = (ViewGroup) getParent();
-    //    parent.removeView(scrollHandle);
-    //}
+    public void removeView(DefaultScrollHandle scrollHandle) {
+        ViewGroup parent = (ViewGroup) getParent();
+        parent.removeView(scrollHandle);
+    }*/
 
     public int getPageCount() {
         return decodeService.getPageCount();
@@ -727,7 +854,6 @@ public class DocumentView extends View implements ZoomListener {
             } else if ((int) e.getY() > bottom) {
                 scrollPage(height);
             } else {
-                //currentPageModel.dispatch(new CurrentPageListener.CurrentPageChangedEvent(getCurrentPage()));
                 if (null != simpleGestureListener) {
                     Page page = getEventPage(e);
                     if (null != page) {
@@ -747,7 +873,10 @@ public class DocumentView extends View implements ZoomListener {
         public boolean onDoubleTapEvent(MotionEvent ev) {
             if (ev.getEventTime() - lastDownEventTime < DOUBLE_TAP_TIME) {
                 if (null != simpleGestureListener) {
-                    simpleGestureListener.onDoubleTapEvent(getCurrentPage());
+                    Page page = getEventPage(ev);
+                    if (null != page) {
+                        simpleGestureListener.onDoubleTapEvent(page.index);
+                    }
                 }
                 return true;
             } else {

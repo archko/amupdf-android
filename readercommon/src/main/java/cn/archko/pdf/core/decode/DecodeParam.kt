@@ -37,7 +37,7 @@ class DecodeParam {
         this.key = key
         pageNum = pageSize.index
         if (TextUtils.isEmpty(key)) {
-            this.key = String.format("%s,%s,%s,%s", imageView, crop, xOrigin, pageSize)
+            this.key = String.format("%s,%s,%s,%s", pageNum, crop, xOrigin, pageSize)
         }
         this.imageView = imageView
         this.crop = crop

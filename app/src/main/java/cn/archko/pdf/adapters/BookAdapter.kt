@@ -130,7 +130,7 @@ class BookAdapter(
                 if (bookProgress?.ext != null) {
                     val ext = bookProgress.ext!!.lowercase(Locale.ROOT)
 
-                    AdapterUtils.setIcon(ext, mIcon!!)
+                    AdapterUtils.setIcon(".$ext", mIcon!!)
                 }
             }
         }

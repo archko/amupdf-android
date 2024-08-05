@@ -193,7 +193,8 @@ public class CropUtils {
     private final static int LINE_SIZE = 4;
     //边距留白,与切割的图片大小是有关的,缩略图越小,留白应该越小,因为精度小
     private final static int LINE_MARGIN = 8;
-    private final static double WHITE_THRESHOLD = 0.005;
+    //这个值越小,表示忽略的空间越大,比如一行就一个页码,如果这个适中,就直接忽略,认为这行是空白的
+    private final static double WHITE_THRESHOLD = 0.004;
 
     /**
      * 使用的是平均像素,对于有些图片切割会异常,在于精确度的调整.
@@ -215,10 +216,11 @@ public class CropUtils {
 
         //计算平均灰度不如直接设置225,效果要好的多,平均值会把红色的识别成白边
         final float avgLum = 225; //calculateAvgLum(bitmap, bitmapBounds);
+        final float rightBottomAvgLum = 235; //calculateAvgLum(bitmap, bitmapBounds);
         float left = getLeftBound(bitmap, bitmapBounds, avgLum);
-        float right = getRightBound(bitmap, bitmapBounds, avgLum);
+        float right = getRightBound(bitmap, bitmapBounds, rightBottomAvgLum);
         float top = getTopBound(bitmap, bitmapBounds, avgLum);
-        float bottom = getBottomBound(bitmap, bitmapBounds, avgLum);
+        float bottom = getBottomBound(bitmap, bitmapBounds, rightBottomAvgLum);
 
         left = left * bitmapBounds.width();
         top = top * bitmapBounds.height();

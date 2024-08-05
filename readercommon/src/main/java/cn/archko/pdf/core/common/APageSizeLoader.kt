@@ -136,6 +136,13 @@ object APageSizeLoader {
         return jsonArray
     }
 
+    fun deletePageSizeFromFile(path: String) {
+        val file = File(path)
+        if (file.exists()) {
+            file.delete()
+        }
+    }
+
     class PageSizeBean {
         var List: List<APage>? = null
         var crop = false

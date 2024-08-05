@@ -95,7 +95,7 @@ public class PdfPage implements CodecPage {
         patchY = (int) ((int) (pageSliceBounds.top * pageH) + cropBound.top * scale);
         Bitmap bitmap = BitmapPool.getInstance().acquire(width, height);
 
-        //Log.d("TAG", String.format("page:%s, patchX:%s, patchY:%s, width:%s, height:%s, %s",pageHandle, patchX, patchY, width, height, cropBound));
+        //Log.d("TAG", String.format("page:%s, scale:%s, patchX:%s, patchY:%s, width:%s, height:%s, %s", pageHandle, scale, patchX, patchY, width, height, cropBound));
 
         com.artifex.mupdf.fitz.Matrix ctm = new com.artifex.mupdf.fitz.Matrix(scale);
         AndroidDrawDevice dev = new AndroidDrawDevice(bitmap, patchX, patchY, 0, 0, width, height);

@@ -2,6 +2,9 @@ package cn.archko.pdf.core.decode
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
@@ -14,6 +17,8 @@ import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.common.ParseTextMain
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.ReflowBean
+import cn.archko.pdf.core.utils.BitmapUtils
+import cn.archko.pdf.core.utils.CropUtils
 import com.artifex.mupdf.fitz.Cookie
 import com.artifex.mupdf.fitz.DisplayList
 import com.artifex.mupdf.fitz.Document
@@ -24,7 +29,6 @@ import com.artifex.mupdf.fitz.Page
 import com.artifex.mupdf.fitz.Quad
 import com.artifex.mupdf.fitz.RectI
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice
-import org.ebookdroid.core.crop.PageCropper
 import java.io.File
 
 /**
@@ -392,8 +396,8 @@ class MupdfDocument(private val context: Context) {
         var useNewCropper = false
         fun getJavaCropRect(bitmap: Bitmap?): RectF {
             return if (useNewCropper) {
-                PageCropper.getJavaCropRect(bitmap)
-            } else PageCropper.getJavaCropBounds(bitmap)
+                CropUtils.getJavaCropRect(bitmap)
+            } else CropUtils.getJavaCropBounds(bitmap)
         }
 
         fun crop(page: Page, viewWidth: Int) {
@@ -430,7 +434,7 @@ class MupdfDocument(private val context: Context) {
             pageH: Int
         ): FloatArray {
             val start = System.currentTimeMillis()
-            val rectF = PageCropper.getJavaCropBounds(
+            val rectF = CropUtils.getJavaCropBounds(
                 thumb,
                 Rect(0, 0, thumb.getWidth(), thumb.getHeight())
             )
@@ -474,7 +478,7 @@ class MupdfDocument(private val context: Context) {
             val matrix =
                 Matrix(ctm.a / ratio, ctm.d / ratio)
             render(page, matrix, thumb, 0, 0, 0)
-            val rectF = PageCropper.getJavaCropBounds(
+            val rectF = CropUtils.getJavaCropBounds(
                 thumb,
                 Rect(0, 0, thumb.getWidth(), thumb.getHeight())
             )
@@ -499,6 +503,66 @@ class MupdfDocument(private val context: Context) {
             //        pageW, pageH, height, thumb.getWidth(), thumb.getHeight(), rectF, xscale, yscale));
             //BitmapPool.getInstance().release(thumb);
             return floatArrayOf(leftBound.toFloat(), topBound.toFloat(), resultH.toFloat(), xscale)
+        }
+
+        /**
+         * 根据页面240像素去缩放,将缩略图去切边,再缩放到原来图片大小.
+         * 返回一个原图片大小的rect,包含切边的left,top大小
+         */
+        fun getArrByCrop(
+            page: Page,
+        ): RectF {
+            val start = System.currentTimeMillis()
+            // decode thumb
+            val thumbw = 240f
+            val pageW = page.bounds.x1 - page.bounds.x0
+            val pageH = page.bounds.y1 - page.bounds.y0
+            val ratio = pageW / thumbw
+            val thumbh = (pageH / ratio)
+
+            val thumb =
+                BitmapPool.getInstance().acquire(thumbw.toInt(), thumbh.toInt())
+            val matrix = Matrix(1 / ratio)
+            render(page, matrix, thumb, 0, 0, 0)
+            val rectF = CropUtils.getJavaCropBounds(
+                thumb,
+                Rect(0, 0, thumb.getWidth(), thumb.getHeight())
+            )
+
+            val leftBound = (rectF.left * ratio)
+            val topBound = (rectF.top * ratio)
+            val resultW = rectF.width() * ratio
+            val resultH = rectF.height() * ratio
+
+            Log.d(
+                "TAG", String.format(
+                    "decode.crop scale.w-h:%s-%s-%s, %s-%s, %s-%s,rect:%s, cos:%s",
+                    resultW, resultH, ratio,
+                    pageW, pageH, leftBound, topBound, rectF,
+                    (System.currentTimeMillis() - start)
+                )
+            )
+
+            //saveBitmap(thumb, rectF)
+            BitmapPool.getInstance().release(thumb)
+            return RectF(leftBound, topBound, leftBound + resultW, topBound + resultH)
+        }
+
+        private fun saveBitmap(thumb: Bitmap, rectF: RectF) {
+            val paint = Paint()
+            paint.setColor(Color.GREEN)
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = 2f
+            val canvas = Canvas(thumb)
+            canvas.drawRect(rectF, paint)
+            BitmapUtils.saveBitmapToFile(
+                thumb, File(
+                    String.format(
+                        "/sdcard/book/%s-%s-%s.jpg",
+                        thumb.getWidth(), thumb.getHeight(), rectF
+                    )
+                )
+            )
         }
 
         fun decode(aPage: APage, decodeTask: DecodeParam) {

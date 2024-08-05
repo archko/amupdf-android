@@ -35,16 +35,13 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        encoding = "UTF-8"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlin {
-        jvmToolchain(8)
-    }
-
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
         freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
     }
 
@@ -148,7 +145,7 @@ dependencies {
     //}
     implementation(libs.multidex)
     //implementation(libs.constraintLayout)
-    api ("androidx.constraintlayout:constraintlayout:2.1.4")
+    api("androidx.constraintlayout:constraintlayout:2.1.4")
 
     implementation(libs.material)
     implementation(libs.swiperefreshlayout)

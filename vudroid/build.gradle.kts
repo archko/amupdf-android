@@ -13,8 +13,20 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    compileOptions {
+        encoding = "UTF-8"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+    }
 }
 dependencies {
     api(project(":readercommon"))
-    api("com.davemorrissey.labs:subsampling-scale-image-view:3.10.0")
+    //api("com.davemorrissey.labs:subsampling-scale-image-view:3.10.0")
+    api(project(":subsampling-scale-image-view"))
 }

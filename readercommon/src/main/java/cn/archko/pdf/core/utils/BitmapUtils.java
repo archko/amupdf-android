@@ -24,10 +24,13 @@ import cn.archko.pdf.core.common.Logcat;
 public class BitmapUtils {
 
     public static boolean saveBitmapToFile(Bitmap bitmap, File file) {
-        return saveBitmapToFile(bitmap, file, Bitmap.CompressFormat.PNG, 100);
+        return saveBitmapToFile(bitmap, file, Bitmap.CompressFormat.JPEG, 100);
     }
 
     public static boolean saveBitmapToFile(Bitmap bitmap, File file, Bitmap.CompressFormat format, int quality) {
+        if (null == bitmap) {
+            return false;
+        }
         FileOutputStream fos = null;
         BufferedOutputStream bos = null;
         ByteArrayOutputStream baos = null;
@@ -76,8 +79,8 @@ public class BitmapUtils {
     public static void saveBitmapToSDCard(Bitmap bitmap) {
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/" + (i++) + ".png");
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/" + (i++) + ".jpg");
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

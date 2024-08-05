@@ -38,8 +38,8 @@ class AboutActivity : AnalysticActivity() {
         var version = ""
         try {
             val packageInfo = packageManager.getPackageInfo(packageName, 0)
-            version = packageInfo.versionName
-            name = resources.getString(packageInfo.applicationInfo.labelRes)
+            version = packageInfo.versionName.toString()
+            name = resources.getString(packageInfo.applicationInfo!!.labelRes)
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
         }

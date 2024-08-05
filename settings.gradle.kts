@@ -50,6 +50,7 @@ include(":vudroid")
 //include ":core-ui"
 include(":paddle-ocr")
 include(":pdf-recyclerview")
+include(":subsampling-scale-image-view")
 
 //include ":library"
 //include ":editor"

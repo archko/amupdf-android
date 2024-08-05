@@ -429,6 +429,14 @@ public final class FileUtils {
         return new File(Environment.getExternalStorageDirectory().getPath() + dir);
     }
 
+    public static void cleanDir(File dir) {
+        if (dir.exists()) {
+            dir.delete();
+        }
+
+        dir.mkdirs();
+    }
+
     //---------------------------
 
     public static String MD5(String data) {

@@ -19,10 +19,11 @@ import org.vudroid.core.codec.CodecPage;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 
 import cn.archko.pdf.core.cache.BitmapCache;
 import cn.archko.pdf.core.cache.BitmapPool;
@@ -36,18 +37,21 @@ public class DecodeServiceBase implements DecodeService {
     private static final int MSG_DECODE_SELECT = 1;
     private static final int MSG_DECODE_CANCEL = 2;
     private static final int MSG_DECODE_FINISH = 4;
+    private static final int MSG_DECODE_TASK = 5;
     private CodecContext codecContext;
 
     private View containerView;
     private CodecDocument document;
     public static final String TAG = "DecodeService";
-    private final LinkedHashMap<String, DecodeTask> nodeTasks = new LinkedHashMap<>(32, 0.75f, false);
-    private final LinkedHashMap<String, DecodeTask> pageTasks = new LinkedHashMap<>(32, 0.75f, false);
+    private final HashMap<String, DecodeTask> nodeTasks = new HashMap<>(64, 0.75f);
+    private final HashMap<String, DecodeTask> pageTasks = new HashMap<>(32, 0.75f);
+    private final ConcurrentHashMap<String, DecodeTask> decodingTasks = new ConcurrentHashMap<>(2);
     private final SparseArray<SoftReference<CodecPage>> pages = new SparseArray<>();
     private final Queue<Integer> pageEvictionQueue = new LinkedList<>();
     private int oriention = DocumentView.VERTICAL;
     private boolean isRecycled;
-    Handler mHandler;
+    private Handler mHandler;
+    private Handler mDecodeHandler;
     private final List<APage> aPageList = new ArrayList<>();
     private final Handler.Callback mCallback = new Handler.Callback() {
         public boolean handleMessage(Message msg) {
@@ -85,6 +89,11 @@ public class DecodeServiceBase implements DecodeService {
                 return;
             }
 
+            if (!decodingTasks.isEmpty()) {
+                Log.d(TAG, String.format("running task>1:%s-%s-%s", decodingTasks.size(), pageTasks.size(), nodeTasks.size()));
+                return;
+            }
+
             DecodeTask selectTask = null;
             if (!pageTasks.isEmpty()) {
                 selectTask = pageTasks.entrySet().iterator().next().getValue();
@@ -98,17 +107,10 @@ public class DecodeServiceBase implements DecodeService {
             }
 
             if (selectTask == null) {
-                //mHandler.sendEmptyMessageDelayed(MSG_DECODE_SELECT, 5000L);
                 Log.d(TAG, String.format("no task:%s-%s", pageTasks.size(), nodeTasks.size()));
             } else {
-                Log.d(TAG, String.format("add task:%s-%s", selectTask.pageNumber, selectTask.type));
-                try {
-                    performDecode(selectTask);
-                } catch (IOException e) {
-                    Log.e(TAG, String.format("decode error:%s-%s", selectTask.pageNumber, selectTask.node));
-                } finally {
-                    mHandler.sendEmptyMessage(MSG_DECODE_SELECT);
-                }
+                decodingTasks.put(selectTask.decodeKey, selectTask);
+                mDecodeHandler.sendEmptyMessage(MSG_DECODE_TASK);
             }
         }
 
@@ -125,6 +127,31 @@ public class DecodeServiceBase implements DecodeService {
             }
         }
     };
+    private final Handler.Callback mDecodeCallback = new Handler.Callback() {
+        public boolean handleMessage(Message msg) {
+            DecodeTask selectTask = null;
+            synchronized (decodingTasks) {
+                if (!decodingTasks.isEmpty()) {
+                    selectTask = decodingTasks.entrySet().iterator().next().getValue();
+                }
+            }
+            if (selectTask == null) {
+                mHandler.sendEmptyMessage(MSG_DECODE_SELECT);
+            } else {
+                try {
+                    Log.d(TAG, String.format("add task:%s-%s, %s-%s", selectTask.pageNumber, selectTask.type, selectTask.decodeKey, selectTask.pageSliceBounds));
+                    performDecode(selectTask);
+                } catch (IOException e) {
+                    Log.e(TAG, String.format("decode error:%s-%s", selectTask.pageNumber, selectTask.node));
+                } finally {
+                    decodingTasks.remove(selectTask.decodeKey);
+                    mHandler.sendEmptyMessage(MSG_DECODE_SELECT);
+                }
+            }
+
+            return true;
+        }
+    };
 
     public DecodeServiceBase(CodecContext codecContext) {
         this.codecContext = codecContext;
@@ -132,9 +159,12 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     private void initDecodeThread() {
-        HandlerThread handlerThread = new HandlerThread("decodeThread");
+        HandlerThread handlerThread = new HandlerThread("taskThread");
         handlerThread.start();
         mHandler = new Handler(handlerThread.getLooper(), mCallback);
+        handlerThread = new HandlerThread("decodeThread");
+        handlerThread.start();
+        mDecodeHandler = new Handler(handlerThread.getLooper(), mDecodeCallback);
     }
 
     public void setContainerView(View containerView) {
@@ -152,20 +182,25 @@ public class DecodeServiceBase implements DecodeService {
         if (null != pageSizeBean) {
             if (!crop || (crop && pageSizeBean.getCrop())) {
                 aPageList.addAll(pageSizeBean.getList());
+                return document;
             }
-            return document;
         }
-        for (int i = 0; i < count; i++) {
-            CodecPage codecPage = document.getPage(i);
-            APage aPage = new APage(i, codecPage.getWidth(), codecPage.getHeight(), 1f);
-            if (crop) {
-                cropPage(codecPage, aPage);
+        try {
+            for (int i = 0; i < count; i++) {
+                CodecPage codecPage = document.getPage(i);
+                APage aPage = new APage(i, codecPage.getWidth(), codecPage.getHeight(), 1f);
+                if (crop) {
+                    cropPage(codecPage, aPage);
+                }
+                aPageList.add(aPage);
+                codecPage.recycle();
             }
-            aPageList.add(aPage);
-            codecPage.recycle();
-        }
-        if (cachePage) {
-            APageSizeLoader.INSTANCE.savePageSizeToFile(true, path, aPageList);
+            if (cachePage) {
+                APageSizeLoader.INSTANCE.savePageSizeToFile(crop, path, aPageList);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+            APageSizeLoader.INSTANCE.deletePageSizeFromFile(path);
         }
         Log.d(TAG, String.format("open.cos:%s", (System.currentTimeMillis() - start)));
         return document;
@@ -485,11 +520,11 @@ public class DecodeServiceBase implements DecodeService {
 
         @Override
         public String toString() {
-            return "DecodeTask{" +
+            return "Task{" +
                     "page=" + pageNumber +
                     ", zoom=" + zoom +
-                    ", pageSliceBounds=" + pageSliceBounds +
-                    ", decodeKey=" + decodeKey +
+                    ", bounds=" + pageSliceBounds +
+                    ", Key=" + decodeKey +
                     '}';
         }
     }
@@ -498,6 +533,9 @@ public class DecodeServiceBase implements DecodeService {
         if (null != mHandler) {
             mHandler.sendEmptyMessage(MSG_DECODE_FINISH);
             mHandler.getLooper().quit();
+        }
+        if (null != mDecodeHandler) {
+            mDecodeHandler.getLooper().quit();
         }
         synchronized (nodeTasks) {
             isRecycled = true;

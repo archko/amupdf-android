@@ -25,6 +25,7 @@ public class StreamUtils {
         try {
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.append(text);
+            fileWriter.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
