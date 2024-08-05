@@ -13,16 +13,12 @@ import android.graphics.Region
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import cn.archko.pdf.core.utils.Utils
 import java.text.DecimalFormat
-import kotlin.math.abs
-import kotlin.math.atan
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 /**
  * @author: archko 2022/7/30 :08:13
@@ -125,7 +121,7 @@ class CakeView @JvmOverloads constructor(
         textPaint = Paint()
         textPaint!!.isAntiAlias = true
         textPaint!!.isDither = true
-        textPaint!!.textSize = 36f
+        textPaint!!.textSize = Utils.px2sp(40f).toFloat()
         textPaint!!.style = Paint.Style.FILL
         textPaint!!.color = Color.parseColor("#ffFFFFFF")
     }
@@ -535,7 +531,7 @@ class CakeView @JvmOverloads constructor(
                 }
                 if (!isQuickMove) {
                     //Log.e(TAG, "ACTION_UP-点击")
-                    
+
                     var i = 0
                     while (i < regionList.size) {
                         val rect = regionList[i]
