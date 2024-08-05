@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">AMuPDF</string>
+    <string name="app_name" translatable="false">Dragon Viewer</string>
 
     <string name="grant_files_permission">grant file permission</string>
     <string name="grant_all_files_permission">grant all files permission</string>

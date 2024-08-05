@@ -111,6 +111,11 @@ object AdapterUtils {
         ) || fname.endsWith("html") || fname.endsWith("xhtml")
     }
 
+    fun isDjvu(name: String): Boolean {
+        val fname = name.lowercase(Locale.getDefault())
+        return fname.endsWith("djvu") || fname.endsWith("djv")
+    }
+
     fun supportImage(path: String): Boolean {
         return path.endsWith(".jpg", true)
                 || path.endsWith(".jpeg", true)
