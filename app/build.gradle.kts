@@ -85,6 +85,22 @@ android {
         doNotStrip += "*/armeabi-v7a/*.so"
         doNotStrip += "*/arm64-v8a/*.so"
     }
+
+    android.applicationVariants.all {
+        val buildType = this.buildType.name
+        val flavorName = this.flavorName
+        val variant = this
+        outputs.all {
+            if (this is com.android.build.gradle.internal.api.ApkVariantOutputImpl) {
+                //修改apk名称
+                if (buildType == "release") {
+                    this.outputFileName = "Dragon Viewer-${variant.versionName}.apk"
+                } else if (buildType == "debug") {
+                    this.outputFileName = "Dragon Viewer-${buildType}-${variant.versionName}.apk"
+                }
+            }
+        }
+    }
 }
 
 dependencies {
@@ -131,7 +147,7 @@ dependencies {
 
     implementation(libs.androidx.activity)
     implementation(libs.androidx.fragment)
-    
+
     //api(Libs.Umeng.asms) {
     //    exclude group: "androidx.lifecycle"
     //    exclude group: "androidx.activity"

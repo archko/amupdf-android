@@ -11,7 +11,6 @@
 
     <string name="toast_set_as_home">请设置图书目录</string>
 
-    <string name="about_title">关于 AMupdf</string>
     <string name="about_commmon_title">"应用信息"</string>
     <string name="about_3dparty_title">"第三方软件"</string>
     <string name="about_changelog_title">"版本变化"</string>

@@ -13,7 +13,7 @@
 
     <string name="toast_set_as_home">Please Set Book Directory</string>
 
-    <string name="about_title">About AMupdf</string>
+    <string name="about_title" translatable="false">About Dragon Viewer</string>
     <string name="about_commmon_title">"Application info"</string>
     <string name="about_3dparty_title">"3rd party software"</string>
     <string name="about_changelog_title">"3rd party software"</string>
