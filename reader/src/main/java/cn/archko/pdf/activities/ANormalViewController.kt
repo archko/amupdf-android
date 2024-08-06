@@ -29,6 +29,7 @@ import org.vudroid.core.models.CurrentPageModel
 import org.vudroid.core.models.DecodingProgressModel
 import org.vudroid.core.models.ZoomModel
 import org.vudroid.pdfdroid.codec.PdfContext
+import org.vudroid.djvudroid.codec.DjvuContext
 
 /**
  * @author: archko 2020/5/15 :12:43
@@ -40,6 +41,7 @@ class ANormalViewController(
     private var mPath: String,
     private var mPageSeekBarControls: APageSeekBarControls?,
     private var gestureDetector: GestureDetector?,
+    private var crop: Boolean,
 ) :
     OutlineListener, AViewController {
 
@@ -96,7 +98,7 @@ class ANormalViewController(
         initDecodeService()
 
         documentView.setDecodeService(decodeService)
-        decodeService!!.open(pdfViewModel.pdfPath, false, true)
+        decodeService!!.open(pdfViewModel.pdfPath, crop, true)
 
         zoomModel.addEventListener(documentView)
         documentView.layoutParams = ViewGroup.LayoutParams(
@@ -115,11 +117,9 @@ class ANormalViewController(
         try {
             Logcat.d("init.pos:$pos, :$scrollOrientation")
             this.scrollOrientation = scrollOrientation
-            //if (null != pdfViewModel.mupdfDocument) {
             this.mPageSizes = pageSizes
 
             setNormalMode(pos)
-            //}
             addGesture()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -151,6 +151,10 @@ class ANormalViewController(
     }
 
     private fun createDecodeService(): DecodeService {
+        if (AdapterUtils.isDjvu(mPath)) {
+            return DecodeServiceBase(DjvuContext())
+        }
+
         return DecodeServiceBase(PdfContext())
     }
 
@@ -168,9 +172,6 @@ class ANormalViewController(
 
     private fun setNormalMode(pos: Int) {
         setOrientation(scrollOrientation)
-        //val document = PdfDocument()
-        //document.core = pdfViewModel.mupdfDocument?.document
-        //(decodeService as DecodeServiceBase).document = document
         if (pos > 0) {
             documentView.goToPage(
                 pos,
@@ -284,7 +285,6 @@ class ANormalViewController(
     }
 
     override fun onPause() {
-        //if (null != pdfViewModel.mupdfDocument) {
         pdfViewModel.bookProgress?.run {
             val position = documentView.currentPage
             pdfViewModel.saveBookProgress(
@@ -296,7 +296,6 @@ class ANormalViewController(
                 documentView.scrollY
             )
         }
-        //}
     }
 
     override fun onDestroy() {

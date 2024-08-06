@@ -825,13 +825,14 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             gestureDetector: GestureDetector?,
         ): AViewController {
             if (viewMode == ViewMode.CROP) {
-                return ACropViewController(
+                return ANormalViewController(
                     context,
                     controllerLayout,
                     pdfViewModel,
                     path,
                     pageSeekBarControls,
                     gestureDetector,
+                    true,
                 )
             } else if (viewMode == ViewMode.REFLOW) {
                 return AReflowViewController(
@@ -850,6 +851,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                     path,
                     pageSeekBarControls,
                     gestureDetector,
+                    false,
                 )
             }
         }
