@@ -152,7 +152,6 @@ class AReflowViewController(
                     mRecyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
                     Logcat.d("onGlobalLayout:$this,pos:$pos")
                     layoutManager!!.scrollToPosition(pos)
-                    mRecyclerView.smoothScrollToPosition(pos)   //为了保证第二次滚动到正确的位置
                 }
             })
         }

@@ -14,7 +14,7 @@
         tools:ignore="ScopedStorage" />
 
     <application>
-        <activity
+        <!--<activity
             android:name=".activity.OcrActivity"
             android:exported="true"
             android:label="Ocr">
@@ -52,7 +52,7 @@
                     android:pathPattern=".*\\.gif"
                     android:scheme="file" />
             </intent-filter>
-        </activity>
+        </activity>-->
     </application>
 
 </manifest>

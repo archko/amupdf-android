@@ -137,14 +137,6 @@
             tools:ignore="DiscouragedApi" />
 
         <!--<activity
-            android:name="cn.archko.pdf.activities.DocumentActivity"
-            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
-            android:label="Document"
-            android:screenOrientation="sensor"
-            android:theme="@style/AppFullscreen"
-            android:windowSoftInputMode="adjustResize"></activity>-->
-
-        <!--<activity
             android:name="cn.archko.pdf.activities.ChooseFileFragmentActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
@@ -167,6 +159,45 @@
             android:screenOrientation="sensor"
             android:theme="@style/AppFullscreen"
             android:windowSoftInputMode="adjustResize"></activity>-->
+        <activity
+            android:name="com.baidu.ai.edge.ui.activity.OcrActivity"
+            android:exported="true"
+            android:label="Ocr">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="*"
+                    android:mimeType="image/*"
+                    android:pathPattern=".*\\.jpg"
+                    android:scheme="file" />
+                <data
+                    android:host="*"
+                    android:mimeType="image/*"
+                    android:pathPattern=".*\\.jpeg"
+                    android:scheme="file" />
+                <data
+                    android:host="*"
+                    android:mimeType="image/*"
+                    android:pathPattern=".*\\.png"
+                    android:scheme="file" />
+                <data
+                    android:host="*"
+                    android:mimeType="image/*"
+                    android:pathPattern=".*\\.webp"
+                    android:scheme="file" />
+                <data
+                    android:host="*"
+                    android:mimeType="image/*"
+                    android:pathPattern=".*\\.gif"
+                    android:scheme="file" />
+            </intent-filter>
+        </activity>
 
     </application>
 </manifest>
