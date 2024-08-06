@@ -174,6 +174,18 @@ class AReflowViewController(
         return position
     }
 
+    fun getLastPos(): Int {
+        if (null == mRecyclerView.layoutManager) {
+            return 0
+        }
+        var position =
+            (mRecyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
+        if (position < 0) {
+            position = 0
+        }
+        return position
+    }
+
     override fun getCount(): Int {
         return mPageSizes.size
     }
@@ -283,11 +295,15 @@ class AReflowViewController(
         if (null != pdfViewModel.mupdfDocument) {
             pdfViewModel.bookProgress?.run {
                 reflow = 1
-                val position = getCurrentPos()
+                var savePos = getCurrentPos() + 1
+                val lastPos = getLastPos()
+                if (lastPos == mPageSizes.size - 1) {
+                    savePos = lastPos
+                }
                 pdfViewModel.saveBookProgress(
                     mPath,
                     pdfViewModel.countPages(),
-                    position + 1,
+                    savePos,
                     pdfViewModel.bookProgress!!.zoomLevel,
                     -1,
                     0
