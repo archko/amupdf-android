@@ -121,11 +121,11 @@ class BookAdapter(
             }
 
             if (entry.type == FileBean.HOME) {
-                mIcon!!.setImageResource(R.drawable.ic_explorer_fldr)
+                mIcon!!.setImageResource(cn.archko.pdf.R.drawable.ic_book_dir_home)
             } else if (entry.type == FileBean.NORMAL && entry.isDirectory && !entry.isUpFolder) {
-                mIcon!!.setImageResource(R.drawable.ic_explorer_fldr)
+                mIcon!!.setImageResource(cn.archko.pdf.R.drawable.ic_book_folder)
             } else if (entry.isUpFolder) {
-                mIcon!!.setImageResource(R.drawable.ic_explorer_fldr)
+                mIcon!!.setImageResource(cn.archko.pdf.R.drawable.ic_book_folder)
             } else {
                 if (bookProgress?.ext != null) {
                     val ext = bookProgress.ext!!.lowercase(Locale.ROOT)

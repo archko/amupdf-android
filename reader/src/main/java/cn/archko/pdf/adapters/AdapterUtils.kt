@@ -2,8 +2,8 @@ package cn.archko.pdf.adapters
 
 import android.widget.ImageView
 import android.widget.ProgressBar
-import cn.archko.mupdf.R
 import java.util.Locale
+import cn.archko.pdf.R
 
 /**
  * @author: archko 2024/3/12 :13:39
@@ -59,38 +59,38 @@ object AdapterUtils {
     }
 
     fun setIcon(ext: String?, imageView: ImageView) {
-        var drawableId = R.drawable.app_pdf
+        var drawableId = R.drawable.ic_book_pdf
         if (".pdf".equals(ext)) {
-            drawableId = R.drawable.app_pdf
+            drawableId = R.drawable.ic_book_pdf
         } else if (".djvu".equals(ext) || ".djv".equals(ext)) {
-            drawableId = R.drawable.image_djvu
+            drawableId = R.drawable.ic_book_djvu
         } else if (".epub".equals(ext) || ".mobi".equals(ext)
         ) {
-            drawableId = R.drawable.app_epub_zip
+            drawableId = R.drawable.ic_book_epub_zip
         } else if (".png".equals(ext) || ".jpg".equals(ext) || ".jpeg".equals(ext)
             || ".bmp".equals(ext) || ".svg".equals(ext) || ".gif".equals(ext)
             || ".jfif".equals(ext) || ".jfif-tbnl".equals(ext)
             || ".tif".equals(ext) || ".tiff".equals(ext)
             || ".heic".equals(ext) || ".webp".equals(ext)
         ) {
-            drawableId = R.drawable.image
+            drawableId = R.drawable.ic_book_image
         } /*else if ("txt".equals(ext) || "log".equals(ext)
             || "js".equals(ext) || "json".equals(ext)
             || "html".equals(ext) || "xhtml".equals(ext)
         ) {
             drawableId = R.drawable.browser_icon_txt
         }*/ else if (".ppt".equals(ext)) {
-            drawableId = R.drawable.office_ppt
+            drawableId = R.drawable.ic_book_ppt
         } else if (".pptx".equals(ext)) {
-            drawableId = R.drawable.office_ppt
+            drawableId = R.drawable.ic_book_ppt
         } else if (".doc".equals(ext)) {
-            drawableId = R.drawable.office_word
+            drawableId = R.drawable.ic_book_word
         } else if (".docx".equals(ext)) {
-            drawableId = R.drawable.office_word
+            drawableId = R.drawable.ic_book_word
         } else if (".xls".equals(ext)) {
-            drawableId = R.drawable.office_excel
+            drawableId = R.drawable.ic_book_excel
         } else if (".xlsx".equals(ext)) {
-            drawableId = R.drawable.office_excel
+            drawableId = R.drawable.ic_book_excel
         }
         imageView.setImageResource(drawableId)
     }
