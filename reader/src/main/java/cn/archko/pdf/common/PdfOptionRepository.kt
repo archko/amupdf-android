@@ -94,7 +94,7 @@ object PdfOptionRepository {
     }
 
     fun getTextSize(): Float {
-        return mmkv.decodeFloat(PdfOptionKeys.STYLE_KEY_FONT_SIZE, 16f)
+        return mmkv.decodeFloat(PdfOptionKeys.STYLE_KEY_FONT_SIZE, 17f)
     }
 
     fun setBgColor(bgColor: Int) {

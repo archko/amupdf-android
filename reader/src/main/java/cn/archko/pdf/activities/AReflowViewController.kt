@@ -152,7 +152,7 @@ class AReflowViewController(
                     mRecyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
                     Logcat.d("onGlobalLayout:$this,pos:$pos")
                     layoutManager!!.scrollToPosition(pos)
-                    mRecyclerView.smoothScrollToPosition(pos)
+                    mRecyclerView.smoothScrollToPosition(pos)   //为了保证第二次滚动到正确的位置
                 }
             })
         }
@@ -215,17 +215,21 @@ class AReflowViewController(
     }
 
     override fun onSingleTap(e: MotionEvent, margin: Int): Boolean {
-        if (tryHyperlink(e)) {
-            return true
-        }
         val documentView = getDocumentView()
         val height = documentView.height
+        val left = documentView.width / 4
         val top = height / 4
         val bottom = height * 3 / 4
         if (scrollPage(e.y.toInt(), top, bottom, margin)) {
             return true
         }
-        showReflowConfigMenu()
+        if (e.x < left) {
+            showReflowConfigMenu()
+        } else {
+            if (mStyleControls?.visibility == View.VISIBLE) {
+                mStyleControls?.visibility = View.GONE
+            }
+        }
         return true
     }
 
