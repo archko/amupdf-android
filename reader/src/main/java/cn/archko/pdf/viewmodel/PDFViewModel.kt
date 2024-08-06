@@ -37,6 +37,7 @@ class PDFViewModel : ViewModel() {
     var pdfPath: String? = null
     var bookmarks: List<Bookmark>? = null
 
+    //every book should have a progress,event if not store in db.
     var bookProgress: BookProgress? = null
         private set
     var mupdfDocument: MupdfDocument? = null
@@ -59,7 +60,7 @@ class PDFViewModel : ViewModel() {
         return null
     }
 
-    private fun loadProgressAndBookmark(absolutePath: String?, autoCrop: Int) {
+    private fun loadProgressAndBookmark(absolutePath: String, autoCrop: Int) {
         val file = File(absolutePath)
         if (file.isDirectory) {
             return
@@ -71,7 +72,7 @@ class PDFViewModel : ViewModel() {
             bookProgress!!.autoCrop = autoCrop
             bookProgress!!._id = Graph.database.progressDao().addProgress(bookProgress!!).toInt()
         }
-        bookProgress!!.readTimes = bookProgress!!.readTimes + 1
+        bookProgress!!.readTimes += 1
         bookProgress!!.inRecent = BookProgress.IN_RECENT
 
         bookmarks = loadBookmarks()
@@ -192,6 +193,22 @@ class PDFViewModel : ViewModel() {
         }
     }
 
+    fun storeCrop(crop: Boolean) {
+        if (crop) {
+            bookProgress?.autoCrop = 0
+        } else {
+            bookProgress?.autoCrop = 1
+        }
+    }
+
+    fun storeReflow(reflow: Boolean) {
+        if (reflow) {
+            bookProgress?.reflow = 1
+        } else {
+            bookProgress?.reflow = 0
+        }
+    }
+
     suspend fun savePageSize(crop: Boolean, pageSizes: List<APage>) = flow {
         APageSizeLoader.savePageSizeToFile(
             crop,
@@ -217,6 +234,20 @@ class PDFViewModel : ViewModel() {
         }
         emit(pageSizeBean)
     }.flowOn(Dispatchers.IO)
+
+    fun checkCrop(): Boolean {
+        if (null == bookProgress) {
+            return PdfOptionRepository.getAutocrop()
+        }
+        return bookProgress!!.autoCrop == 0
+    }
+
+    fun checkReflow(): Boolean {
+        if (null == bookProgress) {
+            return false
+        }
+        return bookProgress!!.reflow == 1
+    }
 
     fun saveBookProgress(
         absolutePath: String?,

@@ -21,10 +21,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
 import cn.archko.pdf.common.OutlineHelper
-import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.cache.BitmapCache
-import cn.archko.pdf.core.common.APageSizeLoader
-import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.Bookmark
@@ -88,14 +85,12 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             menu = BaseMenu(color, 1f, ocrStr, -1, type_ocr)
             menus.add(menu)
 
-            if (viewMode != ViewMode.REFLOW) {
-                if (pdfViewModel.bookProgress?.autoCrop == 0) {
-                    menu = BaseMenu(selectedColor, 1f, autoCropStr, -1, type_crop)
-                    menus.add(menu)
-                } else {
-                    menu = BaseMenu(color, 1f, autoCropStr, -1, type_crop)
-                    menus.add(menu)
-                }
+            if (viewMode == ViewMode.CROP) {
+                menu = BaseMenu(selectedColor, 1f, autoCropStr, -1, type_crop)
+                menus.add(menu)
+            } else if (viewMode == ViewMode.NORMAL) {
+                menu = BaseMenu(color, 1f, autoCropStr, -1, type_crop)
+                menus.add(menu)
             }
         } else {    //文本重排时,自动切边不生效
             menu = BaseMenu(selectedColor, 1f, reflowStr, -1, type_reflow)
@@ -158,11 +153,10 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
             override fun onViewCenterClick() {
             }
-
         }
 
         mContentView = findViewById(R.id.content)
-        mDocumentView = findViewById(R.id.document_view)
+        documentView = findViewById(R.id.document_view)
 
         initTouchParams()
     }
@@ -195,7 +189,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     private fun ocr() {
-        if (mReflow) {
+        if (pdfViewModel.checkReflow()) {
             Toast.makeText(
                 this@AMuPDFRecyclerViewActivity,
                 "已经是文本",
@@ -219,16 +213,16 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     private fun addDocumentView() {
-        mDocumentView?.removeAllViews()
+        documentView?.removeAllViews()
         val lap: FrameLayout.LayoutParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
         )
-        mDocumentView?.addView(viewController?.getDocumentView(), lap)
+        documentView?.addView(viewController?.getDocumentView(), lap)
     }
 
     private fun initTouchParams() {
-        val view = mDocumentView!!
+        val view = documentView!!
         var margin = view.height
         margin = if (margin <= 0) {
             ViewConfiguration.get(this).scaledTouchSlop * 2
@@ -303,15 +297,13 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         })
     }
 
-    private fun changeViewMode(pos: Int) {
-        viewController?.onDestroy()
-        if (viewMode != ViewMode.REFLOW) {
-            if (forceCropParam == 1 || forceCropParam == -1) {
-                viewMode = ViewMode.CROP
-            } else {
-                viewMode = ViewMode.NORMAL
-            }
+    private fun applyViewMode(pos: Int) {
+        if (pdfViewModel.checkCrop() == viewController?.getCrop()) {
+            Logcat.d("applyViewMode:crop don't change, controller:$viewController")
+            return
         }
+        viewController?.onDestroy()
+
         val aViewController = ViewControllerFactory.getOrCreateViewController(
             viewControllerCache,
             viewMode,
@@ -321,23 +313,20 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             gestureDetector
         )
         viewController = aViewController
-        Logcat.d("changeViewMode:$viewMode, pos:$pos,forceCropParam: $forceCropParam, controller:$viewController")
-        if (forceCropParam > -1) {
-            viewController?.setCrop(forceCropParam == 1)
-        }
+        Logcat.d("applyViewMode:$viewMode, pos:$pos,forceCropParam: $forceCropParam, controller:$viewController")
 
         addDocumentView()
-        viewController?.init(mPageSizes, pos, pdfViewModel.bookProgress?.scrollOrientation ?: 1)
+        viewController?.init(pageSizes, pos, pdfViewModel.bookProgress?.scrollOrientation ?: 1)
         viewController?.notifyDataSetChanged()
     }
 
-    override fun loadDoc(password: String?) {
+    /*override fun loadDoc(password: String?) {
         lifecycleScope.launch {
             val ocr = PdfOptionRepository.getImageOcr()
             if (IntentFile.isText(mPath)) {
                 TextActivity.start(this@AMuPDFRecyclerViewActivity, mPath!!)
                 finish()
-            } /*else if (IntentFile.isImage(mPath) && ocr) {
+            } else if (IntentFile.isImage(mPath) && ocr) {
                 OcrActivity.start(
                     this@AMuPDFRecyclerViewActivity,
                     null,
@@ -345,11 +334,11 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                     System.currentTimeMillis().toString()
                 )
                 finish()
-            }*/ else {
+            } else {
                 super.loadDoc(password)
             }
         }
-    }
+    }*/
 
     override fun showPasswordDialog() {
         PasswordDialog.show(this@AMuPDFRecyclerViewActivity,
@@ -372,13 +361,18 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         try {
             //progressDialog.setMessage("Loading menu")
 
-            setCropButton(mCrop)
+            if (viewMode != ViewMode.REFLOW) {
+                if (forceCropParam > -1) {
+                    pdfViewModel.storeCrop(forceCropParam == 1)
+                }
+            }
+            setCropButton(pdfViewModel.checkCrop())
 
             val pos = pdfViewModel.getCurrentPage(pdfViewModel.countPages())
-            Logcat.d("doLoadDoc:mCrop:$mCrop,mReflow:$mReflow, pos:$pos")
-            viewController?.doLoadDoc(mPageSizes, pos)
+            Logcat.d("doLoadDoc:pos:$pos")
+            viewController?.doLoadDoc(pageSizes, pos)
 
-            mPageSeekBarControls?.showReflow(true)
+            mPageSeekBarControls?.showReflow(pdfViewModel.checkReflow())
             mPageSeekBarControls?.orientation = pdfViewModel.bookProgress?.scrollOrientation ?: 1
 
             //outlineHelper = OutlineHelper(pdfViewModel.mupdfDocument, this)
@@ -402,18 +396,18 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                     .apply()
             }
 
-            if (mReflow) {
+            if (pdfViewModel.checkReflow()) {
                 viewMode = ViewMode.REFLOW
-            } else if (mCrop) {
+            } else if (pdfViewModel.checkCrop()) {
                 viewMode = ViewMode.CROP
             } else {
                 viewMode = ViewMode.NORMAL
             }
 
             //checkout bookmark
-            changeViewMode(pos - 1)
+            applyViewMode(pos - 1)
 
-            cropModeSet(mCrop)
+            cropModeSet(pdfViewModel.checkCrop())
         } catch (e: Exception) {
             e.printStackTrace()
             finish()
@@ -460,14 +454,14 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     override fun onDestroy() {
         super.onDestroy()
         viewController?.onDestroy()
-        mPageSizes.let {
+        /*pageSizes.let {
             if (it.size < 0 || it.size < APageSizeLoader.PAGE_COUNT) {
                 return
             }
             lifecycleScope.launch {
-                pdfViewModel.savePageSize(mCrop, mPageSizes).collectLatest { }
+                pdfViewModel.savePageSize(pdfViewModel.checkCrop(), pageSizes).collectLatest { }
             }
-        }
+        }*/
     }
 
     override fun postLoadDoc(cp: Int) {
@@ -484,10 +478,10 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                 if (pageSizeBean != null) {
                     pageSizes = pageSizeBean.List
                 }
-                if (pageSizes != null && pageSizes.size > 0) {
+                if (!pageSizes.isNullOrEmpty()) {
                     Logcat.d("open3:pageSizes>0:" + pageSizes.size)
-                    mPageSizes.clear()
-                    mPageSizes.addAll(pageSizes)
+                    this@AMuPDFRecyclerViewActivity.pageSizes.clear()
+                    this@AMuPDFRecyclerViewActivity.pageSizes.addAll(pageSizes)
                     checkPageSize(cp)
                 } else {
                     start = SystemClock.uptimeMillis()
@@ -503,36 +497,35 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
      * if scale=1.0f,reload it from mupdf
      */
     private fun checkPageSize(cp: Int) {
-        for (i in 0 until mPageSizes.size) {
-            val point = mPageSizes[i]
-            //if (point.scale == 1.0f) {
+        for (i in 0 until pageSizes.size) {
             val pointF = getPageSize(i)
             if (pointF != null) {
-                mPageSizes.add(pointF)
+                pageSizes.add(pointF)
             }
-            //}
         }
     }
 
     private fun toggleReflow() {
-        if (mReflow) {  //如果原来是文本重排模式,则切换为自动切边或普通模式
-            if (mCrop) {
+        val reflow = pdfViewModel.checkReflow()
+        if (!reflow) {  //如果原来是文本重排模式,则切换为自动切边或普通模式
+            if (pdfViewModel.checkCrop()) {
                 viewMode = ViewMode.CROP
             } else {
                 viewMode = ViewMode.NORMAL
             }
+            pdfViewModel.storeReflow(false)
         } else {
             viewMode = ViewMode.REFLOW
+            pdfViewModel.storeReflow(reflow)
         }
-        changeViewMode(getCurrentPos())
 
-        mReflow = !mReflow
-        setReflowButton(mReflow)
-        pdfViewModel.bookProgress?.reflow = if (mReflow) 1 else 0
+        applyViewMode(getCurrentPos())
+
+        setReflowButton(reflow)
 
         Toast.makeText(
             this,
-            if (mReflow) getString(R.string.entering_reflow_mode) else getString(R.string.leaving_reflow_mode),
+            if (reflow) getString(R.string.entering_reflow_mode) else getString(R.string.leaving_reflow_mode),
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -543,7 +536,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         } else {
             mPageSeekBarControls?.reflowButton!!.setColorFilter(Color.argb(0xFF, 255, 255, 255))
         }
-        setCropButton(mCrop)
+        setCropButton(pdfViewModel.checkCrop())
         val pos = getCurrentPos()
         if (pos > 0) {
             viewController?.scrollToPosition(pos + 1)
@@ -667,23 +660,24 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     private fun toggleCrop() {
-        val flag = cropModeSet(!mCrop)
+        var prefCrop = pdfViewModel.checkCrop();
+        val flag = cropModeSet(!prefCrop)
         if (flag) {
             BitmapCache.getInstance().clear()
             viewController?.notifyDataSetChanged()
-            mCrop = !mCrop
-            if (mCrop) {
+            prefCrop = !prefCrop
+            if (prefCrop) {
                 viewMode = ViewMode.CROP
             } else {
                 viewMode = ViewMode.NORMAL
             }
-            changeViewMode(getCurrentPos())
-            pdfViewModel.bookProgress?.autoCrop = if (mCrop) 0 else 1
+            pdfViewModel.storeCrop(prefCrop)
+            applyViewMode(getCurrentPos())
         }
     }
 
     private fun cropModeSet(crop: Boolean): Boolean {
-        if (mReflow) {
+        if (pdfViewModel.checkReflow()) {
             Toast.makeText(
                 this,
                 getString(R.string.in_reflow_mode),
@@ -742,8 +736,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
     override fun onPause() {
         super.onPause()
-        pdfViewModel.storeCropAndReflow(mCrop, mReflow)
-        Logcat.d("onPause:mCrop:$mCrop,mReflow:$mReflow")
         viewController?.onPause()
     }
 

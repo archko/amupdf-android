@@ -226,6 +226,10 @@ class ACropViewController(
         }
     }
 
+    override fun getCrop(): Boolean {
+        return crop
+    }
+
     override fun scrollToPosition(page: Int) {
         mRecyclerView.layoutManager?.run {
             val layoutManager: LinearLayoutManager = this as LinearLayoutManager

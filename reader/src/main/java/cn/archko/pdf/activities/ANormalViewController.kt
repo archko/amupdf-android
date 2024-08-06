@@ -208,6 +208,10 @@ class ANormalViewController(
         this.crop = crop
     }
 
+    override fun getCrop(): Boolean {
+        return crop
+    }
+
     override fun scrollToPosition(page: Int) {
         documentView.goToPage(page - 1)
     }

@@ -23,6 +23,7 @@ interface AViewController {
     fun getCount(): Int
     fun setOrientation(ori: Int)
     fun setCrop(crop: Boolean)
+    fun getCrop(): Boolean
     fun onSelectedOutline(resultCode: Int)
     fun scrollToPosition(page: Int)
     fun scrollPage(y: Int, top: Int, bottom: Int, margin: Int): Boolean

@@ -46,13 +46,13 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     protected var pageNumberToast: Toast? = null
 
     protected var sensorHelper: SensorHelper? = null
-    protected var mPageSizes = mutableListOf<APage>()
+    protected var pageSizes = mutableListOf<APage>()
 
-    protected var mReflow = false
-    protected var mCrop: Boolean = true
+    //private var prefReflow = false
+    //private var prefCrop: Boolean = true
     protected var isDocLoaded: Boolean = false
 
-    protected var mDocumentView: FrameLayout? = null
+    protected var documentView: FrameLayout? = null
     protected var viewController: AViewController? = null
     protected val pdfViewModel: PDFViewModel = PDFViewModel()
 
@@ -88,13 +88,13 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
 
     open fun loadBookmark() {
         lifecycleScope.launch {
-            mCrop = PdfOptionRepository.getAutocrop()
+            //prefCrop = PdfOptionRepository.getAutocrop()
             mPath?.run {
                 val bookProgress = pdfViewModel.loadBookProgressByPath(this)
-                bookProgress?.let {
-                    mCrop = it.autoCrop == 0
-                    mReflow = it.reflow == 1
-                }
+                //bookProgress?.let {
+                //    prefCrop = it.autoCrop == 0
+                //    prefReflow = it.reflow == 1
+                //}
             }
         }
     }
@@ -296,7 +296,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
 
     open fun postLoadDoc(cp: Int) {
         preparePageSize(cp)
-        Logcat.d(TAG, "open:end." + mPageSizes.size)
+        Logcat.d(TAG, "open:end." + pageSizes.size)
         //val mill = SystemClock.uptimeMillis() - start
         //if (mill < 500L) {
         //    delay(500L - mill)
@@ -322,7 +322,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         for (i in 0 until cp) {
             val pointF = getPageSize(i)
             if (pointF != null) {
-                mPageSizes.add(pointF)
+                pageSizes.add(pointF)
             }
         }
     }
