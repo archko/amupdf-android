@@ -501,11 +501,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             val point = mPageSizes[i]
             //if (point.scale == 1.0f) {
             val pointF = getPageSize(i)
-            if (null == point) {
-                mPageSizes.clear()
-                preparePageSize(cp)
-                break
-            }
             if (pointF != null) {
                 mPageSizes.add(pointF)
             }

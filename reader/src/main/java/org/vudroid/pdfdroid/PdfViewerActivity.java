@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
 
-import com.jeremyliao.liveeventbus.LiveEventBus;
-
 import org.vudroid.core.BaseViewerActivity;
 import org.vudroid.core.DecodeService;
 import org.vudroid.core.DecodeServiceBase;
@@ -47,9 +45,7 @@ public class PdfViewerActivity extends BaseViewerActivity implements OutlineList
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        LiveEventBus
-                .get(Event.ACTION_STOPPED)
-                .post(null);
+        //busEvent(GlobalEvent(Event.ACTION_STOPPED, mPath));
     }
 
     private OutlineHelper mOutlineHelper;

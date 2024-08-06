@@ -1,5 +1,6 @@
 package cn.archko.pdf.common
 
+//import cn.archko.pdf.activities.ComposeTextActivity
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -9,9 +10,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.core.content.FileProvider
 import cn.archko.pdf.activities.AMuPDFRecyclerViewActivity
-import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.imagedroid.AlbumViewerActivity
-//import cn.archko.pdf.activities.ComposeTextActivity
 import org.vudroid.pdfdroid.PdfViewerActivity
 import java.io.File
 
@@ -29,11 +28,17 @@ class PDFViewerHelper {
 
         const val mupdfContextMenuItem = Menu.FIRST + 110
 
+        //protected const val apvContextMenuItem = Menu.FIRST + 111
+        const val vudroidContextMenuItem = Menu.FIRST + 112
         const val otherContextMenuItem = Menu.FIRST + 113
         const val infoContextMenuItem = Menu.FIRST + 114
         const val documentContextMenuItem = Menu.FIRST + 115
         const val addToFavoriteContextMenuItem = Menu.FIRST + 116
         const val removeFromFavoriteContextMenuItem = Menu.FIRST + 117
+
+        //protected const val bartekscViewContextMenuItem = Menu.FIRST + 118
+        const val editContextMenuItem = Menu.FIRST + 119
+        const val albumContextMenuItem = Menu.FIRST + 120
 
         fun openViewer(clickedFile: File, item: MenuItem, activity: Activity) {
             val uri = Uri.fromFile(clickedFile)

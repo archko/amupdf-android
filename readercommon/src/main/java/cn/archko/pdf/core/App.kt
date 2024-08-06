@@ -11,6 +11,7 @@ import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import com.tencent.mmkv.MMKV
+import vn.chungha.flowbus.FlowBusInitApplication
 
 open class App : Application(), ImageLoaderFactory {
     //private val appkey = "5c15f639f1f556978b0009c8"
@@ -21,16 +22,13 @@ open class App : Application(), ImageLoaderFactory {
         instance = this
         Graph.provide(this)
         MMKV.initialize(this)
+        FlowBusInitApplication.initializer(this)
 
         Thread.setDefaultUncaughtExceptionHandler(CrashHandler())
         val displayMetrics = resources.displayMetrics
         screenHeight = displayMetrics.heightPixels
         screenWidth = displayMetrics.widthPixels
         //UMConfigure.init(this, appkey, "archko", UMConfigure.DEVICE_TYPE_PHONE, null)
-        //LiveEventBus.config()
-        //    .lifecycleObserverAlwaysActive(true)
-        //    .autoClear(false)
-
         val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
         //获取整个手机内存
         //获取整个手机内存

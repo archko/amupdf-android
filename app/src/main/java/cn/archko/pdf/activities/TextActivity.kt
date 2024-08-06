@@ -29,6 +29,7 @@ import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFTextAdapter
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.core.common.Event
+import cn.archko.pdf.core.common.GlobalEvent
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.SensorHelper
 import cn.archko.pdf.core.common.StatusBarHelper
@@ -39,9 +40,9 @@ import cn.archko.pdf.core.widgets.ViewerDividerItemDecoration
 import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.fragments.FontsFragment
 import cn.archko.pdf.viewmodel.PDFViewModel
-import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
+import vn.chungha.flowbus.busEvent
 
 /**
  * @author: archko 2022/7/11 :9:49 上午
@@ -244,9 +245,7 @@ class TextActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         adapter?.clearCacheViews()
-        LiveEventBus
-            .get<String>(Event.ACTION_STOPPED)
-            .post(path)
+        busEvent(GlobalEvent(Event.ACTION_STOPPED, path))
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

@@ -2,8 +2,8 @@ package cn.archko.pdf.fragments
 
 import android.app.ProgressDialog
 import android.content.Context
-import android.content.IntentFilter
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -19,13 +19,14 @@ import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.Event.Companion.ACTION_FAVORITED
 import cn.archko.pdf.core.common.Event.Companion.ACTION_STOPPED
 import cn.archko.pdf.core.common.Event.Companion.ACTION_UNFAVORITED
+import cn.archko.pdf.core.common.GlobalEvent
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.LengthUtils
 import cn.archko.pdf.widgets.IMoreView
 import cn.archko.pdf.widgets.ListMoreView
-import com.jeremyliao.liveeventbus.LiveEventBus
+import vn.chungha.flowbus.busEvent
 import java.io.File
 
 /**
@@ -45,19 +46,16 @@ class HistoryFragment : BrowserFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val filter = IntentFilter()
-        filter.addAction(ACTION_STOPPED)
-        filter.addAction(ACTION_FAVORITED)
-        filter.addAction(ACTION_UNFAVORITED)
-        LiveEventBus
-            .get(ACTION_STOPPED, String::class.java)
-            .observe(this) { onRefresh() }
-        LiveEventBus
-            .get(ACTION_FAVORITED, FileBean::class.java)
-            .observe(this) { t -> updateItem(t) }
-        LiveEventBus
-            .get(ACTION_UNFAVORITED, FileBean::class.java)
-            .observe(this) { t -> updateItem(t) }
+        vn.chungha.flowbus.collectFlowBus<GlobalEvent>(scope = this, isSticky = true) {
+            Logcat.d(TAG, "ACTION_STOPPED:${it.name}")
+            if (TextUtils.equals(ACTION_STOPPED, it.name)) {
+                onRefresh()
+            } else if (TextUtils.equals(ACTION_FAVORITED, it.name)) {
+                updateItem(it.obj as FileBean)
+            } else if (TextUtils.equals(ACTION_UNFAVORITED, it.name)) {
+                updateItem(it.obj as FileBean)
+            }
+        }
         historyViewModel = HistoryViewModel()
 
         progressDialog = ProgressDialog(activity)
@@ -267,8 +265,7 @@ class HistoryFragment : BrowserFragment() {
             val sp = requireContext().getSharedPreferences(PREF_BROWSER, Context.MODE_PRIVATE)
             val isFirst = sp.getBoolean(PREF_BROWSER_KEY_FIRST, true)
             if (isFirst) {
-                LiveEventBus.get<Boolean>(Event.ACTION_ISFIRST)
-                    .post(true)
+                busEvent(GlobalEvent(Event.ACTION_ISFIRST, true))
                 sp.edit()
                     .putBoolean(PREF_BROWSER_KEY_FIRST, false)
                     .apply()

@@ -6,13 +6,14 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.archko.mupdf.R
+import cn.archko.pdf.common.ProgressScaner
 import cn.archko.pdf.core.App
 import cn.archko.pdf.core.common.BookProgressParser
 import cn.archko.pdf.core.common.Event
+import cn.archko.pdf.core.common.GlobalEvent
 import cn.archko.pdf.core.common.Graph
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
-import cn.archko.pdf.common.ProgressScaner
 import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.entity.LoadResult
@@ -21,7 +22,6 @@ import cn.archko.pdf.core.utils.DateUtils
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.LengthUtils
 import cn.archko.pdf.core.utils.StreamUtils
-import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +34,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import vn.chungha.flowbus.busEvent
 import java.io.File
 import java.io.FileFilter
 import java.util.Arrays
@@ -593,7 +594,7 @@ class FileViewModel() : ViewModel() {
                 }
             }
 
-            //postFavoriteEvent(entry, isFavorited)
+            postFavoriteEvent(entry, isFavorited)
             if (isCurrentTab) {
             }
             loadFavorities(true)
@@ -695,13 +696,9 @@ class FileViewModel() : ViewModel() {
 
     private fun postFavoriteEvent(entry: FileBean, isFavorited: Int) {
         if (isFavorited == 1) {
-            LiveEventBus
-                .get<FileBean>(Event.ACTION_FAVORITED)
-                .post(entry)
+            busEvent(GlobalEvent(Event.ACTION_FAVORITED, entry))
         } else {
-            LiveEventBus
-                .get<FileBean>(Event.ACTION_UNFAVORITED)
-                .post(entry)
+            busEvent(GlobalEvent(Event.ACTION_UNFAVORITED, entry))
         }
     }
 

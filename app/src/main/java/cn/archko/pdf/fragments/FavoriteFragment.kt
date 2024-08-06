@@ -1,7 +1,7 @@
 package cn.archko.pdf.fragments
 
-import android.content.IntentFilter
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,11 +9,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.core.common.Event
+import cn.archko.pdf.core.common.GlobalEvent
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.widgets.IMoreView
 import cn.archko.pdf.widgets.ListMoreView
-import com.jeremyliao.liveeventbus.LiveEventBus
 
 /**
  * @description:favorite list
@@ -29,22 +29,17 @@ class FavoriteFragment : BrowserFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val filter = IntentFilter()
-        filter.addAction(Event.ACTION_FAVORITED)
-        filter.addAction(Event.ACTION_UNFAVORITED)
-        LiveEventBus
-            .get(Event.ACTION_FAVORITED, FileBean::class.java)
-            .observe(this) { t ->
-                Logcat.d(TAG, "FAVORITED:$t")
-                onRefresh()
-            }
-        LiveEventBus
-            .get(Event.ACTION_UNFAVORITED, FileBean::class.java)
-            .observe(this) { t ->
-                Logcat.d(TAG, "UNFAVORITED:$t")
-                onRefresh()
-            }
         favoriteViewModel = FavoriteViewModel()
+        vn.chungha.flowbus.collectFlowBus<GlobalEvent>(scope = this, isSticky = true) {
+            if (TextUtils.equals(
+                    Event.ACTION_FAVORITED,
+                    it.name
+                ) || TextUtils.equals(Event.ACTION_UNFAVORITED, it.name)
+            ) {
+                Logcat.d(TAG, "FAVORITED:${it.name}")
+                onRefresh()
+            }
+        }
     }
 
     override fun onBackPressed(): Boolean {

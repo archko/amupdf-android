@@ -40,7 +40,6 @@ room = "2.6.1"
 secrets = "2.0.1"
 
 constraintLayout = "2.1.4"
-liveEventBusX = "1.8.0"
 umengCommon = "9.3.8"
 umengAsms = "1.2.2"
 colorPickerDialog = "0.2.2"
@@ -161,7 +160,6 @@ ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devto
 room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", version.ref = "room" }
 androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
 
-#live-event-bus-x = { module = "com.jeremyliao:live-event-bus-x", version.ref = "liveEventBusX" }
 umeng-asms = { module = "com.umeng.umsdk:asms", version.ref = "umengAsms" }
 umeng-common = { module = "com.umeng.umsdk:common", version.ref = "umengCommon" }
 colorPickerDialog = { module = "me.jfenn.ColorPickerDialog:base", version.ref = "colorPickerDialog" }
@@ -169,7 +167,6 @@ flinger = { module = "com.github.iamjosephmj:flinger", version.ref = "flinger" }
 
 multidex = { group = "androidx.multidex", name = "multidex", version.ref = "multidex" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-#liveEventBusX = { group = "io.github.jeremyliao", name = "live-event-bus-x", version.ref = "multidex" }
 viewpager2 = { group = "androidx.viewpager2", name = "viewpager2", version.ref = "viewpager2" }
 vectordrawable = { group = "androidx.vectordrawable", name = "vectordrawable", version.ref = "vectordrawable" }
 swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }

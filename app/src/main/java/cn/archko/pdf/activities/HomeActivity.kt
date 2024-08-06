@@ -1,5 +1,6 @@
 package cn.archko.pdf.activities
 
+//import com.umeng.analytics.MobclickAgent
 import android.Manifest
 import android.app.AlertDialog
 import android.app.Dialog
@@ -12,6 +13,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.text.TextUtils
 import android.util.Log
 import android.util.SparseArray
 import android.widget.Toast
@@ -24,6 +26,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import cn.archko.mupdf.R
 import cn.archko.pdf.core.common.Event
+import cn.archko.pdf.core.common.GlobalEvent
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.fragments.BrowserFragment
 import cn.archko.pdf.fragments.FavoriteFragment
@@ -32,8 +35,7 @@ import cn.archko.pdf.fragments.SearchFragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.jeremyliao.liveeventbus.LiveEventBus
-//import com.umeng.analytics.MobclickAgent
+import vn.chungha.flowbus.collectFlowBus
 import java.lang.ref.WeakReference
 
 /**
@@ -107,9 +109,13 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
 
         val filter = IntentFilter()
         filter.addAction(Event.ACTION_ISFIRST)
-        LiveEventBus
-            .get(Event.ACTION_ISFIRST, Boolean::class.java)
-            .observe(this) { mViewPager.currentItem = 1 }
+
+        collectFlowBus<GlobalEvent>(isSticky = true) {
+            if (TextUtils.equals(it.name, Event.ACTION_ISFIRST) && it.obj as Boolean) {
+                Logcat.d(TAG, "ACTION_ISFIRST:${it.name}")
+                mViewPager.currentItem = 1
+            }
+        }
     }
 
     private fun onBackEvent() {

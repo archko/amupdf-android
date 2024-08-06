@@ -217,7 +217,5 @@ public static final int *;
 -keep class com.google.accompanist.insets.**{*;}
 -keep class com.google.accompanist.pager.**{*;}
 -keep class com.google.accompanist.swiperefresh.**{*;}
--keep class com.jeremyliao.liveeventbus.**{*;}
--keep class com.jeremyliao.liveeventbus.ipc.**{*;}
 
 -keep class com.davemorrissey.labs.subscaleview.** { *; }

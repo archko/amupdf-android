@@ -14,6 +14,7 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.LinearLayoutManager
+import cn.archko.pdf.adapters.AdapterUtils
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.listeners.SimpleGestureListener
@@ -28,8 +29,8 @@ import org.vudroid.core.DocumentView
 import org.vudroid.core.models.CurrentPageModel
 import org.vudroid.core.models.DecodingProgressModel
 import org.vudroid.core.models.ZoomModel
-import org.vudroid.pdfdroid.codec.PdfContext
 import org.vudroid.djvudroid.codec.DjvuContext
+import org.vudroid.pdfdroid.codec.PdfContext
 
 /**
  * @author: archko 2020/5/15 :12:43

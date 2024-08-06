@@ -11,3 +11,5 @@ interface Event {
         const val ACTION_ISFIRST = "cn.archko.pdf.ISFIRST"
     }
 }
+
+data class GlobalEvent(val name: String, val obj: Any?)

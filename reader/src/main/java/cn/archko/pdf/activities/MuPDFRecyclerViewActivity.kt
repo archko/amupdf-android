@@ -16,6 +16,7 @@ import cn.archko.pdf.R
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.Event
+import cn.archko.pdf.core.common.GlobalEvent
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.common.SensorHelper
@@ -25,11 +26,11 @@ import cn.archko.pdf.core.entity.State
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.viewmodel.PDFViewModel
-import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import vn.chungha.flowbus.busEvent
 
 /**
  * @author: archko 2016/5/9 :12:43
@@ -147,9 +148,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
     override fun onDestroy() {
         super.onDestroy()
         isDocLoaded = false
-        LiveEventBus
-            .get<String>(Event.ACTION_STOPPED)
-            .post(mPath)
+        busEvent(GlobalEvent(Event.ACTION_STOPPED, mPath))
         pdfViewModel.destroy()
         //progressDialog.dismiss()
         BitmapCache.getInstance().clear()

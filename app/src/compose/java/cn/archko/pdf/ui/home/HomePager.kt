@@ -60,7 +60,6 @@ import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaGradientBackground
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaTab
-import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -97,11 +96,10 @@ fun HomePager(
         mutableStateOf(0)
     }
 
-    LiveEventBus
-        .get(Event.ACTION_STOPPED, String::class.java)
-        .observe(
-            LocalLifecycleOwner.current
-        ) { t -> viewModel.onReadBook(t, currentSection) }
+    vn.chungha.flowbus.collectFlowBus<GlobalEvent>(isSticky = true) {
+        Logcat.d(TAG, "FAVORITED:${it.name}")
+        viewModel.onReadBook(t, currentSection)
+    }
 
     val onPalletChange: () -> Unit = { ->
         showMenu.value = false

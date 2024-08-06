@@ -66,7 +66,6 @@ import cn.archko.pdf.viewmodel.PDFViewModel
 import com.baidu.ai.edge.ui.activity.OcrActivity
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
 import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
-import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 
 /**
@@ -313,9 +312,7 @@ class ComposeTextActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        LiveEventBus
-            .get<String>(Event.ACTION_STOPPED)
-            .post(path)
+        busEvent(GlobalEvent(Event.ACTION_STOPPED, path))
         pdfViewModel.destroy()
         BitmapCache.getInstance().clear()
     }

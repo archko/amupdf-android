@@ -131,8 +131,7 @@ dependencies {
 
     implementation(libs.androidx.activity)
     implementation(libs.androidx.fragment)
-    implementation("io.github.jeremyliao:live-event-bus-x:1.8.0")
-
+    
     //api(Libs.Umeng.asms) {
     //    exclude group: "androidx.lifecycle"
     //    exclude group: "androidx.activity"
