@@ -16,6 +16,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.util.Locale
 
 object IntentFile {
 
@@ -282,28 +283,31 @@ object IntentFile {
                 || path.endsWith(".jpg", true)
                 || path.endsWith(".jpeg", true)
                 || path.endsWith(".webp", true)
+                || path.endsWith(".heic", true)
                 || path.endsWith(".bmp", true)
+                || path.endsWith(".jfif", true)
+                || path.endsWith(".jfif-tbnl", true)
+                || path.endsWith(".tif", true)
+                || path.endsWith(".tiff", true)
     }
 
     fun isPdf(path: String?): Boolean {
         return path!!.endsWith(".pdf", true)
                 || path.endsWith(".xps", true)
                 || path.endsWith(".cbz", true)
-                || path.endsWith(".png", true)
-                || path.endsWith(".jpg", true)
-                || path.endsWith(".jpeg", true)
-                || path.endsWith(".jfif", true)
-                || path.endsWith(".jfif-tbnl", true)
-                || path.endsWith(".tif", true)
-                || path.endsWith(".tiff", true)
                 || path.endsWith(".epub", true)
                 || path.endsWith(".mobi", true)
                 || path.endsWith(".ppt", true)
                 || path.endsWith(".pptx", true)
-                || path.endsWith(".doc", true)
+                //|| path.endsWith(".doc", true)    //会崩溃
                 || path.endsWith(".docx", true)
                 || path.endsWith(".xls", true)
                 || path.endsWith(".xlsx", true)
+    }
+
+    fun isDjvu(name: String): Boolean {
+        val fname = name.lowercase(Locale.getDefault())
+        return fname.endsWith("djvu") || fname.endsWith("djv")
     }
 }
 

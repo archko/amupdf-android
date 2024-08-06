@@ -14,7 +14,7 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.LinearLayoutManager
-import cn.archko.pdf.adapters.AdapterUtils
+import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.listeners.SimpleGestureListener
@@ -152,7 +152,7 @@ class ANormalViewController(
     }
 
     private fun createDecodeService(): DecodeService {
-        if (AdapterUtils.isDjvu(mPath)) {
+        if (IntentFile.isDjvu(mPath)) {
             return DecodeServiceBase(DjvuContext())
         }
 
@@ -180,7 +180,7 @@ class ANormalViewController(
                 pdfViewModel.bookProgress!!.offsetY
             )
         }
-        documentView.showDocument(false)
+        documentView.showDocument(crop)
         //mPageControls?.hide()
     }
 
@@ -205,6 +205,7 @@ class ANormalViewController(
     }
 
     override fun setCrop(crop: Boolean) {
+        this.crop = crop
     }
 
     override fun scrollToPosition(page: Int) {

@@ -2,8 +2,8 @@ package cn.archko.pdf.adapters
 
 import android.widget.ImageView
 import android.widget.ProgressBar
-import java.util.Locale
 import cn.archko.pdf.R
+import java.util.Locale
 
 /**
  * @author: archko 2024/3/12 :13:39
@@ -109,11 +109,6 @@ object AdapterUtils {
         return fname.endsWith("txt") || fname.endsWith("log") || fname.endsWith("json") || fname.endsWith(
             "js"
         ) || fname.endsWith("html") || fname.endsWith("xhtml")
-    }
-
-    fun isDjvu(name: String): Boolean {
-        val fname = name.lowercase(Locale.getDefault())
-        return fname.endsWith("djvu") || fname.endsWith("djv")
     }
 
     fun supportImage(path: String): Boolean {

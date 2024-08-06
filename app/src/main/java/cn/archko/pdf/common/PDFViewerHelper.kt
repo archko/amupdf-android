@@ -10,9 +10,13 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.core.content.FileProvider
 import cn.archko.pdf.activities.AMuPDFRecyclerViewActivity
+import cn.archko.pdf.activities.TextActivity
+import cn.archko.pdf.core.common.IntentFile
+import cn.archko.pdf.core.imagedroid.ImageViewerActivity
 import cn.archko.pdf.imagedroid.AlbumViewerActivity
 import org.vudroid.pdfdroid.PdfViewerActivity
 import java.io.File
+import java.util.Locale
 
 /**
  * @author: archko 2020/1/4 :2:06 下午
@@ -27,20 +31,20 @@ class PDFViewerHelper {
         const val removeContextMenuItem = Menu.FIRST + 101
 
         const val mupdfContextMenuItem = Menu.FIRST + 110
+        const val vudroidContextMenuItem = Menu.FIRST + 111
 
-        //protected const val apvContextMenuItem = Menu.FIRST + 111
-        const val vudroidContextMenuItem = Menu.FIRST + 112
         const val otherContextMenuItem = Menu.FIRST + 113
         const val infoContextMenuItem = Menu.FIRST + 114
-        const val documentContextMenuItem = Menu.FIRST + 115
         const val addToFavoriteContextMenuItem = Menu.FIRST + 116
         const val removeFromFavoriteContextMenuItem = Menu.FIRST + 117
 
-        //protected const val bartekscViewContextMenuItem = Menu.FIRST + 118
         const val editContextMenuItem = Menu.FIRST + 119
         const val albumContextMenuItem = Menu.FIRST + 120
 
-        fun openViewer(clickedFile: File, item: MenuItem, activity: Activity) {
+        /**
+         * 菜单项点击的
+         */
+        fun openViewerWithMenu(clickedFile: File, item: MenuItem, activity: Activity) {
             val uri = Uri.fromFile(clickedFile)
             val intent = Intent()
             intent.action = Intent.ACTION_VIEW
@@ -112,7 +116,19 @@ class PDFViewerHelper {
             activity.startActivity(intent)
         }
 
+        /**
+         * 列表项点击直接调用的,所以要判断类型
+         */
         fun openAMupdf(clickedFile: File, activity: Context) {
+            val fname = clickedFile.name.toLowerCase(Locale.ROOT)
+            if (IntentFile.isImage(fname)) {
+                openImage(clickedFile, activity)
+                return
+            } else if (IntentFile.isText(fname)) {
+                TextActivity.start(activity, clickedFile.absolutePath)
+                return
+            }
+
             val uri = Uri.fromFile(clickedFile)
             val intent = Intent()
             intent.action = Intent.ACTION_VIEW
@@ -122,6 +138,14 @@ class PDFViewerHelper {
             //MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
 
             intent.setClass(activity, AMuPDFRecyclerViewActivity::class.java)
+            activity.startActivity(intent)
+        }
+
+        fun openImage(file: File, activity: Context) {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.setClass(activity, ImageViewerActivity::class.java)
+            intent.setData(Uri.parse(file.absolutePath))
+            intent.putExtra("path", file.absoluteFile)
             activity.startActivity(intent)
         }
 

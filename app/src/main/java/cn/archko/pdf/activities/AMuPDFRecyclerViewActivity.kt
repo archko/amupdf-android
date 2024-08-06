@@ -305,7 +305,13 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
     private fun changeViewMode(pos: Int) {
         viewController?.onDestroy()
-
+        if (viewMode != ViewMode.REFLOW) {
+            if (forceCropParam == 1 || forceCropParam == -1) {
+                viewMode = ViewMode.CROP
+            } else {
+                viewMode = ViewMode.NORMAL
+            }
+        }
         val aViewController = ViewControllerFactory.getOrCreateViewController(
             viewControllerCache,
             viewMode,

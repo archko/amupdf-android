@@ -527,7 +527,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
                 }
 
                 currentBean = entry
-                PDFViewerHelper.openViewer(clickedFile, item, requireActivity())
+                PDFViewerHelper.openViewerWithMenu(clickedFile, item, requireActivity())
             }
         }
         return false
