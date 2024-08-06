@@ -2,6 +2,7 @@ package cn.archko.pdf.activities
 
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_FIRST_USER
+import android.app.ProgressDialog
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.view.GestureDetector
@@ -14,6 +15,7 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.LinearLayoutManager
+import cn.archko.pdf.core.common.AppExecutors.Companion.instance
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
@@ -55,6 +57,8 @@ class ANormalViewController(
     private lateinit var mPageSizes: List<APage>
     private var scrollOrientation = LinearLayoutManager.VERTICAL
     private var pageNumberToast: Toast? = null
+    protected var progressDialog: ProgressDialog? = null
+    protected var isDocLoaded: Boolean = false
 
     private var simpleGestureListener: SimpleGestureListener = object :
         SimpleGestureListener {
@@ -85,21 +89,19 @@ class ANormalViewController(
         progressModel.addEventListener(this)
         currentPageModel = CurrentPageModel()
         currentPageModel.addEventListener(this)
-        documentView =
-            DocumentView(
-                context,
-                zoomModel,
-                DocumentView.VERTICAL,
-                offsetX,
-                offsetY,
-                progressModel,
-                currentPageModel,
-                simpleGestureListener
-            )
+        documentView = DocumentView(
+            context,
+            zoomModel,
+            DocumentView.VERTICAL,
+            offsetX,
+            offsetY,
+            progressModel,
+            currentPageModel,
+            simpleGestureListener
+        )
         initDecodeService()
 
         documentView.setDecodeService(decodeService)
-        decodeService!!.open(pdfViewModel.pdfPath, crop, true)
 
         zoomModel.addEventListener(documentView)
         documentView.layoutParams = ViewGroup.LayoutParams(
@@ -107,11 +109,36 @@ class ANormalViewController(
             ViewGroup.LayoutParams.MATCH_PARENT
         )
         decodeService?.setContainerView(documentView)
-        documentView.setDecodeService(decodeService)
 
         frameLayout = createMainContainer()
         frameLayout.addView(documentView)
         zoomModel.addEventListener(this)
+
+        loadDocument()
+    }
+
+    private fun loadDocument() {
+        progressDialog = ProgressDialog(context)
+        progressDialog!!.setMessage("Loading")
+        progressDialog!!.show()
+
+        instance.diskIO().execute {
+            val document = decodeService!!.open(pdfViewModel.pdfPath, crop, true)
+            instance.mainThread().execute {
+                progressDialog!!.dismiss()
+                if (null == document) {
+                    Toast.makeText(
+                        context,
+                        "Open Failed",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    context.finish()
+                    return@execute
+                }
+                isDocLoaded = true
+                documentView.showDocument(crop)
+            }
+        }
     }
 
     override fun init(pageSizes: List<APage>, pos: Int, scrollOrientation: Int) {
@@ -120,7 +147,8 @@ class ANormalViewController(
             this.scrollOrientation = scrollOrientation
             this.mPageSizes = pageSizes
 
-            setNormalMode(pos)
+            setOrientation(scrollOrientation)
+            gotoPage(pos)
             addGesture()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -133,7 +161,8 @@ class ANormalViewController(
             Logcat.d("doLoadDoc:$scrollOrientation")
             this.mPageSizes = pageSizes
 
-            setNormalMode(pos)
+            setOrientation(scrollOrientation)
+            gotoPage(pos)
             addGesture()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -171,8 +200,7 @@ class ANormalViewController(
         }
     }
 
-    private fun setNormalMode(pos: Int) {
-        setOrientation(scrollOrientation)
+    private fun gotoPage(pos: Int) {
         if (pos > 0) {
             documentView.goToPage(
                 pos,
@@ -180,7 +208,6 @@ class ANormalViewController(
                 pdfViewModel.bookProgress!!.offsetY
             )
         }
-        documentView.showDocument(crop)
         //mPageControls?.hide()
     }
 
