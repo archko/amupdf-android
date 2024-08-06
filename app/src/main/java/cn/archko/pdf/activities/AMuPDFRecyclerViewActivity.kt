@@ -359,6 +359,14 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         try {
             //progressDialog.setMessage("Loading menu")
 
+            if (pdfViewModel.checkReflow()) {
+                viewMode = ViewMode.REFLOW
+            } else if (pdfViewModel.checkCrop()) {
+                viewMode = ViewMode.CROP
+            } else {
+                viewMode = ViewMode.NORMAL
+            }
+
             if (viewMode != ViewMode.REFLOW) {
                 if (forceCropParam > -1) {
                     pdfViewModel.storeCrop(forceCropParam == 1)
@@ -392,14 +400,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                 sp.edit()
                     .putBoolean(PREF_READER_KEY_FIRST, false)
                     .apply()
-            }
-
-            if (pdfViewModel.checkReflow()) {
-                viewMode = ViewMode.REFLOW
-            } else if (pdfViewModel.checkCrop()) {
-                viewMode = ViewMode.CROP
-            } else {
-                viewMode = ViewMode.NORMAL
             }
 
             //checkout bookmark
