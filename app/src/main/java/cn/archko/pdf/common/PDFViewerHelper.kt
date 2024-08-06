@@ -145,7 +145,7 @@ class PDFViewerHelper {
             val intent = Intent(Intent.ACTION_VIEW)
             intent.setClass(activity, ImageViewerActivity::class.java)
             intent.setData(Uri.parse(file.absolutePath))
-            intent.putExtra("path", file.absoluteFile)
+            intent.putExtra("path", file.absolutePath)
             activity.startActivity(intent)
         }
 
@@ -153,7 +153,7 @@ class PDFViewerHelper {
             val intent = Intent(Intent.ACTION_VIEW)
             intent.setClass(activity, AlbumViewerActivity::class.java)
             intent.setData(Uri.parse(file.absolutePath))
-            intent.putExtra("path", file.absoluteFile)
+            intent.putExtra("path", file.absolutePath)
             activity.startActivity(intent)
         }
     }

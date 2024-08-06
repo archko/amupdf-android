@@ -31,7 +31,7 @@ public class PdfViewerActivity extends BaseViewerActivity implements OutlineList
         super.onPause();
         Uri uri = getIntent().getData();
         String filePath = Uri.decode(uri.getEncodedPath());
-        DocumentView documentView = getDocumentView();
+        /*DocumentView documentView = getDocumentView();
         getPdfViewModel().saveBookProgress(
                 filePath,
                 getDecodeService().getPageCount(),
@@ -39,7 +39,7 @@ public class PdfViewerActivity extends BaseViewerActivity implements OutlineList
                 documentView.getZoomModel().getZoom() * 1000f,
                 documentView.getScrollX(),
                 documentView.getScrollY()
-        );
+        );*/
     }
 
     @Override
@@ -52,7 +52,7 @@ public class PdfViewerActivity extends BaseViewerActivity implements OutlineList
     private MenuHelper mMenuHelper;
 
     public void openOutline() {
-        DecodeServiceBase service = (DecodeServiceBase) getDecodeService();
+        /*DecodeServiceBase service = (DecodeServiceBase) getDecodeService();
         PdfDocument document = (PdfDocument) service.getDocument();
         if (null == mOutlineHelper) {
             MupdfDocument mupdfDocument = new MupdfDocument(this);
@@ -75,27 +75,27 @@ public class PdfViewerActivity extends BaseViewerActivity implements OutlineList
             }
         } else {
             getPageSeekBarControls().getLayoutOutline().setVisibility(View.GONE);
-        }
+        }*/
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
+        /*switch (requestCode) {
             case OUTLINE_REQUEST:
                 if (resultCode >= 0)
                     getDocumentView().goToPage(resultCode - RESULT_FIRST_USER);
                 getPageSeekBarControls().hide();
                 break;
-        }
+        }*/
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
     public void onSelectedOutline(int index) {
-        if (index >= 0) {
+        /*if (index >= 0) {
             getDocumentView().goToPage(index - RESULT_FIRST_USER);
         }
         getPageSeekBarControls().hide();
-        getPageControls().hide();
+        getPageControls().hide();*/
     }
 }

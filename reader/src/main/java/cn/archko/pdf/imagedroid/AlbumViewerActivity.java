@@ -27,7 +27,7 @@ public class AlbumViewerActivity extends BaseViewerActivity {
         progressDialog.show();
 
         AppExecutors.Companion.getInstance().diskIO().execute(() -> {
-            CodecDocument document = getDecodeService().open(path, autoCrop, false);
+            CodecDocument document = decodeService.open(path, autoCrop, false);
             AppExecutors.Companion.getInstance().mainThread().execute(() -> {
                 progressDialog.dismiss();
                 if (null == document) {
@@ -35,8 +35,8 @@ public class AlbumViewerActivity extends BaseViewerActivity {
                     finish();
                     return;
                 }
-                setDocLoaded(true);
-                getDocumentView().showDocument(autoCrop);
+                isDocLoaded = (true);
+                documentView.showDocument(autoCrop);
             });
         });
     }
