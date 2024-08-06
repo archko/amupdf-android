@@ -16,21 +16,21 @@ import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
-import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFReflowAdapter
-import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.common.StyleHelper
+import cn.archko.pdf.core.common.AppExecutors
+import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.listeners.DataListener
+import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
+import cn.archko.pdf.core.widgets.ViewerDividerItemDecoration
 import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.fragments.FontsFragment
 import cn.archko.pdf.listeners.AViewController
-import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APageSeekBarControls
-import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
-import cn.archko.pdf.core.widgets.ViewerDividerItemDecoration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -95,7 +95,7 @@ class AReflowViewController(
             if (null != pdfViewModel.mupdfDocument) {
                 this.mPageSizes = pageSizes
 
-                setReflowMode(pos)
+                initReflowMode(pos)
             }
             addGesture()
         } catch (e: Exception) {
@@ -109,7 +109,7 @@ class AReflowViewController(
             Logcat.d("doLoadDoc:$this")
             this.mPageSizes = pageSizes
 
-            setReflowMode(pos)
+            initReflowMode(pos)
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
@@ -128,19 +128,18 @@ class AReflowViewController(
         }
     }
 
-    private fun setReflowMode(pos: Int) {
+    private fun initReflowMode(pos: Int) {
         if (null == mStyleHelper) {
             mStyleHelper = StyleHelper(context)
         }
         if (null == mRecyclerView.adapter) {
-            mRecyclerView.adapter =
-                MuPDFReflowAdapter(
-                    context,
-                    pdfViewModel.mupdfDocument,
-                    mStyleHelper,
-                    scope,
-                    pdfViewModel
-                )
+            mRecyclerView.adapter = MuPDFReflowAdapter(
+                context,
+                pdfViewModel.mupdfDocument,
+                mStyleHelper,
+                scope,
+                pdfViewModel
+            )
         } else {
             (mRecyclerView.adapter as MuPDFReflowAdapter).setScope(scope)
         }
@@ -153,6 +152,7 @@ class AReflowViewController(
                     mRecyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
                     Logcat.d("onGlobalLayout:$this,pos:$pos")
                     layoutManager!!.scrollToPosition(pos)
+                    mRecyclerView.smoothScrollToPosition(pos)
                 }
             })
         }

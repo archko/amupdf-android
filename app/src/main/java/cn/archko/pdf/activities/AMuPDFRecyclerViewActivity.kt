@@ -79,7 +79,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     private fun initMenus() {
         menus.clear()
         var menu: BaseMenu
-        if (pdfViewModel.bookProgress?.reflow == 0) {   //不重排
+        if (!pdfViewModel.checkReflow()) {   //不重排
             menu = BaseMenu(color, 1f, reflowStr, -1, type_reflow)
             menus.add(menu)
             menu = BaseMenu(color, 1f, ocrStr, -1, type_ocr)
@@ -95,9 +95,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         } else {    //文本重排时,自动切边不生效
             menu = BaseMenu(selectedColor, 1f, reflowStr, -1, type_reflow)
             menus.add(menu)
-            if (viewMode != ViewMode.REFLOW) {
-                menu = BaseMenu(color, 1f, autoCropStr, -1, type_crop)
-            }
+            menu = BaseMenu(color, 1f, autoCropStr, -1, type_crop)
             menus.add(menu)
         }
         //addMenu("字体", color, menus)
@@ -298,7 +296,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     private fun applyViewMode(pos: Int) {
-        if (pdfViewModel.checkCrop() == viewController?.getCrop()) {
+        if (!pdfViewModel.checkReflow() && pdfViewModel.checkCrop() == viewController?.getCrop()) {
             Logcat.d("applyViewMode:crop don't change, controller:$viewController")
             return
         }
@@ -506,18 +504,17 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     private fun toggleReflow() {
-        val reflow = pdfViewModel.checkReflow()
+        val reflow = !pdfViewModel.checkReflow()
         if (!reflow) {  //如果原来是文本重排模式,则切换为自动切边或普通模式
             if (pdfViewModel.checkCrop()) {
                 viewMode = ViewMode.CROP
             } else {
                 viewMode = ViewMode.NORMAL
             }
-            pdfViewModel.storeReflow(false)
         } else {
             viewMode = ViewMode.REFLOW
-            pdfViewModel.storeReflow(reflow)
         }
+        pdfViewModel.storeReflow(reflow)
 
         applyViewMode(getCurrentPos())
 
@@ -531,12 +528,16 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     private fun setReflowButton(reflow: Boolean) {
+        val crop: Boolean
         if (reflow) {
+            crop = false
             mPageSeekBarControls?.reflowButton!!.setColorFilter(Color.argb(0xFF, 172, 114, 37))
         } else {
             mPageSeekBarControls?.reflowButton!!.setColorFilter(Color.argb(0xFF, 255, 255, 255))
+            crop = pdfViewModel.checkCrop()
         }
-        setCropButton(pdfViewModel.checkCrop())
+
+        setCropButton(crop)
         val pos = getCurrentPos()
         if (pos > 0) {
             viewController?.scrollToPosition(pos + 1)
