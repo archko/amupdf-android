@@ -219,3 +219,5 @@ public static final int *;
 -keep class com.google.accompanist.swiperefresh.**{*;}
 
 -keep class com.davemorrissey.labs.subscaleview.** { *; }
+-keep class com.baidu.ai.edge.core.*.*{ *; }
+-keep class com.baidu.ai.edge.ui.*.*{ *; }

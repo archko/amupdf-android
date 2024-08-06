@@ -88,7 +88,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             menu = BaseMenu(color, 1f, ocrStr, -1, type_ocr)
             menus.add(menu)
 
-            if (forceCropParam != 0) {
+            if (viewMode != ViewMode.REFLOW) {
                 if (pdfViewModel.bookProgress?.autoCrop == 0) {
                     menu = BaseMenu(selectedColor, 1f, autoCropStr, -1, type_crop)
                     menus.add(menu)
@@ -100,7 +100,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         } else {    //文本重排时,自动切边不生效
             menu = BaseMenu(selectedColor, 1f, reflowStr, -1, type_reflow)
             menus.add(menu)
-            if (forceCropParam != 0) {
+            if (viewMode != ViewMode.REFLOW) {
                 menu = BaseMenu(color, 1f, autoCropStr, -1, type_crop)
             }
             menus.add(menu)

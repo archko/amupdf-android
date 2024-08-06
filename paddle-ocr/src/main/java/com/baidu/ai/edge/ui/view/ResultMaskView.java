@@ -16,7 +16,6 @@ import com.baidu.ai.edge.ui.util.StringUtil;
 import com.baidu.ai.edge.ui.view.model.BasePolygonResultModel;
 import com.baidu.ai.edge.ui.view.model.PoseViewResultModel;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +54,7 @@ public class ResultMaskView extends View {
 
     private float sizeRatio;
     private List<BasePolygonResultModel> mResultModelList;
-    private Point originPt = new Point();
+    private final Point originPt = new Point();
     private int imgWidth;
     private int imgHeight;
     private Paint textPaint;
@@ -70,12 +69,30 @@ public class ResultMaskView extends View {
         super(context);
     }
 
-    private Map<Integer, Paint> paintFixPool = new HashMap<>();
+    private final Map<Integer, Paint> paintFixPool = new HashMap<>();
 
     public ResultMaskView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-
+        init();
     }
+
+    private Paint paint = new Paint();
+    private Paint paintFillAlpha = new Paint();
+    private final int stokeWidth = 1;
+    private final int fontSize = 38;
+    private final Paint paintFill = new Paint();
+    private final Paint paintText = new Paint();
+
+    private void init() {
+        paintText.setColor(Color.WHITE);
+        paintText.setTextAlign(Paint.Align.LEFT);
+        paintText.setTextSize(fontSize);
+
+        paintFill.setStyle(Paint.Style.FILL);
+        paintFill.setColor(Color.parseColor("#3B85F5"));
+    }
+
+    private final Path path = new Path();
 
     @Override
     protected void onAttachedToWindow() {
@@ -83,28 +100,16 @@ public class ResultMaskView extends View {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
     }
 
-
     public void setPolygonListInfo(List<BasePolygonResultModel> modelList, int width, int height) {
         imgWidth = width;
         imgHeight = height;
         mResultModelList = modelList;
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                invalidate();
-            }
-        });
+        postInvalidate();
     }
-
 
     public void clear() {
         mResultModelList = null;
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                invalidate();
-            }
-        });
+        postInvalidate();
     }
 
     private void preCaculate() {
@@ -130,7 +135,7 @@ public class ResultMaskView extends View {
 
     }
 
-    private Map<Integer, Paint> paintRandomPool = new HashMap<>();
+    private final Map<Integer, Paint> paintRandomPool = new HashMap<>();
 
     public ResultMaskView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -190,39 +195,28 @@ public class ResultMaskView extends View {
 
         preCaculate();
 
-        int stokeWidth = 5;
-
-        int fontSize = 38;
         int labelPadding = 5;
         int labelHeight = 46 + 2 * labelPadding;
-        Paint paint = new Paint();
+
         paint.setColor(Color.parseColor("#3B85F5"));
         paint.setStrokeWidth(stokeWidth);
         paint.setStyle(Paint.Style.STROKE);
 
-        Paint paintFillAlpha = new Paint();
         paintFillAlpha.setStyle(Paint.Style.FILL);
         paintFillAlpha.setColor(Color.parseColor("#3B85F5"));
         paintFillAlpha.setAlpha(50);
 
-        Paint paintFill = new Paint();
-        paintFill.setStyle(Paint.Style.FILL);
-        paintFill.setColor(Color.parseColor("#3B85F5"));
 
-        Paint paintText = new Paint();
-        paintText.setColor(Color.WHITE);
-        paintText.setTextAlign(Paint.Align.LEFT);
-        paintText.setTextSize(fontSize);
-        DecimalFormat df = new DecimalFormat("0.00");
-
+        //DecimalFormat df = new DecimalFormat("0.00");
 
         List<Float> points;
         for (int i = 0; i < mResultModelList.size(); i++) {
 
             BasePolygonResultModel model = mResultModelList.get(i);
-            Path path = new Path();
+
             List<Point> polygon = model.getBounds(sizeRatio, originPt);
 
+            path.reset();
             path.moveTo(polygon.get(0).x, polygon.get(0).y);
             for (int j = 1; j < polygon.size(); j++) {
                 path.lineTo(polygon.get(j).x, polygon.get(j).y);
@@ -257,8 +251,8 @@ public class ResultMaskView extends View {
                 canvas.drawPath(path, paintFillAlpha);
                 if (model.isRect()) {
                     Rect rect = model.getRect(sizeRatio, originPt);
-                    canvas.drawRect(new Rect(rect.left, rect.top, rect.right,
-                            rect.top + labelHeight), paintFill);
+                    rect.set(rect.left, rect.top, rect.right, rect.top + labelHeight);
+                    canvas.drawRect(rect, paintFill);
                 }
             }
             if (model.isRect()) {
@@ -355,7 +349,7 @@ public class ResultMaskView extends View {
     /**
      * 用于分割模型，一个颜色对应一系列点
      */
-    private class ColorPointsPair {
+    private static class ColorPointsPair {
         private final Paint paint;
         private List<Float> points;
 

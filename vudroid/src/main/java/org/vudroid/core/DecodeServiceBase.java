@@ -207,6 +207,11 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     private void cropPage(CodecPage vuPage, APage page) {
+        Rect rect = cropPage(vuPage);
+        page.setCropBounds(rect);
+    }
+
+    private Rect cropPage(CodecPage vuPage) {
         int width = 240;
         float ratio = 1f * vuPage.getWidth() / width;
         int height = (int) (vuPage.getHeight() / ratio);
@@ -221,14 +226,14 @@ public class DecodeServiceBase implements DecodeService {
                 thumb,
                 new Rect(0, 0, thumb.getWidth(), thumb.getHeight())
         );
+        BitmapPool.getInstance().release(thumb);
+
         int leftBound = (int) (cropBounds.left * ratio);
         int topBound = (int) (cropBounds.top * ratio);
         int resultW = (int) (cropBounds.width() * ratio);
         int resultH = (int) (cropBounds.height() * ratio);
         Rect rect = new Rect(leftBound, topBound, leftBound + resultW, topBound + resultH);
-        page.setCropBounds(rect);
-
-        BitmapPool.getInstance().release(thumb);
+        return rect;
     }
 
     public CodecDocument getDocument() {
@@ -360,22 +365,19 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     public Bitmap decodeThumb(int page) {
+        APage aPage = aPageList.get(page);
+        float scale = calculateScale(aPage, true) * 1;
         CodecPage vuPage = getPage(page);
-        float xs = 1f;
-        if (oriention == DocumentView.VERTICAL) {
-            xs = 1.0f * getTargetWidth() / vuPage.getWidth();
-        } else {
-            xs = 1.0f * getTargetHeight() / vuPage.getHeight();
-        }
-        int width = (int) (xs * vuPage.getWidth());
-        int height = (int) (xs * vuPage.getHeight());
-        Log.d(TAG, String.format("decodeThumb:%s, w-h:%s-%s-%s", page, width, height, xs));
+        Rect rect = new Rect();
+        rect.right = getScaledWidth(aPage, scale, true);
+        rect.bottom = getScaledHeight(aPage, scale, true);
+
+        Rect cropBounds = cropPage(vuPage);
         Bitmap thumb = vuPage.renderBitmap(
-                new Rect(0, 0, vuPage.getWidth(), vuPage.getHeight()),
-                width,
-                height,
-                new RectF(0, 0, 1, 1),
-                xs);
+                cropBounds,
+                rect.width(), rect.height(), new RectF(0, 0, 1.0f, 1.0f), scale);
+
+        //Log.d(TAG, String.format("decodeThumb:%s, %s-%s-%s", page, scale, cropBounds, rect));
         return thumb;
     }
 

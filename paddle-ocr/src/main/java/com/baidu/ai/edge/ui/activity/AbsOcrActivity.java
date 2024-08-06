@@ -48,7 +48,7 @@ public abstract class AbsOcrActivity extends BaseActivity {
     private ImageView resultImage;
     private ViewGroup mResultPageView;
     private DetectResultAdapter adapter;
-    private BottomSheetBehavior mBottomSheetBehavior;
+    private BottomSheetBehavior<View> mBottomSheetBehavior;
 
     boolean isRealtimeStatusRunning = false;
 
@@ -96,7 +96,6 @@ public abstract class AbsOcrActivity extends BaseActivity {
         //mResultPageView = findViewById(R.id.result_page);
 
         resultMaskView = findViewById(R.id.result_mask);
-        resultMaskView.setHandler(uiHandler);
 
         View bottomSheet = findViewById(R.id.bottom_sheet);
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
