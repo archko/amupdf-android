@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
 import androidx.appcompat.app.AppCompatActivity
+import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.SensorHelper
 import cn.archko.pdf.core.common.StatusBarHelper
 import com.davemorrissey.labs.subscaleview.ImageSource
@@ -30,7 +31,7 @@ class ImageViewerActivity : AppCompatActivity(R.layout.image_viewer) {
         binding = ImageViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val path: String? = intent.getStringExtra("path")
+        val path: String? = IntentFile.processIntentAction(intent, this)
         if (TextUtils.isEmpty(path)) {
             return
         }

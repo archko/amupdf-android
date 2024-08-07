@@ -329,6 +329,10 @@ class PDFViewModel : ViewModel() {
                 mupdfDocument = MupdfDocument(context)
             }
             Logcat.d(Logcat.TAG, "loadPdfDoc.password:$password")
+            if (IntentFile.isDjvu(path)) {
+                emit(listOf())
+                return@flow
+            }
             mupdfDocument!!.newDocument(path, password)
             mupdfDocument!!.let {
                 if (it.getDocument()!!.needsPassword()) {

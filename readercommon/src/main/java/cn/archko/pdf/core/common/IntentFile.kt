@@ -268,8 +268,8 @@ object IntentFile {
         }
     }
 
-    fun isText(path: String?): Boolean {
-        return path!!.endsWith(".txt", true)
+    fun isText(path: String): Boolean {
+        return path.endsWith(".txt", true)
                 || path.endsWith(".log", true)
                 || path.endsWith(".xml", true)
                 || path.endsWith(".html", true)
@@ -278,8 +278,8 @@ object IntentFile {
                 || path.endsWith(".json", true)
     }
 
-    fun isImage(path: String?): Boolean {
-        return path!!.endsWith(".png", true)
+    fun isImage(path: String): Boolean {
+        return path.endsWith(".png", true)
                 || path.endsWith(".jpg", true)
                 || path.endsWith(".jpeg", true)
                 || path.endsWith(".webp", true)
@@ -291,8 +291,12 @@ object IntentFile {
                 || path.endsWith(".tiff", true)
     }
 
-    fun isPdf(path: String?): Boolean {
-        return path!!.endsWith(".pdf", true)
+    fun isPdf(path: String): Boolean {
+        return path.endsWith(".pdf", true)
+    }
+
+    fun isMuPdf(path: String): Boolean {
+        return path.endsWith(".pdf", true)
                 || path.endsWith(".xps", true)
                 || path.endsWith(".cbz", true)
                 || path.endsWith(".epub", true)

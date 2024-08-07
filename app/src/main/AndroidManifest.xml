@@ -55,6 +55,14 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:mimeType="image/*" />  <!-- djvu is image? -->
+            </intent-filter>
         </activity>
         <activity
             android:name="org.vudroid.pdfdroid.PdfViewerActivity"
@@ -132,6 +140,11 @@
             tools:ignore="DiscouragedApi" />
         <activity
             android:name="cn.archko.pdf.core.imagedroid.ImageViewerActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize|uiMode|fontScale"
+            android:screenOrientation="fullSensor"
+            tools:ignore="DiscouragedApi" />
+        <activity
+            android:name="org.vudroid.djvudroid.DjvuViewerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize|uiMode|fontScale"
             android:screenOrientation="fullSensor"
             tools:ignore="DiscouragedApi" />

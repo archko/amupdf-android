@@ -14,6 +14,7 @@ import cn.archko.pdf.activities.TextActivity
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.imagedroid.ImageViewerActivity
 import cn.archko.pdf.imagedroid.AlbumViewerActivity
+import org.vudroid.djvudroid.DjvuViewerActivity
 import org.vudroid.pdfdroid.PdfViewerActivity
 import java.io.File
 import java.util.Locale
@@ -103,8 +104,7 @@ class PDFViewerHelper {
             }
         }
 
-        fun openVudroid(clickedFile: File, activity: Context) {
-            val uri = Uri.fromFile(clickedFile)
+        fun openVudroid(uri: Uri, activity: Context) {
             val intent = Intent()
             intent.action = Intent.ACTION_VIEW
             intent.data = uri
@@ -116,11 +116,25 @@ class PDFViewerHelper {
             activity.startActivity(intent)
         }
 
+        fun openVudroid(clickedFile: File, activity: Context) {
+            val uri = Uri.fromFile(clickedFile)
+            openVudroid(uri, activity)
+        }
+
+        fun openDjvu(uri: Uri?, activity: Context) {
+            val intent = Intent()
+            intent.action = Intent.ACTION_VIEW
+            intent.data = uri
+
+            intent.setClass(activity, DjvuViewerActivity::class.java)
+            activity.startActivity(intent)
+        }
+
         /**
          * 列表项点击直接调用的,所以要判断类型
          */
         fun openAMupdf(clickedFile: File, activity: Context) {
-            val fname = clickedFile.name.toLowerCase(Locale.ROOT)
+            val fname = clickedFile.name.lowercase(Locale.ROOT)
             if (IntentFile.isImage(fname)) {
                 openImage(clickedFile, activity)
                 return
@@ -141,12 +155,16 @@ class PDFViewerHelper {
             activity.startActivity(intent)
         }
 
-        fun openImage(file: File, activity: Context) {
+        fun openImage(path: String?, activity: Context) {
             val intent = Intent(Intent.ACTION_VIEW)
             intent.setClass(activity, ImageViewerActivity::class.java)
-            intent.setData(Uri.parse(file.absolutePath))
-            intent.putExtra("path", file.absolutePath)
+            intent.setData(Uri.parse(path))
+            intent.putExtra("path", path)
             activity.startActivity(intent)
+        }
+
+        fun openImage(file: File, activity: Context) {
+            openImage(file.absolutePath, activity)
         }
 
         fun openAlbum(file: File, activity: Context) {

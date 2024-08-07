@@ -3,6 +3,7 @@ package cn.archko.pdf.activities
 //import com.umeng.analytics.MobclickAgent
 import android.Manifest
 import android.app.AlertDialog
+import android.app.ComponentCaller
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
@@ -25,8 +26,10 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import cn.archko.mupdf.R
+import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.GlobalEvent
+import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.fragments.BrowserFragment
 import cn.archko.pdf.fragments.FavoriteFragment
@@ -52,6 +55,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
     internal var mTabs: MutableList<SamplePagerItem> = ArrayList()
     private val permissionCallbacks = arrayOfNulls<OnPermissionGranted>(PERMISSION_LENGTH)
     private var permissionDialog: Dialog? = null
+    protected var mPath: String? = null
 
     internal data class SamplePagerItem(
         var clss: Class<*>,
@@ -116,6 +120,33 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
                 mViewPager.currentItem = 1
             }
         }
+
+        if (null != savedInstanceState) {
+            mPath = savedInstanceState.getString("path", null)
+        }
+        parseIntent()
+    }
+
+    override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
+        super.onNewIntent(intent, caller)
+        parseIntent()
+    }
+
+    private fun parseIntent() {
+        if (null == intent) {
+            return
+        }
+        if (TextUtils.isEmpty(mPath)) {
+            mPath = IntentFile.processIntentAction(intent, this)
+        }
+        if (!TextUtils.isEmpty(mPath)) {
+            if (IntentFile.isDjvu(mPath!!)) {
+                PDFViewerHelper.openDjvu(intent.data, this)
+            } else if (IntentFile.isImage(mPath!!)) {
+                PDFViewerHelper.openImage(mPath, this)
+            }
+        }
+        intent = null
     }
 
     private fun onBackEvent() {
@@ -306,6 +337,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         onBackEvent()
     }
 

@@ -90,9 +90,9 @@ public abstract class BaseViewerActivity extends FragmentActivity implements Dec
             }
         }*/
 
-        if (IntentFile.INSTANCE.isImage(path)) {
+        /*if (IntentFile.INSTANCE.isImage(path)) {
             zoomModel.setMaxZoom(10);
-        }
+        }*/
         documentView = new DocumentView(this, zoomModel,
                 orientation, 0, 0,
                 progressModel, currentPageModel, simpleGestureListener);

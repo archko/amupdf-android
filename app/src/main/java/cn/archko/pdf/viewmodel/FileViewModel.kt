@@ -131,7 +131,7 @@ class FileViewModel() : ViewModel() {
 
         return@FileFilter IntentFile.isText(fname)
                 || IntentFile.isImage(fname)
-                || IntentFile.isPdf(fname)
+                || IntentFile.isMuPdf(fname)
     }
 
     init {

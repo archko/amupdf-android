@@ -70,7 +70,7 @@ class BookViewModel : ViewModel() {
             return@FileFilter true
         val fname = file.name.toLowerCase(Locale.ROOT)
 
-        return@FileFilter IntentFile.isPdf(fname)
+        return@FileFilter IntentFile.isMuPdf(fname)
                 || IntentFile.isImage(fname)
                 || IntentFile.isText(fname)
     }
