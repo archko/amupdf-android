@@ -12,6 +12,9 @@
     <string name="menu_set_as_home">Set as home</string>
     <string name="menu_search">Search</string>
     <string name="menu_backup">BackUp History</string>
+    <string name="menu_config_webdav">Config Webdav</string>
+    <string name="menu_backup_webdav">BackUp To Webdav</string>
+    <string name="menu_restore_webdav">Restore from Webdav</string>
     <string name="menu_restore">Restore History</string>
     <string name="menu_about">About</string>
     <string name="menu_tools">PDFTools</string>

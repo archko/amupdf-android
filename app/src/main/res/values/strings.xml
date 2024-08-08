@@ -117,4 +117,7 @@
 
     <string name="edit_from_page">From:%s</string>
     <string name="edit_to_page">To:%s</string>
+
+
+    <string name="webdav_title">Webdav config</string>
 </resources>

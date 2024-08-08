@@ -110,7 +110,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
 
     //implementation Libs . Coroutines . android
-    //        implementation Libs . Coroutines . core
+    //implementation Libs . Coroutines . core
 
     //implementation Libs.AndroidX.Activity.activityCompose
     //implementation Libs.AndroidX.Lifecycle.viewModelCompose
@@ -159,8 +159,7 @@ dependencies {
     //    exclude group: "androidx.fragment"
     //}
     implementation(libs.multidex)
-    //implementation(libs.constraintLayout)
-    api("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation(libs.constraintLayout)
 
     implementation(libs.material)
     implementation(libs.swiperefreshlayout)
@@ -171,12 +170,9 @@ dependencies {
     kapt(libs.room.compiler)
 
     implementation(project(":reader"))
-    //implementation project(":editor")
-    //implementation project(":library")
-    //implementation project(":core-ui")
     implementation(project(":paddle-ocr"))
-    //implementation project(":ViewLib")
 
     // https://mvnrepository.com/artifact/com.github.axet/k2pdfopt
-    implementation("com.github.axet:k2pdfopt:0.1.6")
+    implementation(libs.k2pdfopt)
+    implementation(libs.sardine)
 }

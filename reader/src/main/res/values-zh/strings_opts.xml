@@ -12,6 +12,9 @@
     <string name="menu_set_as_home">设为主目录</string>
     <string name="menu_search">搜索</string>
     <string name="menu_backup">备份历史</string>
+    <string name="menu_config_webdav">配置Webdav</string>
+    <string name="menu_backup_webdav">备份到Webdav</string>
+    <string name="menu_restore_webdav">从Webdav恢复</string>
     <string name="menu_restore">恢复历史</string>
     <string name="menu_about">关于</string>
     <string name="menu_tools">PDF工具</string>

@@ -144,17 +144,14 @@ class HistoryViewModel : ViewModel() {
         val now = System.currentTimeMillis()
         viewModelScope.launch {
             val flag = withContext(Dispatchers.IO) {
+                var result = false
                 try {
                     val content = StreamUtils.readStringFromFile(file)
                     Logcat.longLog(
                         Logcat.TAG,
                         "restore.file:" + file.absolutePath + " content:" + content
                     )
-                    val progresses = BookProgressParser.parseProgresses(content)
-                    Graph.database.runInTransaction {
-                        Graph.database.progressDao().deleteAllProgress()
-                        Graph.database.progressDao().addProgresses(progresses)
-                    }
+                    result = BackupViewModel.restore(content)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -167,7 +164,7 @@ class HistoryViewModel : ViewModel() {
                 }
 
                 delay(newTime)
-                return@withContext true
+                return@withContext result
             }
             withContext(Dispatchers.Main) {
                 _uiRestorepModel.value = flag

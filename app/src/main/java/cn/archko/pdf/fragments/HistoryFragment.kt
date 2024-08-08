@@ -24,8 +24,10 @@ import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.LengthUtils
+import cn.archko.pdf.utils.SardineHelper
 import cn.archko.pdf.widgets.IMoreView
 import cn.archko.pdf.widgets.ListMoreView
+import com.tencent.mmkv.MMKV
 import vn.chungha.flowbus.busEvent
 import java.io.File
 
@@ -42,6 +44,7 @@ class HistoryFragment : BrowserFragment() {
     private lateinit var progressDialog: ProgressDialog
 
     protected lateinit var historyViewModel: HistoryViewModel
+    protected lateinit var backupViewModel: BackupViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +60,7 @@ class HistoryFragment : BrowserFragment() {
             }
         }
         historyViewModel = HistoryViewModel()
+        backupViewModel = BackupViewModel()
 
         progressDialog = ProgressDialog(activity)
         progressDialog.setTitle("Waiting...")
@@ -105,6 +109,9 @@ class HistoryFragment : BrowserFragment() {
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
             R.id.action_backup -> backup()
+            R.id.action_config_webdav -> configWebdav()
+            R.id.action_backup_webdav -> backupToWebdav()
+            R.id.action_restore_webdav -> restoreFromWebdav()
             R.id.action_restore -> restore()
             R.id.action_extract -> extractImage()
             R.id.action_create -> createPdf()
@@ -128,6 +135,48 @@ class HistoryFragment : BrowserFragment() {
     private fun backup() {
         progressDialog.show()
         historyViewModel.backupFromDb()
+    }
+
+    private fun configWebdav() {
+        WebdavConfigFragment.showCreateDialog(requireActivity())
+    }
+
+    private fun backupToWebdav() {
+        val mmkv = MMKV.mmkvWithID(SardineHelper.KEY_CONFIG)
+        val name = mmkv.decodeString(SardineHelper.KEY_NAME)
+        val pass = mmkv.decodeString(SardineHelper.KEY_PASS)
+        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(pass)) {
+            Toast.makeText(requireActivity(), "Please config webdav first", Toast.LENGTH_SHORT)
+                .show()
+            return
+        }
+        backupViewModel.backupToWebdav(name!!, pass!!)
+    }
+
+    private fun restoreFromWebdav() {
+        val mmkv = MMKV.mmkvWithID(SardineHelper.KEY_CONFIG)
+        val name = mmkv.decodeString(SardineHelper.KEY_NAME)
+        val pass = mmkv.decodeString(SardineHelper.KEY_PASS)
+        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(pass)) {
+            Toast.makeText(requireActivity(), "Please config webdav first", Toast.LENGTH_SHORT)
+                .show()
+            return
+        }
+        WebdavFragment.showWebdavDialog(activity, object :
+            DataListener {
+            override fun onSuccess(vararg args: Any?) {
+                val filename = args[0] as String
+                progressDialog.show()
+                backupViewModel.restoreFromWebdav(
+                    name!!,
+                    pass!!,
+                    filename
+                )
+            }
+
+            override fun onFailed(vararg args: Any?) {
+            }
+        })
     }
 
     private fun restore() {
@@ -207,15 +256,20 @@ class HistoryFragment : BrowserFragment() {
         }
 
         historyViewModel.uiRestoreModel.observe(viewLifecycleOwner) { flag ->
-            kotlin.run {
-                progressDialog.dismiss()
-                if (flag) {
-                    Toast.makeText(App.instance, "恢复成功:$flag", Toast.LENGTH_LONG).show()
-                    onRefresh()
-                } else {
-                    Toast.makeText(App.instance, "恢复失败", Toast.LENGTH_LONG).show()
-                }
-            }
+            postRestore(flag)
+        }
+        backupViewModel.uiRestoreModel.observe(viewLifecycleOwner) { flag ->
+            postRestore(flag)
+        }
+    }
+
+    private fun postRestore(flag: Boolean) {
+        progressDialog.dismiss()
+        if (flag) {
+            Toast.makeText(App.instance, "恢复成功:$flag", Toast.LENGTH_LONG).show()
+            onRefresh()
+        } else {
+            Toast.makeText(App.instance, "恢复失败", Toast.LENGTH_LONG).show()
         }
     }
 

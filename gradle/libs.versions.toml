@@ -64,6 +64,8 @@ viewpager2 = "1.2.0"
 vectordrawable = "1.2.0"
 swiperefreshlayout = "1.1.0"
 recyclerview = "1.3.2"
+sardine = "0.9"
+k2pdfopt = "0.1.6"
 
 versionCode = "385"
 versionName = "7.0.1"
@@ -171,7 +173,9 @@ viewpager2 = { group = "androidx.viewpager2", name = "viewpager2", version.ref =
 vectordrawable = { group = "androidx.vectordrawable", name = "vectordrawable", version.ref = "vectordrawable" }
 swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
 recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
-constraintLayout = { group = "androidx.constraintLayout", name = "constraintLayout", version.ref = "constraintLayout" }
+constraintLayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintLayout" }
+sardine = { group = "com.github.thegrizzlylabs", name = "sardine-android", version.ref = "sardine" }
+k2pdfopt = { group = "com.github.axet", name = "k2pdfopt", version.ref = "k2pdfopt" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
