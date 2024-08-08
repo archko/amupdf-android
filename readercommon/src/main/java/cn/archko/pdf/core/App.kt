@@ -10,12 +10,13 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
+import com.tencent.bugly.crashreport.CrashReport
 import com.tencent.mmkv.MMKV
 import vn.chungha.flowbus.FlowBusInitApplication
 
 open class App : Application(), ImageLoaderFactory {
     //private val appkey = "5c15f639f1f556978b0009c8"
-    var screenHeight = 720
+    var screenHeight = 2160
     var screenWidth = 1080
     override fun onCreate() {
         super.onCreate()
@@ -23,6 +24,7 @@ open class App : Application(), ImageLoaderFactory {
         Graph.provide(this)
         MMKV.initialize(this)
         FlowBusInitApplication.initializer(this)
+        CrashReport.initCrashReport(getApplicationContext(), "aaeff47e9b", false);
 
         Thread.setDefaultUncaughtExceptionHandler(CrashHandler())
         val displayMetrics = resources.displayMetrics
@@ -31,9 +33,7 @@ open class App : Application(), ImageLoaderFactory {
         //UMConfigure.init(this, appkey, "archko", UMConfigure.DEVICE_TYPE_PHONE, null)
         val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
         //获取整个手机内存
-        //获取整个手机内存
         val memoryInfo = ActivityManager.MemoryInfo()
-        //最大分配内存
         //最大分配内存
         activityManager.getMemoryInfo(memoryInfo)
         val memory = memoryInfo.totalMem
@@ -48,12 +48,9 @@ open class App : Application(), ImageLoaderFactory {
             )
         )
         //最大分配内存获取方法2
-        //最大分配内存获取方法2
         val maxMemory = (Runtime.getRuntime().maxMemory() * 1.0 / (1024 * 1024)).toFloat()
         //当前分配的总内存
-        //当前分配的总内存
         val totalMemory = (Runtime.getRuntime().totalMemory() * 1.0 / (1024 * 1024)).toFloat()
-        //剩余内存
         //剩余内存
         val freeMemory = (Runtime.getRuntime().freeMemory() * 1.0 / (1024 * 1024)).toFloat()
         println(

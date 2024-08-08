@@ -50,10 +50,11 @@ dependencies {
     implementation(libs.room.ktx)
     kapt(libs.room.compiler)
 
-    api("io.github.jeremyliao:live-event-bus-x:1.8.0")
     api(libs.coil.kt)
     api(libs.recyclerview)
     api("com.tencent:mmkv:1.3.4")
+
+    implementation("com.tencent.bugly:crashreport:4.1.9.3")
 
     api(project(":pdf-recyclerview"))
     api(project(":mupdf-android-fitz"))
