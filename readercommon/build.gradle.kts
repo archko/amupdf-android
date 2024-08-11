@@ -32,9 +32,9 @@ android {
     }*/
     //android.ndkVersion "25.2.9519653"
 
-    packagingOptions {
-        doNotStrip += "*/armeabi-v7a/*.so"
-        doNotStrip += "*/arm64-v8a/*.so"
+    packaging {
+        jniLibs.keepDebugSymbols += "*/armeabi-v7a/*.so"
+        jniLibs.keepDebugSymbols += "*/arm64-v8a/*.so"
     }
 }
 

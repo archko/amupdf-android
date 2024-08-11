@@ -80,10 +80,10 @@ android {
     //    kotlinCompilerExtensionVersion Libs.AndroidX.Compose.compiler_version
     //}
 
-    packagingOptions {
+    packaging {
         exclude("META-INF/*.kotlin_module")
-        doNotStrip += "*/armeabi-v7a/*.so"
-        doNotStrip += "*/arm64-v8a/*.so"
+        jniLibs.keepDebugSymbols += "*/armeabi-v7a/*.so"
+        jniLibs.keepDebugSymbols += "*/arm64-v8a/*.so"
     }
 
     android.applicationVariants.all {
