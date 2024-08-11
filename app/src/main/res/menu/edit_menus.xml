@@ -4,15 +4,15 @@
 
     <item
         android:id="@+id/deleteItem"
-        android:title="删除页面"
+        android:title="@string/menu_opt_delete_page"
         app:showAsAction="never" />
     <item
         android:id="@+id/addItem"
-        android:title="插入图片"
+        android:title="@string/menu_opt_insert_image"
         app:showAsAction="never" />
     <item
         android:id="@+id/extractImagesItem"
-        android:title="导出图片"
+        android:title="@string/menu_opt_extract_image"
         app:showAsAction="never" />
 
 </menu>

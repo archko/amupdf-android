@@ -8,7 +8,7 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/editItem"
-        android:title="编辑"
+        android:title="@string/menu_opt_edit"
         app:showAsAction="never" />
 
 </menu>
