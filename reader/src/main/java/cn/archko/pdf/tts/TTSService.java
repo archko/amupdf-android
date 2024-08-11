@@ -127,14 +127,12 @@ public class TTSService extends Service {
         //playBookPage(AppSP.get().lastBookPage, AppSP.get().lastBookPath, "", AppSP.get().lastBookWidth, AppSP.get().lastBookHeight, AppSP.get().lastFontSize, AppSP.get().lastBookTitle);
     }
 
-
     public static void updateTimer() {
         //TempHolder.get().timerFinishTime = System.currentTimeMillis() + AppState.get().ttsTimer * 60 * 1000;
         //Logcat.d("Update-timer", TempHolder.get().timerFinishTime, AppState.get().ttsTimer);
     }
 
     /*public static void playPause(Context context, DocumentController controller) {
-
         if (Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, Manifest.permission.POST_NOTIFICATIONS)) {
 //                final Intent i = new Intent();
@@ -154,7 +152,7 @@ public class TTSService extends Service {
             try {
                 next.send();
             } catch (CanceledException e) {
-                Logcat.d(e);
+                Logcat.e(e);
             }
         } else {
             if (controller != null) {

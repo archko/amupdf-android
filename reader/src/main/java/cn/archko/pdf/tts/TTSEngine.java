@@ -1,8 +1,6 @@
 package cn.archko.pdf.tts;
 
 import android.annotation.TargetApi;
-import android.content.Context;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Build;
@@ -10,6 +8,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.EngineInfo;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import java.io.BufferedInputStream;
@@ -38,19 +37,18 @@ public class TTSEngine {
     public static final String MP3 = ".mp3";
     private static final String TAG = "TTSEngine";
     private static TTSEngine INSTANCE = new TTSEngine();
-    volatile TextToSpeech ttsEngine;
+    volatile TextToSpeech textToSpeech;
     volatile MediaPlayer mp;
     Timer mTimer;
     Object helpObject = new Object();
-    HashMap<String, String> map = new HashMap<String, String>();
-    HashMap<String, String> mapTemp = new HashMap<String, String>();
-
+    HashMap<String, String> map = new HashMap<>();
+    HashMap<String, String> mapTemp = new HashMap<>();
 
     OnInitListener listener = new OnInitListener() {
 
         @Override
         public void onInit(int status) {
-            Logcat.d(TAG, "onInit,SUCCESS:"+ (status == TextToSpeech.SUCCESS));
+            Logcat.d(TAG, "onInit, SUCCESS:"+( status == TextToSpeech.SUCCESS));
             if (status == TextToSpeech.ERROR) {
                 //Toast.makeText(App.Companion.getInstance(), R.string.msg_unexpected_error, Toast.LENGTH_LONG).show();
             }
@@ -103,10 +101,10 @@ public class TTSEngine {
         Logcat.d(TAG, "shutdown");
 
         synchronized (helpObject) {
-            if (ttsEngine != null) {
-                ttsEngine.shutdown();
+            if (textToSpeech != null) {
+                textToSpeech.shutdown();
             }
-            ttsEngine = null;
+            textToSpeech = null;
         }
 
     }
@@ -121,24 +119,25 @@ public class TTSEngine {
                 //TTSEngine.get().loadMP3(BookCSS.get().mp3BookPathGet());
             }
 
-            if (ttsEngine != null) {
-                return ttsEngine;
+            if (textToSpeech != null) {
+                return textToSpeech;
             }
             if (onLisnter == null) {
                 onLisnter = listener;
             }
-            ttsEngine = new TextToSpeech(App.Companion.getInstance(), onLisnter);
+            textToSpeech = new TextToSpeech(App.Companion.getInstance(), onLisnter);
         }
 
-        return ttsEngine;
+        return textToSpeech;
 
     }
 
     public synchronized boolean isShutdown() {
-        return ttsEngine == null;
+        return textToSpeech == null;
     }
 
     public void stop() {
+        //stop(null);
     }
 
     /*public void stop(MediaSessionCompat mediaSessionCompat) {
@@ -175,10 +174,10 @@ public class TTSEngine {
         Logcat.d(TAG, "stop");
         //TxtUtils.dictHash = "";
         synchronized (helpObject) {
-            if (ttsEngine != null) {
-                ttsEngine.shutdown();
+            if (textToSpeech != null) {
+                textToSpeech.shutdown();
             }
-            ttsEngine = null;
+            textToSpeech = null;
         }
         //AppSP.get().lastBookParagraph = 0;
     }
@@ -186,9 +185,9 @@ public class TTSEngine {
     public TextToSpeech setTTSWithEngine(String engine) {
         shutdown();
         synchronized (helpObject) {
-            ttsEngine = new TextToSpeech(App.Companion.getInstance(), listener, engine);
+            textToSpeech = new TextToSpeech(App.Companion.getInstance(), listener, engine);
         }
-        return ttsEngine;
+        return textToSpeech;
     }
 
     public synchronized void speek(final String text) {
@@ -204,17 +203,17 @@ public class TTSEngine {
         if (TxtUtils.isEmpty(text)) {
             return;
         }*/
-        if (ttsEngine == null) {
+        if (textToSpeech == null) {
             Logcat.d("getTTS-status was null");
         } else {
             Logcat.d("getTTS-status not null");
         }
 
-        ttsEngine = getTTS(new OnInitListener() {
+        textToSpeech = getTTS(new OnInitListener() {
 
             @Override
             public void onInit(int status) {
-                Logcat.d("getTTS-status", String.valueOf(status));
+                Logcat.d("getTTS-status:"+ status);
                 if (status == TextToSpeech.SUCCESS) {
                     try {
                         Thread.sleep(1000);
@@ -225,17 +224,17 @@ public class TTSEngine {
             }
         });
 
-        /*ttsEngine.setPitch(AppState.get().ttsPitch);
+        /*textToSpeech.setPitch(AppState.get().ttsPitch);
         if (AppState.get().ttsSpeed == 0.0f) {
             AppState.get().ttsSpeed = 0.01f;
         }
-        ttsEngine.setSpeechRate(AppState.get().ttsSpeed);
+        textToSpeech.setSpeechRate(AppState.get().ttsSpeed);
         Logcat.d(TAG, "Speek s", AppState.get().ttsSpeed);
         Logcat.d(TAG, "Speek AppSP.get().lastBookParagraph", AppSP.get().lastBookParagraph);
 
         if (AppState.get().ttsPauseDuration > 0 && text.contains(TxtUtils.TTS_PAUSE)) {
             String[] parts = text.split(TxtUtils.TTS_PAUSE);
-            ttsEngine.playSilence(0l, TextToSpeech.QUEUE_FLUSH, mapTemp);
+            textToSpeech.playSilence(0l, TextToSpeech.QUEUE_FLUSH, mapTemp);
             for (int i = AppSP.get().lastBookParagraph; i < parts.length; i++) {
                 String big = parts[i];
                 big = big.trim();
@@ -253,11 +252,11 @@ public class TTSEngine {
                     if (big.contains(TxtUtils.TTS_STOP)) {
                         HashMap<String, String> mapStop = new HashMap<String, String>();
                         mapStop.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, STOP_SIGNAL);
-                        ttsEngine.playSilence(AppState.get().ttsPauseDuration, TextToSpeech.QUEUE_ADD, mapStop);
+                        textToSpeech.playSilence(AppState.get().ttsPauseDuration, TextToSpeech.QUEUE_ADD, mapStop);
                         Logcat.d("Add stop signal");
                     }
                     if (big.contains(TxtUtils.TTS_NEXT)) {
-                        ttsEngine.playSilence(0L, TextToSpeech.QUEUE_ADD, map);
+                        textToSpeech.playSilence(0L, TextToSpeech.QUEUE_ADD, map);
                         Logcat.d("next-page signal");
                         break;
                     }
@@ -265,16 +264,16 @@ public class TTSEngine {
                     HashMap<String, String> mapTemp1 = new HashMap<String, String>();
                     mapTemp1.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, FINISHED_SIGNAL + i);
 
-                    ttsEngine.speak(big, TextToSpeech.QUEUE_ADD, mapTemp1);
-                    ttsEngine.playSilence(AppState.get().ttsPauseDuration, TextToSpeech.QUEUE_ADD, mapTemp);
+                    textToSpeech.speak(big, TextToSpeech.QUEUE_ADD, mapTemp1);
+                    textToSpeech.playSilence(AppState.get().ttsPauseDuration, TextToSpeech.QUEUE_ADD, mapTemp);
                     Logcat.d("pageHTML-parts", i, big);
                 }
             }
-            ttsEngine.playSilence(0L, TextToSpeech.QUEUE_ADD, map);
+            textToSpeech.playSilence(0L, TextToSpeech.QUEUE_ADD, map);
         } else {
             String textToPlay = text.replace(TxtUtils.TTS_PAUSE, "");
             Logcat.d("pageHTML-parts-single", text);
-            ttsEngine.speak(textToPlay, TextToSpeech.QUEUE_FLUSH, map);
+            textToSpeech.speak(textToPlay, TextToSpeech.QUEUE_FLUSH, map);
         }*/
     }
 
@@ -288,14 +287,13 @@ public class TTSEngine {
             return;
         }
 
-
         String path = dirFolder.getPath();
         speakToFile(controller, from - 1, path, info, from - 1, to);
-    }
+    }*/
 
-    public void speakToFile(final DocumentController controller, final int page, final String folder, final ResultResponse<String> info, int from, int to) {
+    /*public void speakToFile(final DocumentController controller, final int page, final String folder, final ResultResponse<String> info, int from, int to) {
         Logcat.d("speakToFile", page, controller.getPageCount());
-        if (ttsEngine == null) {
+        if (textToSpeech == null) {
             Logcat.d("TTS is null");
             if (controller != null && controller.getActivity() != null) {
                 Toast.makeText(controller.getActivity(), R.string.msg_unexpected_error, Toast.LENGTH_SHORT).show();
@@ -303,8 +301,8 @@ public class TTSEngine {
             return;
         }
 
-        ttsEngine.setPitch(AppState.get().ttsPitch);
-        ttsEngine.setSpeechRate(AppState.get().ttsSpeed);
+        textToSpeech.setPitch(AppState.get().ttsPitch);
+        textToSpeech.setSpeechRate(AppState.get().ttsSpeed);
 
         if (page >= to || !TempHolder.isRecordTTS) {
             Logcat.d("speakToFile finish", page, controller.getPageCount());
@@ -326,14 +324,12 @@ public class TTSEngine {
         if (TxtUtils.isEmpty(fileText)) {
             speakToFile(controller, page + 1, folder, info, from, to);
         } else {
-
             if (fileText.length() > 3950) {
                 fileText = TxtUtils.substringSmart(fileText, 3950) + " " + controller.getString(R.string.text_is_too_long);
                 Logcat.d("Text-too-long", page);
             }
 
-            ttsEngine.synthesizeToFile(fileText, map, wav);
-
+            textToSpeech.synthesizeToFile(fileText, map, wav);
 
             TTSEngine.get().getTTS().setOnUtteranceCompletedListener(new OnUtteranceCompletedListener() {
 
@@ -341,12 +337,10 @@ public class TTSEngine {
                 public void onUtteranceCompleted(String utteranceId) {
                     Logcat.d("speakToFile onUtteranceCompleted", page, controller.getPageCount());
 
-
                     if (AppState.get().isConvertToMp3) {
                         try {
                             File file = new File(wav);
                             Lame lame = new Lame();
-
 
                             InputStream input = new BufferedInputStream(new FileInputStream(file));
                             input.mark(44);
@@ -354,7 +348,6 @@ public class TTSEngine {
                             Logcat.d("bitrate", bitrate);
                             input.close();
                             input = new FileInputStream(file);
-
 
                             byte[] bytes = IOUtils.toByteArray(input);
 
@@ -369,27 +362,23 @@ public class TTSEngine {
                             IO.copyFile(new ByteArrayInputStream(res), toFile);
                             input.close();
                             file.delete();
-
                         } catch (Exception e) {
                             Logcat.e(e);
                         }
                     }
                     //lame.encode();
 
-
                     speakToFile(controller, page + 1, folder, info, from, to);
                 }
-
             });
         }
-
     }*/
 
     public boolean isTempPausing() {
-        //if (AppState.get().isEnableAccessibility) {
-        //    return true;
-        //}
-        return mp != null || ttsEngine != null;
+        /*if (AppState.get().isEnableAccessibility) {
+            return true;
+        }*/
+        return mp != null || textToSpeech != null;
     }
 
     public boolean isPlaying() {
@@ -401,51 +390,50 @@ public class TTSEngine {
         }
 
         synchronized (helpObject) {
-            if (ttsEngine == null) {
+            if (textToSpeech == null) {
                 return false;
             }
-            return ttsEngine != null && ttsEngine.isSpeaking();
+            return textToSpeech != null && textToSpeech.isSpeaking();
         }
     }
 
     public boolean hasNoEngines() {
         try {
-            return ttsEngine != null && (ttsEngine.getEngines() == null || ttsEngine.getEngines().size() == 0);
+            return textToSpeech != null && (textToSpeech.getEngines() == null || textToSpeech.getEngines().size() == 0);
         } catch (Exception e) {
             return true;
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public String getCurrentLang() {
         try {
-            if (Build.VERSION.SDK_INT >= 21 && ttsEngine != null && ttsEngine.getDefaultVoice() != null && ttsEngine.getDefaultVoice().getLocale() != null) {
-                return ttsEngine.getDefaultVoice().getLocale().getDisplayLanguage();
+            if (Build.VERSION.SDK_INT >= 21 && textToSpeech != null && textToSpeech.getDefaultVoice() != null && textToSpeech.getDefaultVoice().getLocale() != null) {
+                return textToSpeech.getDefaultVoice().getLocale().getDisplayLanguage();
             }
         } catch (Exception e) {
-            //Logcat.e(e);
+            Logcat.e(e);
         }
         return "---";
     }
 
     public int getEngineCount() {
         try {
-            if (ttsEngine == null || ttsEngine.getEngines() == null) {
+            if (textToSpeech == null || textToSpeech.getEngines() == null) {
                 return -1;
             }
 
-            return ttsEngine.getEngines().size();
+            return textToSpeech.getEngines().size();
         } catch (Exception e) {
-            //Logcat.e(e);
+            Logcat.e(e);
         }
         return 0;
     }
 
     public String getCurrentEngineName() {
         try {
-            if (ttsEngine != null) {
-                String enginePackage = ttsEngine.getDefaultEngine();
-                List<EngineInfo> engines = ttsEngine.getEngines();
+            if (textToSpeech != null) {
+                String enginePackage = textToSpeech.getDefaultEngine();
+                List<EngineInfo> engines = textToSpeech.getEngines();
                 for (final EngineInfo eInfo : engines) {
                     if (eInfo.name.equals(enginePackage)) {
                         return engineToString(eInfo);
@@ -453,7 +441,7 @@ public class TTSEngine {
                 }
             }
         } catch (Exception e) {
-            //Logcat.e(e);
+            Logcat.e(e);
         }
         return "---";
     }
@@ -464,10 +452,10 @@ public class TTSEngine {
 
     public void loadMP3(String ttsPlayMp3Path, final boolean play) {
         Logcat.d("loadMP3-", ttsPlayMp3Path);
-        //if (TxtUtils.isEmpty(ttsPlayMp3Path) || !new File(ttsPlayMp3Path).isFile()) {
-        //    Logcat.d("loadMP3-skip mp3");
-        //    return;
-        //}
+        if (TextUtils.isEmpty(ttsPlayMp3Path) || !new File(ttsPlayMp3Path).isFile()) {
+            Logcat.d("loadMP3-skip mp3");
+            return;
+        }
         try {
             mp3Destroy();
             mp = new MediaPlayer();
@@ -486,20 +474,17 @@ public class TTSEngine {
 
             mTimer = new Timer();
 
-            mTimer.schedule(new TimerTask() {
+            /*mTimer.schedule(new TimerTask() {
 
                 @Override
                 public void run() {
-                    //AppState.get().mp3seek = mp.getCurrentPosition();
+                    AppState.get().mp3seek = mp.getCurrentPosition();
                     //Logcat.d("Run timer-task");
-                    //EventBus.getDefault().post(new TtsStatus());
-                }
-
-                ;
-            }, 1000, 1000);
-
+                    EventBus.getDefault().post(new TtsStatus());
+                };
+            }, 1000, 1000);*/
         } catch (Exception e) {
-            //Logcat.e(e);
+            Logcat.e(e);
         }
     }
 
@@ -563,7 +548,7 @@ public class TTSEngine {
     }
 
     public boolean isMp3() {
-        //return TxtUtils.isNotEmpty(BookCSS.get().mp3BookPathGet());
+        //return !TextUtils.isEmpty(BookCSS.get().mp3BookPathGet());
         return true;
     }
 
@@ -571,6 +556,7 @@ public class TTSEngine {
         if (mp != null) {
             mp.seekTo(i);
         }
+
     }
 
 }

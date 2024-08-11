@@ -62,6 +62,13 @@ object Logcat {
     }
 
     @JvmStatic
+    fun e(msg: Throwable) {
+        if (loggable) {
+            msg.message?.let { Log.e(TAG, it) }
+        }
+    }
+
+    @JvmStatic
     fun e(tag: String?, msg: String?) {
         if (loggable) {
             if (msg != null) {
