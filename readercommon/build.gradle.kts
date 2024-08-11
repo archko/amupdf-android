@@ -55,6 +55,7 @@ dependencies {
     api("com.tencent:mmkv:1.3.4")
 
     implementation("com.tencent.bugly:crashreport:4.1.9.3")
+    implementation("com.github.albfernandez:juniversalchardet:2.4.0")
 
     api(project(":pdf-recyclerview"))
     api(project(":mupdf-android-fitz"))
