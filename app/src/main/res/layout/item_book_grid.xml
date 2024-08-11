@@ -36,6 +36,7 @@
         android:ellipsize="end"
         android:maxLines="3"
         android:minHeight="34dp"
+            android:textColor="@color/md_theme_primary"
         android:text="adfadferqfasfadsfgasdg"
         android:textSize="10sp"
         app:layout_constraintTop_toBottomOf="@+id/progressbar" />

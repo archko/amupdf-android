@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
+import androidx.appcompat.widget.Toolbar.OnMenuItemClickListener
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -74,33 +75,45 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.toolbar.setNavigationOnClickListener { dismiss() }
-        binding.save.setOnClickListener {
-            pdfEditViewModel.save()
-        }
-        binding.btnExtractHtml.setOnClickListener {
-            val name = FileUtils.getNameWithoutExt(path)
-            val dir = FileUtils.getStorageDir(name).absolutePath
+        binding.toolbar.setOnMenuItemClickListener(object : OnMenuItemClickListener {
+            override fun onMenuItemClick(item: MenuItem?): Boolean {
+                if (R.id.saveItem == item?.itemId) {
+                    pdfEditViewModel.save()
+                } else if (R.id.extractHtmlItem == item?.itemId) {
+                    val name = FileUtils.getNameWithoutExt(path)
+                    val dir = FileUtils.getStorageDir(name).absolutePath
 
-            progressDialog.show()
-            progressDialog.setCanceledOnTouchOutside(false)
+                    progressDialog.show()
+                    progressDialog.setCanceledOnTouchOutside(false)
 
-            job = lifecycleScope.launch {
-                val result = withContext(Dispatchers.IO) {
-                    PDFCreaterHelper.extractToHtml(
-                        requireActivity(),
-                        "$dir/$name.html",
-                        path!!
-                    )
+                    job = lifecycleScope.launch {
+                        val result = withContext(Dispatchers.IO) {
+                            PDFCreaterHelper.extractToHtml(
+                                requireActivity(),
+                                "$dir/$name.html",
+                                path!!
+                            )
+                        }
+                        if (result) {
+                            Toast.makeText(
+                                activity,
+                                R.string.edit_extract_success,
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        } else {
+                            Toast.makeText(
+                                activity,
+                                R.string.edit_extract_error,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        progressDialog.dismiss()
+                    }
                 }
-                if (result) {
-                    Toast.makeText(activity, R.string.edit_extract_success, Toast.LENGTH_SHORT)
-                        .show()
-                } else {
-                    Toast.makeText(activity, R.string.edit_extract_error, Toast.LENGTH_SHORT).show()
-                }
-                progressDialog.dismiss()
+                return true
             }
-        }
+        })
 
         pdfAdapter = MupdfGridAdapter(
             pdfEditViewModel,
