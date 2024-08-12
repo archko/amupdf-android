@@ -457,7 +457,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             mContentView,
             object : PageControls.ControlListener {
                 override fun toggleReflow() {
-                    toggleReflow()
+                    this@AMuPDFRecyclerViewActivity.toggleReflow()
                 }
 
                 override fun toggleCrop() {

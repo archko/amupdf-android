@@ -143,7 +143,12 @@ public class PageControls implements View.OnClickListener {
     }
 
     public void showReflow(boolean reflow) {
-        this.mReflowButton.setVisibility(reflow ? View.VISIBLE : View.GONE);
+        //mReflowButton.setVisibility(reflow ? View.VISIBLE : View.GONE);
+        if (reflow) {
+            mReflowButton.setColorFilter(Color.argb(0xFF, 172, 114, 37));
+        } else {
+            mReflowButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
+        }
     }
 
     public ImageButton getReflowButton() {
