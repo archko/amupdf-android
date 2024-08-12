@@ -330,13 +330,27 @@ object PDFCreaterHelper {
         return 0
     }
 
-    fun extractToHtml(context: Context, path: String, pdfPath: String): Boolean {
+    fun extractToHtml(
+        start: Int, end: Int, context: Context, path: String, pdfPath: String
+    ): Boolean {
         try {
             val mupdfDocument = MupdfDocument(context)
             mupdfDocument.newDocument(pdfPath, null)
-            val cp: Int = mupdfDocument.countPages()
+            val count: Int = mupdfDocument.countPages()
+            var startPage = start
+            if (startPage < 0) {
+                startPage = 0
+            } else if (startPage >= count) {
+                startPage = 0
+            }
+            var endPage = end
+            if (end > count) {
+                endPage = count
+            } else if (endPage < 0) {
+                endPage = count
+            }
             val stringBuilder = StringBuilder()
-            for (i in 0 until cp) {
+            for (i in startPage until endPage) {
                 val page = mupdfDocument.loadPage(i)
                 if (null != page) {
                     val content =

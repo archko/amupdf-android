@@ -186,7 +186,14 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
         }
         scope = CoroutineScope(Job() + customerDispatcher)
         scope!!.launch {
+            var start: Int = 0
+            var end: Int = 0
+            if (binding.extract.extractLayout.visibility == View.VISIBLE) {
+                start = binding.extract.rangeSlider.values[0].toInt()
+                end = binding.extract.rangeSlider.values[1].toInt()
+            }
             val result = PDFCreaterHelper.extractToHtml(
+                start, end,
                 requireActivity(),
                 "$dir/$name.html",
                 txtPath!!

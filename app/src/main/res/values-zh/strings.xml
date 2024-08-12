@@ -105,7 +105,7 @@
     <string name="edit_select_tip">选择用于导出图片的pdf文件</string>
     <string name="edit_save_tip">导出的内容存储于/sdcard/xx/ 下,xx是pdf文件名, \\n导出图片: 每一页为一张jpg.\\n导出html: 对于非扫描的pdf,则生成一个html,如果里面带图片,会以base64编码图片输出,可用浏览器打开</string>
     <string name="edit_extract_btn_image">导出选中范围图片</string>
-    <string name="edit_extract_btn_html">开始导出所有Html</string>
+    <string name="edit_extract_btn_html">开始导出所所Html</string>
     <string name="edit_extract_html">导出Html</string>
     <string name="extract_btn_merge">合并文件</string>
     <string name="edit_reflow_btn">重排页面</string>

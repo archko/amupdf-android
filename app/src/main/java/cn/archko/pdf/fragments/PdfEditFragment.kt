@@ -89,6 +89,7 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
                     job = lifecycleScope.launch {
                         val result = withContext(Dispatchers.IO) {
                             PDFCreaterHelper.extractToHtml(
+                                0, pdfEditViewModel.countPages(),
                                 requireActivity(),
                                 "$dir/$name.html",
                                 path!!
