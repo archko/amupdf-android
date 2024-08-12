@@ -30,7 +30,7 @@ import cn.archko.pdf.fragments.FontsFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.PDFViewModel
-import cn.archko.pdf.widgets.APageSeekBarControls
+import cn.archko.pdf.widgets.PageControls
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -46,7 +46,7 @@ class AReflowViewController(
     private val mControllerLayout: RelativeLayout,
     private var pdfViewModel: PDFViewModel,
     private var mPath: String,
-    private var mPageSeekBarControls: APageSeekBarControls?,
+    private var pageControls: PageControls?,
     private var gestureDetector: GestureDetector?,
 ) :
     OutlineListener, AViewController {
@@ -269,8 +269,8 @@ class AReflowViewController(
     }
 
     fun updateProgress(index: Int) {
-        if (pdfViewModel.mupdfDocument != null && mPageSeekBarControls?.visibility == View.VISIBLE) {
-            mPageSeekBarControls?.updatePageProgress(index)
+        if (pdfViewModel.mupdfDocument != null && pageControls?.visibility() == View.VISIBLE) {
+            pageControls?.updatePageProgress(index)
         }
     }
 
@@ -349,7 +349,7 @@ class AReflowViewController(
     private var fgSetting: View? = null
 
     private fun initStyleControls() {
-        mPageSeekBarControls?.hide()
+        pageControls?.hide()
         if (null == mStyleControls) {
             mStyleControls = LayoutInflater.from(context).inflate(R.layout.text_style, null, false)
             fontSeekBar = mStyleControls!!.findViewById(R.id.font_seek_bar)

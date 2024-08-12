@@ -24,7 +24,7 @@ import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APDFView
-import cn.archko.pdf.widgets.APageSeekBarControls
+import cn.archko.pdf.widgets.PageControls
 
 /**
  * @author: archko 2020/5/15 :12:43
@@ -34,7 +34,7 @@ class ACropViewController(
     private val mControllerLayout: RelativeLayout,
     private var pdfViewModel: PDFViewModel,
     private var mPath: String,
-    private var mPageSeekBarControls: APageSeekBarControls?,
+    private var pageControls: PageControls?,
     private var gestureDetector: GestureDetector?,
 ) :
     OutlineListener, AViewController {
@@ -321,8 +321,8 @@ class ACropViewController(
     }
 
     private fun updateProgress(index: Int) {
-        if (pdfViewModel.mupdfDocument != null && mPageSeekBarControls?.visibility == View.VISIBLE) {
-            mPageSeekBarControls?.updatePageProgress(index)
+        if (pdfViewModel.mupdfDocument != null && pageControls?.visibility() == View.VISIBLE) {
+            pageControls?.updatePageProgress(index)
         }
     }
 

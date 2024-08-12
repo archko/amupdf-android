@@ -24,7 +24,7 @@
 //import cn.archko.pdf.core.listeners.SimpleGestureListener
 //import cn.archko.pdf.presenter.PageViewPresenter
 //import cn.archko.pdf.viewmodel.PDFViewModel
-//import cn.archko.pdf.widgets.APageSeekBarControls
+//import cn.archko.pdf.widgets.PageControls
 //import kotlinx.coroutines.Dispatchers
 //import kotlinx.coroutines.launch
 //import kotlinx.coroutines.withContext
@@ -47,7 +47,7 @@
 //    var pageControls: PageViewZoomControls? = null
 //
 //    //private CurrentPageModel mPageModel;
-//    var pageSeekBarControls: APageSeekBarControls? = null
+//    var pageSeekBarControls: PageControls? = null
 //    var sensorHelper: SensorHelper? = null
 //    val pdfViewModel: PDFViewModel = PDFViewModel()
 //    protected var progressDialog: ProgressDialog? = null
@@ -115,7 +115,7 @@
 //        }
 //
 //        pageSeekBarControls =
-//            APageSeekBarControls(this, object : PageViewPresenter {
+//            PageControls(this, object : PageViewPresenter {
 //                override fun getPageCount(): Int {
 //                    return decodeService!!.pageCount
 //                }
@@ -226,7 +226,7 @@
 //
 //    /*private PageSeekBarControls createSeekControls(CurrentPageModel pageModel)
 //    {
-//        final PageSeekBarControls controls = new APageSeekBarControls(this, pageModel);
+//        final PageSeekBarControls controls = new PageControls(this, pageModel);
 //        //controls.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
 //        pageModel.addEventListener(controls);
 //        return controls;

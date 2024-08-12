@@ -6,27 +6,30 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.TextView
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.core.adapters.BaseViewHolder
-import cn.archko.pdf.base.BaseFragment
 import cn.archko.pdf.entity.OutlineItem
 import cn.archko.pdf.listeners.OutlineListener
 
 /**
  * @author: archko 2019/7/11 :17:55
  */
-open class OutlineFragment : BaseFragment() {
+open class OutlineFragment : DialogFragment() {
 
     private lateinit var adapter: BaseRecyclerAdapter<OutlineItem>
-    private var outlineItems: ArrayList<OutlineItem>? = null
+    var outlineItems: ArrayList<OutlineItem>? = null
     private var currentPage: Int = 0
     private var recyclerView: RecyclerView? = null
     private var nodataView: View? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        var themeId = R.style.AppDialogTheme
+        setStyle(STYLE_NORMAL, themeId)
 
         arguments?.let {
             currentPage = it.getInt("POSITION", 0)
@@ -111,6 +114,7 @@ open class OutlineFragment : BaseFragment() {
     protected fun onListItemClick(item: OutlineItem) {
         val ac = activity as OutlineListener
         ac.onSelectedOutline(item.page)
+        dismiss()
     }
 
     inner class ViewHolder(root: View) :
@@ -130,5 +134,16 @@ open class OutlineFragment : BaseFragment() {
             page?.text = (data.page.plus(1)).toString()
             itemView.setOnClickListener { onListItemClick(data) }
         }
+    }
+
+    fun showDialog(activity: FragmentActivity?) {
+        val ft = activity?.supportFragmentManager?.beginTransaction()
+        val prev = activity?.supportFragmentManager?.findFragmentByTag("create_dialog")
+        if (prev != null) {
+            ft?.remove(prev)
+        }
+        ft?.addToBackStack(null)
+
+        show(ft!!, "create_dialog")
     }
 }

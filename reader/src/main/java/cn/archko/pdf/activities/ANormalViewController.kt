@@ -24,7 +24,7 @@ import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.PDFViewModel
-import cn.archko.pdf.widgets.APageSeekBarControls
+import cn.archko.pdf.widgets.PageControls
 import org.vudroid.core.DecodeService
 import org.vudroid.core.DecodeServiceBase
 import org.vudroid.core.DocumentView
@@ -42,7 +42,7 @@ class ANormalViewController(
     private val mControllerLayout: RelativeLayout,
     private var pdfViewModel: PDFViewModel,
     private var mPath: String,
-    private var mPageSeekBarControls: APageSeekBarControls?,
+    private var pageControls: PageControls?,
     private var gestureDetector: GestureDetector?,
     private var crop: Boolean,
 ) :
@@ -287,8 +287,8 @@ class ANormalViewController(
     }
 
     private fun updateProgress(index: Int) {
-        if (/*pdfViewModel.mupdfDocument != null &&*/ mPageSeekBarControls?.visibility == View.VISIBLE) {
-            mPageSeekBarControls?.updatePageProgress(index)
+        if (/*pdfViewModel.mupdfDocument != null &&*/ pageControls?.visibility() == View.VISIBLE) {
+            pageControls?.updatePageProgress(index)
         }
     }
 

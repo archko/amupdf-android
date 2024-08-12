@@ -10,15 +10,15 @@
         android:id="@+id/layout_title"
         android:layout_width="match_parent"
         android:layout_height="42dp"
-        android:paddingRight="8dp"
         android:background="@color/menu_bg"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingRight="8dp">
 
         <ImageButton
             android:id="@+id/back_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginLeft="8dp"
             android:background="@drawable/button"
             android:scaleType="center"
@@ -56,8 +56,8 @@
 
         <ImageButton
             android:id="@+id/autoCropButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:background="@drawable/button"
             android:contentDescription="@string/auto_crop"
             android:src="@drawable/ic_crop"
@@ -66,8 +66,8 @@
 
         <ImageButton
             android:id="@+id/reflowButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:background="@drawable/button"
             android:contentDescription="@string/toggle_reflow_mode"
             android:src="@drawable/ic_format_size_white_24dp"
@@ -76,16 +76,16 @@
 
         <ImageButton
             android:id="@+id/outlineButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:background="@drawable/button"
             android:contentDescription="@string/outline_title"
             android:src="@drawable/ic_toc_white_24dp" />
 
         <ImageButton
             android:id="@+id/oriButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:background="@drawable/button"
             android:contentDescription="@string/opts_orientation"
             android:src="@drawable/viewer_menu_viewmode_vscroll" />
@@ -115,12 +115,14 @@
 
     <FrameLayout
         android:id="@+id/layout_outline"
-        android:layout_width="360dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/seek_bar"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="80dp"
         android:layout_marginTop="1px"
         android:background="@color/menu_bg"
+        android:minWidth="260dp"
         android:visibility="gone"
         tools:visibility="visible" />
 
