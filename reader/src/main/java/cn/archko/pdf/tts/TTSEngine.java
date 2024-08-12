@@ -20,6 +20,8 @@ import cn.archko.pdf.core.common.Logcat;
 
 public class TTSEngine {
 
+    private static final String TAG = "TTSEngine";
+
     public static List<String> getEngines(Context context) {
         ArrayList<String> engines = new ArrayList<>();
         PackageManager pm = context.getPackageManager();
@@ -31,19 +33,24 @@ public class TTSEngine {
         return engines;
     }
 
-    public static final String UTTERANCE_ID_DONE = "dragon";
-    private static final String TAG = "TTSEngine";
-    private static TTSEngine INSTANCE = new TTSEngine();
+    public static TTSEngine get() {
+        return Factory.instance;
+    }
+
+    private static final class Factory {
+        private static final TTSEngine instance = new TTSEngine();
+    }
+
     private TextToSpeech textToSpeech;
     private boolean initStatus = false;
-    private Map<String, String> content = new HashMap<>();
-    private List<String> keys = new ArrayList<>();
+    private final Map<String, String> content = new HashMap<>();
+    private final List<String> keys = new ArrayList<>();
 
     public boolean isInitStatus() {
         return initStatus;
     }
 
-    private OnInitListener listener = new OnInitListener() {
+    private final OnInitListener listener = new OnInitListener() {
 
         @Override
         public void onInit(int status) {
@@ -72,10 +79,6 @@ public class TTSEngine {
         }
     };
 
-    public static TTSEngine get() {
-        return INSTANCE;
-    }
-
     public void shutdown() {
         Logcat.d(TAG, "shutdown");
 
@@ -83,6 +86,7 @@ public class TTSEngine {
             textToSpeech.shutdown();
         }
         textToSpeech = null;
+        initStatus = false;
         reset();
     }
 
@@ -91,25 +95,21 @@ public class TTSEngine {
         keys.clear();
     }
 
-    public TextToSpeech getTTS() {
-        return getTTS(null);
-    }
-
-    public TextToSpeech getTTS(OnInitListener onLisnter) {
+    public void getTTS(OnInitListener listener) {
+        if (listener == null) {
+            listener = this.listener;
+        }
         List<String> engines = getEngines(App.Companion.getInstance());
         if (null == engines || engines.isEmpty()) {
-            onLisnter.onInit(TextToSpeech.ERROR);
-            return null;
+            listener.onInit(TextToSpeech.ERROR);
+            return;
         }
         if (textToSpeech != null) {
-            return textToSpeech;
+            initStatus = true;
+            listener.onInit(TextToSpeech.SUCCESS);
+            return;
         }
-        if (onLisnter == null) {
-            onLisnter = listener;
-        }
-        textToSpeech = new TextToSpeech(App.Companion.getInstance(), onLisnter);
-
-        return textToSpeech;
+        textToSpeech = new TextToSpeech(App.Companion.getInstance(), listener);
     }
 
     public void stop() {

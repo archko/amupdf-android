@@ -31,7 +31,7 @@ class MenuHelper(
             field = value
         }
 
-    fun setupMenu(mPath: String?, context: Context, menuListener: MenuListener?) {
+    /*fun setupMenu(mPath: String?, context: Context, menuListener: MenuListener?) {
         val menus = ArrayList<MenuBean>()
         var bean = MenuBean(FileUtils.getRealPath(mPath), MuPDFRecyclerViewActivity.TYPE_TITLE)
         menus.add(bean)
@@ -112,5 +112,5 @@ class MenuHelper(
     fun isOutline(): Boolean {
         val fragment = supportFragmentManager.findFragmentById(R.id.layout_outline)
         return fragment is OutlineFragment && fragment.isVisible
-    }
+    }*/
 }

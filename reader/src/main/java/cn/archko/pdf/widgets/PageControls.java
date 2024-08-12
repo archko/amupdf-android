@@ -28,6 +28,7 @@ public class PageControls implements View.OnClickListener {
     private ImageButton mOutlineButton;
     private ImageButton mAutoCropButton;
     private ImageButton mOriButton;
+    private ImageButton ttsButton;
     private TextView mPath;
     private TextView mTitle;
     private ImageButton mBackButton;
@@ -47,6 +48,8 @@ public class PageControls implements View.OnClickListener {
         void toggleReflow();
 
         void toggleCrop();
+
+        void toggleTts();
     }
 
     public PageControls(View view, ControlListener controlListener) {
@@ -61,6 +64,7 @@ public class PageControls implements View.OnClickListener {
         mOutlineButton = view.findViewById(R.id.outlineButton);
         mAutoCropButton = view.findViewById(R.id.autoCropButton);
         mOriButton = view.findViewById(R.id.oriButton);
+        ttsButton = view.findViewById(R.id.ttsButton);
         mPath = view.findViewById(R.id.path);
         mTitle = view.findViewById(R.id.title);
         mBackButton = view.findViewById(R.id.back_button);
@@ -70,6 +74,7 @@ public class PageControls implements View.OnClickListener {
         mOutlineButton.setOnClickListener(this);
         mAutoCropButton.setOnClickListener(this);
         mOriButton.setOnClickListener(this);
+        ttsButton.setOnClickListener(this);
         mBackButton.setOnClickListener(this);
 
         mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -125,9 +130,9 @@ public class PageControls implements View.OnClickListener {
 
     private void updateOrientation() {
         if (ori == LinearLayout.VERTICAL) {
-            mOriButton.setImageResource(R.drawable.viewer_menu_viewmode_vscroll);
+            mOriButton.setImageResource(R.drawable.ic_vertical);
         } else {
-            mOriButton.setImageResource(R.drawable.viewer_menu_viewmode_hscroll);
+            mOriButton.setImageResource(R.drawable.ic_horizontal);
         }
     }
 
@@ -161,15 +166,18 @@ public class PageControls implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        if (R.id.outlineButton == v.getId()) {
+        int id = v.getId();
+        if (R.id.outlineButton == id) {
             controlListener.showOutline();
-        } else if (R.id.back_button == v.getId()) {
+        } else if (R.id.back_button == id) {
             controlListener.back();
-        } else if (R.id.reflowButton == v.getId()) {
+        } else if (R.id.reflowButton == id) {
             controlListener.toggleReflow();
-        } else if (R.id.autoCropButton == v.getId()) {
+        } else if (R.id.autoCropButton == id) {
             controlListener.toggleCrop();
-        } else if (R.id.oriButton == v.getId()) {
+        } else if (R.id.ttsButton == id) {
+            controlListener.toggleTts();
+        } else if (R.id.oriButton == id) {
             if (ori == LinearLayout.VERTICAL) {
                 ori = LinearLayout.HORIZONTAL;
             } else {

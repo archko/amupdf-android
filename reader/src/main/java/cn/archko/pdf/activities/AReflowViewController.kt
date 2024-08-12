@@ -248,14 +248,7 @@ class AReflowViewController(
         //if (mMupdfDocument == null) {
         //    return
         //}
-        //mPageSeekBarControls?.hide()
         mStyleControls?.visibility = View.GONE
-        //if (!mDrawerLayout.isDrawerOpen(mLeftDrawer)) {
-        //    mDrawerLayout.openDrawer(mLeftDrawer)
-        //} else {
-        //    mDrawerLayout.closeDrawer(mLeftDrawer)
-        //}
-        //showOutline()
     }
 
     override fun onSelectedOutline(index: Int) {

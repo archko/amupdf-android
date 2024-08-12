@@ -1,12 +1,13 @@
 package cn.archko.pdf.activities
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.os.SystemClock
+import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.util.SparseArray
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -28,6 +29,8 @@ import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.fragments.OutlineFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
+import cn.archko.pdf.tts.TTSActivity
+import cn.archko.pdf.tts.TTSEngine
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.PageControls
 import com.baidu.ai.edge.ui.activity.OcrActivity
@@ -44,8 +47,10 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     private var outlineFragment: OutlineFragment? = null
     private lateinit var mReflowLayout: RelativeLayout
     private lateinit var mContentView: View
+    private lateinit var ttsLayout: View
     private val viewControllerCache: SparseArray<AViewController> = SparseArray<AViewController>()
     private var viewMode: ViewMode = ViewMode.CROP
+    private var ttsMode = false
 
     /**
      * 用AMupdf打开,传入强制切边参数,如果是-1,是没有设置,如果设置1表示强制切边,如果是0不切边,让切边按钮失效
@@ -57,6 +62,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         forceCropParam = intent.getIntExtra("forceCropParam", -1)
 
         mContentView = findViewById(R.id.content)
+        ttsLayout = findViewById(R.id.tts_layout)
         mReflowLayout = findViewById(R.id.reflow_layout)
 
         pageControls = createControls()
@@ -161,7 +167,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                     return true
                 }
 
-                //return viewController?.scrollPage(e.y.toInt(), top, bottom, finalMargin)!!
                 if (viewController?.onSingleTap(e, finalMargin) == false) {
                     showPageToast()
                 }
@@ -266,12 +271,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                 orientation = pdfViewModel.bookProgress?.scrollOrientation ?: 1
             }
 
-            //outlineHelper = OutlineHelper(pdfViewModel.mupdfDocument, this)
             outlineHelper = pdfViewModel.outlineHelper
-
-            //mMenuHelper = MenuHelper(mLeftDrawer, outlineHelper, supportFragmentManager)
-            //mMenuHelper?.setupMenu(mPath, this@AMuPDFRecyclerViewActivity, menuListener)
-            //mMenuHelper?.setupOutline(pos)
             setupOutline(pos)
 
             isDocLoaded = true
@@ -279,7 +279,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             val sp = getSharedPreferences(PREF_READER, Context.MODE_PRIVATE)
             val isFirst = sp.getBoolean(PREF_READER_KEY_FIRST, true)
             if (isFirst) {
-                //mDrawerLayout.openDrawer(mLeftDrawer)
                 showOutline()
 
                 sp.edit()
@@ -310,10 +309,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             bundle.putSerializable("POSITION", currentPos)
             outlineFragment?.arguments = bundle
         }
-
-        //supportFragmentManager.beginTransaction()
-        //    .add(R.id.layout_outline, outlineFragment!!)
-        //    .commit()
     }
 
     private fun deleteBookmark(bookmark: Bookmark) {
@@ -337,14 +332,8 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     override fun onDestroy() {
         super.onDestroy()
         viewController?.onDestroy()
-        /*pageSizes.let {
-            if (it.size < 0 || it.size < APageSizeLoader.PAGE_COUNT) {
-                return
-            }
-            lifecycleScope.launch {
-                pdfViewModel.savePageSize(pdfViewModel.checkCrop(), pageSizes).collectLatest { }
-            }
-        }*/
+
+        TTSEngine.get().shutdown()
     }
 
     override fun postLoadDoc(cp: Int) {
@@ -474,15 +463,42 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
                 override fun back() {
                     this@AMuPDFRecyclerViewActivity.finish()
-                    //mPageSeekBarControls?.hide()
                 }
 
                 override fun changeOrientation(ori: Int) {
                     changeOri(ori)
                 }
+
+                override fun toggleTts() {
+                    if (ttsMode) {
+                        TTSEngine.get().stop()
+                        TTSEngine.get().reset()
+                        ttsMode = false
+                        ttsLayout.visibility = View.GONE
+                    } else {
+                        TTSEngine.get().getTTS { status: Int ->
+                            if (status == TextToSpeech.SUCCESS) {
+                                ttsLayout.visibility = View.VISIBLE
+                                ttsMode = true
+                                startTts()
+                            } else {
+                                Log.e(TTSActivity.TAG, "初始化失败")
+                                Toast.makeText(
+                                    this@AMuPDFRecyclerViewActivity,
+                                    getString(R.string.tts_failed),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
+                }
             }
         )
         return pageControls!!
+    }
+
+    private fun startTts() {
+        pdfViewModel.mupdfDocument?.decodeReflow(getCurrentPos())
     }
 
     private fun changeOri(ori: Int) {
@@ -494,9 +510,11 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         outlineHelper?.let {
             if (it.hasOutline()) {
                 outlineFragment?.updateSelection(getCurrentPos())
+                outlineFragment?.showDialog(this)
+            } else {
+                Toast.makeText(this, "no outline", Toast.LENGTH_SHORT).show()
             }
         }
-        outlineFragment?.showDialog(this)
     }
 
     private fun showBookmark() {
@@ -583,7 +601,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     override fun onResume() {
         super.onResume()
 
-        pageControls?.hide()
+        //pageControls?.hide()
 
         viewController?.onResume()
     }
@@ -607,34 +625,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     //===========================================
-
-    /*private var menuListener = object : MenuListener {
-
-        override fun onMenuSelected(data: MenuBean?, position: Int) {
-            when (data?.type) {
-                TYPE_PROGRESS -> {
-                    mDrawerLayout.closeDrawer(mLeftDrawer)
-                    mPageSeekBarControls?.show()
-                }
-
-                TYPE_ZOOM -> {
-                    mDrawerLayout.closeDrawer(mLeftDrawer)
-                    viewController?.showController()
-                }
-
-                TYPE_CLOSE -> {
-                    this@AMuPDFRecyclerViewActivity.finish()
-                }
-
-                TYPE_SETTINGS -> {
-                    PdfOptionsActivity.start(this@AMuPDFRecyclerViewActivity)
-                }
-
-                else -> {
-                }
-            }
-        }
-    }*/
 
     internal object ViewControllerFactory {
         fun getOrCreateViewController(

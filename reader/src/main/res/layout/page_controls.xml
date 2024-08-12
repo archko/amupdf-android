@@ -80,7 +80,7 @@
             android:layout_height="40dp"
             android:background="@drawable/button"
             android:contentDescription="@string/outline_title"
-            android:src="@drawable/ic_toc_white_24dp" />
+            android:src="@drawable/ic_toc" />
 
         <ImageButton
             android:id="@+id/oriButton"
@@ -88,7 +88,7 @@
             android:layout_height="40dp"
             android:background="@drawable/button"
             android:contentDescription="@string/opts_orientation"
-            android:src="@drawable/viewer_menu_viewmode_vscroll" />
+            android:src="@drawable/ic_vertical" />
     </LinearLayout>
 
     <SeekBar
@@ -113,7 +113,7 @@
         android:background="@drawable/bg_page_num"
         android:textColor="@color/white" />
 
-    <FrameLayout
+    <!--<FrameLayout
         android:id="@+id/layout_outline"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -124,6 +124,6 @@
         android:background="@color/menu_bg"
         android:minWidth="260dp"
         android:visibility="gone"
-        tools:visibility="visible" />
+        tools:visibility="visible" />-->
 
 </RelativeLayout>

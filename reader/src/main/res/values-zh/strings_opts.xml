@@ -138,4 +138,6 @@
 
     <string name="bookmark_page">页码:</string>
     <string name="no_bookmark">没有书签,先添加一个吧</string>
+
+    <string name="tts_failed">初始化语音引擎失败</string>
 </resources>

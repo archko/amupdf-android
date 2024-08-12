@@ -37,7 +37,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:navigationIcon="@drawable/ic_nav"
+            app:navigationIcon="@drawable/ic_back"
             app:title="@string/extract_title" />
 
     <include

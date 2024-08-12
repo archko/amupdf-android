@@ -10,7 +10,7 @@
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
-        app:navigationIcon="@drawable/ic_nav"
+        app:navigationIcon="@drawable/ic_back"
         app:popupTheme="@style/ThemeOverlay.MaterialComponents.ActionBar"
         app:title="@string/menu_search"
         android:layout_width="match_parent"

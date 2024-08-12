@@ -16,7 +16,9 @@
         android:layout_height="wrap_content"
         android:background="@color/menu_bg"
         android:orientation="vertical"
-        android:paddingTop="10dp">
+        android:paddingTop="10dp"
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,6 +37,16 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
+
+            <ImageButton
+                android:id="@+id/ttsButton"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/button"
+                android:contentDescription="tts"
+                android:src="@drawable/ic_tts"
+                android:visibility="visible"
+                tools:visibility="visible" />
 
             <ImageButton
                 android:id="@+id/autoCropButton"
@@ -62,7 +74,7 @@
                 android:layout_height="44dp"
                 android:background="@drawable/button"
                 android:contentDescription="@string/outline_title"
-                android:src="@drawable/ic_toc_white_24dp" />
+                android:src="@drawable/ic_toc" />
 
             <ImageButton
                 android:id="@+id/oriButton"
@@ -70,7 +82,7 @@
                 android:layout_height="44dp"
                 android:background="@drawable/button"
                 android:contentDescription="@string/opts_orientation"
-                android:src="@drawable/viewer_menu_viewmode_vscroll" />
+                android:src="@drawable/ic_vertical" />
         </LinearLayout>
 
         <LinearLayout
@@ -102,13 +114,27 @@
         </LinearLayout>
     </LinearLayout>
 
+    <FrameLayout
+        android:id="@+id/tts_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <include layout="@layout/tts_controller" />
+    </FrameLayout>
+
     <LinearLayout
         android:id="@+id/bottom_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@color/menu_bg"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="gone">
 
         <TextView
             android:id="@+id/page_num"

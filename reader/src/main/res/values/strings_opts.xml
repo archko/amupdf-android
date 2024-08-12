@@ -165,4 +165,6 @@
     <string name="bookmark_page">Page:</string>
     <string name="no_bookmark">No bookmark,add one?</string>
 
+    <string name="tts_failed">Init tts engine failed.</string>
+
 </resources>
