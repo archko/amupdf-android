@@ -25,7 +25,7 @@ open class WebdavConfigFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var themeId = R.style.AppTheme
+        var themeId = cn.archko.pdf.R.style.AppTheme
         setStyle(DialogFragment.STYLE_NO_TITLE, themeId)
         backupViewModel = BackupViewModel()
     }

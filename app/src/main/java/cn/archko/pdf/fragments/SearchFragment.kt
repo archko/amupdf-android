@@ -46,7 +46,7 @@ open class SearchFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val themeId = R.style.AppTheme
+        val themeId = cn.archko.pdf.R.style.AppTheme
         setStyle(STYLE_NO_TITLE, themeId)
     }
 

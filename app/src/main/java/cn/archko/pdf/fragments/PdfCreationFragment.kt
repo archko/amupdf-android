@@ -34,7 +34,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.Collections
 
-
 /**
  * @author: archko 2023/3/8 :14:34
  */
@@ -56,7 +55,7 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var themeId = R.style.AppTheme
+        var themeId = cn.archko.pdf.R.style.AppTheme
         setStyle(DialogFragment.STYLE_NO_TITLE, themeId)
 
         progressDialog = ProgressDialog(activity)

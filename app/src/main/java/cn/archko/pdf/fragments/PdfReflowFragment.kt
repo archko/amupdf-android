@@ -51,7 +51,7 @@ class PdfReflowFragment : DialogFragment(R.layout.fragment_reflow_pdf) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var themeId = R.style.AppTheme
+        var themeId = cn.archko.pdf.R.style.AppTheme
         setStyle(DialogFragment.STYLE_NO_TITLE, themeId)
 
         progressDialog = ProgressDialog(activity)

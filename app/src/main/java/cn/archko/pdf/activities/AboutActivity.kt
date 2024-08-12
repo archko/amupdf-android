@@ -33,8 +33,9 @@ class AboutActivity : AnalysticActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.about)
-        var name = "AMuPDF"
+        var name = "Dragon"
         var version = ""
         try {
             val packageInfo = packageManager.getPackageInfo(packageName, 0)

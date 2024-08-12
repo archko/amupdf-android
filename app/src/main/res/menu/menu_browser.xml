@@ -14,17 +14,17 @@
         android:title="@string/options"
         app:showAsAction="ifRoom" />
     <item
-            android:id="@+id/action_config_webdav"
-            android:title="@string/menu_config_webdav"
-            app:showAsAction="ifRoom" />
+        android:id="@+id/action_config_webdav"
+        android:title="@string/menu_config_webdav"
+        app:showAsAction="ifRoom" />
     <item
-            android:id="@+id/action_backup_webdav"
-            android:title="@string/menu_backup_webdav"
-            app:showAsAction="ifRoom" />
+        android:id="@+id/action_backup_webdav"
+        android:title="@string/menu_backup_webdav"
+        app:showAsAction="ifRoom" />
     <item
-            android:id="@+id/action_restore_webdav"
-            android:title="@string/menu_restore_webdav"
-            app:showAsAction="ifRoom" />
+        android:id="@+id/action_restore_webdav"
+        android:title="@string/menu_restore_webdav"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_extract"
         android:title="@string/menu_extract"

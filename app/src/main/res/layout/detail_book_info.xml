@@ -208,7 +208,7 @@
         android:id="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-            android:maxHeight="240dp"
+        android:maxHeight="200dp"
         android:paddingBottom="8dp"
         android:src="@drawable/icon"
         app:layout_constraintLeft_toLeftOf="parent"
