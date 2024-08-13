@@ -1,8 +1,10 @@
 package cn.archko.pdf.core.listeners;
 
+import android.view.MotionEvent;
+
 public interface SimpleGestureListener {
 
-    public void onSingleTapConfirmed(int currentPage);
+    void onSingleTapConfirmed(MotionEvent ev, int currentPage);
 
-    public void onDoubleTapEvent(int currentPage);
+    void onDoubleTapEvent(MotionEvent ev, int currentPage);
 }

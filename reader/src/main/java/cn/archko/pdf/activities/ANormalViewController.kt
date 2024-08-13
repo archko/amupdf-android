@@ -5,7 +5,6 @@ import android.app.Activity.RESULT_FIRST_USER
 import android.app.ProgressDialog
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.view.GestureDetector
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
@@ -43,7 +42,7 @@ class ANormalViewController(
     private var pdfViewModel: PDFViewModel,
     private var mPath: String,
     private var pageControls: PageControls?,
-    private var gestureDetector: GestureDetector?,
+    private var simpleListener: SimpleGestureListener?,
     private var crop: Boolean,
 ) :
     OutlineListener, AViewController {
@@ -62,12 +61,13 @@ class ANormalViewController(
 
     private var simpleGestureListener: SimpleGestureListener = object :
         SimpleGestureListener {
-        override fun onSingleTapConfirmed(currentPage: Int) {
-            showPageToast(currentPage)
+        override fun onSingleTapConfirmed(ev: MotionEvent, currentPage: Int) {
+            simpleListener?.onSingleTapConfirmed(ev, currentPage)
+            //showPageToast(currentPage)
         }
 
-        override fun onDoubleTapEvent(currentPage: Int) {
-            //mPageSeekBarControls!!.toggleSeekControls()
+        override fun onDoubleTapEvent(ev: MotionEvent, currentPage: Int) {
+            //simpleListener?.onDoubleTapEvent(ev, currentPage)
         }
     }
 
@@ -149,7 +149,6 @@ class ANormalViewController(
 
             setOrientation(scrollOrientation)
             gotoPage(pos)
-            addGesture()
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
@@ -163,7 +162,6 @@ class ANormalViewController(
 
             setOrientation(scrollOrientation)
             gotoPage(pos)
-            addGesture()
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
@@ -190,14 +188,6 @@ class ANormalViewController(
 
     override fun getDocumentView(): View {
         return frameLayout
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun addGesture() {
-        documentView.setOnTouchListener { v, event ->
-            val res: Boolean? = gestureDetector?.onTouchEvent(event)
-            return@setOnTouchListener res!!
-        }
     }
 
     private fun gotoPage(pos: Int) {
@@ -255,24 +245,22 @@ class ANormalViewController(
     }
 
     override fun tryHyperlink(ev: MotionEvent): Boolean {
-        //return documentView.tryHyperlink(ev)
-        return false //TODO
+        return false
     }
 
-    //完全忽略点击事件
-    override fun onSingleTap(e: MotionEvent, margin: Int): Boolean {
-        /*if (tryHyperlink(e)) {
-            return true
+    override fun onSingleTap(ev: MotionEvent?, margin: Int): Boolean {
+        if (ev == null) {
+            return false
         }
         val documentView = getDocumentView()
         val height =
             if (scrollOrientation == LinearLayoutManager.VERTICAL) documentView.height else documentView.width
         val top = height / 4
         val bottom = height * 3 / 4
-        if (scrollPage(e.y.toInt(), top, bottom, margin)) {
+        if (scrollPage(ev.y.toInt(), top, bottom, margin)) {
             return true
-        }*/
-        return true
+        }
+        return false
     }
 
     override fun onDoubleTap() {

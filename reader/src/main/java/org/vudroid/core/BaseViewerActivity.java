@@ -4,8 +4,8 @@ import android.app.ProgressDialog;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -28,7 +28,6 @@ import cn.archko.pdf.common.PdfOptionRepository;
 import cn.archko.pdf.core.cache.BitmapCache;
 import cn.archko.pdf.core.cache.BitmapPool;
 import cn.archko.pdf.core.common.AppExecutors;
-import cn.archko.pdf.core.common.IntentFile;
 import cn.archko.pdf.core.common.SensorHelper;
 import cn.archko.pdf.core.common.StatusBarHelper;
 import cn.archko.pdf.core.listeners.SimpleGestureListener;
@@ -228,12 +227,12 @@ public abstract class BaseViewerActivity extends FragmentActivity implements Dec
     private SimpleGestureListener simpleGestureListener = new SimpleGestureListener() {
 
         @Override
-        public void onSingleTapConfirmed(int currentPage) {
+        public void onSingleTapConfirmed(MotionEvent ev, int currentPage) {
             showPageIndex(currentPage);
         }
 
         @Override
-        public void onDoubleTapEvent(int currentPage) {
+        public void onDoubleTapEvent(MotionEvent ev, int currentPage) {
             onDoubleTap(currentPage);
         }
     };

@@ -6,16 +6,13 @@ import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.os.Build;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import org.vudroid.core.events.ZoomListener;
 import org.vudroid.core.models.CurrentPageModel;
@@ -23,7 +20,6 @@ import org.vudroid.core.models.DecodingProgressModel;
 import org.vudroid.core.models.ZoomModel;
 import org.vudroid.core.multitouch.MultiTouchZoom;
 
-//import cn.archko.pdf.core.common.PdfOptionRepository;
 import cn.archko.pdf.core.entity.APage;
 import cn.archko.pdf.core.link.Hyperlink;
 import cn.archko.pdf.core.listeners.SimpleGestureListener;
@@ -843,7 +839,15 @@ public class DocumentView extends View implements ZoomListener {
             if (tryHyperlink(e)) {
                 return true;
             }
-            int height = getHeight();
+            if (null != simpleGestureListener) {
+                Page page = getEventPage(e);
+                if (null != page) {
+                    simpleGestureListener.onSingleTapConfirmed(e, page.index);
+                }
+                return true;
+            }
+
+            /*int height = getHeight();
             int top = height / 4;
             int bottom = height * 3 / 4;
             //Log.d(VIEW_LOG_TAG, "height:"+height+" y:"+e.getY()+" mMargin:"+mMargin);
@@ -854,13 +858,8 @@ public class DocumentView extends View implements ZoomListener {
             } else if ((int) e.getY() > bottom) {
                 scrollPage(height);
             } else {
-                if (null != simpleGestureListener) {
-                    Page page = getEventPage(e);
-                    if (null != page) {
-                        simpleGestureListener.onSingleTapConfirmed(page.index);
-                    }
-                }
-            }
+
+            }*/
             return true;
         }
 
@@ -869,21 +868,22 @@ public class DocumentView extends View implements ZoomListener {
             return false;
         }
 
-        @Override
+        /*@Override
         public boolean onDoubleTapEvent(MotionEvent ev) {
             if (ev.getEventTime() - lastDownEventTime < DOUBLE_TAP_TIME) {
                 if (null != simpleGestureListener) {
                     Page page = getEventPage(ev);
                     if (null != page) {
-                        simpleGestureListener.onDoubleTapEvent(page.index);
+                        simpleGestureListener.onDoubleTapEvent(ev, page.index);
                     }
                 }
+                lastDownEventTime = 0;
                 return true;
             } else {
                 lastDownEventTime = ev.getEventTime();
             }
             return false;
-        }
+        }*/
 
         public boolean onDown(MotionEvent ev) {
             stopScroller();

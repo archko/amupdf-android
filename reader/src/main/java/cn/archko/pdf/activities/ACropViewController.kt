@@ -18,6 +18,7 @@ import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.listeners.SimpleGestureListener
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
 import cn.archko.pdf.listeners.AViewController
@@ -35,7 +36,7 @@ class ACropViewController(
     private var pdfViewModel: PDFViewModel,
     private var mPath: String,
     private var pageControls: PageControls?,
-    private var gestureDetector: GestureDetector?,
+    private var simpleListener: SimpleGestureListener?,
 ) :
     OutlineListener, AViewController {
 
@@ -139,7 +140,7 @@ class ACropViewController(
     @SuppressLint("ClickableViewAccessibility")
     private fun addGesture() {
         mRecyclerView.setOnTouchListener { _, event ->
-            gestureDetector!!.onTouchEvent(event)
+            //gestureDetector!!.onTouchEvent(event)
             false
         }
     }
@@ -256,7 +257,10 @@ class ACropViewController(
         return false
     }
 
-    override fun onSingleTap(e: MotionEvent, margin: Int): Boolean {
+    override fun onSingleTap(e: MotionEvent?, margin: Int): Boolean {
+        if (e==null){
+            return false
+        }
         if (tryHyperlink(e)) {
             return true
         }

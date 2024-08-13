@@ -11,7 +11,6 @@ import android.os.SystemClock
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.util.SparseArray
-import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
@@ -27,6 +26,7 @@ import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.Bookmark
+import cn.archko.pdf.core.listeners.SimpleGestureListener
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.fragments.OutlineFragment
 import cn.archko.pdf.fragments.SleepTimerDialog
@@ -128,71 +128,47 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         } else {
             (margin * 0.03).toInt()
         }
-        gestureDetector = GestureDetector(this, object : GestureDetector.OnGestureListener {
-
-            override fun onDown(e: MotionEvent): Boolean {
-                return false
-            }
-
-            override fun onShowPress(e: MotionEvent) {
-
-            }
-
-            override fun onSingleTapUp(e: MotionEvent): Boolean {
-                return false
-            }
-
-            override fun onScroll(
-                e1: MotionEvent?,
-                e2: MotionEvent,
-                distanceX: Float,
-                distanceY: Float
-            ): Boolean {
-                return false
-            }
-
-            override fun onLongPress(e: MotionEvent) {
-
-            }
-
-            override fun onFling(
-                e1: MotionEvent?,
-                e2: MotionEvent,
-                velocityX: Float,
-                velocityY: Float
-            ): Boolean {
-                return false
-            }
-        })
-
-        val finalMargin = margin
-        gestureDetector!!.setOnDoubleTapListener(object : GestureDetector.OnDoubleTapListener {
-
-            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                if (mReflowLayout.visibility == View.VISIBLE) {
-                    mReflowLayout.visibility = View.GONE
-                    return true
+        simpleGestureListener = object : SimpleGestureListener {
+            override fun onSingleTapConfirmed(ev: MotionEvent?, currentPage: Int) {
+                if (!isDocLoaded) {
+                    return
                 }
-
-                if (onSingleTap()) {
-                    return true
+                if (viewMode == ViewMode.REFLOW) {
+                    var showFlag = false
+                    if (pageControls?.visibility() == View.VISIBLE) {
+                        pageControls?.hide()
+                        showFlag = true
+                    }
+                    if (mReflowLayout.visibility == View.VISIBLE) {
+                        mReflowLayout.visibility = View.GONE
+                        showFlag = true
+                    }
+                    if (!showFlag) {
+                        pageControls?.show()
+                        viewController?.getCurrentPos()
+                            ?.let { pageControls?.updatePageProgress(it) }
+                        mReflowLayout.visibility = View.VISIBLE
+                    }
+                } else {
+                    if (mReflowLayout.visibility == View.VISIBLE) {
+                        mReflowLayout.visibility = View.GONE
+                    }
+                    if (pageControls?.visibility() == View.VISIBLE) {
+                        pageControls?.hide()
+                        viewController?.getCurrentPos()
+                            ?.let { pageControls?.updatePageProgress(it) }
+                        return
+                    } else {
+                        if (viewController?.onSingleTap(ev, margin) != true) {
+                            pageControls?.show()
+                        }
+                    }
                 }
-
-                if (viewController?.onSingleTap(e, finalMargin) == false) {
-                    showPageToast()
-                }
-                return true
             }
 
-            override fun onDoubleTap(e: MotionEvent): Boolean {
-                onDoubleTap()
-                return true
+            override fun onDoubleTapEvent(ev: MotionEvent?, currentPage: Int) {
             }
-
-            override fun onDoubleTapEvent(e: MotionEvent): Boolean {
-                return false
-            }
-        })
+        }
     }
 
     private fun applyViewMode(pos: Int) {
@@ -208,7 +184,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             this@AMuPDFRecyclerViewActivity,
             mReflowLayout, pdfViewModel, mPath!!,
             pageControls!!,
-            gestureDetector
+            simpleGestureListener
         )
         viewController = aViewController
         Logcat.d("applyViewMode:$viewMode, pos:$pos,forceCropParam: $forceCropParam, controller:$viewController")
@@ -390,11 +366,14 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
     private fun toggleReflow() {
         val reflow = !pdfViewModel.checkReflow()
-        if (reflow) {  //如果原来是文本重排模式,则切换为自动切边或普通模式
+        if (!reflow) {  //如果原来是文本重排模式,则切换为自动切边或普通模式
             if (pdfViewModel.checkCrop()) {
                 viewMode = ViewMode.CROP
             } else {
                 viewMode = ViewMode.NORMAL
+            }
+            if (mReflowLayout.visibility == View.VISIBLE) {
+                mReflowLayout.visibility = View.GONE
             }
         } else {
             viewMode = ViewMode.REFLOW
@@ -420,30 +399,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         val pos = getCurrentPos()
         if (pos > 0) {
             viewController?.scrollToPosition(pos + 1)
-        }
-    }
-
-    override fun onSingleTap(): Boolean {
-        if (pageControls?.visibility() == View.VISIBLE) {
-            pageControls?.hide()
-            return true
-        }
-        return false
-    }
-
-    override fun onDoubleTap() {
-        super.onDoubleTap()
-        if (!isDocLoaded) {
-            return
-        }
-
-        viewController?.getCurrentPos()?.let { pageControls?.updatePageProgress(it) }
-        pageControls?.toggleControls()
-        viewController?.onDoubleTap()
-
-        if (mReflowLayout.visibility == View.VISIBLE) {
-            mReflowLayout.visibility = View.GONE
-            return
         }
     }
 
@@ -684,7 +639,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             pdfViewModel: PDFViewModel,
             path: String,
             pageSeekBarControls: PageControls,
-            gestureDetector: GestureDetector?,
+            gestureDetector: SimpleGestureListener?,
         ): AViewController {
             //val aViewController = viewControllerCache.get(viewMode.ordinal)
             //if (null != aViewController) {
@@ -708,7 +663,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             pdfViewModel: PDFViewModel,
             path: String,
             pageSeekBarControls: PageControls,
-            gestureDetector: GestureDetector?,
+            gestureDetector: SimpleGestureListener?,
         ): AViewController {
             if (viewMode == ViewMode.CROP) {
                 return ANormalViewController(

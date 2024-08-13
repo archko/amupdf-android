@@ -23,6 +23,7 @@ import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.listeners.DataListener
+import cn.archko.pdf.core.listeners.SimpleGestureListener
 import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
 import cn.archko.pdf.core.widgets.ViewerDividerItemDecoration
 import cn.archko.pdf.entity.FontBean
@@ -47,10 +48,12 @@ class AReflowViewController(
     private var pdfViewModel: PDFViewModel,
     private var mPath: String,
     private var pageControls: PageControls?,
-    private var gestureDetector: GestureDetector?,
+    private var simpleListener: SimpleGestureListener?,
 ) :
     OutlineListener, AViewController {
 
+    val DOUBLE_TAP_TIME: Int = 600
+    private var lastDownEventTime: Long = 0
     private var mStyleControls: View? = null
 
     private lateinit var mRecyclerView: ARecyclerView
@@ -58,12 +61,21 @@ class AReflowViewController(
     private val START_PROGRESS = 15
     private lateinit var mPageSizes: List<APage>
     private var scope: CoroutineScope? = null
+    private var mGestureDetector: GestureDetector? = null
 
     init {
         initView()
     }
 
+    private inner class MySimpleOnGestureListener : GestureDetector.SimpleOnGestureListener() {
+        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+            simpleListener?.onSingleTapConfirmed(e, 0)
+            return true
+        }
+    }
+
     private fun initView() {
+        mGestureDetector = GestureDetector(context, MySimpleOnGestureListener())
         mRecyclerView = ARecyclerView(context)//contentView.findViewById(R.id.recycler_view)
         with(mRecyclerView) {
             descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
@@ -83,6 +95,8 @@ class AReflowViewController(
                 }
             })
         }
+
+        initStyleControls()
     }
 
     override fun init(pageSizes: List<APage>, pos: Int, scrollOrientation: Int) {
@@ -123,8 +137,7 @@ class AReflowViewController(
     @SuppressLint("ClickableViewAccessibility")
     private fun addGesture() {
         mRecyclerView.setOnTouchListener { v, event ->
-            gestureDetector?.onTouchEvent(event)
-            false
+            mGestureDetector?.onTouchEvent(event) == true
         }
     }
 
@@ -225,30 +238,22 @@ class AReflowViewController(
         return false
     }
 
-    override fun onSingleTap(e: MotionEvent, margin: Int): Boolean {
+    override fun onSingleTap(ev: MotionEvent?, margin: Int): Boolean {
+        if (ev == null) {
+            return false
+        }
         val documentView = getDocumentView()
         val height = documentView.height
-        val left = documentView.width / 4
         val top = height / 4
         val bottom = height * 3 / 4
-        if (scrollPage(e.y.toInt(), top, bottom, margin)) {
-            return true
+        if (scrollPage(ev.y.toInt(), top, bottom, margin)) {
+            return false
         }
-        if (e.x < left) {
-            showReflowConfigMenu()
-        } else {
-            if (mStyleControls?.visibility == View.VISIBLE) {
-                mStyleControls?.visibility = View.GONE
-            }
-        }
+
         return true
     }
 
     override fun onDoubleTap() {
-        //if (mMupdfDocument == null) {
-        //    return
-        //}
-        mStyleControls?.visibility = View.GONE
     }
 
     override fun onSelectedOutline(index: Int) {
@@ -278,8 +283,6 @@ class AReflowViewController(
     //--------------------------------------
 
     override fun onResume() {
-        mStyleControls?.visibility = View.GONE
-
         mRecyclerView.postDelayed({ mRecyclerView.adapter?.notifyDataSetChanged() }, 250L)
     }
 
@@ -315,19 +318,6 @@ class AReflowViewController(
 
     //===========================================
     override fun showController() {
-        mStyleControls?.visibility = View.VISIBLE
-    }
-
-    private fun showReflowConfigMenu() {
-        if (null == mStyleControls) {
-            initStyleControls()
-        } else {
-            if (mStyleControls?.visibility == View.VISIBLE) {
-                mStyleControls?.visibility = View.GONE
-            } else {
-                showStyleFragment()
-            }
-        }
     }
 
     private var fontSeekBar: SeekBar? = null
@@ -363,7 +353,6 @@ class AReflowViewController(
             lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
             mControllerLayout.addView(mStyleControls, lp)
         }
-        mStyleControls?.visibility = View.VISIBLE
 
         mStyleHelper?.let {
             val progress = (it.styleBean?.textSize!! - START_PROGRESS).toInt()
@@ -464,9 +453,4 @@ class AReflowViewController(
         mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
         updateReflowAdapter()
     }
-
-    private fun showStyleFragment() {
-        mStyleControls?.visibility = View.VISIBLE
-    }
-
 }

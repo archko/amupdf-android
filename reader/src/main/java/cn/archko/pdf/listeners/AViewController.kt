@@ -15,7 +15,7 @@ interface AViewController {
     fun doLoadDoc(pageSizes: List<APage>, pos: Int)
 
     fun getDocumentView(): View
-    fun onSingleTap(e: MotionEvent, margin: Int): Boolean
+    fun onSingleTap(ev: MotionEvent?, margin: Int): Boolean
     fun onDoubleTap()
 
     fun getCurrentPos(): Int

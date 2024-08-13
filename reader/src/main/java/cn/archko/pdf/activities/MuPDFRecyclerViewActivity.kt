@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
 import android.text.TextUtils
-import android.view.GestureDetector
 import android.view.Gravity
 import android.view.View
 import android.view.Window
@@ -23,6 +22,7 @@ import cn.archko.pdf.core.common.SensorHelper
 import cn.archko.pdf.core.common.StatusBarHelper
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.State
+import cn.archko.pdf.core.listeners.SimpleGestureListener
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.viewmodel.PDFViewModel
@@ -42,7 +42,7 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
 
     //protected lateinit var progressDialog: ProgressDialog
 
-    protected var gestureDetector: GestureDetector? = null
+    protected var simpleGestureListener: SimpleGestureListener? = null
     protected var pageNumberToast: Toast? = null
 
     protected var sensorHelper: SensorHelper? = null
@@ -174,10 +174,6 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         return null
     }
 
-    open fun onSingleTap(): Boolean {
-        return false
-    }
-
     fun showPageToast() {
         val pos = getCurrentPos()
         val pageText = (pos + 1).toString() + "/" + pdfViewModel.countPages()
@@ -189,12 +185,6 @@ abstract class MuPDFRecyclerViewActivity : AnalysticActivity() {
         }
         pageNumberToast!!.setGravity(Gravity.BOTTOM or Gravity.START, Utils.dipToPixel(15f), 0)
         pageNumberToast!!.show()
-    }
-
-    open fun onDoubleTap() {
-        if (!isDocLoaded) {
-            return
-        }
     }
 
     open fun updateProgress(index: Int) {
