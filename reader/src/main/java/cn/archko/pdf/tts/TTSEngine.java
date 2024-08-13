@@ -44,8 +44,8 @@ public class TTSEngine {
 
     private TextToSpeech textToSpeech;
     private boolean initStatus = false;
-    private final Map<String, String> content = new HashMap<>();
-    private final List<String> keys = new ArrayList<>();
+    private final Map<String, String> keys = new HashMap<>();
+    private final List<String> ttsContent = new ArrayList<>();
 
     public boolean isInitStatus() {
         return initStatus;
@@ -97,8 +97,8 @@ public class TTSEngine {
     }
 
     public void reset() {
-        content.clear();
         keys.clear();
+        ttsContent.clear();
     }
 
     public void getTTS(OnInitListener listener) {
@@ -125,26 +125,26 @@ public class TTSEngine {
     }
 
     public boolean resume() {
-        if (null == textToSpeech || content.isEmpty() || keys.isEmpty()) {
+        if (null == textToSpeech || keys.isEmpty() || ttsContent.isEmpty()) {
             Logcat.d(TAG, "no content.");
             return false;
         }
-        if (content.size() != keys.size()) {
+        if (keys.size() != ttsContent.size()) {
             Logcat.d(TAG, "something wrong.");
-            keys.clear();
-            keys.addAll(content.keySet());
+            ttsContent.clear();
+            ttsContent.addAll(keys.keySet());
         }
 
         textToSpeech.stop();
-        String key = keys.remove(keys.size() - 1);
-        speak(key, content.get(key));
+        String content = ttsContent.remove(0);
+        speak(keys.get(content), content);
 
         return true;
     }
 
     public int getLast() {
-        if (!keys.isEmpty()) {
-            String ss = keys.get(keys.size() - 1);
+        if (!ttsContent.isEmpty()) {
+            String ss = keys.get(ttsContent.size() - 1);
             String[] arr = ss.split("-");
             try {
                 return Utils.parseInt(arr[0]);
@@ -170,8 +170,8 @@ public class TTSEngine {
             return;
         }
 
-        content.put(key, text);
-        keys.add(key);
+        keys.put(text, key);
+        ttsContent.add(text);
         textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override
             public void onStart(String utteranceId) {
@@ -181,21 +181,22 @@ public class TTSEngine {
                 }
             }
 
+            //utteranceId这个是内容
             @Override
             public void onDone(String utteranceId) {
-                Logcat.d(TAG, "onDone:" + utteranceId);
-                keys.remove(utteranceId);
-                content.remove(utteranceId);
+                //Logcat.d(TAG, "onDone:" + utteranceId);
+                ttsContent.remove(utteranceId);
+                String key = keys.remove(utteranceId);
                 if (null != progressListener) {
-                    progressListener.onDone(utteranceId);
+                    progressListener.onDone(key);
                 }
             }
 
             @Override
             public void onError(String utteranceId) {
                 Logcat.d(TAG, "onError:" + utteranceId);
+                ttsContent.remove(utteranceId);
                 keys.remove(utteranceId);
-                content.remove(utteranceId);
             }
         });
         textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, null, text);

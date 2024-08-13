@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -57,6 +58,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     private val viewControllerCache: SparseArray<AViewController> = SparseArray<AViewController>()
     private var viewMode: ViewMode = ViewMode.CROP
     private var ttsMode = false
+    private val handler = Handler(Looper.getMainLooper())
 
     /**
      * 用AMupdf打开,传入强制切边参数,如果是-1,是没有设置,如果设置1表示强制切边,如果是0不切边,让切边按钮失效
@@ -507,13 +509,14 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             override fun onStart(utteranceId: String) {
             }
 
-            override fun onDone(utteranceId: String) {
+            override fun onDone(key: String) {
                 try {
-                    val arr = utteranceId.split("-")
+                    //Logcat.d("onDone:$key")
+                    val arr = key.split("-")
                     val page = Utils.parseInt(arr[0])
                     val current = getCurrentPos()
                     if (current != page) {
-                        onSelectedOutline(page)
+                        handler.post { onSelectedOutline(page + 1) }
                     }
                 } catch (e: Exception) {
                     Logcat.e(e)
@@ -528,16 +531,14 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             }
         }
         ttsClose.setOnClickListener {
-            ttsMode = false
-            TTSEngine.get().shutdown()
+            closeTts()
         }
         ttsSleep.setOnClickListener {
             SleepTimerDialog(object : SleepTimerDialog.TimeListener {
                 override fun onTime(minute: Int) {
                     Logcat.d("TTSEngine.get().stop()")
-                    Handler().postDelayed({
-                        ttsMode = false
-                        TTSEngine.get().shutdown()
+                    handler.postDelayed({
+                        closeTts()
                     }, (minute * 60000).toLong())
                 }
             }).showDialog(this)
@@ -545,6 +546,12 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         lifecycleScope.launch {
             pdfViewModel.decodeTextForTts(getCurrentPos())
         }
+    }
+
+    private fun closeTts() {
+        ttsLayout.visibility = View.GONE
+        ttsMode = false
+        TTSEngine.get().shutdown()
     }
 
     private fun changeOri(ori: Int) {
