@@ -32,7 +32,7 @@
                 android:layout_marginStart="4dp"
                 android:background="@drawable/button"
                 android:scaleType="center"
-                android:src="@drawable/ic_back" />
+                android:src="@drawable/ic_reader_back" />
 
             <Space
                 android:layout_width="0dp"

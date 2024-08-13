@@ -619,7 +619,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
                 Toast.LENGTH_SHORT
             ).show()
             pageControls?.reflowButton!!.setColorFilter(Color.argb(0xFF, 172, 114, 37))
-            pageControls?.autoCropButton!!.setColorFilter(Color.argb(0xFF, 255, 255, 255))
+            pageControls?.autoCropButton!!.setImageResource(R.drawable.ic_no_crop)
             return false
         }
         setCropButton(crop)
@@ -628,9 +628,10 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
     private fun setCropButton(crop: Boolean) {
         if (crop) {
-            pageControls?.autoCropButton!!.setColorFilter(Color.argb(0xFF, 172, 114, 37))
+            pageControls?.autoCropButton!!.setImageResource(R.drawable.ic_crop)
         } else {
-            pageControls?.autoCropButton!!.setColorFilter(Color.argb(0xFF, 255, 255, 255))
+            pageControls?.autoCropButton!!.setImageResource(R.drawable.ic_no_crop)
+
         }
     }
 
