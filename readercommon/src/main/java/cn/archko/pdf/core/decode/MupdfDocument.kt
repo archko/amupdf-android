@@ -285,6 +285,14 @@ class MupdfDocument(private val context: Context) {
         } else null
     }
 
+    fun decodeReflowText(index: Int): List<ReflowBean>? {
+        val p = loadPage(index) ?: return null
+        val result = p.textAsText("preserve-whitespace,inhibit-spaces")
+        return if (null != result) {
+            ParseTextMain.parseAsTextList(result, index)
+        } else null
+    }
+
     companion object {
         private const val TAG = "Mupdf"
         public var ZOOM = 160f / 72

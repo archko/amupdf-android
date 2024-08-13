@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:seekarc="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <cn.archko.pdf.widgets.SeekArc
+            android:id="@+id/seekArc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="85dp"
+            seekarc:arcWidth="8dp"
+            seekarc:max="120"
+            seekarc:progress="20"
+            seekarc:progressWidth="8dp"
+            seekarc:rotation="180"
+            seekarc:startAngle="30"
+            seekarc:sweepAngle="300"
+            seekarc:touchInside="true" />
+
+        <TextView
+            android:id="@+id/timer_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textSize="40sp"
+            tools:text="30" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:paddingTop="80dp"
+            android:textSize="16sp"
+            android:text="minute" />
+
+    </RelativeLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="OK" />
+
+</LinearLayout>

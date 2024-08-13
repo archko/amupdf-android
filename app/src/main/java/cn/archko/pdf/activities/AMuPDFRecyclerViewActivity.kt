@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
 import android.os.SystemClock
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -27,10 +28,12 @@ import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.Bookmark
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.fragments.OutlineFragment
+import cn.archko.pdf.fragments.SleepTimerDialog
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TTSActivity
 import cn.archko.pdf.tts.TTSEngine
+import cn.archko.pdf.tts.TTSEngine.ProgressListener
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.PageControls
 import com.baidu.ai.edge.ui.activity.OcrActivity
@@ -48,6 +51,9 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     private lateinit var mReflowLayout: RelativeLayout
     private lateinit var mContentView: View
     private lateinit var ttsLayout: View
+    private lateinit var ttsPlay: View
+    private lateinit var ttsClose: View
+    private lateinit var ttsSleep: View
     private val viewControllerCache: SparseArray<AViewController> = SparseArray<AViewController>()
     private var viewMode: ViewMode = ViewMode.CROP
     private var ttsMode = false
@@ -63,6 +69,9 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
         mContentView = findViewById(R.id.content)
         ttsLayout = findViewById(R.id.tts_layout)
+        ttsPlay = findViewById(R.id.ttsPlay)
+        ttsClose = findViewById(R.id.ttsClose)
+        ttsSleep = findViewById(R.id.ttsSleep)
         mReflowLayout = findViewById(R.id.reflow_layout)
 
         pageControls = createControls()
@@ -471,10 +480,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
                 override fun toggleTts() {
                     if (ttsMode) {
-                        TTSEngine.get().stop()
-                        TTSEngine.get().reset()
-                        ttsMode = false
-                        ttsLayout.visibility = View.GONE
                     } else {
                         TTSEngine.get().getTTS { status: Int ->
                             if (status == TextToSpeech.SUCCESS) {
@@ -498,7 +503,48 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     }
 
     private fun startTts() {
-        pdfViewModel.mupdfDocument?.decodeReflow(getCurrentPos())
+        TTSEngine.get().setSpeakListener(object : ProgressListener {
+            override fun onStart(utteranceId: String) {
+            }
+
+            override fun onDone(utteranceId: String) {
+                try {
+                    val arr = utteranceId.split("-")
+                    val page = Utils.parseInt(arr[0])
+                    val current = getCurrentPos()
+                    if (current != page) {
+                        onSelectedOutline(page)
+                    }
+                } catch (e: Exception) {
+                    Logcat.e(e)
+                }
+            }
+        })
+        ttsPlay.setOnClickListener {
+            if (TTSEngine.get().isSpeaking()) {
+                TTSEngine.get().stop()
+            } else {
+                TTSEngine.get().resume()
+            }
+        }
+        ttsClose.setOnClickListener {
+            ttsMode = false
+            TTSEngine.get().shutdown()
+        }
+        ttsSleep.setOnClickListener {
+            SleepTimerDialog(object : SleepTimerDialog.TimeListener {
+                override fun onTime(minute: Int) {
+                    Logcat.d("TTSEngine.get().stop()")
+                    Handler().postDelayed({
+                        ttsMode = false
+                        TTSEngine.get().shutdown()
+                    }, (minute * 60000).toLong())
+                }
+            }).showDialog(this)
+        }
+        lifecycleScope.launch {
+            pdfViewModel.decodeTextForTts(getCurrentPos())
+        }
     }
 
     private fun changeOri(ori: Int) {

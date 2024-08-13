@@ -21,6 +21,7 @@ import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.entity.State
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.entity.OutlineItem
+import cn.archko.pdf.tts.TTSEngine
 import com.artifex.mupdf.fitz.Page
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -420,5 +421,27 @@ class PDFViewModel : ViewModel() {
 
     fun loadPage(pageNum: Int): Page? {
         return mupdfDocument?.loadPage(pageNum)
+    }
+
+    fun decodeTextForTts(currentPos: Int) {
+        val last = TTSEngine.get().getLast()
+        val count = countPages() - 1
+        Logcat.i(Logcat.TAG, "decodeTextForTts:last:$last, count:$count, currentPos:$currentPos")
+        if (last == count) {
+            return
+        }
+        if (last > 0) {
+            TTSEngine.get().reset()
+        }
+        val start = System.currentTimeMillis()
+        for (i in currentPos until count) {
+            val beans: List<ReflowBean>? = mupdfDocument?.decodeReflowText(i)
+            if (beans != null) {
+                for (j in beans.indices) {
+                    TTSEngine.get().speak("$i-$j", beans[j].data)
+                }
+            }
+        }
+        Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
     }
 }

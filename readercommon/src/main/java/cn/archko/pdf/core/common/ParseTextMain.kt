@@ -41,6 +41,12 @@ object ParseTextMain {
         return list
     }
 
+    fun parseAsTextList(bytes: ByteArray, pageIndex: Int): List<ReflowBean> {
+        val content = String(bytes)
+        val list = txtParser.parseAsTextList(content, pageIndex)
+        return list
+    }
+
     fun parseXHtmlResult(bytes: ByteArray): String {
         val content = String(bytes)
         //return txtParser.parseTxt(UnicodeDecoder.parseXHtml(UnicodeDecoder.unEscape(content)))
@@ -122,7 +128,7 @@ object ParseTextMain {
             var lastBreak = true
             for (s in lists) {
                 val ss = s.trim()
-                if (ss.isNotEmpty()) {
+                if (!TextUtils.isEmpty(ss)) {
                     //if (Logcat.loggable) {
                     //    Logcat.longLog("text", ss)
                     //}
@@ -269,6 +275,46 @@ object ParseTextMain {
             }
             //Logcat.d("result=>>" + result);
             return parseList(list, pageIndex)
+        }
+
+        fun parseAsTextList(content: String, pageIndex: Int): List<ReflowBean> {
+            //Logcat.d("parse:==>" + content);
+            val sb = StringBuilder()
+            val list = ArrayList<String>()
+            var aChar: Char
+            for (element in content) {
+                aChar = element
+                if (aChar == '\n') {
+                    list.add(sb.toString())
+                    sb.setLength(0)
+                } else {
+                    sb.append(aChar)
+                }
+            }
+            //Logcat.d("result=>>${list.size}");
+            return parseTextList(list)
+        }
+
+        private fun parseTextList(lists: List<String>): List<ReflowBean> {
+            val sb = StringBuilder()
+            val reflowBeans = ArrayList<ReflowBean>()
+            val reflowBean = ReflowBean(null, ReflowBean.TYPE_STRING)
+            reflowBeans.add(reflowBean)
+            for (s in lists) {
+                val ss = s.trim()
+                if (!TextUtils.isEmpty(ss)) {
+                    sb.append(ss)
+                    reflowBean.data = sb.toString()
+                }
+            }
+
+            if (Logcat.loggable) {
+                Logcat.d("result", "length:${lists.size}")
+                for (rb in reflowBeans) {
+                    Logcat.longLog("result", rb.toString())
+                }
+            }
+            return reflowBeans
         }
 
         fun isLetterDigitOrChinese(str: String): Boolean {

@@ -17,6 +17,7 @@ import java.util.Map;
 
 import cn.archko.pdf.core.App;
 import cn.archko.pdf.core.common.Logcat;
+import cn.archko.pdf.core.utils.Utils;
 
 public class TTSEngine {
 
@@ -78,6 +79,11 @@ public class TTSEngine {
             }
         }
     };
+    private ProgressListener progressListener;
+
+    public void setSpeakListener(ProgressListener progressListener) {
+        this.progressListener = progressListener;
+    }
 
     public void shutdown() {
         Logcat.d(TAG, "shutdown");
@@ -136,6 +142,28 @@ public class TTSEngine {
         return true;
     }
 
+    public int getLast() {
+        if (!keys.isEmpty()) {
+            String ss = keys.get(keys.size() - 1);
+            String[] arr = ss.split("-");
+            try {
+                return Utils.parseInt(arr[0]);
+            } catch (Exception e) {
+                Logcat.e(ss, e);
+            }
+        }
+        return 0;
+    }
+
+    public boolean isSpeaking() {
+        if (textToSpeech == null) {
+            Logcat.d(TAG, "textToSpeech not initialized");
+            return false;
+        }
+
+        return textToSpeech.isSpeaking();
+    }
+
     public void speak(final String key, final String text) {
         if (textToSpeech == null) {
             Logcat.d(TAG, "textToSpeech not initialized");
@@ -148,13 +176,19 @@ public class TTSEngine {
             @Override
             public void onStart(String utteranceId) {
                 //Logcat.d(TAG, "onStart:" + utteranceId);
+                if (null != progressListener) {
+                    progressListener.onStart(utteranceId);
+                }
             }
 
             @Override
             public void onDone(String utteranceId) {
-                //Logcat.d(TAG, "onDone:" + utteranceId);
+                Logcat.d(TAG, "onDone:" + utteranceId);
                 keys.remove(utteranceId);
                 content.remove(utteranceId);
+                if (null != progressListener) {
+                    progressListener.onDone(utteranceId);
+                }
             }
 
             @Override
@@ -165,5 +199,11 @@ public class TTSEngine {
             }
         });
         textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, null, text);
+    }
+
+    public interface ProgressListener {
+        void onStart(String utteranceId);
+
+        void onDone(String utteranceId);
     }
 }
