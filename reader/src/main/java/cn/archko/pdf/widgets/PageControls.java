@@ -68,7 +68,6 @@ public class PageControls implements View.OnClickListener {
         mPath = view.findViewById(R.id.path);
         mTitle = view.findViewById(R.id.title);
         mBackButton = view.findViewById(R.id.back_button);
-        mBackButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
 
         mReflowButton.setOnClickListener(this);
         mOutlineButton.setOnClickListener(this);
