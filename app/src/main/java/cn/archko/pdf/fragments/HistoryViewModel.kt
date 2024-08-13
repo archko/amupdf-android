@@ -90,6 +90,32 @@ class HistoryViewModel : ViewModel() {
             }
         }
 
+    fun updateItem(book: FileBean) =
+        viewModelScope.launch {
+            val args = withContext(Dispatchers.IO) {
+                val totalCount: Int = progressDao.progressCount()
+                val progress = book.bookProgress?.name?.run {
+                    progressDao.getProgress(this)
+                }
+
+                Logcat.d("updateItem:$progress, $book")
+
+                val nList = arrayListOf<FileBean>()
+
+                book.bookProgress = progress
+                nList.addAll(list)
+                nList.remove(book)
+                nList.add(0, book)
+
+                return@withContext arrayOf<Any>(totalCount, nList)
+            }
+
+            withContext(Dispatchers.Main) {
+                list = args[1] as MutableList<FileBean>
+                _uiFileModel.value = args
+            }
+        }
+
     fun backupFromDb() {
         val now = System.currentTimeMillis()
         viewModelScope.launch {

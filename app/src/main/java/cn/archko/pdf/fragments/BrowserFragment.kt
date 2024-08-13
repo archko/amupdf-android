@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -71,6 +72,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
                 return oldItem.bookProgress!!.equals(newItem.bookProgress)
                         && oldItem.fileSize == newItem.fileSize
                         && oldItem.label == newItem.label
+                        && oldItem.label == newItem.label
             }
         }
 
@@ -127,7 +129,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     open fun onBackPressed(): Boolean {
         val path = Environment.getExternalStorageDirectory().absolutePath
         if (this.mCurrentPath != path && (this.mCurrentPath != "/" || this.mCurrentPath != "/storage/emulated/0")) {
-            val upFolder = File(this.mCurrentPath!!).parentFile
+            val upFolder = File(this.mCurrentPath).parentFile
             if (null != upFolder && upFolder.isDirectory) {
                 this.mCurrentPath = upFolder.absolutePath
                 loadData()
@@ -242,9 +244,8 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
 
     open fun emitFileBeans(fileList: List<FileBean>) {
         fileListAdapter.submitList(fileList)
-        //fileListAdapter.notifyDataSetChanged()
-        if (null != mPathMap[mCurrentPath!!]) {
-            val pos = mPathMap[mCurrentPath!!]
+        if (null != mPathMap[mCurrentPath]) {
+            val pos = mPathMap[mCurrentPath]
             if (pos!! < fileList.size) {
                 (filesListView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
                     pos,
@@ -256,15 +257,14 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         }
         mSwipeRefreshWidget.isRefreshing = false
 
-        bookViewModel.startGetProgress(fileList, mCurrentPath!!)
+        bookViewModel.startGetProgress(fileList, mCurrentPath)
         pathTextView.text = mCurrentPath
     }
 
     private fun emitScannerBean(args: Array<Any?>) {
         val path = args[0] as String
-        if (mCurrentPath.equals(path)) {
+        if (TextUtils.equals(mCurrentPath, path)) {
             fileListAdapter.submitList(args[1] as ArrayList<FileBean>)
-            fileListAdapter.notifyDataSetChanged()
         }
     }
 
@@ -322,7 +322,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             if (pos < 0) {
                 pos = 0
             }
-            mPathMap.put(mCurrentPath!!, pos)
+            mPathMap.put(mCurrentPath, pos)
             this@BrowserFragment.mCurrentPath = clickedFile.absolutePath
             loadData()
 

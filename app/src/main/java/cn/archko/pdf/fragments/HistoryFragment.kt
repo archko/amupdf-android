@@ -50,9 +50,9 @@ class HistoryFragment : BrowserFragment() {
         super.onCreate(savedInstanceState)
 
         vn.chungha.flowbus.collectFlowBus<GlobalEvent>(scope = this, isSticky = true) {
-            Logcat.d(TAG, "ACTION_STOPPED:${it.name}")
+            Logcat.d(TAG, "ACTION_STOPPED:${it.obj}")
             if (TextUtils.equals(ACTION_STOPPED, it.name)) {
-                onRefresh()
+                updateItem(it.obj as String)
             } else if (TextUtils.equals(ACTION_FAVORITED, it.name)) {
                 updateItem(it.obj as FileBean)
             } else if (TextUtils.equals(ACTION_UNFAVORITED, it.name)) {
@@ -78,6 +78,23 @@ class HistoryFragment : BrowserFragment() {
 
     override fun updateItem() {
         currentBean = null
+    }
+
+    private fun updateItem(path: String?) {
+        var book: FileBean? = null
+        path?.run {
+            for (fb in fileListAdapter.currentList) {
+                if (null != fb.file && TextUtils.equals(fb.file!!.absolutePath, this)) {
+                    book = fb
+                    break
+                }
+            }
+        }
+        if (book != null) {
+            historyViewModel.updateItem(book!!)
+        } else {
+            onRefresh()
+        }
     }
 
     private fun updateItem(fileBean: FileBean?) {
@@ -278,7 +295,6 @@ class HistoryFragment : BrowserFragment() {
         val entryList = args[1] as ArrayList<FileBean>
         mSwipeRefreshWidget.isRefreshing = false
         fileListAdapter.submitList(entryList)
-        fileListAdapter.notifyDataSetChanged()
         updateLoadingStatus(totalCount)
     }
 
