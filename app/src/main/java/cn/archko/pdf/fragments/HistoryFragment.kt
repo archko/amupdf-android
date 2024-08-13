@@ -295,6 +295,7 @@ class HistoryFragment : BrowserFragment() {
         val entryList = args[1] as ArrayList<FileBean>
         mSwipeRefreshWidget.isRefreshing = false
         fileListAdapter.submitList(entryList)
+        fileListAdapter.notifyDataSetChanged()
         updateLoadingStatus(totalCount)
     }
 

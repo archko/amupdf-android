@@ -59,7 +59,7 @@ object AdapterUtils {
     }
 
     fun setIcon(ext: String?, imageView: ImageView) {
-        var drawableId = R.drawable.ic_book_pdf
+        var drawableId = R.drawable.ic_book_text
         if (".pdf".equals(ext)) {
             drawableId = R.drawable.ic_book_pdf
         } else if (".djvu".equals(ext) || ".djv".equals(ext)) {

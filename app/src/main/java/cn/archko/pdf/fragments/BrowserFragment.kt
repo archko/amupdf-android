@@ -61,7 +61,12 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     protected val beanItemCallback: DiffUtil.ItemCallback<FileBean> =
         object : DiffUtil.ItemCallback<FileBean>() {
             override fun areItemsTheSame(oldItem: FileBean, newItem: FileBean): Boolean {
-                return oldItem.equals(newItem)
+                if (null == oldItem.bookProgress || null == newItem.bookProgress) {
+                    return false
+                }
+                return oldItem.bookProgress!!.equals(newItem.bookProgress)
+                        && oldItem.fileSize == newItem.fileSize
+                        && oldItem.label == newItem.label
             }
 
             @SuppressLint("DiffUtilEquals")
@@ -72,7 +77,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
                 return oldItem.bookProgress!!.equals(newItem.bookProgress)
                         && oldItem.fileSize == newItem.fileSize
                         && oldItem.label == newItem.label
-                        && oldItem.label == newItem.label
+                        && oldItem.file == newItem.file
             }
         }
 
