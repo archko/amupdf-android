@@ -66,18 +66,18 @@ class BookViewModel : ViewModel() {
     private var dirsFirst: Boolean = true
     private var showExtension: Boolean = true
     private val fileFilter: FileFilter = FileFilter { file ->
-        if (file.isDirectory) {
-            return@FileFilter true
-        }
         val fname = file.name.lowercase(Locale.ROOT)
         if (fname.startsWith(".")) {
             return@FileFilter false
+        }
+        if (file.isDirectory) {
+            return@FileFilter true
         }
 
         return@FileFilter IntentFile.isMuPdf(fname)
                 || IntentFile.isImage(fname)
                 || IntentFile.isText(fname)
-                || IntentFile.isDjvu(fname)
+                //|| IntentFile.isDjvu(fname)
     }
 
     fun loadFiles(home: String, currentPath: String, dirsFirst: Boolean, showExtension: Boolean) =
