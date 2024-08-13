@@ -3,7 +3,9 @@ package cn.archko.pdf.core.common
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.StreamUtils
+import org.mozilla.universalchardet.UniversalDetector
 import java.io.BufferedReader
+import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 
@@ -20,8 +22,9 @@ object TextHelper {
         var lineCount = 0
         val sb = StringBuilder()
         try {
-            val fileCharsetName = FileUtils.getFileCharsetName(path)
-            val isr = InputStreamReader(FileInputStream(path), fileCharsetName)
+            val stream = FileInputStream(File(path))
+            val encoding = UniversalDetector.detectCharset(stream)
+            val isr = InputStreamReader(FileInputStream(path), encoding)
             bufferedReader = BufferedReader(isr)
             var temp: String?
             while (bufferedReader.readLine().also { temp = it } != null) {

@@ -4,41 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:background="@color/extract_dialog_bg"
+    android:orientation="vertical"
     android:padding="16dp"
     tools:minWidth="380dp">
 
-    <!--<RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:clickable="true"
-            android:text="返回"
-            android:textSize="18sp" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="导出图片"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-    </RelativeLayout>-->
     <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:navigationIcon="@drawable/ic_back"
-            app:title="@string/extract_title" />
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:navigationIcon="@drawable/ic_back"
+        app:title="@string/extract_title" />
 
     <include
         android:id="@+id/extract"

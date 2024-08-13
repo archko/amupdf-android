@@ -135,7 +135,7 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
         var end: Int = 0
         var width = Utils.getScreenWidthPixelWithOrientation(requireActivity())
         if (binding.extract.extractLayout.visibility == View.VISIBLE) {
-            start = binding.extract.rangeSlider.values[0].toInt()
+            start = binding.extract.rangeSlider.values[0].toInt() - 1
             end = binding.extract.rangeSlider.values[1].toInt()
             width = binding.extract.resolutionSlider.value.toInt()
         }
@@ -189,7 +189,7 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
             var start: Int = 0
             var end: Int = 0
             if (binding.extract.extractLayout.visibility == View.VISIBLE) {
-                start = binding.extract.rangeSlider.values[0].toInt()
+                start = binding.extract.rangeSlider.values[0].toInt() - 1
                 end = binding.extract.rangeSlider.values[1].toInt()
             }
             val result = PDFCreaterHelper.extractToHtml(

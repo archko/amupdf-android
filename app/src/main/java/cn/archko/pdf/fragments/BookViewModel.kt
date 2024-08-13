@@ -77,7 +77,7 @@ class BookViewModel : ViewModel() {
         return@FileFilter IntentFile.isMuPdf(fname)
                 || IntentFile.isImage(fname)
                 || IntentFile.isText(fname)
-                //|| IntentFile.isDjvu(fname)
+                || IntentFile.isDjvu(fname)
     }
 
     fun loadFiles(home: String, currentPath: String, dirsFirst: Boolean, showExtension: Boolean) =

@@ -4,9 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.speech.tts.TextToSpeech
 import android.text.TextUtils
+import android.util.Log
 import android.view.GestureDetector
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -25,20 +28,27 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
+import cn.archko.mupdf.databinding.TxtReaderBinding
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFTextAdapter
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.GlobalEvent
 import cn.archko.pdf.core.common.IntentFile
+import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.common.SensorHelper
 import cn.archko.pdf.core.common.StatusBarHelper
 import cn.archko.pdf.core.common.TextHelper
+import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.core.widgets.ViewerDividerItemDecoration
 import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.fragments.FontsFragment
+import cn.archko.pdf.fragments.SleepTimerDialog
+import cn.archko.pdf.tts.TTSActivity
+import cn.archko.pdf.tts.TTSEngine
+import cn.archko.pdf.tts.TTSEngine.ProgressListener
 import cn.archko.pdf.viewmodel.PDFViewModel
 import kotlinx.coroutines.launch
 import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
@@ -50,13 +60,11 @@ import vn.chungha.flowbus.busEvent
 class TextActivity : AppCompatActivity() {
 
     private var path: String? = null
-    private var mUri: Uri? = null
     private var sensorHelper: SensorHelper? = null
     protected val pdfViewModel: PDFViewModel = PDFViewModel()
 
     private var mStyleControls: View? = null
-    private var mControllerLayout: RelativeLayout? = null
-    private var recyclerView: ARecyclerView? = null
+    private lateinit var binding: TxtReaderBinding
 
     private var mStyleHelper: StyleHelper? = null
     private var adapter: MuPDFTextAdapter? = null
@@ -64,6 +72,8 @@ class TextActivity : AppCompatActivity() {
 
     private var header: View? = null
     private var footer: View? = null
+    private var ttsMode = false
+    private val handler = Handler(Looper.getMainLooper())
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +85,7 @@ class TextActivity : AppCompatActivity() {
         initIntent()
 
         if (TextUtils.isEmpty(path)) {
+            finish()
             return
         }
 
@@ -93,18 +104,24 @@ class TextActivity : AppCompatActivity() {
             GestureDetector.SimpleOnGestureListener() {
 
             override fun onDoubleTap(e: MotionEvent): Boolean {
+                hideTopBar()
                 showReflowConfigMenu()
                 return super.onDoubleTap(e)
             }
 
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                val documentView = recyclerView!!
+                val documentView = binding.recyclerView
                 val top = documentView.height / 4
                 val bottom = documentView.height * 3 / 4
 
                 val rs: Boolean = scrollPage(e.y.toInt(), top, bottom, finalMargin)
                 if (!rs) {
-                    onSingleTap()
+                    if (hideReflowConfigMenu()) {
+                        return true
+                    }
+
+                    showOrHideTopBar()
+                    //onSingleTap()
                 }
                 return true
             }
@@ -127,12 +144,11 @@ class TextActivity : AppCompatActivity() {
             }
         })
 
-        recyclerView = ARecyclerView(this)
-        mControllerLayout = RelativeLayout(this)
-        mControllerLayout!!.addView(recyclerView)
-        setContentView(mControllerLayout)
+        binding = TxtReaderBinding.inflate(layoutInflater)
 
-        recyclerView?.run {
+        setContentView(binding.root)
+
+        binding.recyclerView.run {
             descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
             isNestedScrollingEnabled = false
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -165,30 +181,47 @@ class TextActivity : AppCompatActivity() {
 
         updateHeaderFooterBg()
 
-        recyclerView?.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
         lifecycleScope.launch {
             pdfViewModel.loadTextDoc(path!!)
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 pdfViewModel.textFlow.collect {
-                    adapter?.data = it.list
-                    adapter?.notifyDataSetChanged()
-                    loadBookmark()
+                    doLoadDoc(it.list)
                 }
             }
         }
     }
 
+    private fun doLoadDoc(list: List<ReflowBean>?) {
+        adapter?.data = list
+        adapter?.notifyDataSetChanged()
+        loadBookmark()
+
+        binding.title.text = path
+        binding.backButton.setOnClickListener { finish() }
+        binding.ttsButton.setOnClickListener { toggleTts() }
+        /*binding.oriButton.setOnClickListener {
+            val layoutManager = binding.recyclerView.layoutManager as LinearLayoutManager
+            val ori = layoutManager.orientation
+            if (ori == LinearLayoutManager.VERTICAL) {
+
+            } else {
+
+            }
+        }*/
+    }
+
     fun scrollPage(y: Int, top: Int, bottom: Int, margin: Int): Boolean {
         if (y < top) {
-            var scrollY = recyclerView!!.scrollY
-            scrollY -= recyclerView!!.height
-            recyclerView!!.scrollBy(0, scrollY + margin)
+            var scrollY = binding.recyclerView.scrollY
+            scrollY -= binding.recyclerView.height
+            binding.recyclerView.scrollBy(0, scrollY + margin)
             return true
         } else if (y > bottom) {
-            var scrollY = recyclerView!!.scrollY
-            scrollY += recyclerView!!.height
-            recyclerView!!.scrollBy(0, scrollY - margin)
+            var scrollY = binding.recyclerView.scrollY
+            scrollY += binding.recyclerView.height
+            binding.recyclerView.scrollBy(0, scrollY - margin)
             return true
         }
         return false
@@ -203,7 +236,7 @@ class TextActivity : AppCompatActivity() {
     }
 
     private fun scrollToPosition(page: Int) {
-        recyclerView?.layoutManager?.run {
+        binding.recyclerView.layoutManager?.run {
             val layoutManager: LinearLayoutManager = this as LinearLayoutManager
             layoutManager.scrollToPositionWithOffset(page, 0)
         }
@@ -226,11 +259,11 @@ class TextActivity : AppCompatActivity() {
     }
 
     fun getCurrentPos(): Int {
-        if (null == recyclerView?.layoutManager) {
+        if (null == binding.recyclerView.layoutManager) {
             return 0
         }
         var position =
-            (recyclerView!!.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+            (binding.recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
         if (position < 0) {
             position = 0
         }
@@ -246,10 +279,95 @@ class TextActivity : AppCompatActivity() {
         super.onDestroy()
         adapter?.clearCacheViews()
         busEvent(GlobalEvent(Event.ACTION_STOPPED, path))
+        closeTts()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+    }
+
+    private fun showOrHideTopBar() {
+        if (binding.topLayout.visibility == View.GONE) {
+            binding.topLayout.visibility = View.VISIBLE
+        } else if (binding.topLayout.visibility == View.VISIBLE) {
+            binding.topLayout.visibility = View.GONE
+        }
+    }
+
+    private fun hideTopBar() {
+        if (binding.topLayout.visibility == View.VISIBLE) {
+            binding.topLayout.visibility = View.GONE
+        }
+    }
+
+    private fun toggleTts() {
+        if (ttsMode) {
+        } else {
+            TTSEngine.get().getTTS { status: Int ->
+                if (status == TextToSpeech.SUCCESS) {
+                    binding.ttsLayout.visibility = View.VISIBLE
+                    ttsMode = true
+                    startTts()
+                } else {
+                    Log.e(TTSActivity.TAG, "初始化失败")
+                    Toast.makeText(
+                        this@TextActivity,
+                        getString(R.string.tts_failed),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
+    private fun startTts() {
+        TTSEngine.get().setSpeakListener(object : ProgressListener {
+            override fun onStart(utteranceId: String) {
+            }
+
+            override fun onDone(key: String) {
+                try {
+                    //Logcat.d("onDone:$key")
+                    val arr = key.split("-")
+                    val page = Utils.parseInt(arr[0])
+                    val current = getCurrentPos()
+                    if (current != page) {
+                        handler.post { scrollToPosition(page + 1) }
+                    }
+                } catch (e: Exception) {
+                    Logcat.e(e)
+                }
+            }
+        })
+        binding.ttsPlay.setOnClickListener {
+            if (TTSEngine.get().isSpeaking()) {
+                TTSEngine.get().stop()
+            } else {
+                TTSEngine.get().resume()
+            }
+        }
+        binding.ttsClose.setOnClickListener {
+            closeTts()
+        }
+        binding.ttsSleep.setOnClickListener {
+            SleepTimerDialog(object : SleepTimerDialog.TimeListener {
+                override fun onTime(minute: Int) {
+                    Logcat.d("TTSEngine.get().stop()")
+                    handler.postDelayed({
+                        closeTts()
+                    }, (minute * 60000).toLong())
+                }
+            }).showDialog(this)
+        }
+        lifecycleScope.launch {
+            pdfViewModel.decodeTextForTts(getCurrentPos(), adapter?.data)
+        }
+    }
+
+    private fun closeTts() {
+        binding.ttsLayout.visibility = View.GONE
+        ttsMode = false
+        TTSEngine.get().shutdown()
     }
 
     private fun initIntent() {
@@ -270,6 +388,16 @@ class TextActivity : AppCompatActivity() {
                 showStyleFragment()
             }
         }
+    }
+
+    private fun hideReflowConfigMenu(): Boolean {
+        if (null != mStyleControls) {
+            if (mStyleControls?.visibility == View.VISIBLE) {
+                mStyleControls?.visibility = View.GONE
+                return true
+            }
+        }
+        return false
     }
 
     private fun showStyleFragment() {
@@ -306,7 +434,7 @@ class TextActivity : AppCompatActivity() {
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
             lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-            mControllerLayout?.addView(mStyleControls, lp)
+            binding.reflowLayout.addView(mStyleControls, lp)
         }
         mStyleControls?.visibility = View.VISIBLE
 
@@ -404,7 +532,7 @@ class TextActivity : AppCompatActivity() {
     }
 
     private fun updateReflowAdapter() {
-        recyclerView?.adapter?.run {
+        binding.recyclerView.adapter?.run {
             this.notifyDataSetChanged()
         }
     }

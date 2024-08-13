@@ -34,6 +34,7 @@ public class EncodingDetect {
         try {
             FileInputStream in = new FileInputStream(file);
             String encoding = UniversalDetector.detectCharset(in);
+            in = new FileInputStream(file);
             BufferedReader fr;
             boolean isTrim = isTrims.length > 0 ? isTrims[0] : false;
             String line_separator = System.getProperty("line.separator");
@@ -42,7 +43,11 @@ public class EncodingDetect {
             fr = new BufferedReader(read);
             String line = null;
             int flag = 1;
-            while ((line = fr.readLine()) != null) {
+            while (true) {
+                line = fr.readLine();
+                if (line == null) {
+                    break;
+                }
                 if (!isTrim) {
                     if (flag != 1) {
                         buffer.append(line_separator);

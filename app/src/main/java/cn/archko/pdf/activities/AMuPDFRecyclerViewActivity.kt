@@ -539,7 +539,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             }).showDialog(this)
         }
         lifecycleScope.launch {
-            pdfViewModel.decodeTextForTts(getCurrentPos())
+            pdfViewModel.decodePageForTts(getCurrentPos())
         }
     }
 

@@ -423,11 +423,11 @@ class PDFViewModel : ViewModel() {
         return mupdfDocument?.loadPage(pageNum)
     }
 
-    fun decodeTextForTts(currentPos: Int) {
+    fun decodePageForTts(currentPos: Int) {
         val last = TTSEngine.get().getLast()
-        val count = countPages() - 1
-        Logcat.i(Logcat.TAG, "decodeTextForTts:last:$last, count:$count, currentPos:$currentPos")
-        if (last == count) {
+        val count = countPages()
+        Logcat.i(Logcat.TAG, "decodePageForTts:last:$last, count:$count, currentPos:$currentPos")
+        if (last == count - 1 && last != 0) {
             return
         }
         if (last > 0) {
@@ -441,6 +441,26 @@ class PDFViewModel : ViewModel() {
                     TTSEngine.get().speak("$i-$j", beans[j].data)
                 }
             }
+        }
+        Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
+    }
+
+    fun decodeTextForTts(currentPos: Int, data: List<ReflowBean>?) {
+        if (null == data) {
+            return
+        }
+        val last = TTSEngine.get().getLast()
+        val count = countPages()
+        Logcat.i(Logcat.TAG, "decodeTextForTts:last:$last, count:$count, currentPos:$currentPos")
+        if (last == count - 1 && last != 0) {
+            return
+        }
+        if (last > 0) {
+            TTSEngine.get().reset()
+        }
+        val start = System.currentTimeMillis()
+        for (i in currentPos until count) {
+            TTSEngine.get().speak("$i-$i", data[i].data)
         }
         Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
     }

@@ -268,10 +268,6 @@ object PDFCreaterHelper {
 
     var canExtract: Boolean = true
 
-    fun extractToImages(context: Context, screenWidth: Int, dir: String, pdfPath: String): Int {
-        return extractToImages(context, screenWidth, dir, pdfPath, 0, -1)
-    }
-
     fun extractToImages(
         context: Context, screenWidth: Int, dir: String, pdfPath: String,
         start: Int,
