@@ -42,7 +42,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     PopupMenu.OnMenuItemClickListener {
 
     protected val mHandler = Handler(Looper.getMainLooper())
-    private var mCurrentPath: String? = null
+    private var mCurrentPath: String = "/storage/emulated/0"
 
     protected lateinit var mSwipeRefreshWidget: SwipeRefreshLayout
     protected lateinit var pathTextView: TextView
@@ -126,7 +126,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
 
     open fun onBackPressed(): Boolean {
         val path = Environment.getExternalStorageDirectory().absolutePath
-        if (this.mCurrentPath != path && this.mCurrentPath != "/") {
+        if (this.mCurrentPath != path && (this.mCurrentPath != "/" || this.mCurrentPath != "/storage/emulated/0")) {
             val upFolder = File(this.mCurrentPath!!).parentFile
             if (null != upFolder && upFolder.isDirectory) {
                 this.mCurrentPath = upFolder.absolutePath

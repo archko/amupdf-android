@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="auto_crop">Auto Crop</string>
-    <string name="entering_reflow_mode">Entering reflow mode</string>
     <string name="in_reflow_mode">Reflow mode</string>
     <string name="leaving_reflow_mode">Leaving reflow mode</string>
     <string name="toggle_reflow_mode">Toggle reflow mode</string>

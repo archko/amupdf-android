@@ -390,7 +390,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
     private fun toggleReflow() {
         val reflow = !pdfViewModel.checkReflow()
-        if (!reflow) {  //如果原来是文本重排模式,则切换为自动切边或普通模式
+        if (reflow) {  //如果原来是文本重排模式,则切换为自动切边或普通模式
             if (pdfViewModel.checkCrop()) {
                 viewMode = ViewMode.CROP
             } else {
@@ -404,12 +404,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         applyViewMode(getCurrentPos())
 
         setReflowButton(reflow)
-
-        Toast.makeText(
-            this,
-            if (reflow) getString(R.string.entering_reflow_mode) else getString(R.string.leaving_reflow_mode),
-            Toast.LENGTH_SHORT
-        ).show()
     }
 
     private fun setReflowButton(reflow: Boolean) {
@@ -443,6 +437,7 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             return
         }
 
+        viewController?.getCurrentPos()?.let { pageControls?.updatePageProgress(it) }
         pageControls?.toggleControls()
         viewController?.onDoubleTap()
 

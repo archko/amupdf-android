@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="auto_crop">自动切边</string>
-    <string name="entering_reflow_mode">输入重排模式</string>
     <string name="in_reflow_mode">重排模式</string>
     <string name="leaving_reflow_mode">正在离开重排模式</string>
     <string name="toggle_reflow_mode">切换重排模式</string>

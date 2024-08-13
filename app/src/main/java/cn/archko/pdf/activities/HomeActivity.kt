@@ -337,7 +337,6 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
         onBackEvent()
     }
 

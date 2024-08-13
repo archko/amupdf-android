@@ -1,6 +1,7 @@
 package cn.archko.pdf.fragments
 
 import android.os.Environment
+import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -65,17 +66,21 @@ class BookViewModel : ViewModel() {
     private var dirsFirst: Boolean = true
     private var showExtension: Boolean = true
     private val fileFilter: FileFilter = FileFilter { file ->
-        //return (file.isDirectory() || file.getName().toLowerCase().endsWith(".pdf"));
-        if (file.isDirectory)
+        if (file.isDirectory) {
             return@FileFilter true
-        val fname = file.name.toLowerCase(Locale.ROOT)
+        }
+        val fname = file.name.lowercase(Locale.ROOT)
+        if (fname.startsWith(".")) {
+            return@FileFilter false
+        }
 
         return@FileFilter IntentFile.isMuPdf(fname)
                 || IntentFile.isImage(fname)
                 || IntentFile.isText(fname)
+                || IntentFile.isDjvu(fname)
     }
 
-    fun loadFiles(home: String, mCurrentPath: String?, dirsFirst: Boolean, showExtension: Boolean) =
+    fun loadFiles(home: String, currentPath: String, dirsFirst: Boolean, showExtension: Boolean) =
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val fileList: ArrayList<FileBean> = ArrayList()
@@ -83,12 +88,14 @@ class BookViewModel : ViewModel() {
 
                 entry = FileBean(FileBean.HOME, home)
                 fileList.add(entry)
-                if (mCurrentPath != "/") {
-                    val upFolder = File(mCurrentPath!!).parentFile
+                if (!TextUtils.equals(currentPath, "/")
+                    && !TextUtils.equals("/storage/emulated/0", currentPath)
+                ) {
+                    val upFolder = File(currentPath).parentFile
                     entry = FileBean(FileBean.NORMAL, upFolder!!, "..")
                     fileList.add(entry)
                 }
-                val files = File(mCurrentPath).listFiles(fileFilter)
+                val files = File(currentPath).listFiles(fileFilter)
                 if (files != null) {
                     try {
                         Arrays.sort(files, Comparator<File> { f1, f2 ->
@@ -108,7 +115,7 @@ class BookViewModel : ViewModel() {
                         })
                     } catch (e: NullPointerException) {
                         throw RuntimeException(
-                            "failed to sort file list " + files + " for path " + mCurrentPath,
+                            "failed to sort file list $files for path $currentPath",
                             e
                         )
                     }
