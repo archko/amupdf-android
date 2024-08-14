@@ -4,8 +4,8 @@ import android.os.SystemClock;
 
 public class Flinger {
 
-    private static final float FLING_DURATION_PARAM = 50f;
-    private static final int DECELERATED_FACTOR = 3;
+    private static final float FLING_DURATION_PARAM = 90f;
+    private static final int DECELERATED_FACTOR = 4;
     private static final int DEFAULT_DURATION = 200;
 
     private static final int MODE_STOPPED = 0;

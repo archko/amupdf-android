@@ -8,6 +8,7 @@ import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.RelativeLayout
@@ -69,6 +70,15 @@ class AReflowViewController(
 
     private inner class MySimpleOnGestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+            var margin = mRecyclerView.height
+            margin = if (margin <= 0) {
+                ViewConfiguration.get(context).scaledTouchSlop * 2
+            } else {
+                (margin * 0.03).toInt()
+            }
+            if (onSingleTap(e, margin)) {
+                return true
+            }
             simpleListener?.onSingleTapConfirmed(e, 0)
             return true
         }
@@ -247,10 +257,10 @@ class AReflowViewController(
         val top = height / 4
         val bottom = height * 3 / 4
         if (scrollPage(ev.y.toInt(), top, bottom, margin)) {
-            return false
+            return true
         }
 
-        return true
+        return false
     }
 
     override fun onDoubleTap() {
