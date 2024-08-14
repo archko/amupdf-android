@@ -240,7 +240,7 @@ class ANormalViewController(
     }
 
     override fun scrollToPosition(page: Int) {
-        documentView.goToPage(page - 1)
+        documentView.goToPage(page)
     }
 
     override fun scrollPage(y: Int, top: Int, bottom: Int, margin: Int): Boolean {

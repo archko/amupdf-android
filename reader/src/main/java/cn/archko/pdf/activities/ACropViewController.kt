@@ -235,7 +235,7 @@ class ACropViewController(
     override fun scrollToPosition(page: Int) {
         mRecyclerView.layoutManager?.run {
             val layoutManager: LinearLayoutManager = this as LinearLayoutManager
-            layoutManager.scrollToPositionWithOffset(page - 1, 0)
+            layoutManager.scrollToPositionWithOffset(page, 0)
         }
     }
 
