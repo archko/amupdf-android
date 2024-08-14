@@ -68,7 +68,7 @@ sardine = "0.9"
 k2pdfopt = "0.1.6"
 
 versionCode = "385"
-versionName = "7.0.1"
+versionName = "7.0.2"
 
 [libraries]
 accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }

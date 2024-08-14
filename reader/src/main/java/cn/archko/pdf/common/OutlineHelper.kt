@@ -64,12 +64,15 @@ class OutlineHelper(
         list: Array<Outline>?,
         indent: String
     ) {
+        if (mupdfDocument == null) {
+            return
+        }
         for (node in list!!) {
             val element = OutlineItem(nodeId++, parent.id, node.title)
             result.add(element)
             if (node.title != null) {
-                val page = mupdfDocument?.pageNumberFromLocation(node)
-                element.page = page!!
+                val page = mupdfDocument!!.pageNumberFromLocation(node)
+                element.page = page
             }
             if (node.down != null) {
                 flattenOutlineItems(element, result, node.down, "$indent  ")

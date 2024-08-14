@@ -125,7 +125,6 @@ class ANormalViewController(
         progressDialog!!.setMessage("Loading")
         progressDialog!!.show()
 
-        crop = pdfViewModel.checkCrop()
         instance.diskIO().execute {
             val document = try {
                 decodeService!!.open(mPath, crop, true)
@@ -150,6 +149,7 @@ class ANormalViewController(
     }
 
     override fun init() {
+        crop = pdfViewModel.checkCrop()
         val pos: Int = pdfViewModel.getCurrentPage()
         val scrollOrientation: Int = pdfViewModel.bookProgress?.scrollOrientation ?: 1
         Logcat.d("init.pos:$pos, :$scrollOrientation")

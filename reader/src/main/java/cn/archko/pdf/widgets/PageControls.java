@@ -147,7 +147,6 @@ public class PageControls implements View.OnClickListener {
     }
 
     public void showReflow(boolean reflow) {
-        //mReflowButton.setVisibility(reflow ? View.VISIBLE : View.GONE);
         if (reflow) {
             mReflowButton.setColorFilter(Color.argb(0xFF, 172, 114, 37));
         } else {
@@ -161,6 +160,10 @@ public class PageControls implements View.OnClickListener {
 
     public ImageButton getAutoCropButton() {
         return mAutoCropButton;
+    }
+
+    public ImageButton getTtsButton() {
+        return ttsButton;
     }
 
     @Override

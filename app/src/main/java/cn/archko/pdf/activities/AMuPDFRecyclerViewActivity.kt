@@ -165,6 +165,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             updateTitle(mPath)
             showReflow(pdfViewModel.checkReflow())
             orientation = pdfViewModel.bookProgress?.scrollOrientation ?: 1
+            if (IntentFile.isDjvu(mPath!!)) {
+                reflowButton.visibility = View.GONE
+                ttsButton.visibility = View.GONE
+            }
         }
 
         documentLayout = findViewById(R.id.document_layout)
@@ -262,7 +266,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
 
         if (!pdfViewModel.checkReflow() && pdfViewModel.checkCrop() == viewController?.getCrop()) {
-            Logcat.d("applyViewMode:crop don't change, controller:$viewController")
+            Logcat.d("initViewController:crop don't change, controller:$viewController")
             return false
         }
         viewController?.onDestroy()
@@ -314,6 +318,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             return
         }
 
+        pdfViewModel.setCurrentPage(pos)
         viewController?.init()
     }
 

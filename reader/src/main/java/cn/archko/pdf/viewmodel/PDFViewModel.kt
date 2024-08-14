@@ -100,6 +100,10 @@ class PDFViewModel : ViewModel() {
         return currentPage
     }
 
+    fun setCurrentPage(pos: Int) {
+        bookProgress?.page = pos
+    }
+
     fun getCurrentPage(pageCount: Int): Int {
         if (bookProgress == null) {
             return 0
