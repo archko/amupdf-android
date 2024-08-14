@@ -395,7 +395,7 @@ class AReflowViewController(
                 }
                 pdfViewModel.saveBookProgress(
                     mPath,
-                    pdfViewModel.countPages(),
+                    mPageSizes.size,
                     savePos,
                     pdfViewModel.bookProgress!!.zoomLevel,
                     -1,

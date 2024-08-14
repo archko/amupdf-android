@@ -320,7 +320,7 @@ class ANormalViewController(
             val position = documentView.currentPage
             pdfViewModel.saveBookProgress(
                 mPath,
-                pdfViewModel.countPages(),
+                mPageSizes.size,
                 position + 1,
                 documentView.zoomModel.zoom * 1000f,
                 documentView.scrollX,
