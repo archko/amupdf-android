@@ -1,20 +1,23 @@
 package cn.archko.pdf.activities
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.os.SystemClock
 import android.speech.tts.TextToSpeech
+import android.text.TextUtils
 import android.util.Log
 import android.util.SparseArray
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import android.view.ViewGroup
+import android.view.Window
+import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.Toast
@@ -22,11 +25,15 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
 import cn.archko.pdf.common.OutlineHelper
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.cache.BitmapCache
+import cn.archko.pdf.core.common.Event
+import cn.archko.pdf.core.common.GlobalEvent
+import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
-import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.common.SensorHelper
+import cn.archko.pdf.core.common.StatusBarHelper
 import cn.archko.pdf.core.entity.Bookmark
-import cn.archko.pdf.core.listeners.SimpleGestureListener
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.fragments.OutlineFragment
 import cn.archko.pdf.fragments.SleepTimerDialog
@@ -38,13 +45,28 @@ import cn.archko.pdf.tts.TTSEngine.ProgressListener
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.PageControls
 import com.baidu.ai.edge.ui.activity.OcrActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import vn.chungha.flowbus.busEvent
 
 /**
  * @author: archko 2019/8/25 :12:43
  */
-class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener {
+class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
+    private var mPath: String? = null
+
+    private var controllerListener: ControllerListener? = null
+
+    private var sensorHelper: SensorHelper? = null
+
+    private var isDocLoaded: Boolean = false
+
+    private var documentLayout: FrameLayout? = null
+    private var viewController: AViewController? = null
+    private val pdfViewModel: PDFViewModel = PDFViewModel()
 
     private var pageControls: PageControls? = null
     private var outlineHelper: OutlineHelper? = null
@@ -65,8 +87,70 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
      */
     private var forceCropParam = -1
 
-    override fun initView() {
-        super.initView()
+    public override fun onCreate(savedInstanceState: Bundle?) {
+        isLive = true
+        super.onCreate(savedInstanceState)
+
+        if (null != savedInstanceState) {
+            mPath = savedInstanceState.getString("path", null)
+        }
+
+        parseIntent()
+
+        Logcat.d("path:" + mPath!!)
+
+        if (TextUtils.isEmpty(mPath)) {
+            Toast.makeText(
+                this@AMuPDFRecyclerViewActivity,
+                "error file path:$mPath",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        sensorHelper = SensorHelper(this)
+
+        loadBookmark()
+        initView()
+
+        initTouchParams()
+
+        initViewController()
+
+        viewController?.init()
+    }
+
+    private fun parseIntent() {
+        if (null == intent) {
+            finish()
+            return
+        }
+        if (TextUtils.isEmpty(mPath)) {
+            mPath = intent.getStringExtra("path")
+            if (Intent.ACTION_VIEW == intent.action) {
+                if (TextUtils.isEmpty(mPath)) {
+                    val uri = getIntent().data
+                    val path = IntentFile.getPath(this, uri)
+                    mPath = path
+                }
+            } else {
+                mPath = intent.getStringExtra("path")
+            }
+        }
+    }
+
+    private fun loadBookmark() {
+        lifecycleScope.launch {
+            mPath!!.run { pdfViewModel.loadBookProgressByPath(this) }
+        }
+    }
+
+    private fun initView() {
+        StatusBarHelper.hideSystemUI(this)
+        StatusBarHelper.setStatusBarImmerse(window)
+        setFullScreen()
+
+        setContentView(R.layout.reader)
+
         forceCropParam = intent.getIntExtra("forceCropParam", -1)
 
         mContentView = findViewById(R.id.content)
@@ -79,56 +163,30 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         pageControls = createControls()
         pageControls?.apply {
             updateTitle(mPath)
-            autoCropButton!!.visibility = View.VISIBLE
+            showReflow(pdfViewModel.checkReflow())
+            orientation = pdfViewModel.bookProgress?.scrollOrientation ?: 1
         }
 
-        documentView = findViewById(R.id.document_view)
-
-        initTouchParams()
+        documentLayout = findViewById(R.id.document_layout)
     }
 
-    private fun ocr() {
-        if (pdfViewModel.checkReflow()) {
-            Toast.makeText(
-                this@AMuPDFRecyclerViewActivity,
-                "已经是文本",
-                Toast.LENGTH_SHORT
-            ).show()
-            return
-        }
-        val pos = viewController?.getCurrentPos()
-        if (pos != null) {
-            startOcrActivity(
-                this@AMuPDFRecyclerViewActivity,
-                viewController?.getCurrentBitmap(),
-                null,
-                pos
-            )
-        }
-    }
-
-    override fun getDocumentView(): View? {
-        return viewController?.getDocumentView()!!
-    }
-
-    private fun addDocumentView() {
-        documentView?.removeAllViews()
-        val lap: FrameLayout.LayoutParams = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
+    private fun setFullScreen() {
+        window.requestFeature(Window.FEATURE_NO_TITLE)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
-        documentView?.addView(viewController?.getDocumentView(), lap)
     }
 
     private fun initTouchParams() {
-        val view = documentView!!
+        val view = documentLayout!!
         var margin = view.height
         margin = if (margin <= 0) {
             ViewConfiguration.get(this).scaledTouchSlop * 2
         } else {
             (margin * 0.03).toInt()
         }
-        simpleGestureListener = object : SimpleGestureListener {
+        controllerListener = object : ControllerListener {
             override fun onSingleTapConfirmed(ev: MotionEvent?, currentPage: Int) {
                 if (!isDocLoaded) {
                     return
@@ -168,94 +226,101 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
 
             override fun onDoubleTapEvent(ev: MotionEvent?, currentPage: Int) {
             }
+
+            override fun doLoadedDoc(count: Int, pos: Int) {
+                this@AMuPDFRecyclerViewActivity.doLoadDoc(count, pos)
+            }
         }
     }
 
-    private fun applyViewMode(pos: Int) {
+    fun getDocumentView(): View? {
+        return viewController?.getDocumentView()!!
+    }
+
+    private fun addDocumentView() {
+        documentLayout?.removeAllViews()
+        val lap: FrameLayout.LayoutParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        documentLayout?.addView(viewController?.getDocumentView(), lap)
+    }
+
+    private fun initViewController(): Boolean {
+        if (pdfViewModel.checkReflow()) {
+            viewMode = ViewMode.REFLOW
+        } else if (pdfViewModel.checkCrop()) {
+            viewMode = ViewMode.CROP
+        } else {
+            viewMode = ViewMode.NORMAL
+        }
+
+        if (viewMode != ViewMode.REFLOW) {
+            if (forceCropParam > -1) {
+                pdfViewModel.storeCrop(forceCropParam == 1)
+            }
+        }
+
         if (!pdfViewModel.checkReflow() && pdfViewModel.checkCrop() == viewController?.getCrop()) {
             Logcat.d("applyViewMode:crop don't change, controller:$viewController")
-            return
+            return false
         }
         viewController?.onDestroy()
 
         val aViewController = ViewControllerFactory.getOrCreateViewController(
             viewControllerCache,
+            lifecycleScope,
             viewMode,
             this@AMuPDFRecyclerViewActivity,
             mReflowLayout, pdfViewModel, mPath!!,
             pageControls!!,
-            simpleGestureListener
+            controllerListener
         )
         viewController = aViewController
-        Logcat.d("applyViewMode:$viewMode, pos:$pos,forceCropParam: $forceCropParam, controller:$viewController")
+        Logcat.d("initViewController:$viewMode, forceCropParam: $forceCropParam, controller:$viewController")
 
         addDocumentView()
-        viewController?.init(pageSizes, pos, pdfViewModel.bookProgress?.scrollOrientation ?: 1)
-        viewController?.notifyDataSetChanged()
+
+        cropModeSet(pdfViewModel.checkCrop())
+        //setCropButton(pdfViewModel.checkCrop())
+
+        return true
     }
 
-    /*override fun loadDoc(password: String?) {
-        lifecycleScope.launch {
-            val ocr = PdfOptionRepository.getImageOcr()
-            if (IntentFile.isText(mPath)) {
-                TextActivity.start(this@AMuPDFRecyclerViewActivity, mPath!!)
-                finish()
-            } else if (IntentFile.isImage(mPath) && ocr) {
-                OcrActivity.start(
-                    this@AMuPDFRecyclerViewActivity,
-                    null,
-                    mPath,
-                    System.currentTimeMillis().toString()
-                )
-                finish()
-            } else {
-                super.loadDoc(password)
-            }
+    //===========================================
+
+    private fun ocr() {
+        if (pdfViewModel.checkReflow()) {
+            Toast.makeText(
+                this@AMuPDFRecyclerViewActivity,
+                "已经是文本",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
         }
-    }*/
-
-    override fun showPasswordDialog() {
-        PasswordDialog.show(this@AMuPDFRecyclerViewActivity,
-            object : PasswordDialog.PasswordDialogListener {
-                override fun onOK(content: String?) {
-                    loadDoc(password = content)
-                }
-
-                override fun onCancel() {
-                    Toast.makeText(
-                        this@AMuPDFRecyclerViewActivity,
-                        "error file path:$mPath",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            })
+        val pos = viewController?.getCurrentPos()
+        if (pos != null) {
+            startOcrActivity(
+                this@AMuPDFRecyclerViewActivity,
+                viewController?.getCurrentBitmap(),
+                null,
+                pos
+            )
+        }
     }
 
-    override fun doLoadDoc() {
+    private fun applyViewMode(pos: Int) {
+        if (!initViewController()) {
+            return
+        }
+
+        viewController?.init()
+    }
+
+    private fun doLoadDoc(count: Int, pos: Int) {
         try {
-            if (pdfViewModel.checkReflow()) {
-                viewMode = ViewMode.REFLOW
-            } else if (pdfViewModel.checkCrop()) {
-                viewMode = ViewMode.CROP
-            } else {
-                viewMode = ViewMode.NORMAL
-            }
-
-            if (viewMode != ViewMode.REFLOW) {
-                if (forceCropParam > -1) {
-                    pdfViewModel.storeCrop(forceCropParam == 1)
-                }
-            }
-            setCropButton(pdfViewModel.checkCrop())
-
-            val pos = pdfViewModel.getCurrentPage(pdfViewModel.countPages())
-            Logcat.d("doLoadDoc:pos:$pos")
-            viewController?.doLoadDoc(pageSizes, pos)
-
             pageControls?.apply {
-                update(pageSizes.size, pos)
-                showReflow(pdfViewModel.checkReflow())
-                orientation = pdfViewModel.bookProgress?.scrollOrientation ?: 1
+                update(count, pos)
             }
 
             outlineHelper = pdfViewModel.outlineHelper
@@ -274,19 +339,15 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             }
 
             //checkout bookmark
-            applyViewMode(pos - 1)
-
-            cropModeSet(pdfViewModel.checkCrop())
         } catch (e: Exception) {
             e.printStackTrace()
             finish()
         } finally {
-            //progressDialog.dismiss()
         }
     }
 
     private fun setupOutline(currentPos: Int?) {
-        if (null == outlineFragment) {
+        if (null == outlineFragment && null != outlineHelper) {
             outlineFragment = OutlineFragment()
             val bundle = Bundle()
             if (outlineHelper!!.hasOutline()) {
@@ -312,54 +373,6 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
             val currentPos = getCurrentPos()
             pdfViewModel.addBookmark(currentPos).collectLatest {
                 viewController?.notifyDataSetChanged()
-            }
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        viewController?.onDestroy()
-
-        TTSEngine.get().shutdown()
-    }
-
-    override fun postLoadDoc(cp: Int) {
-        val mRecyclerView = viewController?.getDocumentView()
-        val width =
-            mRecyclerView?.width ?: Utils.getScreenWidthPixelWithOrientation(this)
-        var start = SystemClock.uptimeMillis()
-
-        lifecycleScope.launch {
-            pdfViewModel.preparePageSize(width).collectLatest { pageSizeBean ->
-                Logcat.d("open3:" + (SystemClock.uptimeMillis() - start))
-
-                var pageSizes: List<APage>? = null
-                if (pageSizeBean != null) {
-                    pageSizes = pageSizeBean.List
-                }
-                if (!pageSizes.isNullOrEmpty()) {
-                    Logcat.d("open3:pageSizes>0:" + pageSizes.size)
-                    this@AMuPDFRecyclerViewActivity.pageSizes.clear()
-                    this@AMuPDFRecyclerViewActivity.pageSizes.addAll(pageSizes)
-                    checkPageSize(cp)
-                } else {
-                    start = SystemClock.uptimeMillis()
-                    preparePageSize(cp)
-                    Logcat.d("open2:" + (SystemClock.uptimeMillis() - start))
-                }
-                doLoadDoc()
-            }
-        }
-    }
-
-    /**
-     * if scale=1.0f,reload it from mupdf
-     */
-    private fun checkPageSize(cp: Int) {
-        for (i in 0 until pageSizes.size) {
-            val pointF = getPageSize(i)
-            if (pointF != null) {
-                pageSizes.add(pointF)
             }
         }
     }
@@ -561,6 +574,13 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         }
     }
 
+    private fun getCurrentPos(): Int {
+        if (null == viewController) {
+            return 0
+        }
+        return viewController!!.getCurrentPos()
+    }
+
     private fun cropModeSet(crop: Boolean): Boolean {
         if (pdfViewModel.checkReflow()) {
             Toast.makeText(
@@ -595,24 +615,78 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
         viewController?.onConfigurationChanged(newConfig)
     }
 
-    override fun updateProgress(index: Int) {
+    private fun updateProgress(index: Int) {
         if (isDocLoaded && pageControls?.visibility() == View.VISIBLE) {
             pageControls?.updatePageProgress(index)
         }
     }
+
     //--------------------------------------
+
+    override fun onDestroy() {
+        super.onDestroy()
+        isDocLoaded = false
+        busEvent(GlobalEvent(Event.ACTION_STOPPED, mPath))
+        pdfViewModel.destroy()
+        BitmapCache.getInstance().clear()
+
+        viewController?.onDestroy()
+
+        TTSEngine.get().shutdown()
+    }
 
     override fun onResume() {
         super.onResume()
-
-        //pageControls?.hide()
-
+        sensorHelper?.onResume()
         viewController?.onResume()
+        lifecycleScope.launch {
+            var keepOn = false
+            var fullscreen = true
+            withContext(Dispatchers.IO) {
+                keepOn = PdfOptionRepository.getKeepOn()
+                fullscreen = PdfOptionRepository.getFullscreen()
+            }
+
+            if (keepOn) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
+
+            if (fullscreen) {
+                window.setFlags(
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN
+                )
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            }
+        }
+        Logcat.d("onResume ")
     }
 
     override fun onPause() {
         super.onPause()
+        sensorHelper?.onPause()
         viewController?.onPause()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("path", mPath)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        mPath = savedInstanceState.getString("path", null)
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            StatusBarHelper.hideSystemUI(this)
+            StatusBarHelper.setStatusBarImmerse(window)
+        }
     }
 
     //===========================================
@@ -633,66 +707,70 @@ class AMuPDFRecyclerViewActivity : MuPDFRecyclerViewActivity(), OutlineListener 
     internal object ViewControllerFactory {
         fun getOrCreateViewController(
             viewControllerCache: SparseArray<AViewController>,
+            scope: CoroutineScope,
             viewMode: ViewMode,
             context: FragmentActivity,
             controllerLayout: RelativeLayout,
             pdfViewModel: PDFViewModel,
             path: String,
             pageSeekBarControls: PageControls,
-            gestureDetector: SimpleGestureListener?,
+            controllerListener: ControllerListener?,
         ): AViewController {
             //val aViewController = viewControllerCache.get(viewMode.ordinal)
             //if (null != aViewController) {
             //    return aViewController
             //}
             return createViewController(
+                scope,
                 viewMode,
                 context,
                 controllerLayout,
                 pdfViewModel,
                 path,
                 pageSeekBarControls,
-                gestureDetector,
+                controllerListener,
             )
         }
 
         fun createViewController(
+            scope: CoroutineScope,
             viewMode: ViewMode,
             context: FragmentActivity,
             controllerLayout: RelativeLayout,
             pdfViewModel: PDFViewModel,
             path: String,
             pageSeekBarControls: PageControls,
-            gestureDetector: SimpleGestureListener?,
+            controllerListener: ControllerListener?,
         ): AViewController {
             if (viewMode == ViewMode.CROP) {
                 return ANormalViewController(
                     context,
+                    scope,
                     controllerLayout,
                     pdfViewModel,
                     path,
                     pageSeekBarControls,
-                    gestureDetector,
-                    true,
+                    controllerListener,
                 )
             } else if (viewMode == ViewMode.REFLOW) {
                 return AReflowViewController(
                     context,
+                    scope,
                     controllerLayout,
                     pdfViewModel,
                     path,
                     pageSeekBarControls,
-                    gestureDetector,
+                    controllerListener,
                 )
             } else {
                 return ANormalViewController(
                     context,
+                    scope,
                     controllerLayout,
                     pdfViewModel,
                     path,
                     pageSeekBarControls,
-                    gestureDetector,
-                    false,
+                    controllerListener,
                 )
             }
         }

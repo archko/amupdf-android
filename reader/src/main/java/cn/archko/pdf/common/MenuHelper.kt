@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
-import cn.archko.pdf.activities.MuPDFRecyclerViewActivity
 import cn.archko.pdf.adapters.MenuAdapter
 import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.core.entity.Bookmark

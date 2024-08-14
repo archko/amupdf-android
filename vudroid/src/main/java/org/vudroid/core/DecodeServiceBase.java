@@ -53,6 +53,7 @@ public class DecodeServiceBase implements DecodeService {
     private Handler mHandler;
     private Handler mDecodeHandler;
     private final List<APage> aPageList = new ArrayList<>();
+    private APageSizeLoader.PageSizeBean pageSizeBean;
     private final Handler.Callback mCallback = new Handler.Callback() {
         public boolean handleMessage(Message msg) {
             int what = msg.what;
@@ -172,18 +173,24 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     public CodecDocument open(String path, boolean crop, boolean cachePage) {
+        aPageList.clear();
         long start = System.currentTimeMillis();
         document = codecContext.openDocument(path);
         if (null == document) {
             return null;
         }
         int count = document.getPageCount();
-        APageSizeLoader.PageSizeBean pageSizeBean = APageSizeLoader.INSTANCE.loadPageSizeFromFile(count, path);
-        if (null != pageSizeBean) {
-            if (!crop || (crop && pageSizeBean.getCrop())) {
-                aPageList.addAll(pageSizeBean.getList());
+        APageSizeLoader.PageSizeBean psb = APageSizeLoader.INSTANCE.loadPageSizeFromFile(count, path);
+        if (null != psb) {
+            pageSizeBean = psb;
+            if (!crop || (crop && psb.getCrop())) {
+                aPageList.addAll(psb.getList());
                 return document;
             }
+        } else {
+            pageSizeBean = new APageSizeLoader.PageSizeBean();
+            pageSizeBean.setList(aPageList);
+            pageSizeBean.setCrop(crop);
         }
         try {
             for (int i = 0; i < count; i++) {
@@ -195,6 +202,7 @@ public class DecodeServiceBase implements DecodeService {
                 aPageList.add(aPage);
                 codecPage.recycle();
             }
+
             if (cachePage) {
                 APageSizeLoader.INSTANCE.savePageSizeToFile(crop, path, aPageList);
             }
@@ -204,6 +212,10 @@ public class DecodeServiceBase implements DecodeService {
         }
         Log.d(TAG, String.format("open.cos:%s", (System.currentTimeMillis() - start)));
         return document;
+    }
+
+    public APageSizeLoader.PageSizeBean getPageSizeBean() {
+        return pageSizeBean;
     }
 
     private void cropPage(CodecPage vuPage, APage page) {

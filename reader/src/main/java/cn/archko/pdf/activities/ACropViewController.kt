@@ -5,7 +5,6 @@ import android.app.Activity.RESULT_FIRST_USER
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Rect
-import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -26,17 +25,19 @@ import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APDFView
 import cn.archko.pdf.widgets.PageControls
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * @author: archko 2020/5/15 :12:43
  */
 class ACropViewController(
     private var context: FragmentActivity,
+    private val scope: CoroutineScope,
     private val mControllerLayout: RelativeLayout,
     private var pdfViewModel: PDFViewModel,
     private var mPath: String,
     private var pageControls: PageControls?,
-    private var simpleListener: SimpleGestureListener?,
+    private var simpleListener: ControllerListener?,
 ) :
     OutlineListener, AViewController {
 
@@ -104,14 +105,14 @@ class ACropViewController(
             })
     }
 
-    override fun init(pageSizes: List<APage>, pos: Int, scrollOrientation: Int) {
+    override fun init() {
         try {
-            Logcat.d("init.pos:$pos, :$scrollOrientation")
+            Logcat.d("init :$scrollOrientation")
             this.scrollOrientation = scrollOrientation
             if (null != pdfViewModel.mupdfDocument) {
-                this.mPageSizes = pageSizes
+                //this.mPageSizes = pageSizes
 
-                setCropMode(pos)
+                //setCropMode(pos)
             }
             addGesture()
         } catch (e: Exception) {
@@ -120,7 +121,7 @@ class ACropViewController(
         }
     }
 
-    override fun doLoadDoc(pageSizes: List<APage>, pos: Int) {
+    fun doLoadDoc(pageSizes: List<APage>, pos: Int) {
         try {
             Logcat.d("doLoadDoc:$scrollOrientation")
             this.mPageSizes = pageSizes
@@ -258,7 +259,7 @@ class ACropViewController(
     }
 
     override fun onSingleTap(e: MotionEvent?, margin: Int): Boolean {
-        if (e==null){
+        if (e == null) {
             return false
         }
         if (tryHyperlink(e)) {

@@ -2,8 +2,10 @@ package cn.archko.pdf.activities
 
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_FIRST_USER
+import android.app.ProgressDialog
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.os.SystemClock
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -20,11 +22,10 @@ import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFReflowAdapter
 import cn.archko.pdf.common.StyleHelper
-import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.entity.State
 import cn.archko.pdf.core.listeners.DataListener
-import cn.archko.pdf.core.listeners.SimpleGestureListener
 import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
 import cn.archko.pdf.core.widgets.ViewerDividerItemDecoration
 import cn.archko.pdf.entity.FontBean
@@ -34,10 +35,9 @@ import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.PageControls
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
 
 /**
@@ -45,11 +45,12 @@ import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
  */
 class AReflowViewController(
     private var context: FragmentActivity,
+    private var scope: CoroutineScope,
     private val mControllerLayout: RelativeLayout,
     private var pdfViewModel: PDFViewModel,
     private var mPath: String,
     private var pageControls: PageControls?,
-    private var simpleListener: SimpleGestureListener?,
+    private var controllerListener: ControllerListener?,
 ) :
     OutlineListener, AViewController {
 
@@ -60,9 +61,9 @@ class AReflowViewController(
     private lateinit var mRecyclerView: ARecyclerView
     private var mStyleHelper: StyleHelper? = null
     private val START_PROGRESS = 15
-    private lateinit var mPageSizes: List<APage>
-    private var scope: CoroutineScope? = null
+    private var mPageSizes = mutableListOf<APage>()
     private var mGestureDetector: GestureDetector? = null
+    protected var progressDialog: ProgressDialog? = null
 
     init {
         initView()
@@ -79,7 +80,7 @@ class AReflowViewController(
             if (onSingleTap(e, margin)) {
                 return true
             }
-            simpleListener?.onSingleTapConfirmed(e, 0)
+            controllerListener?.onSingleTapConfirmed(e, 0)
             return true
         }
     }
@@ -107,37 +108,123 @@ class AReflowViewController(
         }
 
         initStyleControls()
+
+        addGesture()
     }
 
-    override fun init(pageSizes: List<APage>, pos: Int, scrollOrientation: Int) {
-        try {
-            if (scope == null || !scope!!.isActive) {
-                scope =
-                    CoroutineScope(Job() + AppExecutors.instance.diskIO().asCoroutineDispatcher())
-            }
-            Logcat.d("init:$this")
-            if (null != pdfViewModel.mupdfDocument) {
-                this.mPageSizes = pageSizes
+    private fun showPasswordDialog() {
+        /*PasswordDialog.show(this@AMuPDFRecyclerViewActivity,
+            object : PasswordDialog.PasswordDialogListener {
+                override fun onOK(content: String?) {
+                    loadDoc(password = content)
+                }
 
-                initReflowMode(pos)
-            }
-            addGesture()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
+                override fun onCancel() {
+                    Toast.makeText(
+                        this@AMuPDFRecyclerViewActivity,
+                        "error file path:$mPath",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })*/
+    }
+
+    private fun loadDocument() {
+        progressDialog = ProgressDialog(context)
+        progressDialog!!.setMessage("Loading")
+        progressDialog!!.show()
+
+        scope.launch {
+            val start = SystemClock.uptimeMillis()
+            pdfViewModel.loadPdfDoc(context, mPath, null)
+            pdfViewModel.pageFlow
+                .collectLatest {
+                    progressDialog!!.dismiss()
+                    if (it.state == State.PASS) {
+                        showPasswordDialog()
+                        return@collectLatest
+                    }
+                    val cp = pdfViewModel.countPages()
+                    if (cp > 0) {
+                        Logcat.d(
+                            TAG,
+                            "open:" + (SystemClock.uptimeMillis() - start) + " cp:" + cp
+                        )
+
+                        postLoadDoc(cp)
+                    } else {
+                        context.finish()
+                    }
+                }
         }
     }
 
-    override fun doLoadDoc(pageSizes: List<APage>, pos: Int) {
-        try {
-            Logcat.d("doLoadDoc:$this")
-            this.mPageSizes = pageSizes
+    override fun init() {
+        loadDocument()
+    }
 
-            initReflowMode(pos)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
+    private fun postLoadDoc(cp: Int) {
+        val width = mRecyclerView.width
+        var start = SystemClock.uptimeMillis()
+
+        scope.launch {
+            pdfViewModel.preparePageSize(width).collectLatest { pageSizeBean ->
+                Logcat.d("open3:" + (SystemClock.uptimeMillis() - start))
+                mPageSizes.clear()
+                var pageSizes: List<APage>? = null
+                if (pageSizeBean != null) {
+                    pageSizes = pageSizeBean.List
+                }
+                if (pageSizes.isNullOrEmpty()) {
+                    start = SystemClock.uptimeMillis()
+                    preparePageSize(cp)
+                    Logcat.d("open2:" + (SystemClock.uptimeMillis() - start))
+                } else {
+                    Logcat.d("open3:pageSizes>0:" + pageSizes.size)
+                    mPageSizes.addAll(pageSizes)
+                    //checkPageSize(cp)
+                }
+                doLoadDoc()
+            }
         }
+    }
+
+    /**
+     * if scale=1.0f,reload it from mupdf
+     */
+    private fun checkPageSize(cp: Int) {
+        /*for (i in 0 until mPageSizes.size) {
+            val pointF = getPageSize(i)
+            if (pointF != null) {
+                pageSizes.add(pointF)
+            }
+        }*/
+    }
+
+    private fun getPageSize(pageNum: Int): APage? {
+        val p = pdfViewModel.loadPage(pageNum) ?: return null
+
+        //Logcat.d(TAG, "open:getPageSize.$pageNum page:$p")
+        val b = p.bounds
+        val w = b.x1 - b.x0
+        val h = b.y1 - b.y0
+        p.destroy()
+        return APage(pageNum, w, h, 1.0f/*zoomModel!!.zoom*/)
+    }
+
+    private fun preparePageSize(cp: Int) {
+        for (i in 0 until cp) {
+            val pointF = getPageSize(i)
+            if (pointF != null) {
+                mPageSizes.add(pointF)
+            }
+        }
+    }
+
+    private fun doLoadDoc() {
+        initReflowMode(pdfViewModel.getCurrentPage())
+
+        controllerListener?.doLoadedDoc(pdfViewModel.countPages(), pdfViewModel.getCurrentPage())
     }
 
     override fun getDocumentView(): View {
@@ -169,12 +256,13 @@ class AReflowViewController(
 
         if (pos > 0) {
             val layoutManager = mRecyclerView.layoutManager
+            layoutManager!!.scrollToPosition(pos)
             val vto: ViewTreeObserver = mRecyclerView.viewTreeObserver
             vto.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
                     mRecyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
                     Logcat.d("onGlobalLayout:$this,pos:$pos")
-                    layoutManager!!.scrollToPosition(pos)
+                    layoutManager.scrollToPosition(pos)
                 }
             })
         }
@@ -462,5 +550,10 @@ class AReflowViewController(
         mStyleHelper?.styleBean?.lineSpacingMult = old!!
         mStyleHelper?.saveStyleToSP(mStyleHelper?.styleBean)
         updateReflowAdapter()
+    }
+
+    companion object {
+
+        private const val TAG = "ReflowView"
     }
 }

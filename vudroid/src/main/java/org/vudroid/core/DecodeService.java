@@ -9,6 +9,9 @@ import com.artifex.mupdf.fitz.Outline;
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
 
+import java.util.List;
+
+import cn.archko.pdf.core.common.APageSizeLoader;
 import cn.archko.pdf.core.entity.APage;
 
 public interface DecodeService {
@@ -16,6 +19,8 @@ public interface DecodeService {
     void setContainerView(View containerView);
 
     CodecDocument open(String path, boolean crop, boolean cachePage);
+
+    APageSizeLoader.PageSizeBean getPageSizeBean();
 
     void decodePage(String decodeKey, PageTreeNode node, boolean crop, int pageNumber, DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds);
 

@@ -42,7 +42,7 @@ class PDFViewModel : ViewModel() {
     var bookProgress: BookProgress? = null
         private set
     var mupdfDocument: MupdfDocument? = null
-    val mPageSizes = mutableListOf<APage>()
+    private val mPageSizes = mutableListOf<APage>()
     var txtPageCount: Int = 1
     var outlineHelper: OutlineHelper? = null
     var zoom = 1.0f

@@ -1,6 +1,5 @@
 package cn.archko.pdf.activities
 
-import android.annotation.SuppressLint
 import android.app.Activity.RESULT_FIRST_USER
 import android.app.ProgressDialog
 import android.content.res.Configuration
@@ -14,9 +13,12 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.LinearLayoutManager
+import cn.archko.pdf.common.OutlineHelper
+import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.AppExecutors.Companion.instance
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.listeners.SimpleGestureListener
 import cn.archko.pdf.core.utils.Utils
@@ -24,6 +26,7 @@ import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.PageControls
+import kotlinx.coroutines.CoroutineScope
 import org.vudroid.core.DecodeService
 import org.vudroid.core.DecodeServiceBase
 import org.vudroid.core.DocumentView
@@ -32,20 +35,22 @@ import org.vudroid.core.models.DecodingProgressModel
 import org.vudroid.core.models.ZoomModel
 import org.vudroid.djvudroid.codec.DjvuContext
 import org.vudroid.pdfdroid.codec.PdfContext
+import org.vudroid.pdfdroid.codec.PdfDocument
 
 /**
  * @author: archko 2020/5/15 :12:43
  */
 class ANormalViewController(
     private var context: FragmentActivity,
+    private val scope: CoroutineScope,
     private val mControllerLayout: RelativeLayout,
     private var pdfViewModel: PDFViewModel,
     private var mPath: String,
     private var pageControls: PageControls?,
-    private var simpleListener: SimpleGestureListener?,
-    private var crop: Boolean,
+    private var controllerListener: ControllerListener?,
 ) :
     OutlineListener, AViewController {
+    private var crop: Boolean = true
 
     private lateinit var documentView: DocumentView
     private lateinit var frameLayout: FrameLayout
@@ -62,7 +67,7 @@ class ANormalViewController(
     private var simpleGestureListener: SimpleGestureListener = object :
         SimpleGestureListener {
         override fun onSingleTapConfirmed(ev: MotionEvent, currentPage: Int) {
-            simpleListener?.onSingleTapConfirmed(ev, currentPage)
+            controllerListener?.onSingleTapConfirmed(ev, currentPage)
             //showPageToast(currentPage)
         }
 
@@ -113,8 +118,6 @@ class ANormalViewController(
         frameLayout = createMainContainer()
         frameLayout.addView(documentView)
         zoomModel.addEventListener(this)
-
-        loadDocument()
     }
 
     private fun loadDocument() {
@@ -122,8 +125,12 @@ class ANormalViewController(
         progressDialog!!.setMessage("Loading")
         progressDialog!!.show()
 
+        crop = pdfViewModel.checkCrop()
         instance.diskIO().execute {
-            val document = decodeService!!.open(pdfViewModel.pdfPath, crop, true)
+            val document = try {
+                decodeService!!.open(mPath, crop, true)
+            } catch (e: Exception) {
+            }
             instance.mainThread().execute {
                 progressDialog!!.dismiss()
                 if (null == document) {
@@ -137,35 +144,38 @@ class ANormalViewController(
                 }
                 isDocLoaded = true
                 documentView.showDocument(crop)
+                doLoadDoc(decodeService!!.pageSizeBean, document)
             }
         }
     }
 
-    override fun init(pageSizes: List<APage>, pos: Int, scrollOrientation: Int) {
-        try {
-            Logcat.d("init.pos:$pos, :$scrollOrientation")
-            this.scrollOrientation = scrollOrientation
-            this.mPageSizes = pageSizes
+    override fun init() {
+        val pos: Int = pdfViewModel.getCurrentPage()
+        val scrollOrientation: Int = pdfViewModel.bookProgress?.scrollOrientation ?: 1
+        Logcat.d("init.pos:$pos, :$scrollOrientation")
+        this.scrollOrientation = scrollOrientation
 
-            setOrientation(scrollOrientation)
-            gotoPage(pos)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
-        }
+        setOrientation(scrollOrientation)
+
+        gotoPage(pdfViewModel.getCurrentPage())
+
+        loadDocument()
     }
 
-    override fun doLoadDoc(pageSizes: List<APage>, pos: Int) {
-        try {
-            Logcat.d("doLoadDoc:$scrollOrientation")
-            this.mPageSizes = pageSizes
+    private fun doLoadDoc(pageSizeBean: APageSizeLoader.PageSizeBean, document: Any) {
+        Logcat.d("doLoadDoc:${pageSizeBean.crop}, ${pageSizeBean.List!!.size}")
+        this.mPageSizes = pageSizeBean.List!!
 
-            setOrientation(scrollOrientation)
-            gotoPage(pos)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
+        var outlineHelper = pdfViewModel.outlineHelper
+        if (null == outlineHelper) {
+            val mupdfDocument = MupdfDocument(context)
+            if (document is PdfDocument) {
+                mupdfDocument.setDocument(document.core)
+            }
+            outlineHelper = OutlineHelper(mupdfDocument, context)
+            pdfViewModel.outlineHelper = outlineHelper
         }
+        controllerListener?.doLoadedDoc(mPageSizes.size, pdfViewModel.getCurrentPage())
     }
 
     private fun createMainContainer(): FrameLayout {

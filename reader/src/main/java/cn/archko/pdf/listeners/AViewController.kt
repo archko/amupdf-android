@@ -4,15 +4,13 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.view.MotionEvent
 import android.view.View
-import cn.archko.pdf.core.entity.APage
 
 /**
  * @author: archko 2020/5/15 :12:43
  */
 interface AViewController {
 
-    fun init(pageSizes: List<APage>, pos: Int, scrollOrientation: Int)
-    fun doLoadDoc(pageSizes: List<APage>, pos: Int)
+    fun init()
 
     fun getDocumentView(): View
     fun onSingleTap(ev: MotionEvent?, margin: Int): Boolean
