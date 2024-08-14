@@ -40,7 +40,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "amupdf"
+rootProject.name = "amupdf-android"
 
 include(":app")
 
@@ -52,12 +52,5 @@ include(":paddle-ocr")
 include(":pdf-recyclerview")
 include(":subsampling-scale-image-view")
 
-//include ":library"
-//include ":editor"
-//include ":wheel"
 include(":mupdf-android-fitz")
-
-//project(":library").projectDir = new File("solib/library")
-//project(":editor").projectDir = new File("editor")
-//project(":wheel").projectDir = new File("wheel")
-project(":mupdf-android-fitz").projectDir = File ("solib/mupdf-android-fitz")
+project(":mupdf-android-fitz").projectDir = File("solib/mupdf-android-fitz")
