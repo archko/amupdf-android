@@ -31,6 +31,7 @@ import cn.archko.pdf.core.common.AppExecutors;
 import cn.archko.pdf.core.common.SensorHelper;
 import cn.archko.pdf.core.common.StatusBarHelper;
 import cn.archko.pdf.core.listeners.SimpleGestureListener;
+import cn.archko.pdf.core.utils.Utils;
 
 public abstract class BaseViewerActivity extends FragmentActivity implements DecodingProgressListener, CurrentPageListener {
     protected DecodeService decodeService;
@@ -46,10 +47,12 @@ public abstract class BaseViewerActivity extends FragmentActivity implements Dec
     protected boolean isDocLoaded = false;
     private SensorHelper sensorHelper;
     //private Recent recent;
+    int mMargin;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mMargin = Utils.dipToPixel(16);
 
         StatusBarHelper.INSTANCE.hideSystemUI(this);
         StatusBarHelper.INSTANCE.setImmerseBarAppearance(getWindow(), true);
@@ -228,12 +231,24 @@ public abstract class BaseViewerActivity extends FragmentActivity implements Dec
 
         @Override
         public void onSingleTapConfirmed(MotionEvent ev, int currentPage) {
-            showPageIndex(currentPage);
+            int height = documentView.getHeight();
+            int top = height / 4;
+            int bottom = height * 3 / 4;
+            //Log.d(VIEW_LOG_TAG, "height:"+height+" y:"+e.getY()+" mMargin:"+mMargin);
+
+            height = height - mMargin;
+            if ((int) ev.getY() < top) {
+                documentView.scrollPage(-height);
+            } else if ((int) ev.getY() > bottom) {
+                documentView.scrollPage(height);
+            } else {
+                showPageIndex(currentPage);
+            }
         }
 
         @Override
         public void onDoubleTapEvent(MotionEvent ev, int currentPage) {
-            onDoubleTap(currentPage);
+            //onDoubleTap(currentPage);
         }
     };
 
