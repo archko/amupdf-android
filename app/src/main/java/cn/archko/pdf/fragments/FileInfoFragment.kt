@@ -14,15 +14,13 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import cn.archko.mupdf.R
 import cn.archko.pdf.core.common.Graph
-import cn.archko.pdf.decode.PdfFetcherData
 import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.DateUtils
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.Utils
-import coil.request.CachePolicy
-import coil.request.ImageRequest
+import cn.archko.pdf.utils.FetcherUtils
 import com.artifex.mupdf.fitz.Document
 import java.math.BigDecimal
 
@@ -140,18 +138,7 @@ class FileInfoFragment : DialogFragment() {
     }
 
     private fun showIcon(path: String) {
-        ImageRequest.Builder(requireContext())
-            .data(
-                PdfFetcherData(
-                    path = path,
-                    width = 270,
-                    height = 360,
-                )
-            )
-            .memoryCacheKey("page_$path")
-            .diskCachePolicy(CachePolicy.ENABLED)
-            .memoryCachePolicy(CachePolicy.ENABLED)
-            .build()
+        FetcherUtils.load(path, requireContext(), mIcon)
     }
 
     private fun updatePageCount() {

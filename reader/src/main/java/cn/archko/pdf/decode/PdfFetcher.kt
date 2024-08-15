@@ -35,7 +35,7 @@ class PdfFetcher(
         return DrawableResult(
             drawable = BitmapDrawable(options.context.resources, bitmap),
             isSampled = false,
-            dataSource = DataSource.MEMORY
+            dataSource = DataSource.DISK
         )
     }
 

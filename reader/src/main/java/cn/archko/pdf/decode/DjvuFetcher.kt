@@ -17,13 +17,12 @@ import org.vudroid.djvudroid.codec.DjvuPage
  * @author: archko 2024/8/133 :08:02
  */
 class DjvuFetcher(
-    private val data: PdfFetcherData,
+    private val data: DjvuFetcherData,
     private val options: Options
 ) : Fetcher {
     override suspend fun fetch(): FetchResult {
         val djvuContext = DjvuContext()
         val djvuDocument = djvuContext.openDocument(data.path)
-
 
         val bitmap = if (djvuDocument.pageCount > 0) {
             val djvuPage = djvuDocument.getPage(0)
@@ -33,13 +32,13 @@ class DjvuFetcher(
         return DrawableResult(
             drawable = BitmapDrawable(options.context.resources, bitmap),
             isSampled = false,
-            dataSource = DataSource.MEMORY
+            dataSource = DataSource.DISK
         )
     }
 
     private fun renderPage(page: DjvuPage, width: Int, height: Int): Bitmap {
         val ratio = 1f * width / page.width
-        val nHeight = page.height / ratio
+        val nHeight = height / ratio
         val bitmap = page.renderBitmap(
             Rect(0, 0, 1, 1),
             width,
@@ -47,7 +46,6 @@ class DjvuFetcher(
             RectF(0f, 0f, 1f, 1f),
             1f
         )
-        bitmap
         return bitmap
     }
 
@@ -61,3 +59,9 @@ class DjvuFetcher(
         }
     }
 }
+
+data class DjvuFetcherData(
+    val path: String,
+    val width: Int,
+    val height: Int,
+)
