@@ -337,7 +337,9 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
     }
 
     override fun onBackPressed() {
-        onBackEvent()
+        if (Build.VERSION.SDK_INT < 33) {
+            onBackEvent()
+        }
     }
 
     /*override fun onCreateOptionsMenu(menu: Menu): Boolean {

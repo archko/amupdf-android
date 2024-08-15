@@ -246,10 +246,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
     }
 
-    fun getDocumentView(): View? {
-        return viewController?.getDocumentView()!!
-    }
-
     private fun addDocumentView() {
         documentLayout?.removeAllViews()
         val lap: FrameLayout.LayoutParams = FrameLayout.LayoutParams(
@@ -734,11 +730,11 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             pageSeekBarControls: PageControls,
             controllerListener: ControllerListener?,
         ): AViewController {
-            //val aViewController = viewControllerCache.get(viewMode.ordinal)
-            //if (null != aViewController) {
-            //    return aViewController
-            //}
-            return createViewController(
+            var aViewController = viewControllerCache.get(viewMode.ordinal)
+            if (null != aViewController) {
+                return aViewController
+            }
+            aViewController = createViewController(
                 scope,
                 viewMode,
                 context,
@@ -748,9 +744,11 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 pageSeekBarControls,
                 controllerListener,
             )
+            viewControllerCache.put(viewMode.ordinal, aViewController)
+            return aViewController
         }
 
-        fun createViewController(
+        private fun createViewController(
             scope: CoroutineScope,
             viewMode: ViewMode,
             context: FragmentActivity,

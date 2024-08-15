@@ -35,7 +35,6 @@ import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.PageControls
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
@@ -130,32 +129,34 @@ class AReflowViewController(
     }
 
     private fun loadDocument() {
-        progressDialog = ProgressDialog(context)
-        progressDialog!!.setMessage("Loading")
-        progressDialog!!.show()
+        if (pdfViewModel.mupdfDocument == null) {
+            progressDialog = ProgressDialog(context)
+            progressDialog!!.setMessage("Loading")
+            progressDialog!!.show()
 
-        scope.launch {
-            val start = SystemClock.uptimeMillis()
-            pdfViewModel.loadPdfDoc(context, mPath, null)
-            pdfViewModel.pageFlow
-                .collectLatest {
-                    progressDialog!!.dismiss()
-                    if (it.state == State.PASS) {
-                        showPasswordDialog()
-                        return@collectLatest
-                    }
-                    val cp = pdfViewModel.countPages()
-                    if (cp > 0) {
-                        Logcat.d(
-                            TAG,
-                            "open:" + (SystemClock.uptimeMillis() - start) + " cp:" + cp
-                        )
+            scope.launch {
+                val start = SystemClock.uptimeMillis()
+                pdfViewModel.loadPdfDoc(context, mPath, null)
+                pdfViewModel.pageFlow
+                    .collectLatest {
+                        progressDialog!!.dismiss()
+                        if (it.state == State.PASS) {
+                            showPasswordDialog()
+                            return@collectLatest
+                        }
+                        val cp = pdfViewModel.countPages()
+                        if (cp > 0) {
+                            Logcat.d(
+                                TAG,
+                                "open:" + (SystemClock.uptimeMillis() - start) + " cp:" + cp
+                            )
 
-                        postLoadDoc(cp)
-                    } else {
-                        context.finish()
+                            postLoadDoc(cp)
+                        } else {
+                            context.finish()
+                        }
                     }
-                }
+            }
         }
     }
 
@@ -187,18 +188,6 @@ class AReflowViewController(
                 doLoadDoc()
             }
         }
-    }
-
-    /**
-     * if scale=1.0f,reload it from mupdf
-     */
-    private fun checkPageSize(cp: Int) {
-        /*for (i in 0 until mPageSizes.size) {
-            val pointF = getPageSize(i)
-            if (pointF != null) {
-                pageSizes.add(pointF)
-            }
-        }*/
     }
 
     private fun getPageSize(pageNum: Int): APage? {
