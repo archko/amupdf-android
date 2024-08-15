@@ -140,7 +140,7 @@ public class DecodeServiceBase implements DecodeService {
                 mHandler.sendEmptyMessage(MSG_DECODE_SELECT);
             } else {
                 try {
-                    Log.d(TAG, String.format("add task:%s-%s, %s-%s", selectTask.pageNumber, selectTask.type, selectTask.decodeKey, selectTask.pageSliceBounds));
+                    Log.d(TAG, String.format("add task:%s-%s, %s-%s", selectTask.pageNumber, selectTask.crop, selectTask.decodeKey, selectTask.pageSliceBounds));
                     performDecode(selectTask);
                 } catch (IOException e) {
                     Log.e(TAG, String.format("decode error:%s-%s", selectTask.pageNumber, selectTask.node));
@@ -224,7 +224,7 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     private Rect cropPage(CodecPage vuPage) {
-        int width = 400;
+        int width = 300;
         float ratio = 1f * vuPage.getWidth() / width;
         int height = (int) (vuPage.getHeight() / ratio);
         Bitmap thumb = vuPage.renderBitmap(

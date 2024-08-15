@@ -190,9 +190,10 @@ public class CropUtils {
     //========================= java =========================
 
     // 扫描步进
-    private final static int LINE_SIZE = 4;
+    private final static int LINE_SIZE = 5;
+    private final static int V_LINE_SIZE = 8;
     //边距留白,与切割的图片大小是有关的,缩略图越小,留白应该越小,因为精度小
-    private final static int LINE_MARGIN = 8;
+    private final static int LINE_MARGIN = 16;
     //这个值越小,表示忽略的空间越大,比如一行就一个页码,如果这个适中,就直接忽略,认为这行是空白的
     private final static double WHITE_THRESHOLD = 0.004;
 
@@ -216,11 +217,10 @@ public class CropUtils {
 
         //计算平均灰度不如直接设置225,效果要好的多,平均值会把红色的识别成白边
         final float avgLum = 225; //calculateAvgLum(bitmap, bitmapBounds);
-        final float rightBottomAvgLum = 235; //calculateAvgLum(bitmap, bitmapBounds);
         float left = getLeftBound(bitmap, bitmapBounds, avgLum);
-        float right = getRightBound(bitmap, bitmapBounds, rightBottomAvgLum);
+        float right = getRightBound(bitmap, bitmapBounds, avgLum);
         float top = getTopBound(bitmap, bitmapBounds, avgLum);
-        float bottom = getBottomBound(bitmap, bitmapBounds, rightBottomAvgLum);
+        float bottom = getBottomBound(bitmap, bitmapBounds, avgLum);
 
         left = left * bitmapBounds.width();
         top = top * bitmapBounds.height();
@@ -256,20 +256,20 @@ public class CropUtils {
         final int h = bmp.getHeight() / 3;
         int whiteCount = 0;
         int y = 0;
-        for (y = bitmapBounds.top; y < bitmapBounds.top + h; y += LINE_SIZE) {
+        for (y = bitmapBounds.top; y < bitmapBounds.top + h; y += V_LINE_SIZE) {
             final boolean white = isRectWhite(bmp, bitmapBounds.left + LINE_MARGIN, y, bitmapBounds.right - LINE_MARGIN, y + LINE_SIZE,
                     avgLum);
             if (white) {
                 whiteCount++;
             } else {
                 if (whiteCount >= 1) {
-                    return (float) (Math.max(bitmapBounds.top, y - LINE_SIZE) - bitmapBounds.top)
+                    return (float) (Math.max(bitmapBounds.top, y - V_LINE_SIZE) - bitmapBounds.top)
                             / bitmapBounds.height();
                 }
                 whiteCount = 0;
             }
         }
-        return whiteCount > 0 ? (float) (Math.max(bitmapBounds.top, y - LINE_SIZE) - bitmapBounds.top)
+        return whiteCount > 0 ? (float) (Math.max(bitmapBounds.top, y - V_LINE_SIZE) - bitmapBounds.top)
                 / bitmapBounds.height() : 0;
     }
 
@@ -298,20 +298,20 @@ public class CropUtils {
         final int h = bmp.getHeight() * 2 / 3;
         int whiteCount = 0;
         int y = 0;
-        for (y = bitmapBounds.bottom - LINE_SIZE; y > bitmapBounds.bottom - h; y -= LINE_SIZE) {
+        for (y = bitmapBounds.bottom - V_LINE_SIZE; y > bitmapBounds.bottom - h; y -= V_LINE_SIZE) {
             final boolean white = isRectWhite(bmp, bitmapBounds.left + LINE_MARGIN, y, bitmapBounds.right - LINE_MARGIN, y + LINE_SIZE,
                     avgLum);
             if (white) {
                 whiteCount++;
             } else {
                 if (whiteCount >= 1) {
-                    return (float) (Math.min(bitmapBounds.bottom, y + 2 * LINE_SIZE) - bitmapBounds.top)
+                    return (float) (Math.min(bitmapBounds.bottom, y + 2 * V_LINE_SIZE) - bitmapBounds.top)
                             / bitmapBounds.height();
                 }
                 whiteCount = 0;
             }
         }
-        return whiteCount > 0 ? (float) (Math.min(bitmapBounds.bottom, y + 2 * LINE_SIZE) - bitmapBounds.top)
+        return whiteCount > 0 ? (float) (Math.min(bitmapBounds.bottom, y + 2 * V_LINE_SIZE) - bitmapBounds.top)
                 / bitmapBounds.height() : 1;
     }
 
@@ -360,7 +360,7 @@ public class CropUtils {
 
         final int min = Math.min(r, Math.min(g, b));
         final int max = Math.max(r, Math.max(g, b));
-        return (1f * min + max) / 2;
+        return (2f * min + max) / 3;
     }
 
     public static int[] getPixels(Bitmap bitmap, Rect srcRect) {
