@@ -27,7 +27,7 @@
         android:xlargeScreens="true" />
 
     <application
-        android:name="cn.archko.pdf.core.App"
+        android:name="cn.archko.pdf.PdfApp"
         android:allowBackup="true"
         android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="false"

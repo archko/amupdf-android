@@ -5,16 +5,11 @@ import android.app.Application
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.CrashHandler
 import cn.archko.pdf.core.common.Graph
-import coil.ComponentRegistry
-import coil.ImageLoader
-import coil.ImageLoaderFactory
-import coil.disk.DiskCache
-import coil.memory.MemoryCache
 import com.tencent.bugly.crashreport.CrashReport
 import com.tencent.mmkv.MMKV
 import vn.chungha.flowbus.FlowBusInitApplication
 
-open class App : Application(), ImageLoaderFactory {
+open class App : Application() {
     //private val appkey = "5c15f639f1f556978b0009c8"
     var screenHeight = 2160
     var screenWidth = 1080
@@ -65,31 +60,7 @@ open class App : Application(), ImageLoaderFactory {
     }
 
     companion object {
-        private const val MAX_MEMORY_CACHE_SIZE_PERCENTAGE = 0.3
-        private const val MAX_DISK_CACHE_SIZE_PERCENTAGE = 0.2
         var instance: App? = null
             private set
-    }
-
-    override fun newImageLoader(): ImageLoader {
-        val imageLoader = ImageLoader.Builder(this)
-            .components(fun ComponentRegistry.Builder.() {
-                //add(PdfiumFetcher.Factory())
-                //add(MupdfFetcher.Factory())
-            })
-            .allowRgb565(true)
-            .memoryCache {
-                MemoryCache.Builder(this)
-                    .maxSizePercent(MAX_MEMORY_CACHE_SIZE_PERCENTAGE)
-                    .build()
-            }
-            .diskCache {
-                DiskCache.Builder()
-                    .directory(cacheDir.resolve("image_cache"))
-                    .maxSizePercent(MAX_DISK_CACHE_SIZE_PERCENTAGE)
-                    .build()
-            }
-            .build()
-        return imageLoader
     }
 }
