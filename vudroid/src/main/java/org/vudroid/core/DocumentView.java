@@ -821,7 +821,7 @@ public class DocumentView extends View implements ZoomListener {
         }
     }
 
-    protected void setFilter(int colorMode) {
+    public void setFilter(int colorMode) {
         float[] colorMatrix = ColorUtil.getColorMode(colorMode);
         if (null == colorMatrix) {
             filter = null;

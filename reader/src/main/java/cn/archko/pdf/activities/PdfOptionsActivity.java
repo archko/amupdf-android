@@ -20,10 +20,10 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cn.archko.pdf.R;
-import cn.archko.pdf.core.adapters.BaseRecyclerAdapter;
-import cn.archko.pdf.core.adapters.BaseViewHolder;
 import cn.archko.pdf.common.PdfOptionKeys;
 import cn.archko.pdf.common.PdfOptionRepository;
+import cn.archko.pdf.core.adapters.BaseRecyclerAdapter;
+import cn.archko.pdf.core.adapters.BaseViewHolder;
 import cn.archko.pdf.core.widgets.ColorItemDecoration;
 
 /**
@@ -106,6 +106,13 @@ public class PdfOptionsActivity extends FragmentActivity {
 
         //prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_cropper), getString(R.string.opts_cropper), PdfOptionKeys.PREF_CROPPER, PdfOptionRepository.INSTANCE.getCropper());
         //prefsList.add(prefs);
+
+        prefs = new Prefs(TYPE_LIST, getString(R.string.opts_color_mode), getString(R.string.opts_color_mode),
+                PdfOptionKeys.PREF_COLORMODE,
+                getResources().getStringArray(R.array.opts_color_modes),
+                getResources().getStringArray(R.array.opts_color_mode_labels),
+                PdfOptionRepository.INSTANCE.getColorMode());
+        prefsList.add(prefs);
     }
 
     private static final int TYPE_CHECK = 0;
@@ -180,14 +187,16 @@ public class PdfOptionsActivity extends FragmentActivity {
                     (dialog, which) -> {
                         dialog.dismiss();
                         summary.setText(data.labels[which]);
-                        setCheckVal(data.key, data.vals[which]);
+                        setCheckListVal(data.key, data.vals[which]);
                     });
             builder.create().show();
         }
 
-        private void setCheckVal(String key, Object val) {
+        private void setCheckListVal(String key, Object val) {
             if (TextUtils.equals(key, PdfOptionKeys.PREF_ORIENTATION)) {
                 PdfOptionRepository.INSTANCE.setOrientation(Integer.parseInt(val.toString()));
+            } else if (TextUtils.equals(key, PdfOptionKeys.PREF_COLORMODE)) {
+                PdfOptionRepository.INSTANCE.setColorMode(Integer.parseInt(val.toString()));
             }
         }
     }

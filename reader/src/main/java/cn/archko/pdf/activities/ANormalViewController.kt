@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.common.OutlineHelper
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.AppExecutors.Companion.instance
 import cn.archko.pdf.core.common.IntentFile
@@ -119,6 +120,8 @@ class ANormalViewController(
         frameLayout = createMainContainer()
         frameLayout.addView(documentView)
         zoomModel.addEventListener(this)
+
+        setFilter(PdfOptionRepository.getColorMode())
     }
 
     private fun loadDocument() {
@@ -307,6 +310,10 @@ class ANormalViewController(
         }
         pageNumberToast!!.setGravity(Gravity.BOTTOM or Gravity.START, Utils.dipToPixel(15f), 0)
         pageNumberToast!!.show()
+    }
+
+    override fun setFilter(colorMode: Int) {
+        documentView.setFilter(colorMode)
     }
 
     //--------------------------------------

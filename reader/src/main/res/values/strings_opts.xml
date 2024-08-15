@@ -76,10 +76,20 @@
     <string-array name="opts_color_modes">
         <item>0</item>
         <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
     </string-array>
     <string-array name="opts_color_mode_labels">
         <item>Normal</item>
         <item>Invert</item>
+        <item>Black on Yellow</item>
+        <item>Grayscale on greyish</item>
+        <item>Grayscale on gray</item>
+        <item>Grayscale on dark gray</item>
+        <item>White on blue</item>
     </string-array>
 
     <string name="opts_default_list_style" translatable="false">1</string>

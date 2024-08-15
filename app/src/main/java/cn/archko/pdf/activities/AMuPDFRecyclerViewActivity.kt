@@ -730,11 +730,11 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             pageSeekBarControls: PageControls,
             controllerListener: ControllerListener?,
         ): AViewController {
-            var aViewController = viewControllerCache.get(viewMode.ordinal)
-            if (null != aViewController) {
-                return aViewController
-            }
-            aViewController = createViewController(
+            //var aViewController = viewControllerCache.get(viewMode.ordinal)
+            //if (null != aViewController) {
+            //    return aViewController
+            //}
+            val aViewController = createViewController(
                 scope,
                 viewMode,
                 context,
@@ -744,7 +744,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 pageSeekBarControls,
                 controllerListener,
             )
-            viewControllerCache.put(viewMode.ordinal, aViewController)
+            //viewControllerCache.put(viewMode.ordinal, aViewController)
             return aViewController
         }
 

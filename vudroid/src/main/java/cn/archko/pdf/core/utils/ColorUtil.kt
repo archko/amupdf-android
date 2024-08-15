@@ -18,41 +18,45 @@ object ColorUtil {
             0.0f, 0.0f, 0.0f, 1.0f, 0.0f
         ),
 
-        /*"CM_BLACK_ON_YELLOWISH" to floatArrayOf(
+        //"CM_BLACK_ON_YELLOWISH"
+        2 to floatArrayOf(
             0.94f, 0.02f, 0.02f, 0.0f, 0.0f,
             0.02f, 0.86f, 0.02f, 0.0f, 0.0f,
             0.02f, 0.02f, 0.74f, 0.0f, 0.0f,
             0.00f, 0.00f, 0.00f, 1.0f, 0.0f
         ),
 
-        "CM_GRAYSCALE_LIGHT" to floatArrayOf(
+        //"CM_GRAYSCALE_LIGHT"
+        3 to floatArrayOf(
             0.27f, 0.54f, 0.09f, 0.0f, 0.0f,
             0.27f, 0.54f, 0.09f, 0.0f, 0.0f,
             0.27f, 0.54f, 0.09f, 0.0f, 0.0f,
             0.00f, 0.00f, 0.00f, 1.0f, 0.0f
         ),
 
-
-        "CM_GRAYSCALE" to floatArrayOf(
+        //"CM_GRAYSCALE"
+        4 to floatArrayOf(
             0.215f, 0.45f, 0.08f, 0.0f, 0.0f,
             0.215f, 0.45f, 0.08f, 0.0f, 0.0f,
             0.215f, 0.45f, 0.08f, 0.0f, 0.0f,
             0.000f, 0.00f, 0.00f, 1.0f, 0.0f
         ),
 
-        "CM_GRAYSCALE_DARK" to floatArrayOf(
+        //"CM_GRAYSCALE_DARK"
+        5 to floatArrayOf(
             0.15f, 0.30f, 0.05f, 0.0f, 0.0f,
             0.15f, 0.30f, 0.05f, 0.0f, 0.0f,
             0.15f, 0.30f, 0.05f, 0.0f, 0.0f,
             0.00f, 0.00f, 0.00f, 1.0f, 0.0f
         ),
 
-        "CM_WHITE_ON_BLUE" to floatArrayOf(
-            -0.94f, -0.02f, -0.02f, 1.0f, 1.0f,
-            -0.02f, -0.86f, -0.02f, 1.0f, 1.0f,
-            -0.02f, -0.02f, -0.74f, 1.0f, 1.0f,
+        //"CM_WHITE_ON_BLUE"
+        6 to floatArrayOf(
+            -0.94f, -0.02f, -0.02f, 0.0f, 255.0f,
+            -0.02f, -0.86f, -0.02f, 0.0f, 255.0f,
+            -0.02f, -0.02f, -0.74f, 0.0f, 255.0f,
             0.00f, 0.00f, 0.00f, 1.0f, 0.0f
-        )*/
+        )
     )
 
     @JvmStatic

@@ -339,6 +339,9 @@ class ACropViewController(
         mRecyclerView.adapter?.notifyItemChanged(pos)
     }
 
+    override fun setFilter(colorMode: Int) {
+    }
+
     //--------------------------------------
 
     override fun onResume() {

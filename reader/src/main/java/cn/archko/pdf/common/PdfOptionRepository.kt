@@ -179,6 +179,14 @@ object PdfOptionRepository {
         return mmkv.decodeInt(PdfOptionKeys.PREF_CROPPER, 0) == 1
     }
 
+    fun setColorMode(colorMode: Int) {
+        mmkv.encode(PdfOptionKeys.PREF_COLORMODE, colorMode)
+    }
+
+    fun getColorMode(): Int {
+        return mmkv.decodeInt(PdfOptionKeys.PREF_COLORMODE, 0)
+    }
+
     @JvmField
     val FONT_DIR = "amupdf/fonts/"
 
@@ -246,6 +254,7 @@ object PdfOptionKeys {
     const val PREF_DIRS_FIRST = ("dirsFirst")
     const val PREF_NEW_VIEWER = ("newViewer")
     const val PREF_CROPPER = ("cropper")
+    const val PREF_COLORMODE = ("colorMode")
 
     //============== font and style ==============
     const val FONT_KEY_TYPE = ("font_key_type")
