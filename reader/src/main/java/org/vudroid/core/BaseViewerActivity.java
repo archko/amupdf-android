@@ -247,7 +247,7 @@ public abstract class BaseViewerActivity extends FragmentActivity implements Dec
         }
 
         @Override
-        public void onDoubleTapEvent(MotionEvent ev, int currentPage) {
+        public void onDoubleTap(MotionEvent ev, int currentPage) {
             //onDoubleTap(currentPage);
         }
     };

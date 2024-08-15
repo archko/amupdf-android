@@ -42,8 +42,6 @@ public class DocumentView extends View implements ZoomListener {
     DecodingProgressModel progressModel;
     private RectF viewRect;
     private boolean inZoom;
-    private long lastDownEventTime;
-    private static final int DOUBLE_TAP_TIME = 600;
     private MultiTouchZoom multiTouchZoom;
     public static final int HORIZONTAL = LinearLayout.HORIZONTAL;
     public static final int VERTICAL = LinearLayout.VERTICAL;
@@ -865,25 +863,15 @@ public class DocumentView extends View implements ZoomListener {
 
         @Override
         public boolean onDoubleTap(MotionEvent ev) {
-            return false;
-        }
-
-        /*@Override
-        public boolean onDoubleTapEvent(MotionEvent ev) {
-            if (ev.getEventTime() - lastDownEventTime < DOUBLE_TAP_TIME) {
-                if (null != simpleGestureListener) {
-                    Page page = getEventPage(ev);
-                    if (null != page) {
-                        simpleGestureListener.onDoubleTapEvent(ev, page.index);
-                    }
+            if (null != simpleGestureListener) {
+                Page page = getEventPage(ev);
+                if (null != page) {
+                    simpleGestureListener.onDoubleTap(ev, page.index);
+                    return true;
                 }
-                lastDownEventTime = 0;
-                return true;
-            } else {
-                lastDownEventTime = ev.getEventTime();
             }
             return false;
-        }*/
+        }
 
         public boolean onDown(MotionEvent ev) {
             stopScroller();

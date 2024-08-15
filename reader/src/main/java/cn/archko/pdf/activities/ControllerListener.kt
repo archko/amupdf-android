@@ -8,7 +8,7 @@ import android.view.MotionEvent
 interface ControllerListener {
     fun onSingleTapConfirmed(ev: MotionEvent?, currentPage: Int)
 
-    fun onDoubleTapEvent(ev: MotionEvent?, currentPage: Int)
+    fun onDoubleTap(ev: MotionEvent?, currentPage: Int)
 
     fun doLoadedDoc(count: Int, pos: Int)
 }

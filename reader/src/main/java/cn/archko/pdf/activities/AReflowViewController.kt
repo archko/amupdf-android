@@ -385,23 +385,21 @@ class AReflowViewController(
     }
 
     override fun onPause() {
-        if (null != pdfViewModel.mupdfDocument) {
-            pdfViewModel.bookProgress?.run {
-                reflow = 1
-                var savePos = getCurrentPos() + 1
-                val lastPos = getLastPos()
-                if (lastPos == mPageSizes.size - 1) {
-                    savePos = lastPos
-                }
-                pdfViewModel.saveBookProgress(
-                    mPath,
-                    mPageSizes.size,
-                    savePos,
-                    pdfViewModel.bookProgress!!.zoomLevel,
-                    -1,
-                    0
-                )
+        if (null != pdfViewModel.mupdfDocument && null != pdfViewModel.bookProgress) {
+            pdfViewModel.bookProgress!!.reflow = 1
+            var savePos = getCurrentPos() + 1
+            val lastPos = getLastPos()
+            if (lastPos == mPageSizes.size - 1) {
+                savePos = lastPos
             }
+            pdfViewModel.saveBookProgress(
+                mPath,
+                mPageSizes.size,
+                savePos,
+                pdfViewModel.bookProgress!!.zoomLevel,
+                -1,
+                0
+            )
         }
         if (null != mRecyclerView.adapter && mRecyclerView.adapter is MuPDFReflowAdapter) {
             (mRecyclerView.adapter as MuPDFReflowAdapter).clearCacheViews()
@@ -409,9 +407,6 @@ class AReflowViewController(
     }
 
     override fun onDestroy() {
-        scope?.let {
-            scope!!.cancel()
-        }
     }
 
     //===========================================

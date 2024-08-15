@@ -228,7 +228,16 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 }
             }
 
-            override fun onDoubleTapEvent(ev: MotionEvent?, currentPage: Int) {
+            override fun onDoubleTap(ev: MotionEvent?, currentPage: Int) {
+                if (!isDocLoaded) {
+                    return
+                }
+                if (pageControls?.visibility() == View.VISIBLE) {
+                    pageControls?.hide()
+                }
+                if (mReflowLayout.visibility == View.VISIBLE) {
+                    mReflowLayout.visibility = View.GONE
+                }
             }
 
             override fun doLoadedDoc(count: Int, pos: Int) {

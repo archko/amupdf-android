@@ -58,7 +58,7 @@ class ANormalViewController(
 
     private lateinit var currentPageModel: CurrentPageModel
 
-    private lateinit var mPageSizes: List<APage>
+    private var mPageSizes: List<APage>? = null
     private var scrollOrientation = LinearLayoutManager.VERTICAL
     private var pageNumberToast: Toast? = null
     protected var progressDialog: ProgressDialog? = null
@@ -68,11 +68,10 @@ class ANormalViewController(
         SimpleGestureListener {
         override fun onSingleTapConfirmed(ev: MotionEvent, currentPage: Int) {
             controllerListener?.onSingleTapConfirmed(ev, currentPage)
-            //showPageToast(currentPage)
         }
 
-        override fun onDoubleTapEvent(ev: MotionEvent, currentPage: Int) {
-            //simpleListener?.onDoubleTapEvent(ev, currentPage)
+        override fun onDoubleTap(ev: MotionEvent, currentPage: Int) {
+            controllerListener?.onDoubleTap(ev, currentPage)
         }
     }
 
@@ -165,6 +164,9 @@ class ANormalViewController(
     private fun doLoadDoc(pageSizeBean: APageSizeLoader.PageSizeBean, document: Any) {
         Logcat.d("doLoadDoc:${pageSizeBean.crop}, ${pageSizeBean.List!!.size}")
         this.mPageSizes = pageSizeBean.List!!
+        if (null == mPageSizes) {
+            return
+        }
 
         var outlineHelper = pdfViewModel.outlineHelper
         if (null == outlineHelper) {
@@ -175,7 +177,7 @@ class ANormalViewController(
             outlineHelper = OutlineHelper(mupdfDocument, context)
             pdfViewModel.outlineHelper = outlineHelper
         }
-        controllerListener?.doLoadedDoc(mPageSizes.size, pdfViewModel.getCurrentPage())
+        controllerListener?.doLoadedDoc(mPageSizes!!.size, pdfViewModel.getCurrentPage())
     }
 
     private fun createMainContainer(): FrameLayout {
@@ -224,7 +226,7 @@ class ANormalViewController(
     }
 
     override fun getCount(): Int {
-        return mPageSizes.size
+        return mPageSizes?.size ?: 0
     }
 
     override fun setOrientation(ori: Int) {
@@ -316,11 +318,11 @@ class ANormalViewController(
     }
 
     override fun onPause() {
-        pdfViewModel.bookProgress?.run {
+        if (null != pdfViewModel.bookProgress && null != mPageSizes) {
             val position = documentView.currentPage
             pdfViewModel.saveBookProgress(
                 mPath,
-                mPageSizes.size,
+                mPageSizes!!.size,
                 position + 1,
                 documentView.zoomModel.zoom * 1000f,
                 documentView.scrollX,

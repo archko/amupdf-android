@@ -6,5 +6,5 @@ public interface SimpleGestureListener {
 
     void onSingleTapConfirmed(MotionEvent ev, int currentPage);
 
-    void onDoubleTapEvent(MotionEvent ev, int currentPage);
+    void onDoubleTap(MotionEvent ev, int currentPage);
 }
