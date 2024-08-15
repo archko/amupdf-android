@@ -29,6 +29,7 @@ public class PageControls implements View.OnClickListener {
     private ImageButton mAutoCropButton;
     private ImageButton mOriButton;
     private ImageButton ttsButton;
+    private ImageButton ocrButton;
     private TextView mPath;
     private TextView mTitle;
     private ImageButton mBackButton;
@@ -50,6 +51,8 @@ public class PageControls implements View.OnClickListener {
         void toggleCrop();
 
         void toggleTts();
+
+        void ocr();
     }
 
     public PageControls(View view, ControlListener controlListener) {
@@ -65,6 +68,7 @@ public class PageControls implements View.OnClickListener {
         mAutoCropButton = view.findViewById(R.id.autoCropButton);
         mOriButton = view.findViewById(R.id.oriButton);
         ttsButton = view.findViewById(R.id.ttsButton);
+        ocrButton = view.findViewById(R.id.ocrButton);
         mPath = view.findViewById(R.id.path);
         mTitle = view.findViewById(R.id.title);
         mBackButton = view.findViewById(R.id.back_button);
@@ -75,6 +79,7 @@ public class PageControls implements View.OnClickListener {
         mOriButton.setOnClickListener(this);
         ttsButton.setOnClickListener(this);
         mBackButton.setOnClickListener(this);
+        ocrButton.setOnClickListener(this);
 
         mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -187,6 +192,8 @@ public class PageControls implements View.OnClickListener {
             }
             updateOrientation();
             controlListener.changeOrientation(ori);
+        } else if (R.id.ocrButton == id) {
+            controlListener.ocr();
         }
     }
 

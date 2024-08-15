@@ -476,6 +476,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                         }
                     }
                 }
+
+                override fun ocr() {
+                    this@AMuPDFRecyclerViewActivity.ocr()
+                }
             }
         )
         return pageControls!!
