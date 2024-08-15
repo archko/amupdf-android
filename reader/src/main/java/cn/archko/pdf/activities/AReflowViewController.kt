@@ -129,34 +129,32 @@ class AReflowViewController(
     }
 
     private fun loadDocument() {
-        if (pdfViewModel.mupdfDocument == null) {
-            progressDialog = ProgressDialog(context)
-            progressDialog!!.setMessage("Loading")
-            progressDialog!!.show()
+        progressDialog = ProgressDialog(context)
+        progressDialog!!.setMessage("Loading")
+        progressDialog!!.show()
 
-            scope.launch {
-                val start = SystemClock.uptimeMillis()
-                pdfViewModel.loadPdfDoc(context, mPath, null)
-                pdfViewModel.pageFlow
-                    .collectLatest {
-                        progressDialog!!.dismiss()
-                        if (it.state == State.PASS) {
-                            showPasswordDialog()
-                            return@collectLatest
-                        }
-                        val cp = pdfViewModel.countPages()
-                        if (cp > 0) {
-                            Logcat.d(
-                                TAG,
-                                "open:" + (SystemClock.uptimeMillis() - start) + " cp:" + cp
-                            )
-
-                            postLoadDoc(cp)
-                        } else {
-                            context.finish()
-                        }
+        scope.launch {
+            val start = SystemClock.uptimeMillis()
+            pdfViewModel.loadPdfDoc(context, mPath, null)
+            pdfViewModel.pageFlow
+                .collectLatest {
+                    progressDialog!!.dismiss()
+                    if (it.state == State.PASS) {
+                        showPasswordDialog()
+                        return@collectLatest
                     }
-            }
+                    val cp = pdfViewModel.countPages()
+                    if (cp > 0) {
+                        Logcat.d(
+                            TAG,
+                            "open:" + (SystemClock.uptimeMillis() - start) + " cp:" + cp
+                        )
+
+                        postLoadDoc(cp)
+                    } else {
+                        context.finish()
+                    }
+                }
         }
     }
 

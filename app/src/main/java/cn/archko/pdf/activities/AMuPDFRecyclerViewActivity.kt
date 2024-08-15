@@ -246,6 +246,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
     }
 
+    fun getDocumentView(): View? {
+        return viewController?.getDocumentView()!!
+    }
+
     private fun addDocumentView() {
         documentLayout?.removeAllViews()
         val lap: FrameLayout.LayoutParams = FrameLayout.LayoutParams(
@@ -256,6 +260,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun initViewController(): Boolean {
+        val oldMode = viewMode
         if (pdfViewModel.checkReflow()) {
             viewMode = ViewMode.REFLOW
         } else if (pdfViewModel.checkCrop()) {
@@ -270,10 +275,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             }
         }
 
-        if (!pdfViewModel.checkReflow() && pdfViewModel.checkCrop() == viewController?.getCrop()) {
-            Logcat.d("initViewController:crop don't change, controller:$viewController")
-            return false
-        }
         viewController?.onDestroy()
 
         val aViewController = ViewControllerFactory.getOrCreateViewController(
@@ -730,11 +731,11 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             pageSeekBarControls: PageControls,
             controllerListener: ControllerListener?,
         ): AViewController {
-            //var aViewController = viewControllerCache.get(viewMode.ordinal)
+            //val aViewController = viewControllerCache.get(viewMode.ordinal)
             //if (null != aViewController) {
             //    return aViewController
             //}
-            val aViewController = createViewController(
+            return createViewController(
                 scope,
                 viewMode,
                 context,
@@ -744,11 +745,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 pageSeekBarControls,
                 controllerListener,
             )
-            //viewControllerCache.put(viewMode.ordinal, aViewController)
-            return aViewController
         }
 
-        private fun createViewController(
+        fun createViewController(
             scope: CoroutineScope,
             viewMode: ViewMode,
             context: FragmentActivity,
