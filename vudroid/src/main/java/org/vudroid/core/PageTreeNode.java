@@ -110,7 +110,8 @@ public class PageTreeNode {
         }
         Bitmap bmp = getBitmap();
         if (bmp != null && !bmp.isRecycled()) {
-            //System.out.println(String.format("level:%s, page:%s, width:%s, %s", treeNodeDepthLevel, page.index, bmp.getWidth(), bmp.getHeight()));
+            //System.out.println(String.format("level:%s, page:%s, width:%s, %s, %s",
+            //        treeNodeDepthLevel, page.index, bmp.getWidth(), bmp.getHeight(), getTargetRect()));
             canvas.drawBitmap(bmp, new Rect(0, 0, bmp.getWidth(), bmp.getHeight()), getTargetRect(), bitmapPaint);
             //canvas.drawRect(getTargetRect(), strokePaint);
         }
@@ -179,7 +180,11 @@ public class PageTreeNode {
     private final DecodeService.DecodeCallback decodeCallback = new DecodeService.DecodeCallback() {
         @Override
         public void decodeComplete(Bitmap bitmap, boolean isThumb) {
-            //System.out.println(String.format("DecodeService index:%s, bitmap:%s, key:%s", page.index, bitmap == null, getCacheKey()));
+            //if (null != bitmap) {
+            //    System.out.println(String.format("DecodeService index:%s, %s-%s, bitmap:%s-%s, bounds:%s, key:%s",
+            //            page.index, documentView.getWidth(), documentView.getHeight(), bitmap.getWidth(), bitmap.getHeight(),
+            //            page.bounds, getCacheKey()));
+            //}
 
             setBitmap(bitmap);
             invalidateFlag = false;

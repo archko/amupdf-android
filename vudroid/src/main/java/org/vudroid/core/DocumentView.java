@@ -139,7 +139,7 @@ public class DocumentView extends View implements ZoomListener {
             pages.put(i, page);
             page.setAspectRatio(width, height);
         }
-        Log.d(TAG, "DecodeService:" + pages.size() + " pageToGoTo:" + pageToGoTo);
+        Log.d(TAG, String.format("DecodeService:%s, pageToGoTo:%s, w-h:%s-%s", pages.size(), pageToGoTo, getWidth(), getHeight()));
         isInitialized = true;
         currentPageModel.setPageCount(decodeService.getPageCount());
         invalidatePageSizes();

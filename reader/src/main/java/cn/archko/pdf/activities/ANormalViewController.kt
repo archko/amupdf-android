@@ -88,7 +88,9 @@ class ANormalViewController(
             zoomModel.zoom = this.zoomLevel / 1000
             offsetX = this.offsetX
             offsetY = this.offsetY
+            scrollOrientation = pdfViewModel.bookProgress?.scrollOrientation ?: 1
         }
+
         val progressModel = DecodingProgressModel()
         progressModel.addEventListener(this)
         currentPageModel = CurrentPageModel()
@@ -96,7 +98,7 @@ class ANormalViewController(
         documentView = DocumentView(
             context,
             zoomModel,
-            DocumentView.VERTICAL,
+            scrollOrientation,
             offsetX,
             offsetY,
             progressModel,
@@ -141,20 +143,15 @@ class ANormalViewController(
                     return@execute
                 }
                 isDocLoaded = true
-                documentView.showDocument(crop)
                 doLoadDoc(decodeService!!.pageSizeBean, document)
+                documentView.showDocument(crop)
             }
         }
     }
 
     override fun init() {
+        Logcat.d("init:")
         crop = pdfViewModel.checkCrop()
-        val pos: Int = pdfViewModel.getCurrentPage()
-        val scrollOrientation: Int = pdfViewModel.bookProgress?.scrollOrientation ?: 1
-        Logcat.d("init.pos:$pos, :$scrollOrientation")
-        this.scrollOrientation = scrollOrientation
-
-        setOrientation(scrollOrientation)
 
         gotoPage(pdfViewModel.getCurrentPage())
 
@@ -174,6 +171,7 @@ class ANormalViewController(
             if (document is PdfDocument) {
                 mupdfDocument.setDocument(document.core)
             }
+            pdfViewModel.mupdfDocument = mupdfDocument
             outlineHelper = OutlineHelper(mupdfDocument, context)
             pdfViewModel.outlineHelper = outlineHelper
         }
