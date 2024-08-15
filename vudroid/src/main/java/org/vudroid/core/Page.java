@@ -109,7 +109,7 @@ public class Page {
         final Paint strokePaint = new Paint();
         strokePaint.setColor(Color.BLACK);
         strokePaint.setStyle(Paint.Style.STROKE);
-        strokePaint.setStrokeWidth(1);
+        strokePaint.setStrokeWidth(2);
         return strokePaint;
     }
 

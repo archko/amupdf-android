@@ -224,7 +224,7 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     private Rect cropPage(CodecPage vuPage) {
-        int width = 240;
+        int width = 400;
         float ratio = 1f * vuPage.getWidth() / width;
         int height = (int) (vuPage.getHeight() / ratio);
         Bitmap thumb = vuPage.renderBitmap(
