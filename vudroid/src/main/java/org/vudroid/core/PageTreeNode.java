@@ -3,7 +3,7 @@ package org.vudroid.core;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrixColorFilter;
+import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -30,7 +30,7 @@ public class PageTreeNode {
     private Rect targetRect;
     private RectF targetRectF;
     private final Paint strokePaint = strokePaint();
-    private ColorMatrixColorFilter filter;
+    private ColorFilter filter;
 
     private Paint bmPaint() {
         final Paint paint = new Paint();
@@ -46,7 +46,7 @@ public class PageTreeNode {
         return strokePaint;
     }
 
-    PageTreeNode(DocumentView documentView, RectF localPageSliceBounds, Page page, int treeNodeDepthLevel, PageTreeNode parent, ColorMatrixColorFilter filter) {
+    PageTreeNode(DocumentView documentView, RectF localPageSliceBounds, Page page, int treeNodeDepthLevel, PageTreeNode parent, ColorFilter filter) {
         this.documentView = documentView;
         this.pageSliceBounds = evaluatePageSliceBounds(localPageSliceBounds, parent);
         this.page = page;
@@ -209,7 +209,7 @@ public class PageTreeNode {
         }
     };
 
-    public void applyFilter(ColorMatrixColorFilter filter) {
+    public void applyFilter(ColorFilter filter) {
         this.filter = filter;
         bitmapPaint.setColorFilter(filter);
     }

@@ -2,6 +2,7 @@ package org.vudroid.core;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.ColorFilter;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Rect;
@@ -25,7 +26,6 @@ import cn.archko.pdf.core.link.Hyperlink;
 import cn.archko.pdf.core.listeners.SimpleGestureListener;
 import cn.archko.pdf.core.utils.ColorUtil;
 import cn.archko.pdf.core.utils.Utils;
-//import cn.archko.pdf.core.viewer.DefaultScrollHandle;
 
 public class DocumentView extends View implements ZoomListener {
 
@@ -46,13 +46,11 @@ public class DocumentView extends View implements ZoomListener {
     public static final int HORIZONTAL = LinearLayout.HORIZONTAL;
     public static final int VERTICAL = LinearLayout.VERTICAL;
     private int oriention = VERTICAL;
-    private ColorMatrixColorFilter filter;
+    private ColorFilter filter;
 
     private final GestureDetector mGestureDetector;
-    int mMargin = 16;
     boolean crop = false;
     private SimpleGestureListener simpleGestureListener;
-    //DefaultScrollHandle scrollHandle;
 
     float widthAccum = 0;
 
@@ -104,9 +102,6 @@ public class DocumentView extends View implements ZoomListener {
         initMultiTouchZoomIfAvailable(zoomModel);
         mGestureDetector = new GestureDetector(context, new MySimpleOnGestureListener());
         this.simpleGestureListener = simpleGestureListener;
-
-        mMargin = Utils.dipToPixel(16);
-        //scrollHandle = new DefaultScrollHandle(context);
     }
 
     private void initMultiTouchZoomIfAvailable(ZoomModel zoomModel) {
@@ -123,15 +118,10 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void init() {
-        /*if (PdfOptionRepository.INSTANCE.getFastscroll()) {
-            setupHandle();
-        }*/
-
         if (isInitialized || decodeService.getPageCount() < 1) {
             return;
         }
 
-        //setFilter(PdfOptionRepository.INSTANCE.getColorMode());
         for (int i = 0; i < decodeService.getPageCount(); i++) {
             final int width = decodeService.getEffectivePagesWidth(i, crop);
             final int height = decodeService.getEffectivePagesHeight(i, crop);
@@ -144,18 +134,6 @@ public class DocumentView extends View implements ZoomListener {
         currentPageModel.setPageCount(decodeService.getPageCount());
         invalidatePageSizes();
         goToPageImpl(pageToGoTo);
-    }
-
-    private void setupHandle() {
-        /*scrollHandle.setupLayout(this);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-                int page = getPage();
-                if (page >= 0) {
-                    scrollHandle.setScroll(page, scrollX, scrollY, widthAccum, heightAccum);
-                }
-            });
-        }*/
     }
 
     private void goToPageImpl(final int toPage) {
@@ -231,7 +209,6 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void updatePageVisibility() {
-        //for (Page page : pages.values()) {
         Page page;
         for (int i = 0; i < pages.size(); i++) {
             page = pages.valueAt(i);
@@ -240,7 +217,6 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     public void commitZoom() {
-        //for (Page page : pages.values()) {
         Page page;
         for (int i = 0; i < pages.size(); i++) {
             page = pages.valueAt(i);
@@ -658,10 +634,6 @@ public class DocumentView extends View implements ZoomListener {
         return zoomModel;
     }
 
-    public void setScrollMargin(int margin) {
-        mMargin = margin;
-    }
-
     public void scrollPage(int height) {
         mCurrentFlingRunnable = new FlingRunnable(getContext());
         mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), 0, height, 0);
@@ -718,22 +690,6 @@ public class DocumentView extends View implements ZoomListener {
         } else {
             return zoomModel.getZoom() * (1.0f * getHeight() / vuPage.getHeight(crop));
         }
-    }
-
-    public boolean isSwipeVertical() {
-        return oriention == LinearLayout.VERTICAL;
-    }
-
-    public void setPositionOffset(float v, boolean b) {
-        int x = getScrollX();
-        int y = getScrollY();
-        if (isSwipeVertical()) {
-            y = (int) (heightAccum * v);
-        } else {
-            x = (int) (widthAccum * v);
-        }
-
-        scrollTo(x, y);
     }
 
     public int getPage() {
@@ -797,17 +753,6 @@ public class DocumentView extends View implements ZoomListener {
         return -1;
     }
 
-    /*public void addView(DefaultScrollHandle scrollHandle, RelativeLayout.LayoutParams lp) {
-        removeView(scrollHandle);
-        RelativeLayout frameLayout = (RelativeLayout) getParent();
-        frameLayout.addView(scrollHandle, lp);
-    }
-
-    public void removeView(DefaultScrollHandle scrollHandle) {
-        ViewGroup parent = (ViewGroup) getParent();
-        parent.removeView(scrollHandle);
-    }*/
-
     public int getPageCount() {
         return decodeService.getPageCount();
     }
@@ -845,19 +790,6 @@ public class DocumentView extends View implements ZoomListener {
                 return true;
             }
 
-            /*int height = getHeight();
-            int top = height / 4;
-            int bottom = height * 3 / 4;
-            //Log.d(VIEW_LOG_TAG, "height:"+height+" y:"+e.getY()+" mMargin:"+mMargin);
-
-            height = height - mMargin;
-            if ((int) e.getY() < top) {
-                scrollPage(-height);
-            } else if ((int) e.getY() > bottom) {
-                scrollPage(height);
-            } else {
-
-            }*/
             return true;
         }
 

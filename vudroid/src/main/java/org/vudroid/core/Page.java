@@ -3,7 +3,7 @@ package org.vudroid.core;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrixColorFilter;
+import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -35,9 +35,9 @@ public class Page {
     private SoftReference<Bitmap> bitmapWeakReference;
     private boolean invalidateFlag;
     protected boolean crop = true;
-    private ColorMatrixColorFilter filter;
+    private ColorFilter filter;
 
-    Page(DocumentView documentView, int index, boolean crop, ColorMatrixColorFilter filter) {
+    Page(DocumentView documentView, int index, boolean crop, ColorFilter filter) {
         this.documentView = documentView;
         this.index = index;
         this.crop = crop;
@@ -97,7 +97,7 @@ public class Page {
 
         node.draw(canvas);
         //canvas.drawLine(bounds.left, bounds.top, bounds.right, bounds.top, strokePaint);
-        canvas.drawLine(bounds.left, bounds.bottom, bounds.right / 5, bounds.bottom, strokePaint);
+        canvas.drawLine(bounds.left, bounds.bottom - 1, bounds.right / 5, bounds.bottom, strokePaint);
         drawPageLinks(canvas);
     }
 
@@ -138,7 +138,7 @@ public class Page {
         return paint;
     }
 
-    public void applyFilter(ColorMatrixColorFilter filter) {
+    public void applyFilter(ColorFilter filter) {
         this.filter = filter;
         fillPaint.setColorFilter(filter);
         node.applyFilter(filter);
