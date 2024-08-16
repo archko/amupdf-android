@@ -31,10 +31,10 @@ class ExtractDialog(
         binding = DialogExtractBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupRangeSlider()
-        
+
         binding.toolbar.setNavigationOnClickListener { dismiss() }
         //binding.back.setOnClickListener { dismiss() }
-        
+
         binding.btnExtract.setOnClickListener {
             extractListener.exportRange(
                 binding.extract.rangeSlider.values[0].toInt(),
@@ -54,8 +54,10 @@ class ExtractDialog(
         if (width < 1080) {
             binding.extract.resolutionSlider.valueFrom = width.toFloat()
         }
-        binding.extract.tvStart.text = "从1页"
-        binding.extract.tvEnd.text = "到${count}页"
+        binding.extract.tvStart.text =
+            String.format(context.getString(R.string.edit_from_page), "1")
+        binding.extract.tvEnd.text =
+            String.format(context.getString(R.string.edit_to_page), count.toString())
 
         binding.extract.rangeSlider.valueFrom = 1f
         binding.extract.rangeSlider.valueTo = count.toFloat()
@@ -76,8 +78,15 @@ class ExtractDialog(
             @SuppressLint("RestrictedApi")
             override fun onStopTrackingTouch(slider: RangeSlider) {
                 binding.extract.tvStart.text =
-                    "从${binding.extract.rangeSlider.values[0].toInt()}页"
-                binding.extract.tvEnd.text = "到${binding.extract.rangeSlider.values[1].toInt()}页"
+                    String.format(
+                        context.getString(R.string.edit_from_page),
+                        binding.extract.rangeSlider.values[0]
+                    )
+                binding.extract.tvEnd.text =
+                    String.format(
+                        context.getString(R.string.edit_to_page),
+                        binding.extract.rangeSlider.values[1]
+                    )
             }
         })
     }

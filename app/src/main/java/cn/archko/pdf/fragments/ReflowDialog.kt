@@ -83,8 +83,10 @@ class ReflowDialog(
         if (screenWidth < 1080) {
             binding.resolutionSlider.valueFrom = screenWidth.toFloat()
         }
-        binding.tvStart.text = "从1页"
-        binding.tvEnd.text = "到${count}页"
+        binding.tvStart.text =
+            String.format(context.getString(R.string.edit_from_page), "1")
+        binding.tvEnd.text =
+            String.format(context.getString(R.string.edit_to_page), count.toString())
 
         binding.rangeSlider.valueFrom = 1f
         binding.rangeSlider.valueTo = count.toFloat()
@@ -105,8 +107,15 @@ class ReflowDialog(
             @SuppressLint("RestrictedApi")
             override fun onStopTrackingTouch(slider: RangeSlider) {
                 binding.tvStart.text =
-                    "从${binding.rangeSlider.values[0].toInt()}页"
-                binding.tvEnd.text = "到${binding.rangeSlider.values[1].toInt()}页"
+                    String.format(
+                        context.getString(R.string.edit_from_page),
+                        binding.rangeSlider.values[0]
+                    )
+                binding.tvEnd.text =
+                    String.format(
+                        context.getString(R.string.edit_to_page),
+                        binding.rangeSlider.values[1]
+                    )
             }
         })
     }

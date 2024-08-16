@@ -292,8 +292,15 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
             @SuppressLint("RestrictedApi")
             override fun onStopTrackingTouch(slider: RangeSlider) {
                 binding.extract.tvStart.text =
-                    "从${binding.extract.rangeSlider.values[0].toInt()}页"
-                binding.extract.tvEnd.text = "到${binding.extract.rangeSlider.values[1].toInt()}页"
+                    String.format(
+                        getString(R.string.edit_from_page),
+                        binding.extract.rangeSlider.values[0]
+                    )
+                binding.extract.tvEnd.text =
+                    String.format(
+                        getString(R.string.edit_to_page),
+                        binding.extract.rangeSlider.values[1]
+                    )
             }
         })
     }
