@@ -308,7 +308,7 @@ class ANormalViewController(
     }
 
     override fun setFilter(colorMode: Int) {
-        //documentView.setFilter(colorMode)
+        documentView.setFilter(colorMode)
     }
 
     override fun decodePageForTts(currentPos: Int) {
