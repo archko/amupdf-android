@@ -264,8 +264,9 @@ object ParseTextMain {
             val sb = StringBuilder()
             val list = ArrayList<String>()
             var aChar: Char
-            for (i in 0 until content.length) {
-                aChar = content[i]
+            val rs = content.replace(SINGLE_WORD_FIX_REGEX, "")
+            for (i in 0 until rs.length) {
+                aChar = rs[i]
                 if (aChar == '\n') {
                     list.add(sb.toString())
                     sb.setLength(0)
@@ -329,6 +330,9 @@ object ParseTextMain {
         val txtParser = TxtParser(filepath)
         txtParser.parseTxt()
     }
+
+    //对于一些文档,会有一个换行符,导致每一个字符都换行,目前测试中发现,有两个换行符的才是换行.
+    internal val SINGLE_WORD_FIX_REGEX = Regex("( \\n)")
 
     /**
      * 段落的开始字符可能是以下的:

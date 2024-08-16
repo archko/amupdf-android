@@ -165,8 +165,12 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             updateTitle(mPath)
             showReflow(pdfViewModel.checkReflow())
             orientation = pdfViewModel.bookProgress?.scrollOrientation ?: 1
-            reflowButton.visibility = View.GONE
-            ttsButton.visibility = View.GONE
+            if (IntentFile.canotReflow(mPath!!)) {
+                reflowButton.visibility = View.GONE
+            }
+            if (IntentFile.isImage(mPath!!)) {
+                ttsButton.visibility = View.GONE
+            }
         }
 
         documentLayout = findViewById(R.id.document_layout)
@@ -538,13 +542,11 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun showOutline() {
-        outlineLinks?.let {
-            if (outlineLinks!!.size > 0) {
-                outlineFragment?.updateSelection(getCurrentPos())
-                outlineFragment?.showDialog(this)
-            } else {
-                Toast.makeText(this, "no outline", Toast.LENGTH_SHORT).show()
-            }
+        if (outlineLinks.size > 0) {
+            outlineFragment?.updateSelection(getCurrentPos())
+            outlineFragment?.showDialog(this)
+        } else {
+            Toast.makeText(this, "no outline", Toast.LENGTH_SHORT).show()
         }
     }
 

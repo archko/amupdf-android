@@ -291,6 +291,10 @@ object IntentFile {
                 || path.endsWith(".tiff", true)
     }
 
+    fun canotReflow(path: String): Boolean {
+        return isText(path) || isImage(path)
+    }
+
     fun isPdf(path: String): Boolean {
         return path.endsWith(".pdf", true)
     }
