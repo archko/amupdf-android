@@ -97,7 +97,7 @@ public class Page {
 
         node.draw(canvas);
         //canvas.drawLine(bounds.left, bounds.top, bounds.right, bounds.top, strokePaint);
-        canvas.drawLine(bounds.left, bounds.bottom - 1, bounds.right / 5, bounds.bottom, strokePaint);
+        canvas.drawLine(bounds.left, bounds.bottom, bounds.right / 5, bounds.bottom, strokePaint);
         drawPageLinks(canvas);
     }
 
