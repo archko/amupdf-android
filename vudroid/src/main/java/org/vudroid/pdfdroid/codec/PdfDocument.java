@@ -5,6 +5,13 @@ import com.artifex.mupdf.fitz.Outline;
 
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
+import org.vudroid.core.codec.OutlineLink;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.archko.pdf.core.decode.MupdfDocument;
+import cn.archko.pdf.core.entity.ReflowBean;
 
 public class PdfDocument implements CodecDocument {
 
@@ -54,7 +61,28 @@ public class PdfDocument implements CodecDocument {
     }
 
     @Override
-    public Outline[] loadOutline() {
-        return core.loadOutline();
+    public List<OutlineLink> loadOutline() {
+        Outline[] outlines = core.loadOutline();
+        List<OutlineLink> links = new ArrayList<>();
+        downOutline(core, outlines, links);
+        return links;
+    }
+
+    @Override
+    public List<ReflowBean> decodeReflowText(int index) {
+        List<ReflowBean> beans = MupdfDocument.Companion.decodeReflowText(index, core);
+        return beans;
+    }
+
+    public static void downOutline(Document core, Outline[] outlines, List<OutlineLink> links) {
+        for (Outline outline : outlines) {
+            int page = core.pageNumberFromLocation(core.resolveLink(outline));
+            OutlineLink link = new OutlineLink(outline.title, page, 0);
+            if (outline.down != null) {
+                Outline[] child = outline.down;
+                downOutline(core, child, links);
+            }
+            links.add(link);
+        }
     }
 }

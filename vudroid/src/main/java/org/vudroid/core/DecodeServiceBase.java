@@ -10,11 +10,10 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
-import com.artifex.mupdf.fitz.Outline;
-
 import org.vudroid.core.codec.CodecContext;
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
+import org.vudroid.core.codec.OutlineLink;
 
 import java.io.IOException;
 import java.lang.ref.SoftReference;
@@ -459,7 +458,7 @@ public class DecodeServiceBase implements DecodeService {
         return aPageList.get(pageIndex);
     }
 
-    public Outline[] getOutlines() {
+    public List<OutlineLink> getOutlines() {
         return document.loadOutline();
     }
 

@@ -13,30 +13,30 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.LinearLayoutManager
-import cn.archko.pdf.common.OutlineHelper
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.AppExecutors.Companion.instance
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
-import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.SimpleGestureListener
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
-import cn.archko.pdf.viewmodel.PDFViewModel
+import cn.archko.pdf.tts.TTSEngine
+import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.widgets.PageControls
 import kotlinx.coroutines.CoroutineScope
 import org.vudroid.core.DecodeService
 import org.vudroid.core.DecodeServiceBase
 import org.vudroid.core.DocumentView
+import org.vudroid.core.codec.CodecDocument
 import org.vudroid.core.models.CurrentPageModel
 import org.vudroid.core.models.DecodingProgressModel
 import org.vudroid.core.models.ZoomModel
 import org.vudroid.djvudroid.codec.DjvuContext
 import org.vudroid.pdfdroid.codec.PdfContext
-import org.vudroid.pdfdroid.codec.PdfDocument
 
 /**
  * @author: archko 2020/5/15 :12:43
@@ -45,7 +45,7 @@ class ANormalViewController(
     private var context: FragmentActivity,
     private val scope: CoroutineScope,
     private val mControllerLayout: RelativeLayout,
-    private var pdfViewModel: PDFViewModel,
+    private var pdfViewModel: DocViewModel,
     private var mPath: String,
     private var pageControls: PageControls?,
     private var controllerListener: ControllerListener?,
@@ -64,6 +64,7 @@ class ANormalViewController(
     private var pageNumberToast: Toast? = null
     protected var progressDialog: ProgressDialog? = null
     protected var isDocLoaded: Boolean = false
+    private var document: CodecDocument? = null
 
     private var simpleGestureListener: SimpleGestureListener = object :
         SimpleGestureListener {
@@ -130,8 +131,8 @@ class ANormalViewController(
         progressDialog!!.show()
 
         instance.diskIO().execute {
-            val document = try {
-                decodeService!!.open(mPath, crop, true)
+            try {
+                document = decodeService!!.open(mPath, crop, true)
             } catch (e: Exception) {
             }
             instance.mainThread().execute {
@@ -146,7 +147,7 @@ class ANormalViewController(
                     return@execute
                 }
                 isDocLoaded = true
-                doLoadDoc(decodeService!!.pageSizeBean, document)
+                doLoadDoc(decodeService!!.pageSizeBean, document!!)
                 documentView.showDocument(crop)
             }
         }
@@ -161,24 +162,18 @@ class ANormalViewController(
         loadDocument()
     }
 
-    private fun doLoadDoc(pageSizeBean: APageSizeLoader.PageSizeBean, document: Any) {
+    private fun doLoadDoc(pageSizeBean: APageSizeLoader.PageSizeBean, document: CodecDocument) {
         Logcat.d("doLoadDoc:${pageSizeBean.crop}, ${pageSizeBean.List!!.size}")
         this.mPageSizes = pageSizeBean.List!!
         if (null == mPageSizes) {
             return
         }
 
-        var outlineHelper = pdfViewModel.outlineHelper
-        if (null == outlineHelper) {
-            val mupdfDocument = MupdfDocument(context)
-            if (document is PdfDocument) {
-                mupdfDocument.setDocument(document.core)
-            }
-            pdfViewModel.mupdfDocument = mupdfDocument
-            outlineHelper = OutlineHelper(mupdfDocument, context)
-            pdfViewModel.outlineHelper = outlineHelper
-        }
-        controllerListener?.doLoadedDoc(mPageSizes!!.size, pdfViewModel.getCurrentPage())
+        controllerListener?.doLoadedDoc(
+            mPageSizes!!.size,
+            pdfViewModel.getCurrentPage(),
+            document.loadOutline()
+        )
     }
 
     private fun createMainContainer(): FrameLayout {
@@ -288,7 +283,7 @@ class ANormalViewController(
     }
 
     private fun updateProgress(index: Int) {
-        if (/*pdfViewModel.mupdfDocument != null &&*/ pageControls?.visibility() == View.VISIBLE) {
+        if (pageControls?.visibility() == View.VISIBLE) {
             pageControls?.updatePageProgress(index)
         }
     }
@@ -301,7 +296,7 @@ class ANormalViewController(
 
     fun showPageToast(currentPage: Int) {
         val pos = currentPage
-        val pageText = (pos + 1).toString() + "/" + pdfViewModel.countPages()
+        val pageText = (pos + 1).toString() + "/" + mPageSizes?.size
         if (pageNumberToast != null) {
             pageNumberToast!!.setText(pageText)
         } else {
@@ -314,6 +309,30 @@ class ANormalViewController(
 
     override fun setFilter(colorMode: Int) {
         documentView.setFilter(colorMode)
+    }
+
+    override fun decodePageForTts(currentPos: Int) {
+        val last = TTSEngine.get().getLast()
+        val count = document!!.pageCount
+        Logcat.i(Logcat.TAG, "decodePageForTts:last:$last, count:$count, currentPos:$currentPos")
+        if (last == count - 1 && last != 0) {
+            return
+        }
+        if (last > 0) {
+            TTSEngine.get().reset()
+        }
+        val start = System.currentTimeMillis()
+        if (null != document) {
+            for (i in currentPos until count) {
+                val beans: List<ReflowBean>? = document!!.decodeReflowText(i)
+                if (beans != null) {
+                    for (j in beans.indices) {
+                        TTSEngine.get().speak("$i-$j", beans[j].data)
+                    }
+                }
+            }
+        }
+        Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
     }
 
     //--------------------------------------

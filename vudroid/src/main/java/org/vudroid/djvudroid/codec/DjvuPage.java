@@ -8,6 +8,7 @@ import android.util.Log;
 import org.vudroid.core.codec.CodecPage;
 import org.vudroid.core.codec.CodecPageInfo;
 import org.vudroid.core.codec.PageLink;
+import org.vudroid.core.codec.PageTextBox;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import cn.archko.pdf.core.cache.BitmapPool;
 import cn.archko.pdf.core.link.Hyperlink;
+import cn.archko.pdf.core.utils.LengthUtils;
 
 public class DjvuPage implements CodecPage {
     private long pageHandle;
@@ -41,6 +43,28 @@ public class DjvuPage implements CodecPage {
         }
     }
 
+    static void normalizeTextBox(final PageTextBox r, final float width, final float height) {
+        final float left = r.left / width;
+        final float right = r.right / width;
+        final float top = 1 - r.top / height;
+        final float bottom = 1 - r.bottom / height;
+        r.left = Math.min(left, right);
+        r.right = Math.max(left, right);
+        r.top = Math.min(top, bottom);
+        r.bottom = Math.max(top, bottom);
+    }
+
+    native static List<PageTextBox> getPageText(long docHandle, int pageNo, long contextHandle, String pattern);
+
+    public static List<PageTextBox> getPageTextSync(long docHandle, int pageNo, long contextHandle, String pattern) {
+        //TempHolder.lock.lock();
+        try {
+            return getPageText(docHandle, pageNo, contextHandle, pattern);
+        } finally {
+            //TempHolder.lock.unlock();
+        }
+    }
+
     public int getWidth() {
         if (width > 1) {
             return width;
@@ -53,6 +77,40 @@ public class DjvuPage implements CodecPage {
             return height;
         }
         return getHeight(pageHandle);
+    }
+
+    public static boolean isListEmpty(List<?> objects) {
+        return objects == null || objects.size() <= 0;
+    }
+
+    public String getPageHTML() {
+        List<PageTextBox> pageText1 = getPageText1();
+        if (isListEmpty(pageText1)) {
+            return "";
+        }
+        StringBuilder res = new StringBuilder();
+        for (PageTextBox p : pageText1) {
+            res.append(p.text);
+            res.append(" ");
+        }
+
+        return res.toString();
+    }
+
+    public String getPageHTMLWithImages() {
+        return "";
+    }
+
+    public List<PageTextBox> getPageText1() {
+        final List<PageTextBox> list = getPageTextSync(documentHandle, pageNumber, contextHandle, null);
+        if (LengthUtils.isNotEmpty(list)) {
+            final float width = getWidth();
+            final float height = getHeight();
+            for (final PageTextBox ptb : list) {
+                normalizeTextBox(ptb, width, height);
+            }
+        }
+        return list;
     }
 
     public Bitmap renderBitmap(Rect cropBound, int width, int height, RectF pageSliceBounds, float scale) {
@@ -71,7 +129,8 @@ public class DjvuPage implements CodecPage {
         Log.d("TAG", String.format("scale:%s, patchX:%s, patchY:%s,pageW:%s, pageH:%s, width:%s, height:%s, %s, %s", scale, patchX, patchY, pageW, pageH, width, height, cropBound, pageSliceBounds));
 
         final int[] buffer = new int[width * height];
-        renderPage2(pageHandle, contextHandle, pageW, pageH, patchX, patchY, width, height, buffer);
+        ///renderPage(pageHandle, contextHandle, pageW, pageH, patchX, patchY, width, height, buffer);
+        renderPage(pageHandle, contextHandle, width, height, pageSliceBounds.left, pageSliceBounds.top, pageSliceBounds.width(), pageSliceBounds.height(), buffer);
 
         Bitmap bitmap = BitmapPool.getInstance().acquire(width, height, Bitmap.Config.RGB_565);
         bitmap.setPixels(buffer, 0, width, 0, 0, width, height);
@@ -156,12 +215,6 @@ public class DjvuPage implements CodecPage {
                                              float pageSliceX, float pageSliceY,
                                              float pageSliceWidth, float pageSliceHeight,
                                              int[] buffer);
-
-    private static native boolean renderPage2(long pageHandle, long contextHandle,
-                                              int pageWidth, int pageHeight,
-                                              int patchX, int patchY,
-                                              int patchW, int patchH,
-                                              int[] buffer);
 
     //argb8888
     private static native boolean renderPageDirect(long pageHandle, long contextHandle,

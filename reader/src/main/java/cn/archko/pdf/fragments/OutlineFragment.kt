@@ -12,16 +12,16 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.core.adapters.BaseViewHolder
-import cn.archko.pdf.entity.OutlineItem
 import cn.archko.pdf.listeners.OutlineListener
+import org.vudroid.core.codec.OutlineLink
 
 /**
  * @author: archko 2019/7/11 :17:55
  */
 open class OutlineFragment : DialogFragment() {
 
-    private lateinit var adapter: BaseRecyclerAdapter<OutlineItem>
-    var outlineItems: ArrayList<OutlineItem>? = null
+    private lateinit var adapter: BaseRecyclerAdapter<OutlineLink>
+    var outlineItems: ArrayList<OutlineLink>? = null
     private var currentPage: Int = 0
     private var recyclerView: RecyclerView? = null
     private var nodataView: View? = null
@@ -34,7 +34,7 @@ open class OutlineFragment : DialogFragment() {
         arguments?.let {
             currentPage = it.getInt("POSITION", 0)
             if (it.getSerializable("OUTLINE") != null) {
-                outlineItems = it.getSerializable("OUTLINE") as ArrayList<OutlineItem>
+                outlineItems = it.getSerializable("OUTLINE") as ArrayList<OutlineLink>
             }
 
             //if (it.getSerializable("out") != null) {
@@ -66,12 +66,12 @@ open class OutlineFragment : DialogFragment() {
         if (outlineItems == null) {
             nodataView?.visibility = View.VISIBLE
         } else {
-            adapter = object : BaseRecyclerAdapter<OutlineItem>(activity, outlineItems!!) {
+            adapter = object : BaseRecyclerAdapter<OutlineLink>(activity, outlineItems!!) {
 
                 override fun onCreateViewHolder(
                     parent: ViewGroup,
                     viewType: Int
-                ): BaseViewHolder<OutlineItem> {
+                ): BaseViewHolder<OutlineLink> {
                     val root = inflater.inflate(R.layout.item_outline, parent, false)
                     return ViewHolder(root)
                 }
@@ -95,7 +95,7 @@ open class OutlineFragment : DialogFragment() {
         var found = -1
         for (i in outlineItems!!.indices) {
             val item = outlineItems!![i]
-            if (found < 0 && item.page >= currentPage) {
+            if (found < 0 && item.targetPage >= currentPage) {
                 found = i
             }
         }
@@ -111,14 +111,14 @@ open class OutlineFragment : DialogFragment() {
         }
     }
 
-    protected fun onListItemClick(item: OutlineItem) {
+    protected fun onListItemClick(item: OutlineLink) {
         val ac = activity as OutlineListener
-        ac.onSelectedOutline(item.page)
+        ac.onSelectedOutline(item.targetPage)
         dismiss()
     }
 
     inner class ViewHolder(root: View) :
-        BaseViewHolder<OutlineItem>(root) {
+        BaseViewHolder<OutlineLink>(root) {
 
 
         var title: TextView? = null
@@ -129,9 +129,9 @@ open class OutlineFragment : DialogFragment() {
             page = root.findViewById(R.id.page)
         }
 
-        override fun onBind(data: OutlineItem, position: Int) {
+        override fun onBind(data: OutlineLink, position: Int) {
             title?.text = data.title
-            page?.text = (data.page.plus(1)).toString()
+            page?.text = (data.targetPage.plus(1)).toString()
             itemView.setOnClickListener { onListItemClick(data) }
         }
     }

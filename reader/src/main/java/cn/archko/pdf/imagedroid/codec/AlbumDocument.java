@@ -1,18 +1,19 @@
 package cn.archko.pdf.imagedroid.codec;
 
-import com.artifex.mupdf.fitz.Outline;
-
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
+import org.vudroid.core.codec.OutlineLink;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 import cn.archko.pdf.core.common.IntentFile;
+import cn.archko.pdf.core.entity.ReflowBean;
 
 public class AlbumDocument implements CodecDocument {
 
@@ -89,7 +90,12 @@ public class AlbumDocument implements CodecDocument {
     }
 
     @Override
-    public Outline[] loadOutline() {
-        return new Outline[0];
+    public List<OutlineLink> loadOutline() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<ReflowBean> decodeReflowText(int index) {
+        return Collections.emptyList();
     }
 }

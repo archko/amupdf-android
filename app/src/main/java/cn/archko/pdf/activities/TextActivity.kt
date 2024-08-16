@@ -49,6 +49,7 @@ import cn.archko.pdf.fragments.SleepTimerDialog
 import cn.archko.pdf.tts.TTSActivity
 import cn.archko.pdf.tts.TTSEngine
 import cn.archko.pdf.tts.TTSEngine.ProgressListener
+import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.viewmodel.PDFViewModel
 import kotlinx.coroutines.launch
 import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
@@ -62,6 +63,7 @@ class TextActivity : AppCompatActivity() {
     private var path: String? = null
     private var sensorHelper: SensorHelper? = null
     protected val pdfViewModel: PDFViewModel = PDFViewModel()
+    protected val docViewModel: DocViewModel = DocViewModel()
 
     private var mStyleControls: View? = null
     private lateinit var binding: TxtReaderBinding
@@ -230,7 +232,7 @@ class TextActivity : AppCompatActivity() {
     private fun loadBookmark() {
         lifecycleScope.launch {
             val bookProgress =
-                path!!.run { pdfViewModel.loadBookProgressByPath(this) }
+                path!!.run { docViewModel.loadBookProgressByPath(this) }
             bookProgress?.page?.let { scrollToPosition(it) }
         }
     }
@@ -245,13 +247,13 @@ class TextActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         //sensorHelper.onPause();
-        pdfViewModel.bookProgress?.run {
+        docViewModel.bookProgress?.run {
             val position = getCurrentPos()
-            pdfViewModel.saveBookProgress(
+            docViewModel.saveBookProgress(
                 path,
                 adapter?.itemCount?.minus(2) ?: 1,
                 position,
-                pdfViewModel.bookProgress!!.zoomLevel,
+                docViewModel.bookProgress!!.zoomLevel,
                 -1,
                 0
             )

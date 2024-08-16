@@ -32,6 +32,7 @@ import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.fragments.FontsFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
+import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.PageControls
 import kotlinx.coroutines.CoroutineScope
@@ -46,15 +47,13 @@ class AReflowViewController(
     private var context: FragmentActivity,
     private var scope: CoroutineScope,
     private val mControllerLayout: RelativeLayout,
-    private var pdfViewModel: PDFViewModel,
+    private var docViewModel: DocViewModel,
     private var mPath: String,
     private var pageControls: PageControls?,
     private var controllerListener: ControllerListener?,
 ) :
     OutlineListener, AViewController {
 
-    val DOUBLE_TAP_TIME: Int = 600
-    private var lastDownEventTime: Long = 0
     private var mStyleControls: View? = null
 
     private lateinit var mRecyclerView: ARecyclerView
@@ -63,6 +62,7 @@ class AReflowViewController(
     private var mPageSizes = mutableListOf<APage>()
     private var mGestureDetector: GestureDetector? = null
     protected var progressDialog: ProgressDialog? = null
+    private var pdfViewModel = PDFViewModel()
 
     init {
         initView()
@@ -167,7 +167,7 @@ class AReflowViewController(
         var start = SystemClock.uptimeMillis()
 
         scope.launch {
-            pdfViewModel.preparePageSize(width).collectLatest { pageSizeBean ->
+            docViewModel.preparePageSize(width).collectLatest { pageSizeBean ->
                 Logcat.d("open3:" + (SystemClock.uptimeMillis() - start))
                 mPageSizes.clear()
                 var pageSizes: List<APage>? = null
@@ -209,9 +209,13 @@ class AReflowViewController(
     }
 
     private fun doLoadDoc() {
-        initReflowMode(pdfViewModel.getCurrentPage())
+        initReflowMode(docViewModel.getCurrentPage())
 
-        controllerListener?.doLoadedDoc(pdfViewModel.countPages(), pdfViewModel.getCurrentPage())
+        controllerListener?.doLoadedDoc(
+            pdfViewModel.countPages(),
+            docViewModel.getCurrentPage(),
+            pdfViewModel.links
+        )
     }
 
     override fun getDocumentView(): View {
@@ -226,9 +230,6 @@ class AReflowViewController(
     }
 
     private fun initReflowMode(pos: Int) {
-        if (null == mStyleHelper) {
-            mStyleHelper = StyleHelper(context)
-        }
         if (null == mRecyclerView.adapter) {
             mRecyclerView.adapter = MuPDFReflowAdapter(
                 context,
@@ -368,6 +369,10 @@ class AReflowViewController(
     override fun setFilter(colorMode: Int) {
     }
 
+    override fun decodePageForTts(currentPos: Int) {
+        //pdfViewModel.decodeTextForTts(currentPos)
+    }
+
     //--------------------------------------
 
     override fun onResume() {
@@ -375,18 +380,18 @@ class AReflowViewController(
     }
 
     override fun onPause() {
-        if (null != pdfViewModel.mupdfDocument && null != pdfViewModel.bookProgress) {
-            pdfViewModel.bookProgress!!.reflow = 1
+        if (null != pdfViewModel.mupdfDocument && null != docViewModel.bookProgress) {
+            docViewModel.bookProgress!!.reflow = 1
             var savePos = getCurrentPos() + 1
             val lastPos = getLastPos()
             if (lastPos == mPageSizes.size - 1) {
                 savePos = lastPos
             }
-            pdfViewModel.saveBookProgress(
+            docViewModel.saveBookProgress(
                 mPath,
                 mPageSizes.size,
                 savePos,
-                pdfViewModel.bookProgress!!.zoomLevel,
+                docViewModel.bookProgress!!.zoomLevel,
                 -1,
                 0
             )
@@ -397,6 +402,7 @@ class AReflowViewController(
     }
 
     override fun onDestroy() {
+        pdfViewModel.destroy()
     }
 
     //===========================================
@@ -415,6 +421,9 @@ class AReflowViewController(
     private var fgSetting: View? = null
 
     private fun initStyleControls() {
+        if (null == mStyleHelper) {
+            mStyleHelper = StyleHelper(context)
+        }
         pageControls?.hide()
         if (null == mStyleControls) {
             mStyleControls = LayoutInflater.from(context).inflate(R.layout.text_style, null, false)

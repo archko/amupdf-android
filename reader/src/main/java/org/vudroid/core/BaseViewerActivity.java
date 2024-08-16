@@ -16,11 +16,14 @@ import android.widget.Toast;
 import com.artifex.mupdf.fitz.Outline;
 
 import org.vudroid.core.codec.CodecDocument;
+import org.vudroid.core.codec.OutlineLink;
 import org.vudroid.core.events.CurrentPageListener;
 import org.vudroid.core.events.DecodingProgressListener;
 import org.vudroid.core.models.CurrentPageModel;
 import org.vudroid.core.models.DecodingProgressModel;
 import org.vudroid.core.models.ZoomModel;
+
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
@@ -40,7 +43,7 @@ public abstract class BaseViewerActivity extends FragmentActivity implements Dec
     private CurrentPageModel currentPageModel;
 
     //private OutlineDialog outlineDialog;
-    private Outline[] outlines = null;
+    private List<OutlineLink> outlines = null;
     private boolean addToRecent = true;
 
     protected ProgressDialog progressDialog;

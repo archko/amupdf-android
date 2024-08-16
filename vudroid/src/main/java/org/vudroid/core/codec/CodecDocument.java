@@ -1,6 +1,8 @@
 package org.vudroid.core.codec;
 
-import com.artifex.mupdf.fitz.Outline;
+import java.util.List;
+
+import cn.archko.pdf.core.entity.ReflowBean;
 
 public interface CodecDocument {
     CodecPage getPage(int pageNumber);
@@ -9,5 +11,7 @@ public interface CodecDocument {
 
     void recycle();
 
-    Outline[] loadOutline();
+    List<OutlineLink> loadOutline();
+
+    List<ReflowBean> decodeReflowText(int index);
 }

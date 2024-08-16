@@ -81,14 +81,14 @@ class MuPDFReflowAdapter(
     }
 
     private fun showBookmark(position: Int): Boolean {
-        val bookmarks = pdfViewModel.bookmarks
+        /*val bookmarks = pdfViewModel.bookmarks
         if (null != bookmarks) {
             for (bookmark in bookmarks) {
                 if (position == bookmark.page) {
                     return true
                 }
             }
-        }
+        }*/
         return false
     }
 

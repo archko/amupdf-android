@@ -21,6 +21,7 @@ import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
+import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APDFView
 import cn.archko.pdf.widgets.PageControls
@@ -33,7 +34,7 @@ class ACropViewController(
     private var context: FragmentActivity,
     private val scope: CoroutineScope,
     private val mControllerLayout: RelativeLayout,
-    private var pdfViewModel: PDFViewModel,
+    private var pdfViewModel: DocViewModel,
     private var mPath: String,
     private var pageControls: PageControls?,
     private var simpleListener: ControllerListener?,
@@ -108,11 +109,6 @@ class ACropViewController(
         try {
             Logcat.d("init :$scrollOrientation")
             this.scrollOrientation = scrollOrientation
-            if (null != pdfViewModel.mupdfDocument) {
-                //this.mPageSizes = pageSizes
-
-                //setCropMode(pos)
-            }
             addGesture()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -148,7 +144,7 @@ class ACropViewController(
     private fun setCropMode(pos: Int) {
         setOrientation(scrollOrientation)
         if (null == pdfAdapter) {
-            pdfAdapter = PDFRecyclerAdapter(context, pdfViewModel, mPageSizes, mRecyclerView)
+            //pdfAdapter = PDFRecyclerAdapter(context, pdfViewModel, mPageSizes, mRecyclerView)
             mRecyclerView.adapter = pdfAdapter
             pdfAdapter!!.setCrop(crop)
         }
@@ -325,9 +321,9 @@ class ACropViewController(
     }
 
     private fun updateProgress(index: Int) {
-        if (pdfViewModel.mupdfDocument != null && pageControls?.visibility() == View.VISIBLE) {
+        /*if (pdfViewModel.mupdfDocument != null && pageControls?.visibility() == View.VISIBLE) {
             pageControls?.updatePageProgress(index)
-        }
+        }*/
     }
 
     override fun notifyDataSetChanged() {
@@ -341,6 +337,9 @@ class ACropViewController(
     override fun setFilter(colorMode: Int) {
     }
 
+    override fun decodePageForTts(currentPos: Int) {
+    }
+
     //--------------------------------------
 
     override fun onResume() {
@@ -350,7 +349,7 @@ class ACropViewController(
     }
 
     override fun onPause() {
-        if (null != pdfViewModel.mupdfDocument) {
+        /*if (null != pdfViewModel.mupdfDocument) {
             var savePos = getCurrentPos() + 1
             val lastPos = getLastPos()
             if (lastPos == mPageSizes.size - 1) {
@@ -367,7 +366,7 @@ class ACropViewController(
                     0
                 )
             }
-        }
+        }*/
     }
 
     override fun onDestroy() {

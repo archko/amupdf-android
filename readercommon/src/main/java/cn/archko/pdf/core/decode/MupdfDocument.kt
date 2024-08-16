@@ -661,5 +661,19 @@ class MupdfDocument(private val context: Context) {
                 decodeTask.decodeCallback?.decodeComplete(bitmap, decodeTask)
             }
         }
+
+        fun decodeReflowText(index: Int, document: Document): List<ReflowBean>? {
+            val pageCount = document.countPages()
+            val p = if (index >= pageCount) null else document.loadPage(
+                index
+            )
+            val result = p?.textAsText("preserve-whitespace,inhibit-spaces")
+            val list = if (null != result) {
+                ParseTextMain.parseAsTextList(result, index)
+            } else null
+
+            p?.destroy()
+            return list
+        }
     }
 }

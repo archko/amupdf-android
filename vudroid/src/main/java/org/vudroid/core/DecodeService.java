@@ -4,10 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.view.View;
 
-import com.artifex.mupdf.fitz.Outline;
-
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
+import org.vudroid.core.codec.OutlineLink;
 
 import java.util.List;
 
@@ -43,7 +42,7 @@ public interface DecodeService {
 
     APage getAPage(int pageIndex);
 
-    Outline[] getOutlines();
+    List<OutlineLink> getOutlines();
 
     void recycle();
 

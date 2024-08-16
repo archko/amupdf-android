@@ -24,7 +24,6 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
-import cn.archko.pdf.common.OutlineHelper
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.Event
@@ -42,7 +41,7 @@ import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TTSActivity
 import cn.archko.pdf.tts.TTSEngine
 import cn.archko.pdf.tts.TTSEngine.ProgressListener
-import cn.archko.pdf.viewmodel.PDFViewModel
+import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.widgets.PageControls
 import com.baidu.ai.edge.ui.activity.OcrActivity
 import kotlinx.coroutines.CoroutineScope
@@ -50,6 +49,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.vudroid.core.codec.OutlineLink
 import vn.chungha.flowbus.busEvent
 
 /**
@@ -66,10 +66,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     private var documentLayout: FrameLayout? = null
     private var viewController: AViewController? = null
-    private val pdfViewModel: PDFViewModel = PDFViewModel()
+    private val pdfViewModel: DocViewModel = DocViewModel()
 
     private var pageControls: PageControls? = null
-    private var outlineHelper: OutlineHelper? = null
+    private var outlineLinks = mutableListOf<OutlineLink>()
     private var outlineFragment: OutlineFragment? = null
     private lateinit var mReflowLayout: RelativeLayout
     private lateinit var mContentView: View
@@ -165,10 +165,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             updateTitle(mPath)
             showReflow(pdfViewModel.checkReflow())
             orientation = pdfViewModel.bookProgress?.scrollOrientation ?: 1
-            if (IntentFile.isDjvu(mPath!!)) {
-                reflowButton.visibility = View.GONE
-                ttsButton.visibility = View.GONE
-            }
         }
 
         documentLayout = findViewById(R.id.document_layout)
@@ -240,8 +236,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 }
             }
 
-            override fun doLoadedDoc(count: Int, pos: Int) {
-                this@AMuPDFRecyclerViewActivity.doLoadDoc(count, pos)
+            override fun doLoadedDoc(count: Int, pos: Int, outlineLinks: List<OutlineLink>?) {
+                this@AMuPDFRecyclerViewActivity.doLoadDoc(count, pos, outlineLinks)
             }
         }
     }
@@ -328,13 +324,15 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         viewController?.init()
     }
 
-    private fun doLoadDoc(count: Int, pos: Int) {
+    private fun doLoadDoc(count: Int, pos: Int, outlineLinks: List<OutlineLink>?) {
         try {
             pageControls?.apply {
                 update(count, pos)
             }
 
-            outlineHelper = pdfViewModel.outlineHelper
+            if (outlineLinks != null) {
+                this.outlineLinks.addAll(outlineLinks)
+            }
             setupOutline(pos)
 
             isDocLoaded = true
@@ -358,12 +356,12 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun setupOutline(currentPos: Int?) {
-        if (null == outlineFragment && null != outlineHelper) {
+        if (null == outlineFragment) {
             outlineFragment = OutlineFragment()
             val bundle = Bundle()
-            if (outlineHelper!!.hasOutline()) {
-                outlineFragment!!.outlineItems = outlineHelper!!.getOutlineItems()
-                bundle.putSerializable("out", outlineHelper?.getOutlineItems())
+            if (outlineLinks.size > 0) {
+                outlineFragment!!.outlineItems = ArrayList(outlineLinks)
+                bundle.putSerializable("out", outlineFragment!!.outlineItems)
             }
             bundle.putSerializable("POSITION", currentPos)
             outlineFragment?.arguments = bundle
@@ -522,7 +520,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             }).showDialog(this)
         }
         lifecycleScope.launch {
-            pdfViewModel.decodePageForTts(getCurrentPos())
+            viewController?.decodePageForTts(getCurrentPos())
         }
     }
 
@@ -538,8 +536,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun showOutline() {
-        outlineHelper?.let {
-            if (it.hasOutline()) {
+        outlineLinks?.let {
+            if (outlineLinks!!.size > 0) {
                 outlineFragment?.updateSelection(getCurrentPos())
                 outlineFragment?.showDialog(this)
             } else {
@@ -549,27 +547,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun showBookmark() {
-        outlineHelper?.let {
-            //val frameLayout = pageControls?.layoutOutline
-
-            /*val bookmarks = arrayListOf<Bookmark>()
-            var element = Bookmark()
-            element.page = 3
-            bookmarks.add(element)
-            element = Bookmark()
-            element.page = 30
-            bookmarks.add(element)*/
-            /*if (frameLayout?.visibility == View.GONE) {
-                frameLayout.visibility = View.VISIBLE
-                mMenuHelper?.showBookmark(getCurrentPos(), pdfViewModel.bookmarks)
-            } else {
-                if (mMenuHelper!!.isOutline()) {
-                    mMenuHelper?.showBookmark(getCurrentPos(), pdfViewModel.bookmarks)
-                } else {
-                    frameLayout?.visibility = View.GONE
-                }
-            }*/
-        }
     }
 
     private fun toggleCrop() {
@@ -642,7 +619,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         super.onDestroy()
         isDocLoaded = false
         busEvent(GlobalEvent(Event.ACTION_STOPPED, mPath))
-        pdfViewModel.destroy()
         BitmapCache.getInstance().clear()
 
         viewController?.onDestroy()
@@ -726,7 +702,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             viewMode: ViewMode,
             context: FragmentActivity,
             controllerLayout: RelativeLayout,
-            pdfViewModel: PDFViewModel,
+            pdfViewModel: DocViewModel,
             path: String,
             pageSeekBarControls: PageControls,
             controllerListener: ControllerListener?,
@@ -752,7 +728,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             viewMode: ViewMode,
             context: FragmentActivity,
             controllerLayout: RelativeLayout,
-            pdfViewModel: PDFViewModel,
+            pdfViewModel: DocViewModel,
             path: String,
             pageSeekBarControls: PageControls,
             controllerListener: ControllerListener?,

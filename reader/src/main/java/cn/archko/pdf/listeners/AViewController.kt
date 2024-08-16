@@ -36,4 +36,5 @@ interface AViewController {
     fun notifyDataSetChanged()
     fun notifyItemChanged(pos: Int)
     fun setFilter(colorMode: Int)
+    fun decodePageForTts(currentPos: Int)
 }
