@@ -16,6 +16,7 @@ import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.listeners.OnItemClickListener
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.utils.FetcherUtils
 import java.util.Locale
 
 /**
@@ -239,8 +240,7 @@ class BookAdapter(
 
                 AdapterUtils.setIcon(ext, mIcon!!)
 
-                //ImageLoader.getInstance()
-                //    .loadImage(entry.file?.absolutePath, 0, 1.0f, screenWidth, mIcon!!)
+                entry.file?.absolutePath?.let { FetcherUtils.load(it, mIcon!!.context, mIcon!!) }
             }
         }
     }

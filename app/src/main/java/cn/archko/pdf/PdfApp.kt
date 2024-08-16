@@ -1,7 +1,6 @@
 package cn.archko.pdf
 
 import cn.archko.pdf.core.App
-import cn.archko.pdf.decode.DjvuFetcher
 import cn.archko.pdf.decode.PdfFetcher
 import coil.ComponentRegistry
 import coil.ImageLoader
@@ -21,10 +20,8 @@ class PdfApp : App(), ImageLoaderFactory {
         val imageLoader = ImageLoader.Builder(this)
             .components(fun ComponentRegistry.Builder.() {
                 add(PdfFetcher.Factory())
-                add(DjvuFetcher.Factory())
                 //add(MupdfFetcher.Factory())
             })
-            .allowRgb565(true)
             .memoryCache {
                 MemoryCache.Builder(this)
                     .maxSizePercent(MAX_MEMORY_CACHE_SIZE_PERCENTAGE)

@@ -222,12 +222,13 @@ class HistoryFragment : BrowserFragment() {
         mListMoreView = ListMoreView(filesListView)
         //fileListAdapter.addFootView(mListMoreView.getLoadMoreView())
 
+        //applyStyle()
         addObserver()
         return view
     }
 
     private fun applyStyle() {
-        /*if (mStyle == STYLE_LIST) {
+        if (mStyle == STYLE_LIST) {
             fileListAdapter.setMode(BookAdapter.TYPE_RENCENT)
             filesListView.layoutManager =
                 LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
@@ -237,7 +238,7 @@ class HistoryFragment : BrowserFragment() {
 
             filesListView.layoutManager = GridLayoutManager(activity, 3)
             fileListAdapter.notifyDataSetChanged()
-        }*/
+        }
     }
 
     private fun reset() {

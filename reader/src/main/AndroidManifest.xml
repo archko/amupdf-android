@@ -9,7 +9,7 @@
         android:smallScreens="true"
         android:xlargeScreens="true" />
 
-    <application android:name=".core.App">
+    <application>
 
     </application>
 </manifest> 

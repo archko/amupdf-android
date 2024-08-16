@@ -48,7 +48,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     protected lateinit var mSwipeRefreshWidget: SwipeRefreshLayout
     protected lateinit var pathTextView: TextView
     protected lateinit var filesListView: RecyclerView
-    protected lateinit var fileListAdapter: ListAdapter<FileBean, BaseViewHolder<FileBean>>
+    protected lateinit var fileListAdapter: BookAdapter
 
     private val dirsFirst = true
     protected var showExtension: Boolean = true

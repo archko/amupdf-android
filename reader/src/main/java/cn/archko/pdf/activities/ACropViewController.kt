@@ -17,7 +17,6 @@ import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
-import cn.archko.pdf.core.listeners.SimpleGestureListener
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
 import cn.archko.pdf.listeners.AViewController
