@@ -165,6 +165,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             updateTitle(mPath)
             showReflow(pdfViewModel.checkReflow())
             orientation = pdfViewModel.bookProgress?.scrollOrientation ?: 1
+            reflowButton.visibility = View.GONE
+            ttsButton.visibility = View.GONE
         }
 
         documentLayout = findViewById(R.id.document_layout)

@@ -64,7 +64,9 @@ public class PdfDocument implements CodecDocument {
     public List<OutlineLink> loadOutline() {
         Outline[] outlines = core.loadOutline();
         List<OutlineLink> links = new ArrayList<>();
-        downOutline(core, outlines, links);
+        if (outlines != null) {
+            downOutline(core, outlines, links);
+        }
         return links;
     }
 
