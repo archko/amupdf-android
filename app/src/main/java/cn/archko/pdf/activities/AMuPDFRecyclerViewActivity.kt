@@ -48,7 +48,6 @@ import cn.archko.pdf.widgets.PageControls
 import com.baidu.ai.edge.ui.activity.OcrActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.vudroid.core.codec.OutlineLink
@@ -119,6 +118,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         initViewController()
 
         viewController?.init()
+        updateControls()
     }
 
     private fun parseIntent() {
@@ -163,7 +163,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         mReflowLayout = findViewById(R.id.reflow_layout)
 
         pageControls = createControls()
-        updateControls()
 
         documentLayout = findViewById(R.id.document_layout)
     }
@@ -267,7 +266,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun initViewController(): Boolean {
-        val oldMode = viewMode
         if (IntentFile.isText(mPath!!)) {
             viewMode = ViewMode.TEXT
         } else {
@@ -287,7 +285,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
 
         closeTts()
-        //viewController?.onDestroy()
+        viewController?.onDestroy()
+        val old = viewController
 
         val aViewController = ViewControllerFactory.getOrCreateViewController(
             viewControllerCache,
@@ -301,13 +300,13 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             controllerListener
         )
         viewController = aViewController
-        Logcat.d("initViewController:$viewMode, forceCropParam: $forceCropParam, controller:$viewController")
+        Logcat.d("initViewController:$old, $viewController, forceCropParam: $forceCropParam, controller:$viewController")
 
         addDocumentView()
 
         cropModeSet(pdfViewModel.checkCrop())
 
-        return oldMode != viewMode
+        return true
     }
 
     //===========================================
@@ -730,11 +729,11 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             pageSeekBarControls: PageControls,
             controllerListener: ControllerListener?,
         ): AViewController {
-            var aViewController = viewControllerCache.get(viewMode.ordinal)
-            if (null != aViewController) {
-                return aViewController
-            }
-            aViewController = createViewController(
+            //var aViewController = viewControllerCache.get(viewMode.ordinal)
+            //if (null != aViewController) {
+            //    return aViewController
+            //}
+            val aViewController = createViewController(
                 scope,
                 viewMode,
                 context,
@@ -744,7 +743,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 pageSeekBarControls,
                 controllerListener,
             )
-            viewControllerCache.put(viewMode.ordinal, aViewController)
+            //viewControllerCache.put(viewMode.ordinal, aViewController)
 
             return aViewController
         }
