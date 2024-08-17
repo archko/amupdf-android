@@ -171,6 +171,10 @@ public class PageControls implements View.OnClickListener {
         return ttsButton;
     }
 
+    public ImageButton getOutlineButton() {
+        return mOutlineButton;
+    }
+
     @Override
     public void onClick(View v) {
         int id = v.getId();

@@ -161,19 +161,26 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         mReflowLayout = findViewById(R.id.reflow_layout)
 
         pageControls = createControls()
+        updateControls()
+
+        documentLayout = findViewById(R.id.document_layout)
+    }
+
+    private fun updateControls() {
         pageControls?.apply {
             updateTitle(mPath)
             showReflow(pdfViewModel.checkReflow())
             orientation = pdfViewModel.bookProgress?.scrollOrientation ?: 1
-            if (IntentFile.canotReflow(mPath!!)) {
+            if (viewMode == ViewMode.TEXT) {
                 reflowButton.visibility = View.GONE
-            }
-            if (IntentFile.isImage(mPath!!)) {
-                ttsButton.visibility = View.GONE
+                autoCropButton.visibility = View.GONE
+                outlineButton.visibility = View.GONE
+            } else{
+                reflowButton.visibility = View.VISIBLE
+                autoCropButton.visibility = View.VISIBLE
+                outlineButton.visibility = View.VISIBLE
             }
         }
-
-        documentLayout = findViewById(R.id.document_layout)
     }
 
     private fun setFullScreen() {
@@ -248,10 +255,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
     }
 
-    fun getDocumentView(): View? {
-        return viewController?.getDocumentView()!!
-    }
-
     private fun addDocumentView() {
         documentLayout?.removeAllViews()
         val lap: FrameLayout.LayoutParams = FrameLayout.LayoutParams(
@@ -263,12 +266,16 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     private fun initViewController(): Boolean {
         val oldMode = viewMode
-        if (pdfViewModel.checkReflow()) {
-            viewMode = ViewMode.REFLOW
-        } else if (pdfViewModel.checkCrop()) {
-            viewMode = ViewMode.CROP
+        if (IntentFile.isText(mPath!!)) {
+            viewMode = ViewMode.TEXT
         } else {
-            viewMode = ViewMode.NORMAL
+            if (pdfViewModel.checkReflow()) {
+                viewMode = ViewMode.REFLOW
+            } else if (pdfViewModel.checkCrop()) {
+                viewMode = ViewMode.CROP
+            } else {
+                viewMode = ViewMode.NORMAL
+            }
         }
 
         if (viewMode != ViewMode.REFLOW) {
@@ -294,7 +301,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         addDocumentView()
 
         cropModeSet(pdfViewModel.checkCrop())
-        //setCropButton(pdfViewModel.checkCrop())
 
         return true
     }
@@ -327,6 +333,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
 
         pdfViewModel.setCurrentPage(pos)
+        updateControls()
         viewController?.init()
     }
 
@@ -757,6 +764,16 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     pageSeekBarControls,
                     controllerListener,
                 )
+            } else if (viewMode == ViewMode.TEXT) {
+                return ATextViewController(
+                    context,
+                    scope,
+                    controllerLayout,
+                    pdfViewModel,
+                    path,
+                    pageSeekBarControls,
+                    controllerListener,
+                )
             } else {
                 return ANormalViewController(
                     context,
@@ -772,6 +789,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     enum class ViewMode {
-        NORMAL, CROP, REFLOW
+        NORMAL, CROP, REFLOW, TEXT
     }
 }

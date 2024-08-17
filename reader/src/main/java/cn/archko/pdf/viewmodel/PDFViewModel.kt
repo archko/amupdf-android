@@ -27,8 +27,6 @@ class PDFViewModel : ViewModel() {
 
     var pdfPath: String? = null
 
-    var bookProgress: BookProgress? = null
-        private set
     var mupdfDocument: MupdfDocument? = null
     private val mPageSizes = mutableListOf<APage>()
     var txtPageCount: Int = 1
@@ -145,7 +143,6 @@ class PDFViewModel : ViewModel() {
             return txtPageCount
         }
         val pc = mupdfDocument?.countPages() ?: 0
-        bookProgress?.pageCount = pc
         return pc
     }
 

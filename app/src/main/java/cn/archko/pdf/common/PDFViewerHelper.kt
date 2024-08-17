@@ -138,10 +138,10 @@ class PDFViewerHelper {
             if (IntentFile.isImage(fname)) {
                 openImage(clickedFile, activity)
                 return
-            } else if (IntentFile.isText(fname)) {
+            } /*else if (IntentFile.isText(fname)) {
                 TextActivity.start(activity, clickedFile.absolutePath)
                 return
-            }
+            }*/
 
             val uri = Uri.fromFile(clickedFile)
             val intent = Intent()
