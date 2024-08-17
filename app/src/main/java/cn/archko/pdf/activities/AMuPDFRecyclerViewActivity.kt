@@ -21,6 +21,7 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.Toast
+import androidx.core.util.forEach
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
@@ -175,7 +176,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 reflowButton.visibility = View.GONE
                 autoCropButton.visibility = View.GONE
                 outlineButton.visibility = View.GONE
-            } else{
+            } else {
                 reflowButton.visibility = View.VISIBLE
                 autoCropButton.visibility = View.VISIBLE
                 outlineButton.visibility = View.VISIBLE
@@ -284,14 +285,17 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             }
         }
 
-        viewController?.onDestroy()
+        closeTts()
+        //viewController?.onDestroy()
 
         val aViewController = ViewControllerFactory.getOrCreateViewController(
             viewControllerCache,
             lifecycleScope,
             viewMode,
             this@AMuPDFRecyclerViewActivity,
-            mReflowLayout, pdfViewModel, mPath!!,
+            mReflowLayout,
+            pdfViewModel,
+            mPath!!,
             pageControls!!,
             controllerListener
         )
@@ -302,7 +306,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
         cropModeSet(pdfViewModel.checkCrop())
 
-        return true
+        return oldMode != viewMode
     }
 
     //===========================================
@@ -329,6 +333,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     private fun applyViewMode(pos: Int) {
         if (!initViewController()) {
+            pdfViewModel.setCurrentPage(pos)
+            updateControls()
+            viewController?.notifyDataSetChanged()
             return
         }
 
@@ -632,7 +639,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         busEvent(GlobalEvent(Event.ACTION_STOPPED, mPath))
         BitmapCache.getInstance().clear()
 
-        viewController?.onDestroy()
+        viewControllerCache.forEach { key, value -> value.onDestroy() }
 
         TTSEngine.get().shutdown()
     }
@@ -718,11 +725,11 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             pageSeekBarControls: PageControls,
             controllerListener: ControllerListener?,
         ): AViewController {
-            //val aViewController = viewControllerCache.get(viewMode.ordinal)
-            //if (null != aViewController) {
-            //    return aViewController
-            //}
-            return createViewController(
+            var aViewController = viewControllerCache.get(viewMode.ordinal)
+            if (null != aViewController) {
+                return aViewController
+            }
+            aViewController = createViewController(
                 scope,
                 viewMode,
                 context,
@@ -732,6 +739,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 pageSeekBarControls,
                 controllerListener,
             )
+            viewControllerCache.put(viewMode.ordinal, aViewController)
+
+            return aViewController
         }
 
         fun createViewController(
