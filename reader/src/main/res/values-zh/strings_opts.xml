@@ -76,10 +76,10 @@
         <item>原色</item>
         <item>反色</item>
         <item>黄底黑字</item>
+        <item>苹果绿底</item>
         <item>浅灰底灰度</item>
         <item>灰底灰度</item>
         <item>深灰底灰度</item>
-        <item>蓝底白字</item>
     </string-array>
 
     <string name="opts_list_style">列表风格</string>

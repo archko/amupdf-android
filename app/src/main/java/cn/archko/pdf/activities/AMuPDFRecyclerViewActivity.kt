@@ -27,6 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.cache.BitmapCache
+import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.GlobalEvent
 import cn.archko.pdf.core.common.IntentFile
@@ -332,15 +333,17 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun applyViewMode(pos: Int) {
+        BitmapPool.getInstance().clear()
+        BitmapCache.getInstance().clear()
+
+        pdfViewModel.setCurrentPage(pos)
+        updateControls()
+
         if (!initViewController()) {
-            pdfViewModel.setCurrentPage(pos)
-            updateControls()
             viewController?.notifyDataSetChanged()
             return
         }
 
-        pdfViewModel.setCurrentPage(pos)
-        updateControls()
         viewController?.init()
     }
 
@@ -398,12 +401,12 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun addBookmark(page: Int) {
-        lifecycleScope.launch {
+        /*lifecycleScope.launch {
             val currentPos = getCurrentPos()
             pdfViewModel.addBookmark(currentPos).collectLatest {
                 viewController?.notifyDataSetChanged()
             }
-        }
+        }*/
     }
 
     private fun toggleReflow() {
@@ -642,6 +645,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         viewControllerCache.forEach { key, value -> value.onDestroy() }
 
         TTSEngine.get().shutdown()
+        BitmapPool.getInstance().clear()
+        BitmapCache.getInstance().clear()
     }
 
     override fun onResume() {

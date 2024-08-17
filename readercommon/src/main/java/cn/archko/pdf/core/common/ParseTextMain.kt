@@ -41,16 +41,11 @@ object ParseTextMain {
         return list
     }
 
+    //解析为普通文件,原数据就是普通文本+图片,没有html标签
     fun parseAsTextList(bytes: ByteArray, pageIndex: Int): List<ReflowBean> {
         val content = String(bytes)
         val list = txtParser.parseAsTextList(content, pageIndex)
         return list
-    }
-
-    fun parseXHtmlResult(bytes: ByteArray): String {
-        val content = String(bytes)
-        //return txtParser.parseTxt(UnicodeDecoder.parseXHtml(UnicodeDecoder.unEscape(content)))
-        return content
     }
 
     class TxtParser {
@@ -62,16 +57,6 @@ object ParseTextMain {
 
         constructor(path: String) {
             this.path = path
-        }
-
-        fun parseTxt() {
-            /*String content = parse(StreamUtils.readStringAsList(path));
-            String saveFile = "F:\\pdf3.text2";
-            saveToFile(content, saveFile);*/
-        }
-
-        internal fun saveToFile(content: String, saveFile: String) {
-            StreamUtils.saveStringToFile(content, saveFile)
         }
 
         internal fun parse(lists: List<String>): String {
@@ -326,9 +311,6 @@ object ParseTextMain {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        val filepath = "F:\\ebook\\pdf.text"
-        val txtParser = TxtParser(filepath)
-        txtParser.parseTxt()
     }
 
     //对于一些文档,会有一个换行符,导致每一个字符都换行,目前测试中发现,有两个换行符的才是换行.

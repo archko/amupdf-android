@@ -86,10 +86,10 @@
         <item>Normal</item>
         <item>Invert</item>
         <item>Black on Yellow</item>
+        <item>Black on Apple Green</item>
         <item>Grayscale on greyish</item>
         <item>Grayscale on gray</item>
         <item>Grayscale on dark gray</item>
-        <item>White on blue</item>
     </string-array>
 
     <string name="opts_default_list_style" translatable="false">1</string>
