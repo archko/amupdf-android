@@ -2,6 +2,7 @@ package cn.archko.pdf
 
 import cn.archko.pdf.core.App
 import cn.archko.pdf.decode.PdfFetcher
+import cn.archko.pdf.decode.PdfFetcherKeyer
 import coil.ComponentRegistry
 import coil.ImageLoader
 import coil.ImageLoaderFactory
@@ -19,8 +20,9 @@ class PdfApp : App(), ImageLoaderFactory {
     override fun newImageLoader(): ImageLoader {
         val imageLoader = ImageLoader.Builder(this)
             .components(fun ComponentRegistry.Builder.() {
-                add(PdfFetcher.Factory())
                 //add(MupdfFetcher.Factory())
+                add(PdfFetcher.Factory())
+                    .add(PdfFetcherKeyer())
             })
             .memoryCache {
                 MemoryCache.Builder(this)

@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.BookProgressParser
 import cn.archko.pdf.core.common.Graph
 import cn.archko.pdf.core.common.Logcat
@@ -223,6 +224,42 @@ class HistoryViewModel : ViewModel() {
             withContext(Dispatchers.Main) {
                 _uiFileModel.value = args
             }
+        }
+    }
+
+    fun removeRecentAndClearCache(absolutePath: String) {
+        viewModelScope.launch {
+            val args = withContext(Dispatchers.IO) {
+                val path = FileUtils.getName(absolutePath)
+                val count = progressDao.deleteProgress(path)
+                if (count < 1) { //maybe path is absolutepath,not /book/xx.pdf
+                    progressDao.deleteProgress(absolutePath)
+                }
+
+                var fb: FileBean? = null
+                list.forEach {
+                    if (null != it.file && TextUtils.equals(it.file!!.absolutePath, absolutePath)) {
+                        fb = it
+                        return@forEach
+                    }
+                }
+                fb?.let {
+                    list.remove(fb)
+                }
+
+                deleteCachePage(path)
+
+                return@withContext arrayOf<Any>(list.size + 1, list)
+            }
+            withContext(Dispatchers.Main) {
+                _uiFileModel.value = args
+            }
+        }
+    }
+
+    private fun deleteCachePage(path: String?) {
+        if (path != null) {
+            APageSizeLoader.deletePageSizeFromFile(path)
         }
     }
 }

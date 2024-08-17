@@ -307,6 +307,10 @@ class HistoryFragment : BrowserFragment() {
         }
     }
 
+    override fun removeAndClear(entry: FileBean) {
+        historyViewModel.removeRecentAndClearCache(entry.file!!.absolutePath)
+    }
+
     override fun clickItem2(entry: FileBean, view: View) {
         if (!entry.isDirectory && entry.type != FileBean.HOME) {
             selectedBean = entry

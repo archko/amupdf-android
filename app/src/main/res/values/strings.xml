@@ -33,6 +33,7 @@
     <string name="menu_edit">Edit Pdf</string>
     <string name="menu_info">View File Info</string>
     <string name="menu_remove_from_recent">Remove from recent</string>
+    <string name="menu_remove_and_clear">Remove and clear</string>
     <string name="menu_delete">Delete</string>
     <string name="menu_add_to_fav">Add To Favorites</string>
     <string name="menu_remove_from_fav">Remove from Favorites</string>

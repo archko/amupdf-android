@@ -138,8 +138,12 @@ object APageSizeLoader {
 
     fun deletePageSizeFromFile(path: String) {
         val file = File(path)
-        if (file.exists()) {
-            file.delete()
+        val saveFile = File(
+            FileUtils.getStorageDirPath() + "/amupdf"
+                    + File.separator + "page" + File.separator + file.nameWithoutExtension + ".json"
+        )
+        if (saveFile.exists()) {
+            saveFile.delete()
         }
     }
 

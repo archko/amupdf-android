@@ -38,9 +38,11 @@
 
     <ImageView
             android:id="@+id/icon"
+            android:padding="2dp"
+            android:background="@drawable/bg_book"
             android:layout_width="90dp"
-            android:layout_height="110dp"
-            android:scaleType="fitXY"
+            android:layout_height="120dp"
+            android:scaleType="centerCrop"
             android:src="@drawable/ic_book_pdf"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"

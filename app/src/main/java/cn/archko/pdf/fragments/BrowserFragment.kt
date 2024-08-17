@@ -438,6 +438,12 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
                 0,
                 getString(R.string.menu_remove_from_recent)
             )
+            menuBuilder.menu.add(
+                0,
+                PDFViewerHelper.removeAndClearContextMenuItem,
+                0,
+                getString(R.string.menu_remove_and_clear)
+            )
         } else if (!entry.isDirectory && entry.type != FileBean.HOME) {
             if (entry.bookProgress?.isFavorited == 0) {
                 menuBuilder.menu.add(
@@ -495,6 +501,8 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             return true
         } else if (item.itemId == PDFViewerHelper.removeContextMenuItem) {
             remove(entry)
+        } else if (item.itemId == PDFViewerHelper.removeAndClearContextMenuItem) {
+            removeAndClear(entry)
         } else if (item.itemId == PDFViewerHelper.editContextMenuItem) {
             editPdf(entry.file?.absolutePath)
         } else if (item.itemId == PDFViewerHelper.albumContextMenuItem) {
@@ -539,6 +547,9 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     }
 
     open fun remove(entry: FileBean) {
+    }
+
+    open fun removeAndClear(entry: FileBean) {
     }
 
     private fun showFileInfoDiaLog(entry: FileBean) {

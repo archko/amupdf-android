@@ -155,8 +155,8 @@ abstract class ATextBaseViewController(
         return position
     }
 
-
     override fun setOrientation(ori: Int) {
+        (mRecyclerView.layoutManager as LinearLayoutManager).orientation = ori
     }
 
     override fun setCrop(crop: Boolean) {

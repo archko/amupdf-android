@@ -34,6 +34,7 @@ class PdfFetcher(
     private val options: Options
 ) : Fetcher {
     override suspend fun fetch(): FetchResult {
+        println("PdfFetcher:${data.path}")
         var bitmap = if (IntentFile.isDjvu(data.path)) {
             decodeDjvu()
         } else if (IntentFile.isPdf(data.path)) {

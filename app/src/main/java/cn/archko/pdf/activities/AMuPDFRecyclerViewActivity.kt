@@ -176,6 +176,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 reflowButton.visibility = View.GONE
                 autoCropButton.visibility = View.GONE
                 outlineButton.visibility = View.GONE
+                oriButton.visibility = View.GONE
             } else {
                 reflowButton.visibility = View.VISIBLE
                 autoCropButton.visibility = View.VISIBLE

@@ -29,6 +29,7 @@ class PDFViewerHelper {
 
         const val deleteContextMenuItem = Menu.FIRST + 100
         const val removeContextMenuItem = Menu.FIRST + 101
+        const val removeAndClearContextMenuItem = Menu.FIRST + 102
 
         const val mupdfContextMenuItem = Menu.FIRST + 110
         const val vudroidContextMenuItem = Menu.FIRST + 111
