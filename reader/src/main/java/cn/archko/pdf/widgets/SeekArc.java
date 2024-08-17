@@ -35,7 +35,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import cn.archko.mupdf.R;
+import cn.archko.pdf.R;
 
 /**
  * SeekArc.java

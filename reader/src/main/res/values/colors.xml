@@ -29,4 +29,5 @@
     <color name="progress_color">#CCFF8D8D</color>
     <color name="toc_color_bg">#CCD2D2D2</color>
     <color name="bg_reflow_color">#33D2D2D2</color>
+    <color name="progress_gray">#FFD8D8D8</color>
 </resources>

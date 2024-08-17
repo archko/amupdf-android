@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Dragon Viewer</string>
-
     <string name="grant_files_permission">grant file permission</string>
     <string name="grant_all_files_permission">grant all files permission</string>
     <string name="grantfailed">grant failed</string>
     <string name="grant_cancel">cancel grant</string>
     <string name="grant_ok">grant</string>
-
-    <string name="outline_title">Table of Contents</string>
-    <string name="auto_crop">auto crop bound</string>
 
     <string name="toast_set_as_home">Please Set Book Directory</string>
 
@@ -52,73 +47,8 @@
     <string name="empty_title">NO History</string>
     <string name="empty_subtitle">Start Reading some book</string>
 
-    <string name="create_pdf_label">Create A PDF</string>
-    <string name="menu_create">Create A PDF</string>
-    <string name="create_pdf_select_old">Select old pdf</string>
-    <string name="create_pdf_save">Save as pdf</string>
-    <string name="create_pdf_select_old_tip">if donot has an old pdf,it will create one for you.</string>
-    <string name="create_pdf_success">create pdf successfully</string>
-    <string name="create_pdf_error">create pdf error</string>
-
     <string name="sodk_editor_password_for_document">Password</string>
     <string name="sodk_editor_ok">OK</string>
     <string name="sodk_editor_cancel">cancel</string>
     
-    <string name="extract_title">Extract Images</string>
-    <string name="extract_selection">Extract Selection</string>
-    <string name="extract_current">Extract Current</string>
-    <string name="extract_tip">Select resolution,default width=1080, max width=3600</string>
-    <string name="extract_resolution">Extract Resolution</string>
-    <string name="extract_page_range">Page Rang</string>
-    <string name="extract_range">Rang</string>
-
-    <string name="edit_save_success">Save success</string>
-    <string name="edit_no_modification">No modification</string>
-    <string name="edit_create_success">Create success</string>
-    <string name="edit_create_error">Create pdf Failed!</string>
-    <string name="edit_create_select_file">Select a file</string>
-    <string name="edit_page">Page:%s</string>
-    <string name="edit_cannot_load_pdf">Can not load pdf</string>
-    <string name="edit_extract_success">Extract Success</string>
-    <string name="edit_extract_error">Extract failed</string>
-    <string name="edit_extract_cancel_pages">Cancel extract,already extract:%s"</string>
-    <string name="edit_extract_not_impl">No implemention</string>
-    <string name="edit_back">Back</string>
-    
-    <string name="edit_title">Edit pdf</string>
-    <string name="reflow_title">Reflow pdf</string>
-    <string name="edit_item_save">Save</string>
-    <string name="edit_item_extract">Extract Images</string>
-    
-    <string name="create_title">Create pdf</string>
-    <string name="create_use_image">Use image</string>
-    <string name="create_use_txt">Use text</string>
-    <string name="create_pdf_tip">Select text for creating pdf</string>
-    <string name="create_btn_select_text">Select a text</string>
-    <string name="create_text_path_tip">save path:/sdcard/book/ ,default name:new.pdf</string>
-    <string name="create_text_name">the name of pdf</string>
-    <string name="create_btn_text">Generate</string>
-    <string name="create_btn_old_pdf">Select old pdf</string>
-    <string name="create_old_pdf_tip">if you select an old pdf,then the new page will append to the old</string>
-    <string name="create_image_name_hint">the name of the new pdf</string>
-    <string name="create_image_btn_add_image">Add Image</string>
-    <string name="create_image_btn_save">Save</string>
-    <string name="edit_btn_image">Extract images</string>
-    <string name="edit_btn_merge">Merge</string>
-    <string name="edit_btn_select">Select pdf</string>
-    <string name="edit_select_tip">Select a pdf to extract images</string>
-    <string name="edit_save_tip">extract images will be saved to /sdcard/pdfname/ , \\nExtrace image: a image for a page.\\nExtract html: generate a html,image will be encode with base64,can be open by browser</string>
-    <string name="edit_extract_btn_image">Extract selection</string>
-    <string name="edit_extract_btn_html">Extract Html</string>
-    <string name="edit_extract_html">Extract Html</string>
-    <string name="extract_btn_merge">Merge</string>
-    <string name="edit_reflow_btn">Reflow</string>
-    <string name="edit_reflow_page_range">Reflow range</string>
-    <string name="edit_reflow_preview">Preview</string>
-
-    <string name="edit_from_page">From:%s</string>
-    <string name="edit_to_page">To:%s</string>
-
-
-    <string name="webdav_title">Webdav config</string>
 </resources>

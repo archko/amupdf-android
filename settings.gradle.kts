@@ -47,7 +47,7 @@ include(":app")
 include(":reader")
 include(":readercommon")
 include(":vudroid")
-//include ":core-ui"
+//include (":core-ui")
 include(":paddle-ocr")
 include(":pdf-recyclerview")
 include(":subsampling-scale-image-view")

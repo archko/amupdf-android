@@ -6,10 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
-import cn.archko.mupdf.R
-import cn.archko.mupdf.databinding.DialogSleepTimerBinding
 import cn.archko.pdf.widgets.SeekArc
-import cn.archko.pdf.widgets.SeekArc.OnSeekArcChangeListener
+import cn.archko.pdf.R
+import cn.archko.pdf.databinding.DialogSleepTimerBinding
 
 class SleepTimerDialog(private var timeListener: TimeListener) : DialogFragment(R.layout.dialog_sleep_timer) {
 
@@ -35,7 +34,7 @@ class SleepTimerDialog(private var timeListener: TimeListener) : DialogFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.seekArc.setOnSeekArcChangeListener(object : OnSeekArcChangeListener {
+        binding.seekArc.setOnSeekArcChangeListener(object : SeekArc.OnSeekArcChangeListener {
             override fun onStopTrackingTouch(seekArc: SeekArc) {
 
             }

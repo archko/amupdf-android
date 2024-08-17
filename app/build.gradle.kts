@@ -65,8 +65,17 @@ android {
         abortOnError = false
     }
 
+    sourceSets {
+        named("main") {
+            java.setSrcDirs(listOf("src/main/java", "src/common/java"))
+            res.srcDir("src/main/res")
+            //res.srcDir("src/compose/res")
+            res.srcDir("src/common/res")
+        }
+    }
+
     buildFeatures {
-        //compose true
+        //compose = true
         // Disable unused AGP features
         buildConfig = false
         aidl = false
@@ -76,9 +85,9 @@ android {
         viewBinding = true
     }
 
-    //composeOptions {
-    //    kotlinCompilerExtensionVersion Libs.AndroidX.Compose.compiler_version
-    //}
+    composeOptions {
+        //kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
+    }
 
     packaging {
         exclude("META-INF/*.kotlin_module")
@@ -109,41 +118,34 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
 
-    //implementation Libs . Coroutines . android
-    //implementation Libs . Coroutines . core
-
-    //implementation Libs.AndroidX.Activity.activityCompose
-    //implementation Libs.AndroidX.Lifecycle.viewModelCompose
-    //implementation Libs.AndroidX.ConstraintLayout.constraintLayoutCompose
-
     implementation(libs.androidx.lifecycle.runtimeKtx)
     implementation(libs.androidx.lifecycle.viewmodelKtx)
     implementation(libs.androidx.lifecycle.livedata)
-    //implementation Libs.AndroidX.Lifecycle.lifecycleRuntimeCompose
 
     /*implementation(Libs.AndroidX.Paging.pagingRuntime) {
         exclude group: "androidx.recyclerview"
     }
-    implementation Libs.AndroidX.Paging.pagingCompose
-
-    implementation platform(Libs.AndroidX.Compose.androidxComposeBom)
-
-    implementation Libs.AndroidX.Compose.runtime
-    implementation Libs.AndroidX.Compose.foundation
-    implementation Libs.AndroidX.Compose.layout
-    implementation Libs.AndroidX.Compose.ui
-    implementation Libs.AndroidX.Compose.uiUtil
-    implementation Libs.AndroidX.Compose.material
-    implementation Libs.AndroidX.Compose.Material3.material3
-    implementation Libs.AndroidX.Compose.Material3.material3WindowSizeClass
-    implementation Libs.AndroidX.Compose.animation
-    implementation Libs.AndroidX.Compose.tooling
-
-    implementation Libs.flinger
-
-    implementation Libs.Accompanist.pager
-    implementation Libs.Accompanist.pagerIndicators
     implementation Libs.Accompanist.swiperefresh*/
+
+    /*implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.viewModelCompose)
+    implementation(libs.androidx.navigation.compose)
+
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
+
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.androidx.compose.ui.util)
+    implementation(libs.androidx.compose.material.iconsExtended)
+    implementation(libs.androidx.compose.material3.adaptive)
+    implementation(libs.androidx.compose.material3.adaptive.layout)
+    implementation(libs.androidx.compose.material3.adaptive.navigation)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.material3.android)
+
+    implementation(libs.flinger)*/
 
     implementation(libs.androidx.activity)
     implementation(libs.androidx.fragment)
@@ -171,6 +173,7 @@ dependencies {
 
     implementation(project(":reader"))
     implementation(project(":paddle-ocr"))
+    //implementation(project(":core-ui"))
 
     // https://mvnrepository.com/artifact/com.github.axet/k2pdfopt
     implementation(libs.k2pdfopt)

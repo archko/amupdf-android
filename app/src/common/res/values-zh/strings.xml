@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="outline_title">目录</string>
+    <string name="auto_crop">自动切边</string>
+
+    <string name="create_pdf_label">创建PDF</string>
+    <string name="menu_create">创建PDF</string>
+    <string name="create_pdf_select_old">选择旧的 pdf</string>
+    <string name="create_pdf_save">保存pdf</string>
+    <string name="create_pdf_select_old_tip">如果没有则创建新的pdf</string>
+    <string name="create_pdf_success">成功创建pdf</string>
+    <string name="create_pdf_error">创建pdf错误</string>
+
+    <string name="extract_title">导出图片</string>
+    <string name="extract_selection">导出选中范围</string>
+    <string name="extract_current">导出当前页</string>
+    <string name="extract_tip">选择导出的分辨率,默认为1080宽,最小为原始图片宽,图片最大宽可达3600</string>
+    <string name="extract_resolution">导出分辨率</string>
+    <string name="extract_page_range">页面范围</string>
+    <string name="extract_range">范围</string>
+
+    <string name="edit_save_success">保存成功</string>
+    <string name="edit_no_modification">未修改pdf</string>
+    <string name="edit_create_success">创建pdf成功</string>
+    <string name="edit_create_error">创建pdf失败</string>
+    <string name="edit_create_select_file">请先选择文本文件</string>
+    <string name="edit_page">"第%s页"</string>
+    <string name="edit_cannot_load_pdf">无法加载pdf</string>
+    <string name="edit_extract_success">导出成功</string>
+    <string name="edit_extract_error">导出错误!</string>
+    <string name="edit_extract_cancel_pages">取消导出,已导出%s张</string>
+    <string name="edit_extract_not_impl">未实现功能</string>
+    <string name="edit_back">返回</string>
+
+    <string name="edit_title">编辑pdf</string>
+    <string name="reflow_title">重排 pdf</string>
+    <string name="edit_item_save">保存</string>
+    <string name="edit_item_extract">导出图片</string>
+    
+    <string name="create_title">创建pdf</string>
+    <string name="create_use_image">使用图片</string>
+    <string name="create_use_txt">使用文本</string>
+    <string name="create_pdf_tip">选择用于生成pdf的文本文件</string>
+    <string name="create_btn_select_text">选择文本文件</string>
+    <string name="create_text_path_tip">生成pdf的文件名:存储于/sdcard/book/ 下,默认为new.pdf</string>
+    <string name="create_text_name">填写生成pdf的文件名</string>
+    <string name="create_btn_text">开始生成</string>
+    <string name="create_btn_old_pdf">选择旧的pdf</string>
+    <string name="create_old_pdf_tip">如果有旧的pdf,新文档采用追加文档后边,如果没有旧的pdf则创建新的pdf</string>
+    <string name="create_image_name_hint">填写生成pdf的文件名</string>
+    <string name="create_image_btn_add_image">添加图片</string>
+    <string name="create_image_btn_save">保存</string>
+    <string name="edit_btn_image">导出为图片</string>
+    <string name="edit_btn_merge">合并</string>
+    <string name="edit_btn_select">选择pdf文件</string>
+    <string name="edit_select_tip">选择用于导出图片的pdf文件</string>
+    <string name="edit_save_tip">导出的内容存储于/sdcard/xx/ 下,xx是pdf文件名, \\n导出图片: 每一页为一张jpg.\\n导出html: 对于非扫描的pdf,则生成一个html,如果里面带图片,会以base64编码图片输出,可用浏览器打开</string>
+    <string name="edit_extract_btn_image">导出选中范围图片</string>
+    <string name="edit_extract_btn_html">开始导出所选Html</string>
+    <string name="edit_extract_html">导出Html</string>
+    <string name="extract_btn_merge">合并文件</string>
+    <string name="edit_reflow_btn">重排页面</string>
+    <string name="edit_reflow_page_range">重排页面范围</string>
+    <string name="edit_reflow_preview">预览</string>
+
+    <string name="edit_from_page">从%s页</string>
+    <string name="edit_to_page">到%s页</string>
+
+    <string name="webdav_title">Webdav config</string>
+</resources>

@@ -42,10 +42,8 @@ import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TTSActivity
 import cn.archko.pdf.tts.TTSEngine
-import cn.archko.pdf.tts.TTSEngine.ProgressListener
 import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.widgets.PageControls
-import com.baidu.ai.edge.ui.activity.OcrActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -360,7 +358,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
             isDocLoaded = true
 
-            val sp = getSharedPreferences(PREF_READER, Context.MODE_PRIVATE)
+            val sp = getSharedPreferences(PREF_READER, MODE_PRIVATE)
             val isFirst = sp.getBoolean(PREF_READER_KEY_FIRST, true)
             if (isFirst) {
                 showOutline()
@@ -504,7 +502,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun startTts() {
-        TTSEngine.get().setSpeakListener(object : ProgressListener {
+        TTSEngine.get().setSpeakListener(object : TTSEngine.ProgressListener {
             override fun onStart(utteranceId: String) {
             }
 
@@ -712,7 +710,18 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         const val PREF_READER_KEY_FIRST = "pref_reader_key_first"
 
         fun startOcrActivity(context: Context, bitmap: Bitmap?, path: String?, pos: Int) {
-            OcrActivity.start(context, bitmap, path, pos.toString())
+            //OcrActivity.start(context, bitmap, path, pos.toString())
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.setClassName(context, "com.baidu.ai.edge.ui.activity.OcrActivity")
+            intent.putExtra("path", path)
+            if (null != bitmap) {
+                val key = System.currentTimeMillis().toString()
+                BitmapCache.getInstance().addBitmap(key, bitmap)
+                intent.putExtra("key", key)
+            }
+            intent.putExtra("name", pos.toString())
+            context.startActivity(intent)
         }
     }
 
