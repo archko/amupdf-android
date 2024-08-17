@@ -170,14 +170,15 @@
 
     <ProgressBar
         android:id="@+id/progressbar"
-        style="?android:attr/progressBarStyleHorizontal"
+            android:progressDrawable="@drawable/progressbar_horizontal"
+            android:indeterminateOnly="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="4dp"
         android:layout_marginTop="4dp"
         android:layout_marginRight="4dp"
-        android:maxHeight="2dp"
-        android:minHeight="2dp"
+        android:maxHeight="10dp"
+        android:minHeight="10dp"
         android:textSize="14sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/lastRead" />
@@ -191,7 +192,7 @@
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/btn_ok"
-        app:layout_constraintTop_toBottomOf="@id/lastRead" />
+        app:layout_constraintTop_toBottomOf="@id/progressbar" />
 
     <Button
         android:id="@+id/btn_ok"
@@ -202,7 +203,7 @@
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintLeft_toRightOf="@id/btn_cancel"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lastRead" />
+        app:layout_constraintTop_toBottomOf="@id/progressbar" />
 
     <ImageView
         android:id="@+id/icon"

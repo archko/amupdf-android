@@ -2,6 +2,7 @@ package cn.archko.pdf.utils
 
 import android.content.Context
 import android.widget.ImageView
+import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.decode.PdfFetcherData
 import coil.load
 
@@ -13,8 +14,8 @@ object FetcherUtils {
         imageView.load(
             PdfFetcherData(
                 path = path,
-                width = 270,
-                height = 360,
+                width = Utils.dipToPixel(135f),
+                height = Utils.dipToPixel(180f),
             )
         )
         /*val req = ImageRequest.Builder(context)

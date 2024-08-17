@@ -61,7 +61,7 @@ open class WebdavConfigFragment : DialogFragment() {
 
         val mmkv = MMKV.mmkvWithID(SardineHelper.KEY_CONFIG)
         val name = mmkv.decodeString(SardineHelper.KEY_NAME)
-        binding.password.setText(name)
+        binding.name.setText(name)
     }
 
     private fun testAuth() {
