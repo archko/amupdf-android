@@ -15,6 +15,7 @@ import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
+import cn.archko.pdf.viewmodel.TextViewModel
 import cn.archko.pdf.widgets.PageControls
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -41,11 +42,13 @@ class ATextViewController(
 ),
     OutlineListener, AViewController {
 
+    private var viewModel = TextViewModel()
+
     override fun loadDocument() {
         scope.launch {
-            pdfViewModel.loadTextDoc(mPath)
+            viewModel.loadTextDoc(mPath)
             context.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                pdfViewModel.textFlow.collect {
+                viewModel.textFlow.collect {
                     doLoadDoc(it.list)
                 }
             }
@@ -57,9 +60,9 @@ class ATextViewController(
         (mRecyclerView.adapter as MuPDFTextAdapter).data = list
 
         controllerListener?.doLoadedDoc(
-            pdfViewModel.countPages(),
+            viewModel.countPages(),
             docViewModel.getCurrentPage(),
-            pdfViewModel.links
+            listOf()
         )
     }
 
@@ -149,13 +152,17 @@ class ATextViewController(
     }
 
     override fun decodePageForTts(currentPos: Int) {
+        viewModel.decodeTextForTts(
+            getCurrentPos(),
+            (mRecyclerView.adapter as MuPDFTextAdapter).data
+        )
     }
 
     //--------------------------------------
 
     override fun onPause() {
         val count = mRecyclerView.adapter?.itemCount ?: 0
-        if (null != pdfViewModel.mupdfDocument && null != docViewModel.bookProgress && count > 0) {
+        if (null != docViewModel.bookProgress && count > 0) {
             docViewModel.bookProgress!!.reflow = 1
             var savePos = getCurrentPos() + 1
             val lastPos = getLastPos()
@@ -177,7 +184,6 @@ class ATextViewController(
     }
 
     override fun onDestroy() {
-        pdfViewModel.destroy()
     }
 
 }

@@ -5,10 +5,8 @@ import android.text.TextUtils
 import androidx.lifecycle.ViewModel
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
-import cn.archko.pdf.core.common.TextHelper
 import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.entity.APage
-import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.LoadResult
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.entity.State
@@ -29,31 +27,8 @@ class PDFViewModel : ViewModel() {
 
     var mupdfDocument: MupdfDocument? = null
     private val mPageSizes = mutableListOf<APage>()
-    var txtPageCount: Int = 1
     var isDestroy = false
     val links = mutableListOf<OutlineLink>()
-
-    private val _textFlow = MutableStateFlow<LoadResult<Any, ReflowBean>>(LoadResult(State.INIT))
-    val textFlow: StateFlow<LoadResult<Any, ReflowBean>>
-        get() = _textFlow
-
-    suspend fun loadTextDoc(path: String) = flow {
-        pdfPath = path
-        val reflowBeans = TextHelper.readString(path)
-        txtPageCount = reflowBeans.size
-        emit(reflowBeans)
-    }.flowOn(Dispatchers.IO)
-        .collectLatest {
-            val state = if (it.isNotEmpty()) {
-                State.FINISHED
-            } else {
-                State.ERROR
-            }
-            _textFlow.value = LoadResult(
-                state,
-                list = it
-            )
-        }
 
     private val _pageFlow = MutableStateFlow<LoadResult<Any, APage>>(LoadResult(State.INIT))
     val pageFlow: StateFlow<LoadResult<Any, APage>>
@@ -139,9 +114,6 @@ class PDFViewModel : ViewModel() {
     }
 
     fun countPages(): Int {
-        if (!TextUtils.isEmpty(pdfPath) && IntentFile.isText(pdfPath!!)) {
-            return txtPageCount
-        }
         val pc = mupdfDocument?.countPages() ?: 0
         return pc
     }
@@ -150,13 +122,13 @@ class PDFViewModel : ViewModel() {
         return mupdfDocument?.loadPage(pageNum)
     }
 
-    fun decodeTextForTts(currentPos: Int, data: List<ReflowBean>?) {
-        if (null == data) {
+    fun decodeTextForTts(currentPos: Int) {
+        if (null == mupdfDocument) {
             return
         }
         val last = TTSEngine.get().getLast()
         val count = countPages()
-        Logcat.i(Logcat.TAG, "decodeTextForTts:last:$last, count:$count, currentPos:$currentPos")
+        Logcat.i(Logcat.TAG, "decodePageForTts:last:$last, count:$count, currentPos:$currentPos")
         if (last == count - 1 && last != 0) {
             return
         }
@@ -165,7 +137,12 @@ class PDFViewModel : ViewModel() {
         }
         val start = System.currentTimeMillis()
         for (i in currentPos until count) {
-            TTSEngine.get().speak("$i-$i", data[i].data)
+            val beans: List<ReflowBean>? = mupdfDocument!!.decodeReflowText(i)
+            if (beans != null) {
+                for (j in beans.indices) {
+                    TTSEngine.get().speak("$i-$j", beans[j].data)
+                }
+            }
         }
         Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
     }

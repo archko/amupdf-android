@@ -13,6 +13,7 @@ import cn.archko.pdf.core.entity.State
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
+import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.PageControls
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
@@ -40,7 +41,8 @@ class AReflowViewController(
 ), OutlineListener, AViewController {
 
     private var mPageSizes = mutableListOf<APage>()
-    protected var progressDialog: ProgressDialog? = null
+    private var progressDialog: ProgressDialog? = null
+    private var pdfViewModel = PDFViewModel()
 
     override fun showPasswordDialog() {
         /*PasswordDialog.show(this@AMuPDFRecyclerViewActivity,
@@ -183,6 +185,7 @@ class AReflowViewController(
     }
 
     override fun decodePageForTts(currentPos: Int) {
+        pdfViewModel.decodeTextForTts(currentPos)
     }
 
     //--------------------------------------

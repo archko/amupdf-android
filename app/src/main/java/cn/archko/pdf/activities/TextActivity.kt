@@ -50,7 +50,7 @@ import cn.archko.pdf.tts.TTSActivity
 import cn.archko.pdf.tts.TTSEngine
 import cn.archko.pdf.tts.TTSEngine.ProgressListener
 import cn.archko.pdf.viewmodel.DocViewModel
-import cn.archko.pdf.viewmodel.PDFViewModel
+import cn.archko.pdf.viewmodel.TextViewModel
 import kotlinx.coroutines.launch
 import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
 import vn.chungha.flowbus.busEvent
@@ -62,8 +62,8 @@ class TextActivity : AppCompatActivity() {
 
     private var path: String? = null
     private var sensorHelper: SensorHelper? = null
-    protected val pdfViewModel: PDFViewModel = PDFViewModel()
-    protected val docViewModel: DocViewModel = DocViewModel()
+    protected val pdfViewModel = TextViewModel()
+    protected val docViewModel = DocViewModel()
 
     private var mStyleControls: View? = null
     private lateinit var binding: TxtReaderBinding

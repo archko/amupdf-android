@@ -61,7 +61,6 @@ class ANormalViewController(
 
     private var mPageSizes: List<APage>? = null
     private var scrollOrientation = LinearLayoutManager.VERTICAL
-    private var pageNumberToast: Toast? = null
     protected var progressDialog: ProgressDialog? = null
     protected var isDocLoaded: Boolean = false
     private var document: CodecDocument? = null
@@ -292,19 +291,6 @@ class ANormalViewController(
     }
 
     override fun notifyItemChanged(pos: Int) {
-    }
-
-    fun showPageToast(currentPage: Int) {
-        val pos = currentPage
-        val pageText = (pos + 1).toString() + "/" + mPageSizes?.size
-        if (pageNumberToast != null) {
-            pageNumberToast!!.setText(pageText)
-        } else {
-            pageNumberToast =
-                Toast.makeText(context, pageText, Toast.LENGTH_SHORT)
-        }
-        pageNumberToast!!.setGravity(Gravity.BOTTOM or Gravity.START, Utils.dipToPixel(15f), 0)
-        pageNumberToast!!.show()
     }
 
     override fun setFilter(colorMode: Int) {

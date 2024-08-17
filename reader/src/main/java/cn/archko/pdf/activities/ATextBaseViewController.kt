@@ -2,7 +2,6 @@ package cn.archko.pdf.activities
 
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_FIRST_USER
-import android.app.ProgressDialog
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.view.GestureDetector
@@ -27,7 +26,6 @@ import cn.archko.pdf.fragments.FontsFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
-import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.PageControls
 import kotlinx.coroutines.CoroutineScope
 import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
@@ -52,7 +50,6 @@ abstract class ATextBaseViewController(
     protected var mStyleHelper: StyleHelper? = null
     protected val START_PROGRESS = 15
     protected var mGestureDetector: GestureDetector? = null
-    protected var pdfViewModel = PDFViewModel()
 
     init {
         initView()

@@ -119,6 +119,11 @@
                 <data android:pathPattern="/.*\.fb2" />
                 <data android:pathPattern="/.*\.xml" />
                 <data android:pathPattern="/.*\.html" />
+                <data android:pathPattern="/.*\.xhtml" />
+                <data android:pathPattern="/.*\.txt" />
+                <data android:pathPattern="/.*\.log" />
+                <data android:pathPattern="/.*\.js" />
+                <data android:pathPattern="/.*\.json" />
             </intent-filter>
         </activity>
 
@@ -131,13 +136,13 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/about_title"
             android:screenOrientation="portrait"></activity>
-        <activity
+        <!--<activity
             android:name="cn.archko.pdf.activities.TextActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
             android:label="Text"
             android:screenOrientation="sensor"
             android:theme="@style/AppFullscreen"
-            android:windowSoftInputMode="adjustResize"></activity>
+            android:windowSoftInputMode="adjustResize"></activity>-->
 
         <activity
             android:name="cn.archko.pdf.imagedroid.AlbumViewerActivity"
