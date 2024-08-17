@@ -288,6 +288,7 @@ class ANormalViewController(
     }
 
     override fun notifyDataSetChanged() {
+        documentView.postInvalidate()
     }
 
     override fun notifyItemChanged(pos: Int) {
