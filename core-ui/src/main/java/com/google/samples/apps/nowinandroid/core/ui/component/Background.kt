@@ -42,7 +42,7 @@ import kotlin.math.tan
 
 /**
  * The main background for the app.
- * Uses [LocalBackgroundTheme] to set the color and tonal elevation of a [Box].
+ * Uses [LocalBackgroundTheme] to set the color and tonal elevation of a [Surface].
  *
  * @param modifier Modifier to be applied to the background.
  * @param content The background content.

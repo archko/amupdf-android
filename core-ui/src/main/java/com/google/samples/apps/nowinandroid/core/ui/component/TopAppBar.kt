@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.google.samples.apps.nowinandroid.core.ui.component
 
+import android.R
 import androidx.annotation.StringRes
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,7 +34,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.google.samples.apps.nowinandroid.core.ui.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,15 +73,19 @@ fun NiaTopAppBar(
     )
 }
 
+/*
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview("Top App Bar")
 @Composable
-fun NiaTopAppBarPreview() {
-    NiaTopAppBar(
-        titleRes = R.string.top_app_bar_preview_title,
-        navigationIcon = Icons.Default.Search,
-        navigationIconContentDescription = "Navigation icon",
-        actionIcon = Icons.Default.MoreVert,
-        actionIconContentDescription = "Action icon"
-    )
+private fun NiaTopAppBarPreview() {
+    NiaTheme {
+        NiaTopAppBar(
+            titleRes = R.string.untitled,
+            navigationIcon = NiaIcons.Search,
+            navigationIconContentDescription = "Navigation icon",
+            actionIcon = NiaIcons.MoreVert,
+            actionIconContentDescription = "Action icon",
+        )
+    }
 }
+*/

@@ -18,7 +18,6 @@ package com.google.samples.apps.nowinandroid.core.ui.component
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -34,15 +33,14 @@ import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
 /**
  * Now in Android filter chip with included leading checked icon as well as text content slot.
  *
- * @param checked Whether the chip is currently checked.
- * @param onCheckedChange Called when the user clicks the chip and toggles checked.
+ * @param selected Whether the chip is currently checked.
+ * @param onSelectedChange Called when the user clicks the chip and toggles checked.
  * @param modifier Modifier to be applied to the chip.
  * @param enabled Controls the enabled state of the chip. When `false`, this chip will not be
  * clickable and will appear disabled to accessibility services.
- * @param text The text label content.
+ * @param label The text label content.
  */
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 fun NiaFilterChip(
     selected: Boolean,
     onSelectedChange: (Boolean) -> Unit,

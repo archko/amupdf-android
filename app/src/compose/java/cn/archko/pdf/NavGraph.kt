@@ -9,7 +9,6 @@ import cn.archko.pdf.ui.home.HomePager
 
 object Destination {
     const val HOME = "Home"
-    const val GANKDETAIL = "GankDetail"
 }
 
 @Composable
@@ -29,13 +28,6 @@ fun NavGraph(
     ) {
         composable(Destination.HOME) {
             HomePager(changeTheme, darkTheme, up, navController)
-        }
-        composable(
-            "${Destination.GANKDETAIL}/{gankStr}"
-            //arguments = listOf(navArgument(COURSE_DETAIL_ID_KEY) { type = NavType.LongType })
-        ) {
-            //val arguments = it.arguments!!.getString("gankStr") ?: ""
-
         }
     }
 }
