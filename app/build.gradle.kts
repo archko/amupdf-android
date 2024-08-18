@@ -2,7 +2,7 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     kotlin("kapt")
-    alias(libs.plugins.compose.compiler)
+    //alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -69,15 +69,16 @@ android {
         named("main") {
             //java.setSrcDirs(listOf("src/main/java", "src/common/java"))
             java.srcDir("src/common/java")
-            java.srcDir("src/compose/java")
-            //res.srcDir("src/old/res")
-            res.srcDir("src/compose/res")
+            //java.srcDir("src/compose/java")
+            java.srcDir("src/old/java")
+            res.srcDir("src/old/res")
+            //res.srcDir("src/compose/res")
             res.srcDir("src/common/res")
         }
     }
 
     buildFeatures {
-        compose = true
+        //compose = true
         // Disable unused AGP features
         buildConfig = false
         aidl = false
@@ -85,9 +86,6 @@ android {
         resValues = false
         shaders = false
         viewBinding = true
-    }
-
-    composeOptions {
     }
 
     packaging {
@@ -123,12 +121,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodelKtx)
     implementation(libs.androidx.lifecycle.livedata)
 
-    /*implementation(Libs.AndroidX.Paging.pagingRuntime) {
-        exclude group: "androidx.recyclerview"
-    }
-    implementation Libs.Accompanist.swiperefresh*/
-
-    implementation(libs.androidx.activity.compose)
+    /*implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
     implementation(libs.androidx.navigation.compose)
 
@@ -151,6 +144,7 @@ dependencies {
     implementation(libs.coil.kt.compose)
 
     implementation(libs.flinger)
+    implementation(project(":core-ui"))*/
 
     implementation(libs.androidx.activity)
     implementation(libs.androidx.fragment)
@@ -178,7 +172,6 @@ dependencies {
 
     implementation(project(":reader"))
     implementation(project(":paddle-ocr"))
-    implementation(project(":core-ui"))
 
     // https://mvnrepository.com/artifact/com.github.axet/k2pdfopt
     implementation(libs.k2pdfopt)
