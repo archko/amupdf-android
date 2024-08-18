@@ -7,6 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.archko.mupdf.R
 import cn.archko.pdf.common.ProgressScaner
+import cn.archko.pdf.components.searchTypeFavorite
+import cn.archko.pdf.components.searchTypeFile
+import cn.archko.pdf.components.searchTypeHistory
 import cn.archko.pdf.core.App
 import cn.archko.pdf.core.common.BookProgressParser
 import cn.archko.pdf.core.common.Event
@@ -22,6 +25,7 @@ import cn.archko.pdf.core.utils.DateUtils
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.LengthUtils
 import cn.archko.pdf.core.utils.StreamUtils
+import cn.archko.pdf.model.SearchSuggestionGroup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -84,7 +88,7 @@ class FileViewModel() : ViewModel() {
     private var dirsFirst: Boolean = true
     private var showExtension: Boolean = true
 
-    private var sdcardRoot: String = Environment.getExternalStorageDirectory().getPath()
+    var sdcardRoot: String = Environment.getExternalStorageDirectory().getPath()
     private var homePath: String
 
     /**
@@ -703,6 +707,38 @@ class FileViewModel() : ViewModel() {
     }
 
     // ============================ search ==========================
+
+    fun getSuggestions(): List<SearchSuggestionGroup> = searchSuggestions
+
+    private val searchSuggestions = listOf(
+        SearchSuggestionGroup(
+            id = 0L,
+            name = "Recent searches",
+            suggestions = listOf(
+                "",
+            )
+        )
+    )
+
+    suspend fun search(query: String, searchType: Int): MutableList<FileBean> =
+        withContext(Dispatchers.Default) {
+            Logcat.d("search:$searchType,query:$query")
+            var fileList = ArrayList<FileBean>()
+            when (searchType) {
+                searchTypeFile -> {
+                    doSearchFile(fileList, query, File(homePath))
+                }
+
+                searchTypeHistory -> {
+                    fileList = doSearchHistory(query)
+                }
+
+                searchTypeFavorite -> {
+                    fileList = doSearchFavorite(query)
+                }
+            }
+            fileList
+        }
 
     private fun doSearchFile(fileList: ArrayList<FileBean>, keyword: String, dir: File) {
         if (dir.isDirectory) {

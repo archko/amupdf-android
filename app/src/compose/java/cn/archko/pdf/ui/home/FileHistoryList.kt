@@ -10,10 +10,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PDFViewerHelper
-import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.entity.State
+import cn.archko.pdf.components.FileBeanType
+import cn.archko.pdf.components.MenuItemType
+import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.entity.FileBean
+import cn.archko.pdf.core.entity.State
 import cn.archko.pdf.viewmodel.FileViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
@@ -38,7 +40,7 @@ fun FileHistoryList(
     }
     val onClick: (FileBean) -> Unit = { it ->
         it.file?.run {
-            PDFViewerHelper.openWithDefaultViewer(it.file!!, context)
+            PDFViewerHelper.openAMupdf(it.file!!, context)
         }
     }
     val refresh: () -> Unit = { ->
@@ -52,20 +54,12 @@ fun FileHistoryList(
         when (menuType) {
             MenuItemType.ViewBookWithAMupdf -> {
                 fb.file?.run {
-                    PDFViewerHelper.openOldMupdf(this, context)
+                    PDFViewerHelper.openAMupdfNoCrop(this, context)
                 }
             }
 
-            MenuItemType.ViewBookWithNewViewer -> {
-                PDFViewerHelper.openWithNewViewer(fb.file!!, context)
-            }
-
-            MenuItemType.ViewBookWithVudroid -> {
-                PDFViewerHelper.openVudroid(fb.file!!, context)
-            }
-
             MenuItemType.OpenWithOther -> {
-                PDFViewerHelper.openViewerOther(fb.file!!, context)
+                PDFViewerHelper.openWithOther(fb.file!!, context)
             }
 
             MenuItemType.ViewBookInfo -> {

@@ -1,21 +1,17 @@
 package cn.archko.pdf
 
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import cn.archko.pdf.ui.home.HomePager
-import com.google.accompanist.pager.ExperimentalPagerApi
 
 object Destination {
     const val HOME = "Home"
     const val GANKDETAIL = "GankDetail"
 }
 
-@ExperimentalPagerApi
-@ExperimentalMaterialApi
 @Composable
 fun NavGraph(
     changeTheme: (Boolean) -> Unit,

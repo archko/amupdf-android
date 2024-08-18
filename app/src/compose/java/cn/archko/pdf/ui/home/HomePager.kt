@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.height
@@ -14,9 +13,8 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ScrollableTabRow
-import androidx.compose.material.TabRowDefaults
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
@@ -25,6 +23,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -40,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -48,24 +47,21 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import cn.archko.mupdf.R
-import cn.archko.pdf.activities.AboutActivity
+import cn.archko.pdf.activities.ComposeAboutActivity
 import cn.archko.pdf.activities.SettingsActivity
-import cn.archko.pdf.common.Event
-import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.entity.State
+import cn.archko.pdf.components.LoadingDialog
+import cn.archko.pdf.components.PopupMenu
+import cn.archko.pdf.core.common.GlobalEvent
+import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.entity.FileBean
+import cn.archko.pdf.core.entity.State
 import cn.archko.pdf.viewmodel.FileViewModel
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.pagerTabIndicatorOffset
-import com.google.accompanist.pager.rememberPagerState
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaGradientBackground
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaTab
 import kotlinx.coroutines.launch
 import java.io.File
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
-@ExperimentalPagerApi
-@ExperimentalMaterialApi
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomePager(
     changeTheme: (Boolean) -> Unit,
@@ -96,10 +92,10 @@ fun HomePager(
         mutableStateOf(0)
     }
 
-    vn.chungha.flowbus.collectFlowBus<GlobalEvent>(isSticky = true) {
-        Logcat.d(TAG, "FAVORITED:${it.name}")
-        viewModel.onReadBook(t, currentSection)
-    }
+    //vn.chungha.flowbus.collectFlowBus<GlobalEvent>(isSticky = true) {
+    //    Logcat.d("FAVORITED:${it.name}")
+    //    viewModel.onReadBook(t, currentSection)
+    //}
 
     val onPalletChange: () -> Unit = { ->
         showMenu.value = false
@@ -116,43 +112,43 @@ fun HomePager(
         ) {
             when (currentSection) {
                 1 -> {
-                    MenuItem(stringResource(id = cn.archko.pdf.R.string.options)) {
+                    cn.archko.pdf.components.MenuItem(stringResource(id = cn.archko.pdf.R.string.options)) {
                         onPalletChange()
                         startSetting(context)
                     }
-                    MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_backup)) {
+                    cn.archko.pdf.components.MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_backup)) {
                         onPalletChange()
                         backup(showLoadingDialog, viewModel)
                     }
-                    MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_restore)) {
+                    cn.archko.pdf.components.MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_restore)) {
                         onPalletChange()
                         restore(showRestoreDialog)
                     }
                 }
 
                 2 -> {
-                    MenuItem(stringResource(id = cn.archko.pdf.R.string.options)) {
+                    cn.archko.pdf.components.MenuItem(stringResource(id = cn.archko.pdf.R.string.options)) {
                         onPalletChange()
                         startSetting(context)
                     }
-                    MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_set_as_home)) {
+                    cn.archko.pdf.components.MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_set_as_home)) {
                         onPalletChange()
                         viewModel.setAsHome(context)
                     }
                 }
 
                 0, 3 -> {
-                    MenuItem(stringResource(id = cn.archko.pdf.R.string.options)) {
+                    cn.archko.pdf.components.MenuItem(stringResource(id = cn.archko.pdf.R.string.options)) {
                         onPalletChange()
                         startSetting(context)
                     }
                 }
             }
-            MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_about)) {
+            cn.archko.pdf.components.MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_about)) {
                 onPalletChange()
-                AboutActivity.start(context)
+                ComposeAboutActivity.start(context)
             }
-            MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_tools)) {
+            cn.archko.pdf.components.MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_tools)) {
                 onPalletChange()
                 //PDFToolActivity.start(context)
             }
@@ -180,7 +176,7 @@ fun HomePager(
                             changeTheme(darkTheme)
                         }) {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_sleep),
+                                painter = painterResource(id = cn.archko.pdf.R.drawable.ic_sleep),
                                 contentDescription = null
                             )
                         }
@@ -235,8 +231,6 @@ private fun restore(showRestoreDialog: MutableState<Boolean>) {
     showRestoreDialog.value = true
 }
 
-@ExperimentalPagerApi
-@ExperimentalMaterialApi
 @Composable
 private fun TabContent(
     viewModel: FileViewModel,
@@ -247,7 +241,7 @@ private fun TabContent(
 ) {
     Logcat.d("$navController")
     val coroutineScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(initialPage = 1)
+    val pagerState = rememberPagerState(pageCount = { 4 })
     Column {
         ScrollableTabRow(
             selectedTabIndex = pagerState.currentPage,
@@ -256,12 +250,12 @@ private fun TabContent(
             indicator = { tabPositions ->
                 TabRowDefaults.Indicator(
                     Modifier
-                        .pagerTabIndicatorOffset(pagerState, tabPositions)
+                        //.pagerTabIndicatorOffset(pagerState, tabPositions)
                         .height(4.dp),
                     color = MaterialTheme.colorScheme.onSurface
                 )
             },
-            backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+            //backgroundColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onSurface,
         ) {
             navItems.forEachIndexed { index, title ->
@@ -279,11 +273,10 @@ private fun TabContent(
         }
 
         HorizontalPager(
-            count = 4,
             state = pagerState,
             modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.Top,
-            content = { page ->
+            pageContent = { page ->
                 setCurrentSection(pagerState.currentPage)
                 when (page) {
                     0 -> FileSearchList(

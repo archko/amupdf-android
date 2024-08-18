@@ -9,9 +9,9 @@ import android.util.Log
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.geometry.Offset
-import cn.archko.pdf.entity.APage
-import cn.archko.pdf.model.Hyperlink
-import cn.archko.pdf.mupdf.MupdfDocument
+import cn.archko.pdf.core.decode.MupdfDocument
+import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.link.Hyperlink
 import com.artifex.mupdf.fitz.Document
 import com.artifex.mupdf.fitz.Link
 import com.artifex.mupdf.fitz.Location
@@ -34,7 +34,7 @@ class LinkUtils {
                     val hyper = Hyperlink()
                     val loc: Location = doc.resolveLink(link)
                     val page: Int = doc.pageNumberFromLocation(loc)
-                    hyper.pageNum = page
+                    hyper.page = page
                     if (page >= 0) {
                         hyper.bbox = Rect(0, 0, 0, 0)
                         hyper.url = null
@@ -82,7 +82,7 @@ class LinkUtils {
                 val x = (offset.x - 0) / scale
                 val y = (offset.y - lazyListItemInfo.offset) / scale
                 val link: Hyperlink? =
-                    mapPointToPage(mupdfDocument.document, page, x, y)
+                    mapPointToPage(mupdfDocument.getDocument(), page, x, y)
                 if (link != null) {
                     Log.d(
                         "PDFSDK", "link:$link"
@@ -91,7 +91,7 @@ class LinkUtils {
                         openSystemBrowser(context, link.url)
                         true
                     } else {
-                        listState.scrollToItem(link.pageNum, 0)
+                        listState.scrollToItem(link.page, 0)
                         true
                     }
                 }
@@ -100,7 +100,7 @@ class LinkUtils {
         }
 
         private fun getFactor(page: Page, aPage: APage): Float {
-            return 1f * aPage.getTargetWidth() / (page.bounds.x1 - page.bounds.x0)
+            return 1f * aPage.getCropWidth() / (page.bounds.x1 - page.bounds.x0)
         }
     }
 }

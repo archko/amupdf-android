@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cn.archko.pdf.components.BookProgressBar
-import cn.archko.pdf.entity.FileBean
+import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.utils.getIcon
 import cn.archko.pdf.utils.getProgress
 import cn.archko.pdf.utils.getSize
@@ -52,7 +52,7 @@ fun FileItem(
                 painter = painterResource(id = fileBean.getIcon()),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(44.dp)
                     .align(Alignment.CenterVertically)
             )
             Box(
@@ -63,7 +63,7 @@ fun FileItem(
                         end = 72.dp,
                         bottom = 1.dp,
                     )
-                    .height(48.dp)
+                    .height(52.dp)
             ) {
                 val progress = fileBean.getProgress()
                 if (progress > 0) {

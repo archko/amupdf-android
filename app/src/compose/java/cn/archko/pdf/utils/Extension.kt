@@ -1,6 +1,6 @@
 package cn.archko.pdf.utils
 
-import cn.archko.mupdf.R
+import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.utils.Utils
 import java.util.Locale
@@ -9,45 +9,54 @@ import java.util.Locale
  * @author: archko 2021/4/14 :16:25
  */
 fun FileBean.getIcon(): Int {
-    var iconId = R.drawable.browser_icon_folder
+    var drawableId = cn.archko.pdf.R.drawable.ic_book_text
     if (type == FileBean.HOME || type == FileBean.CURRENT) {
+        drawableId = cn.archko.pdf.R.drawable.ic_book_dir_home
     } else if (type == FileBean.NORMAL && isDirectory && !isUpFolder) {
+        drawableId = cn.archko.pdf.R.drawable.ic_book_folder
     } else if (isUpFolder) {
+        drawableId = cn.archko.pdf.R.drawable.ic_book_folder
     } else {
         bookProgress?.let {
             if (null != bookProgress!!.ext) {
-                val ext: String = bookProgress!!.ext!!.lowercase(Locale.ROOT)
-                if ("pdf".equals(ext)) {
-                    iconId = R.drawable.browser_icon_pdf
-                } else if ("epub".equals(ext) || "mobi".equals(ext)) {
-                    iconId = R.drawable.browser_icon_epub
-                } else if (ext.contains("txt") || ext.contains("log")
-                    || ext.contains("js") || ext.contains("json")
-                    || ext.contains("html") || ext.contains("xhtml")
+                val ext: String = "." + bookProgress!!.ext!!.lowercase(Locale.ROOT)
+                if (".pdf".equals(ext)) {
+                    drawableId = cn.archko.pdf.R.drawable.ic_book_pdf
+                } else if (".djvu".equals(ext) || ".djv".equals(ext)) {
+                    drawableId = cn.archko.pdf.R.drawable.ic_book_djvu
+                } else if (".epub".equals(ext) || ".mobi".equals(ext)
                 ) {
-                    iconId = R.drawable.browser_icon_txt
-                } else if (ext.contains("png") || ext.contains("jpg") || ext.contains("jpeg")) {
-                    iconId = R.drawable.browser_icon_image
-                } else if ("ppt".equals(ext)) {
-                    iconId = R.drawable.browser_icon_ppt
-                } else if ("pptx".equals(ext)) {
-                    iconId = R.drawable.browser_icon_pptx
-                } else if ("doc".equals(ext)) {
-                    iconId = R.drawable.browser_icon_doc
-                } else if ("docx".equals(ext)) {
-                    iconId = R.drawable.browser_icon_docx
-                } else if ("xls".equals(ext)) {
-                    iconId = R.drawable.browser_icon_xls
-                } else if ("xlsx".equals(ext)) {
-                    iconId = R.drawable.browser_icon_xlsx
-                } else {
-                    iconId = R.drawable.browser_icon_any
+                    drawableId = cn.archko.pdf.R.drawable.ic_book_epub_zip
+                } else if (".png".equals(ext) || ".jpg".equals(ext) || ".jpeg".equals(ext)
+                    || ".bmp".equals(ext) || ".svg".equals(ext) || ".gif".equals(ext)
+                    || ".jfif".equals(ext) || ".jfif-tbnl".equals(ext)
+                    || ".tif".equals(ext) || ".tiff".equals(ext)
+                    || ".heic".equals(ext) || ".webp".equals(ext)
+                ) {
+                    drawableId = cn.archko.pdf.R.drawable.ic_book_image
+                } else if ("txt".equals(ext) || "log".equals(ext)
+                    || "js".equals(ext) || "json".equals(ext)
+                    || "html".equals(ext) || "xhtml".equals(ext)
+                ) {
+                    drawableId = cn.archko.pdf.R.drawable.ic_book_text
+                } else if (".ppt".equals(ext)) {
+                    drawableId = cn.archko.pdf.R.drawable.ic_book_ppt
+                } else if (".pptx".equals(ext)) {
+                    drawableId = cn.archko.pdf.R.drawable.ic_book_ppt
+                } else if (".doc".equals(ext)) {
+                    drawableId = cn.archko.pdf.R.drawable.ic_book_word
+                } else if (".docx".equals(ext)) {
+                    drawableId = cn.archko.pdf.R.drawable.ic_book_word
+                } else if (".xls".equals(ext)) {
+                    drawableId = cn.archko.pdf.R.drawable.ic_book_excel
+                } else if (".xlsx".equals(ext)) {
+                    drawableId = cn.archko.pdf.R.drawable.ic_book_excel
                 }
             }
         }
     }
 
-    return iconId
+    return drawableId
 }
 
 fun FileBean.getProgress(): Float {

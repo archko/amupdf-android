@@ -2,7 +2,7 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     kotlin("kapt")
-    //id("org.jetbrains.kotlin.plugin.compose")
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -68,14 +68,15 @@ android {
     sourceSets {
         named("main") {
             java.setSrcDirs(listOf("src/main/java", "src/common/java"))
+            java.srcDir("src/compose/java")
             res.srcDir("src/main/res")
-            //res.srcDir("src/compose/res")
+            res.srcDir("src/compose/res")
             res.srcDir("src/common/res")
         }
     }
 
     buildFeatures {
-        //compose = true
+        compose = true
         // Disable unused AGP features
         buildConfig = false
         aidl = false
@@ -86,7 +87,6 @@ android {
     }
 
     composeOptions {
-        //kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
     }
 
     packaging {
@@ -127,7 +127,7 @@ dependencies {
     }
     implementation Libs.Accompanist.swiperefresh*/
 
-    /*implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
     implementation(libs.androidx.navigation.compose)
 
@@ -145,7 +145,11 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.material3.android)
 
-    implementation(libs.flinger)*/
+    implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.accompanist.swiperefresh)
+    implementation(libs.coil.kt.compose)
+
+    implementation(libs.flinger)
 
     implementation(libs.androidx.activity)
     implementation(libs.androidx.fragment)
@@ -173,7 +177,7 @@ dependencies {
 
     implementation(project(":reader"))
     implementation(project(":paddle-ocr"))
-    //implementation(project(":core-ui"))
+    implementation(project(":core-ui"))
 
     // https://mvnrepository.com/artifact/com.github.axet/k2pdfopt
     implementation(libs.k2pdfopt)

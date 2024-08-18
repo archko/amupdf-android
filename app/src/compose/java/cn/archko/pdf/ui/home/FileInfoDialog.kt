@@ -9,11 +9,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -26,14 +26,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cn.archko.mupdf.R
-import cn.archko.pdf.App
-import cn.archko.pdf.common.AsyncPdfImagePainter
-import cn.archko.pdf.common.ImageWorker
-import cn.archko.pdf.components.Divider
-import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.utils.DateUtils
-import cn.archko.pdf.utils.FileUtils
-import cn.archko.pdf.utils.Utils
+import cn.archko.pdf.components.MenuItemType
+import cn.archko.pdf.core.entity.FileBean
+import cn.archko.pdf.core.utils.DateUtils
+import cn.archko.pdf.core.utils.FileUtils
+import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.decode.PdfFetcherData
+import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -43,7 +44,6 @@ fun FileInfoDialog(
     fileBean: FileBean?,
     menuOpt: (MenuItemType, FileBean) -> Unit,
 ) {
-    val context = LocalContext.current
     if (showInfoDialog.value && fileBean != null) {
         val file = fileBean.file
         Dialog(
@@ -70,7 +70,7 @@ fun FileInfoDialog(
                                 .align(Alignment.CenterVertically)
                         )
                     }
-                    Divider(thickness = 1.dp)
+                    HorizontalDivider(thickness = 1.dp)
                     Spacer(Modifier.height(4.dp))
                     Row(
                         Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
@@ -225,44 +225,23 @@ fun FileInfoDialog(
 
                     fileBean.file?.path?.let {
                         if (fileBean.file!!.exists()) {
-                            /*val androidImageView = remember {
-                                ImageView(context).apply {
-                                    ImageLoader.getInstance().loadImage(
-                                        fileBean.file?.path,
-                                        0,
-                                        1.0f,
-                                        App.instance!!.screenWidth,
-                                        this
-                                    )
-                                }
-                            }
-
-                            AndroidView(
-                                { androidImageView },
-                                modifier = Modifier
-                                    .padding(bottom = 8.dp)
-                                    .width(120.dp)
-                                    .height(160.dp)
-                                    .align(Alignment.CenterHorizontally)
-                            ) {
-                            }*/
-                            Image(
-                                painter = remember {
-                                    AsyncPdfImagePainter(
-                                        ImageWorker.DecodeParam(
-                                            fileBean.file!!.path,
-                                            0,
-                                            1.0f,
-                                            App.instance!!.screenWidth,
-                                            null
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(
+                                        PdfFetcherData(
+                                            path = fileBean.file!!.absolutePath,
+                                            width = Utils.dipToPixel(135f),
+                                            height = Utils.dipToPixel(180f),
                                         )
                                     )
-                                },
+                                    .memoryCacheKey("page_$fileBean.file!!.absolutePath")
+                                    .diskCachePolicy(CachePolicy.ENABLED)
+                                    .memoryCachePolicy(CachePolicy.ENABLED)
+                                    .build(),
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .padding(bottom = 8.dp)
-                                    .width(120.dp)
-                                    .height(160.dp)
+                                    .width(135.dp)
+                                    .height(180.dp)
                                     .align(Alignment.CenterHorizontally)
                             )
                         }

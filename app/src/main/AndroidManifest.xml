@@ -52,10 +52,29 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity
+        <!--<activity
             android:name="cn.archko.pdf.activities.HomeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:mimeType="image/*" />  &lt;!&ndash; djvu is image? &ndash;&gt;
+            </intent-filter>
+        </activity>-->
+        <activity
+            android:name="cn.archko.pdf.activities.ComposeHomeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="true"
+                android:theme="@style/Theme.Nia"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -222,6 +241,17 @@
                     android:scheme="file" />
             </intent-filter>
         </activity>
+
+        <activity android:name="cn.archko.pdf.activities.ComposeAboutActivity"
+                android:configChanges="orientation|keyboardHidden|screenSize"
+                android:label="@string/about_title"
+                android:theme="@style/Theme.Nia"
+                android:screenOrientation="portrait"/>
+
+        <activity android:name="cn.archko.pdf.activities.SettingsActivity"
+                android:theme="@style/Theme.Nia"
+                android:configChanges="orientation|keyboardHidden|screenSize"
+                android:screenOrientation="portrait"/>
 
     </application>
 </manifest>

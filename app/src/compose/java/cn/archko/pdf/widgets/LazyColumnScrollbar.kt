@@ -35,7 +35,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.floor
@@ -325,7 +324,7 @@ fun InternalLazyColumnScrollbar(
                 .fillMaxWidth()
         ) {
             val maxHeightFloat = constraints.maxHeight.toFloat()
-            ConstraintLayout(
+            /*ConstraintLayout(
                 modifier = Modifier
                     .align(if (rightSide) Alignment.TopEnd else Alignment.TopStart)
                     .graphicsLayer(
@@ -334,7 +333,7 @@ fun InternalLazyColumnScrollbar(
                     )
             ) {
                 val (box, content) = createRefs()
-                /*Box(
+                *//*Box(
                     modifier = Modifier
                         .padding(
                             start = if (rightSide) 0.dp else padding,
@@ -350,7 +349,7 @@ fun InternalLazyColumnScrollbar(
                             else start.linkTo(parent.start)
                         }
                         .testTag("TestTagsScrollbar.scrollbar")
-                )*/
+                )*//*
 
                 Box(
                     modifier = Modifier
@@ -417,7 +416,7 @@ fun InternalLazyColumnScrollbar(
                         isSelected
                     )
                 }
-            }
+            }*/
         }
     } else {
         return

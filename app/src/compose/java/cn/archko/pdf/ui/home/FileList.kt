@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -13,20 +14,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.components.Divider
+import cn.archko.pdf.components.EmptyView
+import cn.archko.pdf.components.FileBeanType
 import cn.archko.pdf.components.LoadingFooter
-import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.entity.LoadResult
-import cn.archko.pdf.entity.State
+import cn.archko.pdf.components.MenuItemType
+import cn.archko.pdf.components.UserOptDialog
+import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.entity.FileBean
+import cn.archko.pdf.core.entity.LoadResult
+import cn.archko.pdf.core.entity.State
 import cn.archko.pdf.paging.itemsIndexed
-import cn.archko.pdf.ui.home.EmptyView
-import cn.archko.pdf.ui.home.FileBeanType
 import cn.archko.pdf.ui.home.FileHeaderItem
 import cn.archko.pdf.ui.home.FileInfoDialog
 import cn.archko.pdf.ui.home.FileItem
-import cn.archko.pdf.ui.home.MenuItemType
-import cn.archko.pdf.ui.home.UserOptDialog
 import cn.archko.pdf.viewmodel.FileViewModel
 import kotlinx.coroutines.launch
 
@@ -110,7 +110,7 @@ private fun ItemList(
         val hasMore = result.nextKey != null
         itemsIndexed(list) { index, fileBean ->
             if (index > 0) {
-                Divider(thickness = 1.dp)
+                HorizontalDivider(thickness = 1.dp)
             }
             key(index, fileBean) {
                 fileBean?.let {

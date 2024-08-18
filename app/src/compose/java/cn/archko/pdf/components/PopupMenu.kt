@@ -1,4 +1,4 @@
-package cn.archko.pdf.ui.home
+package cn.archko.pdf.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable

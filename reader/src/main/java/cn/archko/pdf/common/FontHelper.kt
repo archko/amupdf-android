@@ -1,7 +1,7 @@
 package cn.archko.pdf.common
 
 import android.graphics.Typeface
-import androidx.fragment.app.FragmentActivity
+import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.core.utils.FileUtils
@@ -14,7 +14,7 @@ import java.io.File
  * @author: archko 2019-06-19 :12:27
  */
 class FontHelper(
-    private var context: FragmentActivity,
+    private var context: ComponentActivity,
 ) {
 
     init {

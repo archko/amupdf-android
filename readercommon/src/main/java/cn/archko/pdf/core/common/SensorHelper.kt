@@ -7,7 +7,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Build
-import androidx.fragment.app.FragmentActivity
+import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +17,7 @@ import kotlinx.coroutines.withContext
 /**
  * @author: archko 2018/7/22 :13:03
  */
-class SensorHelper(private val activity: FragmentActivity) {
+class SensorHelper(private val activity: ComponentActivity) {
 
     private val sensorEventListener: SensorEventListener = object : SensorEventListener {
         /**

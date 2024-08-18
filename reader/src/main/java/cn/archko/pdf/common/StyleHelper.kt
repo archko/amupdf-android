@@ -1,6 +1,6 @@
 package cn.archko.pdf.common
 
-import androidx.fragment.app.FragmentActivity
+import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.entity.StyleBean
 import kotlinx.coroutines.Dispatchers
@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
  * @author: archko 2019-06-19 :12:27
  */
 class StyleHelper(
-    private var context: FragmentActivity,
+    private var context: ComponentActivity,
 ) {
 
     var styleBean: StyleBean? = null

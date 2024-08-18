@@ -155,6 +155,69 @@ class PDFViewerHelper {
             activity.startActivity(intent)
         }
 
+        fun openAMupdfNoCrop(clickedFile: File, activity: Context) {
+            val fname = clickedFile.name.lowercase(Locale.ROOT)
+            if (IntentFile.isImage(fname)) {
+                openImage(clickedFile, activity)
+                return
+            }
+
+            val uri = Uri.fromFile(clickedFile)
+            val intent = Intent()
+            intent.action = Intent.ACTION_VIEW
+            intent.data = uri
+            intent.putExtra("forceCropParam", 0)
+
+            intent.setClass(activity, AMuPDFRecyclerViewActivity::class.java)
+            activity.startActivity(intent)
+        }
+
+        fun openWithOther(clickedFile: File, activity: Context) {
+            val fname = clickedFile.name.lowercase(Locale.ROOT)
+            if (IntentFile.isImage(fname)) {
+                openImage(clickedFile, activity)
+                return
+            }
+
+            val uri = Uri.fromFile(clickedFile)
+            val intent = Intent()
+            intent.action = Intent.ACTION_VIEW
+            intent.data = uri
+
+            var mimeType = "application/pdf"
+            val name = clickedFile.absolutePath;
+            if (name.endsWith("pdf", true)) {
+                mimeType = "application/pdf";
+            } else if (name.endsWith("epub", true)) {
+                mimeType = "application/epub+zip";
+            } else if (name.endsWith("mobi", true)) {
+                mimeType = "application/mobi+zip";
+            } else if (name.endsWith("cbz", true)) {
+                mimeType = "application/x-cbz";
+            } else if (name.endsWith("fb2", true)) {
+                mimeType = "application/fb2";
+            } else if (name.endsWith("txt", true)) {
+                mimeType = "text/plain";
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                //val mimeType = this@BrowserFragment.activity?.contentResolver?.getType(FileProvider.getUriForFile(getContext()!!, "cn.archko.mupdf.fileProvider", clickedFile))
+                intent.setDataAndType(
+                    FileProvider.getUriForFile(
+                        activity,
+                        FILE_PROVIDER,
+                        clickedFile
+                    ), mimeType
+                );
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                intent.addCategory(Intent.CATEGORY_DEFAULT);
+            } else {
+                intent.setDataAndType(uri, mimeType)
+            }
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            activity.startActivity(intent)
+        }
+
         fun openImage(path: String?, activity: Context) {
             val intent = Intent(Intent.ACTION_VIEW)
             intent.setClass(activity, ImageViewerActivity::class.java)

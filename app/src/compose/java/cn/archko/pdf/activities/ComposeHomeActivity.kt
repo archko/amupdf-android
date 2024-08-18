@@ -15,7 +15,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -24,8 +23,6 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.CompositionLocalProvider
@@ -38,24 +35,19 @@ import androidx.core.view.WindowCompat
 import cn.archko.mupdf.R
 import cn.archko.pdf.LocalBackPressedDispatcher
 import cn.archko.pdf.NavGraph
-import cn.archko.pdf.common.Logcat
 import cn.archko.pdf.common.PdfOptionRepository
-import com.google.accompanist.pager.ExperimentalPagerApi
+import cn.archko.pdf.core.common.Logcat
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaBackground
 import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
 
 /**
  * @author archko
  */
-open class ChooseFileFragmentActivity : AnalysticActivity(), OnPermissionGranted {
+open class ComposeHomeActivity : AnalysticActivity(), OnPermissionGranted {
 
     private val permissionCallbacks = arrayOfNulls<OnPermissionGranted>(PERMISSION_LENGTH)
     private var permissionDialog: Dialog? = null
 
-    @OptIn(
-        ExperimentalMaterialApi::class, ExperimentalPagerApi::class,
-        ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class
-    )
     override fun onCreate(savedInstanceState: Bundle?) {
         isLive = true
         super.onCreate(savedInstanceState)
@@ -66,7 +58,6 @@ open class ChooseFileFragmentActivity : AnalysticActivity(), OnPermissionGranted
             Logcat.d(TAG, "!isTaskRoot")
             return
         }
-        //val windowSizeClass = calculateWindowSizeClass(this)
         setContent {
             val sysDark = isSystemInDarkTheme()
             val darkTheme = remember {
@@ -240,13 +231,10 @@ open class ChooseFileFragmentActivity : AnalysticActivity(), OnPermissionGranted
 
     companion object {
 
-        /**
-         * Logging tag.
-         */
         private val TAG = "ChooseFile"
 
         @JvmField
-        val PREF_TAG = "ChooseFileActivity"
+        val PREF_TAG = "ComposeHomeActivity"
 
         @JvmField
         val PREF_HOME = "Home"

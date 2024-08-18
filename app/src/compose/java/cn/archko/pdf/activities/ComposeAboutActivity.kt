@@ -28,7 +28,7 @@ import com.google.samples.apps.nowinandroid.core.ui.theme.NiaTheme
 /**
  * @author: archko 2018/12/16 :9:43
  */
-class AboutActivity : ComponentActivity() {
+class ComposeAboutActivity : ComponentActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {

@@ -17,14 +17,15 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.RadioButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,8 +47,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cn.archko.mupdf.R
 import cn.archko.pdf.common.PDFViewerHelper
-import cn.archko.pdf.components.Divider
-import cn.archko.pdf.entity.FileBean
+import cn.archko.pdf.components.MenuItemType
+import cn.archko.pdf.components.UserOptDialog
+import cn.archko.pdf.components.searchTypeFavorite
+import cn.archko.pdf.components.searchTypeFile
+import cn.archko.pdf.components.searchTypeHistory
+import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.model.SearchSuggestionGroup
 import cn.archko.pdf.viewmodel.FileViewModel
 
@@ -61,7 +66,7 @@ fun FileSearchList(
     val onClick: (FileBean) -> Unit = { it ->
         it.file?.run {
             if (!it.isDirectory) {
-                PDFViewerHelper.openWithDefaultViewer(this, context)
+                PDFViewerHelper.openAMupdf(this, context)
             }
         }
     }
@@ -74,20 +79,12 @@ fun FileSearchList(
         when (menuType) {
             MenuItemType.ViewBookWithAMupdf -> {
                 fb.file?.run {
-                    PDFViewerHelper.openOldMupdf(this, context)
+                    PDFViewerHelper.openAMupdfNoCrop(this, context)
                 }
             }
 
-            MenuItemType.ViewBookWithNewViewer -> {
-                PDFViewerHelper.openWithNewViewer(fb.file!!, context)
-            }
-
-            MenuItemType.ViewBookWithVudroid -> {
-                PDFViewerHelper.openVudroid(fb.file!!, context)
-            }
-
             MenuItemType.OpenWithOther -> {
-                PDFViewerHelper.openViewerOther(fb.file!!, context)
+                PDFViewerHelper.openWithOther(fb.file!!, context)
             }
 
             MenuItemType.ViewBookInfo -> {
@@ -160,7 +157,7 @@ fun FileSearchList(
                     onClearQuery = { state.query = TextFieldValue("") },
                     searching = state.searching
                 )
-                Divider()
+                HorizontalDivider()
 
                 LaunchedEffect(state.query.text) {
                     state.searching = true
@@ -171,7 +168,7 @@ fun FileSearchList(
                     SearchDisplay.Categories -> {
                         Text(
                             text = "",
-                            style = androidx.compose.material.Typography().subtitle1,
+                            style = androidx.compose.material3.Typography().titleSmall,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -357,7 +354,7 @@ private fun ItemList(
     ) {
         itemsIndexed(list) { index, fileBean ->
             if (index > 0) {
-                Divider(thickness = 1.dp)
+                HorizontalDivider(thickness = 1.dp)
             }
             FileItem(
                 fileBean = fileBean,

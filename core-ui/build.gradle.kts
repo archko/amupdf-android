@@ -1,40 +1,44 @@
-apply plugin: "com.android.library"
-apply plugin: "org.jetbrains.kotlin.android"
-apply plugin: "kotlin-android"
-apply plugin: "kotlin-parcelize"
-apply plugin: "kotlin-kapt"
+plugins {
+    id("com.android.library")
+    id("kotlin-android")
+    alias(libs.plugins.compose.compiler)
+}
 
 android {
-    namespace 'com.google.samples.apps.nowinandroid.core.ui'
+    namespace = "com.google.samples.apps.nowinandroid.core.ui"
+
+    compileSdk = libs.versions.compileSdk.get().toInt()
+
+    defaultConfig {
+        minSdk = libs.versions.minSdk.get().toInt()
+    }
 
     compileOptions {
-        encoding "UTF-8"
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        encoding = "UTF-8"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
         jvmTarget = "17"
     }
 
-    lintOptions { abortOnError false }
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
 
     buildFeatures {
-        compose true
-        // Disable unused AGP features
-        buildConfig false
-        aidl false
-        renderScript false
-        resValues false
-        shaders false
+        compose = true
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
     }
 
-    packagingOptions {
+    packaging {
         exclude("META-INF/*.kotlin_module")
+        jniLibs.keepDebugSymbols += "*/armeabi-v7a/*.so"
+        jniLibs.keepDebugSymbols += "*/arm64-v8a/*.so"
     }
 }
 

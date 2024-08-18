@@ -1,4 +1,4 @@
-package cn.archko.pdf.ui.home
+package cn.archko.pdf.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -12,8 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,10 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cn.archko.mupdf.R
-import cn.archko.pdf.components.Divider
-import cn.archko.pdf.entity.BookProgress
-import cn.archko.pdf.entity.FileBean
-import cn.archko.pdf.utils.FileUtils
+import cn.archko.pdf.core.entity.BookProgress
+import cn.archko.pdf.core.entity.FileBean
+import cn.archko.pdf.core.utils.FileUtils
 
 @Composable
 fun EmptyView(modifier: Modifier) {
@@ -53,7 +53,7 @@ fun EmptyView(modifier: Modifier) {
             )
             Text(
                 text = stringResource(id = R.string.empty_title),
-                style = androidx.compose.material.Typography().h5,
+                style = androidx.compose.material3.Typography().headlineLarge,
                 modifier = Modifier
                     .padding(12.dp)
                     .fillMaxWidth(),
@@ -61,7 +61,7 @@ fun EmptyView(modifier: Modifier) {
             )
             Text(
                 text = stringResource(id = R.string.empty_subtitle),
-                style = androidx.compose.material.Typography().subtitle1,
+                style = androidx.compose.material3.Typography().titleSmall,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -71,18 +71,18 @@ fun EmptyView(modifier: Modifier) {
 
 sealed class MenuItemType {
     object ViewBookWithAMupdf : MenuItemType()
-    object ViewBookWithVudroid : MenuItemType()
-    object ViewBookWithNewViewer : MenuItemType()
+    //object ViewBookWithVudroid : MenuItemType()
+    //object ViewBookWithNewViewer : MenuItemType()
     object ViewBookInfo : MenuItemType()
     object DeleteHistory : MenuItemType()
     object DeleteFile : MenuItemType()
     object AddToFav : MenuItemType()
     object DeleteFav : MenuItemType()
     object OpenWithOther : MenuItemType()
-    object Compress : MenuItemType()
-    object EncryptPDF : MenuItemType()
-    object DecryptPDF : MenuItemType()
-    object ConvertToPDF : MenuItemType()
+    //object Compress : MenuItemType()
+    //object EncryptPDF : MenuItemType()
+    //object DecryptPDF : MenuItemType()
+    //object ConvertToPDF : MenuItemType()
 }
 
 sealed class FileBeanType {
@@ -127,17 +127,17 @@ fun UserOptDialog(
                                 .align(Alignment.CenterVertically)
                         )
                     }
-                    Divider(thickness = 1.dp)
+                    HorizontalDivider(thickness = 1.dp)
                     DialogItem(
                         txt = stringResource(id = R.string.menu_mupdf),
                         onClick = { menuOpt(MenuItemType.ViewBookWithAMupdf, fileBean) }
                     )
-                    Divider(thickness = 1.dp)
-                    DialogItem(
+                    HorizontalDivider(thickness = 1.dp)
+                    /*DialogItem(
                         txt = stringResource(id = R.string.menu_new_mupdf),
                         onClick = { menuOpt(MenuItemType.ViewBookWithNewViewer, fileBean) }
-                    )
-                    Divider(thickness = 0.5.dp)
+                    )*/
+                    HorizontalDivider(thickness = 0.5.dp)
                     DialogItem(
                         txt = stringResource(id = R.string.menu_other),
                         onClick = { menuOpt(MenuItemType.OpenWithOther, fileBean) }
@@ -166,7 +166,7 @@ fun UserOptDialog(
                             txt = stringResource(id = R.string.menu_remove_from_recent),
                             onClick = { menuOpt(MenuItemType.DeleteHistory, fileBean) }
                         )
-                        Divider(thickness = 0.5.dp)
+                        HorizontalDivider(thickness = 0.5.dp)
                     }
                     if (null != fileBean.file) {
                         var bookProgress = fileBean.bookProgress
@@ -179,13 +179,13 @@ fun UserOptDialog(
                                 txt = stringResource(id = R.string.menu_add_to_fav),
                                 onClick = { menuOpt(MenuItemType.AddToFav, fileBean) }
                             )
-                            Divider(thickness = 0.5.dp)
+                            HorizontalDivider(thickness = 0.5.dp)
                         } else {
                             DialogItem(
                                 txt = stringResource(id = R.string.menu_remove_from_fav),
                                 onClick = { menuOpt(MenuItemType.DeleteFav, fileBean) }
                             )
-                            Divider(thickness = 0.5.dp)
+                            HorizontalDivider(thickness = 0.5.dp)
                         }
                     }
                     DialogItem(

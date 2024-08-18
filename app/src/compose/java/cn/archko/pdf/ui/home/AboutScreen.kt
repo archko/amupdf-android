@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -43,9 +44,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import cn.archko.mupdf.R
 import cn.archko.pdf.bahaviours.CustomFlingBehaviours
-import cn.archko.pdf.components.Divider
-import cn.archko.pdf.utils.FileUtils
-import cn.archko.pdf.utils.LengthUtils
+import cn.archko.pdf.core.utils.FileUtils
+import cn.archko.pdf.core.utils.LengthUtils
 import com.google.samples.apps.nowinandroid.core.ui.component.NiaGradientBackground
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -60,7 +60,7 @@ fun AboutScreen(
     val context = LocalContext.current
     val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
     val version = packageInfo.versionName
-    val name = stringResource(packageInfo.applicationInfo.labelRes)
+    val name = packageInfo.applicationInfo?.let { stringResource(it.labelRes) }
     val text = name + if (LengthUtils.isNotEmpty(version)) " v$version" else ""
 
     NiaGradientBackground {
@@ -109,9 +109,9 @@ fun AboutScreen(
                         modifier = modifier
                     ) {
                         itemsIndexed(PARTS) { index, part ->
-                            Divider(thickness = 1.dp)
+                            HorizontalDivider(thickness = 1.dp)
                             PartItem(context, part, modifier)
-                            Divider(thickness = 1.dp)
+                            HorizontalDivider(thickness = 1.dp)
                         }
                     }
                 }
@@ -149,7 +149,7 @@ fun PartItem(
             )
         }
         if (expanded.value) {
-            Divider(thickness = 1.dp)
+            HorizontalDivider(thickness = 1.dp)
             val androidImageView = remember {
                 WebView(context).apply {
                     coroutineScope.launch(Dispatchers.IO) {

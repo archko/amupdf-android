@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,8 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cn.archko.mupdf.R
-import cn.archko.pdf.common.Logcat
-import cn.archko.pdf.components.Divider
+import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.viewmodel.FileViewModel
 import java.io.File
 
@@ -73,11 +73,11 @@ fun RestoreDialog(
                                 .align(Alignment.CenterVertically)
                         )
                     }
-                    Divider(thickness = 1.dp)
+                    HorizontalDivider(thickness = 1.dp)
                     LazyColumn {
                         itemsIndexed(uiBackupFiles.list!!) { index, file ->
                             if (index > 0) {
-                                Divider(thickness = 0.5.dp)
+                                HorizontalDivider(thickness = 0.5.dp)
                             }
                             DialogItem(
                                 file = file,
