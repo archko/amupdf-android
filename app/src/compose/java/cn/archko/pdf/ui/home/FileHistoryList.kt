@@ -75,6 +75,11 @@ fun FileHistoryList(
                 viewModel.deleteHistory(fb.file!!)
             }
 
+            MenuItemType.DeleteHistoryAndClear -> {
+                //MobclickAgent.onEvent(context, AnalysticsHelper.A_MENU, "removeRecentAndClearCache")
+                viewModel.removeRecentAndClearCache(fb.file!!)
+            }
+
             MenuItemType.AddToFav -> {
                 viewModel.favorite(context, fb, 1)
             }

@@ -61,14 +61,14 @@ open class WebdavFragment : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(cn.archko.pdf.R.layout.item_font, container, false)
-        view.findViewById<View>(R.id.layout_search).visibility = View.GONE
+        view.findViewById<View>(cn.archko.pdf.R.id.layout_search).visibility = View.GONE
         val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
         toolbar.setNavigationOnClickListener { dismiss() }
 
         toolbar?.setTitle(R.string.dialog_title_backup)
         toolbar?.setSubtitle(R.string.dialog_sub_title_backup)
 
-        recyclerView = view.findViewById(R.id.files)
+        recyclerView = view.findViewById(cn.archko.pdf.R.id.files)
         recyclerView.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
 
@@ -93,7 +93,7 @@ open class WebdavFragment : DialogFragment() {
                 parent: ViewGroup,
                 viewType: Int
             ): BaseViewHolder<DavResource> {
-                val view = mInflater.inflate(R.layout.item_book_normal, parent, false)
+                val view = mInflater.inflate(R.layout.item_webdav, parent, false)
                 return ItemHolder(view)
             }
         }
@@ -118,11 +118,6 @@ open class WebdavFragment : DialogFragment() {
 
         private var title: TextView = itemView!!.findViewById(R.id.name)
         private var mIcon: ImageView? = itemView!!.findViewById(R.id.icon)
-
-        init {
-            val view: View = itemView!!.findViewById(R.id.progressbar)
-            view.visibility = View.GONE
-        }
 
         override fun onBind(data: DavResource, position: Int) {
             title.text = data.displayName

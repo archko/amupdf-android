@@ -2,6 +2,7 @@ package cn.archko.pdf.viewmodel
 
 import android.content.Context
 import android.os.Environment
+import android.text.TextUtils
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +12,7 @@ import cn.archko.pdf.components.searchTypeFavorite
 import cn.archko.pdf.components.searchTypeFile
 import cn.archko.pdf.components.searchTypeHistory
 import cn.archko.pdf.core.App
+import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.BookProgressParser
 import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.GlobalEvent
@@ -400,6 +402,34 @@ class FileViewModel() : ViewModel() {
                 }
             }
             loadHistories(true)
+        }
+    }
+
+    fun removeRecentAndClearCache(file: File) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val bookProgress = progressDao.getProgress(file.name)
+                Logcat.d("old:$bookProgress")
+
+                bookProgress?.run {
+                    firstTimestampe = 0
+                    page = 0
+                    progress = 0
+                    inRecent = -1
+                }
+                if (bookProgress != null) {
+                    progressDao.updateProgress(bookProgress)
+                    Logcat.d("new:$bookProgress")
+                }
+                deleteCachePage(file.absolutePath)
+            }
+            loadHistories(true)
+        }
+    }
+
+    private fun deleteCachePage(path: String?) {
+        if (path != null) {
+            APageSizeLoader.deletePageSizeFromFile(path)
         }
     }
 

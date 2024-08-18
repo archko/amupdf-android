@@ -75,6 +75,7 @@ sealed class MenuItemType {
     //object ViewBookWithNewViewer : MenuItemType()
     object ViewBookInfo : MenuItemType()
     object DeleteHistory : MenuItemType()
+    object DeleteHistoryAndClear : MenuItemType()
     object DeleteFile : MenuItemType()
     object AddToFav : MenuItemType()
     object DeleteFav : MenuItemType()
@@ -132,41 +133,29 @@ fun UserOptDialog(
                         txt = stringResource(id = R.string.menu_mupdf),
                         onClick = { menuOpt(MenuItemType.ViewBookWithAMupdf, fileBean) }
                     )
-                    HorizontalDivider(thickness = 1.dp)
-                    /*DialogItem(
-                        txt = stringResource(id = R.string.menu_new_mupdf),
-                        onClick = { menuOpt(MenuItemType.ViewBookWithNewViewer, fileBean) }
-                    )*/
                     HorizontalDivider(thickness = 0.5.dp)
                     DialogItem(
                         txt = stringResource(id = R.string.menu_other),
                         onClick = { menuOpt(MenuItemType.OpenWithOther, fileBean) }
                     )
                     if (fileBeanType == FileBeanType.SysFile) {
+                        HorizontalDivider(thickness = 0.5.dp)
                         DialogItem(
                             txt = stringResource(id = R.string.menu_delete),
                             onClick = { menuOpt(MenuItemType.DeleteFile, fileBean) }
                         )
-                        /*Divider(thickness = 0.5.dp)
-                        DialogItem(
-                            txt = stringResource(id = com.radaee.viewlib.R.string.compress_pdf_label),
-                            onClick = { menuOpt(MenuItemType.Compress, fileBean) }
-                        )
-                        Divider(thickness = 0.5.dp)
-                        if (fileBean.isImage()) {
-                            DialogItem(
-                                txt = stringResource(id = com.radaee.viewlib.R.string.convert_pdf_label),
-                                onClick = { menuOpt(MenuItemType.ConvertToPDF, fileBean) }
-                            )
-                            Divider(thickness = 0.5.dp)
-                        }*/
                     }
                     if (fileBeanType == FileBeanType.History) {
+                        HorizontalDivider(thickness = 0.5.dp)
                         DialogItem(
                             txt = stringResource(id = R.string.menu_remove_from_recent),
                             onClick = { menuOpt(MenuItemType.DeleteHistory, fileBean) }
                         )
                         HorizontalDivider(thickness = 0.5.dp)
+                        DialogItem(
+                            txt = stringResource(id = R.string.menu_remove_and_clear),
+                            onClick = { menuOpt(MenuItemType.DeleteHistoryAndClear, fileBean) }
+                        )
                     }
                     if (null != fileBean.file) {
                         var bookProgress = fileBean.bookProgress
@@ -175,19 +164,20 @@ fun UserOptDialog(
                                 BookProgress(FileUtils.getRealPath(fileBean.file!!.absolutePath))
                         }
                         if (bookProgress.isFavorited == 0) {
+                            HorizontalDivider(thickness = 0.5.dp)
                             DialogItem(
                                 txt = stringResource(id = R.string.menu_add_to_fav),
                                 onClick = { menuOpt(MenuItemType.AddToFav, fileBean) }
                             )
-                            HorizontalDivider(thickness = 0.5.dp)
                         } else {
+                            HorizontalDivider(thickness = 0.5.dp)
                             DialogItem(
                                 txt = stringResource(id = R.string.menu_remove_from_fav),
                                 onClick = { menuOpt(MenuItemType.DeleteFav, fileBean) }
                             )
-                            HorizontalDivider(thickness = 0.5.dp)
                         }
                     }
+                    HorizontalDivider(thickness = 0.5.dp)
                     DialogItem(
                         txt = stringResource(id = R.string.menu_info),
                         onClick = { menuOpt(MenuItemType.ViewBookInfo, fileBean) }

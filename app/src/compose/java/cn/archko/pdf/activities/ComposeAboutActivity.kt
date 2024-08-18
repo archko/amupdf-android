@@ -38,7 +38,6 @@ class ComposeAboutActivity : ComponentActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, true)
@@ -84,8 +83,8 @@ class ComposeAboutActivity : ComponentActivity() {
 
     companion object {
 
-        fun start(context: Context) {
+        /*fun start(context: Context) {
             context.startActivity(Intent(context, AboutActivity::class.java))
-        }
+        }*/
     }
 }

@@ -85,13 +85,9 @@ fun SettingsScreen() {
         key = "showExtension",
         defaultValue = PdfOptionRepository.getShowExtension()
     )
-    val newViewerState = rememberPreferenceState(
-        key = "newViewer",
-        defaultValue = PdfOptionRepository.getNewViewer()
-    )
-    val cropperState = rememberPreferenceState(
-        key = "cropper",
-        defaultValue = PdfOptionRepository.getCropper()
+    val colorModeState = rememberPreferenceState(
+        key = "colorMode",
+        defaultValue = PdfOptionRepository.getColorMode().toString()
     )
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 
@@ -128,8 +124,7 @@ fun SettingsScreen() {
                     PdfOptionRepository.setKeepOn(keepOnState.value)
                     PdfOptionRepository.setDirsFirst(dirsFirstState.value)
                     PdfOptionRepository.setShowExtension(showExtensionState.value)
-                    PdfOptionRepository.setNewViewer(newViewerState.value)
-                    PdfOptionRepository.setCropper(cropperState.value)
+                    PdfOptionRepository.setColorMode(colorModeState.value.toInt())
                 }
             }
 
@@ -243,35 +238,14 @@ fun SettingsScreen() {
                 },
                 rememberState = { showExtensionState }
             )
-            checkboxPreference(
-                key = "newViewer",
-                defaultValue = false,
-                title = { Text(text = stringResource(id = R.string.opts_new_viewer)) },
-                summary = {
-                    Text(
-                        text = if (it) {
-                            context.resources.getString(R.string.opts_on)
-                        } else {
-                            context.resources.getString(R.string.opts_off)
-                        }
-                    )
-                },
-                rememberState = { newViewerState }
-            )
-            checkboxPreference(
-                key = "cropper",
-                defaultValue = false,
-                title = { Text(text = stringResource(id = R.string.opts_cropper)) },
-                summary = {
-                    Text(
-                        text = if (it) {
-                            context.resources.getString(R.string.opts_on)
-                        } else {
-                            context.resources.getString(R.string.opts_off)
-                        }
-                    )
-                },
-                rememberState = { cropperState }
+            listPreference(
+                key = "colorMode",
+                defaultValue = context.resources.getStringArray(R.array.opts_color_modes)[0],
+                values = context.resources.getStringArray(R.array.opts_color_modes)
+                    .asList(),
+                title = { Text(text = stringResource(id = R.string.opts_color_mode)) },
+                summary = { Text(text = context.resources.getStringArray(R.array.opts_color_mode_labels)[it.toInt()]) },
+                rememberState = { colorModeState }
             )
 
             //footerPreference(

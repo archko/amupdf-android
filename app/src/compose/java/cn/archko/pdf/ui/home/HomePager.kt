@@ -146,7 +146,7 @@ fun HomePager(
             }
             cn.archko.pdf.components.MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_about)) {
                 onPalletChange()
-                ComposeAboutActivity.start(context)
+                //ComposeAboutActivity.start(context)
             }
             cn.archko.pdf.components.MenuItem(stringResource(id = cn.archko.pdf.R.string.menu_tools)) {
                 onPalletChange()
