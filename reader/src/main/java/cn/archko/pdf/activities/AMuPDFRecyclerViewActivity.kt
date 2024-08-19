@@ -215,7 +215,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                         showFlag = true
                     }
                     if (!showFlag) {
-                        pageControls?.show()
+                        pageControls?.apply {
+                            updateControls()
+                            show()
+                        }
                         viewController?.getCurrentPos()
                             ?.let { pageControls?.updatePageProgress(it) }
                         mReflowLayout.visibility = View.VISIBLE
@@ -231,7 +234,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                         return
                     } else {
                         if (viewController?.onSingleTap(ev, margin) != true) {
-                            pageControls?.show()
+                            pageControls?.apply {
+                                updateControls()
+                                show()
+                            }
                         }
                     }
                 }
