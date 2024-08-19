@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.mupdf.R
 import cn.archko.pdf.adapters.BookAdapter
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.App
 import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.Event.Companion.ACTION_FAVORITED
@@ -48,6 +49,7 @@ class HistoryFragment : BrowserFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mStyle = PdfOptionRepository.getStyle()
 
         vn.chungha.flowbus.collectFlowBus<GlobalEvent>(scope = this, isSticky = true) {
             Logcat.d(TAG, "ACTION_STOPPED:${it.obj}")
@@ -138,10 +140,7 @@ class HistoryFragment : BrowserFragment() {
                 } else {
                     mStyle = STYLE_LIST
                 }
-                PreferenceManager.getDefaultSharedPreferences(activity)
-                    .edit()
-                    .putString(PdfOptionsActivity.PREF_LIST_STYLE, mStyle.toString())
-                    .apply()
+                PdfOptionRepository.setStyle(mStyle)
                 applyStyle()
             }*/
         }
@@ -222,7 +221,7 @@ class HistoryFragment : BrowserFragment() {
         mListMoreView = ListMoreView(filesListView)
         //fileListAdapter.addFootView(mListMoreView.getLoadMoreView())
 
-        //applyStyle()
+        applyStyle()
         addObserver()
         return view
     }
@@ -232,13 +231,11 @@ class HistoryFragment : BrowserFragment() {
             fileListAdapter.setMode(BookAdapter.TYPE_RENCENT)
             filesListView.layoutManager =
                 LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-            fileListAdapter.notifyDataSetChanged()
         } else {
             fileListAdapter.setMode(BookAdapter.TYPE_GRID)
-
             filesListView.layoutManager = GridLayoutManager(activity, 3)
-            fileListAdapter.notifyDataSetChanged()
         }
+        fileListAdapter.notifyDataSetChanged()
     }
 
     private fun reset() {
