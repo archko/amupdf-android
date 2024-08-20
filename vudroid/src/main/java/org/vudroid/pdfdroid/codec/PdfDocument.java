@@ -40,6 +40,9 @@ public class PdfDocument implements CodecDocument {
         System.out.println("Trying to open " + fname);
         try {
             core = Document.openDocument(fname);
+            if (fname.endsWith("epub") || fname.endsWith("mobi")) {
+                core.layout(MupdfDocument.LAYOUTW, MupdfDocument.LAYOUTH, MupdfDocument.LAYOUTEM);
+            }
             document.setCore(core);
         } catch (Exception e) {
             e.printStackTrace();

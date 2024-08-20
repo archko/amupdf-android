@@ -47,9 +47,9 @@ class MupdfDocument(private val context: Context) {
     private var isDestroy = false
 
     /* Default to "A Format" pocket book size. */
-    private var layoutW = 720
-    private var layoutH = 1080
-    private var layoutEM = 16
+    private var layoutW = LAYOUTW
+    private var layoutH = LAYOUTH
+    private var layoutEM = LAYOUTEM
     fun getDocument(): Document? {
         return document
     }
@@ -296,6 +296,10 @@ class MupdfDocument(private val context: Context) {
     companion object {
         private const val TAG = "Mupdf"
         public var ZOOM = 160f / 72
+
+        const val LAYOUTW = 1080
+        const val LAYOUTH = 1600
+        const val LAYOUTEM = 44
 
         //File selectedFile = new File(filename);
         //String documentPath = selectedFile.getAbsolutePath();
