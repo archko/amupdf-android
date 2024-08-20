@@ -19,7 +19,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.mupdf.R
 import cn.archko.pdf.activities.HomeActivity
+import cn.archko.pdf.adapters.BaseBookAdapter
 import cn.archko.pdf.adapters.BookAdapter
+import cn.archko.pdf.adapters.SearchBookAdapter
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.listeners.DataListener
@@ -35,10 +37,10 @@ import java.io.FileFilter
 open class SearchFragment : DialogFragment() {
 
     private lateinit var editView: EditText
-    private lateinit var filesListView: RecyclerView
+    private lateinit var recyclerView: RecyclerView
     private lateinit var imgClose: ImageView
     private val fileFilter: FileFilter? = null
-    protected var fileListAdapter: BookAdapter? = null
+    protected var bookAdapter: BaseBookAdapter? = null
 
     override fun setArguments(args: Bundle?) {
         super.setArguments(args)
@@ -72,10 +74,10 @@ open class SearchFragment : DialogFragment() {
         dialog?.setTitle(cn.archko.pdf.R.string.menu_search)
         editView = view.findViewById(R.id.searchEdit)
         imgClose = view.findViewById(R.id.img_close)
-        filesListView = view.findViewById(R.id.files)
-        filesListView.layoutManager =
+        recyclerView = view.findViewById(R.id.files)
+        recyclerView.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-        filesListView.addItemDecoration(ColorItemDecoration(requireContext()))
+        recyclerView.addItemDecoration(ColorItemDecoration(requireContext()))
 
         imgClose.setOnClickListener { clear() }
 
@@ -109,8 +111,8 @@ open class SearchFragment : DialogFragment() {
     }
 
     private fun clearList() {
-        fileListAdapter?.submitList(listOf())
-        fileListAdapter?.notifyDataSetChanged()
+        bookAdapter?.submitList(listOf())
+        bookAdapter?.notifyDataSetChanged()
     }
 
     private fun clear() {
@@ -136,16 +138,14 @@ open class SearchFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (null == fileListAdapter) {
-            fileListAdapter = BookAdapter(
+        if (null == bookAdapter) {
+            bookAdapter = SearchBookAdapter(
                 activity as Context,
                 beanItemCallback,
-                BookAdapter.TYPE_SEARCH,
                 itemClickListener
             )
-            this.fileListAdapter!!.setMode(BookAdapter.TYPE_SEARCH)
         }
-        filesListView.adapter = this.fileListAdapter
+        recyclerView.adapter = this.bookAdapter
     }
 
     private fun search(keyword: String) {
@@ -157,8 +157,8 @@ open class SearchFragment : DialogFragment() {
         val home = getHome()
         doSearch(fileList, keyword, File(home))
 
-        fileListAdapter?.submitList(fileList)
-        fileListAdapter?.notifyDataSetChanged()
+        bookAdapter?.submitList(fileList)
+        bookAdapter?.notifyDataSetChanged()
     }
 
     private fun doSearch(fileList: ArrayList<FileBean>, keyword: String, dir: File) {
@@ -204,7 +204,7 @@ open class SearchFragment : DialogFragment() {
         object : OnItemClickListener<FileBean> {
             override fun onItemClick(view: View?, data: FileBean?, position: Int) {
                 val clickedEntry =
-                    this@SearchFragment.fileListAdapter!!.currentList[position] as FileBean
+                    this@SearchFragment.bookAdapter!!.currentList[position] as FileBean
                 val clickedFile = clickedEntry.file
 
                 if (null == clickedFile || !clickedFile.exists()) {
@@ -215,7 +215,7 @@ open class SearchFragment : DialogFragment() {
             }
 
             override fun onItemClick2(view: View?, data: FileBean?, position: Int) {
-                val entry = this@SearchFragment.fileListAdapter!!.currentList[position] as FileBean
+                val entry = this@SearchFragment.bookAdapter!!.currentList[position] as FileBean
                 showFileInfoDialog(entry)
             }
         }

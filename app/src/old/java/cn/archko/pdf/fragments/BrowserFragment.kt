@@ -17,14 +17,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cn.archko.mupdf.R
+import cn.archko.pdf.adapters.BaseBookAdapter
 import cn.archko.pdf.adapters.BookAdapter
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.common.PdfOptionRepository
-import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.FileBean
@@ -47,8 +46,8 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
 
     protected lateinit var mSwipeRefreshWidget: SwipeRefreshLayout
     protected lateinit var pathTextView: TextView
-    protected lateinit var filesListView: RecyclerView
-    protected lateinit var fileListAdapter: BookAdapter
+    protected lateinit var recyclerView: RecyclerView
+    protected var bookAdapter: BaseBookAdapter? = null
 
     private val dirsFirst = true
     protected var showExtension: Boolean = true
@@ -85,15 +84,14 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         super.onCreate(savedInstanceState)
 
         mCurrentPath = getHome()
-        fileListAdapter = initAdapter()
+        bookAdapter = initAdapter()
         bookViewModel = BookViewModel()
     }
 
-    open fun initAdapter(): BookAdapter {
+    open fun initAdapter(): BaseBookAdapter {
         return BookAdapter(
             activity as Context,
             beanItemCallback,
-            BookAdapter.TYPE_FILE,
             itemClickListener
         )
     }
@@ -178,19 +176,13 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         val view = inflater.inflate(R.layout.list_book_choose, container, false)
 
         this.pathTextView = view.findViewById(R.id.path)
-        this.filesListView = view.findViewById(R.id.files)
-        filesListView.layoutManager =
+        this.recyclerView = view.findViewById(R.id.files)
+        recyclerView.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-        filesListView.addItemDecoration(ColorItemDecoration(requireContext()))
+        recyclerView.addItemDecoration(ColorItemDecoration(requireContext()))
 
         mSwipeRefreshWidget = view.findViewById(R.id.swipe_refresh_widget)!!
         mSwipeRefreshWidget.apply {
-            setColorSchemeResources(
-                cn.archko.pdf.R.color.text_border_pressed,
-                cn.archko.pdf.R.color.text_border_pressed,
-                cn.archko.pdf.R.color.text_border_pressed,
-                cn.archko.pdf.R.color.text_border_pressed
-            )
             setOnRefreshListener(this@BrowserFragment)
         }
 
@@ -205,7 +197,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        this.filesListView.adapter = this.fileListAdapter
+        this.recyclerView.adapter = this.bookAdapter
         mHandler.postDelayed({ onRefresh() }, 80L)
     }
 
@@ -213,7 +205,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         bookViewModel.uiFileModel.observe(viewLifecycleOwner) { fileList -> emitFileBeans(fileList) }
 
         bookViewModel.uiItemModel.observe(viewLifecycleOwner) {
-            fileListAdapter.notifyDataSetChanged()
+            bookAdapter?.notifyDataSetChanged()
             currentBean = null
         }
 
@@ -234,7 +226,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         val file = currentBean!!.file
 
         file?.let {
-            bookViewModel.updateItem(it, fileListAdapter.currentList)
+            bookAdapter?.currentList?.let { it1 -> bookViewModel.updateItem(it, it1) }
         }
     }
 
@@ -248,17 +240,17 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     }
 
     open fun emitFileBeans(fileList: List<FileBean>) {
-        fileListAdapter.submitList(fileList)
+        bookAdapter?.submitList(fileList)
         if (null != mPathMap[mCurrentPath]) {
             val pos = mPathMap[mCurrentPath]
             if (pos!! < fileList.size) {
-                (filesListView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
+                (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
                     pos,
                     0
                 )
             }
         } else {
-            (filesListView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(0, 0)
+            (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(0, 0)
         }
         mSwipeRefreshWidget.isRefreshing = false
 
@@ -269,7 +261,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     private fun emitScannerBean(args: Array<Any?>) {
         val path = args[0] as String
         if (TextUtils.equals(mCurrentPath, path)) {
-            fileListAdapter.submitList(args[1] as ArrayList<FileBean>)
+            bookAdapter?.submitList(args[1] as ArrayList<FileBean>)
         }
     }
 
@@ -323,7 +315,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
 
         if (clickedFile.isDirectory) {
             var pos: Int =
-                (filesListView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
             if (pos < 0) {
                 pos = 0
             }
@@ -494,9 +486,9 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
                 entry.file?.delete()
                 //update()
                 val list: ArrayList<FileBean> = arrayListOf()
-                list.addAll(fileListAdapter.currentList)
+                bookAdapter?.currentList?.let { list.addAll(it) }
                 list.remove(entry)
-                fileListAdapter.submitList(list)
+                bookAdapter?.submitList(list)
             }
             return true
         } else if (item.itemId == PDFViewerHelper.removeContextMenuItem) {
@@ -557,7 +549,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             DataListener {
             override fun onSuccess(vararg args: Any?) {
                 val fileEntry = args[0] as FileBean
-                filesListView.let { prepareMenu(it, fileEntry) }
+                recyclerView.let { prepareMenu(it, fileEntry) }
             }
 
             override fun onFailed(vararg args: Any?) {

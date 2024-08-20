@@ -54,8 +54,8 @@ class FavoriteFragment : BrowserFragment() {
         val view = super.onCreateView(inflater, container, savedInstanceState)
 
         this.pathTextView.visibility = View.GONE
-        filesListView.addOnScrollListener(onScrollListener)
-        mListMoreView = ListMoreView(filesListView)
+        recyclerView.addOnScrollListener(onScrollListener)
+        mListMoreView = ListMoreView(recyclerView)
         //fileListAdapter.addFootView(mListMoreView.getLoadMoreView())
 
         addObserver()
@@ -87,8 +87,8 @@ class FavoriteFragment : BrowserFragment() {
         val totalCount = args[0] as Int
         val entryList = args[1] as ArrayList<FileBean>
         mSwipeRefreshWidget.isRefreshing = false
-        fileListAdapter.submitList(entryList)
-        fileListAdapter.notifyDataSetChanged()
+        bookAdapter?.submitList(entryList)
+        bookAdapter?.notifyDataSetChanged()
         updateLoadingStatus(totalCount)
     }
 
@@ -97,11 +97,11 @@ class FavoriteFragment : BrowserFragment() {
             String.format(
                 "$this, total count:%s, adapter count:%s",
                 totalCount,
-                fileListAdapter.currentList.size
+                bookAdapter?.currentList?.size
             )
         )
-        if (fileListAdapter.currentList.size > 0) {
-            if (fileListAdapter.currentList.size < totalCount) {
+        if (null != bookAdapter && bookAdapter!!.currentList.size > 0) {
+            if (bookAdapter!!.currentList.size < totalCount) {
                 mListMoreView.onLoadingStateChanged(IMoreView.STATE_NORMAL)
             } else {
                 Logcat.d("fileListAdapter!!.normalCount < totalCount")
@@ -130,19 +130,23 @@ class FavoriteFragment : BrowserFragment() {
                         || mListMoreView.state == IMoreView.STATE_LOAD_FAIL
                     ) {
                         var isReachBottom = false
+                        if (null == bookAdapter) {
+                            return
+                        }
                         if (mStyle == HistoryFragment.STYLE_GRID) {
-                            val gridLayoutManager = filesListView.layoutManager as GridLayoutManager
+                            val gridLayoutManager =
+                                this@FavoriteFragment.recyclerView.layoutManager as GridLayoutManager
                             val rowCount =
-                                fileListAdapter.getItemCount() / gridLayoutManager.spanCount
+                                bookAdapter!!.itemCount / gridLayoutManager.spanCount
                             val lastVisibleRowPosition =
                                 gridLayoutManager.findLastVisibleItemPosition() / gridLayoutManager.spanCount
                             isReachBottom = lastVisibleRowPosition >= rowCount - 1
                         } else if (mStyle == HistoryFragment.STYLE_LIST) {
                             val layoutManager: LinearLayoutManager =
-                                filesListView.layoutManager as LinearLayoutManager
+                                this@FavoriteFragment.recyclerView.layoutManager as LinearLayoutManager
                             val lastVisibleItemPosition =
                                 layoutManager.findLastVisibleItemPosition()
-                            val rowCount = fileListAdapter.getItemCount()
+                            val rowCount = bookAdapter!!.itemCount
                             isReachBottom =
                                 lastVisibleItemPosition >= rowCount - 1 //- fileListAdapter.headersCount - fileListAdapter.footersCount
                         }

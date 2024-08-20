@@ -13,7 +13,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.mupdf.R
+import cn.archko.pdf.adapters.BaseBookAdapter
 import cn.archko.pdf.adapters.BookAdapter
+import cn.archko.pdf.adapters.GridBookAdapter
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.App
 import cn.archko.pdf.core.common.Event
@@ -69,13 +71,20 @@ class HistoryFragment : BrowserFragment() {
         progressDialog.setMessage("Waiting...")
     }
 
-    override fun initAdapter(): BookAdapter {
-        return BookAdapter(
-            activity as Context,
-            beanItemCallback,
-            BookAdapter.TYPE_RENCENT,
-            itemClickListener
-        )
+    override fun initAdapter(): BaseBookAdapter {
+        if (mStyle == STYLE_LIST) {
+            return BookAdapter(
+                activity as Context,
+                beanItemCallback,
+                itemClickListener
+            )
+        } else {
+            return GridBookAdapter(
+                activity as Context,
+                beanItemCallback,
+                itemClickListener
+            )
+        }
     }
 
     override fun updateItem() {
@@ -84,9 +93,9 @@ class HistoryFragment : BrowserFragment() {
 
     private fun updateItem(path: String?) {
         var book: FileBean? = null
-        path?.run {
-            for (fb in fileListAdapter.currentList) {
-                if (null != fb.file && TextUtils.equals(fb.file!!.absolutePath, this)) {
+        if (!TextUtils.isEmpty(path) && null != bookAdapter) {
+            for (fb in bookAdapter!!.currentList) {
+                if (null != fb.file && TextUtils.equals(fb.file!!.absolutePath, path)) {
                     book = fb
                     break
                 }
@@ -100,8 +109,8 @@ class HistoryFragment : BrowserFragment() {
     }
 
     private fun updateItem(fileBean: FileBean?) {
-        if (fileBean?.bookProgress != null) {
-            for (fb in fileListAdapter.currentList) {
+        if (fileBean?.bookProgress != null && null != bookAdapter) {
+            for (fb in bookAdapter!!.currentList) {
                 if (null != fb.bookProgress && fb.bookProgress!!._id == fileBean.bookProgress!!._id) {
                     fb.bookProgress!!.isFavorited = fileBean.bookProgress!!.isFavorited
                     break
@@ -112,9 +121,6 @@ class HistoryFragment : BrowserFragment() {
 
     override fun onResume() {
         super.onResume()
-        //val options = PreferenceManager.getDefaultSharedPreferences(activity)
-        //mStyle = Integer.parseInt(options.getString(PdfOptionsActivity.PREF_LIST_STYLE, "0")!!)
-        //applyStyle()
     }
 
     override fun onDestroy() {
@@ -217,25 +223,40 @@ class HistoryFragment : BrowserFragment() {
         val view = super.onCreateView(inflater, container, savedInstanceState)
 
         this.pathTextView.visibility = View.GONE
-        filesListView.setOnScrollListener(onScrollListener)
-        mListMoreView = ListMoreView(filesListView)
-        //fileListAdapter.addFootView(mListMoreView.getLoadMoreView())
+        recyclerView.setOnScrollListener(onScrollListener)
+        mListMoreView = ListMoreView(recyclerView)
+        //recyclerView.addFootView(mListMoreView.getLoadMoreView())
 
-        applyStyle()
         addObserver()
         return view
     }
 
     private fun applyStyle() {
         if (mStyle == STYLE_LIST) {
-            fileListAdapter.setMode(BookAdapter.TYPE_RENCENT)
-            filesListView.layoutManager =
+            recyclerView.layoutManager =
                 LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+            if (bookAdapter is GridBookAdapter) {
+                bookAdapter = BookAdapter(
+                    activity as Context,
+                    beanItemCallback,
+                    itemClickListener
+                )
+                recyclerView.swapAdapter(bookAdapter, true)
+                return
+            }
         } else {
-            fileListAdapter.setMode(BookAdapter.TYPE_GRID)
-            filesListView.layoutManager = GridLayoutManager(activity, 3)
+            recyclerView.layoutManager = GridLayoutManager(activity, 3)
+            if (bookAdapter is BookAdapter) {
+                bookAdapter = GridBookAdapter(
+                    activity as Context,
+                    beanItemCallback,
+                    itemClickListener
+                )
+                recyclerView.swapAdapter(bookAdapter, true)
+                return
+            }
         }
-        fileListAdapter.notifyDataSetChanged()
+        bookAdapter?.notifyDataSetChanged()
     }
 
     private fun reset() {
@@ -292,8 +313,8 @@ class HistoryFragment : BrowserFragment() {
         val totalCount = args[0] as Int
         val entryList = args[1] as ArrayList<FileBean>
         mSwipeRefreshWidget.isRefreshing = false
-        fileListAdapter.submitList(entryList)
-        fileListAdapter.notifyDataSetChanged()
+        bookAdapter?.submitList(entryList)
+        bookAdapter?.notifyDataSetChanged()
         updateLoadingStatus(totalCount)
     }
 
@@ -322,18 +343,18 @@ class HistoryFragment : BrowserFragment() {
             String.format(
                 "total count:%s, adapter count:%s",
                 totalCount,
-                fileListAdapter.currentList.size
+                bookAdapter?.currentList?.size
             )
         )
-        if (fileListAdapter.currentList.size > 0) {
-            if (fileListAdapter.currentList.size < totalCount) {
+        if (null != bookAdapter && bookAdapter!!.currentList.size > 0) {
+            if (bookAdapter!!.currentList.size < totalCount) {
                 mListMoreView.onLoadingStateChanged(IMoreView.STATE_NORMAL)
             } else {
-                Logcat.d("fileListAdapter!!.normalCount < totalCount")
+                Logcat.d("bookAdapter!!.normalCount < totalCount")
                 mListMoreView.onLoadingStateChanged(IMoreView.STATE_NO_MORE)
             }
         } else {
-            Logcat.d("fileListAdapter!!.normalCount <= 0")
+            Logcat.d("bookAdapter!!.normalCount <= 0")
             mListMoreView.onLoadingStateChanged(IMoreView.STATE_NO_MORE)
             val sp = requireContext().getSharedPreferences(PREF_BROWSER, Context.MODE_PRIVATE)
             val isFirst = sp.getBoolean(PREF_BROWSER_KEY_FIRST, true)
@@ -354,21 +375,22 @@ class HistoryFragment : BrowserFragment() {
                         || mListMoreView.state == IMoreView.STATE_LOAD_FAIL
                     ) {
                         var isReachBottom = false
-                        if (mStyle == STYLE_GRID) {
-                            val gridLayoutManager = filesListView.layoutManager as GridLayoutManager
-                            val rowCount =
-                                fileListAdapter.getItemCount() / gridLayoutManager.spanCount
+                        if (null == bookAdapter) {
+                            return
+                        }
+                        val layoutManager = recyclerView.layoutManager
+                        if (layoutManager is GridLayoutManager) {
+                            Logcat.d("adapter", "layout:$layoutManager")
+                            val rowCount = bookAdapter!!.itemCount / layoutManager.spanCount
                             val lastVisibleRowPosition =
-                                gridLayoutManager.findLastVisibleItemPosition() / gridLayoutManager.spanCount
+                                layoutManager.findLastVisibleItemPosition() / layoutManager.spanCount
                             isReachBottom = lastVisibleRowPosition >= rowCount - 1
-                        } else if (mStyle == STYLE_LIST) {
-                            val layoutManager: LinearLayoutManager =
-                                filesListView.layoutManager as LinearLayoutManager
+                        } else if (layoutManager is LinearLayoutManager) {
                             val lastVisibleItemPosition =
                                 layoutManager.findLastVisibleItemPosition()
-                            val rowCount = fileListAdapter.getItemCount()
+                            val rowCount = bookAdapter!!.itemCount
                             isReachBottom =
-                                lastVisibleItemPosition >= rowCount - 1//- fileListAdapter.headersCount - fileListAdapter.footersCount
+                                lastVisibleItemPosition >= rowCount - 1//- bookAdapter.headersCount - bookAdapter.footersCount
                         }
                         if (isReachBottom) {
                             mListMoreView.onLoadingStateChanged(IMoreView.STATE_LOADING)

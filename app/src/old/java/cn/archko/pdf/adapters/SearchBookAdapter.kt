@@ -11,7 +11,7 @@ import cn.archko.pdf.core.listeners.OnItemClickListener
 /**
  * @author: archko 2024/8/12 :15:43
  */
-class BookAdapter(
+open class SearchBookAdapter(
     context: Context,
     diffCallback: DiffUtil.ItemCallback<FileBean>,
     itemClickListener: OnItemClickListener<FileBean>?
@@ -19,7 +19,7 @@ class BookAdapter(
     BaseBookAdapter(context, diffCallback, itemClickListener) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<FileBean> {
-        val view = mInflater.inflate(R.layout.item_book_normal, parent, false)
-        return ViewHolder(view)
+        val view = mInflater.inflate(R.layout.item_book_search, parent, false)
+        return SearchViewHolder(view)
     }
 }
