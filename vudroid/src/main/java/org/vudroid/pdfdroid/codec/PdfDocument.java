@@ -10,6 +10,7 @@ import org.vudroid.core.codec.OutlineLink;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.archko.pdf.core.common.IntentFile;
 import cn.archko.pdf.core.decode.MupdfDocument;
 import cn.archko.pdf.core.entity.ReflowBean;
 
@@ -40,7 +41,7 @@ public class PdfDocument implements CodecDocument {
         System.out.println("Trying to open " + fname);
         try {
             core = Document.openDocument(fname);
-            if (fname.endsWith("epub") || fname.endsWith("mobi")) {
+            if (IntentFile.INSTANCE.isReflowable(fname)) {
                 core.layout(MupdfDocument.LAYOUTW, MupdfDocument.LAYOUTH, MupdfDocument.LAYOUTEM);
             }
             document.setCore(core);

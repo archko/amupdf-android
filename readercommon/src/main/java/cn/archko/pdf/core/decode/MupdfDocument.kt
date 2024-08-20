@@ -298,8 +298,8 @@ class MupdfDocument(private val context: Context) {
         public var ZOOM = 160f / 72
 
         const val LAYOUTW = 1080
-        const val LAYOUTH = 1600
-        const val LAYOUTEM = 44
+        const val LAYOUTH = 1800
+        const val LAYOUTEM = 40
 
         //File selectedFile = new File(filename);
         //String documentPath = selectedFile.getAbsolutePath();
