@@ -23,7 +23,6 @@ import cn.archko.pdf.widgets.ListMoreView
 class FavoriteFragment : BrowserFragment() {
 
     private lateinit var mListMoreView: ListMoreView
-    private var mStyle: Int = HistoryFragment.STYLE_LIST
     protected lateinit var favoriteViewModel: FavoriteViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -133,22 +132,19 @@ class FavoriteFragment : BrowserFragment() {
                         if (null == bookAdapter) {
                             return
                         }
-                        if (mStyle == HistoryFragment.STYLE_GRID) {
-                            val gridLayoutManager =
-                                this@FavoriteFragment.recyclerView.layoutManager as GridLayoutManager
-                            val rowCount =
-                                bookAdapter!!.itemCount / gridLayoutManager.spanCount
+                        val layoutManager = recyclerView.layoutManager
+                        if (layoutManager is GridLayoutManager) {
+                            Logcat.d("adapter", "layout:$layoutManager")
+                            val rowCount = bookAdapter!!.itemCount / layoutManager.spanCount
                             val lastVisibleRowPosition =
-                                gridLayoutManager.findLastVisibleItemPosition() / gridLayoutManager.spanCount
+                                layoutManager.findLastVisibleItemPosition() / layoutManager.spanCount
                             isReachBottom = lastVisibleRowPosition >= rowCount - 1
-                        } else if (mStyle == HistoryFragment.STYLE_LIST) {
-                            val layoutManager: LinearLayoutManager =
-                                this@FavoriteFragment.recyclerView.layoutManager as LinearLayoutManager
+                        } else if (layoutManager is LinearLayoutManager) {
                             val lastVisibleItemPosition =
                                 layoutManager.findLastVisibleItemPosition()
                             val rowCount = bookAdapter!!.itemCount
                             isReachBottom =
-                                lastVisibleItemPosition >= rowCount - 1 //- fileListAdapter.headersCount - fileListAdapter.footersCount
+                                lastVisibleItemPosition >= rowCount - 1//- bookAdapter.headersCount - bookAdapter.footersCount
                         }
                         if (isReachBottom) {
                             mListMoreView.onLoadingStateChanged(IMoreView.STATE_LOADING)
