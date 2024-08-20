@@ -24,6 +24,7 @@ import cn.archko.pdf.adapters.BaseBookAdapter
 import cn.archko.pdf.adapters.BookAdapter
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.common.PdfOptionRepository
+import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.FileBean
@@ -414,7 +415,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             getString(R.string.menu_other)
         )
 
-        if (entry.type == FileBean.NORMAL) {
+        if (entry.type == FileBean.NORMAL && IntentFile.isPdf(entry.file!!.absolutePath)) {
             menuBuilder.menu.add(
                 0,
                 PDFViewerHelper.editContextMenuItem,
