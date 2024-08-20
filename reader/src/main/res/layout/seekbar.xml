@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottom_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="@color/menu_bg"
+    android:orientation="vertical"
+    android:visibility="visible"
+    tools:visibility="visible">
+
+    <TextView
+        android:id="@+id/page_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        tools:text="133/999" />
+
+    <SeekBar
+        android:id="@+id/seek_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_margin="8dp"
+        android:layout_toStartOf="@id/oriButton"
+        android:layout_toEndOf="@id/page_num"
+        android:progressDrawable="@drawable/seek_line"
+        android:thumb="@drawable/seek_thumb" />
+
+    <ImageButton
+        android:id="@+id/oriButton"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/button"
+        android:contentDescription="@string/opts_orientation"
+        android:src="@drawable/ic_vertical" />
+</RelativeLayout>

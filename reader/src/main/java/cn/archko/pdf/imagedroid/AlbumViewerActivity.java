@@ -37,6 +37,7 @@ public class AlbumViewerActivity extends BaseViewerActivity {
                 }
                 isDocLoaded = (true);
                 documentView.showDocument(autoCrop);
+                seekbarControls.update(decodeService.getPageCount(), 0);
             });
         });
     }
