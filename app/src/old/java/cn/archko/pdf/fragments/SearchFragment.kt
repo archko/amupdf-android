@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.archko.mupdf.R
 import cn.archko.pdf.activities.HomeActivity
 import cn.archko.pdf.adapters.BaseBookAdapter
-import cn.archko.pdf.adapters.BookAdapter
 import cn.archko.pdf.adapters.SearchBookAdapter
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.core.entity.FileBean

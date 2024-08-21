@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.mupdf.R
 import cn.archko.pdf.adapters.BaseBookAdapter
-import cn.archko.pdf.adapters.BookAdapter
 import cn.archko.pdf.adapters.GridBookAdapter
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.App
@@ -27,6 +26,7 @@ import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.LengthUtils
+import cn.archko.pdf.core.widgets.ColorItemDecoration
 import cn.archko.pdf.utils.SardineHelper
 import cn.archko.pdf.widgets.IMoreView
 import cn.archko.pdf.widgets.ListMoreView
@@ -51,7 +51,6 @@ class HistoryFragment : BrowserFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mStyle = PdfOptionRepository.getStyle()
 
         vn.chungha.flowbus.collectFlowBus<GlobalEvent>(scope = this, isSticky = true) {
             Logcat.d(TAG, "ACTION_STOPPED:${it.obj}")
@@ -72,8 +71,11 @@ class HistoryFragment : BrowserFragment() {
     }
 
     override fun initAdapter(): BaseBookAdapter {
+        mStyle = PdfOptionRepository.getStyle()
+        Logcat.d(TAG, "onCreate:$mStyle")
+
         if (mStyle == STYLE_LIST) {
-            return BookAdapter(
+            return BaseBookAdapter(
                 activity as Context,
                 beanItemCallback,
                 itemClickListener
@@ -84,6 +86,16 @@ class HistoryFragment : BrowserFragment() {
                 beanItemCallback,
                 itemClickListener
             )
+        }
+    }
+
+    override fun setupUi() {
+        if (mStyle == STYLE_LIST) {
+            recyclerView.layoutManager =
+                LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+            recyclerView.addItemDecoration(ColorItemDecoration(requireContext()))
+        } else {
+            recyclerView.layoutManager = GridLayoutManager(activity, 3)
         }
     }
 
@@ -140,7 +152,7 @@ class HistoryFragment : BrowserFragment() {
             R.id.action_restore -> restore()
             R.id.action_extract -> extractImage()
             R.id.action_create -> createPdf()
-            /*R.id.action_style -> {
+            R.id.action_style -> {
                 if (mStyle == STYLE_LIST) {
                     mStyle = STYLE_GRID
                 } else {
@@ -148,7 +160,7 @@ class HistoryFragment : BrowserFragment() {
                 }
                 PdfOptionRepository.setStyle(mStyle)
                 applyStyle()
-            }*/
+            }
         }
 
         return super.onOptionsItemSelected(menuItem)
@@ -232,31 +244,40 @@ class HistoryFragment : BrowserFragment() {
     }
 
     private fun applyStyle() {
+        removeItemDecorations()
         if (mStyle == STYLE_LIST) {
             recyclerView.layoutManager =
                 LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+            recyclerView.addItemDecoration(ColorItemDecoration(requireContext()))
             if (bookAdapter is GridBookAdapter) {
-                bookAdapter = BookAdapter(
+                bookAdapter = BaseBookAdapter(
                     activity as Context,
                     beanItemCallback,
                     itemClickListener
                 )
-                recyclerView.swapAdapter(bookAdapter, true)
-                return
+                bookAdapter?.notifyItemInserted(0);
+                recyclerView.adapter = bookAdapter
+                recyclerView.postInvalidate()
             }
         } else {
             recyclerView.layoutManager = GridLayoutManager(activity, 3)
-            if (bookAdapter is BookAdapter) {
+            if (bookAdapter is BaseBookAdapter) {
                 bookAdapter = GridBookAdapter(
                     activity as Context,
                     beanItemCallback,
                     itemClickListener
                 )
-                recyclerView.swapAdapter(bookAdapter, true)
-                return
+                bookAdapter?.notifyItemInserted(0);
+                recyclerView.adapter = bookAdapter
+                recyclerView.postInvalidate()
             }
         }
-        bookAdapter?.notifyDataSetChanged()
+    }
+
+    private fun removeItemDecorations() {
+        for (i in 0 until recyclerView.itemDecorationCount) {
+            recyclerView.removeItemDecorationAt(i)
+        }
     }
 
     private fun reset() {

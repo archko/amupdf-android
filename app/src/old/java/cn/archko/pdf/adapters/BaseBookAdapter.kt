@@ -36,8 +36,8 @@ open class BaseBookAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<FileBean> {
-        Logcat.d("adapter", "create:$viewType")
-        return BaseViewHolder(parent)
+        val view = mInflater.inflate(R.layout.item_book_normal, parent, false)
+        return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder<FileBean>, position: Int) {

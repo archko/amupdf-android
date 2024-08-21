@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cn.archko.mupdf.R
 import cn.archko.pdf.adapters.BaseBookAdapter
-import cn.archko.pdf.adapters.BookAdapter
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.common.IntentFile
@@ -90,7 +89,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     }
 
     open fun initAdapter(): BaseBookAdapter {
-        return BookAdapter(
+        return BaseBookAdapter(
             activity as Context,
             beanItemCallback,
             itemClickListener
@@ -178,9 +177,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
 
         this.pathTextView = view.findViewById(R.id.path)
         this.recyclerView = view.findViewById(R.id.files)
-        recyclerView.layoutManager =
-            LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-        recyclerView.addItemDecoration(ColorItemDecoration(requireContext()))
+        setupUi()
 
         mSwipeRefreshWidget = view.findViewById(R.id.swipe_refresh_widget)!!
         mSwipeRefreshWidget.apply {
@@ -189,6 +186,12 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
 
         addObserver()
         return view
+    }
+
+    open fun setupUi() {
+        recyclerView.layoutManager =
+            LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+        recyclerView.addItemDecoration(ColorItemDecoration(requireContext()))
     }
 
     override fun onRefresh() {

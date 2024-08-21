@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import cn.archko.mupdf.R
 import cn.archko.pdf.core.adapters.BaseViewHolder
+import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.listeners.OnItemClickListener
 
