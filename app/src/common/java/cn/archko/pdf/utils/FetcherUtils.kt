@@ -4,10 +4,7 @@ import android.content.Context
 import android.widget.ImageView
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.decode.PdfFetcherData
-import coil.ImageLoader
 import coil.load
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 
 /**
  * @author: archko 2024/8/15 :22:12
@@ -19,7 +16,9 @@ object FetcherUtils {
             width = Utils.dipToPixel(135f),
             height = Utils.dipToPixel(180f),
         )
-        imageView.load(fetcherData)
+        imageView.load(fetcherData) {
+            error(cn.archko.mupdf.R.drawable.ic_book)
+        }
         /*val req = ImageRequest.Builder(context)
             .data(fetcherData)
             .memoryCacheKey("page_$path")

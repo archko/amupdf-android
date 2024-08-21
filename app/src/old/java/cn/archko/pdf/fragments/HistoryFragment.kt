@@ -255,9 +255,9 @@ class HistoryFragment : BrowserFragment() {
                     beanItemCallback,
                     itemClickListener
                 )
-                bookAdapter?.notifyItemInserted(0);
                 recyclerView.adapter = bookAdapter
-                recyclerView.postInvalidate()
+                bookAdapter?.notifyItemInserted(0)
+                recyclerView.smoothScrollToPosition(0)
             }
         } else {
             recyclerView.layoutManager = GridLayoutManager(activity, 3)
@@ -267,9 +267,9 @@ class HistoryFragment : BrowserFragment() {
                     beanItemCallback,
                     itemClickListener
                 )
-                bookAdapter?.notifyItemInserted(0);
                 recyclerView.adapter = bookAdapter
-                recyclerView.postInvalidate()
+                bookAdapter?.notifyItemInserted(0)
+                recyclerView.smoothScrollToPosition(0)
             }
         }
     }
