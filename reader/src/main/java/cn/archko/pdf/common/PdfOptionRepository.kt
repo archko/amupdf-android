@@ -161,24 +161,6 @@ object PdfOptionRepository {
         return mmkv.decodeBool(PdfOptionKeys.PREF_DIRS_FIRST, true)
     }
 
-    fun setNewViewer(enable: Boolean) {
-        mmkv.encode(PdfOptionKeys.PREF_NEW_VIEWER, enable)
-    }
-
-    fun getNewViewer(): Boolean {
-        return mmkv.decodeBool(PdfOptionKeys.PREF_NEW_VIEWER, false)
-    }
-
-    fun setCropper(enable: Boolean) {
-        val code = if (enable) 1 else 0
-        MupdfDocument.useNewCropper = enable
-        mmkv.encode(PdfOptionKeys.PREF_CROPPER, code)
-    }
-
-    fun getCropper(): Boolean {
-        return mmkv.decodeInt(PdfOptionKeys.PREF_CROPPER, 0) == 1
-    }
-
     fun setColorMode(colorMode: Int) {
         mmkv.encode(PdfOptionKeys.PREF_COLORMODE, colorMode)
     }
@@ -257,7 +239,6 @@ object PdfOptionKeys {
 
     const val PREF_TOP_MARGIN = ("topMargin")
     const val PREF_KEEP_ON = ("keepOn")
-    const val PREF_LIST_STYLE = ("list_style")
     const val PREF_DART_THEME = ("pref_dart_theme")
     const val PREF_DIRS_FIRST = ("dirsFirst")
     const val PREF_NEW_VIEWER = ("newViewer")

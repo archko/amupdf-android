@@ -133,6 +133,11 @@ class HistoryFragment : BrowserFragment() {
 
     override fun onResume() {
         super.onResume()
+        val newStyle = PdfOptionRepository.getStyle()
+        if (newStyle != mStyle) {
+            mStyle = newStyle
+            applyStyle()
+        }
     }
 
     override fun onDestroy() {

@@ -101,11 +101,12 @@ public class PdfOptionsActivity extends FragmentActivity {
         prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_show_extension), getString(R.string.opts_show_extension), PdfOptionKeys.PREF_SHOW_EXTENSION, PdfOptionRepository.INSTANCE.getShowExtension());
         prefsList.add(prefs);
 
-        //prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_new_viewer), getString(R.string.opts_new_viewer), PdfOptionKeys.PREF_NEW_VIEWER, PdfOptionRepository.INSTANCE.getNewViewer());
-        //prefsList.add(prefs);
-
-        //prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_cropper), getString(R.string.opts_cropper), PdfOptionKeys.PREF_CROPPER, PdfOptionRepository.INSTANCE.getCropper());
-        //prefsList.add(prefs);
+        prefs = new Prefs(TYPE_LIST, getString(R.string.opts_list_style), getString(R.string.opts_list_style),
+                PdfOptionKeys.PREF_STYLE,
+                getResources().getStringArray(R.array.opts_list_styles),
+                getResources().getStringArray(R.array.opts_list_style_labels),
+                PdfOptionRepository.INSTANCE.getStyle());
+        prefsList.add(prefs);
 
         prefs = new Prefs(TYPE_LIST, getString(R.string.opts_color_mode), getString(R.string.opts_color_mode),
                 PdfOptionKeys.PREF_COLORMODE,
@@ -197,6 +198,8 @@ public class PdfOptionsActivity extends FragmentActivity {
                 PdfOptionRepository.INSTANCE.setOrientation(Integer.parseInt(val.toString()));
             } else if (TextUtils.equals(key, PdfOptionKeys.PREF_COLORMODE)) {
                 PdfOptionRepository.INSTANCE.setColorMode(Integer.parseInt(val.toString()));
+            } else if (TextUtils.equals(key, PdfOptionKeys.PREF_STYLE)) {
+                PdfOptionRepository.INSTANCE.setStyle(Integer.parseInt(val.toString()));
             }
         }
     }
@@ -231,10 +234,6 @@ public class PdfOptionsActivity extends FragmentActivity {
                 PdfOptionRepository.INSTANCE.setDirsFirst(val);
             } else if (TextUtils.equals(key, PdfOptionKeys.PREF_SHOW_EXTENSION)) {
                 PdfOptionRepository.INSTANCE.setShowExtension(val);
-            } else if (TextUtils.equals(key, PdfOptionKeys.PREF_NEW_VIEWER)) {
-                PdfOptionRepository.INSTANCE.setNewViewer(val);
-            } else if (TextUtils.equals(key, PdfOptionKeys.PREF_CROPPER)) {
-                PdfOptionRepository.INSTANCE.setCropper(val);
             }
         }
     }
