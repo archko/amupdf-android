@@ -301,11 +301,11 @@ object IntentFile {
                 || path.endsWith(".cbz", true)
                 || path.endsWith(".epub", true)
                 || path.endsWith(".mobi", true)
-                || path.endsWith(".ppt", true)
+                //|| path.endsWith(".ppt", true)
                 || path.endsWith(".pptx", true)
                 //|| path.endsWith(".doc", true)    //会崩溃
                 || path.endsWith(".docx", true)
-                || path.endsWith(".xls", true)
+                //|| path.endsWith(".xls", true)
                 || path.endsWith(".xlsx", true)
     }
 
@@ -313,10 +313,10 @@ object IntentFile {
         return path.endsWith(".cbz", true)
                 || path.endsWith(".epub", true)
                 || path.endsWith(".mobi", true)
-                || path.endsWith(".ppt", true)
+                //|| path.endsWith(".ppt", true)
                 || path.endsWith(".pptx", true)
                 || path.endsWith(".docx", true)
-                || path.endsWith(".xls", true)
+                //|| path.endsWith(".xls", true)
                 || path.endsWith(".xlsx", true)
     }
 

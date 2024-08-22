@@ -28,11 +28,8 @@ object AdapterUtils {
         exts.add("mobi")
         exts.add("txt")
         exts.add("log")
-        exts.add("ppt")
         exts.add("pptx")
-        exts.add("doc")
         exts.add("docx")
-        exts.add("xls")
         exts.add("xlsx")
         exts.add("json")
         exts.add("js")
@@ -79,16 +76,10 @@ object AdapterUtils {
             || "html".equals(ext) || "xhtml".equals(ext)
         ) {
             drawableId = R.drawable.browser_icon_txt
-        }*/ else if (".ppt".equals(ext)) {
+        }*/ else if (".pptx".equals(ext)) {
             drawableId = R.drawable.ic_book_ppt
-        } else if (".pptx".equals(ext)) {
-            drawableId = R.drawable.ic_book_ppt
-        } else if (".doc".equals(ext)) {
-            drawableId = R.drawable.ic_book_word
         } else if (".docx".equals(ext)) {
             drawableId = R.drawable.ic_book_word
-        } else if (".xls".equals(ext)) {
-            drawableId = R.drawable.ic_book_excel
         } else if (".xlsx".equals(ext)) {
             drawableId = R.drawable.ic_book_excel
         }

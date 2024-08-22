@@ -39,8 +39,6 @@ fun FileBean.getIcon(): Int {
                     || "html".equals(ext) || "xhtml".equals(ext)
                 ) {
                     drawableId = cn.archko.pdf.R.drawable.ic_book_text
-                } else if (".ppt".equals(ext)) {
-                    drawableId = cn.archko.pdf.R.drawable.ic_book_ppt
                 } else if (".pptx".equals(ext)) {
                     drawableId = cn.archko.pdf.R.drawable.ic_book_ppt
                 } else if (".doc".equals(ext)) {
