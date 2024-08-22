@@ -69,6 +69,10 @@ abstract class ATextBaseViewController(
             controllerListener?.onSingleTapConfirmed(e, 0)
             return true
         }
+
+        override fun onDoubleTap(e: MotionEvent): Boolean {
+            return controllerListener?.onDoubleTap(e, 0) ?: super.onDoubleTap(e)
+        }
     }
 
     private fun initView() {

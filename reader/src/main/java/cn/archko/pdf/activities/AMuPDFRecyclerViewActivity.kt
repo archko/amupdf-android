@@ -204,6 +204,22 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 if (!isDocLoaded) {
                     return
                 }
+
+                if (pageControls?.visibility() == View.VISIBLE) {
+                    pageControls?.hide()
+                    return
+                }
+                if (mReflowLayout.visibility == View.VISIBLE) {
+                    mReflowLayout.visibility = View.GONE
+                    return
+                }
+                viewController?.onSingleTap(ev, margin)
+            }
+
+            override fun onDoubleTap(ev: MotionEvent?, currentPage: Int): Boolean {
+                if (!isDocLoaded) {
+                    return false
+                }
                 if (viewMode == ViewMode.REFLOW) {
                     var showFlag = false
                     if (pageControls?.visibility() == View.VISIBLE) {
@@ -231,7 +247,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                         pageControls?.hide()
                         viewController?.getCurrentPos()
                             ?.let { pageControls?.updatePageProgress(it) }
-                        return
                     } else {
                         if (viewController?.onSingleTap(ev, margin) != true) {
                             pageControls?.apply {
@@ -241,18 +256,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                         }
                     }
                 }
-            }
-
-            override fun onDoubleTap(ev: MotionEvent?, currentPage: Int) {
-                if (!isDocLoaded) {
-                    return
-                }
-                if (pageControls?.visibility() == View.VISIBLE) {
-                    pageControls?.hide()
-                }
-                if (mReflowLayout.visibility == View.VISIBLE) {
-                    mReflowLayout.visibility = View.GONE
-                }
+                return true
             }
 
             override fun doLoadedDoc(count: Int, pos: Int, outlineLinks: List<OutlineLink>?) {

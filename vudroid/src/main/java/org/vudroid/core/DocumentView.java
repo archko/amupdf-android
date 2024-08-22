@@ -25,7 +25,6 @@ import cn.archko.pdf.core.entity.APage;
 import cn.archko.pdf.core.link.Hyperlink;
 import cn.archko.pdf.core.listeners.SimpleGestureListener;
 import cn.archko.pdf.core.utils.ColorUtil;
-import cn.archko.pdf.core.utils.Utils;
 
 public class DocumentView extends View implements ZoomListener {
 
@@ -180,7 +179,7 @@ public class DocumentView extends View implements ZoomListener {
                 }
             }
         }
-        Log.d(VIEW_LOG_TAG, String.format("goToPageImpl.xToScroll:%s, scroll:%s, yToScroll:%s, scrollY:%s, bottom:%s, page:%s",
+        Log.d(TAG, String.format("goToPageImpl.xToScroll:%s, scroll:%s, yToScroll:%s, scrollY:%s, bottom:%s, page:%s",
                 xToScroll, scrollX, yToScroll, scrollY, page.getBottom(), page));
         yToScroll = 0;
         xToScroll = 0;
@@ -638,12 +637,12 @@ public class DocumentView extends View implements ZoomListener {
         mCurrentFlingRunnable = new FlingRunnable(getContext());
         mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), 0, height, 0);
         post(mCurrentFlingRunnable);
-        //Log.d(VIEW_LOG_TAG, "height:" + height);
+        //Log.d(TAG, "height:" + height);
     }
 
-    private boolean tryHyperlink(MotionEvent e) {
+    private Page tryHyperlink(MotionEvent e) {
         if (decodeService.getPageCount() < 1) {
-            return false;
+            return null;
         }
 
         Page page = getEventPage(e);
@@ -660,22 +659,22 @@ public class DocumentView extends View implements ZoomListener {
                 y += rect.top;
             }
 
-            Log.d(VIEW_LOG_TAG, String.format("scrollX:%s, scrollY:%s, scale:%s, zoom:%s, index:%s, e.x:%s, e.y:%s, bound:%s",
-                    scrollX, scrollY, scale, zoomModel.getZoom(), page.index, e.getX(), e.getY(), page.bounds.top));
+            //Log.d(TAG, String.format("scrollX:%s, scrollY:%s, scale:%s, zoom:%s, index:%s, e.x:%s, e.y:%s, bound:%s",
+            //        scrollX, scrollY, scale, zoomModel.getZoom(), page.index, e.getX(), e.getY(), page.bounds.top));
 
             Hyperlink link = Hyperlink.Companion.mapPointToPage(page, x, y);
-            //Log.d(VIEW_LOG_TAG, String.format("x:%s, y:%s, bounds:%s, link:%s, links:%s", x, y, page.bounds, link, page.links));
+            //Log.d(TAG, String.format("x:%s, y:%s, bounds:%s, link:%s, links:%s", x, y, page.bounds, link, page.links));
             if (link != null) {
                 if (Hyperlink.LINKTYPE_URL == link.getLinkType()) {
                     Hyperlink.Companion.openSystemBrowser(getContext(), link.getUrl());
-                    return true;
+                    return page;
                 } else {
                     goToPage(link.getPage());
-                    return true;
+                    return page;
                 }
             }
         }
-        return false;
+        return null;
     }
 
     public Rect getBounds(Page page) {
@@ -779,14 +778,16 @@ public class DocumentView extends View implements ZoomListener {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            if (tryHyperlink(e)) {
+            Page page = tryHyperlink(e);
+            if (page != null) {
                 return true;
             }
             if (null != simpleGestureListener) {
-                Page page = getEventPage(e);
+                int index = 0;
                 if (null != page) {
-                    simpleGestureListener.onSingleTapConfirmed(e, page.index);
+                    index = page.index;
                 }
+                simpleGestureListener.onSingleTapConfirmed(e, index);
                 return true;
             }
 
@@ -797,10 +798,11 @@ public class DocumentView extends View implements ZoomListener {
         public boolean onDoubleTap(MotionEvent ev) {
             if (null != simpleGestureListener) {
                 Page page = getEventPage(ev);
+                int index = 0;
                 if (null != page) {
-                    simpleGestureListener.onDoubleTap(ev, page.index);
-                    return true;
+                    index = page.index;
                 }
+                simpleGestureListener.onDoubleTap(ev, index);
             }
             return false;
         }

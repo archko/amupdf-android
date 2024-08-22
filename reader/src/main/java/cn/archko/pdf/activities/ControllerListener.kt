@@ -9,7 +9,7 @@ import org.vudroid.core.codec.OutlineLink
 interface ControllerListener {
     fun onSingleTapConfirmed(ev: MotionEvent?, currentPage: Int)
 
-    fun onDoubleTap(ev: MotionEvent?, currentPage: Int)
+    fun onDoubleTap(ev: MotionEvent?, currentPage: Int): Boolean
 
     fun doLoadedDoc(count: Int, pos: Int, outlineLinks: List<OutlineLink>?)
 }
