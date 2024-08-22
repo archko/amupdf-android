@@ -4,14 +4,17 @@ it's not only a pdf reader,also a imageviewer
 ### features:
 
 * textreflow
-* auto crop white column
-* multitouch
-* zoom
+* auto crop white bounds
+* multitouch, zoom
 * file browser
 * history and favorite
-* support pdf,xps,epub,mobi,txt,html,xhtml,xml,json
+* grid/list view
+* support pdf, xps, epub, mobi, txt, html, xhtml, xml, json
 * image viewer
 * album viewer
+* export image/html
+* create pdf from image/txt
+* webdave(only support jianguoyun)
 
 ### released apks:
 
