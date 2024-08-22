@@ -205,15 +205,18 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     return
                 }
 
+                var showFlag = false
                 if (pageControls?.visibility() == View.VISIBLE) {
                     pageControls?.hide()
-                    return
+                    showFlag = true
                 }
                 if (mReflowLayout.visibility == View.VISIBLE) {
                     mReflowLayout.visibility = View.GONE
-                    return
+                    showFlag = true
                 }
-                viewController?.onSingleTap(ev, margin)
+                if (!showFlag) {
+                    viewController?.onSingleTap(ev, margin)
+                }
             }
 
             override fun onDoubleTap(ev: MotionEvent?, currentPage: Int): Boolean {

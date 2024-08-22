@@ -57,7 +57,7 @@ abstract class ATextBaseViewController(
 
     private inner class MySimpleOnGestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-            var margin = mRecyclerView.height
+            /*var margin = mRecyclerView.height
             margin = if (margin <= 0) {
                 ViewConfiguration.get(context).scaledTouchSlop * 2
             } else {
@@ -65,7 +65,7 @@ abstract class ATextBaseViewController(
             }
             if (onSingleTap(e, margin)) {
                 return true
-            }
+            }*/
             controllerListener?.onSingleTapConfirmed(e, 0)
             return true
         }
