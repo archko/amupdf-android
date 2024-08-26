@@ -180,6 +180,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 autoCropButton.visibility = View.VISIBLE
                 outlineButton.visibility = View.VISIBLE
             }
+            updatePageProgress(getCurrentPos())
         }
     }
 
@@ -526,7 +527,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     val page = Utils.parseInt(arr[0])
                     val current = getCurrentPos()
                     if (current != page) {
-                        handler.post { onSelectedOutline(page + 1) }
+                        handler.post { onSelectedOutline(page) }
                     }
                 } catch (e: Exception) {
                     Logcat.e(e)
@@ -631,7 +632,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     override fun onSelectedOutline(index: Int) {
         viewController?.onSelectedOutline(index)
-        updateProgress(index - RESULT_FIRST_USER)
+        updateProgress(index)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

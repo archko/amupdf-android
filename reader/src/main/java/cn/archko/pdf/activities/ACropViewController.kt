@@ -277,8 +277,8 @@ class ACropViewController(
     }
 
     override fun onSelectedOutline(index: Int) {
-        mRecyclerView.layoutManager?.scrollToPosition(index - RESULT_FIRST_USER)
-        updateProgress(index - RESULT_FIRST_USER)
+        mRecyclerView.layoutManager?.scrollToPosition(index)
+        updateProgress(index)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

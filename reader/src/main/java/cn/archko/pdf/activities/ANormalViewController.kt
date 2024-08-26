@@ -274,8 +274,8 @@ class ANormalViewController(
     }
 
     override fun onSelectedOutline(index: Int) {
-        documentView.goToPage(index - RESULT_FIRST_USER)
-        updateProgress(index - RESULT_FIRST_USER)
+        documentView.goToPage(index)
+        updateProgress(index)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
