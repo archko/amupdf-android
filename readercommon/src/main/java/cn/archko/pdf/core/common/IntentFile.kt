@@ -324,5 +324,11 @@ object IntentFile {
         val fname = name.lowercase(Locale.getDefault())
         return fname.endsWith("djvu") || fname.endsWith("djv")
     }
+
+    fun isSupportedImageForCreater(path: String): Boolean {
+        return path.endsWith(".jpg", true)
+                || path.endsWith(".jpeg", true)
+                || path.endsWith(".gif", true)
+    }
 }
 

@@ -1,9 +1,7 @@
 package cn.archko.pdf.adapters
 
 import android.widget.ImageView
-import android.widget.ProgressBar
 import cn.archko.pdf.R
-import java.util.Locale
 
 /**
  * @author: archko 2024/3/12 :13:39
@@ -84,27 +82,5 @@ object AdapterUtils {
             drawableId = R.drawable.ic_book_excel
         }
         imageView.setImageResource(drawableId)
-    }
-
-    fun setProgress(progressbar: ProgressBar, progress: Int, count: Int) {
-        progressbar.setMax(progress)
-        progressbar.progress = count
-    }
-
-    fun isSupportExt(fname: String): Boolean {
-        return exts.contains(getExtension(fname))
-    }
-
-    fun isPlainTxt(name: String): Boolean {
-        val fname = name.lowercase(Locale.getDefault())
-        return fname.endsWith("txt") || fname.endsWith("log") || fname.endsWith("json") || fname.endsWith(
-            "js"
-        ) || fname.endsWith("html") || fname.endsWith("xhtml")
-    }
-
-    fun supportImage(path: String): Boolean {
-        return path.endsWith(".jpg", true)
-                || path.endsWith(".jpeg", true)
-                || path.endsWith(".gif", true)
     }
 }

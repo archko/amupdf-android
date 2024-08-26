@@ -96,7 +96,9 @@
                 <data android:mimeType="application/pdf" />
                 <data android:mimeType="text/xml" />
                 <data android:mimeType="application/epub+zip" />
+                <data android:mimeType="application/x-mobipocket-ebook" />
                 <data android:mimeType="image/svg+xml" />
+                <data android:mimeType="image/djvu" />
                 <data android:mimeType="application/xhtml+xml" />
                 <data android:mimeType="application/x-cbz" />
                 <data android:mimeType="application/vnd.ms-xpsdocument" />
@@ -117,6 +119,7 @@
                 <data android:pathPattern="/.*\.xps" />
                 <data android:pathPattern="/.*\.cbz" />
                 <data android:pathPattern="/.*\.epub" />
+                <data android:pathPattern="/.*\.mobi" />
                 <data android:pathPattern="/.*\.fb2" />
                 <data android:pathPattern="/.*\.xml" />
                 <data android:pathPattern="/.*\.html" />
@@ -125,6 +128,10 @@
                 <data android:pathPattern="/.*\.log" />
                 <data android:pathPattern="/.*\.js" />
                 <data android:pathPattern="/.*\.json" />
+                <data android:pathPattern="/.*\.djvu" />
+                <data android:pathPattern="/.*\.pptx" />
+                <data android:pathPattern="/.*\.docx" />
+                <data android:pathPattern="/.*\.xlsx" />
             </intent-filter>
         </activity>
 

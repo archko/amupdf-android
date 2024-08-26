@@ -13,10 +13,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import cn.archko.mupdf.R
-import cn.archko.pdf.adapters.AdapterUtils
 import cn.archko.pdf.core.App
 import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.common.EncodingDetect
+import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.utils.BitmapUtils
 import cn.archko.pdf.core.utils.FileUtils
@@ -187,7 +187,7 @@ object PDFCreaterHelper {
                     //split image,maxheight=PAPER_HEIGHT
                     splitImages(result, path, options.outWidth, options.outHeight)
                 } else {
-                    if (AdapterUtils.supportImage(path)) {
+                    if (IntentFile.isSupportedImageForCreater(path)) {
                         result.add(path)
                     } else {
                         convertImageToJpeg(result, path)
