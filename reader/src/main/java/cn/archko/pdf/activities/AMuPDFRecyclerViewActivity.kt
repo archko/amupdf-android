@@ -522,7 +522,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     val arr = key.split("-")
                     val page = Utils.parseInt(arr[0])
                     val current = getCurrentPos()
-                    Logcat.d("onStart:$key, current:$current")
+                    //Logcat.d("onStart:$key, current:$current")
                     if (current != page) {
                         onSelectedOutline(page)
                     }

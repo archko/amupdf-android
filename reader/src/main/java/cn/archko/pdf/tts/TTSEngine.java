@@ -119,9 +119,9 @@ public class TTSEngine {
         textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override
             public void onStart(String utteranceId) {
-                //Logcat.d(TAG, "onStart:" + utteranceId);
                 if (null != progressListener) {
                     String key = keys.get(utteranceId);
+                    //Logcat.d(TAG, "onStart:" + utteranceId + " key:" + key);
                     progressListener.onStart(key);
                 }
             }
@@ -164,9 +164,10 @@ public class TTSEngine {
         }
 
         textToSpeech.stop();
-        String content = ttsContent.remove(0);
-        speak(keys.get(content), content);
-
+        for (int i = 0; i < ttsContent.size(); i++) {
+            String content = ttsContent.get(i);
+            resumeSpeak(content);
+        }
         return true;
     }
 
@@ -190,6 +191,15 @@ public class TTSEngine {
         }
 
         return textToSpeech.isSpeaking();
+    }
+
+    public void resumeSpeak(final String text) {
+        if (textToSpeech == null) {
+            Logcat.d(TAG, "textToSpeech not initialized");
+            return;
+        }
+
+        textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, null, text);
     }
 
     public void speak(final String key, final String text) {
