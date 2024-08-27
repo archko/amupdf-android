@@ -51,7 +51,7 @@ class TextViewModel : ViewModel() {
     }
 
     fun decodeTextForTts(currentPos: Int, data: List<ReflowBean>?) {
-        if (null == data|| data.isEmpty()) {
+        if (data.isNullOrEmpty()) {
             return
         }
         val last = TTSEngine.get().getLast()
@@ -65,7 +65,10 @@ class TextViewModel : ViewModel() {
         }
         val start = System.currentTimeMillis()
         for (i in currentPos until count) {
-            TTSEngine.get().speak("$i-$i", data[i].data)
+            val str = data[i].data
+            if (str != null && !TextUtils.isEmpty(str.trim())) {
+                TTSEngine.get().speak("$i-$i", str)
+            }
         }
         Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
     }

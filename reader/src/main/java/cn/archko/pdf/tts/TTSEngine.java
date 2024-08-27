@@ -116,6 +116,34 @@ public class TTSEngine {
             return;
         }
         textToSpeech = new TextToSpeech(App.Companion.getInstance(), listener);
+        textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+            @Override
+            public void onStart(String utteranceId) {
+                //Logcat.d(TAG, "onStart:" + utteranceId);
+                if (null != progressListener) {
+                    String key = keys.get(utteranceId);
+                    progressListener.onStart(key);
+                }
+            }
+
+            //utteranceId这个是内容
+            @Override
+            public void onDone(String utteranceId) {
+                //Logcat.d(TAG, "onDone:" + utteranceId);
+                ttsContent.remove(utteranceId);
+                String key = keys.remove(utteranceId);
+                //if (null != progressListener) {
+                //    progressListener.onDone(key);
+                //}
+            }
+
+            @Override
+            public void onError(String utteranceId) {
+                Logcat.d(TAG, "onError:" + utteranceId);
+                ttsContent.remove(utteranceId);
+                keys.remove(utteranceId);
+            }
+        });
     }
 
     public void stop() {
@@ -172,33 +200,6 @@ public class TTSEngine {
 
         keys.put(text, key);
         ttsContent.add(text);
-        textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-            @Override
-            public void onStart(String utteranceId) {
-                //Logcat.d(TAG, "onStart:" + utteranceId);
-                if (null != progressListener) {
-                    progressListener.onStart(utteranceId);
-                }
-            }
-
-            //utteranceId这个是内容
-            @Override
-            public void onDone(String utteranceId) {
-                //Logcat.d(TAG, "onDone:" + utteranceId);
-                ttsContent.remove(utteranceId);
-                String key = keys.remove(utteranceId);
-                if (null != progressListener) {
-                    progressListener.onDone(key);
-                }
-            }
-
-            @Override
-            public void onError(String utteranceId) {
-                Logcat.d(TAG, "onError:" + utteranceId);
-                ttsContent.remove(utteranceId);
-                keys.remove(utteranceId);
-            }
-        });
         textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, null, text);
     }
 

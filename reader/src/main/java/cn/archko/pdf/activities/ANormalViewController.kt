@@ -1,10 +1,9 @@
 package cn.archko.pdf.activities
 
-import android.app.Activity.RESULT_FIRST_USER
 import android.app.ProgressDialog
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.view.Gravity
+import android.text.TextUtils
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +20,6 @@ import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.SimpleGestureListener
-import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TTSEngine
@@ -314,7 +312,9 @@ class ANormalViewController(
                 val beans: List<ReflowBean>? = document!!.decodeReflowText(i)
                 if (beans != null) {
                     for (j in beans.indices) {
-                        TTSEngine.get().speak("$i-$j", beans[j].data)
+                        if (!TextUtils.isEmpty(beans[j].data?.trim())) {
+                            TTSEngine.get().speak("$i-$j", beans[j].data)
+                        }
                     }
                 }
             }
@@ -325,7 +325,6 @@ class ANormalViewController(
     //--------------------------------------
 
     override fun onResume() {
-        //mPageControls?.hide()
     }
 
     override fun onPause() {

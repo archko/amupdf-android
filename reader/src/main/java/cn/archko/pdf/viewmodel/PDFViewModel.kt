@@ -140,7 +140,9 @@ class PDFViewModel : ViewModel() {
             val beans: List<ReflowBean>? = mupdfDocument!!.decodeReflowText(i)
             if (beans != null) {
                 for (j in beans.indices) {
-                    TTSEngine.get().speak("$i-$j", beans[j].data)
+                    if (!TextUtils.isEmpty(beans[j].data?.trim())) {
+                        TTSEngine.get().speak("$i-$j", beans[j].data)
+                    }
                 }
             }
         }

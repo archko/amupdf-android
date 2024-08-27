@@ -517,21 +517,21 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     private fun startTts() {
         TTSEngine.get().setSpeakListener(object : TTSEngine.ProgressListener {
-            override fun onStart(utteranceId: String) {
-            }
-
-            override fun onDone(key: String) {
+            override fun onStart(key: String) {
                 try {
-                    //Logcat.d("onDone:$key")
                     val arr = key.split("-")
                     val page = Utils.parseInt(arr[0])
                     val current = getCurrentPos()
+                    Logcat.d("onStart:$key, current:$current")
                     if (current != page) {
-                        handler.post { onSelectedOutline(page) }
+                        onSelectedOutline(page)
                     }
                 } catch (e: Exception) {
                     Logcat.e(e)
                 }
+            }
+
+            override fun onDone(key: String) {
             }
         })
         ttsPlay.setOnClickListener {
@@ -689,6 +689,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             }
         }
         Logcat.d("onResume ")
+        updateControls()
     }
 
     override fun onPause() {

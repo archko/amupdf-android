@@ -1,14 +1,12 @@
 package cn.archko.pdf.activities
 
 import android.annotation.SuppressLint
-import android.app.Activity.RESULT_FIRST_USER
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.SeekBar
@@ -18,6 +16,7 @@ import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.R
 import cn.archko.pdf.common.StyleHelper
+import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
 import cn.archko.pdf.core.widgets.ViewerDividerItemDecoration
@@ -215,7 +214,7 @@ abstract class ATextBaseViewController(
     }
 
     override fun onSelectedOutline(index: Int) {
-        mRecyclerView.layoutManager?.scrollToPosition(index)
+        mRecyclerView.smoothScrollToPosition(index)
         updateProgress(index)
     }
 
