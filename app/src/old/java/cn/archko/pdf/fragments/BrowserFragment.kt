@@ -401,7 +401,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
 
         menuBuilder.menu.add(
             0,
-            PDFViewerHelper.mupdfContextMenuItem,
+            PDFViewerHelper.mupdfNoCropContextMenuItem,
             0,
             getString(R.string.menu_mupdf)
         )

@@ -140,11 +140,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
             mPath = IntentFile.processIntentAction(intent, this)
         }
         if (!TextUtils.isEmpty(mPath)) {
-            if (IntentFile.isDjvu(mPath!!)) {
-                PDFViewerHelper.openDjvu(intent.data, this)
-            } else if (IntentFile.isImage(mPath!!)) {
-                PDFViewerHelper.openImage(mPath, this)
-            }
+            PDFViewerHelper.openImage(mPath, this)
         }
         intent = null
     }

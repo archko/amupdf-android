@@ -528,7 +528,7 @@ public class DecodeServiceBase implements DecodeService {
         return document.getPageCount();
     }
 
-    private class DecodeTask {
+    private static class DecodeTask {
         private static final int TYPE_PAGE = 0;
         private static final int TYPE_NODE = 1;
         private final String decodeKey;

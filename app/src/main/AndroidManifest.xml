@@ -162,11 +162,6 @@
             android:configChanges="orientation|keyboardHidden|screenSize|uiMode|fontScale"
             android:screenOrientation="fullSensor"
             tools:ignore="DiscouragedApi" />
-        <activity
-            android:name="org.vudroid.djvudroid.DjvuViewerActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize|uiMode|fontScale"
-            android:screenOrientation="fullSensor"
-            tools:ignore="DiscouragedApi" />
 
         <!--<activity
             android:name="cn.archko.pdf.activities.ChooseFileFragmentActivity"
