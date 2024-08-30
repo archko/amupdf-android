@@ -794,7 +794,17 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     controllerListener,
                 )
             } else if (viewMode == ViewMode.REFLOW) {
-                return AReflowViewController(
+                return AScanReflowViewController(
+                    context,
+                    scope,
+                    controllerLayout,
+                    pdfViewModel,
+                    path,
+                    pageSeekBarControls,
+                    controllerListener,
+                )
+            } else if (viewMode == ViewMode.REFLOW_SCAN) {
+                return AScanReflowViewController(
                     context,
                     scope,
                     controllerLayout,
@@ -828,6 +838,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     enum class ViewMode {
-        NORMAL, CROP, REFLOW, TEXT
+        NORMAL, CROP, REFLOW, REFLOW_SCAN, TEXT
     }
 }

@@ -22,14 +22,14 @@ import kotlinx.coroutines.launch
 /**
  * @author: archko 2020/5/15 :12:43
  */
-class AReflowViewController(
-    private var context: FragmentActivity,
-    private var scope: CoroutineScope,
-    private val mControllerLayout: RelativeLayout,
-    private var docViewModel: DocViewModel,
-    private var mPath: String,
-    private var pageControls: PageControls?,
-    private var controllerListener: ControllerListener?,
+class ATextReflowViewController(
+    context: FragmentActivity,
+    scope: CoroutineScope,
+    mControllerLayout: RelativeLayout,
+    docViewModel: DocViewModel,
+    mPath: String,
+    pageControls: PageControls?,
+    controllerListener: ControllerListener?,
 ) : ATextBaseViewController(
     context,
     scope,

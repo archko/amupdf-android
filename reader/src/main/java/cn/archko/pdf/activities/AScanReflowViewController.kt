@@ -2,6 +2,7 @@ package cn.archko.pdf.activities
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.SystemClock
 import android.view.View
 import android.view.ViewGroup
@@ -12,15 +13,12 @@ import android.widget.RelativeLayout
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
 import cn.archko.pdf.common.ReflowHelper
-import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.ReflowViewCache
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.State
 import cn.archko.pdf.core.utils.Utils
-import cn.archko.pdf.listeners.AViewController
-import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.PageControls
@@ -41,14 +39,14 @@ import kotlinx.coroutines.withContext
  * @author: archko 2024/8/25 :12:43
  */
 class AScanReflowViewController(
-    private var context: FragmentActivity,
-    private var scope: CoroutineScope,
-    private val mControllerLayout: RelativeLayout,
-    private var docViewModel: DocViewModel,
-    private var mPath: String,
-    private var pageControls: PageControls?,
-    private var controllerListener: ControllerListener?,
-) : ATextBaseViewController(
+    context: FragmentActivity,
+    scope: CoroutineScope,
+    mControllerLayout: RelativeLayout,
+    docViewModel: DocViewModel,
+    mPath: String,
+    pageControls: PageControls?,
+    controllerListener: ControllerListener?,
+) : ABaseViewController(
     context,
     scope,
     mControllerLayout,
@@ -56,7 +54,7 @@ class AScanReflowViewController(
     mPath,
     pageControls,
     controllerListener
-), OutlineListener, AViewController {
+) {
 
     val opt = K2PdfOpt()
     private var mPageSizes = mutableListOf<APage>()
@@ -72,7 +70,7 @@ class AScanReflowViewController(
 
     private var adapter = object : ARecyclerView.Adapter<ReflowViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReflowViewHolder {
-            val pdfView = ReflowView(context, mStyleHelper)
+            val pdfView = ReflowView(context)
             val holder = ReflowViewHolder(pdfView)
             val lp: ARecyclerView.LayoutParams = ARecyclerView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -95,7 +93,7 @@ class AScanReflowViewController(
                 if (bitmap == null) {
                     bitmap = ReflowHelper.loadBitmapByPage(
                         pdfViewModel.mupdfDocument,
-                        screenWidth * 2,
+                        (screenWidth * 2.5f).toInt(),
                         position,
                     )
                     BitmapCache.getInstance().addBitmap(key, bitmap)
@@ -104,7 +102,7 @@ class AScanReflowViewController(
                 if (null != bitmap) {
                     bitmaps = ReflowHelper.k2pdf2bitmap(
                         opt,
-                        1.3f,
+                        1f,
                         bitmap,
                         screenWidth,
                         screenHeight,
@@ -225,7 +223,6 @@ class AScanReflowViewController(
     }
 
     override fun decodePageForTts(currentPos: Int) {
-        pdfViewModel.decodeTextForTts(currentPos)
     }
 
     //--------------------------------------
@@ -284,10 +281,14 @@ class AScanReflowViewController(
         }
     }
 
-    inner class ReflowView(context: Context?, private val styleHelper: StyleHelper) :
+    inner class ReflowView(context: Context?) :
         LinearLayout(context) {
+        private val leftPadding = 10
+        private val rightPadding = 10
+
         init {
             orientation = VERTICAL
+            setBackgroundColor(Color.WHITE)
             minimumHeight = Utils.dipToPixel(200f)
         }
 
@@ -305,13 +306,12 @@ class AScanReflowViewController(
                 imageView.scaleType = ImageView.ScaleType.FIT_CENTER
             }
             val ratio = 1f * width / bitmap.width
+            val rw = width - leftPadding - rightPadding
             val height = (bitmap.height * ratio).toInt()
-            Logcat.d("reflow", String.format("w-h:%s-%s,%s", width, height, ratio))
-            val lp = LayoutParams(width, height)
-            lp.leftMargin = styleHelper.styleBean!!.leftPadding
-            lp.topMargin = styleHelper.styleBean!!.topPadding
-            lp.rightMargin = styleHelper.styleBean!!.rightPadding
-            lp.bottomMargin = styleHelper.styleBean!!.bottomPadding
+            //Logcat.d("reflow", String.format("w-h:%s-%s,%s", rw, height, ratio))
+            val lp = LayoutParams(rw, height)
+            lp.leftMargin = leftPadding
+            lp.rightMargin = rightPadding
             addView(imageView, lp)
             imageView.setImageBitmap(bitmap)
         }
@@ -320,6 +320,6 @@ class AScanReflowViewController(
 
     companion object {
 
-        private const val TAG = "ReflowView"
+        private const val TAG = "ScanReflowView"
     }
 }

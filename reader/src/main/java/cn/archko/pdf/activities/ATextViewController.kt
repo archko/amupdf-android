@@ -24,13 +24,13 @@ import kotlinx.coroutines.launch
  * @author: archko 2024/8/15 :12:43
  */
 class ATextViewController(
-    private var context: FragmentActivity,
-    private var scope: CoroutineScope,
-    private val mControllerLayout: RelativeLayout,
-    private var docViewModel: DocViewModel,
-    private var mPath: String,
-    private var pageControls: PageControls?,
-    private var controllerListener: ControllerListener?,
+    context: FragmentActivity,
+    scope: CoroutineScope,
+    mControllerLayout: RelativeLayout,
+    docViewModel: DocViewModel,
+    mPath: String,
+    pageControls: PageControls?,
+    controllerListener: ControllerListener?,
 ) : ATextBaseViewController(
     context,
     scope,

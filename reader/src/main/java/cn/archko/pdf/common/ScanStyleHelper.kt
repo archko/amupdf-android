@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 /**
  * @author: archko 2019-06-19 :12:27
  */
-class StyleHelper(
+class ScanStyleHelper(
     private var context: ComponentActivity,
 ) {
 
