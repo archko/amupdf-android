@@ -20,6 +20,39 @@
             app:navigationIcon="@drawable/ic_back"
             app:title="@string/edit_title" />
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPreview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:gravity="center"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/edit_reflow_preview" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnReflow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:gravity="center"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/edit_reflow_btn" />
+        </LinearLayout>
     </RelativeLayout>
 
     <LinearLayout
@@ -33,35 +66,71 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginRight="8dp"
-            android:text="选择重排后的高宽"
-            android:visibility="gone" />
+            android:text="原图宽:越大,重排效果越好,但耗时越长,生成体积越大"
+            android:textSize="13sp"
+            android:visibility="visible"
+            tools:visibility="visible" />
 
         <com.google.android.material.slider.Slider
             android:id="@+id/resolutionSlider"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
-            android:layout_marginTop="10dp"
             android:layout_marginRight="8dp"
             android:stepSize="1"
             android:text="分辨率"
             android:theme="@style/Theme.RangeSlider"
             android:valueFrom="1080.0"
             android:valueTo="3600.0"
+            android:visibility="visible"
+            app:labelBehavior="visible"
+            app:tickVisible="false"
+            tools:visibility="visible" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/fontSlider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:stepSize="0.1"
+            android:text="字体"
+            android:theme="@style/Theme.RangeSlider"
+            android:valueFrom="0.5"
+            android:valueTo="2.0"
+            android:visibility="visible"
+            app:labelBehavior="visible"
+            app:tickVisible="false"
+            tools:visibility="visible" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/dpiSlider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:stepSize="1"
+            android:text="dpi"
+            android:theme="@style/Theme.RangeSlider"
+            android:valueFrom="200"
+            android:valueTo="600"
             android:visibility="gone"
             app:labelBehavior="visible"
-            app:tickVisible="false" />
+            app:tickVisible="false"
+            tools:visibility="gone" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp">
+            android:layout_margin="8dp"
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvStart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="10" />
+                tools:text="1" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
@@ -75,7 +144,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 tools:ignore="RelativeOverlap"
-                tools:text="10" />
+                tools:text="100" />
         </RelativeLayout>
 
         <com.google.android.material.slider.RangeSlider
@@ -83,47 +152,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
-            android:layout_marginTop="10dp"
             android:layout_marginRight="8dp"
             android:stepSize="1"
             android:text="@string/edit_reflow_page_range"
             android:theme="@style/Theme.RangeSlider"
+            android:visibility="gone"
             app:labelBehavior="visible"
-            app:tickVisible="false" />
+            app:tickVisible="false"
+            tools:visibility="gone" />
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:orientation="horizontal">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnPreview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:gravity="center"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/edit_reflow_preview" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnReflow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:gravity="center"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/edit_reflow_btn" />
     </LinearLayout>
 
     <androidx.recyclerview.awidget.ARecyclerView

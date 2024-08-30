@@ -12,7 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import cn.archko.mupdf.R
+import cn.archko.pdf.R
 import cn.archko.pdf.core.App
 import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.common.EncodingDetect
@@ -516,8 +516,11 @@ object PDFCreaterHelper {
         val bitmap = BitmapFactory.decodeFile(path)
         contentView.setImageBitmap(bitmap)
         val pageHeight = bitmap.height * pageWidth / bitmap.width
-        val pageInfo: PdfDocument.PageInfo = PdfDocument.PageInfo
-            .Builder(pageWidth, pageHeight, pageNo)
+        val pageInfo: PdfDocument.PageInfo = PdfDocument.PageInfo.Builder(
+            pageWidth,
+            pageHeight,
+            pageNo
+        )
             .create()
         val page: PdfDocument.Page = pdfDocument.startPage(pageInfo)
         val canvas: Canvas = page.getCanvas()

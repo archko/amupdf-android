@@ -3,12 +3,12 @@ package cn.archko.pdf.adapters
 import android.content.Context
 import android.view.ViewGroup
 import androidx.recyclerview.awidget.ARecyclerView
-import cn.archko.pdf.core.App
-import cn.archko.pdf.core.common.Logcat
-import cn.archko.pdf.core.cache.ReflowViewCache
 import cn.archko.pdf.common.StyleHelper
-import cn.archko.pdf.core.entity.ReflowBean
+import cn.archko.pdf.core.App
+import cn.archko.pdf.core.cache.ReflowViewCache
+import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.decode.MupdfDocument
+import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.viewmodel.PDFViewModel
 import kotlinx.coroutines.CoroutineScope

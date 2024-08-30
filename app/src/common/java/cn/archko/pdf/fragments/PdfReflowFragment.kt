@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.awidget.GridLayoutManager
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.FragmentReflowPdfBinding
+import cn.archko.pdf.common.ReflowHelper
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.common.IntentFile
@@ -25,6 +26,7 @@ import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.fragments.MupdfGridAdapter
 import cn.archko.pdf.fragments.PDFEditViewModel
+import cn.archko.pdf.fragments.ReflowDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -102,6 +104,12 @@ class PdfReflowFragment : DialogFragment(R.layout.fragment_reflow_pdf) {
                 showReflowDialog(0)
             }
         }
+
+        pdfPath = "/storage/emulated/0/book/3、医方真谛.pdf"
+        pdfPath?.let {
+            pdfEditViewModel.loadPdfDoc(requireActivity(), it, null)
+            pdfAdapter.notifyDataSetChanged()
+        }
     }
 
     private fun showReflowDialog(pos: Int) {
@@ -153,8 +161,11 @@ class PdfReflowFragment : DialogFragment(R.layout.fragment_reflow_pdf) {
             val name = FileUtils.getNameWithoutExt(pdfPath)
             val dir = FileUtils.getStorageDir(name).absolutePath
             val result = withContext(Dispatchers.IO) {
-                pdfEditViewModel.reflow(
-                    requireActivity(), binding.layoutTmp,
+                ReflowHelper.reflow(
+                    pdfEditViewModel.mupdfDocument,
+                    pdfEditViewModel.opt,
+                    requireActivity(),
+                    binding.layoutTmp,
                     start, end,
                     Utils.getScreenWidthPixelWithOrientation(requireActivity()),
                     Utils.getScreenHeightPixelWithOrientation(requireActivity()),

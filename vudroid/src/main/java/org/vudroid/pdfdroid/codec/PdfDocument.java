@@ -81,14 +81,16 @@ public class PdfDocument implements CodecDocument {
     }
 
     public static void downOutline(Document core, Outline[] outlines, List<OutlineLink> links) {
-        for (Outline outline : outlines) {
-            int page = core.pageNumberFromLocation(core.resolveLink(outline));
-            OutlineLink link = new OutlineLink(outline.title, page, 0);
-            if (outline.down != null) {
-                Outline[] child = outline.down;
-                downOutline(core, child, links);
+        if (null != outlines) {
+            for (Outline outline : outlines) {
+                int page = core.pageNumberFromLocation(core.resolveLink(outline));
+                OutlineLink link = new OutlineLink(outline.title, page, 0);
+                if (outline.down != null) {
+                    Outline[] child = outline.down;
+                    downOutline(core, child, links);
+                }
+                links.add(link);
             }
-            links.add(link);
         }
     }
 }

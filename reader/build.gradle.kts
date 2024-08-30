@@ -55,6 +55,7 @@ dependencies {
     //    exclude group: "androidx.activity"
     //    exclude group: "androidx.fragment"
     //}
+    implementation(libs.k2pdfopt)
 
     api(project(":vudroid"))
     api(project(":pdf-recyclerview"))

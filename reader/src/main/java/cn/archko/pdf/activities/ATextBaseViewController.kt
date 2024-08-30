@@ -16,7 +16,6 @@ import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.R
 import cn.archko.pdf.common.StyleHelper
-import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
 import cn.archko.pdf.core.widgets.ViewerDividerItemDecoration
@@ -46,7 +45,7 @@ abstract class ATextBaseViewController(
     protected var mStyleControls: View? = null
 
     protected lateinit var mRecyclerView: ARecyclerView
-    protected var mStyleHelper: StyleHelper? = null
+    protected var mStyleHelper: StyleHelper = StyleHelper(context)
     protected val START_PROGRESS = 15
     protected var mGestureDetector: GestureDetector? = null
 
@@ -263,9 +262,6 @@ abstract class ATextBaseViewController(
     private var fgSetting: View? = null
 
     private fun initStyleControls() {
-        if (null == mStyleHelper) {
-            mStyleHelper = StyleHelper(context)
-        }
         pageControls?.hide()
         if (null == mStyleControls) {
             mStyleControls = LayoutInflater.from(context).inflate(R.layout.text_style, null, false)

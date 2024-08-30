@@ -1,8 +1,9 @@
-package cn.archko.pdf.core.ui
+package cn.archko.pdf.fragments
 
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.ViewGroup
@@ -11,10 +12,8 @@ import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.DialogReflowBinding
+import cn.archko.pdf.common.ReflowHelper
 import cn.archko.pdf.core.common.AppExecutors
-import cn.archko.pdf.core.utils.FileUtils
-import cn.archko.pdf.fragments.PDFEditViewModel
-import coil.load
 import com.google.android.material.slider.RangeSlider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +21,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 
 class ReflowDialog(
     context: Context,
@@ -118,36 +116,32 @@ class ReflowDialog(
                     )
             }
         })
+
+        val dm = context.resources.displayMetrics
+        binding.fontSlider.value = 1f
     }
 
     private fun preview() {
-        val name = FileUtils.getNameWithoutExt(pdfPath)
-        val dir = FileUtils.getStorageDir(name).absolutePath
         val scope = CoroutineScope(Job() + AppExecutors.instance.diskIO().asCoroutineDispatcher())
         scope.launch {
-            FileUtils.cleanDir(File(dir))
+            val dm = context.resources.displayMetrics
             val width = binding.resolutionSlider.value.toInt()
-            val bitmap = pdfEditViewModel.loadBitmapByPage(width, page)
+            val fontSize = binding.fontSlider.value
+
+            val bitmap =
+                ReflowHelper.loadBitmapByPage(pdfEditViewModel.mupdfDocument, width, page)
             if (null != bitmap) {
-                val list = mutableListOf<String>()
-                val result = pdfEditViewModel.k2pdf(
+                val bitmaps: MutableList<Bitmap> = ReflowHelper.k2pdf2bitmap(
+                    pdfEditViewModel.opt,
+                    fontSize,
                     bitmap,
                     screenWidth,
                     screenHeight,
-                    270,
-                    dir,
-                    list
+                    dm.densityDpi
                 )
-                if (result > 0) {
-                    val file = File(dir)
-                    val files = file.listFiles()
-
-                    withContext(Dispatchers.Main) {
-                        if (files != null) {
-                            imageAdapter.files = files
-                            imageAdapter.notifyDataSetChanged()
-                        }
-                    }
+                withContext(Dispatchers.Main) {
+                    imageAdapter.bitmaps = bitmaps
+                    imageAdapter.notifyDataSetChanged()
                 }
             }
         }
@@ -158,13 +152,13 @@ class ReflowDialog(
     ) :
         ARecyclerView.Adapter<ARecyclerView.ViewHolder>() {
 
-        var files: Array<File>? = null
+        var bitmaps: List<Bitmap>? = null
 
         override fun getItemCount(): Int {
-            if (null == files) {
+            if (null == bitmaps) {
                 return 0
             }
-            return files!!.size
+            return bitmaps!!.size
         }
 
         override fun onCreateViewHolder(
@@ -185,14 +179,13 @@ class ReflowDialog(
 
         override fun onBindViewHolder(viewHolder: ARecyclerView.ViewHolder, position: Int) {
             val pdfHolder = viewHolder as ImageHolder
-
             pdfHolder.onBind(position)
         }
 
         inner class ImageHolder(internal var view: ImageView) : ARecyclerView.ViewHolder(view) {
 
             fun onBind(position: Int) {
-                view.load(files?.get(position)?.path)
+                view.setImageBitmap(bitmaps?.get(position))
             }
         }
     }
