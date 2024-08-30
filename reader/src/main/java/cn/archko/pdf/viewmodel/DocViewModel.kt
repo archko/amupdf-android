@@ -163,19 +163,6 @@ class DocViewModel : ViewModel() {
         emit(bookmarks)
     }.flowOn(Dispatchers.IO)
 
-    fun storeCropAndReflow(crop: Boolean, reflow: Boolean) {
-        if (crop) {
-            bookProgress?.autoCrop = 0
-        } else {
-            bookProgress?.autoCrop = 1
-        }
-        if (reflow) {
-            bookProgress?.reflow = 1
-        } else {
-            bookProgress?.reflow = 0
-        }
-    }
-
     fun storeCrop(crop: Boolean) {
         if (crop) {
             bookProgress?.autoCrop = 0
@@ -184,12 +171,8 @@ class DocViewModel : ViewModel() {
         }
     }
 
-    fun storeReflow(reflow: Boolean) {
-        if (reflow) {
-            bookProgress?.reflow = 1
-        } else {
-            bookProgress?.reflow = 0
-        }
+    fun storeReflow(reflow: Int) {
+        bookProgress?.reflow = reflow
     }
 
     fun checkCrop(): Boolean {
@@ -199,11 +182,8 @@ class DocViewModel : ViewModel() {
         return bookProgress!!.autoCrop == 0
     }
 
-    fun checkReflow(): Boolean {
-        if (null == bookProgress) {
-            return false
-        }
-        return bookProgress!!.reflow == 1
+    fun getReflow(): Int {
+        return bookProgress?.reflow ?: 0
     }
 
     fun saveBookProgress(

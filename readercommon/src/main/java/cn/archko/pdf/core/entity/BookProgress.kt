@@ -102,7 +102,7 @@ class BookProgress : Serializable, Comparator<BookProgress> {
     var autoCrop: Int = 0
 
     /**
-     * 3.2.0 add textreflow:0,no reflow mode,1,reflow mode
+     * 3.2.0 add textreflow:0,no reflow mode,1,reflow mode,2 scan pdf reflow mode
      */
     @JvmField
     @ColumnInfo(name = "record_reflow")
@@ -292,5 +292,9 @@ class BookProgress : Serializable, Comparator<BookProgress> {
         const val IN_RECENT = 0
         const val NOT_IN_RECENT = -1
         const val ALL = -2
+
+        const val REFLOW_NO = 0
+        const val REFLOW_TXT = 1
+        const val REFLOW_SCAN = 2
     }
 }

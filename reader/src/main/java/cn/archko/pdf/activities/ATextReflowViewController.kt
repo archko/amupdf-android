@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentActivity
 import cn.archko.pdf.adapters.MuPDFReflowAdapter
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.State
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
@@ -186,6 +187,10 @@ class ATextReflowViewController(
 
     override fun decodePageForTts(currentPos: Int) {
         pdfViewModel.decodeTextForTts(currentPos)
+    }
+
+    override fun reflow(): Int {
+        return BookProgress.REFLOW_TXT
     }
 
     //--------------------------------------

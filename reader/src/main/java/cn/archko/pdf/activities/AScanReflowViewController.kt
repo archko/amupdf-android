@@ -17,6 +17,7 @@ import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.ReflowViewCache
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.State
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.viewmodel.DocViewModel
@@ -93,7 +94,7 @@ class AScanReflowViewController(
                 if (bitmap == null) {
                     bitmap = ReflowHelper.loadBitmapByPage(
                         pdfViewModel.mupdfDocument,
-                        screenWidth * 3,
+                        (screenWidth * 2.4).toInt(),
                         position,
                     )
                     BitmapCache.getInstance().addBitmap(key, bitmap)
@@ -229,7 +230,7 @@ class AScanReflowViewController(
 
     override fun onPause() {
         if (null != pdfViewModel.mupdfDocument && null != docViewModel.bookProgress) {
-            docViewModel.bookProgress!!.reflow = 1
+            docViewModel.bookProgress!!.reflow = BookProgress.REFLOW_SCAN
             var savePos = getCurrentPos() + 1
             val lastPos = getLastPos()
             if (lastPos == mPageSizes.size - 1) {
@@ -316,10 +317,8 @@ class AScanReflowViewController(
             imageView.setImageBitmap(bitmap)
         }
     }
-    //===========================================
 
-    companion object {
-
-        private const val TAG = "ScanReflowView"
+    override fun reflow(): Int {
+        return BookProgress.REFLOW_SCAN
     }
 }

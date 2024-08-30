@@ -4,6 +4,7 @@
     <string name="in_reflow_mode">Reflow mode</string>
     <string name="leaving_reflow_mode">Leaving reflow mode</string>
     <string name="toggle_reflow_mode">Toggle reflow mode</string>
+    <string name="toggle_reflow_image">Reflow as Image</string>
     <string name="outline_title">Outline</string>
     <string name="bookmark_title">Bookmark</string>
 

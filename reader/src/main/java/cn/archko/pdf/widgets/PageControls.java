@@ -8,6 +8,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import cn.archko.pdf.R;
+import cn.archko.pdf.core.entity.BookProgress;
 import cn.archko.pdf.core.utils.FileUtils;
 
 /**
@@ -25,6 +26,7 @@ public class PageControls implements View.OnClickListener {
     protected TextView mPageNumber;
 
     private ImageButton mReflowButton;
+    private ImageButton mImageButton;
     private ImageButton mOutlineButton;
     private ImageButton mAutoCropButton;
     private ImageButton mOriButton;
@@ -48,6 +50,8 @@ public class PageControls implements View.OnClickListener {
 
         void toggleReflow();
 
+        void toggleReflowImage();
+
         void toggleCrop();
 
         void toggleTts();
@@ -64,6 +68,7 @@ public class PageControls implements View.OnClickListener {
         mPageSlider = view.findViewById(R.id.seek_bar);
         mPageNumber = view.findViewById(R.id.page_num);
         mReflowButton = view.findViewById(R.id.reflowButton);
+        mImageButton = view.findViewById(R.id.imageButton);
         mOutlineButton = view.findViewById(R.id.outlineButton);
         mAutoCropButton = view.findViewById(R.id.autoCropButton);
         mOriButton = view.findViewById(R.id.oriButton);
@@ -74,6 +79,7 @@ public class PageControls implements View.OnClickListener {
         mBackButton = view.findViewById(R.id.back_button);
 
         mReflowButton.setOnClickListener(this);
+        mImageButton.setOnClickListener(this);
         mOutlineButton.setOnClickListener(this);
         mAutoCropButton.setOnClickListener(this);
         mOriButton.setOnClickListener(this);
@@ -151,16 +157,30 @@ public class PageControls implements View.OnClickListener {
         bottomLayout.setVisibility(View.GONE);
     }
 
-    public void showReflow(boolean reflow) {
-        if (reflow) {
+    public void showReflow(int reflow) {
+        boolean shouldReflow = reflow == BookProgress.REFLOW_TXT;
+        if (shouldReflow) {
             mReflowButton.setColorFilter(Color.argb(0xFF, 172, 114, 37));
         } else {
             mReflowButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
         }
     }
 
+    public void showReflowImage(int reflow) {
+        boolean shouldReflow = reflow == BookProgress.REFLOW_SCAN;
+        if (shouldReflow) {
+            mImageButton.setColorFilter(Color.argb(0xFF, 172, 114, 37));
+        } else {
+            mImageButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
+        }
+    }
+
     public ImageButton getReflowButton() {
         return mReflowButton;
+    }
+
+    public ImageButton getImageButton() {
+        return mImageButton;
     }
 
     public ImageButton getAutoCropButton() {
@@ -188,6 +208,8 @@ public class PageControls implements View.OnClickListener {
             controlListener.back();
         } else if (R.id.reflowButton == id) {
             controlListener.toggleReflow();
+        } else if (R.id.imageButton == id) {
+            controlListener.toggleReflowImage();
         } else if (R.id.autoCropButton == id) {
             controlListener.toggleCrop();
         } else if (R.id.ttsButton == id) {

@@ -11,6 +11,7 @@ import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.adapters.MuPDFReflowAdapter
 import cn.archko.pdf.adapters.MuPDFTextAdapter
 import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
@@ -146,6 +147,10 @@ class ATextViewController(
             getCurrentPos(),
             (mRecyclerView.adapter as MuPDFTextAdapter).data
         )
+    }
+
+    override fun reflow(): Int {
+        return BookProgress.REFLOW_TXT
     }
 
     //--------------------------------------

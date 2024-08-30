@@ -37,4 +37,5 @@ interface AViewController {
     fun notifyItemChanged(pos: Int)
     fun setFilter(colorMode: Int)
     fun decodePageForTts(currentPos: Int)
+    fun reflow(): Int
 }

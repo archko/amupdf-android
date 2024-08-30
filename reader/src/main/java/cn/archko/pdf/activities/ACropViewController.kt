@@ -1,7 +1,6 @@
 package cn.archko.pdf.activities
 
 import android.annotation.SuppressLint
-import android.app.Activity.RESULT_FIRST_USER
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Rect
@@ -17,12 +16,12 @@ import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
-import cn.archko.pdf.viewmodel.PDFViewModel
 import cn.archko.pdf.widgets.APDFView
 import cn.archko.pdf.widgets.PageControls
 import kotlinx.coroutines.CoroutineScope
@@ -338,6 +337,10 @@ class ACropViewController(
     }
 
     override fun decodePageForTts(currentPos: Int) {
+    }
+
+    override fun reflow(): Int {
+        return BookProgress.REFLOW_NO
     }
 
     //--------------------------------------

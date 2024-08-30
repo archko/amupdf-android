@@ -18,6 +18,7 @@ import cn.archko.pdf.core.common.AppExecutors.Companion.instance
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.SimpleGestureListener
 import cn.archko.pdf.listeners.AViewController
@@ -320,6 +321,16 @@ class ANormalViewController(
             }
         }
         Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
+    }
+
+    /**
+     * 重排判断是从这出的.判断是文本重排还是图片重排,依据当前的pdf文档
+     * 如果是pdf之外的,直接判断为文本方式重排.
+     * 如果是pdf,则从页面内容判断,取第二页,中间两页来判断是否可以取得文本,页数不够则从头开始
+     * 如果可以则认为是文本类,如果不可以,则认为是图片类
+     */
+    override fun reflow(): Int {
+        return BookProgress.REFLOW_NO
     }
 
     //--------------------------------------

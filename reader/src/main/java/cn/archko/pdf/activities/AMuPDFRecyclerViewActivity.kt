@@ -34,6 +34,7 @@ import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.common.SensorHelper
 import cn.archko.pdf.core.common.StatusBarHelper
+import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.Bookmark
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.fragments.OutlineFragment
@@ -168,15 +169,23 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private fun updateControls() {
         pageControls?.apply {
             updateTitle(mPath)
-            showReflow(pdfViewModel.checkReflow())
+            showReflow(pdfViewModel.getReflow())
+            showReflowImage(pdfViewModel.getReflow())
             orientation = pdfViewModel.bookProgress?.scrollOrientation ?: 1
-            if (viewMode == ViewMode.TEXT) {
+            if (IntentFile.isText(mPath!!)) {
                 reflowButton.visibility = View.GONE
                 autoCropButton.visibility = View.GONE
                 outlineButton.visibility = View.GONE
                 oriButton.visibility = View.GONE
+                imageButton.visibility = View.GONE
+            } else if (IntentFile.isMuPdf(mPath!!)) {
+                reflowButton.visibility = View.VISIBLE
+                imageButton.visibility = View.VISIBLE
+                autoCropButton.visibility = View.VISIBLE
+                outlineButton.visibility = View.VISIBLE
             } else {
                 reflowButton.visibility = View.VISIBLE
+                imageButton.visibility = View.GONE
                 autoCropButton.visibility = View.VISIBLE
                 outlineButton.visibility = View.VISIBLE
             }
@@ -224,7 +233,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 if (!isDocLoaded) {
                     return false
                 }
-                if (viewMode == ViewMode.REFLOW) {
+                if (viewMode == ViewMode.REFLOW || viewMode == ViewMode.REFLOW_SCAN) {
                     var showFlag = false
                     if (pageControls?.visibility() == View.VISIBLE) {
                         pageControls?.hide()
@@ -282,16 +291,19 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         if (IntentFile.isText(mPath!!)) {
             viewMode = ViewMode.TEXT
         } else {
-            if (pdfViewModel.checkReflow()) {
-                viewMode = ViewMode.REFLOW
+            val reflow = pdfViewModel.getReflow()
+            viewMode = if (reflow == BookProgress.REFLOW_TXT) {
+                ViewMode.REFLOW
+            } else if (reflow == BookProgress.REFLOW_SCAN) {
+                ViewMode.REFLOW_SCAN
             } else if (pdfViewModel.checkCrop()) {
-                viewMode = ViewMode.CROP
+                ViewMode.CROP
             } else {
-                viewMode = ViewMode.NORMAL
+                ViewMode.NORMAL
             }
         }
 
-        if (viewMode != ViewMode.REFLOW) {
+        if (viewMode != ViewMode.REFLOW && viewMode != ViewMode.REFLOW_SCAN) {
             if (forceCropParam > -1) {
                 pdfViewModel.storeCrop(forceCropParam == 1)
             }
@@ -317,7 +329,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
         addDocumentView()
 
-        cropModeSet(pdfViewModel.checkCrop())
+        setReflowButton(pdfViewModel.getReflow())
 
         return true
     }
@@ -325,7 +337,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     //===========================================
 
     private fun ocr() {
-        if (pdfViewModel.checkReflow()) {
+        if (pdfViewModel.getReflow() != BookProgress.REFLOW_NO) {//TODO
             Toast.makeText(
                 this@AMuPDFRecyclerViewActivity,
                 "已经是文本",
@@ -421,34 +433,72 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }*/
     }
 
+    /**
+     * 原来不是文本重排模式,可能是没有初始化过,不确定,切换为重排模式时需要先确定文档是否支持
+     * 原来是重排模式,直接切换回来即可,切边或不切边
+     */
     private fun toggleReflow() {
-        val reflow = !pdfViewModel.checkReflow()
-        if (!reflow) {  //如果原来是文本重排模式,则切换为自动切边或普通模式
-            if (pdfViewModel.checkCrop()) {
-                viewMode = ViewMode.CROP
+        val reflow = pdfViewModel.getReflow()
+        if (reflow == BookProgress.REFLOW_TXT) {
+            pdfViewModel.storeReflow(BookProgress.REFLOW_NO)
+            viewMode = if (pdfViewModel.checkCrop()) {
+                ViewMode.CROP
             } else {
-                viewMode = ViewMode.NORMAL
+                ViewMode.NORMAL
             }
             if (mReflowLayout.visibility == View.VISIBLE) {
                 mReflowLayout.visibility = View.GONE
             }
         } else {
+            /*val reflowMode = viewController?.reflow()
+            viewMode = if (reflowMode == BookProgress.REFLOW_TXT) {
+                ViewMode.REFLOW
+            } else {
+                ViewMode.REFLOW_SCAN
+            }
+            if (reflowMode != null) {
+                pdfViewModel.storeReflow(reflowMode)
+            }*/
             viewMode = ViewMode.REFLOW
+            pdfViewModel.storeReflow(BookProgress.REFLOW_TXT)
         }
-        pdfViewModel.storeReflow(reflow)
 
         applyViewMode(getCurrentPos())
-
-        setReflowButton(reflow)
     }
 
-    private fun setReflowButton(reflow: Boolean) {
+    private fun toggleReflowImage() {
+        val reflow = pdfViewModel.getReflow()
+        if (reflow == BookProgress.REFLOW_SCAN) {
+            pdfViewModel.storeReflow(BookProgress.REFLOW_NO)
+            viewMode = if (pdfViewModel.checkCrop()) {
+                ViewMode.CROP
+            } else {
+                ViewMode.NORMAL
+            }
+        } else {
+            viewMode = ViewMode.REFLOW_SCAN
+            pdfViewModel.storeReflow(BookProgress.REFLOW_SCAN)
+        }
+        if (mReflowLayout.visibility == View.VISIBLE) {
+            mReflowLayout.visibility = View.GONE
+        }
+
+        applyViewMode(getCurrentPos())
+    }
+
+    private fun setReflowButton(reflow: Int) {
         val crop: Boolean
-        if (reflow) {
+        if (reflow == BookProgress.REFLOW_TXT) {
             crop = false
             pageControls?.reflowButton!!.setColorFilter(Color.argb(0xFF, 172, 114, 37))
+            pageControls?.imageButton!!.setColorFilter(Color.argb(0xFF, 255, 255, 255))
+        } else if (reflow == BookProgress.REFLOW_SCAN) {
+            crop = false
+            pageControls?.reflowButton!!.setColorFilter(Color.argb(0xFF, 255, 255, 255))
+            pageControls?.imageButton!!.setColorFilter(Color.argb(0xFF, 172, 114, 37))
         } else {
             pageControls?.reflowButton!!.setColorFilter(Color.argb(0xFF, 255, 255, 255))
+            pageControls?.imageButton!!.setColorFilter(Color.argb(0xFF, 255, 255, 255))
             crop = pdfViewModel.checkCrop()
         }
 
@@ -465,6 +515,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             object : PageControls.ControlListener {
                 override fun toggleReflow() {
                     this@AMuPDFRecyclerViewActivity.toggleReflow()
+                }
+
+                override fun toggleReflowImage() {
+                    this@AMuPDFRecyclerViewActivity.toggleReflowImage()
                 }
 
                 override fun toggleCrop() {
@@ -583,12 +637,11 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun toggleCrop() {
-        var prefCrop = pdfViewModel.checkCrop();
-        val flag = cropModeSet(!prefCrop)
-        if (flag) {
+        val prefCrop = !pdfViewModel.checkCrop()
+        val flag = viewMode == ViewMode.REFLOW || viewMode == ViewMode.REFLOW_SCAN
+        if (!flag) {
             BitmapCache.getInstance().clear()
             viewController?.notifyDataSetChanged()
-            prefCrop = !prefCrop
             if (prefCrop) {
                 viewMode = ViewMode.CROP
             } else {
@@ -596,6 +649,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             }
             pdfViewModel.storeCrop(prefCrop)
             applyViewMode(getCurrentPos())
+            setReflowButton(pdfViewModel.getReflow())
         }
     }
 
@@ -606,27 +660,11 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         return viewController!!.getCurrentPos()
     }
 
-    private fun cropModeSet(crop: Boolean): Boolean {
-        if (pdfViewModel.checkReflow()) {
-            Toast.makeText(
-                this,
-                getString(R.string.in_reflow_mode),
-                Toast.LENGTH_SHORT
-            ).show()
-            pageControls?.reflowButton!!.setColorFilter(Color.argb(0xFF, 172, 114, 37))
-            pageControls?.autoCropButton!!.setImageResource(R.drawable.ic_no_crop)
-            return false
-        }
-        setCropButton(crop)
-        return true
-    }
-
     private fun setCropButton(crop: Boolean) {
         if (crop) {
             pageControls?.autoCropButton!!.setImageResource(R.drawable.ic_crop)
         } else {
             pageControls?.autoCropButton!!.setImageResource(R.drawable.ic_no_crop)
-
         }
     }
 
