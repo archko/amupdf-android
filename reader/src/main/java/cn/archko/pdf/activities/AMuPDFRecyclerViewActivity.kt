@@ -794,7 +794,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     controllerListener,
                 )
             } else if (viewMode == ViewMode.REFLOW) {
-                return AScanReflowViewController(
+                return ATextReflowViewController(
                     context,
                     scope,
                     controllerLayout,

@@ -93,7 +93,7 @@ class AScanReflowViewController(
                 if (bitmap == null) {
                     bitmap = ReflowHelper.loadBitmapByPage(
                         pdfViewModel.mupdfDocument,
-                        (screenWidth * 2.5f).toInt(),
+                        screenWidth * 3,
                         position,
                     )
                     BitmapCache.getInstance().addBitmap(key, bitmap)
@@ -283,8 +283,8 @@ class AScanReflowViewController(
 
     inner class ReflowView(context: Context?) :
         LinearLayout(context) {
-        private val leftPadding = 10
-        private val rightPadding = 10
+        private val leftPadding = 15
+        private val rightPadding = 15
 
         init {
             orientation = VERTICAL
