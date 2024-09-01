@@ -77,6 +77,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private lateinit var ttsPlay: View
     private lateinit var ttsClose: View
     private lateinit var ttsSleep: View
+    private lateinit var ttsText: View
     private val viewControllerCache: SparseArray<AViewController> = SparseArray<AViewController>()
     private var viewMode: ViewMode = ViewMode.CROP
     private var ttsMode = false
@@ -159,6 +160,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         ttsPlay = findViewById(R.id.ttsPlay)
         ttsClose = findViewById(R.id.ttsClose)
         ttsSleep = findViewById(R.id.ttsSleep)
+        ttsText = findViewById(R.id.ttsText)
         mReflowLayout = findViewById(R.id.reflow_layout)
 
         pageControls = createControls()
@@ -608,10 +610,29 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 }
             }).showDialog(this)
         }
+        ttsText.setOnClickListener {
+            if (TTSEngine.get().isSpeaking()) {
+                TTSEngine.get().stop()
+            }
+
+            TtsTextFragment.showCreateDialog(
+                this,
+                object : DataListener {
+                    override fun onSuccess(vararg args: Any?) {
+                        val key = args[0] as String
+                        TTSEngine.get().resumeFromKey(content)
+                    }
+
+                    override fun onFailed(vararg args: Any?) {
+                    }
+                })
+        }
         lifecycleScope.launch {
             viewController?.decodePageForTts(getCurrentPos())
         }
     }
+
+    private val closeRunnable = Runnable { closeTts() }
 
     private fun closeTts() {
         ttsLayout.visibility = View.GONE

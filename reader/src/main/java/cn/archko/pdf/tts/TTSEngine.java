@@ -7,6 +7,7 @@ import android.content.pm.ResolveInfo;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.UtteranceProgressListener;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -167,6 +168,37 @@ public class TTSEngine {
         for (int i = 0; i < ttsContent.size(); i++) {
             String content = ttsContent.get(i);
             resumeSpeak(content);
+        }
+        return true;
+    }
+
+    /**
+     * 从指定的内容开始朗读
+     *
+     * @param text
+     * @return
+     */
+    public boolean resumeFromKey(String text) {
+        if (null == textToSpeech || keys.isEmpty() || ttsContent.isEmpty()) {
+            Logcat.d(TAG, "no content.");
+            return false;
+        }
+        if (keys.size() != ttsContent.size()) {
+            Logcat.d(TAG, "something wrong.");
+            ttsContent.clear();
+            ttsContent.addAll(keys.keySet());
+        }
+
+        textToSpeech.stop();
+        boolean found = false;
+        for (int i = 0; i < ttsContent.size(); i++) {
+            if (TextUtils.equals(content, text)) {
+                found = true;
+            }
+            if (found) {
+                String content = ttsContent.get(i);
+                resumeSpeak(content);
+            }
         }
         return true;
     }
