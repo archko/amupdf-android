@@ -324,13 +324,13 @@ class TextActivity : AppCompatActivity() {
 
     private fun startTts() {
         TTSEngine.get().setSpeakListener(object : ProgressListener {
-            override fun onStart(utteranceId: String) {
+            override fun onStart(utteranceId: ReflowBean) {
             }
 
-            override fun onDone(key: String) {
+            override fun onDone(key: ReflowBean) {
                 try {
                     //Logcat.d("onDone:$key")
-                    val arr = key.split("-")
+                    val arr = key.page.split("-")
                     val page = Utils.parseInt(arr[0])
                     val current = getCurrentPos()
                     if (current != page) {

@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
+import cn.archko.pdf.adapters.ReflowTextViewHolder
 import cn.archko.pdf.common.ReflowHelper
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.ReflowViewCache
@@ -117,6 +118,13 @@ class AScanReflowViewController(
                         reflowCache
                     )
                 }
+            }
+        }
+
+        override fun onViewRecycled(holder: ReflowViewHolder) {
+            super.onViewRecycled(holder)
+            if (holder is ReflowViewHolder) {
+                holder.recycleViews(reflowCache)
             }
         }
     }
@@ -271,7 +279,7 @@ class AScanReflowViewController(
             }
         }
 
-        private fun recycleViews(reflowViewCache: ReflowViewCache?) {
+        fun recycleViews(reflowViewCache: ReflowViewCache?) {
             if (null != reflowViewCache) {
                 for (i in 0 until pageView.childCount) {
                     val child = pageView.getChildAt(i)

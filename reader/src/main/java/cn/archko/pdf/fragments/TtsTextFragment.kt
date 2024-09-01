@@ -10,8 +10,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.archko.pdf.R
+import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.DataListener
-import java.util.HashMap
+import cn.archko.pdf.tts.TTSEngine
 
 /**
  * @author: archko 2023/7/28 :14:34
@@ -55,7 +56,10 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
         super.onViewCreated(view, savedInstanceState)
         binding.toolbar.setNavigationOnClickListener { dismiss() }
 
-        pdfAdapter = TextAdapter()
+        textAdapter = TextAdapter()
+        textAdapter.keys.clear()
+        textAdapter.keys.addAll(TTSEngine.get().getTtsContent())
+
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
         binding.recyclerView.adapter = pdfAdapter
         binding.recyclerView.setHasFixedSize(true)
@@ -65,18 +69,14 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
         super.onDestroy()
     }
 
-    private class TextAdapter(
+    inner class TextAdapter(
         var context: Context,
     ) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-        private val keys: MutableMap<String, String> = HashMap<String, String>()
+        val keys: List<ReflowBean> = mutableListOf<ReflowBean>()
 
         override fun getItemCount(): Int {
-            if (null == keys) {
-                return 0
-            }
-            return keys!!.size
+            return keys.size
         }
 
         override fun onCreateViewHolder(
@@ -89,7 +89,7 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
                         RecyclerView.LayoutParams.MATCH_PARENT,
                         RecyclerView.LayoutParams.WRAP_CONTENT
                     )
-                    singleline=true
+                    singleline = true
                 }
 
             return TextHolder(view)
@@ -103,11 +103,11 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
         inner class TextHolder(internal var view: TextView) : RecyclerView.ViewHolder(view) {
 
             fun onBind(position: Int) {
-                view.setOnClickListener{
-                    mDataListener?.onSuccess(keys.get(position))
+                view.setOnClickListener {
+                    mDataListener?.onSuccess(keys[position])
                     dismiss()
                 }
-                view.setText(keys.get(position))
+                view.setText(String.format("%s-%s", keys[position].page, keys[position].data))
             }
         }
     }
@@ -127,7 +127,7 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
             }
             ft?.addToBackStack(null)
 
-            val pdfFragment = PdfReflowFragment()
+            val pdfFragment = TtsTextFragment()
             pdfFragment.setListener(dataListener)
             pdfFragment.show(ft!!, "TtsTextFragment")
         }

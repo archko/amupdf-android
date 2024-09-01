@@ -18,6 +18,7 @@ import java.util.Map;
 
 import cn.archko.pdf.core.App;
 import cn.archko.pdf.core.common.Logcat;
+import cn.archko.pdf.core.entity.ReflowBean;
 import cn.archko.pdf.core.utils.Utils;
 
 public class TTSEngine {
@@ -45,8 +46,8 @@ public class TTSEngine {
 
     private TextToSpeech textToSpeech;
     private boolean initStatus = false;
-    private final Map<String, String> keys = new HashMap<>();
-    private final List<String> ttsContent = new ArrayList<>();
+    private final Map<String, ReflowBean> keys = new HashMap<>();
+    private final List<ReflowBean> ttsContent = new ArrayList<>();
 
     public boolean isInitStatus() {
         return initStatus;
@@ -81,6 +82,10 @@ public class TTSEngine {
         }
     };
     private ProgressListener progressListener;
+
+    public List<ReflowBean> getTtsContent() {
+        return ttsContent;
+    }
 
     public void setSpeakListener(ProgressListener progressListener) {
         this.progressListener = progressListener;
@@ -121,7 +126,7 @@ public class TTSEngine {
             @Override
             public void onStart(String utteranceId) {
                 if (null != progressListener) {
-                    String key = keys.get(utteranceId);
+                    ReflowBean key = keys.get(utteranceId);
                     //Logcat.d(TAG, "onStart:" + utteranceId + " key:" + key);
                     progressListener.onStart(key);
                 }
@@ -132,7 +137,7 @@ public class TTSEngine {
             public void onDone(String utteranceId) {
                 //Logcat.d(TAG, "onDone:" + utteranceId);
                 ttsContent.remove(utteranceId);
-                String key = keys.remove(utteranceId);
+                ReflowBean key = keys.remove(utteranceId);
                 //if (null != progressListener) {
                 //    progressListener.onDone(key);
                 //}
@@ -166,8 +171,8 @@ public class TTSEngine {
 
         textToSpeech.stop();
         for (int i = 0; i < ttsContent.size(); i++) {
-            String content = ttsContent.get(i);
-            resumeSpeak(content);
+            ReflowBean content = ttsContent.get(i);
+            resumeSpeak(content.getData());
         }
         return true;
     }
@@ -178,7 +183,7 @@ public class TTSEngine {
      * @param text
      * @return
      */
-    public boolean resumeFromKey(String text) {
+    public boolean resumeFromKey(ReflowBean bean) {
         if (null == textToSpeech || keys.isEmpty() || ttsContent.isEmpty()) {
             Logcat.d(TAG, "no content.");
             return false;
@@ -192,11 +197,11 @@ public class TTSEngine {
         textToSpeech.stop();
         boolean found = false;
         for (int i = 0; i < ttsContent.size(); i++) {
-            if (TextUtils.equals(content, text)) {
+            if (TextUtils.equals(ttsContent.get(i).getPage(), bean.getPage())) {
                 found = true;
             }
             if (found) {
-                String content = ttsContent.get(i);
+                ReflowBean content = ttsContent.get(i);
                 resumeSpeak(content);
             }
         }
@@ -225,13 +230,13 @@ public class TTSEngine {
         return textToSpeech.isSpeaking();
     }
 
-    public void resumeSpeak(final String text) {
+    public void resumeSpeak(final ReflowBean bean) {
         if (textToSpeech == null) {
             Logcat.d(TAG, "textToSpeech not initialized");
             return;
         }
 
-        textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, null, text);
+        textToSpeech.speak(bean.getData(), TextToSpeech.QUEUE_ADD, null, bean.getData());
     }
 
     public void speak(final String key, final String text) {
@@ -246,8 +251,8 @@ public class TTSEngine {
     }
 
     public interface ProgressListener {
-        void onStart(String utteranceId);
+        void onStart(ReflowBean utteranceId);
 
-        void onDone(String utteranceId);
+        void onDone(ReflowBean utteranceId);
     }
 }

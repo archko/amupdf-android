@@ -36,6 +36,7 @@ import cn.archko.pdf.core.common.SensorHelper
 import cn.archko.pdf.core.common.StatusBarHelper
 import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.Bookmark
+import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.fragments.OutlineFragment
 import cn.archko.pdf.fragments.SleepTimerDialog
@@ -573,9 +574,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     private fun startTts() {
         TTSEngine.get().setSpeakListener(object : TTSEngine.ProgressListener {
-            override fun onStart(key: String) {
+            override fun onStart(key: ReflowBean) {
                 try {
-                    val arr = key.split("-")
+                    val arr = key.page.split("-")
                     val page = Utils.parseInt(arr[0])
                     val current = getCurrentPos()
                     //Logcat.d("onStart:$key, current:$current")
@@ -587,7 +588,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 }
             }
 
-            override fun onDone(key: String) {
+            override fun onDone(key: ReflowBean) {
             }
         })
         ttsPlay.setOnClickListener {
@@ -619,8 +620,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 this,
                 object : DataListener {
                     override fun onSuccess(vararg args: Any?) {
-                        val key = args[0] as String
-                        TTSEngine.get().resumeFromKey(content)
+                        val key = args[0] as ReflowBean
+                        TTSEngine.get().resumeFromKey(key)
                     }
 
                     override fun onFailed(vararg args: Any?) {
