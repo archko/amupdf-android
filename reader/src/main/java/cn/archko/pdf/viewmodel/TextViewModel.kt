@@ -2,11 +2,13 @@ package cn.archko.pdf.viewmodel
 
 import android.text.TextUtils
 import androidx.lifecycle.ViewModel
+import cn.archko.pdf.common.TtsHelper
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.common.TextHelper
 import cn.archko.pdf.core.entity.LoadResult
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.entity.State
+import cn.archko.pdf.entity.TtsBean
 import cn.archko.pdf.tts.TTSEngine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,7 +53,7 @@ class TextViewModel : ViewModel() {
     }
 
     fun decodeTextForTts(currentPos: Int, data: List<ReflowBean>?) {
-        if (data.isNullOrEmpty()) {
+        if (data.isNullOrEmpty() || TextUtils.isEmpty(pdfPath)) {
             return
         }
         val last = TTSEngine.get().getLast()
@@ -63,11 +65,22 @@ class TextViewModel : ViewModel() {
         if (last > 0) {
             TTSEngine.get().reset()
         }
-        val start = System.currentTimeMillis()
-        for (i in currentPos until count) {
-            val str = data[i].data
-            if (str != null && !TextUtils.isEmpty(str.trim())) {
-                TTSEngine.get().speak("$i-$i", str)
+
+        val ttsBean: TtsBean? = TtsHelper.loadFromFile(count, pdfPath!!)
+        if (ttsBean?.list == null) {
+            val start = System.currentTimeMillis()
+            val list = mutableListOf<ReflowBean>()
+            for (i in currentPos until count) {
+                val str = data[i].data
+                if (str != null && !TextUtils.isEmpty(str.trim())) {
+                    TTSEngine.get().speak("$i-$i", str)
+                    list.add(ReflowBean(str, page = "$i-$i"))
+                }
+            }
+            TtsHelper.saveToFile(count, pdfPath!!, list)
+        } else {
+            for (bean in ttsBean.list) {
+                TTSEngine.get().speak(bean.page, bean.data)
             }
         }
         Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")

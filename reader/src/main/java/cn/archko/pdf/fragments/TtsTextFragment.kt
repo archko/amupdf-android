@@ -1,19 +1,17 @@
-package cn.archko.pdf.core.ui
+package cn.archko.pdf.fragments
 
-import android.app.Activity
-import android.content.Intent
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
-import androidx.recyclerview.awidget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import cn.archko.pdf.R
-import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.listeners.DataListener
-import cn.archko.pdf.core.utils.Utils
+import java.util.HashMap
 
 /**
  * @author: archko 2023/7/28 :14:34
@@ -24,8 +22,6 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
 
     private var mDataListener: DataListener? = null
     private lateinit var textAdapter: TextAdapter
-
-    private var job: Job? = null
 
     fun setListener(dataListener: DataListener?) {
         mDataListener = dataListener
@@ -72,7 +68,7 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
     private class TextAdapter(
         var context: Context,
     ) :
-        ARecyclerView.Adapter<ARecyclerView.ViewHolder>() {
+        RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val keys: MutableMap<String, String> = HashMap<String, String>()
 
@@ -86,24 +82,25 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
         override fun onCreateViewHolder(
             parent: ViewGroup,
             viewType: Int
-        ): ARecyclerView.ViewHolder {
+        ): RecyclerView.ViewHolder {
             val view = TextView(context)
                 .apply {
-                    layoutParams = ARecyclerView.LayoutParams(
-                        ARecyclerView.LayoutParams.MATCH_PARENT,
-                        ARecyclerView.LayoutParams.WRAP_CONTENT
+                    layoutParams = RecyclerView.LayoutParams(
+                        RecyclerView.LayoutParams.MATCH_PARENT,
+                        RecyclerView.LayoutParams.WRAP_CONTENT
                     )
+                    singleline=true
                 }
 
             return TextHolder(view)
         }
 
-        override fun onBindViewHolder(viewHolder: ARecyclerView.ViewHolder, position: Int) {
+        override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
             val pdfHolder = viewHolder as TextHolder
             pdfHolder.onBind(position)
         }
 
-        inner class TextHolder(internal var view: TextView) : ARecyclerView.ViewHolder(view) {
+        inner class TextHolder(internal var view: TextView) : RecyclerView.ViewHolder(view) {
 
             fun onBind(position: Int) {
                 view.setOnClickListener{

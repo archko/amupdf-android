@@ -3,6 +3,7 @@ package cn.archko.pdf.viewmodel
 import android.content.Context
 import android.text.TextUtils
 import androidx.lifecycle.ViewModel
+import cn.archko.pdf.common.TtsHelper
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.decode.MupdfDocument
@@ -10,6 +11,7 @@ import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.LoadResult
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.entity.State
+import cn.archko.pdf.entity.TtsBean
 import cn.archko.pdf.tts.TTSEngine
 import com.artifex.mupdf.fitz.Page
 import kotlinx.coroutines.Dispatchers
@@ -123,7 +125,7 @@ class PDFViewModel : ViewModel() {
     }
 
     fun decodeTextForTts(currentPos: Int) {
-        if (null == mupdfDocument) {
+        if (null == mupdfDocument || TextUtils.isEmpty(pdfPath)) {
             return
         }
         val last = TTSEngine.get().getLast()
@@ -135,15 +137,25 @@ class PDFViewModel : ViewModel() {
         if (last > 0) {
             TTSEngine.get().reset()
         }
-        val start = System.currentTimeMillis()
-        for (i in currentPos until count) {
-            val beans: List<ReflowBean>? = mupdfDocument!!.decodeReflowText(i)
-            if (beans != null) {
-                for (j in beans.indices) {
-                    if (!TextUtils.isEmpty(beans[j].data?.trim())) {
-                        TTSEngine.get().speak("$i-$j", beans[j].data)
+        val ttsBean: TtsBean? = TtsHelper.loadFromFile(count, pdfPath!!)
+        if (ttsBean?.list == null) {
+            val start = System.currentTimeMillis()
+            val list = mutableListOf<ReflowBean>()
+            for (i in currentPos until count) {
+                val beans: List<ReflowBean>? = mupdfDocument!!.decodeReflowText(i)
+                if (beans != null) {
+                    for (j in beans.indices) {
+                        if (!TextUtils.isEmpty(beans[j].data?.trim())) {
+                            TTSEngine.get().speak("$i-$j", beans[j].data)
+                            list.add(ReflowBean(str, page = "$i-$i"))
+                        }
                     }
                 }
+            }
+            TtsHelper.saveToFile(count, pdfPath!!, list)
+        } else{
+            for (bean in ttsBean.list) {
+                TTSEngine.get().speak(bean.page, bean.data)
             }
         }
         Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
