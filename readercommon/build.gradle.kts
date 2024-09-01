@@ -56,7 +56,7 @@ dependencies {
 
     implementation("com.tencent.bugly:crashreport:4.1.9.3")
     implementation("com.github.albfernandez:juniversalchardet:2.4.0")
+    api("com.artifex.mupdf:mupdf-fitz:1.24.3")
 
     api(project(":pdf-recyclerview"))
-    api(project(":mupdf-android-fitz"))
 }

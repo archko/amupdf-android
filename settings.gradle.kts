@@ -51,6 +51,3 @@ include(":vudroid")
 include(":paddle-ocr")
 include(":pdf-recyclerview")
 include(":subsampling-scale-image-view")
-
-include(":mupdf-android-fitz")
-project(":mupdf-android-fitz").projectDir = File("solib/mupdf-android-fitz")

@@ -1,8 +1,0 @@
-/build
-.gradle
-.externalNativeBuild
-# ASAN builds copy resources from the NDK into these directories.
-# They are not required forn any other purpose.
-/src/main/jniLibs/
-/src/main/resources/
-.cxx
