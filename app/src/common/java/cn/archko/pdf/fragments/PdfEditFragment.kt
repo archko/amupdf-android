@@ -37,6 +37,7 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
     private lateinit var binding: FragmentPdfEditBinding
     protected lateinit var progressDialog: ProgressDialog
     private var pdfEditViewModel = PDFEditViewModel()
+    private var decodeService : DocDecodeService?=null
 
     private var mDataListener: DataListener? = null
     private lateinit var pdfAdapter: MupdfGridAdapter
@@ -80,7 +81,7 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
         binding.toolbar.setNavigationOnClickListener { dismiss() }
         binding.toolbar.setOnMenuItemClickListener { item ->
             if (R.id.saveItem == item?.itemId) {
-                pdfEditViewModel.save()
+                //pdfEditViewModel.save()
             } else if (R.id.extractHtmlItem == item?.itemId) {
                 val name = FileUtils.getNameWithoutExt(path)
                 val dir = FileUtils.getStorageDir(name).absolutePath
@@ -90,12 +91,14 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
 
                 job = lifecycleScope.launch {
                     val result = withContext(Dispatchers.IO) {
-                        PDFCreaterHelper.extractToHtml(
-                            0, pdfEditViewModel.countPages(),
-                            requireActivity(),
-                            "$dir/$name.html",
-                            path!!
-                        )
+                        decodeService?.pageCount?.let {
+                            PDFCreaterHelper.extractToHtml(
+                                0, it,
+                                requireActivity(),
+                                "$dir/$name.html",
+                                path!!
+                            )
+                        }
                     }
                     if (result) {
                         Toast.makeText(
