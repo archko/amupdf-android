@@ -49,7 +49,7 @@ public interface DecodeService {
     Bitmap decodeThumb(int page);
 
     interface DecodeCallback {
-        void decodeComplete(Bitmap bitmap, boolean isThumb);
+        void decodeComplete(Bitmap bitmap, boolean isThumb, Object args);
 
         boolean shouldRender(int pageNumber, boolean isFullPage);
     }

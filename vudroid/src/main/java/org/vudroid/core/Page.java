@@ -214,7 +214,7 @@ public class Page {
 
     private final DecodeService.DecodeCallback decodeCallback = new DecodeService.DecodeCallback() {
         @Override
-        public void decodeComplete(Bitmap bitmap, boolean isThumb) {
+        public void decodeComplete(Bitmap bitmap, boolean isThumb, Object args) {
             setBitmap(bitmap);
             invalidateFlag = false;
             setDecodingNow(false);

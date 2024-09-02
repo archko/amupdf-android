@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.core.entity.APage
-import cn.archko.pdf.viewmodel.PDFViewModel
+import cn.archko.pdf.decode.DocDecodeService
 import cn.archko.pdf.widgets.APDFView
 
 /**
@@ -14,7 +14,7 @@ import cn.archko.pdf.widgets.APDFView
  */
 class PDFRecyclerAdapter(
     var context: Context,
-    val pdfViewModel: PDFViewModel,
+    val decodeService: DocDecodeService,
     val mPageSizes: List<APage>,
     val recyclerView: ARecyclerView
 ) : ARecyclerView.Adapter<ARecyclerView.ViewHolder>()/*, FastScrollRecyclerView.SectionedAdapter*/ {
@@ -68,7 +68,7 @@ class PDFRecyclerAdapter(
         parent: ViewGroup,
         viewType: Int
     ): ARecyclerView.ViewHolder {
-        val view = APDFView(context, pdfViewModel)
+        val view = APDFView(context, decodeService)
             .apply {
                 layoutParams = ARecyclerView.LayoutParams(defaultWidth, defaultHeight)
                 adjustViewBounds = true

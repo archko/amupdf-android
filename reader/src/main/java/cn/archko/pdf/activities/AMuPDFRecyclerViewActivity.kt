@@ -201,6 +201,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 autoCropButton.visibility = View.VISIBLE
                 outlineButton.visibility = View.VISIBLE
             }
+            if (viewMode == ViewMode.REFLOW_SCAN) {
+                oriButton.visibility = View.GONE
+            }
             updatePageProgress(getCurrentPos())
         }
     }
@@ -262,7 +265,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                         }
                         viewController?.getCurrentPos()
                             ?.let { pageControls?.updatePageProgress(it) }
-                        mReflowLayout.visibility = View.VISIBLE
+                        if (viewMode == ViewMode.REFLOW) {
+                            mReflowLayout.visibility = View.VISIBLE
+                        }
                     }
                 } else {
                     if (mReflowLayout.visibility == View.VISIBLE) {

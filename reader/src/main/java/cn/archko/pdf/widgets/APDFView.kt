@@ -6,20 +6,18 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.RectF
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
-import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.core.cache.BitmapCache
-import cn.archko.pdf.core.common.Logcat
-import cn.archko.pdf.core.decode.MupdfDocument
+import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.core.entity.APage
-import cn.archko.pdf.core.decode.DecodeParam
-import cn.archko.pdf.core.decode.DecodeCallback
 import cn.archko.pdf.core.utils.Utils
-import cn.archko.pdf.viewmodel.PDFViewModel
+import cn.archko.pdf.decode.DocDecodeService
+import org.vudroid.core.DecodeService
 
 /**
  * @author: archko 2018/7/25 :12:43
@@ -27,7 +25,7 @@ import cn.archko.pdf.viewmodel.PDFViewModel
 @SuppressLint("AppCompatCustomView")
 class APDFView(
     private var ctx: Context,
-    private var pdfViewModel: PDFViewModel,
+    private var decodeService: DocDecodeService,
 ) : ImageView(ctx) {
 
     private val textPaint: Paint = textPaint()
@@ -116,7 +114,7 @@ class APDFView(
         defaultHeight: Int,
     ) {
         aPage = pageSize
-        if (aPage == null && pdfViewModel.isDestroy) {
+        if (aPage == null) {
             return
         }
         index = pageSize!!.index
@@ -141,44 +139,30 @@ class APDFView(
 
         if (null != bmp) {
             Log.d("TAG", String.format("hit the cache:%s", aPage?.index))
-            updateImage(this, bmp, resultWidth, resultHeight, aPage!!.index)
+            updateImage(this, bmp, resultWidth, resultHeight)
             return
         }
 
-        //aPage 这个如果当参数传递,由于复用机制,后面的页面更新后会把它覆盖,导致解码并不是原来那个
-        //这里应该传递高宽值
-        val decodeParam = DecodeParam(
-            key,
-            this,
-            crop,
-            0,
-            aPage!!,
-            pdfViewModel.mupdfDocument,
+        decodeService.decodePage(
+            cacheKey,
+            null,
+            false,
+            index,
             callback,
-            resultWidth,
-            resultHeight
+            1f,
+            RectF(0f, 0f, 1f, 1f),
+            0
         )
-        AppExecutors.instance.diskIO().execute {
-            MupdfDocument.decode(aPage!!, decodeParam)
-        }
     }
 
-    private val callback = object : DecodeCallback {
-        override fun decodeComplete(bitmap: Bitmap?, param: DecodeParam) {
-            if (param.pageNum == index) {
-                updateImage(this@APDFView, bitmap!!, width, height, param.pageNum)
-            } else {
-                Log.d(
-                    "TAG",
-                    String.format(
-                        "decode callback:cancel:%s-%s, decode.page:%s, key:%s, param:%s",
-                        param.pageNum, index, param.pageNum, cacheKey, param.key
-                    )
-                )
+    private val callback = object : DecodeService.DecodeCallback {
+        override fun decodeComplete(bitmap: Bitmap?, param: Boolean, args: Any?) {
+            AppExecutors.instance.mainThread().execute {
+                updateImage(this@APDFView, bitmap!!, width, height)
             }
         }
 
-        override fun shouldRender(index: Int, param: DecodeParam): Boolean {
+        override fun shouldRender(index: Int, param: Boolean): Boolean {
             return this@APDFView.index == index
         }
     }
@@ -199,7 +183,7 @@ class APDFView(
         }
     }
 
-    private fun updateImage(view: ImageView, bitmap: Bitmap, width: Int, height: Int, index: Int) {
+    private fun updateImage(view: ImageView, bitmap: Bitmap, width: Int, height: Int) {
         val bmpWidth = bitmap.width
         val bmpHeight = bitmap.height
         var lp = view.layoutParams as ARecyclerView.LayoutParams?

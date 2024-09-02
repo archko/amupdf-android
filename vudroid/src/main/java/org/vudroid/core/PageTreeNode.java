@@ -179,7 +179,7 @@ public class PageTreeNode {
 
     private final DecodeService.DecodeCallback decodeCallback = new DecodeService.DecodeCallback() {
         @Override
-        public void decodeComplete(Bitmap bitmap, boolean isThumb) {
+        public void decodeComplete(Bitmap bitmap, boolean isThumb, Object args) {
             //if (null != bitmap) {
             //    System.out.println(String.format("DecodeService index:%s, %s-%s, bitmap:%s-%s, bounds:%s, key:%s",
             //            page.index, documentView.getWidth(), documentView.getHeight(), bitmap.getWidth(), bitmap.getHeight(),

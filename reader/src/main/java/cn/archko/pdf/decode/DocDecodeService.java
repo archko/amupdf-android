@@ -1,4 +1,4 @@
-package org.vudroid.core;
+package cn.archko.pdf.decode;
 
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -10,12 +10,15 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
+import com.github.axet.k2pdfopt.K2PdfOpt;
+
+import org.vudroid.core.DecodeService;
+import org.vudroid.core.DecodeTask;
+import org.vudroid.core.DocumentView;
+import org.vudroid.core.PageTreeNode;
 import org.vudroid.core.codec.CodecContext;
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
-import org.vudroid.core.codec.OutlineLink;
-import org.vudroid.djvudroid.codec.DjvuContext;
-import org.vudroid.pdfdroid.codec.PdfContext;
 
 import java.io.IOException;
 import java.lang.ref.SoftReference;
@@ -26,14 +29,14 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
+import cn.archko.pdf.common.ReflowHelper;
 import cn.archko.pdf.core.cache.BitmapCache;
 import cn.archko.pdf.core.cache.BitmapPool;
 import cn.archko.pdf.core.common.APageSizeLoader;
-import cn.archko.pdf.core.common.IntentFile;
 import cn.archko.pdf.core.entity.APage;
-import cn.archko.pdf.core.utils.CropUtils;
 
-public class DecodeServiceBase implements DecodeService {
+public class DocDecodeService {
+
     private static final int PAGE_POOL_SIZE = 6;
     private static final int MSG_DECODE_START = 0;
     private static final int MSG_DECODE_SELECT = 1;
@@ -46,7 +49,6 @@ public class DecodeServiceBase implements DecodeService {
     private CodecDocument document;
     public static final String TAG = "DecodeService";
     private final HashMap<String, DecodeTask> nodeTasks = new HashMap<>(64, 0.75f);
-    private final HashMap<String, DecodeTask> pageTasks = new HashMap<>(32, 0.75f);
     private final ConcurrentHashMap<String, DecodeTask> decodingTasks = new ConcurrentHashMap<>(2);
     private final SparseArray<SoftReference<CodecPage>> pages = new SparseArray<>();
     private final Queue<Integer> pageEvictionQueue = new LinkedList<>();
@@ -56,6 +58,8 @@ public class DecodeServiceBase implements DecodeService {
     private Handler mDecodeHandler;
     private final List<APage> aPageList = new ArrayList<>();
     private APageSizeLoader.PageSizeBean pageSizeBean;
+
+    private K2PdfOpt opt = new K2PdfOpt();
     private final Handler.Callback mCallback = new Handler.Callback() {
         public boolean handleMessage(Message msg) {
             int what = msg.what;
@@ -71,18 +75,11 @@ public class DecodeServiceBase implements DecodeService {
 
         private void addDecodeTask(Message msg) {
             final DecodeTask decodeTask = (DecodeTask) msg.obj;
-            if (decodeTask.type == DecodeTask.TYPE_PAGE) {
-                DecodeTask old = pageTasks.put(decodeTask.decodeKey, decodeTask);
-                if (old != null) {
-                    Log.d(TAG, String.format("old page task:%s-%s", pageTasks.size(), old));
-                }
-            } else {
-                DecodeTask old = nodeTasks.put(decodeTask.decodeKey, decodeTask);
-                if (old != null) {
-                    Log.d(TAG, String.format("old node task:%s-%s", nodeTasks.size(), old));
-                }
+            DecodeTask old = nodeTasks.put(decodeTask.decodeKey, decodeTask);
+            if (old != null) {
+                Log.d(TAG, String.format("old node task:%s-%s", nodeTasks.size(), old));
             }
-            if (pageTasks.size() + nodeTasks.size() <= 1) {
+            if (nodeTasks.size() <= 1) {
                 mHandler.sendEmptyMessage(MSG_DECODE_SELECT);
             }
         }
@@ -93,24 +90,18 @@ public class DecodeServiceBase implements DecodeService {
             }
 
             if (!decodingTasks.isEmpty()) {
-                Log.d(TAG, String.format("running task>1:%s-%s-%s", decodingTasks.size(), pageTasks.size(), nodeTasks.size()));
+                Log.d(TAG, String.format("running task>1:%s-%s", decodingTasks.size(), nodeTasks.size()));
                 return;
             }
 
             DecodeTask selectTask = null;
-            if (!pageTasks.isEmpty()) {
-                selectTask = pageTasks.entrySet().iterator().next().getValue();
-                pageTasks.remove(selectTask.decodeKey);
-            }
-            if (selectTask == null) {
-                if (!nodeTasks.isEmpty()) {
-                    selectTask = nodeTasks.entrySet().iterator().next().getValue();
-                    nodeTasks.remove(selectTask.decodeKey);
-                }
+            if (!nodeTasks.isEmpty()) {
+                selectTask = nodeTasks.entrySet().iterator().next().getValue();
+                nodeTasks.remove(selectTask.decodeKey);
             }
 
             if (selectTask == null) {
-                Log.d(TAG, String.format("no task:%s-%s", pageTasks.size(), nodeTasks.size()));
+                Log.d(TAG, String.format("no task:%s", nodeTasks.size()));
             } else {
                 decodingTasks.put(selectTask.decodeKey, selectTask);
                 mDecodeHandler.sendEmptyMessage(MSG_DECODE_TASK);
@@ -119,14 +110,9 @@ public class DecodeServiceBase implements DecodeService {
 
         private void cancelDecodeTask(Message msg) {
             String key = (String) msg.obj;
-            DecodeTask remove = pageTasks.remove(key);
+            DecodeTask remove = nodeTasks.remove(key);
             if (remove != null) {
-                remove.decodeCallback.decodeComplete(null, true, null);
-            } else {
-                remove = nodeTasks.remove(key);
-                if (remove != null) {
-                    remove.decodeCallback.decodeComplete(null, false, null);
-                }
+                remove.decodeCallback.decodeComplete(null, false, null);
             }
         }
     };
@@ -145,7 +131,7 @@ public class DecodeServiceBase implements DecodeService {
                     Log.d(TAG, String.format("add task:%s-%s, %s-%s", selectTask.pageNumber, selectTask.crop, selectTask.decodeKey, selectTask.pageSliceBounds));
                     performDecode(selectTask);
                 } catch (IOException e) {
-                    Log.e(TAG, String.format("decode error:%s-%s", selectTask.pageNumber, selectTask.node));
+                    Log.e(TAG, String.format("decode error:%s", selectTask.pageNumber));
                 } finally {
                     decodingTasks.remove(selectTask.decodeKey);
                     mHandler.sendEmptyMessage(MSG_DECODE_SELECT);
@@ -156,16 +142,7 @@ public class DecodeServiceBase implements DecodeService {
         }
     };
 
-    public static CodecContext openContext(String path) {
-        if (IntentFile.INSTANCE.isMuPdf(path)) {
-            return new PdfContext();
-        } else if (IntentFile.INSTANCE.isDjvu(path)) {
-            return new DjvuContext();
-        }
-        return null;
-    }
-
-    public DecodeServiceBase(CodecContext codecContext) {
+    public DocDecodeService(CodecContext codecContext) {
         this.codecContext = codecContext;
         initDecodeThread();
     }
@@ -194,32 +171,21 @@ public class DecodeServiceBase implements DecodeService {
         APageSizeLoader.PageSizeBean psb = APageSizeLoader.INSTANCE.loadPageSizeFromFile(count, path);
         if (null != psb) {
             pageSizeBean = psb;
-            if (!crop || (crop && psb.getCrop())) {
-                aPageList.addAll(psb.getList());
-                return document;
-            }
+            aPageList.addAll(psb.getList());
+            return document;
         } else {
             pageSizeBean = new APageSizeLoader.PageSizeBean();
             pageSizeBean.setList(aPageList);
-            pageSizeBean.setCrop(crop);
         }
         try {
             for (int i = 0; i < count; i++) {
                 CodecPage codecPage = document.getPage(i);
                 APage aPage = new APage(i, codecPage.getWidth(), codecPage.getHeight(), 1f);
-                if (crop) {
-                    cropPage(codecPage, aPage);
-                }
                 aPageList.add(aPage);
                 codecPage.recycle();
             }
-
-            if (cachePage) {
-                APageSizeLoader.INSTANCE.savePageSizeToFile(crop, path, aPageList);
-            }
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
-            APageSizeLoader.INSTANCE.deletePageSizeFromFile(path);
         }
         Log.d(TAG, String.format("open.cos:%s", (System.currentTimeMillis() - start)));
         return document;
@@ -227,36 +193,6 @@ public class DecodeServiceBase implements DecodeService {
 
     public APageSizeLoader.PageSizeBean getPageSizeBean() {
         return pageSizeBean;
-    }
-
-    private void cropPage(CodecPage vuPage, APage page) {
-        Rect rect = cropPage(vuPage);
-        page.setCropBounds(rect);
-    }
-
-    private Rect cropPage(CodecPage vuPage) {
-        int width = 300;
-        float ratio = 1f * vuPage.getWidth() / width;
-        int height = (int) (vuPage.getHeight() / ratio);
-        Bitmap thumb = vuPage.renderBitmap(
-                new Rect(0, 0, 1, 1),
-                width,
-                height,
-                new RectF(0, 0, 1, 1),
-                1 / ratio);
-
-        RectF cropBounds = CropUtils.getJavaCropBounds(
-                thumb,
-                new Rect(0, 0, thumb.getWidth(), thumb.getHeight())
-        );
-        BitmapPool.getInstance().release(thumb);
-
-        int leftBound = (int) (cropBounds.left * ratio);
-        int topBound = (int) (cropBounds.top * ratio);
-        int resultW = (int) (cropBounds.width() * ratio);
-        int resultH = (int) (cropBounds.height() * ratio);
-        Rect rect = new Rect(leftBound, topBound, leftBound + resultW, topBound + resultH);
-        return rect;
     }
 
     public CodecDocument getDocument() {
@@ -272,8 +208,8 @@ public class DecodeServiceBase implements DecodeService {
         initDecodeThread();
     }
 
-    public void decodePage(String decodeKey, PageTreeNode node, boolean crop, int pageNumber, final DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds) {
-        final DecodeTask decodeTask = new DecodeTask(node, crop, pageNumber, decodeCallback, zoom, decodeKey, pageSliceBounds, 0);
+    public void decodePage(String decodeKey, PageTreeNode node, boolean crop, int pageNumber, final DecodeService.DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds, int dpi) {
+        final DecodeTask decodeTask = new DecodeTask(node, crop, pageNumber, decodeCallback, zoom, decodeKey, pageSliceBounds, dpi);
         Message message = Message.obtain();
         message.obj = decodeTask;
         message.what = MSG_DECODE_START;
@@ -284,7 +220,6 @@ public class DecodeServiceBase implements DecodeService {
         if (isRecycled) {
             return;
         }
-        pageTasks.remove(decodeKey);
         Message message = Message.obtain();
         message.obj = decodeKey;
         message.what = MSG_DECODE_CANCEL;
@@ -292,15 +227,9 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     private void performDecode(DecodeTask task) throws IOException {
-        if (isRecycled) {
+        if (isRecycled || isTaskDead(task)) {
             return;
         }
-
-        if (isTaskDead(task)) {
-            //Log.d(TAG, "Skipping decode task for page " + task);
-            return;
-        }
-        //Log.d(TAG, "Starting decode of page: " + currentDecodeTask +" slice:"+currentDecodeTask.pageSliceBounds);
         CodecPage vuPage = getPage(task.pageNumber);
         preloadNextPage(task.pageNumber);
 
@@ -308,19 +237,12 @@ public class DecodeServiceBase implements DecodeService {
             vuPage.loadPage(task.pageNumber);
         }
 
-        if (task.type == DecodeTask.TYPE_PAGE) {
-            decodeThumb(task, vuPage);
-            return;
-        }
-
-        //如果直接取,有可能在release池中,被换成其它的图片了
-        Bitmap bitmap = null;//BitmapCache.getInstance().removeNode(task.decodeKey);
+        Bitmap bitmap = BitmapCache.getInstance().removeNode(task.decodeKey);
         if (null != bitmap) {
-            finishDecoding(task, bitmap);
+            k2pdfAndFinish(task, bitmap);
             return;
         }
         if (isTaskDead(task)) {
-            //Log.d(TAG, "Skipping decode when decoding task for page " + task);
             return;
         }
 
@@ -328,80 +250,36 @@ public class DecodeServiceBase implements DecodeService {
         float scale = calculateScale(aPage, task.crop) * task.zoom;
         Rect rect = getScaledSize(task, aPage, scale, task.crop);
 
-        if (null != task.node && task.node.page.links == null) {
-            task.node.page.links = vuPage.getPageLinks();
-        }
-
-        //Log.d(TAG, String.format("renderBitmap:%s, slice:%s, rect:%s", task.pageNumber, task.pageSliceBounds, rect));
-        Rect cropBounds = aPage.getCropBounds();
-        if (task.crop) {
-            if (cropBounds == null) {
-                cropBounds = new Rect(0, 0, (int) aPage.getWidth(), (int) aPage.getHeight());
-            }
-        } else {
-            cropBounds = new Rect(0, 0, (int) aPage.getWidth(), (int) aPage.getHeight());
-        }
+        Rect cropBounds = new Rect(0, 0, (int) aPage.getWidth(), (int) aPage.getHeight());
         bitmap = vuPage.renderBitmap(
                 cropBounds,
                 rect.width(), rect.height(), task.pageSliceBounds, scale);
-        //if (null != bitmap) {
-        //    BitmapCache.getInstance().addNodeBitmap(task.decodeKey, bitmap);
-        //}
+        if (null != bitmap) {
+            BitmapCache.getInstance().addNodeBitmap(task.decodeKey, bitmap);
+        }
         if (isTaskDead(task)) {
             //Log.d(TAG, "decode bitmap dead:" + task);
             BitmapPool.getInstance().release(bitmap);
             return;
         }
 
-        finishDecoding(task, bitmap);
+        k2pdfAndFinish(task, bitmap);
     }
 
-    private void decodeThumb(DecodeTask task, CodecPage vuPage) {
-        Bitmap thumb = BitmapCache.getInstance().getBitmap(task.decodeKey);
-        if (null != thumb) {
-            updateThumb(task, thumb);
-        } else {
-            float xs = 1f;
-            if (oriention == DocumentView.VERTICAL) {
-                xs = 1.0f * getTargetWidth() / vuPage.getWidth() / 4;
-            } else {
-                xs = 1.0f * getTargetHeight() / vuPage.getHeight() / 4;
-            }
-            int width = (int) (xs * vuPage.getWidth());
-            int height = (int) (xs * vuPage.getHeight());
-            Log.d(TAG, String.format("decodeThumb:%s, w-h:%s-%s-%s, %s", task.pageNumber, width, height, xs, task.decodeKey));
-            thumb = vuPage.renderBitmap(
-                    new Rect(0, 0, vuPage.getWidth(), vuPage.getHeight()),
-                    width,
-                    height,
-                    new RectF(0, 0, 1, 1),
-                    xs);
-            //PDFUtils.saveBitmapToFile(thumb, new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/book/" + task.pageNumber + "-" + System.currentTimeMillis() + ".png"));
-            if (null != thumb) {
-                BitmapCache.getInstance().addBitmap(task.decodeKey, thumb);
-            }
-            //if (isTaskDead(task)) {
-            //    return;
-            //}
-            updateThumb(task, thumb);
+    private void k2pdfAndFinish(DecodeTask task, Bitmap bitmap) {
+        List<Bitmap> bitmaps = null;
+        if (task.dpi > 0) {
+            bitmaps = ReflowHelper.INSTANCE.k2pdf2bitmap(
+                    opt,
+                    1f,
+                    bitmap,
+                    getTargetWidth(),
+                    getTargetHeight(),
+                    task.dpi
+            );
         }
-    }
 
-    public Bitmap decodeThumb(int page) {
-        APage aPage = aPageList.get(page);
-        float scale = calculateScale(aPage, true) * 1;
-        CodecPage vuPage = getPage(page);
-        Rect rect = new Rect();
-        rect.right = getScaledWidth(aPage, scale, true);
-        rect.bottom = getScaledHeight(aPage, scale, true);
-
-        Rect cropBounds = cropPage(vuPage);
-        Bitmap thumb = vuPage.renderBitmap(
-                cropBounds,
-                rect.width(), rect.height(), new RectF(0, 0, 1.0f, 1.0f), scale);
-
-        //Log.d(TAG, String.format("decodeThumb:%s, %s-%s-%s", page, scale, cropBounds, rect));
-        return thumb;
+        finishDecoding(task, bitmap, bitmaps);
     }
 
     Rect getScaledSize(final DecodeTask task, final APage vuPage, float scale, boolean crop) {
@@ -436,9 +314,8 @@ public class DecodeServiceBase implements DecodeService {
         }
     }
 
-    private void finishDecoding(DecodeTask task, Bitmap bitmap) {
-        updateImage(task, bitmap);
-        //stopDecoding(task.decodeKey);
+    private void finishDecoding(DecodeTask task, Bitmap bitmap, Object args) {
+        updateImage(task, bitmap, args);
     }
 
     private void preloadNextPage(int pageNumber) {
@@ -470,14 +347,6 @@ public class DecodeServiceBase implements DecodeService {
         return aPageList.get(pageIndex);
     }
 
-    public List<OutlineLink> getOutlines() {
-        return document.loadOutline();
-    }
-
-    public void setOriention(int oriention) {
-        this.oriention = oriention;
-    }
-
     private int getTargetWidth() {
         return containerView.getWidth();
     }
@@ -486,34 +355,8 @@ public class DecodeServiceBase implements DecodeService {
         return containerView.getHeight();
     }
 
-    public int getEffectivePagesWidth(int index, boolean crop) {
-        //final CodecPage page = getPage();
-        final APage page = aPageList.get(index);
-        return getScaledWidth(page, calculateScale(page, crop), crop);
-    }
-
-    public int getEffectivePagesHeight(int index, boolean crop) {
-        //final CodecPage page = getPage(0);
-        final APage page = aPageList.get(index);
-        return getScaledHeight(page, calculateScale(page, crop), crop);
-    }
-
-    public int getPageWidth(int pageIndex, boolean crop) {
-        //return getPage(pageIndex).getWidth();
-        return (int) aPageList.get(pageIndex).getWidth(crop);
-    }
-
-    public int getPageHeight(int pageIndex, boolean crop) {
-        //return getPage(pageIndex).getHeight();
-        return (int) aPageList.get(pageIndex).getHeight(crop);
-    }
-
-    private void updateImage(final DecodeTask task, Bitmap bitmap) {
-        task.decodeCallback.decodeComplete(bitmap, false, null);
-    }
-
-    private void updateThumb(final DecodeTask task, Bitmap bitmap) {
-        task.decodeCallback.decodeComplete(bitmap, true, null);
+    private void updateImage(final DecodeTask task, Bitmap bitmap, Object args) {
+        task.decodeCallback.decodeComplete(bitmap, false, args);
     }
 
     private boolean skipInvisible(DecodeTask task, boolean isFullPage) {
@@ -526,7 +369,7 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     private boolean isTaskDead(DecodeTask task) {
-        boolean isPage = task.type == DecodeTask.TYPE_PAGE;
+        boolean isPage = true;//task.type == DecodeTask.TYPE_PAGE;
         if (skipInvisible(task, isPage)) {
             return true;
         }

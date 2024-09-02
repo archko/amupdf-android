@@ -8,11 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
-import androidx.appcompat.widget.Toolbar.OnMenuItemClickListener
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.awidget.GridLayoutManager
+import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.FragmentPdfEditBinding
 import cn.archko.pdf.common.PDFCreaterHelper
@@ -21,10 +20,13 @@ import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.listeners.ClickListener
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.FileUtils
+import cn.archko.pdf.decode.DocDecodeService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.vudroid.core.DecodeServiceBase
+import org.vudroid.core.codec.CodecDocument
 
 /**
  * @author: archko 2023/3/8 :14:34
@@ -75,71 +77,76 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.toolbar.setNavigationOnClickListener { dismiss() }
-        binding.toolbar.setOnMenuItemClickListener(object : OnMenuItemClickListener {
-            override fun onMenuItemClick(item: MenuItem?): Boolean {
-                if (R.id.saveItem == item?.itemId) {
-                    pdfEditViewModel.save()
-                } else if (R.id.extractHtmlItem == item?.itemId) {
-                    val name = FileUtils.getNameWithoutExt(path)
-                    val dir = FileUtils.getStorageDir(name).absolutePath
+        binding.toolbar.setOnMenuItemClickListener { item ->
+            if (R.id.saveItem == item?.itemId) {
+                pdfEditViewModel.save()
+            } else if (R.id.extractHtmlItem == item?.itemId) {
+                val name = FileUtils.getNameWithoutExt(path)
+                val dir = FileUtils.getStorageDir(name).absolutePath
 
-                    progressDialog.show()
-                    progressDialog.setCanceledOnTouchOutside(false)
+                progressDialog.show()
+                progressDialog.setCanceledOnTouchOutside(false)
 
-                    job = lifecycleScope.launch {
-                        val result = withContext(Dispatchers.IO) {
-                            PDFCreaterHelper.extractToHtml(
-                                0, pdfEditViewModel.countPages(),
-                                requireActivity(),
-                                "$dir/$name.html",
-                                path!!
-                            )
-                        }
-                        if (result) {
-                            Toast.makeText(
-                                activity,
-                                R.string.edit_extract_success,
-                                Toast.LENGTH_SHORT
-                            )
-                                .show()
-                        } else {
-                            Toast.makeText(
-                                activity,
-                                R.string.edit_extract_error,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                        progressDialog.dismiss()
+                job = lifecycleScope.launch {
+                    val result = withContext(Dispatchers.IO) {
+                        PDFCreaterHelper.extractToHtml(
+                            0, pdfEditViewModel.countPages(),
+                            requireActivity(),
+                            "$dir/$name.html",
+                            path!!
+                        )
                     }
+                    if (result) {
+                        Toast.makeText(
+                            activity,
+                            R.string.edit_extract_success,
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    } else {
+                        Toast.makeText(
+                            activity,
+                            R.string.edit_extract_error,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    progressDialog.dismiss()
                 }
-                return true
             }
-        })
-
-        pdfAdapter = MupdfGridAdapter(
-            pdfEditViewModel,
-            requireActivity(),
-            binding.recyclerView,
-            object : ClickListener<View> {
-                override fun click(t: View?, pos: Int) {
-                    Toast.makeText(
-                        requireActivity(),
-                        String.format(getString(R.string.edit_page), (pos + 1)),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-                override fun longClick(t: View?, pos: Int, view: View) {
-                    showPopupMenu(view, pos)
-                }
-
-            })
-        binding.recyclerView.layoutManager = GridLayoutManager(activity, 2)
-        binding.recyclerView.adapter = pdfAdapter
-        binding.recyclerView.setHasFixedSize(true)
+            true
+        }
 
         path?.let {
-            pdfEditViewModel.loadPdfDoc(requireActivity(), it, null)
+            val codecContext = DecodeServiceBase.openContext(it)
+            if (null == codecContext) {
+                Toast.makeText(requireActivity(), "open file error", Toast.LENGTH_SHORT).show()
+                return@let
+            }
+            val decodeService = DocDecodeService(codecContext)
+            decodeService.setContainerView(binding.recyclerView)
+            pdfAdapter = MupdfGridAdapter(
+                decodeService,
+                requireActivity(),
+                binding.recyclerView,
+                object : ClickListener<View> {
+                    override fun click(t: View?, pos: Int) {
+                        Toast.makeText(
+                            requireActivity(),
+                            String.format(getString(R.string.edit_page), (pos + 1)),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    override fun longClick(t: View?, pos: Int, view: View) {
+                        //showPopupMenu(view, pos)
+                    }
+
+                })
+            binding.recyclerView.layoutManager = LinearLayoutManager(activity)
+            binding.recyclerView.adapter = pdfAdapter
+            binding.recyclerView.setHasFixedSize(true)
+
+            val document: CodecDocument = decodeService.open(it, false, true)
             pdfAdapter.notifyDataSetChanged()
         }
     }

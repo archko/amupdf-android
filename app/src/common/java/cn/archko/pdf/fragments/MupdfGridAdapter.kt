@@ -2,6 +2,7 @@ package cn.archko.pdf.fragments
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.RectF
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -10,17 +11,15 @@ import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.GridLayoutManager
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.AppExecutors
-import cn.archko.pdf.core.decode.DecodeCallback
-import cn.archko.pdf.core.decode.DecodeParam
-import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.listeners.ClickListener
-import cn.archko.pdf.core.listeners.MupdfListener
+import cn.archko.pdf.decode.DocDecodeService
+import org.vudroid.core.DecodeService
 
 /**
  * @author: archko 2023/3/8 :14:34
  */
 class MupdfGridAdapter(
-    var mupdfListener: MupdfListener,
+    var decodeService: DocDecodeService,
     var context: Context,
     var recyclerView: ARecyclerView,
     var clickListener: ClickListener<View>
@@ -31,7 +30,7 @@ class MupdfGridAdapter(
     private var resultHeight: Int = 1080
 
     override fun getItemCount(): Int {
-        return mupdfListener.getPageCount()
+        return decodeService.getPageCount()
     }
 
     fun viewWidth(): Int {
@@ -75,7 +74,7 @@ class MupdfGridAdapter(
 
         fun onBind(position: Int) {
             index = position
-            val aPage = mupdfListener.getPageList()[position]
+            val aPage = decodeService.getAPage(position)
 
             val cacheKey =
                 "page_$position-${aPage}"
@@ -101,22 +100,20 @@ class MupdfGridAdapter(
                 return
             }
 
-            val callback = object : DecodeCallback {
-                override fun decodeComplete(bitmap: Bitmap?, param: DecodeParam) {
+            val callback = object : DecodeService.DecodeCallback {
+                override fun decodeComplete(bitmap: Bitmap?, param: Boolean, args: Any?) {
                     Log.d(
                         "TAG",
                         String.format(
-                            "decode callback:index:%s-%s, decode.page:%s, w-h:%s-%s, key:%s, param:%s",
-                            param.pageNum,
+                            "decode callback:index:%s-%s, w-h:%s-%s, key:%s",
                             index,
-                            param.pageNum,
+                            param,
                             bitmap?.width,
                             bitmap?.height,
                             cacheKey,
-                            param.key
                         )
                     )
-                    if (param.pageNum == index) {
+                    AppExecutors.instance.mainThread().execute {
                         if (null != bitmap && resultHeight != bitmap.height) {
                             val lp = view.layoutParams
                             lp.width = bitmap.width
@@ -126,26 +123,21 @@ class MupdfGridAdapter(
                     }
                 }
 
-                override fun shouldRender(index: Int, param: DecodeParam): Boolean {
+                override fun shouldRender(index: Int, param: Boolean): Boolean {
                     return this@PdfHolder.index == index
                 }
             }
-            //aPage 这个如果当参数传递,由于复用机制,后面的页面更新后会把它覆盖,导致解码并不是原来那个
-            //这里应该传递高宽值
-            val decodeParam = DecodeParam(
+
+            decodeService.decodePage(
                 cacheKey,
-                view,
+                null,
                 false,
-                0,
-                aPage,
-                mupdfListener.getDocument(),
+                index,
                 callback,
-                resultWidth,
-                resultHeight
+                1f,
+                RectF(0f, 0f, 1f, 1f),
+                0
             )
-            AppExecutors.instance.diskIO().execute {
-                MupdfDocument.decode(aPage, decodeParam)
-            }
         }
     }
 }

@@ -10,12 +10,9 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Environment
 import android.util.Log
-import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.BitmapPool
-import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.common.ParseTextMain
-import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.utils.BitmapUtils
 import cn.archko.pdf.core.utils.CropUtils
@@ -575,95 +572,6 @@ class MupdfDocument(private val context: Context) {
                     )
                 )
             )
-        }
-
-        fun decode(aPage: APage, decodeTask: DecodeParam) {
-            if (!decodeTask.decodeCallback!!.shouldRender(decodeTask.pageNum, decodeTask)) {
-                Log.d("TAG", String.format("decode.cancel:%s", aPage.index))
-                return
-            }
-
-            if (decodeTask.document?.isDestroy == true) {
-                Log.d("TAG", "decode.abort document.destroy")
-                return
-            }
-            val page: Page = decodeTask.document?.loadPage(decodeTask.pageNum) ?: return
-
-            var leftBound = 0
-            var topBound = 0
-            val pageW: Int = decodeTask.width
-            var pageH: Int = decodeTask.height
-
-            val ctm = Matrix(ZOOM)
-            val bbox = RectI(page.bounds?.transform(ctm))
-            val xscale = pageW.toFloat() / (bbox.x1 - bbox.x0).toFloat()
-            val yscale = pageH.toFloat() / (bbox.y1 - bbox.y0).toFloat()
-            ctm.scale(xscale, yscale)
-
-            if (decodeTask.crop) {
-                val arr = getArrByCrop(page, ctm, pageW, pageH)
-                leftBound = arr[0].toInt()
-                topBound = arr[1].toInt()
-                pageH = arr[2].toInt()
-                //val cropScale = arr[3]
-                //pageSize.setCropHeight(pageH)
-                //pageSize.setCropWidth(pageW)
-                //val cropRectf = RectF(
-                //    leftBound.toFloat(), topBound.toFloat(),
-                //    (leftBound + pageW).toFloat(), (topBound + pageH).toFloat()
-                //);
-                //pageSize.setCropBounds(cropRectf, cropScale)
-                if (!decodeTask.decodeCallback!!.shouldRender(decodeTask.pageNum, decodeTask)) {
-                    Log.d("TAG", String.format("decode.cancel after crop:%s", aPage.index))
-                    return
-                }
-            }
-
-            var bitmap = BitmapCache.getInstance().getBitmap(decodeTask.key)
-            if (null != bitmap) {
-                upload(decodeTask, bitmap)
-                return
-            }
-
-            bitmap = BitmapPool.getInstance().acquire(pageW, pageH)
-            if (!decodeTask.decodeCallback!!.shouldRender(decodeTask.pageNum, decodeTask)) {
-                Log.d(
-                    TAG, String.format("decode bitmap: cancel2:%s", decodeTask)
-                )
-                return
-            }
-            if (decodeTask.document?.isDestroy == true) {
-                Log.d("TAG", "decode.abort document.destroy2")
-                return
-            }
-
-            render(page, ctm, bitmap, 0, leftBound, topBound)
-            page.destroy()
-            Log.d(
-                "TAG",
-                String.format(
-                    "decode.finish task:%s.view:%s, bmp.w-h:%s-%s",
-                    decodeTask.pageNum, aPage.index,
-                    bitmap.width, bitmap.height
-                )
-            )
-
-            BitmapCache.getInstance().addBitmap(decodeTask.key, bitmap)
-
-            upload(decodeTask, bitmap)
-        }
-
-        fun upload(
-            decodeTask: DecodeParam,
-            bitmap: Bitmap?
-        ) {
-            AppExecutors.instance.mainThread().execute {
-                if (!decodeTask.decodeCallback!!.shouldRender(decodeTask.pageNum, decodeTask)) {
-                    return@execute
-                }
-
-                decodeTask.decodeCallback?.decodeComplete(bitmap, decodeTask)
-            }
         }
 
         fun decodeReflowText(index: Int, document: Document): List<ReflowBean>? {

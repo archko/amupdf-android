@@ -68,6 +68,7 @@ public abstract class BaseViewerActivity extends FragmentActivity implements Dec
                 progressModel, currentPageModel, simpleGestureListener);
         zoomModel.addEventListener(documentView);
         documentView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        decodeService = createDecodeService();
         decodeService.setContainerView(documentView);
         documentView.setDecodeService(decodeService);
 

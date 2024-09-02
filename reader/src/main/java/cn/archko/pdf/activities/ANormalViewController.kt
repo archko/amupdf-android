@@ -15,7 +15,6 @@ import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.TtsHelper
 import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.AppExecutors.Companion.instance
-import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.BookProgress
@@ -35,8 +34,6 @@ import org.vudroid.core.codec.CodecDocument
 import org.vudroid.core.models.CurrentPageModel
 import org.vudroid.core.models.DecodingProgressModel
 import org.vudroid.core.models.ZoomModel
-import org.vudroid.djvudroid.codec.DjvuContext
-import org.vudroid.pdfdroid.codec.PdfContext
 
 /**
  * @author: archko 2020/5/15 :12:43
@@ -186,11 +183,11 @@ class ANormalViewController(
     }
 
     private fun createDecodeService(): DecodeService {
-        if (IntentFile.isDjvu(mPath)) {
-            return DecodeServiceBase(DjvuContext())
+        val codecContext = DecodeServiceBase.openContext(mPath)
+        if (null == codecContext) {
+            Toast.makeText(context, "open file error", Toast.LENGTH_SHORT).show()
         }
-
-        return DecodeServiceBase(PdfContext())
+        return DecodeServiceBase(codecContext)
     }
 
     override fun getDocumentView(): View {

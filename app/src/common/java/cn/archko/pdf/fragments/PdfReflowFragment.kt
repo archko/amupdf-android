@@ -13,7 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.awidget.GridLayoutManager
+import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.FragmentReflowPdfBinding
 import cn.archko.pdf.common.ReflowHelper
@@ -24,6 +24,7 @@ import cn.archko.pdf.core.listeners.ClickListener
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.decode.DocDecodeService
 import cn.archko.pdf.fragments.MupdfGridAdapter
 import cn.archko.pdf.fragments.PDFEditViewModel
 import cn.archko.pdf.fragments.ReflowDialog
@@ -31,6 +32,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.vudroid.core.DecodeServiceBase
+import org.vudroid.core.codec.CodecDocument
 
 /**
  * @author: archko 2023/7/28 :14:34
@@ -82,32 +85,39 @@ class PdfReflowFragment : DialogFragment(R.layout.fragment_reflow_pdf) {
         super.onViewCreated(view, savedInstanceState)
         binding.toolbar.setNavigationOnClickListener { dismiss() }
 
-        pdfAdapter = MupdfGridAdapter(
-            pdfEditViewModel,
-            requireActivity(),
-            binding.recyclerView,
-            object : ClickListener<View> {
-                override fun click(t: View?, pos: Int) {
-                    showReflowDialog(pos)
-                }
-
-                override fun longClick(t: View?, pos: Int, view: View) {
-                }
-            })
-        binding.recyclerView.layoutManager = GridLayoutManager(activity, 1)
-        binding.recyclerView.adapter = pdfAdapter
-        binding.recyclerView.setHasFixedSize(true)
-
-        binding.btnAddPdf.setOnClickListener { selectPdf() }
-        binding.btnReflow.setOnClickListener {
-            if (null != pdfEditViewModel.getDocument()) {
-                showReflowDialog(0)
-            }
-        }
-
-        pdfPath = "/storage/emulated/0/book/3、医方真谛.pdf"
+        //pdfPath = "/storage/emulated/0/book/3、医方真谛.pdf"
         pdfPath?.let {
-            pdfEditViewModel.loadPdfDoc(requireActivity(), it, null)
+            val codecContext = DecodeServiceBase.openContext(it)
+            if (null == codecContext) {
+                Toast.makeText(requireActivity(), "open file error", Toast.LENGTH_SHORT).show()
+                return@let
+            }
+            val decodeService = DocDecodeService(codecContext)
+            decodeService.setContainerView(binding.recyclerView)
+            pdfAdapter = MupdfGridAdapter(
+                decodeService,
+                requireActivity(),
+                binding.recyclerView,
+                object : ClickListener<View> {
+                    override fun click(t: View?, pos: Int) {
+                        showReflowDialog(pos)
+                    }
+
+                    override fun longClick(t: View?, pos: Int, view: View) {
+                    }
+                })
+            binding.recyclerView.layoutManager = LinearLayoutManager(activity)
+            binding.recyclerView.adapter = pdfAdapter
+            binding.recyclerView.setHasFixedSize(true)
+
+            binding.btnAddPdf.setOnClickListener { selectPdf() }
+            binding.btnReflow.setOnClickListener {
+                if (null != pdfEditViewModel.getDocument()) {
+                    showReflowDialog(0)
+                }
+            }
+
+            val document: CodecDocument = decodeService.open(pdfPath, false, true)
             pdfAdapter.notifyDataSetChanged()
         }
     }

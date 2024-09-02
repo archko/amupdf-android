@@ -1,6 +1,6 @@
 package cn.archko.pdf.activities
 
-import android.annotation.SuppressLint
+import android.app.ProgressDialog
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Rect
@@ -10,21 +10,31 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.RelativeLayout
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.core.cache.BitmapCache
+import cn.archko.pdf.core.common.APageSizeLoader
+import cn.archko.pdf.core.common.AppExecutors.Companion.instance
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.BookProgress
+import cn.archko.pdf.core.listeners.SimpleGestureListener
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
+import cn.archko.pdf.decode.DocDecodeService
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.widgets.APDFView
 import cn.archko.pdf.widgets.PageControls
 import kotlinx.coroutines.CoroutineScope
+import org.vudroid.core.DecodeServiceBase
+import org.vudroid.core.codec.CodecDocument
+import org.vudroid.core.models.CurrentPageModel
+import org.vudroid.core.models.DecodingProgressModel
+import org.vudroid.core.models.ZoomModel
 
 /**
  * @author: archko 2020/5/15 :12:43
@@ -36,7 +46,7 @@ class ACropViewController(
     private var pdfViewModel: DocViewModel,
     private var mPath: String,
     private var pageControls: PageControls?,
-    private var simpleListener: ControllerListener?,
+    private var controllerListener: ControllerListener?,
 ) :
     OutlineListener, AViewController {
 
@@ -50,6 +60,24 @@ class ACropViewController(
     private var crop: Boolean = true
     private var scrollOrientation = LinearLayoutManager.VERTICAL
 
+    private var decodeService: DocDecodeService? = null
+    private lateinit var currentPageModel: CurrentPageModel
+
+    protected var progressDialog: ProgressDialog? = null
+    protected var isDocLoaded: Boolean = false
+    private var document: CodecDocument? = null
+
+    private var simpleGestureListener: SimpleGestureListener = object :
+        SimpleGestureListener {
+        override fun onSingleTapConfirmed(ev: MotionEvent, currentPage: Int) {
+            controllerListener?.onSingleTapConfirmed(ev, currentPage)
+        }
+
+        override fun onDoubleTap(ev: MotionEvent, currentPage: Int) {
+            controllerListener?.onDoubleTap(ev, currentPage)
+        }
+    }
+
     var defaultWidth = 1080
     var defaultHeight = 1080
 
@@ -58,11 +86,29 @@ class ACropViewController(
     }
 
     private fun initView() {
-        //mRecyclerView = FastScrollRecyclerView(context)//contentView.findViewById(R.id.recycler_view)
+        val zoomModel = ZoomModel()
+
+        var offsetX = 0
+        var offsetY = 0
+        pdfViewModel.bookProgress?.run {
+            zoomModel.zoom = this.zoomLevel / 1000
+            offsetX = this.offsetX
+            offsetY = this.offsetY
+            scrollOrientation = pdfViewModel.bookProgress?.scrollOrientation ?: 1
+        }
+
+        val progressModel = DecodingProgressModel()
+        progressModel.addEventListener(this)
+        currentPageModel = CurrentPageModel()
+        currentPageModel.addEventListener(this)
+        initDecodeService()
+
         val view = LayoutInflater.from(context)
             .inflate(cn.archko.pdf.R.layout.reader_crop, mControllerLayout, false)
         mRecyclerView = view.findViewById(cn.archko.pdf.R.id.recycler)
         (mRecyclerView.parent as ViewGroup).removeView(mRecyclerView)
+
+        decodeService?.setContainerView(mRecyclerView)
 
         with(mRecyclerView) {
             descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
@@ -104,46 +150,79 @@ class ACropViewController(
             })
     }
 
-    override fun init() {
-        try {
-            Logcat.d("init :$scrollOrientation")
-            this.scrollOrientation = scrollOrientation
-            addGesture()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
+    private fun loadDocument() {
+        progressDialog = ProgressDialog(context)
+        progressDialog!!.setMessage("Loading")
+        progressDialog!!.show()
+
+        instance.diskIO().execute {
+            try {
+                document = decodeService!!.open(mPath, crop, true)
+            } catch (e: Exception) {
+            }
+            instance.mainThread().execute {
+                progressDialog!!.dismiss()
+                if (null == document) {
+                    Toast.makeText(
+                        context,
+                        "Open Failed",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    context.finish()
+                    return@execute
+                }
+                isDocLoaded = true
+                doLoadDoc(decodeService!!.pageSizeBean, document!!)
+                //documentView.showDocument(crop)
+            }
         }
     }
 
-    fun doLoadDoc(pageSizes: List<APage>, pos: Int) {
-        try {
-            Logcat.d("doLoadDoc:$scrollOrientation")
-            this.mPageSizes = pageSizes
+    override fun init() {
+        Logcat.d("init:")
+        crop = pdfViewModel.checkCrop()
 
-            setCropMode(pos)
-            addGesture()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
+        loadDocument()
+    }
+
+    private fun doLoadDoc(pageSizeBean: APageSizeLoader.PageSizeBean, document: CodecDocument) {
+        Logcat.d("doLoadDoc:${pageSizeBean.crop}, ${pageSizeBean.List!!.size}")
+        this.mPageSizes = pageSizeBean.List!!
+        if (null == mPageSizes) {
+            return
         }
+
+        controllerListener?.doLoadedDoc(
+            mPageSizes!!.size,
+            pdfViewModel.getCurrentPage(),
+            document.loadOutline()
+        )
+
+        gotoPage(pdfViewModel.getCurrentPage())
+    }
+
+    private fun initDecodeService() {
+        if (decodeService == null) {
+            decodeService = createDecodeService()
+        }
+    }
+
+    private fun createDecodeService(): DocDecodeService {
+        val codecContext = DecodeServiceBase.openContext(mPath)
+        if (null == codecContext) {
+            Toast.makeText(context, "open file error", Toast.LENGTH_SHORT).show()
+        }
+        return DocDecodeService(codecContext)
     }
 
     override fun getDocumentView(): View {
         return mRecyclerView
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    private fun addGesture() {
-        mRecyclerView.setOnTouchListener { _, event ->
-            //gestureDetector!!.onTouchEvent(event)
-            false
-        }
-    }
-
-    private fun setCropMode(pos: Int) {
+    private fun gotoPage(pos: Int) {
         setOrientation(scrollOrientation)
         if (null == pdfAdapter) {
-            //pdfAdapter = PDFRecyclerAdapter(context, pdfViewModel, mPageSizes, mRecyclerView)
+            pdfAdapter = PDFRecyclerAdapter(context, decodeService!!, mPageSizes, mRecyclerView)
             mRecyclerView.adapter = pdfAdapter
             pdfAdapter!!.setCrop(crop)
         }
@@ -320,9 +399,9 @@ class ACropViewController(
     }
 
     private fun updateProgress(index: Int) {
-        /*if (pdfViewModel.mupdfDocument != null && pageControls?.visibility() == View.VISIBLE) {
+        if (pageControls?.visibility() == View.VISIBLE) {
             pageControls?.updatePageProgress(index)
-        }*/
+        }
     }
 
     override fun notifyDataSetChanged() {
@@ -346,8 +425,6 @@ class ACropViewController(
     //--------------------------------------
 
     override fun onResume() {
-        //mPageSeekBarControls?.hide()
-
         mRecyclerView.postDelayed({ mRecyclerView.adapter?.notifyDataSetChanged() }, 250L)
     }
 
@@ -374,6 +451,7 @@ class ACropViewController(
 
     override fun onDestroy() {
         Logcat.d("crop.onDestroy")
+        decodeService?.recycle()
     }
 
     //===========================================
