@@ -26,9 +26,6 @@ class MupdfGridAdapter(
 ) :
     ARecyclerView.Adapter<ARecyclerView.ViewHolder>() {
 
-    private var resultWidth: Int = 1080
-    private var resultHeight: Int = 1080
-
     override fun getItemCount(): Int {
         return decodeService.getPageCount()
     }
@@ -63,9 +60,7 @@ class MupdfGridAdapter(
 
     override fun onViewRecycled(holder: ARecyclerView.ViewHolder) {
         super.onViewRecycled(holder)
-        val pos = holder.absoluteAdapterPosition
-        //Log.d("TAG", String.format("decode.onViewRecycled:%s", pos))
-        (holder as PdfHolder).view.setImageResource(android.R.color.transparent)
+        (holder as PdfHolder).view.setImageBitmap(null)
     }
 
     inner class PdfHolder(internal var view: ImageView) : ARecyclerView.ViewHolder(view) {
@@ -76,16 +71,13 @@ class MupdfGridAdapter(
             index = position
             val aPage = decodeService.getAPage(position)
 
-            val cacheKey =
-                "page_$position-${aPage}"
+            val cacheKey = "page_$position-${aPage}"
 
             var width: Int = viewWidth()
             if (width == 0) {
                 width = 1080
             }
-            val height: Int = (width * 4 / 3f).toInt()
-            resultWidth = width
-            resultHeight = height
+            val height: Int = (1f * width * aPage.height / aPage.width).toInt()
 
             view.setOnClickListener { clickListener.click(view, position) }
             view.setOnLongClickListener {
@@ -114,7 +106,7 @@ class MupdfGridAdapter(
                         )
                     )
                     AppExecutors.instance.mainThread().execute {
-                        if (null != bitmap && resultHeight != bitmap.height) {
+                        if (null != bitmap && height != bitmap.height) {
                             val lp = view.layoutParams
                             lp.width = bitmap.width
                             lp.height = bitmap.height
