@@ -21,6 +21,7 @@ import cn.archko.pdf.core.listeners.ClickListener
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.decode.DocDecodeService
+import cn.archko.pdf.decode.DocDecodeService.IView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -116,6 +117,15 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
             true
         }
 
+        val iView = object : IView {
+            override fun getWidth(): Int {
+                return binding.recyclerView.getWidth()
+            }
+
+            override fun getHeight(): Int {
+                return binding.recyclerView.getHeight()
+            }
+        }
         path?.let {
             val codecContext = DecodeServiceBase.openContext(it)
             if (null == codecContext) {
@@ -123,7 +133,7 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
                 return@let
             }
             val decodeService = DocDecodeService(codecContext)
-            decodeService.setContainerView(binding.recyclerView)
+            decodeService.setContainerView(iView)
             pdfAdapter = MupdfGridAdapter(
                 decodeService,
                 requireActivity(),

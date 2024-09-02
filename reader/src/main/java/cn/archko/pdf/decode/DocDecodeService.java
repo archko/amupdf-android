@@ -37,6 +37,12 @@ import cn.archko.pdf.core.entity.APage;
 
 public class DocDecodeService {
 
+    public interface IView {
+        int getWidth();
+
+        int getHeight();
+    }
+
     private static final int PAGE_POOL_SIZE = 6;
     private static final int MSG_DECODE_START = 0;
     private static final int MSG_DECODE_SELECT = 1;
@@ -45,7 +51,7 @@ public class DocDecodeService {
     private static final int MSG_DECODE_TASK = 5;
     private CodecContext codecContext;
 
-    private View containerView;
+    private IView containerView;
     private CodecDocument document;
     public static final String TAG = "DecodeService";
     private final HashMap<String, DecodeTask> nodeTasks = new HashMap<>(64, 0.75f);
@@ -156,7 +162,7 @@ public class DocDecodeService {
         mDecodeHandler = new Handler(handlerThread.getLooper(), mDecodeCallback);
     }
 
-    public void setContainerView(View containerView) {
+    public void setContainerView(IView containerView) {
         this.containerView = containerView;
     }
 

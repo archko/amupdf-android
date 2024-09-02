@@ -24,6 +24,7 @@ import cn.archko.pdf.core.listeners.SimpleGestureListener
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
 import cn.archko.pdf.decode.DocDecodeService
+import cn.archko.pdf.decode.DocDecodeService.IView
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
@@ -108,7 +109,17 @@ class ACropViewController(
         mRecyclerView = view.findViewById(cn.archko.pdf.R.id.recycler)
         (mRecyclerView.parent as ViewGroup).removeView(mRecyclerView)
 
-        decodeService?.setContainerView(mRecyclerView)
+        val iView= object : IView {
+            override fun getWidth(): Int {
+                return mRecyclerView.getWidth()
+            }
+
+            override fun getHeight(): Int {
+                return mRecyclerView.getHeight()
+            }
+        }
+
+        decodeService?.setContainerView(iView)
 
         with(mRecyclerView) {
             descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS

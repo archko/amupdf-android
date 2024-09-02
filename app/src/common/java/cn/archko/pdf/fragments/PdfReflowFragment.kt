@@ -25,6 +25,7 @@ import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.decode.DocDecodeService
+import cn.archko.pdf.decode.DocDecodeService.IView
 import cn.archko.pdf.fragments.MupdfGridAdapter
 import cn.archko.pdf.fragments.PDFEditViewModel
 import cn.archko.pdf.fragments.ReflowDialog
@@ -85,6 +86,16 @@ class PdfReflowFragment : DialogFragment(R.layout.fragment_reflow_pdf) {
         super.onViewCreated(view, savedInstanceState)
         binding.toolbar.setNavigationOnClickListener { dismiss() }
 
+        val iView= object : IView {
+            override fun getWidth(): Int {
+                return binding.recyclerView.getWidth()
+            }
+
+            override fun getHeight(): Int {
+                return binding.recyclerView.getHeight()
+            }
+        }
+
         //pdfPath = "/storage/emulated/0/book/3、医方真谛.pdf"
         pdfPath?.let {
             val codecContext = DecodeServiceBase.openContext(it)
@@ -93,7 +104,7 @@ class PdfReflowFragment : DialogFragment(R.layout.fragment_reflow_pdf) {
                 return@let
             }
             val decodeService = DocDecodeService(codecContext)
-            decodeService.setContainerView(binding.recyclerView)
+            decodeService.setContainerView(iView)
             pdfAdapter = MupdfGridAdapter(
                 decodeService,
                 requireActivity(),
