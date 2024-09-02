@@ -109,6 +109,7 @@ class PdfReflowFragment : DialogFragment(R.layout.fragment_reflow_pdf) {
                 decodeService,
                 requireActivity(),
                 binding.recyclerView,
+                false,
                 object : ClickListener<View> {
                     override fun click(t: View?, pos: Int) {
                         showReflowDialog(pos)

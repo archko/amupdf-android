@@ -37,13 +37,14 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
     private lateinit var binding: FragmentPdfEditBinding
     protected lateinit var progressDialog: ProgressDialog
     private var pdfEditViewModel = PDFEditViewModel()
-    private var decodeService : DocDecodeService?=null
+    private var decodeService: DocDecodeService? = null
 
     private var mDataListener: DataListener? = null
     private lateinit var pdfAdapter: MupdfGridAdapter
 
     private var path: String? = null
     private var job: Job? = null
+    private var crop: Boolean = false
 
     fun setListener(dataListener: DataListener?) {
         mDataListener = dataListener
@@ -141,6 +142,7 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
                 decodeService,
                 requireActivity(),
                 binding.recyclerView,
+                crop,
                 object : ClickListener<View> {
                     override fun click(t: View?, pos: Int) {
                         Toast.makeText(
@@ -159,7 +161,7 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
             binding.recyclerView.adapter = pdfAdapter
             binding.recyclerView.setHasFixedSize(true)
 
-            val document: CodecDocument = decodeService.open(it, false, true)
+            val document: CodecDocument = decodeService.open(it, crop, true)
             pdfAdapter.notifyDataSetChanged()
         }
     }

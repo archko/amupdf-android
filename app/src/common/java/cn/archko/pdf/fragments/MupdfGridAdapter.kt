@@ -22,6 +22,7 @@ class MupdfGridAdapter(
     var decodeService: DocDecodeService,
     var context: Context,
     var recyclerView: ARecyclerView,
+    private var crop: Boolean,
     var clickListener: ClickListener<View>
 ) :
     ARecyclerView.Adapter<ARecyclerView.ViewHolder>() {
@@ -123,7 +124,7 @@ class MupdfGridAdapter(
             decodeService.decodePage(
                 cacheKey,
                 null,
-                false,
+                crop,
                 index,
                 callback,
                 1f,
