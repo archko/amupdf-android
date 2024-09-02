@@ -21,6 +21,9 @@ it's not only a pdf reader,also a imageviewer
 https://github.com/archko/amupdf-nativelib
 compile so,then upload to local maven
 
+### apk
+https://www.pgyer.com/CoA1zTQ8
+
 ### blog
 - [https://blog.csdn.net/archko/article/details/136145186?spm=1001.2014.3001.5502](https://blog.csdn.net/archko/article/details/136145186?spm=1001.2014.3001.5502)
 
