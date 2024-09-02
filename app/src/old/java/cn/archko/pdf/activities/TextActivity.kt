@@ -31,6 +31,7 @@ import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.mupdf.databinding.TxtReaderBinding
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFTextAdapter
+import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.GlobalEvent
@@ -51,7 +52,9 @@ import cn.archko.pdf.tts.TTSEngine
 import cn.archko.pdf.tts.TTSEngine.ProgressListener
 import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.viewmodel.TextViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
 import vn.chungha.flowbus.busEvent
 
@@ -186,7 +189,9 @@ class TextActivity : AppCompatActivity() {
         binding.recyclerView.adapter = adapter
 
         lifecycleScope.launch {
-            pdfViewModel.loadTextDoc(path!!)
+            withContext(Dispatchers.IO) {
+                pdfViewModel.loadTextDoc(path!!)
+            }
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 pdfViewModel.textFlow.collect {
                     doLoadDoc(it.list)
@@ -231,9 +236,11 @@ class TextActivity : AppCompatActivity() {
 
     private fun loadBookmark() {
         lifecycleScope.launch {
-            val bookProgress =
-                path!!.run { docViewModel.loadBookProgressByPath(this) }
-            bookProgress?.page?.let { scrollToPosition(it) }
+            val result = withContext(Dispatchers.IO) {
+                val bookProgress =
+                    path!!.run { docViewModel.loadBookProgressByPath(this) }
+                bookProgress?.page?.let { scrollToPosition(it) }
+            }
         }
     }
 
@@ -362,7 +369,9 @@ class TextActivity : AppCompatActivity() {
             }).showDialog(this)
         }
         lifecycleScope.launch {
-            pdfViewModel.decodeTextForTts(getCurrentPos(), adapter?.data)
+            val result = withContext(Dispatchers.IO) {
+                pdfViewModel.decodeTextForTts(getCurrentPos(), adapter?.data)
+            }
         }
     }
 

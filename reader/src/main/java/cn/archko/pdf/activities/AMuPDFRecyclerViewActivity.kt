@@ -145,7 +145,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     private fun loadBookmark() {
         lifecycleScope.launch {
-            mPath!!.run { pdfViewModel.loadBookProgressByPath(this) }
+            val result = withContext(Dispatchers.IO) {
+                mPath!!.run { pdfViewModel.loadBookProgressByPath(this) }
+            }
+
         }
     }
 
@@ -634,7 +637,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 })
         }
         lifecycleScope.launch {
-            viewController?.decodePageForTts(getCurrentPos())
+            val result = withContext(Dispatchers.IO) {
+                viewController?.decodePageForTts(getCurrentPos())
+            }
         }
     }
 
