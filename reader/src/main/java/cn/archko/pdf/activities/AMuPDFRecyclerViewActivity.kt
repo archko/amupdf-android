@@ -189,7 +189,11 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 autoCropButton.visibility = View.VISIBLE
                 outlineButton.visibility = View.VISIBLE
             } else {
-                reflowButton.visibility = View.VISIBLE
+                if (IntentFile.isDjvu(mPath!!)) {
+                    reflowButton.visibility = View.GONE
+                } else {
+                    reflowButton.visibility = View.VISIBLE
+                }
                 imageButton.visibility = View.GONE
                 autoCropButton.visibility = View.VISIBLE
                 outlineButton.visibility = View.VISIBLE
