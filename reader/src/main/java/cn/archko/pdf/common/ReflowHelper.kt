@@ -203,7 +203,8 @@ object ReflowHelper {
         screenHeight: Int,
         pageWidth: Int,
         dir: String,
-        name: String
+        name: String,
+        densityDpi: Int,
     ): Int {
         FileUtils.cleanDir(File(dir))
         val list = mutableListOf<String>()
@@ -215,7 +216,7 @@ object ReflowHelper {
                     bitmap,
                     screenWidth,
                     screenHeight,
-                    250,
+                    densityDpi,
                     dir,
                     list
                 )

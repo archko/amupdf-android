@@ -180,6 +180,7 @@ class PdfReflowFragment : DialogFragment(R.layout.fragment_reflow_pdf) {
         progressDialog.setCancelable(false)
 
         job = lifecycleScope.launch {
+            val dm = requireActivity().resources.displayMetrics
             val name = FileUtils.getNameWithoutExt(pdfPath)
             val dir = FileUtils.getStorageDir(name).absolutePath
             val result = withContext(Dispatchers.IO) {
@@ -193,7 +194,8 @@ class PdfReflowFragment : DialogFragment(R.layout.fragment_reflow_pdf) {
                     Utils.getScreenHeightPixelWithOrientation(requireActivity()),
                     width,
                     dir,
-                    name
+                    name,
+                    dm.densityDpi
                 )
             }
             if (result > 0) {
