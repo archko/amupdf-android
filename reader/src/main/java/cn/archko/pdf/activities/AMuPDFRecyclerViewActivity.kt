@@ -607,6 +607,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             SleepTimerDialog(object : SleepTimerDialog.TimeListener {
                 override fun onTime(minute: Int) {
                     Logcat.d("TTSEngine.get().stop()")
+                    handler.removeCallbacks(closeRunnable)
                     handler.postDelayed(closeRunnable, (minute * 60000).toLong())
                 }
             }).showDialog(this)
