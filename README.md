@@ -17,7 +17,7 @@ it's not only a pdf reader,also a imageviewer
 * webdave(only support jianguoyun)
 
 ### blog
-- [https://mp.csdn.net/mp_blog/creation/editor/130561453](https://mp.csdn.net/mp_blog/creation/editor/130561453)
+- [https://blog.csdn.net/archko/article/details/136145186?spm=1001.2014.3001.5502](https://blog.csdn.net/archko/article/details/136145186?spm=1001.2014.3001.5502)
 
 ### released apks:
 
