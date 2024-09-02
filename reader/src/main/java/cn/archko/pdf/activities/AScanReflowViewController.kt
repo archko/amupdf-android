@@ -43,6 +43,7 @@ import org.vudroid.core.codec.CodecDocument
 import org.vudroid.core.models.CurrentPageModel
 import org.vudroid.core.models.DecodingProgressModel
 import org.vudroid.core.models.ZoomModel
+import java.util.HashMap
 
 /**
  * 扫描版的重排,用k2pdfopt库
@@ -76,6 +77,7 @@ class AScanReflowViewController(
     protected var progressDialog: ProgressDialog? = null
     protected var isDocLoaded: Boolean = false
     private var document: CodecDocument? = null
+    private var widthHeightMap = HashMap<String, Int?>()
 
     private inner class MySimpleOnGestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
@@ -120,7 +122,7 @@ class AScanReflowViewController(
         mRecyclerView = view.findViewById(cn.archko.pdf.R.id.recycler)
         (mRecyclerView.parent as ViewGroup).removeView(mRecyclerView)
 
-        val iView= object : IView {
+        val iView = object : IView {
             override fun getWidth(): Int {
                 return defaultWidth
             }
@@ -253,7 +255,7 @@ class AScanReflowViewController(
                 val holder = ReflowViewHolder(pdfView)
                 val lp: ARecyclerView.LayoutParams = ARecyclerView.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
+                    defaultWidth
                 )
                 pdfView.layoutParams = lp
 
@@ -394,8 +396,8 @@ class AScanReflowViewController(
         mRecyclerView.stopScroll()
         BitmapCache.getInstance().clear()
 
-        defaultWidth = Utils.dipToPixel(newConfig.screenWidthDp.toFloat())
-        defaultHeight = Utils.dipToPixel(newConfig.screenHeightDp.toFloat())
+        //defaultWidth = Utils.dipToPixel(newConfig.screenWidthDp.toFloat())
+        //defaultHeight = Utils.dipToPixel(newConfig.screenHeightDp.toFloat())
         if (Logcat.loggable) {
             Logcat.d(
                 "TAG", String.format(
@@ -495,13 +497,15 @@ class AScanReflowViewController(
         private fun updateImage(bmp: Bitmap?, args: Any?, reflowViewCache: ReflowViewCache?) {
             if (args is List<*>) {
                 val bitmaps = args as List<Bitmap>
+                var height = 0
                 for (bitmap in bitmaps) {
-                    pageView.addImageView(
+                    height += pageView.addImageView(
                         bitmap,
                         defaultWidth,
                         reflowViewCache,
                     )
                 }
+                widthHeightMap.put("$index-$defaultWidth", height)
             }
         }
 
@@ -510,17 +514,23 @@ class AScanReflowViewController(
             index: Int,
             reflowViewCache: ReflowViewCache?
         ) {
+            val height: Int? = widthHeightMap["$index-$defaultWidth"]
+            if (height != null) {
+                var lp = pageView.layoutParams as ARecyclerView.LayoutParams?
+                if (null == lp) {
+                    lp = ARecyclerView.LayoutParams(ARecyclerView.LayoutParams.MATCH_PARENT, height)
+                    pageView.layoutParams = lp
+                } else {
+                    lp.width = ARecyclerView.LayoutParams.MATCH_PARENT
+                    lp.height = height
+                    pageView.layoutParams = lp
+                }
+            }
+
             this.index = index
             recycleViews(reflowViewCache)
 
             val key = generateCacheKey(index, defaultWidth, defaultHeight, crop)
-            /*val bmp = BitmapCache.getInstance().getBitmap(key)
-
-            if (null != bmp) {
-                Log.d("TAG", String.format("hit the cache:%s", index))
-                updateImage(this, bmp, resultWidth, resultHeight)
-                return
-            }*/
 
             val callback = object : DecodeService.DecodeCallback {
                 override fun decodeComplete(bitmap: Bitmap?, param: Boolean, args: Any?) {
@@ -572,7 +582,7 @@ class AScanReflowViewController(
             bitmap: Bitmap,
             width: Int,
             reflowViewCache: ReflowViewCache?,
-        ) {
+        ): Int {
             val imageView: ImageView?
             if (null != reflowViewCache && reflowViewCache.imageViewCount() > 0) {
                 imageView = reflowViewCache.getImageView(0)
@@ -590,6 +600,8 @@ class AScanReflowViewController(
             lp.rightMargin = rightPadding
             addView(imageView, lp)
             imageView.setImageBitmap(bitmap)
+
+            return height
         }
     }
 }

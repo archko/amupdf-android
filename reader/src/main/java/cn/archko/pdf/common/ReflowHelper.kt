@@ -154,9 +154,10 @@ object ReflowHelper {
                     (System.currentTimeMillis() - start)
                 )
             )
-            /*val end = System.currentTimeMillis() - start
+            val end = System.currentTimeMillis() - start
             start = System.currentTimeMillis()
-            val cropBounds = CropUtils.getJavaCropBounds(
+            //只需要切边上下就够了.
+            val cropBounds = CropUtils.getJavaCropTopBottomBounds(
                 bmp,
                 Rect(0, 0, bmp.getWidth(), bmp.getHeight())
             )
@@ -169,7 +170,8 @@ object ReflowHelper {
             )
             val cropEnd = System.currentTimeMillis() - start
             Log.d(
-                "reflow", String.format(
+                "reflow",
+                String.format(
                     "index:%s, dpi:%s, font:%s, view.w-h:%s-%s, bitmap.w-h:%s-%s, cos:%s, cos2:%s, nBitmap.w-h:%s-%s, %s",
                     i,
                     densityDpi,
@@ -184,7 +186,7 @@ object ReflowHelper {
                     cropBounds
                 )
             )
-            bmp.recycle()*/
+            bmp.recycle()
             list.add(bmp)
         }
         return list

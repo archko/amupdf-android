@@ -8,7 +8,6 @@ import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.View;
 
 import com.github.axet.k2pdfopt.K2PdfOpt;
 
@@ -65,7 +64,7 @@ public class DocDecodeService {
     private final List<APage> aPageList = new ArrayList<>();
     private APageSizeLoader.PageSizeBean pageSizeBean;
 
-    private K2PdfOpt opt = new K2PdfOpt();
+    private K2PdfOpt k2PdfOpt = new K2PdfOpt();
     private final Handler.Callback mCallback = new Handler.Callback() {
         public boolean handleMessage(Message msg) {
             int what = msg.what;
@@ -276,7 +275,7 @@ public class DocDecodeService {
         List<Bitmap> bitmaps = null;
         if (task.dpi > 0) {
             bitmaps = ReflowHelper.INSTANCE.k2pdf2bitmap(
-                    opt,
+                    k2PdfOpt,
                     1f,
                     bitmap,
                     getTargetWidth(),

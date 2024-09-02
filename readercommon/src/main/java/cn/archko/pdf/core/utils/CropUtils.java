@@ -209,6 +209,24 @@ public class CropUtils {
         return getJavaCropBounds(bitmap, new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight()));
     }
 
+    public static RectF getJavaCropTopBottomBounds(final Bitmap bitmap, final Rect bitmapBounds) {
+        if (bitmap.getHeight() < (MIN_WIDTH) || bitmap.getWidth() < MIN_WIDTH) {
+            return new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        }
+        final float avgLum = 225;
+        float left = 0;
+        float right = 0;
+        float top = getTopBound(bitmap, bitmapBounds, avgLum);
+        float bottom = getBottomBound(bitmap, bitmapBounds, avgLum);
+
+        left = left * bitmapBounds.width();
+        top = top * bitmapBounds.height();
+        right = right * bitmapBounds.width();
+        bottom = bottom * bitmapBounds.height();
+
+        return new RectF(left, top, right, bottom);
+    }
+
     public static RectF getJavaCropBounds(final Bitmap bitmap, final Rect bitmapBounds) {
         if (bitmap.getHeight() < (MIN_WIDTH) || bitmap.getWidth() < MIN_WIDTH) {
             return new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight());
