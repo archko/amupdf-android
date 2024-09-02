@@ -43,7 +43,6 @@ import org.vudroid.core.codec.CodecDocument
 import org.vudroid.core.models.CurrentPageModel
 import org.vudroid.core.models.DecodingProgressModel
 import org.vudroid.core.models.ZoomModel
-import java.util.HashMap
 
 /**
  * 扫描版的重排,用k2pdfopt库
@@ -297,7 +296,8 @@ class AScanReflowViewController(
     }
 
     override fun getCurrentBitmap(): Bitmap? {
-        return null
+        val bitmap = BitmapCache.getInstance().getBitmap(generateCacheKey(getCurrentPos(), defaultWidth, defaultHeight, crop))
+        return bitmap
     }
 
     override fun getCurrentPos(): Int {
@@ -484,15 +484,14 @@ class AScanReflowViewController(
     override fun showController() {
     }
 
+    private fun generateCacheKey(index: Int, w: Int, h: Int, crop: Boolean): String {
+        return String.format("%s-%s-%s-%s", index, w, h, crop)
+    }
 
     inner class ReflowViewHolder(private var pageView: ReflowView) :
         ARecyclerView.ViewHolder(pageView) {
 
         private var index: Int = 0
-
-        private fun generateCacheKey(index: Int, w: Int, h: Int, crop: Boolean): String {
-            return String.format("%s-%s-%s-%s", index, w, h, crop)
-        }
 
         private fun updateImage(bmp: Bitmap?, args: Any?, reflowViewCache: ReflowViewCache?) {
             if (args is List<*>) {

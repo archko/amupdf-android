@@ -184,7 +184,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 reflowButton.visibility = View.GONE
                 autoCropButton.visibility = View.GONE
                 outlineButton.visibility = View.GONE
-                oriButton.visibility = View.GONE
+                oriButton.visibility = View.VISIBLE
                 imageButton.visibility = View.GONE
             } else if (IntentFile.isMuPdf(mPath!!)) {
                 reflowButton.visibility = View.VISIBLE
@@ -192,14 +192,13 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 autoCropButton.visibility = View.VISIBLE
                 outlineButton.visibility = View.VISIBLE
             } else {
-                if (IntentFile.isDjvu(mPath!!)) {
-                    reflowButton.visibility = View.GONE
-                } else {
-                    reflowButton.visibility = View.VISIBLE
-                }
-                imageButton.visibility = View.GONE
+                reflowButton.visibility = View.VISIBLE
+                imageButton.visibility = View.VISIBLE
                 autoCropButton.visibility = View.VISIBLE
                 outlineButton.visibility = View.VISIBLE
+            }
+            if (IntentFile.isReflowable(mPath!!)) {
+                imageButton.visibility = View.GONE
             }
             if (viewMode == ViewMode.REFLOW_SCAN) {
                 oriButton.visibility = View.GONE
@@ -354,7 +353,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     //===========================================
 
     private fun ocr() {
-        if (pdfViewModel.getReflow() != BookProgress.REFLOW_NO) {//TODO
+        if (pdfViewModel.getReflow() != BookProgress.REFLOW_NO) {
             Toast.makeText(
                 this@AMuPDFRecyclerViewActivity,
                 "已经是文本",
@@ -800,16 +799,17 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         const val PREF_READER_KEY_FIRST = "pref_reader_key_first"
 
         fun startOcrActivity(context: Context, bitmap: Bitmap?, path: String?, pos: Int) {
+            if (null == bitmap&&TextUtils.isEmpty(path)) {
+                return
+            }
             //OcrActivity.start(context, bitmap, path, pos.toString())
             val intent = Intent(Intent.ACTION_VIEW)
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.setClassName(context, "com.baidu.ai.edge.ui.activity.OcrActivity")
             intent.putExtra("path", path)
-            if (null != bitmap) {
-                val key = System.currentTimeMillis().toString()
-                BitmapCache.getInstance().addBitmap(key, bitmap)
-                intent.putExtra("key", key)
-            }
+            val key = System.currentTimeMillis().toString()
+            BitmapCache.getInstance().addBitmap(key, bitmap!!)
+            intent.putExtra("key", key)
             intent.putExtra("name", pos.toString())
             context.startActivity(intent)
         }
