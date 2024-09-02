@@ -330,7 +330,7 @@ class TextActivity : AppCompatActivity() {
             override fun onDone(key: ReflowBean) {
                 try {
                     //Logcat.d("onDone:$key")
-                    val arr = key.page.split("-")
+                    val arr = key.page!!.split("-")
                     val page = Utils.parseInt(arr[0])
                     val current = getCurrentPos()
                     if (current != page) {

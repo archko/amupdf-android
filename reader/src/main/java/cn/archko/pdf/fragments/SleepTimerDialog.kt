@@ -6,9 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
-import cn.archko.pdf.widgets.SeekArc
 import cn.archko.pdf.R
 import cn.archko.pdf.databinding.DialogSleepTimerBinding
+import cn.archko.pdf.widgets.SeekArc
 import com.tencent.mmkv.MMKV
 
 class SleepTimerDialog(private var timeListener: TimeListener) :
@@ -54,7 +54,7 @@ class SleepTimerDialog(private var timeListener: TimeListener) :
 
         val mmkv = MMKV.mmkvWithID("seekArc")
         val progress = mmkv.decodeInt("progress")
-        binding.seekArc.progress = progress
+        binding.seekArc.progress = if (progress == 0) 20 else progress
 
         binding.timerDisplay.text = binding.seekArc.progress.toString()
         binding.ok.setOnClickListener {

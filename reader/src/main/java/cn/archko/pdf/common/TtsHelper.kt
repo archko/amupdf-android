@@ -84,7 +84,7 @@ object TtsHelper {
     private fun toJsons(list: List<ReflowBean>): JSONArray {
         val jsonArray = JSONArray()
         for (bean in list) {
-            val jo=JSONObject()
+            val jo = JSONObject()
             jo.put("page", bean.page)
             jo.put("data", bean.data)
             jsonArray.put(jo)

@@ -9,9 +9,12 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.DataListener
+import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.databinding.DialogTtsTextBinding
 import cn.archko.pdf.tts.TTSEngine
 
 /**
@@ -19,8 +22,7 @@ import cn.archko.pdf.tts.TTSEngine
  */
 class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
 
-    private lateinit var binding: FragmentDialogTtsTextBinding
-
+    private lateinit var binding: DialogTtsTextBinding
     private var mDataListener: DataListener? = null
     private lateinit var textAdapter: TextAdapter
 
@@ -30,7 +32,7 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var themeId = cn.archko.pdf.R.style.AppTheme
+        var themeId = R.style.AppTheme
         setStyle(DialogFragment.STYLE_NO_TITLE, themeId)
     }
 
@@ -48,7 +50,7 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentDialogTtsTextBinding.inflate(layoutInflater)
+        binding = DialogTtsTextBinding.inflate(layoutInflater)
         return binding.root
     }
 
@@ -56,12 +58,12 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
         super.onViewCreated(view, savedInstanceState)
         binding.toolbar.setNavigationOnClickListener { dismiss() }
 
-        textAdapter = TextAdapter()
+        textAdapter = TextAdapter(requireContext())
         textAdapter.keys.clear()
-        textAdapter.keys.addAll(TTSEngine.get().getTtsContent())
+        textAdapter.keys.addAll(TTSEngine.get().ttsContent)
 
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
-        binding.recyclerView.adapter = pdfAdapter
+        binding.recyclerView.adapter = textAdapter
         binding.recyclerView.setHasFixedSize(true)
     }
 
@@ -73,7 +75,7 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
         var context: Context,
     ) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-        val keys: List<ReflowBean> = mutableListOf<ReflowBean>()
+        val keys: MutableList<ReflowBean> = mutableListOf()
 
         override fun getItemCount(): Int {
             return keys.size
@@ -89,7 +91,9 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
                         RecyclerView.LayoutParams.MATCH_PARENT,
                         RecyclerView.LayoutParams.WRAP_CONTENT
                     )
-                    singleline = true
+                    maxLines = 2
+                    val padding = Utils.dipToPixel(8f)
+                    setPadding(padding, padding, padding, padding)
                 }
 
             return TextHolder(view)
@@ -107,7 +111,7 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
                     mDataListener?.onSuccess(keys[position])
                     dismiss()
                 }
-                view.setText(String.format("%s-%s", keys[position].page, keys[position].data))
+                view.text = String.format("%s-%s", keys[position].page, keys[position].data)
             }
         }
     }

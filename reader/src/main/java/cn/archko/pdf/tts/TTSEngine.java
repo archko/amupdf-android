@@ -46,6 +46,7 @@ public class TTSEngine {
 
     private TextToSpeech textToSpeech;
     private boolean initStatus = false;
+    //保存正在进行中的数据列表
     private final Map<String, ReflowBean> keys = new HashMap<>();
     private final List<ReflowBean> ttsContent = new ArrayList<>();
 
@@ -127,7 +128,7 @@ public class TTSEngine {
             public void onStart(String utteranceId) {
                 if (null != progressListener) {
                     ReflowBean key = keys.get(utteranceId);
-                    //Logcat.d(TAG, "onStart:" + utteranceId + " key:" + key);
+                    Logcat.d(TAG, "onStart:" + utteranceId + " key:" + key);
                     progressListener.onStart(key);
                 }
             }
@@ -136,18 +137,15 @@ public class TTSEngine {
             @Override
             public void onDone(String utteranceId) {
                 //Logcat.d(TAG, "onDone:" + utteranceId);
-                ttsContent.remove(utteranceId);
                 ReflowBean key = keys.remove(utteranceId);
-                //if (null != progressListener) {
-                //    progressListener.onDone(key);
-                //}
+                ttsContent.remove(key);
             }
 
             @Override
             public void onError(String utteranceId) {
-                Logcat.d(TAG, "onError:" + utteranceId);
-                ttsContent.remove(utteranceId);
-                keys.remove(utteranceId);
+                ReflowBean key = keys.remove(utteranceId);
+                Logcat.d(TAG, String.format("onError:%s, %s", utteranceId, key));
+                ttsContent.remove(key);
             }
         });
     }
@@ -165,14 +163,14 @@ public class TTSEngine {
         }
         if (keys.size() != ttsContent.size()) {
             Logcat.d(TAG, "something wrong.");
-            ttsContent.clear();
-            ttsContent.addAll(keys.keySet());
         }
+        keys.clear();
 
         textToSpeech.stop();
         for (int i = 0; i < ttsContent.size(); i++) {
-            ReflowBean content = ttsContent.get(i);
-            resumeSpeak(content.getData());
+            ReflowBean bean = ttsContent.get(i);
+            keys.put(bean.getPage(), bean);
+            resumeSpeak(bean);
         }
         return true;
     }
@@ -190,32 +188,37 @@ public class TTSEngine {
         }
         if (keys.size() != ttsContent.size()) {
             Logcat.d(TAG, "something wrong.");
-            ttsContent.clear();
-            ttsContent.addAll(keys.keySet());
         }
+        keys.clear();
 
         textToSpeech.stop();
         boolean found = false;
+        List<ReflowBean> list = new ArrayList<>();
         for (int i = 0; i < ttsContent.size(); i++) {
             if (TextUtils.equals(ttsContent.get(i).getPage(), bean.getPage())) {
                 found = true;
             }
             if (found) {
-                ReflowBean content = ttsContent.get(i);
-                resumeSpeak(content);
+                list.add(ttsContent.get(i));
             }
+        }
+        ttsContent.clear();
+        ttsContent.addAll(list);
+        for (ReflowBean reflowBean : list) {
+            keys.put(reflowBean.getPage(), reflowBean);
+            resumeSpeak(reflowBean);
         }
         return true;
     }
 
     public int getLast() {
         if (!ttsContent.isEmpty()) {
-            String ss = keys.get(ttsContent.size() - 1);
-            String[] arr = ss.split("-");
+            ReflowBean bean = keys.get(ttsContent.size() - 1);
+            String[] arr = bean.getPage().split("-");
             try {
                 return Utils.parseInt(arr[0]);
             } catch (Exception e) {
-                Logcat.e(ss, e);
+                Logcat.e("reflow", String.format("%s, %s", bean, e));
             }
         }
         return 0;
@@ -236,18 +239,18 @@ public class TTSEngine {
             return;
         }
 
-        textToSpeech.speak(bean.getData(), TextToSpeech.QUEUE_ADD, null, bean.getData());
+        textToSpeech.speak(bean.getData(), TextToSpeech.QUEUE_ADD, null, bean.getPage());
     }
 
-    public void speak(final String key, final String text) {
+    public void speak(final ReflowBean bean) {
         if (textToSpeech == null) {
             Logcat.d(TAG, "textToSpeech not initialized");
             return;
         }
 
-        keys.put(text, key);
-        ttsContent.add(text);
-        textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, null, text);
+        keys.put(bean.getPage(), bean);
+        ttsContent.add(bean);
+        textToSpeech.speak(bean.getData(), TextToSpeech.QUEUE_ADD, null, bean.getPage());
     }
 
     public interface ProgressListener {

@@ -7,7 +7,6 @@ import android.text.TextUtils
 import cn.archko.pdf.core.entity.BitmapBean
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.utils.BitmapUtils
-import cn.archko.pdf.core.utils.StreamUtils
 import java.util.regex.Pattern
 
 /**
@@ -120,13 +119,14 @@ object ParseTextMain {
                     if (ss.startsWith(IMAGE_START_MARK)) {
                         isImage = true
                         sb.setLength(0)
-                        reflowBean = ReflowBean(null, ReflowBean.TYPE_STRING)
+                        reflowBean = ReflowBean(null, ReflowBean.TYPE_STRING, pageIndex.toString())
                         reflowBean.type = ReflowBean.TYPE_IMAGE
                         reflowBeans.add(reflowBean)
                     }
                     if (!isImage) {
                         if (null == reflowBean) {
-                            reflowBean = ReflowBean(null, ReflowBean.TYPE_STRING)
+                            reflowBean =
+                                ReflowBean(null, ReflowBean.TYPE_STRING, pageIndex.toString())
                             reflowBeans.add(reflowBean)
                         }
                         lastBreak = parseLine(ss, sb, pageIndex, lastBreak)
@@ -278,13 +278,13 @@ object ParseTextMain {
                 }
             }
             //Logcat.d("result=>>${list.size}");
-            return parseTextList(list)
+            return parseTextList(list, pageIndex)
         }
 
-        private fun parseTextList(lists: List<String>): List<ReflowBean> {
+        private fun parseTextList(lists: List<String>, pageIndex: Int): List<ReflowBean> {
             val sb = StringBuilder()
             val reflowBeans = ArrayList<ReflowBean>()
-            val reflowBean = ReflowBean(null, ReflowBean.TYPE_STRING)
+            val reflowBean = ReflowBean(null, ReflowBean.TYPE_STRING, pageIndex.toString())
             reflowBeans.add(reflowBean)
             for (s in lists) {
                 val ss = s.trim()

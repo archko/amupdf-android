@@ -37,9 +37,11 @@ import cn.archko.pdf.core.common.StatusBarHelper
 import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.Bookmark
 import cn.archko.pdf.core.entity.ReflowBean
+import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.fragments.OutlineFragment
 import cn.archko.pdf.fragments.SleepTimerDialog
+import cn.archko.pdf.fragments.TtsTextFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TTSActivity
@@ -576,7 +578,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         TTSEngine.get().setSpeakListener(object : TTSEngine.ProgressListener {
             override fun onStart(key: ReflowBean) {
                 try {
-                    val arr = key.page.split("-")
+                    val arr = key.page!!.split("-")
                     val page = Utils.parseInt(arr[0])
                     val current = getCurrentPos()
                     //Logcat.d("onStart:$key, current:$current")
@@ -605,9 +607,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             SleepTimerDialog(object : SleepTimerDialog.TimeListener {
                 override fun onTime(minute: Int) {
                     Logcat.d("TTSEngine.get().stop()")
-                    handler.postDelayed({
-                        closeTts()
-                    }, (minute * 60000).toLong())
+                    handler.postDelayed(closeRunnable, (minute * 60000).toLong())
                 }
             }).showDialog(this)
         }

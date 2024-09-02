@@ -32,13 +32,14 @@
             android:layout_centerInParent="true"
             android:textSize="40sp"
             tools:text="30" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:paddingTop="80dp"
-            android:textSize="16sp"
-            android:text="minute" />
+            android:text="minute"
+            android:textSize="16sp" />
 
     </RelativeLayout>
 

@@ -146,18 +146,18 @@ class PDFViewModel : ViewModel() {
                 if (beans != null) {
                     for (j in beans.indices) {
                         if (!TextUtils.isEmpty(beans[j].data?.trim())) {
-                            TTSEngine.get().speak("$i-$j", beans[j].data)
-                            list.add(ReflowBean(str, page = "$i-$i"))
+                            TTSEngine.get().speak(beans[j])
+                            list.add(beans[j])
                         }
                     }
                 }
             }
+            Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
             TtsHelper.saveToFile(count, pdfPath!!, list)
-        } else{
+        } else {
             for (bean in ttsBean.list) {
-                TTSEngine.get().speak(bean.page, bean.data)
+                TTSEngine.get().speak(bean)
             }
         }
-        Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
     }
 }

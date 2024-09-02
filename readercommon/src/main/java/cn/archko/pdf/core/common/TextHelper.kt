@@ -1,7 +1,6 @@
 package cn.archko.pdf.core.common
 
 import cn.archko.pdf.core.entity.ReflowBean
-import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.StreamUtils
 import org.mozilla.universalchardet.UniversalDetector
 import java.io.BufferedReader
@@ -19,7 +18,8 @@ object TextHelper {
     fun readString(path: String): List<ReflowBean> {
         var bufferedReader: BufferedReader? = null
         val reflowBeans = mutableListOf<ReflowBean>()
-        var lineCount = 0
+        var countPerLine = 0
+        var line = 0
         val sb = StringBuilder()
         try {
             val stream = FileInputStream(File(path))
@@ -31,21 +31,22 @@ object TextHelper {
                 temp = temp?.trimIndent()
                 if (null != temp && temp!!.length > READ_CHAR_COUNT + 40) {
                     //如果一行大于READ_CHAR_COUNT个字符,就应该把这一行按READ_CHAR_COUNT一个字符换行.
-                    addLargeLine(temp!!, reflowBeans)
+                    line = addLargeLine(temp!!, reflowBeans, line)
                 } else {
-                    if (lineCount < READ_LINE) {
+                    if (countPerLine < READ_LINE) {
                         sb.append(temp)
-                        lineCount++
+                        countPerLine++
                     } else {
                         Logcat.d("======================:$sb")
-                        reflowBeans.add(ReflowBean(sb.toString(), ReflowBean.TYPE_STRING))
+                        reflowBeans.add(ReflowBean(sb.toString(), ReflowBean.TYPE_STRING, "$line"))
                         sb.setLength(0)
-                        lineCount = 0
+                        countPerLine = 0
+                        line++
                     }
                 }
             }
             if (sb.isNotEmpty()) {
-                reflowBeans.add(ReflowBean(sb.toString(), ReflowBean.TYPE_STRING))
+                reflowBeans.add(ReflowBean(sb.toString(), ReflowBean.TYPE_STRING, "$line"))
             }
         } catch (e: Throwable) {
             e.printStackTrace()
@@ -56,17 +57,20 @@ object TextHelper {
         return reflowBeans
     }
 
-    private fun addLargeLine(temp: String, reflowBeans: MutableList<ReflowBean>) {
+    private fun addLargeLine(temp: String, reflowBeans: MutableList<ReflowBean>, line: Int): Int {
         val length = temp.length
         var start = 0
+        var count = line
         while (start < length) {
             var end = start + READ_CHAR_COUNT
             if (end > length) {
                 end = length
             }
-            val line = temp.subSequence(start, end)
-            reflowBeans.add(ReflowBean(line.toString(), ReflowBean.TYPE_STRING))
+            val sequence = temp.subSequence(start, end)
+            reflowBeans.add(ReflowBean(sequence.toString(), ReflowBean.TYPE_STRING, "$count"))
             start = end
+            count++
         }
+        return count
     }
 }

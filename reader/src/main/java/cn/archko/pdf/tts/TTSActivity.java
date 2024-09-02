@@ -33,10 +33,10 @@ public class TTSActivity extends Activity {
 
         TTSEngine.get().getTTS(status -> {
                     if (status == TextToSpeech.SUCCESS) {
-                        TTSEngine.get().speak("1", "TextToSpeech.QUEUE_ADD, null, null");
-                        TTSEngine.get().speak("2", "requestedVisible:true, getLeash:Surface(name=Surface(name=ea7ad61 NavigationBar0");
-                        TTSEngine.get().speak("3", "TTS是语音合成应用的一种，它将储存于电脑中的文件，如帮助文件或者网页，转换成自然语音输出。\n" +
-                                "著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。");
+                        //TTSEngine.get().speak("1", "TextToSpeech.QUEUE_ADD, null, null");
+                        //TTSEngine.get().speak("2", "requestedVisible:true, getLeash:Surface(name=Surface(name=ea7ad61 NavigationBar0");
+                        //TTSEngine.get().speak("3", "TTS是语音合成应用的一种，它将储存于电脑中的文件，如帮助文件或者网页，转换成自然语音输出。\n" +
+                        //        "著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。");
                     } else {
                         // 初始化失败
                         Log.e(TAG, "初始化失败");

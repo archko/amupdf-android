@@ -314,7 +314,7 @@ class ANormalViewController(
                 if (beans != null) {
                     for (j in beans.indices) {
                         if (!TextUtils.isEmpty(beans[j].data?.trim())) {
-                            TTSEngine.get().speak("$i-$j", beans[j].data)
+                            TTSEngine.get().speak(beans[j])
                         }
                     }
                 }

@@ -58,7 +58,7 @@ class TextViewModel : ViewModel() {
         }
         val last = TTSEngine.get().getLast()
         val count = countPages()
-        Logcat.i(Logcat.TAG, "decodeTextForTts:last:$last, count:$count, currentPos:$currentPos")
+        Logcat.i("reflow", "decodeTextForTts:last:$last, count:$count, currentPos:$currentPos")
         if (last == count - 1 && last != 0) {
             return
         }
@@ -73,16 +73,16 @@ class TextViewModel : ViewModel() {
             for (i in currentPos until count) {
                 val str = data[i].data
                 if (str != null && !TextUtils.isEmpty(str.trim())) {
-                    TTSEngine.get().speak("$i-$i", str)
+                    TTSEngine.get().speak(data[i])
                     list.add(ReflowBean(str, page = "$i-$i"))
                 }
             }
+            Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
             TtsHelper.saveToFile(count, pdfPath!!, list)
         } else {
             for (bean in ttsBean.list) {
-                TTSEngine.get().speak(bean.page, bean.data)
+                TTSEngine.get().speak(bean)
             }
         }
-        Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
     }
 }

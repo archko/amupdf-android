@@ -1,6 +1,5 @@
 package org.vudroid.djvudroid.codec;
 
-import org.jetbrains.annotations.Nullable;
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.OutlineLink;
 
@@ -74,7 +73,7 @@ public class DjvuDocument implements CodecDocument {
         String rest = page.getPageHTML();
         page.recycle();
         List<ReflowBean> list = new ArrayList<>();
-        ReflowBean bean = new ReflowBean(rest, ReflowBean.TYPE_STRING);
+        ReflowBean bean = new ReflowBean(rest, ReflowBean.TYPE_STRING, null);
         list.add(bean);
         return list;
     }
