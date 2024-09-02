@@ -3,7 +3,6 @@ package cn.archko.pdf.activities
 import android.app.ProgressDialog
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.text.TextUtils
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +12,7 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.common.PdfOptionRepository
+import cn.archko.pdf.common.TtsHelper
 import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.AppExecutors.Companion.instance
 import cn.archko.pdf.core.common.IntentFile
@@ -21,6 +21,7 @@ import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.SimpleGestureListener
+import cn.archko.pdf.entity.TtsBean
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TTSEngine
@@ -307,20 +308,31 @@ class ANormalViewController(
         if (last > 0) {
             TTSEngine.get().reset()
         }
-        val start = System.currentTimeMillis()
-        if (null != document) {
-            for (i in currentPos until count) {
-                val beans: List<ReflowBean>? = document!!.decodeReflowText(i)
-                if (beans != null) {
-                    for (j in beans.indices) {
-                        if (!TextUtils.isEmpty(beans[j].data?.trim())) {
-                            TTSEngine.get().speak(beans[j])
+        val ttsBean: TtsBean? = TtsHelper.loadFromFile(count, mPath)
+        if (ttsBean?.list == null) {
+            val start = System.currentTimeMillis()
+            val list = mutableListOf<ReflowBean>()
+            if (null != document) {
+                for (i in 0 until count) {
+                    val beans: List<ReflowBean>? = document!!.decodeReflowText(i)
+                    if (beans != null) {
+                        //这里应该只有一个元素
+                        for (j in beans.indices) {
+                            list.add(beans[j])
                         }
                     }
                 }
             }
+            Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
+            TtsHelper.saveToFile(count, mPath, list)
+            for (i in currentPos until list.size) {
+                TTSEngine.get().speak(list[i])
+            }
+        } else {
+            for (i in currentPos until ttsBean.list.size) {
+                TTSEngine.get().speak(ttsBean.list[i])
+            }
         }
-        Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
     }
 
     /**

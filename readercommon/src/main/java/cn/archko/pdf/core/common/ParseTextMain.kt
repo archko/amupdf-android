@@ -145,7 +145,6 @@ object ParseTextMain {
             }
 
             if (Logcat.loggable) {
-                Logcat.d("result", "length:${lists.size}")
                 for (rb in reflowBeans) {
                     Logcat.longLog("result", rb.toString())
                 }
@@ -295,7 +294,6 @@ object ParseTextMain {
             }
 
             if (Logcat.loggable) {
-                Logcat.d("result", "length:${lists.size}")
                 for (rb in reflowBeans) {
                     Logcat.longLog("result", rb.toString())
                 }

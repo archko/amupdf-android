@@ -7,7 +7,7 @@ data class ReflowBean(
 ) {
 
     override fun toString(): String {
-        return "ReflowBean(page=$page, type=$type, data=$data)"
+        return "ReflowBean(page=$page, data=$data)"
     }
 
     companion object {

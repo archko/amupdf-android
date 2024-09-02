@@ -144,19 +144,20 @@ class PDFViewModel : ViewModel() {
             for (i in currentPos until count) {
                 val beans: List<ReflowBean>? = mupdfDocument!!.decodeReflowText(i)
                 if (beans != null) {
+                    //理论上只有一个数据
                     for (j in beans.indices) {
-                        if (!TextUtils.isEmpty(beans[j].data?.trim())) {
-                            TTSEngine.get().speak(beans[j])
-                            list.add(beans[j])
-                        }
+                        list.add(beans[j])
                     }
                 }
             }
             Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
             TtsHelper.saveToFile(count, pdfPath!!, list)
+            for (i in currentPos until list.size) {
+                TTSEngine.get().speak(list[i])
+            }
         } else {
-            for (bean in ttsBean.list) {
-                TTSEngine.get().speak(bean)
+            for (i in currentPos until ttsBean.list.size) {
+                TTSEngine.get().speak(ttsBean.list[i])
             }
         }
     }
