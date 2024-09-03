@@ -71,13 +71,13 @@ class MupdfGridAdapter(
                     width = 1080
                 }
                 val height: Int = (1f * width * bmp.height / bmp.width).toInt()
-                Log.d("TAG", String.format("updateImage:%s-%s", width, height))
+                //Log.d("TAG", String.format("updateImage:%s-%s", width, height))
                 var lp = view.layoutParams as ARecyclerView.LayoutParams?
                 if (null == lp) {
                     lp = ARecyclerView.LayoutParams(ARecyclerView.LayoutParams.MATCH_PARENT, height)
                     view.layoutParams = lp
                 } else {
-                    lp.width = ARecyclerView.LayoutParams.MATCH_PARENT
+                    lp.width = width
                     lp.height = height
                     view.layoutParams = lp
                 }

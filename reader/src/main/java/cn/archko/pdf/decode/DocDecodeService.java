@@ -242,8 +242,9 @@ public class DocDecodeService {
             vuPage.loadPage(task.pageNumber);
         }
 
-        Bitmap bitmap = BitmapCache.getInstance().removeNode(task.decodeKey);
+        Bitmap bitmap = BitmapCache.getInstance().getBitmap(task.decodeKey);
         if (null != bitmap) {
+            Log.d("TAG", String.format("performDecode.hit cache:%s-%s", task.pageNumber, task.decodeKey));
             k2pdfAndFinish(task, bitmap);
             return;
         }
@@ -258,9 +259,12 @@ public class DocDecodeService {
         Rect cropBounds = new Rect(0, 0, (int) aPage.getWidth(), (int) aPage.getHeight());
         bitmap = vuPage.renderBitmap(
                 cropBounds,
-                rect.width(), rect.height(), task.pageSliceBounds, scale);
+                rect.width(),
+                rect.height(),
+                task.pageSliceBounds,
+                scale);
         if (null != bitmap) {
-            BitmapCache.getInstance().addNodeBitmap(task.decodeKey, bitmap);
+            BitmapCache.getInstance().addBitmap(task.decodeKey, bitmap);
         }
         if (isTaskDead(task)) {
             //Log.d(TAG, "decode bitmap dead:" + task);
@@ -374,7 +378,7 @@ public class DocDecodeService {
     }
 
     private boolean isTaskDead(DecodeTask task) {
-        boolean isPage = true;//task.type == DecodeTask.TYPE_PAGE;
+        boolean isPage = true;
         if (skipInvisible(task, isPage)) {
             return true;
         }

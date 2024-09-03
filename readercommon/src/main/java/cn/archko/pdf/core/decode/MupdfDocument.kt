@@ -8,10 +8,8 @@ import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
-import android.os.Environment
 import android.util.Log
 import cn.archko.pdf.core.cache.BitmapPool
-import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.common.ParseTextMain
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.utils.BitmapUtils
@@ -143,35 +141,6 @@ class MupdfDocument(private val context: Context) {
         document = null
     }
 
-    /**
-     * 渲染页面,传入一个Bitmap对象.使用硬件加速,虽然速度影响不大.
-     *
-     * @param bm     需要渲染的位图,配置为ARGB8888
-     * @param page   当前渲染页面页码
-     * @param pageW  页面的宽,由缩放级别计算得到的最后宽,由于这个宽诸页面的裁剪大小,如果不正确,得到的Tile页面是不正确的
-     * @param pageH  页面的宽,由缩放级别计算得到的最后宽,由于这个宽诸页面的裁剪大小,如果不正确,得到的Tile页面是不正确的
-     * @param patchX 裁剪的页面的左顶点
-     * @param patchY 裁剪的页面的上顶点
-     */
-    fun drawPage(
-        bm: Bitmap?, pageNum: Int,
-        pageW: Int, pageH: Int,
-        patchX: Int, patchY: Int,
-        cookie: Cookie?
-    ) {
-        gotoPage(pageNum)
-        if (displayList == null) displayList = page!!.toDisplayList(false)
-        val ctm = Matrix(ZOOM, ZOOM)
-        val bbox = RectI(page!!.bounds.transform(ctm))
-        val xscale = pageW.toFloat() / (bbox.x1 - bbox.x0).toFloat()
-        val yscale = pageH.toFloat() / (bbox.y1 - bbox.y0).toFloat()
-        ctm.scale(xscale, yscale)
-        val dev = AndroidDrawDevice(bm, patchX, patchY)
-        displayList!!.run(dev, ctm, cookie)
-        dev.close()
-        dev.destroy()
-    }
-
     fun getPageLinks(pageNum: Int): Array<Link> {
         gotoPage(pageNum)
         return page!!.links
@@ -213,13 +182,6 @@ class MupdfDocument(private val context: Context) {
         flattenOutlineNodes(result, outline, "");
         return result;
     }*/
-    fun needsPassword(): Boolean {
-        return document!!.needsPassword()
-    }
-
-    fun authenticatePassword(password: String?): Boolean {
-        return document!!.authenticatePassword(password)
-    }
 
     fun renderBitmap(
         bitmap: Bitmap,
@@ -292,89 +254,13 @@ class MupdfDocument(private val context: Context) {
 
     companion object {
         private const val TAG = "Mupdf"
-        public var ZOOM = 160f / 72
+        const val ZOOM = 160f / 72
 
         const val LAYOUTW = 1080
         const val LAYOUTH = 1800
         const val LAYOUTEM = 40
 
-        //File selectedFile = new File(filename);
-        //String documentPath = selectedFile.getAbsolutePath();
-        //String acceleratorPath = getAcceleratorPath(documentPath);
-        //if (acceleratorValid(selectedFile, new File(acceleratorPath))) {
-        //	doc = Document.openDocument(documentPath, acceleratorPath);
-        //} else {
-        //	doc = Document.openDocument(documentPath);
-        //}
-        //doc.saveAccelerator(acceleratorPath);
-        fun getAcceleratorPath(documentPath: String): String {
-            var acceleratorPath = documentPath.substring(1)
-            acceleratorPath = acceleratorPath.replace(File.separatorChar, '%')
-            acceleratorPath = acceleratorPath.replace('\\', '%')
-            acceleratorPath = acceleratorPath.replace(':', '%')
-            val tmpdir = Environment.getExternalStorageDirectory().path + "/amupdf"
-            return StringBuffer(tmpdir).append(File.separatorChar).append(acceleratorPath)
-                .append(".accel").toString()
-        }
-
-        fun acceleratorValid(documentFile: File, acceleratorFile: File): Boolean {
-            val documentModified = documentFile.lastModified()
-            val acceleratorModified = acceleratorFile.lastModified()
-            return acceleratorModified != 0L && acceleratorModified > documentModified
-        }
-
         //=================================================
-        fun getArrByCrop(
-            page: Page?,
-            ctm: Matrix,
-            pageW: Int,
-            pageH: Int,
-            leftBound: Int,
-            topBound: Int
-        ): FloatArray {
-            var leftBound = leftBound
-            var topBound = topBound
-            val bWith = 200f
-            val ratio = pageW / bWith
-            val thumb =
-                BitmapPool.getInstance().acquire((pageW / ratio).toInt(), (pageH / ratio).toInt())
-            val matrix = Matrix(ctm.a / ratio, ctm.d / ratio)
-            render(page, matrix, thumb, 0, leftBound, topBound)
-            val rectF = getJavaCropRect(thumb)
-            val xscale = thumb.getWidth() / rectF.width()
-            leftBound = (rectF.left * ratio * xscale).toInt()
-            topBound = (rectF.top * ratio * xscale).toInt()
-            val height = (rectF.height() * ratio * xscale).toInt()
-            ctm.scale(xscale, xscale)
-            if (Logcat.loggable) {
-                val tw = thumb.getWidth() * ratio
-                val th = thumb.getHeight() * ratio
-                val sw = xscale * pageW
-                val sh = xscale * pageH
-                Logcat.d(
-                    TAG, String.format(
-                        "decode crop.bitmap tw-th:%s-:%s, crop.w-h:%s-%s, sw-sh:%s-%s,xscale:%s, rect:%s-%s",
-                        tw,
-                        th,
-                        sw,
-                        sh,
-                        xscale,
-                        rectF.width(),
-                        rectF.height(),
-                        rectF.width() * ratio,
-                        rectF.height() * ratio
-                    )
-                )
-
-                //Logcat.d(TAG, String.format("bitmap:%s-%s,height:%s,thumb:%s-%s, crop rect:%s, xscale:%s,yscale:%s",
-                //        pageW, pageH, height, thumb.getWidth(), thumb.getHeight(), rectF, xscale, yscale));
-            }
-            val arr =
-                floatArrayOf(leftBound.toFloat(), topBound.toFloat(), height.toFloat(), xscale)
-            BitmapPool.getInstance().release(thumb)
-            return arr
-        }
-
         fun render(
             page: Page?,
             ctm: Matrix?,
@@ -390,23 +276,6 @@ class MupdfDocument(private val context: Context) {
             page.run(dev, ctm, null)
             dev.close()
             dev.destroy()
-        }
-
-        /*public static RectF getNativeCropRect(Bitmap bitmap) {
-        //long start = SystemClock.uptimeMillis();
-        ByteBuffer byteBuffer = PageCropper.create(bitmap.getByteCount()).order(ByteOrder.nativeOrder());
-        bitmap.copyPixelsToBuffer(byteBuffer);
-        //Log.d("test", String.format("%s,%s,%s,%s", bitmap.getWidth(), bitmap.getHeight(), (SystemClock.uptimeMillis() - start), rectF));
-
-        //view: view:Point(1920, 1080) patchX:71 mss:6.260591 mZoomSize:Point(2063, 3066) zoom:1.0749608
-        //test: 2063,3066,261,RectF(85.0, 320.0, 1743.0, 2736.0)
-        return PageCropper.getCropBounds(byteBuffer, bitmap.getWidth(), bitmap.getHeight(), new RectF(0f, 0f, bitmap.getWidth(), bitmap.getHeight()));
-    }*/
-        var useNewCropper = false
-        fun getJavaCropRect(bitmap: Bitmap?): RectF {
-            return if (useNewCropper) {
-                CropUtils.getJavaCropRect(bitmap)
-            } else CropUtils.getJavaCropBounds(bitmap)
         }
 
         fun crop(page: Page, viewWidth: Int) {
@@ -434,40 +303,6 @@ class MupdfDocument(private val context: Context) {
             )
             val bitmap = BitmapPool.getInstance().acquire(pageW.toInt(), pageH.toInt())
             render(page, ctm, bitmap, 0, leftBound, topBound)
-        }
-
-        fun getArrByCrop(
-            thumb: Bitmap,
-            ratio: Float,
-            pageW: Int,
-            pageH: Int
-        ): FloatArray {
-            val start = System.currentTimeMillis()
-            val rectF = CropUtils.getJavaCropBounds(
-                thumb,
-                Rect(0, 0, thumb.getWidth(), thumb.getHeight())
-            )
-
-            //scale to original image
-            val xscale = 1f * pageW / rectF.width()
-            val leftBound = (rectF.left * xscale).toInt()
-            val topBound = (rectF.top * xscale).toInt()
-            val resultH = (rectF.height() * xscale).toInt()
-            val resultW = pageW
-
-            Log.d(
-                "TAG", String.format(
-                    "crop.bitmap target.w-h:%s-%s, xscale:%s, rect:%s-%s, cos:%s",
-                    resultW,
-                    resultH,
-                    xscale,
-                    rectF.width() * ratio,
-                    rectF.height() * ratio,
-                    System.currentTimeMillis() - start
-                )
-            )
-
-            return floatArrayOf(leftBound.toFloat(), topBound.toFloat(), resultH.toFloat(), xscale)
         }
 
         /**
