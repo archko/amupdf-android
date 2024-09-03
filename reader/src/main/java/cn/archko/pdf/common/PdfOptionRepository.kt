@@ -18,7 +18,7 @@ object PdfOptionRepository {
     }
 
     fun getOrientation(): Int {
-        return mmkv.decodeInt(PdfOptionKeys.PREF_ORIENTATION, 7)
+        return mmkv.decodeInt(PdfOptionKeys.PREF_ORIENTATION, 1)
     }
 
     fun setShowExtension(enable: Boolean) {

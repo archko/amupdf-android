@@ -69,6 +69,10 @@ class AScanReflowViewController(
 ) :
     OutlineListener, AViewController {
 
+    companion object {
+        const val TAG = "ScanReflow"
+    }
+
     private lateinit var mRecyclerView: ARecyclerView
     private lateinit var mPageSizes: List<APage>
 
@@ -95,6 +99,7 @@ class AScanReflowViewController(
         }
     }
 
+    var screenWidth = 1080
     var defaultWidth = 1080
     var defaultHeight = 1080
 
@@ -103,6 +108,7 @@ class AScanReflowViewController(
 
     init {
         defaultWidth = Utils.getScreenWidthPixelWithOrientation(context)
+        screenWidth = defaultWidth
         defaultHeight = Utils.getScreenHeightPixelWithOrientation(context)
         initView()
     }
@@ -129,7 +135,7 @@ class AScanReflowViewController(
 
         val iView = object : IView {
             override fun getWidth(): Int {
-                return defaultWidth
+                return screenWidth
             }
 
             override fun getHeight(): Int {
@@ -163,14 +169,13 @@ class AScanReflowViewController(
                     val changed = defaultWidth != mRecyclerView.width
                     defaultWidth = mRecyclerView.width
                     defaultHeight = mRecyclerView.height
-                    if (Logcat.loggable) {
-                        Logcat.d(
-                            "TAG", String.format(
-                                "onGlobalLayout : w-h:%s-%s",
-                                defaultWidth, defaultHeight
-                            )
+                    screenWidth = defaultWidth
+                    Logcat.d(
+                        TAG, String.format(
+                            "onGlobalLayout : w-h:%s-%s",
+                            defaultWidth, defaultHeight
                         )
-                    }
+                    )
                     if (changed) {
                         mRecyclerView.adapter?.notifyDataSetChanged()
                     }
@@ -213,14 +218,14 @@ class AScanReflowViewController(
     }
 
     override fun init() {
-        Logcat.d("init:")
+        Logcat.d(TAG, "init:")
         crop = pdfViewModel.checkCrop()
 
         loadDocument()
     }
 
     private fun doLoadDoc(pageSizeBean: APageSizeLoader.PageSizeBean, document: CodecDocument) {
-        Logcat.d("doLoadDoc:${pageSizeBean.crop}, ${pageSizeBean.List!!.size}")
+        Logcat.d(TAG, "doLoadDoc:${pageSizeBean.crop}, ${pageSizeBean.List!!.size}")
         this.mPageSizes = pageSizeBean.List!!
         if (null == mPageSizes) {
             return
@@ -293,7 +298,7 @@ class AScanReflowViewController(
             vto.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
                     mRecyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    Logcat.d("onGlobalLayout:$this,pos:$pos")
+                    Logcat.d(TAG, "onGlobalLayout:$this,pos:$pos")
                     mRecyclerView.postDelayed({
                         layoutManager!!.scrollToPosition(pos)
                         mRecyclerView.requestLayout()
@@ -405,20 +410,18 @@ class AScanReflowViewController(
         mRecyclerView.stopScroll()
         BitmapCache.getInstance().clear()
 
-        //defaultWidth = Utils.dipToPixel(newConfig.screenWidthDp.toFloat())
-        //defaultHeight = Utils.dipToPixel(newConfig.screenHeightDp.toFloat())
-        if (Logcat.loggable) {
-            Logcat.d(
-                "TAG", String.format(
-                    "newConfig:w-h:%s-%s, config:%s-%s, %s",
-                    defaultWidth,
-                    defaultHeight,
-                    newConfig.screenWidthDp,
-                    newConfig.screenHeightDp,
-                    newConfig.orientation
-                )
+        defaultWidth = Utils.dipToPixel(newConfig.screenWidthDp.toFloat())
+        defaultHeight = Utils.dipToPixel(newConfig.screenHeightDp.toFloat())
+        Logcat.d(
+            TAG, String.format(
+                "newConfig:w-h:%s-%s, config:%s-%s, %s",
+                defaultWidth,
+                defaultHeight,
+                newConfig.screenWidthDp,
+                newConfig.screenHeightDp,
+                newConfig.orientation
             )
-        }
+        )
 
         val lm = (mRecyclerView.layoutManager as LinearLayoutManager)
         var offset = 0
@@ -491,7 +494,7 @@ class AScanReflowViewController(
     }
 
     override fun onDestroy() {
-        Logcat.d("crop.onDestroy")
+        Logcat.d(TAG, "ScanReflow.onDestroy")
         decodeService?.recycle()
     }
 
@@ -619,7 +622,7 @@ class AScanReflowViewController(
             val ratio = 1f * width / bitmap.width
             val rw = width - leftPadding - rightPadding
             val height = (bitmap.height * ratio).toInt()
-            //Logcat.d("reflow", String.format("w-h:%s-%s,%s", rw, height, ratio))
+            //Logcat.d(TAG, String.format("w-h:%s-%s,%s", rw, height, ratio))
             val lp = LayoutParams(rw, height)
             lp.leftMargin = leftPadding
             lp.rightMargin = rightPadding
