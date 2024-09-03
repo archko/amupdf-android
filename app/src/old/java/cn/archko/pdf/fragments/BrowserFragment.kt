@@ -418,7 +418,10 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             getString(R.string.menu_other)
         )
 
-        if (entry.type == FileBean.NORMAL && IntentFile.isPdf(entry.file!!.absolutePath)) {
+        if (entry.type == FileBean.NORMAL
+            && (IntentFile.isMuPdf(entry.file!!.absolutePath)
+                    || IntentFile.isDjvu(entry.file!!.absolutePath))
+        ) {
             menuBuilder.menu.add(
                 0,
                 PDFViewerHelper.editContextMenuItem,

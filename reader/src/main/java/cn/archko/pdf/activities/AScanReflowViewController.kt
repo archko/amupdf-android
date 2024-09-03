@@ -296,7 +296,8 @@ class AScanReflowViewController(
     }
 
     override fun getCurrentBitmap(): Bitmap? {
-        val bitmap = BitmapCache.getInstance().getBitmap(generateCacheKey(getCurrentPos(), defaultWidth, defaultHeight, crop))
+        val bitmap = BitmapCache.getInstance()
+            .getBitmap(generateCacheKey(getCurrentPos(), defaultWidth, defaultHeight, crop))
         return bitmap
     }
 
@@ -505,6 +506,15 @@ class AScanReflowViewController(
                     )
                 }
                 widthHeightMap.put("$index-$defaultWidth", height)
+                var lp = pageView.layoutParams as ARecyclerView.LayoutParams?
+                if (null == lp) {
+                    lp = ARecyclerView.LayoutParams(ARecyclerView.LayoutParams.MATCH_PARENT, height)
+                    pageView.layoutParams = lp
+                } else {
+                    lp.width = ARecyclerView.LayoutParams.MATCH_PARENT
+                    lp.height = height
+                    pageView.layoutParams = lp
+                }
             }
         }
 

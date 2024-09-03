@@ -101,7 +101,7 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
                             )
                         }
                     }
-                    if (result) {
+                    if (result == true) {
                         Toast.makeText(
                             activity,
                             R.string.edit_extract_success,

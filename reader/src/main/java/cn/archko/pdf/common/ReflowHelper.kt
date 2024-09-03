@@ -187,7 +187,7 @@ object ReflowHelper {
                 )
             )
             bmp.recycle()
-            list.add(bmp)
+            list.add(nBitmap)
         }
         return list
     }

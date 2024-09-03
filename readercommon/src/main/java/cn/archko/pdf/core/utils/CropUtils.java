@@ -215,13 +215,13 @@ public class CropUtils {
         }
         final float avgLum = 225;
         float left = 0;
-        float right = 0;
+        float right = bitmap.getWidth();
         float top = getTopBound(bitmap, bitmapBounds, avgLum);
         float bottom = getBottomBound(bitmap, bitmapBounds, avgLum);
 
         left = left * bitmapBounds.width();
         top = top * bitmapBounds.height();
-        right = right * bitmapBounds.width();
+        right = bitmap.getWidth();
         bottom = bottom * bitmapBounds.height();
 
         return new RectF(left, top, right, bottom);

@@ -39,14 +39,11 @@ class MupdfGridAdapter(
         return recyclerView.width
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): ARecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ARecyclerView.ViewHolder {
         val width: Int = viewWidth()
         val view = ImageView(context)
             .apply {
-                layoutParams = ViewGroup.LayoutParams(width, width)
+                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, width)
                 adjustViewBounds = true
             }
 
@@ -67,18 +64,32 @@ class MupdfGridAdapter(
     inner class PdfHolder(internal var view: ImageView) : ARecyclerView.ViewHolder(view) {
 
         private var index = -1
+        private fun updateImage(bmp: Bitmap?) {
+            if (null != bmp) {
+                var width: Int = viewWidth()
+                if (width == 0) {
+                    width = 1080
+                }
+                val height: Int = (1f * width * bmp.height / bmp.width).toInt()
+                Log.d("TAG", String.format("updateImage:%s-%s", width, height))
+                var lp = view.layoutParams as ARecyclerView.LayoutParams?
+                if (null == lp) {
+                    lp = ARecyclerView.LayoutParams(ARecyclerView.LayoutParams.MATCH_PARENT, height)
+                    view.layoutParams = lp
+                } else {
+                    lp.width = ARecyclerView.LayoutParams.MATCH_PARENT
+                    lp.height = height
+                    view.layoutParams = lp
+                }
+            }
+            view.setImageBitmap(bmp)
+        }
 
         fun onBind(position: Int) {
             index = position
             val aPage = decodeService.getAPage(position)
 
             val cacheKey = "page_$position-${aPage}"
-
-            var width: Int = viewWidth()
-            if (width == 0) {
-                width = 1080
-            }
-            val height: Int = (1f * width * aPage.height / aPage.width).toInt()
 
             view.setOnClickListener { clickListener.click(view, position) }
             view.setOnLongClickListener {
@@ -89,7 +100,7 @@ class MupdfGridAdapter(
             val bmp = BitmapCache.getInstance().getBitmap(cacheKey)
             if (null != bmp) {
                 Log.d("TAG", String.format("bind.hit cache:%s", aPage.index))
-                view.setImageBitmap(bmp)
+                updateImage(bmp)
                 return
             }
 
@@ -107,12 +118,7 @@ class MupdfGridAdapter(
                         )
                     )
                     AppExecutors.instance.mainThread().execute {
-                        if (null != bitmap && height != bitmap.height) {
-                            val lp = view.layoutParams
-                            lp.width = bitmap.width
-                            lp.height = bitmap.height
-                        }
-                        view.setImageBitmap(bitmap)
+                        updateImage(bitmap)
                     }
                 }
 
