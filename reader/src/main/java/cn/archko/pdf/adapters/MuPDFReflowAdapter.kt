@@ -10,7 +10,6 @@ import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.utils.Utils
-import cn.archko.pdf.viewmodel.PDFViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,7 +23,6 @@ class MuPDFReflowAdapter(
     private val mupdfDocument: MupdfDocument?,
     private var styleHelper: StyleHelper?,
     private var scope: CoroutineScope?,
-    private var pdfViewModel: PDFViewModel
 ) : ARecyclerView.Adapter<ReflowTextViewHolder>() {
 
     private var screenHeight = 720

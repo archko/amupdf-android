@@ -8,7 +8,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.awidget.LinearLayoutManager
-import cn.archko.pdf.adapters.MuPDFReflowAdapter
 import cn.archko.pdf.adapters.MuPDFTextAdapter
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.BookProgress
@@ -173,7 +172,7 @@ class ATextViewController(
                 0
             )
         }
-        if (null != mRecyclerView.adapter && mRecyclerView.adapter is MuPDFReflowAdapter) {
+        if (null != mRecyclerView.adapter && mRecyclerView.adapter is MuPDFTextAdapter) {
             (mRecyclerView.adapter as MuPDFTextAdapter).clearCacheViews()
         }
     }

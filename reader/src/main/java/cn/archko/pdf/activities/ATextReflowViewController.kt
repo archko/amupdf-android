@@ -155,7 +155,6 @@ class ATextReflowViewController(
                 pdfViewModel.mupdfDocument,
                 mStyleHelper,
                 scope,
-                pdfViewModel
             )
         } else {
             (mRecyclerView.adapter as MuPDFReflowAdapter).setScope(scope)
