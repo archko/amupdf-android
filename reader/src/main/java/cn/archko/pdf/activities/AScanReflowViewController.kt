@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.graphics.Rect
 import android.graphics.RectF
 import android.view.GestureDetector
@@ -20,6 +23,7 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.ReflowViewCache
 import cn.archko.pdf.core.common.APageSizeLoader
@@ -28,6 +32,7 @@ import cn.archko.pdf.core.common.AppExecutors.Companion.instance
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.BookProgress
+import cn.archko.pdf.core.utils.ColorUtil.getColorMode
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
 import cn.archko.pdf.decode.DocDecodeService
@@ -77,6 +82,7 @@ class AScanReflowViewController(
     protected var isDocLoaded: Boolean = false
     private var document: CodecDocument? = null
     private var widthHeightMap = HashMap<String, Int?>()
+    private var filter: ColorFilter? = null
 
     private inner class MySimpleOnGestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
@@ -174,6 +180,8 @@ class AScanReflowViewController(
         mRecyclerView.setOnTouchListener { v, event ->
             gestureDetector.onTouchEvent(event) == true
         }
+
+        setFilter(PdfOptionRepository.getColorMode())
     }
 
     private fun loadDocument() {
@@ -442,6 +450,12 @@ class AScanReflowViewController(
     }
 
     override fun setFilter(colorMode: Int) {
+        val colorMatrix = getColorMode(colorMode)
+        filter = if (null == colorMatrix) {
+            null
+        } else {
+            ColorMatrixColorFilter(ColorMatrix(colorMatrix))
+        }
     }
 
     override fun decodePageForTts(currentPos: Int) {
@@ -503,6 +517,7 @@ class AScanReflowViewController(
                         bitmap,
                         defaultWidth,
                         reflowViewCache,
+                        filter
                     )
                 }
                 widthHeightMap.put("$index-$defaultWidth", height)
@@ -591,6 +606,7 @@ class AScanReflowViewController(
             bitmap: Bitmap,
             width: Int,
             reflowViewCache: ReflowViewCache?,
+            filter: ColorFilter?
         ): Int {
             val imageView: ImageView?
             if (null != reflowViewCache && reflowViewCache.imageViewCount() > 0) {
@@ -608,6 +624,7 @@ class AScanReflowViewController(
             lp.leftMargin = leftPadding
             lp.rightMargin = rightPadding
             addView(imageView, lp)
+            imageView.colorFilter = filter
             imageView.setImageBitmap(bitmap)
 
             return height
