@@ -73,7 +73,7 @@ public class DjvuDocument implements CodecDocument {
         String rest = page.getPageHTML();
         page.recycle();
         List<ReflowBean> list = new ArrayList<>();
-        ReflowBean bean = new ReflowBean(rest, ReflowBean.TYPE_STRING, null);
+        ReflowBean bean = new ReflowBean(rest, ReflowBean.TYPE_STRING, index + "-0");
         list.add(bean);
         return list;
     }
