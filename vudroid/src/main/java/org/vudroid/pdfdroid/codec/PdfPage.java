@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.util.Log;
 
 import com.artifex.mupdf.fitz.Document;
 import com.artifex.mupdf.fitz.Link;
@@ -71,20 +70,32 @@ public class PdfPage implements CodecPage {
     /**
      * 解码
      *
-     * @param cropBound       一个页面切边后的框,只用于计算偏移量
-     * @param width           一个页面的宽,最终要渲染的宽,已经计算了切边的了
-     * @param height          一个页面的高,最终要渲染的高
-     * @param pageSliceBounds 每个页面的边框,用来计算偏移量
-     * @param scale           缩放级别,目标view宽/实际渲染页面的宽,它也等于width/cropBound.width()
+     * @param width           一个页面的宽
+     * @param height          一个页面的高
+     * @param pageSliceBounds 每个页面的边框
+     * @param scale           缩放级别
      * @return 位图
      */
     public Bitmap renderBitmap(Rect cropBound, int width, int height, RectF pageSliceBounds, float scale) {
-        //偏移就是cropBound.left*scale加上当前是第几块*每一块width,因为cropBound只是原始的切边数据,不是缩放后的.
-        int patchX = (int) (cropBound.left * scale + (int) (pageSliceBounds.left * width));
-        int patchY = (int) (cropBound.top * scale + (int) (pageSliceBounds.top * height));
-        //Log.d("TAG", String.format("page:%s, scale:%s, patchX-Y:%s-%s, w-h:%s-%s, %s, %s",
-        //        pageHandle, scale, patchX, patchY, width, height, cropBound, pageSliceBounds));
+        //Matrix matrix=new Matrix();
+        //matrix.postScale(width/getWidth(), -height/getHeight());
+        //matrix.postTranslate(0, height);
+        //matrix.postTranslate(-pageSliceBounds.left*width, -pageSliceBounds.top*height);
+        //matrix.postScale(1/pageSliceBounds.width(), 1/pageSliceBounds.height());
+
+        int pageW;
+        int pageH;
+        int patchX;
+        int patchY;
+        //如果页面的缩放为1,那么这时的pageW就是view的宽.
+        pageW = (int) (cropBound.width() * scale);
+        pageH = (int) (cropBound.height() * scale);
+
+        patchX = (int) ((int) (pageSliceBounds.left * pageW) + cropBound.left * scale);
+        patchY = (int) ((int) (pageSliceBounds.top * pageH) + cropBound.top * scale);
         Bitmap bitmap = BitmapPool.getInstance().acquire(width, height);
+
+        //Log.d("TAG", String.format("page:%s, scale:%s, patchX:%s, patchY:%s, width:%s, height:%s, %s", pageHandle, scale, patchX, patchY, width, height, cropBound));
 
         com.artifex.mupdf.fitz.Matrix ctm = new com.artifex.mupdf.fitz.Matrix(scale);
         AndroidDrawDevice dev = new AndroidDrawDevice(bitmap, patchX, patchY, 0, 0, width, height);
