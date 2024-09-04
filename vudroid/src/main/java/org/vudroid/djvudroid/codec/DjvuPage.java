@@ -114,19 +114,9 @@ public class DjvuPage implements CodecPage {
     }
 
     public Bitmap renderBitmap(Rect cropBound, int width, int height, RectF pageSliceBounds, float scale) {
-        int pageW;
-        int pageH;
-        int patchX;
-        int patchY;
-        //如果页面的缩放为1,那么这时的pageW就是view的宽.这里先将切边后比例把原始图缩放一次
-        pageW = (int) (this.width * scale);
-        pageH = (int) (this.height * scale);
-
-        //scale = viewwidth / pagewidth,前者是显示宽,后者是缩放切边后的宽
-        //width = scale * pagewidth * bound.width = viewwidth * bound.width
-        patchX = (int) ((int) (pageW * pageSliceBounds.left) + cropBound.left * scale);
-        patchY = (int) ((int) (pageH * pageSliceBounds.top) + cropBound.top * scale);
-        Log.d("TAG", String.format("scale:%s, patchX:%s, patchY:%s,pageW:%s, pageH:%s, width:%s, height:%s, %s, %s", scale, patchX, patchY, pageW, pageH, width, height, cropBound, pageSliceBounds));
+        //float patchX = (cropBound.left * scale + (int) (pageSliceBounds.left * width));
+        //float patchY = (cropBound.top * scale + (int) (pageSliceBounds.top * height));
+        //Log.d("TAG", String.format("page:%s, scale:%s, patchX:%s, patchY:%s, width:%s, height:%s, %s, %s", pageNumber, scale, patchX, patchY, width, height, cropBound, pageSliceBounds));
 
         final int[] buffer = new int[width * height];
         ///renderPage(pageHandle, contextHandle, pageW, pageH, patchX, patchY, width, height, buffer);

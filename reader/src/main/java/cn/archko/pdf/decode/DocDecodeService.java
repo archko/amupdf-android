@@ -33,6 +33,7 @@ import cn.archko.pdf.core.cache.BitmapCache;
 import cn.archko.pdf.core.cache.BitmapPool;
 import cn.archko.pdf.core.common.APageSizeLoader;
 import cn.archko.pdf.core.entity.APage;
+import cn.archko.pdf.core.utils.CropUtils;
 
 public class DocDecodeService {
 
@@ -189,6 +190,10 @@ public class DocDecodeService {
                 aPageList.add(aPage);
                 codecPage.recycle();
             }
+
+            if (cachePage) {
+                APageSizeLoader.INSTANCE.savePageSizeToFile(crop, path, aPageList);
+            }
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
@@ -198,6 +203,33 @@ public class DocDecodeService {
 
     public APageSizeLoader.PageSizeBean getPageSizeBean() {
         return pageSizeBean;
+    }
+
+    private Rect cropPage(CodecPage vuPage) {
+        int width = 300;
+        float ratio = 1f * vuPage.getWidth() / width;
+        int height = (int) (vuPage.getHeight() / ratio);
+        Bitmap thumb = vuPage.renderBitmap(
+                new Rect(0, 0, width, height),
+                width,
+                height,
+                new RectF(0, 0, 1, 1),
+                1 / ratio);
+
+        RectF cropBounds = CropUtils.getJavaCropBounds(
+                thumb,
+                new Rect(0, 0, thumb.getWidth(), thumb.getHeight())
+        );
+        BitmapPool.getInstance().release(thumb);
+
+        int leftBound = (int) (cropBounds.left * ratio);
+        int topBound = (int) (cropBounds.top * ratio);
+        int resultW = (int) (cropBounds.width() * ratio);
+        int resultH = (int) (cropBounds.height() * ratio);
+        Rect rect = new Rect(leftBound, topBound, leftBound + resultW, topBound + resultH);
+        //Log.d("TAG", String.format("cropPage:%s, w-h:%s-%s, %s, %s",
+        //        ratio, width, height, cropBounds, rect));
+        return rect;
     }
 
     public CodecDocument getDocument() {
@@ -253,10 +285,18 @@ public class DocDecodeService {
         }
 
         APage aPage = aPageList.get(task.pageNumber);
+
+        Rect cropBounds;
+        if (task.crop) {
+            cropBounds = cropPage(vuPage);
+            aPage.setCropBounds(cropBounds);
+        } else {
+            cropBounds = new Rect(0, 0, (int) aPage.getWidth(), (int) aPage.getHeight());
+        }
+
+        //scale需要在切边后计算,否则缩放值是不对
         float scale = calculateScale(aPage, task.crop) * task.zoom;
         Rect rect = getScaledSize(task, aPage, scale, task.crop);
-
-        Rect cropBounds = new Rect(0, 0, (int) aPage.getWidth(), (int) aPage.getHeight());
         bitmap = vuPage.renderBitmap(
                 cropBounds,
                 rect.width(),

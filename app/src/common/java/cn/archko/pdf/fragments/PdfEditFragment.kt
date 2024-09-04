@@ -1,6 +1,8 @@
 package cn.archko.pdf.fragments
 
 import android.app.ProgressDialog
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -19,6 +21,7 @@ import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.listeners.ClickListener
 import cn.archko.pdf.core.listeners.DataListener
+import cn.archko.pdf.core.utils.ColorUtil.getColorMode
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.decode.DocDecodeService
 import cn.archko.pdf.decode.DocDecodeService.IView
@@ -121,6 +124,10 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
             true
         }
 
+        val colorMatrix = getColorMode(1)
+        binding.autoCropButton.colorFilter = ColorMatrixColorFilter(ColorMatrix(colorMatrix))
+        binding.autoCropButton.setOnClickListener { toggleCrop() }
+
         val iView = object : IView {
             override fun getWidth(): Int {
                 return binding.recyclerView.getWidth()
@@ -164,6 +171,16 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
             val document: CodecDocument = decodeService.open(it, crop, true)
             pdfAdapter.notifyDataSetChanged()
         }
+    }
+
+    private fun toggleCrop() {
+        crop = !crop
+        val resId =
+            if (crop) cn.archko.pdf.R.drawable.ic_crop else cn.archko.pdf.R.drawable.ic_no_crop
+        binding.autoCropButton.setImageResource(resId)
+        binding.recyclerView.stopScroll()
+
+        pdfAdapter.setCrop(crop)
     }
 
     private fun showPopupMenu(view: View, position: Int) {

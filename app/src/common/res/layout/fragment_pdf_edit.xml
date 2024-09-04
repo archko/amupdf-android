@@ -5,13 +5,34 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:menu="@menu/edit_toolbar_menus"
-        app:navigationIcon="@drawable/ic_back"
-        app:title="@string/edit_title" />
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:navigationIcon="@drawable/ic_back"
+            app:title="@string/edit_title" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/autoCropButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/button"
+            android:contentDescription="@string/auto_crop"
+            android:gravity="center"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:src="@drawable/ic_no_crop" />
+
+    </RelativeLayout>
 
     <androidx.recyclerview.awidget.ARecyclerView
         android:id="@+id/recyclerView"

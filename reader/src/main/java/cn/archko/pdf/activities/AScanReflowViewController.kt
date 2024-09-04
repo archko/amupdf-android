@@ -577,7 +577,7 @@ class AScanReflowViewController(
                 false,
                 index,
                 callback,
-                2.4f,
+                2.2f,
                 RectF(0f, 0f, 1f, 1f),
                 dpi
             )

@@ -61,6 +61,14 @@ class MupdfGridAdapter(
         (holder as PdfHolder).view.setImageBitmap(null)
     }
 
+    fun setCrop(crop: Boolean) {
+        if (this.crop != crop) {
+            BitmapCache.getInstance().clear()
+            this.crop = crop
+            notifyDataSetChanged()
+        }
+    }
+
     inner class PdfHolder(internal var view: ImageView) : ARecyclerView.ViewHolder(view) {
 
         private var index = -1
@@ -71,10 +79,13 @@ class MupdfGridAdapter(
                     width = 1080
                 }
                 val height: Int = (1f * width * bmp.height / bmp.width).toInt()
-                //Log.d("TAG", String.format("updateImage:%s-%s", width, height))
-                var lp = view.layoutParams as ARecyclerView.LayoutParams?
+                //Log.d(
+                //    "TAG",
+                //    String.format("updateImage:%s-%s, %s-%s", width, height, bmp.width, bmp.height)
+                //)
+                var lp = view.layoutParams
                 if (null == lp) {
-                    lp = ARecyclerView.LayoutParams(ARecyclerView.LayoutParams.MATCH_PARENT, height)
+                    lp = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height)
                     view.layoutParams = lp
                 } else {
                     lp.width = width
@@ -89,7 +100,7 @@ class MupdfGridAdapter(
             index = position
             val aPage = decodeService.getAPage(position)
 
-            val cacheKey = "page_$position-${aPage}"
+            val cacheKey = "crop-$crop-$position-${aPage}"
 
             view.setOnClickListener { clickListener.click(view, position) }
             view.setOnLongClickListener {
@@ -111,7 +122,7 @@ class MupdfGridAdapter(
                         String.format(
                             "decode callback:index:%s-%s, w-h:%s-%s, key:%s",
                             index,
-                            param,
+                            crop,
                             bitmap?.width,
                             bitmap?.height,
                             cacheKey,

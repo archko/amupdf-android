@@ -56,7 +56,7 @@ class APage {
     fun getHeight(crop: Boolean): Float {
         if (crop && cropBounds != null) {
             return cropBounds!!.height().toFloat()
-    }
+        }
         return height
     }
 
@@ -109,12 +109,12 @@ class APage {
 
         fun calculateScale(viewWidth: Int, width: Float): Float {
             return 1.0f * viewWidth / width
-    }
+        }
 
         @JvmStatic
         fun toJson(aPage: APage): JSONObject {
-        val jo = JSONObject()
-        try {
+            val jo = JSONObject()
+            try {
                 jo.put("index", aPage.index)
                 jo.put("width", aPage.width.toDouble())
                 jo.put("height", aPage.height.toDouble())
@@ -125,12 +125,12 @@ class APage {
                     jo.put("cbtop", aPage.cropBounds!!.top)
                     jo.put("cbright", aPage.cropBounds!!.right)
                     jo.put("cbbottom", aPage.cropBounds!!.bottom)
+                }
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-        } catch (e: JSONException) {
-            e.printStackTrace()
+            return jo
         }
-        return jo
-    }
 
         @JvmStatic
         fun fromJson(jo: JSONObject): APage {

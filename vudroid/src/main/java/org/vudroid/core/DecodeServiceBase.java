@@ -192,6 +192,9 @@ public class DecodeServiceBase implements DecodeService {
         }
         int count = document.getPageCount();
         APageSizeLoader.PageSizeBean psb = APageSizeLoader.INSTANCE.loadPageSizeFromFile(count, path);
+        if (codecContext instanceof DjvuContext) {
+            crop = false;
+        }
         if (null != psb) {
             pageSizeBean = psb;
             if (!crop || (crop && psb.getCrop())) {
@@ -239,7 +242,7 @@ public class DecodeServiceBase implements DecodeService {
         float ratio = 1f * vuPage.getWidth() / width;
         int height = (int) (vuPage.getHeight() / ratio);
         Bitmap thumb = vuPage.renderBitmap(
-                new Rect(0, 0, 1, 1),
+                new Rect(0, 0, width, height),
                 width,
                 height,
                 new RectF(0, 0, 1, 1),
@@ -292,15 +295,9 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     private void performDecode(DecodeTask task) throws IOException {
-        if (isRecycled) {
+        if (isRecycled || isTaskDead(task)) {
             return;
         }
-
-        if (isTaskDead(task)) {
-            //Log.d(TAG, "Skipping decode task for page " + task);
-            return;
-        }
-        //Log.d(TAG, "Starting decode of page: " + currentDecodeTask +" slice:"+currentDecodeTask.pageSliceBounds);
         CodecPage vuPage = getPage(task.pageNumber);
         preloadNextPage(task.pageNumber);
 
@@ -320,27 +317,29 @@ public class DecodeServiceBase implements DecodeService {
             return;
         }
         if (isTaskDead(task)) {
-            //Log.d(TAG, "Skipping decode when decoding task for page " + task);
             return;
         }
 
         APage aPage = aPageList.get(task.pageNumber);
-        float scale = calculateScale(aPage, task.crop) * task.zoom;
-        Rect rect = getScaledSize(task, aPage, scale, task.crop);
 
         if (null != task.node && task.node.page.links == null) {
             task.node.page.links = vuPage.getPageLinks();
         }
 
         //Log.d(TAG, String.format("renderBitmap:%s, slice:%s, rect:%s", task.pageNumber, task.pageSliceBounds, rect));
-        Rect cropBounds = aPage.getCropBounds();
+        Rect cropBounds;
         if (task.crop) {
+            cropBounds = aPage.getCropBounds();
             if (cropBounds == null) {
                 cropBounds = new Rect(0, 0, (int) aPage.getWidth(), (int) aPage.getHeight());
             }
         } else {
             cropBounds = new Rect(0, 0, (int) aPage.getWidth(), (int) aPage.getHeight());
         }
+
+        //scale需要在切边后计算,否则缩放值是不对
+        float scale = calculateScale(aPage, task.crop) * task.zoom;
+        Rect rect = getScaledSize(task, aPage, scale, task.crop);
         bitmap = vuPage.renderBitmap(
                 cropBounds,
                 rect.width(), rect.height(), task.pageSliceBounds, scale);

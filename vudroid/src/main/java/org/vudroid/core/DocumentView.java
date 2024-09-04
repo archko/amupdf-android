@@ -655,8 +655,10 @@ public class DocumentView extends View implements ZoomListener {
 
             if (crop) {
                 Rect rect = getBounds(page);
-                x += rect.left;
-                y += rect.top;
+                if (null != rect) {
+                    x += rect.left;
+                    y += rect.top;
+                }
             }
 
             //Log.d(TAG, String.format("scrollX:%s, scrollY:%s, scale:%s, zoom:%s, index:%s, e.x:%s, e.y:%s, bound:%s",

@@ -77,7 +77,7 @@ class PdfFetcher(
             w = (page.width * yscale).toInt()
         }
         val bitmap = page.renderBitmap(
-            Rect(0, 0, 1, 1),
+            Rect(0, 0, w, h),
             w,
             h,
             RectF(0f, 0f, 1f, 1f),
