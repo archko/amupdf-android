@@ -166,7 +166,7 @@ public class DocDecodeService {
         this.containerView = containerView;
     }
 
-    public CodecDocument open(String path, boolean crop, boolean cachePage) {
+    public CodecDocument open(String path, boolean cachePage) {
         aPageList.clear();
         long start = System.currentTimeMillis();
         document = codecContext.openDocument(path);
@@ -192,7 +192,7 @@ public class DocDecodeService {
             }
 
             if (cachePage) {
-                APageSizeLoader.INSTANCE.savePageSizeToFile(crop, path, aPageList);
+                APageSizeLoader.INSTANCE.savePageSizeToFile(false, path, aPageList);
             }
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());

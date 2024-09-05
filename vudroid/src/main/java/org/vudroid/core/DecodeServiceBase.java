@@ -6,6 +6,7 @@ import android.graphics.RectF;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
@@ -55,6 +56,8 @@ public class DecodeServiceBase implements DecodeService {
     private Handler mHandler;
     private Handler mDecodeHandler;
     private final List<APage> aPageList = new ArrayList<>();
+    private String path;
+    private boolean cachePage = true;
     private APageSizeLoader.PageSizeBean pageSizeBean;
     private final Handler.Callback mCallback = new Handler.Callback() {
         public boolean handleMessage(Message msg) {
@@ -183,7 +186,9 @@ public class DecodeServiceBase implements DecodeService {
         this.containerView = containerView;
     }
 
-    public CodecDocument open(String path, boolean crop, boolean cachePage) {
+    public CodecDocument open(String path, boolean cachePage) {
+        this.path = path;
+        this.cachePage = cachePage;
         aPageList.clear();
         long start = System.currentTimeMillis();
         document = codecContext.openDocument(path);
@@ -192,37 +197,30 @@ public class DecodeServiceBase implements DecodeService {
         }
         int count = document.getPageCount();
         APageSizeLoader.PageSizeBean psb = APageSizeLoader.INSTANCE.loadPageSizeFromFile(count, path);
-        if (codecContext instanceof DjvuContext) {
-            crop = false;
-        }
         if (null != psb) {
             pageSizeBean = psb;
-            if (!crop || (crop && psb.getCrop())) {
-                aPageList.addAll(psb.getList());
-                return document;
-            }
+            aPageList.addAll(psb.getList());
+            return document;
         } else {
             pageSizeBean = new APageSizeLoader.PageSizeBean();
             pageSizeBean.setList(aPageList);
-            pageSizeBean.setCrop(crop);
         }
         try {
             for (int i = 0; i < count; i++) {
                 CodecPage codecPage = document.getPage(i);
                 APage aPage = new APage(i, codecPage.getWidth(), codecPage.getHeight(), 1f);
-                if (crop) {
-                    cropPage(codecPage, aPage);
-                }
                 aPageList.add(aPage);
                 codecPage.recycle();
             }
 
             if (cachePage) {
-                APageSizeLoader.INSTANCE.savePageSizeToFile(crop, path, aPageList);
+                APageSizeLoader.INSTANCE.savePageSizeToFile(false, path, aPageList);
             }
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
-            APageSizeLoader.INSTANCE.deletePageSizeFromFile(path);
+            path = null;
+            aPageList.clear();
+            cachePage = false;
         }
         Log.d(TAG, String.format("open.cos:%s", (System.currentTimeMillis() - start)));
         return document;
@@ -331,7 +329,9 @@ public class DecodeServiceBase implements DecodeService {
         if (task.crop) {
             cropBounds = aPage.getCropBounds();
             if (cropBounds == null) {
-                cropBounds = new Rect(0, 0, (int) aPage.getWidth(), (int) aPage.getHeight());
+                cropBounds = cropPage(vuPage);
+                aPage.setCropBounds(cropBounds);
+                //cropBounds = new Rect(0, 0, (int) aPage.getWidth(), (int) aPage.getHeight());
             }
         } else {
             cropBounds = new Rect(0, 0, (int) aPage.getWidth(), (int) aPage.getHeight());
@@ -540,6 +540,12 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     public void recycle() {
+        Log.d(TAG, String.format("recycle:%s-%s, %s", cachePage, path, aPageList));
+
+        if (cachePage && !TextUtils.isEmpty(path) && aPageList != null && !aPageList.isEmpty()) {
+            APageSizeLoader.INSTANCE.savePageSizeToFile(false, path, aPageList);
+        }
+
         if (null != mHandler) {
             mHandler.sendEmptyMessage(MSG_DECODE_FINISH);
             mHandler.getLooper().quit();

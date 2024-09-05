@@ -104,7 +104,7 @@ public abstract class BaseViewerActivity extends FragmentActivity implements Dec
         progressDialog.show();
 
         AppExecutors.Companion.getInstance().diskIO().execute(() -> {
-            CodecDocument document = decodeService.open(path, crop, true);
+            CodecDocument document = decodeService.open(path, true);
             AppExecutors.Companion.getInstance().mainThread().execute(() -> {
                 progressDialog.dismiss();
                 if (null == document) {

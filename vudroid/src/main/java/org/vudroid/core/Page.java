@@ -343,7 +343,9 @@ public class Page {
 
         if (crop) {
             Rect rect = documentView.getBounds(this);
-            sourceRect.offset(-rect.left, -rect.top);
+            if (null != rect) {
+                sourceRect.offset(-rect.left, -rect.top);
+            }
         }
 
         m.postScale(scale, scale);

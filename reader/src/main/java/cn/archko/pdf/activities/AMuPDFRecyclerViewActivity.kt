@@ -724,9 +724,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        viewController?.onDestroy()
+
         isDocLoaded = false
         busEvent(GlobalEvent(Event.ACTION_STOPPED, mPath))
-        BitmapCache.getInstance().clear()
 
         viewControllerCache.forEach { key, value -> value.onDestroy() }
 

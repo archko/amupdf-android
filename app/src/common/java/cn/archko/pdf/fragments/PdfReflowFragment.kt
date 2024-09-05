@@ -45,6 +45,8 @@ class PdfReflowFragment : DialogFragment(R.layout.fragment_reflow_pdf) {
     protected lateinit var progressDialog: ProgressDialog
     private var pdfEditViewModel = PDFEditViewModel()
     private var pdfPath: String? = null
+    private var decodeService: DocDecodeService? = null
+
 
     private var mDataListener: DataListener? = null
     private lateinit var pdfAdapter: MupdfGridAdapter
@@ -86,7 +88,7 @@ class PdfReflowFragment : DialogFragment(R.layout.fragment_reflow_pdf) {
         super.onViewCreated(view, savedInstanceState)
         binding.toolbar.setNavigationOnClickListener { dismiss() }
 
-        val iView= object : IView {
+        val iView = object : IView {
             override fun getWidth(): Int {
                 return binding.recyclerView.getWidth()
             }
@@ -103,10 +105,10 @@ class PdfReflowFragment : DialogFragment(R.layout.fragment_reflow_pdf) {
                 Toast.makeText(requireActivity(), "open file error", Toast.LENGTH_SHORT).show()
                 return@let
             }
-            val decodeService = DocDecodeService(codecContext)
-            decodeService.setContainerView(iView)
+            decodeService = DocDecodeService(codecContext)
+            decodeService!!.setContainerView(iView)
             pdfAdapter = MupdfGridAdapter(
-                decodeService,
+                decodeService!!,
                 requireActivity(),
                 binding.recyclerView,
                 false,
@@ -129,7 +131,7 @@ class PdfReflowFragment : DialogFragment(R.layout.fragment_reflow_pdf) {
                 }
             }
 
-            val document: CodecDocument = decodeService.open(pdfPath, false, true)
+            val document: CodecDocument = decodeService!!.open(pdfPath, true)
             pdfAdapter.notifyDataSetChanged()
         }
     }
@@ -211,6 +213,7 @@ class PdfReflowFragment : DialogFragment(R.layout.fragment_reflow_pdf) {
         super.onDestroy()
         job?.cancel()
 
+        decodeService?.recycle()
         BitmapCache.getInstance().clear()
         BitmapPool.getInstance().clear()
     }

@@ -143,10 +143,10 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
                 Toast.makeText(requireActivity(), "open file error", Toast.LENGTH_SHORT).show()
                 return@let
             }
-            val decodeService = DocDecodeService(codecContext)
-            decodeService.setContainerView(iView)
+            decodeService = DocDecodeService(codecContext)
+            decodeService!!.setContainerView(iView)
             pdfAdapter = MupdfGridAdapter(
-                decodeService,
+                decodeService!!,
                 requireActivity(),
                 binding.recyclerView,
                 crop,
@@ -168,7 +168,7 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
             binding.recyclerView.adapter = pdfAdapter
             binding.recyclerView.setHasFixedSize(true)
 
-            val document: CodecDocument = decodeService.open(it, crop, true)
+            val document: CodecDocument = decodeService!!.open(it, true)
             pdfAdapter.notifyDataSetChanged()
         }
     }
@@ -255,6 +255,8 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
     override fun onDestroy() {
         super.onDestroy()
         job?.cancel()
+
+        decodeService?.recycle()
 
         BitmapCache.getInstance().clear()
         BitmapPool.getInstance().clear()

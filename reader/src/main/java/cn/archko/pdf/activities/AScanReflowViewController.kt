@@ -196,7 +196,7 @@ class AScanReflowViewController(
 
         instance.diskIO().execute {
             try {
-                document = decodeService!!.open(mPath, crop, true)
+                document = decodeService!!.open(mPath, true)
             } catch (e: Exception) {
             }
             instance.mainThread().execute {
