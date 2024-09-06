@@ -3,7 +3,7 @@ package cn.archko.pdf.viewmodel
 import android.content.Context
 import android.text.TextUtils
 import androidx.lifecycle.ViewModel
-import cn.archko.pdf.common.TtsHelper
+import cn.archko.pdf.core.common.TtsHelper
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.decode.MupdfDocument
@@ -11,7 +11,7 @@ import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.LoadResult
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.entity.State
-import cn.archko.pdf.entity.TtsBean
+import cn.archko.pdf.core.entity.TtsBean
 import cn.archko.pdf.tts.TTSEngine
 import com.artifex.mupdf.fitz.Page
 import kotlinx.coroutines.Dispatchers

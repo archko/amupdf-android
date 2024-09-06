@@ -1,11 +1,11 @@
-package cn.archko.pdf.common
+package cn.archko.pdf.core.common
 
 import android.text.TextUtils
 import android.util.Log
 import cn.archko.pdf.core.entity.ReflowBean
+import cn.archko.pdf.core.entity.TtsBean
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.StreamUtils
-import cn.archko.pdf.entity.TtsBean
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File

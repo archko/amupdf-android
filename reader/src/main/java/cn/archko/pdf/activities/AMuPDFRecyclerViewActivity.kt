@@ -48,6 +48,7 @@ import cn.archko.pdf.tts.TTSActivity
 import cn.archko.pdf.tts.TTSEngine
 import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.widgets.PageControls
+import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -113,6 +114,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
         sensorHelper = SensorHelper(this)
 
+        clean()
+
         loadBookmark()
         initView()
 
@@ -122,6 +125,13 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
         viewController?.init()
         updateControls()
+    }
+
+    private fun clean() {
+        val mmkv = MMKV.mmkvWithID("seekArc")
+        mmkv.remove("progress")
+        BitmapPool.getInstance().clear()
+        BitmapCache.getInstance().clear()
     }
 
     private fun parseIntent() {
@@ -586,7 +596,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun startTts() {
-        TTSEngine.get().setSpeakListener(object : TTSEngine.ProgressListener {
+        TTSEngine.get().setSpeakListener(object :
+            TTSEngine.TtsProgressListener {
             override fun onStart(key: ReflowBean) {
                 try {
                     val arr = key.page!!.split("-")
@@ -800,7 +811,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         const val PREF_READER_KEY_FIRST = "pref_reader_key_first"
 
         fun startOcrActivity(context: Context, bitmap: Bitmap?, path: String?, pos: Int) {
-            if (null == bitmap&&TextUtils.isEmpty(path)) {
+            if (null == bitmap && TextUtils.isEmpty(path)) {
                 return
             }
             //OcrActivity.start(context, bitmap, path, pos.toString())

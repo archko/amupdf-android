@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cn.archko.mupdf.R
+import cn.archko.pdf.activities.EditActivity
 import cn.archko.pdf.adapters.BaseBookAdapter
 import cn.archko.pdf.common.PDFViewerHelper
 import cn.archko.pdf.common.PdfOptionRepository
@@ -119,7 +120,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
 
     private fun editPdf(path: String?) {
         if (path != null) {
-            PdfEditFragment.showCreateDialog(path, requireActivity(), null)
+            EditActivity.start(path, requireActivity())
         }
     }
 
@@ -399,12 +400,12 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             return
         }
 
-        menuBuilder.menu.add(
+        /*menuBuilder.menu.add(
             0,
             PDFViewerHelper.mupdfNoCropContextMenuItem,
             0,
             getString(R.string.menu_mupdf)
-        )
+        )*/
         menuBuilder.menu.add(
             0,
             PDFViewerHelper.infoContextMenuItem,

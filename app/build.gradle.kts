@@ -175,5 +175,4 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.github.axet/k2pdfopt
     implementation(libs.k2pdfopt)
-    implementation(libs.sardine)
 }

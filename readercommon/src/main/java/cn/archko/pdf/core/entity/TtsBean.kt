@@ -1,6 +1,4 @@
-package cn.archko.pdf.entity
-
-import cn.archko.pdf.core.entity.ReflowBean
+package cn.archko.pdf.core.entity
 
 /**
  * @author: archko 2024/9/1 :19:49

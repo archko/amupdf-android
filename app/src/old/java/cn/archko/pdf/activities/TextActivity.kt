@@ -31,7 +31,6 @@ import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.mupdf.databinding.TxtReaderBinding
 import cn.archko.pdf.R
 import cn.archko.pdf.adapters.MuPDFTextAdapter
-import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.GlobalEvent
@@ -49,7 +48,7 @@ import cn.archko.pdf.fragments.FontsFragment
 import cn.archko.pdf.fragments.SleepTimerDialog
 import cn.archko.pdf.tts.TTSActivity
 import cn.archko.pdf.tts.TTSEngine
-import cn.archko.pdf.tts.TTSEngine.ProgressListener
+import cn.archko.pdf.tts.TTSEngine.TtsProgressListener
 import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.viewmodel.TextViewModel
 import kotlinx.coroutines.Dispatchers
@@ -330,7 +329,8 @@ class TextActivity : AppCompatActivity() {
     }
 
     private fun startTts() {
-        TTSEngine.get().setSpeakListener(object : ProgressListener {
+        TTSEngine.get().setSpeakListener(object :
+            TtsProgressListener {
             override fun onStart(utteranceId: ReflowBean) {
             }
 

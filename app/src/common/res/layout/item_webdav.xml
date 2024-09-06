@@ -21,7 +21,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-            android:id="@+id/size"
+            android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -49,7 +49,7 @@
             android:paddingTop="4dp"
             android:textSize="17sp"
             android:textAppearance="?attr/textAppearanceBody1"
-            app:layout_constraintEnd_toStartOf="@+id/size"
+            app:layout_constraintEnd_toStartOf="@+id/time"
             app:layout_constraintStart_toEndOf="@+id/icon"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="喹adfad" />

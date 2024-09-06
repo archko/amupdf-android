@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,13 +25,16 @@ import cn.archko.pdf.core.common.Event.Companion.ACTION_UNFAVORITED
 import cn.archko.pdf.core.common.GlobalEvent
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.FileBean
+import cn.archko.pdf.core.entity.ResponseHandler
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.LengthUtils
 import cn.archko.pdf.core.widgets.ColorItemDecoration
-import cn.archko.pdf.utils.SardineHelper
 import cn.archko.pdf.widgets.IMoreView
 import cn.archko.pdf.widgets.ListMoreView
-import com.tencent.mmkv.MMKV
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import vn.chungha.flowbus.busEvent
 import java.io.File
 
@@ -181,36 +185,28 @@ class HistoryFragment : BrowserFragment() {
     }
 
     private fun backupToWebdav() {
-        val mmkv = MMKV.mmkvWithID(SardineHelper.KEY_CONFIG)
-        val name = mmkv.decodeString(SardineHelper.KEY_NAME)
-        val pass = mmkv.decodeString(SardineHelper.KEY_PASS)
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(pass)) {
-            Toast.makeText(requireActivity(), "Please config webdav first", Toast.LENGTH_SHORT)
-                .show()
-            return
+        progressDialog.show()
+        lifecycleScope.launch {
+            backupViewModel.backupToWebdav().flowOn(Dispatchers.IO).collectLatest {
+                progressDialog.dismiss()
+                if (it) {
+                    Toast.makeText(App.instance, "Success", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(App.instance, "Failed", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
-        backupViewModel.backupToWebdav(name!!, pass!!)
     }
 
     private fun restoreFromWebdav() {
-        val mmkv = MMKV.mmkvWithID(SardineHelper.KEY_CONFIG)
-        val name = mmkv.decodeString(SardineHelper.KEY_NAME)
-        val pass = mmkv.decodeString(SardineHelper.KEY_PASS)
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(pass)) {
-            Toast.makeText(requireActivity(), "Please config webdav first", Toast.LENGTH_SHORT)
-                .show()
-            return
-        }
         WebdavFragment.showWebdavDialog(activity, object :
             DataListener {
             override fun onSuccess(vararg args: Any?) {
-                val filename = args[0] as String
+                val path = args[0] as String
                 progressDialog.show()
-                backupViewModel.restoreFromWebdav(
-                    name!!,
-                    pass!!,
-                    filename
-                )
+                lifecycleScope.launch {
+                    backupViewModel.restoreFromWebdav(path)
+                }
             }
 
             override fun onFailed(vararg args: Any?) {
@@ -306,29 +302,38 @@ class HistoryFragment : BrowserFragment() {
         }
 
         historyViewModel.uiBackupModel.observe(viewLifecycleOwner) { filepath ->
-            kotlin.run {
-                progressDialog.dismiss()
-                if (!LengthUtils.isEmpty(filepath)) {
-                    Logcat.d("", "file:$filepath")
-                    Toast.makeText(App.instance, "备份成功:$filepath", Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(App.instance, "备份失败", Toast.LENGTH_LONG).show()
-                }
+            progressDialog.dismiss()
+            if (!LengthUtils.isEmpty(filepath)) {
+                Logcat.d("", "file:$filepath")
+                Toast.makeText(App.instance, "备份成功:$filepath", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(App.instance, "备份失败", Toast.LENGTH_LONG).show()
             }
         }
 
         historyViewModel.uiRestoreModel.observe(viewLifecycleOwner) { flag ->
             postRestore(flag)
         }
-        backupViewModel.uiRestoreModel.observe(viewLifecycleOwner) { flag ->
-            postRestore(flag)
+        backupViewModel.uiRestoreModel.observe(viewLifecycleOwner) { res ->
+            when (res) {
+                is ResponseHandler.Success<Boolean> -> {
+                    postRestore(res.data)
+                }
+
+                is ResponseHandler.Failure -> {
+                    postRestore(false)
+                }
+
+                else -> {
+                }
+            }
         }
     }
 
     private fun postRestore(flag: Boolean) {
         progressDialog.dismiss()
         if (flag) {
-            Toast.makeText(App.instance, "恢复成功:$flag", Toast.LENGTH_LONG).show()
+            Toast.makeText(App.instance, "恢复成功", Toast.LENGTH_LONG).show()
             onRefresh()
         } else {
             Toast.makeText(App.instance, "恢复失败", Toast.LENGTH_LONG).show()

@@ -10,6 +10,7 @@ import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.BookProgressParser
 import cn.archko.pdf.core.common.Graph
 import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.common.TtsHelper
 import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.utils.DateUtils
 import cn.archko.pdf.core.utils.FileUtils
@@ -260,6 +261,7 @@ class HistoryViewModel : ViewModel() {
     private fun deleteCachePage(path: String?) {
         if (path != null) {
             APageSizeLoader.deletePageSizeFromFile(path)
+            TtsHelper.deleteFromFile(path)
         }
     }
 }

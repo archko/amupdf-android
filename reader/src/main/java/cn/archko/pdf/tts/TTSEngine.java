@@ -82,13 +82,13 @@ public class TTSEngine {
             }
         }
     };
-    private ProgressListener progressListener;
+    private TtsProgressListener progressListener;
 
     public List<ReflowBean> getTtsContent() {
         return ttsContent;
     }
 
-    public void setSpeakListener(ProgressListener progressListener) {
+    public void setSpeakListener(TtsProgressListener progressListener) {
         this.progressListener = progressListener;
     }
 
@@ -253,7 +253,7 @@ public class TTSEngine {
         textToSpeech.speak(bean.getData(), TextToSpeech.QUEUE_ADD, null, bean.getPage());
     }
 
-    public interface ProgressListener {
+    public interface TtsProgressListener {
         void onStart(ReflowBean utteranceId);
 
         void onDone(ReflowBean utteranceId);

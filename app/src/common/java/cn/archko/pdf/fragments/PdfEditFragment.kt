@@ -1,8 +1,10 @@
 package cn.archko.pdf.fragments
 
 import android.app.ProgressDialog
+import android.content.res.Configuration
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -19,10 +21,12 @@ import cn.archko.mupdf.databinding.FragmentPdfEditBinding
 import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.BitmapPool
+import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.listeners.ClickListener
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.ColorUtil.getColorMode
 import cn.archko.pdf.core.utils.FileUtils
+import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.decode.DocDecodeService
 import cn.archko.pdf.decode.DocDecodeService.IView
 import kotlinx.coroutines.Dispatchers
@@ -130,11 +134,11 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
 
         val iView = object : IView {
             override fun getWidth(): Int {
-                return binding.recyclerView.getWidth()
+                return binding.recyclerView.width
             }
 
             override fun getHeight(): Int {
-                return binding.recyclerView.getHeight()
+                return binding.recyclerView.height
             }
         }
         path?.let {
@@ -152,6 +156,11 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
                 crop,
                 object : ClickListener<View> {
                     override fun click(t: View?, pos: Int) {
+                        if (binding.toolbarLayout.visibility == View.GONE) {
+                            binding.toolbarLayout.visibility = View.VISIBLE
+                        } else {
+                            binding.toolbarLayout.visibility = View.GONE
+                        }
                         Toast.makeText(
                             requireActivity(),
                             String.format(getString(R.string.edit_page), (pos + 1)),
@@ -266,8 +275,41 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
         pdfAdapter.notifyDataSetChanged()
     }
 
-    private fun setPath(path: String) {
+    fun setPath(path: String) {
         this.path = path
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        binding.recyclerView.stopScroll()
+        BitmapCache.getInstance().clear()
+
+        val defaultWidth = Utils.dipToPixel(newConfig.screenWidthDp.toFloat())
+        val defaultHeight = Utils.dipToPixel(newConfig.screenHeightDp.toFloat())
+        Logcat.d(
+            TAG, String.format(
+                "newConfig:w-h:%s-%s, config:%s-%s, %s",
+                defaultWidth,
+                defaultHeight,
+                newConfig.screenWidthDp,
+                newConfig.screenHeightDp,
+                newConfig.orientation
+            )
+        )
+
+        val lm = (binding.recyclerView.layoutManager as LinearLayoutManager)
+        var offset = 0
+        val first = lm.findFirstVisibleItemPosition()
+        if (first > 0) {
+            val child = lm.findViewByPosition(first)
+            child?.run {
+                val r = Rect()
+                child.getLocalVisibleRect(r)
+                offset = r.top
+            }
+        }
+        lm.scrollToPositionWithOffset(first, -offset)
+        binding.recyclerView.adapter?.notifyDataSetChanged()
     }
 
     companion object {

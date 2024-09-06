@@ -12,15 +12,15 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.common.PdfOptionRepository
-import cn.archko.pdf.common.TtsHelper
 import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.AppExecutors.Companion.instance
 import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.common.TtsHelper
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.ReflowBean
+import cn.archko.pdf.core.entity.TtsBean
 import cn.archko.pdf.core.listeners.SimpleGestureListener
-import cn.archko.pdf.entity.TtsBean
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TTSEngine
@@ -348,7 +348,7 @@ class ANormalViewController(
     }
 
     override fun onPause() {
-        if (null != pdfViewModel.bookProgress && null != mPageSizes) {
+        if (null != pdfViewModel.bookProgress && null != mPageSizes && mPageSizes!!.isNotEmpty()) {
             val position = documentView.currentPage
             pdfViewModel.saveBookProgress(
                 mPath,

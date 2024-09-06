@@ -58,18 +58,18 @@ class MuPDFReflowAdapter(
 
     override fun onBindViewHolder(holder: ReflowTextViewHolder, position: Int) {
         scope!!.launch {
-            val result = decode(position)
-            withContext(Dispatchers.Main) {
-                result?.run {
-                    holder.bindAsList(
-                        result,
-                        screenHeight,
-                        screenWidth,
-                        systemScale,
-                        reflowCache,
-                        showBookmark(position)
-                    )
-                }
+            val result = withContext(Dispatchers.IO) {
+                decode(position)
+            }
+            result?.run {
+                holder.bindAsList(
+                    result,
+                    screenHeight,
+                    screenWidth,
+                    systemScale,
+                    reflowCache,
+                    showBookmark(position)
+                )
             }
         }
     }
@@ -94,9 +94,8 @@ class MuPDFReflowAdapter(
         super.onViewRecycled(holder)
         val pdfHolder = holder as ReflowTextViewHolder?
 
-        Logcat.d("onViewRecycled:$pdfHolder,exist count:${reflowCache.textViewCount()},${reflowCache.imageViewCount()}")
         pdfHolder?.recycleViews(reflowCache)
-        Logcat.d("onViewRecycled end,exist count::${reflowCache.textViewCount()},${reflowCache.imageViewCount()}")
+        //Logcat.d("onViewRecycled end,exist count::${reflowCache.textViewCount()},${reflowCache.imageViewCount()}")
     }
 
     fun clearCacheViews() {

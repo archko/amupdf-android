@@ -145,29 +145,29 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
         }
         scope = CoroutineScope(Job() + customerDispatcher)
         scope!!.launch {
-            val result = PDFCreaterHelper.extractToImages(
-                requireActivity(),
-                width,
-                dir,
-                txtPath!!,
-                start,
-                end
-            )
-            withContext(Dispatchers.Main) {
-                if (result == 0) {
-                    Toast.makeText(activity, R.string.edit_extract_success, Toast.LENGTH_SHORT)
-                        .show()
-                } else if (result == -2) {
-                    Toast.makeText(activity, R.string.edit_extract_error, Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(
-                        activity,
-                        String.format(getString(R.string.edit_extract_cancel_pages, result)),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                progressDialog.dismiss()
+            val result = withContext(Dispatchers.IO) {
+                PDFCreaterHelper.extractToImages(
+                    requireActivity(),
+                    width,
+                    dir,
+                    txtPath!!,
+                    start,
+                    end
+                )
             }
+            if (result == 0) {
+                Toast.makeText(activity, R.string.edit_extract_success, Toast.LENGTH_SHORT)
+                    .show()
+            } else if (result == -2) {
+                Toast.makeText(activity, R.string.edit_extract_error, Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(
+                    activity,
+                    String.format(getString(R.string.edit_extract_cancel_pages, result)),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            progressDialog.dismiss()
         }
     }
 
@@ -192,12 +192,14 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
                 start = binding.extract.rangeSlider.values[0].toInt() - 1
                 end = binding.extract.rangeSlider.values[1].toInt()
             }
-            val result = PDFCreaterHelper.extractToHtml(
-                start, end,
-                requireActivity(),
-                "$dir/$name.html",
-                txtPath!!
-            )
+            val result = withContext(Dispatchers.IO) {
+                PDFCreaterHelper.extractToHtml(
+                    start, end,
+                    requireActivity(),
+                    "$dir/$name.html",
+                    txtPath!!
+                )
+            }
             withContext(Dispatchers.Main) {
                 if (result) {
                     Toast.makeText(activity, R.string.edit_extract_success, Toast.LENGTH_SHORT)

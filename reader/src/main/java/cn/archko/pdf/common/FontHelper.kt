@@ -3,8 +3,8 @@ package cn.archko.pdf.common
 import android.graphics.Typeface
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
-import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.core.utils.FileUtils
+import cn.archko.pdf.entity.FontBean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -33,12 +33,8 @@ class FontHelper(
 
     fun loadFont() {
         context.lifecycleScope.launch {
-            var fontType :Int
-            var fontName: String
-            withContext(Dispatchers.IO) {
-                fontType = PdfOptionRepository.getFontType()
-                fontName = PdfOptionRepository.getFontName()?:PdfOptionRepository.SYSTEM_FONT
-            }
+            val fontType = PdfOptionRepository.getFontType()
+            val fontName = PdfOptionRepository.getFontName() ?: PdfOptionRepository.SYSTEM_FONT
             initFontBean(fontType, fontName)
         }
     }

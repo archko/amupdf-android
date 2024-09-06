@@ -18,8 +18,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.util.SparseArray
 import android.widget.Toast
-import android.window.OnBackInvokedCallback
-import android.window.OnBackInvokedDispatcher
+import androidx.activity.OnBackPressedCallback
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -63,21 +62,11 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
         var title: CharSequence
     )
 
-    private var onBackInvokedCallback: OnBackInvokedCallback? = null
     public override fun onCreate(savedInstanceState: Bundle?) {
         isLive = true
         super.onCreate(savedInstanceState)
 
-        if (Build.VERSION.SDK_INT >= 33) {
-            onBackInvokedCallback = OnBackInvokedCallback {
-                onBackEvent()
-            }.also {
-                onBackInvokedDispatcher.registerOnBackInvokedCallback(
-                    OnBackInvokedDispatcher.PRIORITY_DEFAULT,
-                    it
-                )
-            }
-        }
+        onBackPressedDispatcher.addCallback(this, onBackPress)
 
         setContentView(R.layout.tabs_home)
         toolbar = findViewById(R.id.toolbar)
@@ -145,26 +134,26 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
         intent = null
     }
 
-    private fun onBackEvent() {
+    private val onBackPress = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (onBackEvent()) {
+                return
+            }
+            finish()
+        }
+    }
+
+    private fun onBackEvent(): Boolean {
         if (null == mPagerAdapter) {
-            return
+            return false
         }
         val itemFragment = mPagerAdapter.getItemFragment(mViewPager.currentItem)
         if (itemFragment is BrowserFragment) {
             if (itemFragment.onBackPressed()) {
-                return
+                return true
             }
         }
-        super.onBackPressed()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (Build.VERSION.SDK_INT >= 33) {
-            onBackInvokedCallback?.let {
-                onBackInvokedDispatcher.unregisterOnBackInvokedCallback(it)
-            }
-        }
+        return false
     }
 
     public override fun onResume() {
@@ -335,11 +324,11 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
         mTabs.add(SamplePagerItem(FavoriteFragment::class.java, bundle, title!!))
     }
 
-    override fun onBackPressed() {
+    /*override fun onBackPressed() {
         if (Build.VERSION.SDK_INT < 33) {
             onBackEvent()
         }
-    }
+    }*/
 
     /*override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val flag = super.onCreateOptionsMenu(menu)

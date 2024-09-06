@@ -81,6 +81,10 @@ public class DateUtils {
         return new SimpleDateFormat(format).format(new Date(time));
     }
 
+    public static String formatTime(Date time, String format) {
+        return new SimpleDateFormat(format).format(time);
+    }
+
     public static String getSLFriendlyTime(long time) {
         return getSLFriendlyTime(time, "MM-dd");
     }

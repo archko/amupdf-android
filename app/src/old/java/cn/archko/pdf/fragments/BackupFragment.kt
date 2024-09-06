@@ -7,14 +7,20 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.mupdf.R
 import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.core.adapters.BaseViewHolder
+import cn.archko.pdf.core.entity.ResponseHandler
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
 import com.google.android.material.appbar.MaterialToolbar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 //import com.umeng.analytics.MobclickAgent
 import java.io.File
 
@@ -67,15 +73,6 @@ open class BackupFragment : DialogFragment() {
         recyclerView.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
 
-        backupViewModel.uiFileModel.observe(viewLifecycleOwner) { files ->
-            kotlin.run {
-                if (files!!.isNotEmpty()) {
-                    adapter.data = files
-                    adapter.notifyDataSetChanged()
-                }
-            }
-        }
-
         return view
     }
 
@@ -84,7 +81,10 @@ open class BackupFragment : DialogFragment() {
 
         adapter = object : BaseRecyclerAdapter<File>(activity) {
 
-            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<File> {
+            override fun onCreateViewHolder(
+                parent: ViewGroup,
+                viewType: Int
+            ): BaseViewHolder<File> {
                 val view = mInflater.inflate(cn.archko.pdf.R.layout.item_outline, parent, false)
                 return ItemHolder(view)
             }
@@ -95,7 +95,22 @@ open class BackupFragment : DialogFragment() {
     }
 
     private fun loadBackups() {
-        backupViewModel.backupFiles()
+        lifecycleScope.launch {
+            backupViewModel.backupFiles()
+                .flowOn(Dispatchers.IO)
+                .collectLatest {
+                    when (it) {
+                        is ResponseHandler.Success -> {
+                            if (it.data.isNotEmpty()) {
+                                adapter.data = it.data
+                                adapter.notifyDataSetChanged()
+                            }
+                        }
+
+                        else -> {}
+                    }
+                }
+        }
     }
 
     inner class ItemHolder(itemView: View?) : BaseViewHolder<File>(itemView) {

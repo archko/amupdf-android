@@ -1,21 +1,23 @@
 package cn.archko.pdf.fragments
 
-import android.widget.Toast
+import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import cn.archko.pdf.core.App
 import cn.archko.pdf.core.common.BookProgressParser
 import cn.archko.pdf.core.common.Graph
 import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.entity.ResponseHandler
+import cn.archko.pdf.core.sardine.SardineHelper
+import cn.archko.pdf.core.sardine.WebdavUser
 import cn.archko.pdf.core.utils.FileUtils
-import cn.archko.pdf.utils.SardineHelper
+import com.tencent.mmkv.MMKV
 import com.thegrizzlylabs.sardineandroid.DavResource
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -28,156 +30,169 @@ import java.util.Arrays
 class BackupViewModel : ViewModel() {
 
     private val progressDao by lazy { Graph.database.progressDao() }
-    private val _uiFileModel = MutableLiveData<List<File>>()
-    val uiFileModel: LiveData<List<File>>
-        get() = _uiFileModel
+    val sardine = OkHttpSardine()
+    var webdavUser: WebdavUser? = null
 
     private val _uiDavResourceModel = MutableLiveData<List<DavResource>?>()
     val uiDavResourceModel: LiveData<List<DavResource>?>
         get() = _uiDavResourceModel
 
-    private val _uiRestorepModel = MutableLiveData<Boolean>()
-    val uiRestoreModel: LiveData<Boolean>
-        get() = _uiRestorepModel
+    private val _uiRestoreModel = MutableLiveData<ResponseHandler<Boolean>>()
+    val uiRestoreModel: LiveData<ResponseHandler<Boolean>>
+        get() = _uiRestoreModel
 
-    fun backupFiles() =
-        viewModelScope.launch {
-            val files: List<File> = withContext(Dispatchers.IO) {
-                var files: Array<File>? = null
-                val dir = FileUtils.getStorageDir("amupdf")
-                if (dir.exists()) {
-                    files = dir.listFiles { pathname: File -> pathname.name.startsWith("mupdf_") }
-                    if (files != null) {
-                        Arrays.sort(files) { f1: File?, f2: File? ->
-                            if (f1 == null) throw RuntimeException("f1 is null inside sort")
-                            if (f2 == null) throw RuntimeException("f2 is null inside sort")
-                            return@sort f2.lastModified().compareTo(f1.lastModified())
-                        }
-                    }
-                }
-                val list = ArrayList<File>()
+    fun backupFiles() = flow {
+        try {
+            var files: Array<File>? = null
+            val dir = FileUtils.getStorageDir("amupdf")
+            if (dir.exists()) {
+                files = dir.listFiles { pathname: File -> pathname.name.startsWith("mupdf_") }
                 if (files != null) {
-                    for (f in files) {
-                        list.add(f)
+                    Arrays.sort(files) { f1: File?, f2: File? ->
+                        if (f1 == null) throw RuntimeException("f1 is null inside sort")
+                        if (f2 == null) throw RuntimeException("f2 is null inside sort")
+                        return@sort f2.lastModified().compareTo(f1.lastModified())
                     }
                 }
-                return@withContext list
             }
-
-            withContext(Dispatchers.Main) {
-                _uiFileModel.value = files
-            }
-        }
-
-    fun backupToWebdav(username: String, password: String) {
-        viewModelScope.launch {
-            val result = withContext(Dispatchers.IO) {
-                val root = JSONObject()
-                try {
-                    val list = progressDao.getAllProgress()
-                    val ja = JSONArray()
-                    root.put("root", ja)
-                    //root.put("name", name)
-                    list?.run {
-                        for (progress in list) {
-                            BookProgressParser.addProgressToJson(progress, ja)
-                        }
-                    }
-                    val sardine = OkHttpSardine()
-                    sardine.setCredentials(username, password)
-                    val content = root.toString()
-                    Logcat.d("backupToWebdav.content:$content")
-
-                    SardineHelper.uploadFile(
-                        sardine,
-                        content.toByteArray(),
-                        SardineHelper.DEFAULT_JSON
-                    )
-                    return@withContext true
-                } catch (e: JSONException) {
-                    Logcat.e(Logcat.TAG, e.message)
-                } catch (e: Exception) {
-                    Logcat.e(Logcat.TAG, e.message)
-                }
-
-                return@withContext false
-            }
-
-            withContext(Dispatchers.Main) {
-                if (result) {
-                    Toast.makeText(App.instance, "Success", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(App.instance, "Failed", Toast.LENGTH_SHORT).show()
+            val list = ArrayList<File>()
+            if (files != null) {
+                for (f in files) {
+                    list.add(f)
                 }
             }
+
+            emit(ResponseHandler.Success(list))
+        } catch (e: Exception) {
+            emit(ResponseHandler.Failure())
         }
     }
 
-    fun restoreFromWebdav(username: String, password: String, name: String) {
-        viewModelScope.launch {
-            val result = withContext(Dispatchers.IO) {
-                try {
-                    val sardine = OkHttpSardine()
-                    sardine.setCredentials(username, password)
-                    val content = SardineHelper.downloadFile(sardine, name)
-                    return@withContext restore(content)
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                } catch (e: Exception) {
-                    Logcat.e(Logcat.TAG, e.message)
+    fun backupToWebdav() = flow {
+        try {
+            if (!checkAndLoadUser()) {
+                emit(false)
+                return@flow
+            }
+            val root = JSONObject()
+            val list = progressDao.getAllProgress()
+            val ja = JSONArray()
+            root.put("root", ja)
+            //root.put("name", name)
+            list?.run {
+                for (progress in list) {
+                    BookProgressParser.addProgressToJson(progress, ja)
                 }
-
-                return@withContext false
             }
+            val content = root.toString()
+            Logcat.d("backupToWebdav.content:$content")
 
-            withContext(Dispatchers.Main) {
-                _uiRestorepModel.value = result
-            }
+            SardineHelper.uploadFile(
+                sardine,
+                content.toByteArray(),
+                SardineHelper.DEFAULT_JSON,
+                webdavUser
+            )
+            emit(true)
+        } catch (e: JSONException) {
+            emit(false)
+            Logcat.e(Logcat.TAG, e.message)
+        } catch (e: Exception) {
+            emit(false)
+            Logcat.e(Logcat.TAG, e.message)
         }
     }
 
-    fun webdavBackupFiles(username: String, password: String, name: String) =
-        viewModelScope.launch {
-            val resources: List<DavResource>? = withContext(Dispatchers.IO) {
-                var list: MutableList<DavResource>? = null
-                try {
-                    val sardine = OkHttpSardine()
-                    sardine.setCredentials(username, password)
-                    list = SardineHelper.listFiles(sardine, name)
-                } catch (e: Exception) {
-                    Logcat.e(Logcat.TAG, e.message)
+    fun checkAndLoadUser(): Boolean {
+        if (null == webdavUser) {
+            val mmkv = MMKV.mmkvWithID(SardineHelper.KEY_CONFIG_JSON)
+            val content = mmkv.decodeString(SardineHelper.KEY_CONFIG_USER)
+            if (!TextUtils.isEmpty(content)) {
+                Logcat.d(content)
+                val jsonObject = JSONObject(content!!)
+                val name = jsonObject.optString(SardineHelper.KEY_NAME)
+                val pass = jsonObject.optString(SardineHelper.KEY_PASS)
+                val host = jsonObject.optString(SardineHelper.KEY_HOST)
+                val path = jsonObject.optString(SardineHelper.KEY_PATH)
+                if (TextUtils.isEmpty(name) || TextUtils.isEmpty(pass)
+                    || TextUtils.isEmpty(host) || TextUtils.isEmpty(path)
+                ) {
+                    return false
                 }
+                webdavUser = WebdavUser(name, pass, host, path)
 
-                return@withContext list
+                sardine.setCredentials(webdavUser!!.name, webdavUser!!.pass)
+                return true
             }
-
-            withContext(Dispatchers.Main) {
-                _uiDavResourceModel.value = resources
-            }
+            return false
         }
+        return true
+    }
 
-    fun testAuth(username: String?, password: String?) {
-        viewModelScope.launch {
-            val result: Boolean = withContext(Dispatchers.IO) {
-                try {
-                    val sardine = OkHttpSardine()
-                    sardine.setCredentials(username, password)
-                    val result = SardineHelper.testAuth(sardine)
-                    Logcat.d("result:$result")
-                    return@withContext result
-                } catch (e: Exception) {
-                    Logcat.e(Logcat.TAG, e.message)
-                }
-                return@withContext false
+    suspend fun restoreFromWebdav(name: String) = flow {
+        try {
+            if (!checkAndLoadUser()) {
+                emit(ResponseHandler.Failure())
+                return@flow
+            }
+            val content = SardineHelper.downloadFile(
+                sardine, name,
+                webdavUser
+            )
+            val result = restore(content)
+            emit(ResponseHandler.Success(result))
+        } catch (e: JSONException) {
+            emit(ResponseHandler.Failure())
+            e.printStackTrace()
+        } catch (e: Exception) {
+            emit(ResponseHandler.Failure())
+            Logcat.e(Logcat.TAG, e.message)
+        }
+    }.flowOn(Dispatchers.IO)
+        .collectLatest { _uiRestoreModel.value = it }
+
+    suspend fun webdavBackupFiles(path: String) =
+        flow {
+            if (!checkAndLoadUser()) {
+                emit(listOf())
+                return@flow
+            }
+            var list: MutableList<DavResource>? = null
+            try {
+                list = SardineHelper.listFiles(sardine, path, webdavUser)
+            } catch (e: Exception) {
+                Logcat.e(Logcat.TAG, e.message)
             }
 
-            withContext(Dispatchers.Main) {
-                if (result) {
-                    Toast.makeText(App.instance, "Success", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(App.instance, "Failed", Toast.LENGTH_SHORT).show()
-                }
+            emit(list)
+        }.flowOn(Dispatchers.IO)
+            .collectLatest { _uiDavResourceModel.value = it }
+
+    /**
+     * 保存,需要确定path是要可建立目录的权限目录下,坚果云只能在"dav/我的坚果云"路径下才有权限.
+     */
+    suspend fun saveWebdavUser(name: String, pass: String, host: String, path: String) = flow {
+        try {
+            val httpSardine = OkHttpSardine()
+            httpSardine.setCredentials(name, pass)
+            val result = SardineHelper.testPathOrCreate(httpSardine, host, path)
+            if (result) {
+                val mmkv = MMKV.mmkvWithID(SardineHelper.KEY_CONFIG_JSON)
+                val jsonObject = JSONObject()
+                jsonObject.put(SardineHelper.KEY_NAME, name)
+                jsonObject.put(SardineHelper.KEY_PASS, pass)
+                jsonObject.put(SardineHelper.KEY_HOST, host)
+                jsonObject.put(SardineHelper.KEY_PATH, path)
+                webdavUser = WebdavUser(name, pass, host, path)
+                sardine.setCredentials(name, pass)
+                mmkv.encode(SardineHelper.KEY_CONFIG_USER, jsonObject.toString())
+                emit(true)
+            } else {
+                emit(false)
             }
+        } catch (e: Exception) {
+            Logcat.e(e)
+            emit(false)
         }
     }
 

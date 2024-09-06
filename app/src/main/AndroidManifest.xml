@@ -54,7 +54,7 @@
 
         <activity
             android:name="cn.archko.pdf.activities.HomeActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
             android:exported="true"
             android:label="@string/app_name">
             <intent-filter>
@@ -134,9 +134,14 @@
             android:screenOrientation="portrait" />
         <activity
             android:name="cn.archko.pdf.activities.AboutActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
             android:label="@string/about_title"
             android:screenOrientation="portrait"></activity>
+        <activity
+            android:name="cn.archko.pdf.activities.EditActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
+            android:label="@string/about_title"
+            android:screenOrientation="fullSensor"></activity>
         <!--<activity
             android:name="cn.archko.pdf.activities.TextActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
@@ -181,6 +186,7 @@
             android:windowSoftInputMode="adjustResize"></activity>-->
         <activity
             android:name="com.baidu.ai.edge.ui.activity.OcrActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
             android:exported="true"
             android:label="Ocr">
             <intent-filter>

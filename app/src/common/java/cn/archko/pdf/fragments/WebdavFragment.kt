@@ -1,8 +1,10 @@
 package cn.archko.pdf.fragments
 
 //import com.umeng.analytics.MobclickAgent
+import android.content.DialogInterface
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.mupdf.R
@@ -18,10 +21,11 @@ import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.listeners.DataListener
-import cn.archko.pdf.utils.SardineHelper
+import cn.archko.pdf.core.utils.DateUtils
+import cn.archko.pdf.core.utils.FileUtils
 import com.google.android.material.appbar.MaterialToolbar
-import com.tencent.mmkv.MMKV
 import com.thegrizzlylabs.sardineandroid.DavResource
+import kotlinx.coroutines.launch
 
 /**
  * webdav备份列表
@@ -55,6 +59,18 @@ open class WebdavFragment : DialogFragment() {
         //MobclickAgent.onPageEnd(TAG)
     }
 
+    private fun onKey(dialog: DialogInterface?, keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event?.action == KeyEvent.ACTION_UP) {
+            if (toUpLevel()) {
+                return true
+            }
+            dismissAllowingStateLoss()
+            return true
+        } else {
+            return false
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -73,11 +89,9 @@ open class WebdavFragment : DialogFragment() {
             LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
 
         backupViewModel.uiDavResourceModel.observe(viewLifecycleOwner) { resources ->
-            kotlin.run {
-                if (null != resources && resources.isNotEmpty()) {
-                    adapter.data = resources
-                    adapter.notifyDataSetChanged()
-                }
+            if (!resources.isNullOrEmpty()) {
+                adapter.data = resources
+                adapter.notifyDataSetChanged()
             }
         }
 
@@ -99,41 +113,74 @@ open class WebdavFragment : DialogFragment() {
         }
         recyclerView.adapter = adapter
 
-        loadBackups("amupdf")
+        dialog?.setOnKeyListener { dialog, keyCode, event ->
+            this@WebdavFragment.onKey(
+                dialog,
+                keyCode,
+                event
+            )
+        }
+        /*requireActivity().onBackPressedDispatcher.addCallback(
+            this,
+            mBackPressedCallback
+        )*/
+
+        loadBackups(null)
     }
 
-    private fun loadBackups(filePath: String) {
-        val mmkv = MMKV.mmkvWithID(SardineHelper.KEY_CONFIG)
-        val name = mmkv.decodeString(SardineHelper.KEY_NAME)
-        val pass = mmkv.decodeString(SardineHelper.KEY_PASS)
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(pass)) {
-            Toast.makeText(requireActivity(), "Please config webdav first", Toast.LENGTH_SHORT)
-                .show()
-            return
+    private fun loadBackups(filePath: String?) {
+        if (backupViewModel.checkAndLoadUser()) {
+            backupViewModel.webdavUser?.let {
+                val path = if (TextUtils.isEmpty(filePath)) it.path else filePath!!
+                lifecycleScope.launch {
+                    backupViewModel.webdavBackupFiles(path)
+                }
+            }
+        } else {
+            Toast.makeText(requireContext(), "Please config a webdav", Toast.LENGTH_SHORT).show()
         }
-        backupViewModel.webdavBackupFiles(name!!, pass!!, filePath)
+    }
+
+    private fun toUpLevel(): Boolean {
+        if (adapter.itemCount < 1 || backupViewModel.webdavUser == null) {
+            return false
+        }
+        val davResource = adapter.data[0]
+        if (TextUtils.equals(davResource.path, backupViewModel.webdavUser!!.path)) {
+            return false
+        }
+        val upLevel = FileUtils.getDir(davResource.path)
+        loadBackups(upLevel)
+        return true
     }
 
     inner class ItemHolder(itemView: View?) : BaseViewHolder<DavResource>(itemView) {
 
         private var title: TextView = itemView!!.findViewById(R.id.name)
+        private var time: TextView = itemView!!.findViewById(R.id.time)
         private var mIcon: ImageView? = itemView!!.findViewById(R.id.icon)
 
         override fun onBind(data: DavResource, position: Int) {
             title.text = data.displayName
+            time.text = DateUtils.formatTime(data.modified, DateUtils.TIME_FORMAT_11)
             if (data.isDirectory) {
-                mIcon!!.setImageResource(cn.archko.pdf.R.drawable.ic_book_folder)
+                if (position == 0) {
+                    mIcon!!.setImageResource(cn.archko.pdf.R.drawable.ic_book_dir_home)
+                } else {
+                    mIcon!!.setImageResource(cn.archko.pdf.R.drawable.ic_book_folder)
+                }
             } else {
                 mIcon!!.setImageResource(cn.archko.pdf.R.drawable.ic_book_text)
             }
 
             itemView.setOnClickListener {
                 if (position == 0) {
-                    Logcat.d("点击的是当前目录")
+                    Logcat.d("点击的是当前目录,现在向上一级")
+                    toUpLevel()
                     return@setOnClickListener
                 }
                 if (data.isDirectory) {
-                    loadBackups(data.name)
+                    loadBackups(data.href.rawPath)
                     return@setOnClickListener
                 }
                 this@WebdavFragment.dismiss()
