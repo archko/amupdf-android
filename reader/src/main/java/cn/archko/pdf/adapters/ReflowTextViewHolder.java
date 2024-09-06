@@ -109,7 +109,7 @@ public class ReflowTextViewHolder extends ARecyclerView.ViewHolder {
             }
             TextView textView = null;
             if (null != cacheViews && cacheViews.textViewCount() > 0) {
-                textView = cacheViews.getTextView(0);
+                textView = cacheViews.getAndRemoveTextView(0);
             } else {
                 textView = new TextView(getContext());
                 textView.setTextIsSelectable(false);
@@ -169,7 +169,7 @@ public class ReflowTextViewHolder extends ARecyclerView.ViewHolder {
             if (null != bean && bean.getBitmap() != null) {
                 ImageView imageView = null;
                 if (null != reflowViewCache && reflowViewCache.imageViewCount() > 0) {
-                    imageView = reflowViewCache.getImageView(0);
+                    imageView = reflowViewCache.getAndRemoveImageView(0);
                 } else {
                     imageView = new ImageView(getContext());
                     imageView.setAdjustViewBounds(true);

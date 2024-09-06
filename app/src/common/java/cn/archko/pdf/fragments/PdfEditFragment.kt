@@ -163,7 +163,10 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
                         }
                         Toast.makeText(
                             requireActivity(),
-                            String.format(getString(R.string.edit_page), (pos + 1)),
+                            String.format(
+                                getString(R.string.edit_page),
+                                "${pos + 1}/" + decodeService!!.pageCount
+                            ),
                             Toast.LENGTH_SHORT
                         ).show()
                     }

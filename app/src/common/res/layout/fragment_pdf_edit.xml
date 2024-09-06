@@ -35,7 +35,7 @@
 
     </RelativeLayout>
 
-    <androidx.recyclerview.awidget.ARecyclerView
+    <cn.archko.pdf.widgets.PdfRecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

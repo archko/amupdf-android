@@ -9,7 +9,7 @@ import android.widget.TextView
 public class ReflowViewCache {
 
     private val cacheTextViews = ArrayList<TextView>(22)
-    private val cacheImageViews = ArrayList<ImageView>(10)
+    private val cacheImageViews = ArrayList<ImageView>(8)
 
     fun textViewCount(): Int {
         return cacheTextViews.size
@@ -37,11 +37,11 @@ public class ReflowViewCache {
         cacheImageViews.add(child)
     }
 
-    fun getTextView(i: Int): TextView {
+    fun getAndRemoveTextView(i: Int): TextView {
         return cacheTextViews.removeAt(i)
     }
 
-    fun getImageView(i: Int): ImageView {
+    fun getAndRemoveImageView(i: Int): ImageView {
         return cacheImageViews.removeAt(i)
     }
 

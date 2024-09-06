@@ -99,17 +99,21 @@ class AScanReflowViewController(
         }
     }
 
+    //解码的高宽固定,避免横竖屏切换时,重新生成
     var screenWidth = 1080
-    var defaultWidth = 1080
-    var defaultHeight = 1080
+    var screenHeight = 1080
+    //显示的高宽,图片解码后,需要根据这个缩放
+    var viewWidth = 1080
+    var viewHeight = 1080
 
     private val reflowCache = ReflowViewCache()
     private var pdfAdapter: ARecyclerView.Adapter<ReflowViewHolder>? = null
 
     init {
-        defaultWidth = Utils.getScreenWidthPixelWithOrientation(context)
-        screenWidth = defaultWidth
-        defaultHeight = Utils.getScreenHeightPixelWithOrientation(context)
+        viewWidth = Utils.getScreenWidthPixelWithOrientation(context)
+        viewHeight = Utils.getScreenHeightPixelWithOrientation(context)
+        screenWidth = viewWidth
+        screenHeight = viewHeight
         initView()
     }
 
@@ -139,7 +143,7 @@ class AScanReflowViewController(
             }
 
             override fun getHeight(): Int {
-                return defaultHeight
+                return screenHeight
             }
         }
         decodeService?.setContainerView(iView)
@@ -166,14 +170,14 @@ class AScanReflowViewController(
             .addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
                     mRecyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    val changed = defaultWidth != mRecyclerView.width
-                    defaultWidth = mRecyclerView.width
-                    defaultHeight = mRecyclerView.height
-                    screenWidth = defaultWidth
+                    val changed = viewWidth != mRecyclerView.width
+                    viewWidth = mRecyclerView.width
+                    viewHeight = mRecyclerView.height
+                    screenWidth = viewWidth
                     Logcat.d(
                         TAG, String.format(
                             "onGlobalLayout : w-h:%s-%s",
-                            defaultWidth, defaultHeight
+                            viewWidth, viewHeight
                         )
                     )
                     if (changed) {
@@ -237,28 +241,6 @@ class AScanReflowViewController(
             document.loadOutline()
         )
 
-        gotoPage(pdfViewModel.getCurrentPage())
-    }
-
-    private fun initDecodeService() {
-        if (decodeService == null) {
-            decodeService = createDecodeService()
-        }
-    }
-
-    private fun createDecodeService(): DocDecodeService {
-        val codecContext = DecodeServiceBase.openContext(mPath)
-        if (null == codecContext) {
-            Toast.makeText(context, "open file error", Toast.LENGTH_SHORT).show()
-        }
-        return DocDecodeService(codecContext)
-    }
-
-    override fun getDocumentView(): View {
-        return mRecyclerView
-    }
-
-    private fun gotoPage(pos: Int) {
         setOrientation(scrollOrientation)
         val dm = context.resources.displayMetrics
         pdfAdapter = object : ARecyclerView.Adapter<ReflowViewHolder>() {
@@ -267,7 +249,7 @@ class AScanReflowViewController(
                 val holder = ReflowViewHolder(pdfView)
                 val lp: ARecyclerView.LayoutParams = ARecyclerView.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
-                    defaultWidth
+                    viewWidth
                 )
                 pdfView.layoutParams = lp
 
@@ -291,6 +273,28 @@ class AScanReflowViewController(
         }
         mRecyclerView.adapter = pdfAdapter
 
+        gotoPage(pdfViewModel.getCurrentPage())
+    }
+
+    private fun initDecodeService() {
+        if (decodeService == null) {
+            decodeService = createDecodeService()
+        }
+    }
+
+    private fun createDecodeService(): DocDecodeService {
+        val codecContext = DecodeServiceBase.openContext(mPath)
+        if (null == codecContext) {
+            Toast.makeText(context, "open file error", Toast.LENGTH_SHORT).show()
+        }
+        return DocDecodeService(codecContext)
+    }
+
+    override fun getDocumentView(): View {
+        return mRecyclerView
+    }
+
+    private fun gotoPage(pos: Int) {
         if (pos > 0) {
             val layoutManager = mRecyclerView.layoutManager
 
@@ -310,7 +314,7 @@ class AScanReflowViewController(
 
     override fun getCurrentBitmap(): Bitmap? {
         val bitmap = BitmapCache.getInstance()
-            .getBitmap(generateCacheKey(getCurrentPos(), defaultWidth, defaultHeight, crop))
+            .getBitmap(generateCacheKey(getCurrentPos(), viewWidth, viewHeight, crop))
         return bitmap
     }
 
@@ -408,15 +412,14 @@ class AScanReflowViewController(
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         mRecyclerView.stopScroll()
-        BitmapCache.getInstance().clear()
 
-        defaultWidth = Utils.dipToPixel(newConfig.screenWidthDp.toFloat())
-        defaultHeight = Utils.dipToPixel(newConfig.screenHeightDp.toFloat())
+        viewWidth = Utils.dipToPixel(newConfig.screenWidthDp.toFloat())
+        viewHeight = Utils.dipToPixel(newConfig.screenHeightDp.toFloat())
         Logcat.d(
             TAG, String.format(
                 "newConfig:w-h:%s-%s, config:%s-%s, %s",
-                defaultWidth,
-                defaultHeight,
+                viewWidth,
+                viewHeight,
                 newConfig.screenWidthDp,
                 newConfig.screenHeightDp,
                 newConfig.orientation
@@ -511,26 +514,26 @@ class AScanReflowViewController(
 
         private var index: Int = 0
 
-        private fun updateImage(bmp: Bitmap?, args: Any?, reflowViewCache: ReflowViewCache?) {
+        private fun updateImage(args: Any?, reflowViewCache: ReflowViewCache?) {
             if (args is List<*>) {
                 val bitmaps = args as List<Bitmap>
-                var height = 0
+                var allHeight = 0
                 for (bitmap in bitmaps) {
-                    height += pageView.addImageView(
+                    allHeight += pageView.addImageView(
                         bitmap,
-                        defaultWidth,
+                        viewWidth,
                         reflowViewCache,
                         filter
                     )
                 }
-                widthHeightMap.put("$index-$defaultWidth", height)
+                widthHeightMap["$index-$viewWidth"] = allHeight
                 var lp = pageView.layoutParams as ARecyclerView.LayoutParams?
                 if (null == lp) {
-                    lp = ARecyclerView.LayoutParams(ARecyclerView.LayoutParams.MATCH_PARENT, height)
+                    lp = ARecyclerView.LayoutParams(ARecyclerView.LayoutParams.MATCH_PARENT, allHeight)
                     pageView.layoutParams = lp
                 } else {
                     lp.width = ARecyclerView.LayoutParams.MATCH_PARENT
-                    lp.height = height
+                    lp.height = allHeight
                     pageView.layoutParams = lp
                 }
             }
@@ -541,7 +544,7 @@ class AScanReflowViewController(
             index: Int,
             reflowViewCache: ReflowViewCache?
         ) {
-            val height: Int? = widthHeightMap["$index-$defaultWidth"]
+            val height: Int? = widthHeightMap["$index-$viewWidth"]
             if (height != null) {
                 var lp = pageView.layoutParams as ARecyclerView.LayoutParams?
                 if (null == lp) {
@@ -554,15 +557,10 @@ class AScanReflowViewController(
                 }
             }
 
-            this.index = index
-            recycleViews(reflowViewCache)
-
-            val key = generateCacheKey(index, defaultWidth, defaultHeight, crop)
-
             val callback = object : DecodeService.DecodeCallback {
                 override fun decodeComplete(bitmap: Bitmap?, param: Boolean, args: Any?) {
                     AppExecutors.instance.mainThread().execute {
-                        updateImage(bitmap, args, reflowViewCache)
+                        updateImage(args, reflowViewCache)
                     }
                 }
 
@@ -571,6 +569,8 @@ class AScanReflowViewController(
                 }
             }
 
+            this.index = index
+            val key = generateCacheKey(index, viewWidth, viewHeight, crop)
             decodeService?.decodePage(
                 key,
                 null,
@@ -613,7 +613,7 @@ class AScanReflowViewController(
         ): Int {
             val imageView: ImageView?
             if (null != reflowViewCache && reflowViewCache.imageViewCount() > 0) {
-                imageView = reflowViewCache.getImageView(0)
+                imageView = reflowViewCache.getAndRemoveImageView(0)
             } else {
                 imageView = ImageView(context)
                 imageView.adjustViewBounds = true
