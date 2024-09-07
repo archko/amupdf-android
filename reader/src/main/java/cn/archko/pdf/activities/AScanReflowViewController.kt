@@ -1,6 +1,5 @@
 package cn.archko.pdf.activities
 
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -76,7 +75,6 @@ class AScanReflowViewController(
 
     private var decodeService: DocDecodeService? = null
 
-    protected var progressDialog: ProgressDialog? = null
     protected var isDocLoaded: Boolean = false
     private var document: CodecDocument? = null
     private var widthHeightMap = HashMap<String, Int?>()
@@ -180,17 +178,12 @@ class AScanReflowViewController(
     }
 
     private fun loadDocument() {
-        progressDialog = ProgressDialog(context)
-        progressDialog!!.setMessage("Loading")
-        progressDialog!!.show()
-
         instance.diskIO().execute {
             try {
                 document = decodeService!!.open(mPath, true)
             } catch (e: Exception) {
             }
             instance.mainThread().execute {
-                progressDialog!!.dismiss()
                 if (null == document) {
                     Toast.makeText(
                         context,

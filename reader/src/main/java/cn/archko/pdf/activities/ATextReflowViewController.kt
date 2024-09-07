@@ -1,6 +1,5 @@
 package cn.archko.pdf.activities
 
-import android.app.ProgressDialog
 import android.os.SystemClock
 import android.view.View
 import android.view.ViewTreeObserver
@@ -42,7 +41,6 @@ class ATextReflowViewController(
 ), OutlineListener, AViewController {
 
     private var mPageSizes = mutableListOf<APage>()
-    private var progressDialog: ProgressDialog? = null
     private var pdfViewModel = PDFViewModel()
 
     override fun showPasswordDialog() {
@@ -63,16 +61,11 @@ class ATextReflowViewController(
     }
 
     override fun loadDocument() {
-        progressDialog = ProgressDialog(context)
-        progressDialog!!.setMessage("Loading")
-        progressDialog!!.show()
-
         scope.launch {
             val start = SystemClock.uptimeMillis()
             pdfViewModel.loadPdfDoc(context, mPath, null)
             pdfViewModel.pageFlow
                 .collectLatest {
-                    progressDialog!!.dismiss()
                     if (it.state == State.PASS) {
                         showPasswordDialog()
                         return@collectLatest

@@ -1,6 +1,5 @@
 package cn.archko.pdf.activities
 
-import android.app.ProgressDialog
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.view.MotionEvent
@@ -58,7 +57,6 @@ class ANormalViewController(
 
     private var mPageSizes: List<APage>? = null
     private var scrollOrientation = LinearLayoutManager.VERTICAL
-    protected var progressDialog: ProgressDialog? = null
     protected var isDocLoaded: Boolean = false
     private var document: CodecDocument? = null
 
@@ -122,17 +120,12 @@ class ANormalViewController(
     }
 
     private fun loadDocument() {
-        progressDialog = ProgressDialog(context)
-        progressDialog!!.setMessage("Loading")
-        progressDialog!!.show()
-
         instance.diskIO().execute {
             try {
                 document = decodeService!!.open(mPath, true)
             } catch (e: Exception) {
             }
             instance.mainThread().execute {
-                progressDialog!!.dismiss()
                 if (null == document) {
                     Toast.makeText(
                         context,
@@ -349,7 +342,7 @@ class ANormalViewController(
 
     override fun onPause() {
         if (null != pdfViewModel.bookProgress && null != mPageSizes && mPageSizes!!.isNotEmpty()) {
-            var savePos = getCurrentPos() + 1
+            var savePos = getCurrentPos()
             /*val lastPos = getLastPos()
             if (lastPos == documentView.pageCount - 1) {
                 savePos = lastPos

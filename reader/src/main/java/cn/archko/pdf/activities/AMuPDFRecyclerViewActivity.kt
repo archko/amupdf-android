@@ -351,7 +351,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             controllerListener
         )
         viewController = aViewController
-        Logcat.d("initViewController:$old, $viewController, forceCropParam: $forceCropParam, controller:$viewController")
+        Logcat.d("initViewController:$old, $viewController, controller:$viewController")
 
         addDocumentView()
 
@@ -687,7 +687,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         val prefCrop = !pdfViewModel.checkCrop()
         val flag = viewMode == ViewMode.REFLOW || viewMode == ViewMode.REFLOW_SCAN
         if (!flag) {
-            BitmapCache.getInstance().clear()
             viewController?.notifyDataSetChanged()
             if (prefCrop) {
                 viewMode = ViewMode.CROP
