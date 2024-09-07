@@ -335,10 +335,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             }
         }
 
-        closeTts()
-        viewController?.onDestroy()
-        val old = viewController
-
         val aViewController = ViewControllerFactory.getOrCreateViewController(
             viewControllerCache,
             lifecycleScope,
@@ -350,6 +346,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             pageControls!!,
             controllerListener
         )
+
+        viewController?.onDestroy()
+        val old = viewController
         viewController = aViewController
         Logcat.d("initViewController:$old, $viewController, controller:$viewController")
 
