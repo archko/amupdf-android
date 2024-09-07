@@ -10,6 +10,7 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.util.Log
 import cn.archko.pdf.core.cache.BitmapPool
+import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.common.ParseTextMain
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.utils.BitmapUtils
@@ -210,7 +211,8 @@ class MupdfDocument(private val context: Context) {
     }
 
     fun loadPage(pageIndex: Int): Page? {
-        return if (document == null || pageIndex >= pageCount) null else document!!.loadPage(
+        return if (document == null || pageIndex >= pageCount || pageIndex < 0) null
+        else document!!.loadPage(
             pageIndex
         )
     }

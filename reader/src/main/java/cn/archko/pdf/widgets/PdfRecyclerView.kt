@@ -2,8 +2,7 @@ package cn.archko.pdf.widgets
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Rect
-import android.util.Log
+import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
@@ -13,8 +12,12 @@ import androidx.recyclerview.awidget.LinearLayoutManager
 /**
  * @author: archko 2024/9/6 :20:47
  */
-class PdfRecyclerView(context: Context) :
-    ARecyclerView(context, null) {
+class PdfRecyclerView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) :
+    ARecyclerView(context, attrs, defStyleAttr) {
 
     private var mScaleGestureDetector: ScaleGestureDetector
     var gestureDetector: GestureDetector? = null

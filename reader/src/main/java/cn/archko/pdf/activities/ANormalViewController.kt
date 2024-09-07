@@ -349,11 +349,15 @@ class ANormalViewController(
 
     override fun onPause() {
         if (null != pdfViewModel.bookProgress && null != mPageSizes && mPageSizes!!.isNotEmpty()) {
-            val position = documentView.currentPage
+            var savePos = getCurrentPos() + 1
+            /*val lastPos = getLastPos()
+            if (lastPos == documentView.pageCount - 1) {
+                savePos = lastPos
+            }*/
             pdfViewModel.saveBookProgress(
                 mPath,
                 mPageSizes!!.size,
-                position + 1,
+                savePos,
                 documentView.zoomModel.zoom * 1000f,
                 documentView.scrollX,
                 documentView.scrollY

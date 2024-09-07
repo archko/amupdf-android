@@ -6,10 +6,13 @@ import android.widget.TextView
 /**
  * @author: archko 2019/11/17 :09:35
  */
-public class ReflowViewCache {
+class ReflowViewCache(
+    private val txtCount: Int = TEXT_THRESHOLD,
+    private val imgCount: Int = IMAGE_THRESHOLD
+) {
 
-    private val cacheTextViews = ArrayList<TextView>(22)
-    private val cacheImageViews = ArrayList<ImageView>(8)
+    private val cacheTextViews = ArrayList<TextView>(txtCount)
+    private val cacheImageViews = ArrayList<ImageView>(imgCount)
 
     fun textViewCount(): Int {
         return cacheTextViews.size
@@ -23,7 +26,7 @@ public class ReflowViewCache {
         if (cacheTextViews.size > TEXT_THRESHOLD) {
             cacheTextViews.clear()
         }
-        child.setText(null)
+        child.text = null
         //(child.parent as ViewGroup).removeView(child)
         cacheTextViews.add(child)
     }

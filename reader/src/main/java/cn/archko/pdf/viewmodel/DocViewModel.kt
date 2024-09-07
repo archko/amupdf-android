@@ -4,8 +4,6 @@ import android.text.TextUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.archko.pdf.common.PdfOptionRepository
-import cn.archko.pdf.core.App
-import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.Graph
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.BookProgress
@@ -229,7 +227,7 @@ class DocViewModel : ViewModel() {
         }
     }
 
-    suspend fun preparePageSize(width: Int) = flow {
+    /*suspend fun preparePageSize(width: Int) = flow {
         var pageSizeBean: APageSizeLoader.PageSizeBean? = null
         if (bookProgress != null) {
             pageSizeBean = APageSizeLoader.loadPageSizeFromFile(
@@ -241,6 +239,6 @@ class DocViewModel : ViewModel() {
             )
         }
         emit(pageSizeBean)
-    }.flowOn(Dispatchers.IO)
+    }.flowOn(Dispatchers.IO)*/
 
 }

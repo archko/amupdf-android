@@ -22,7 +22,7 @@ interface AViewController {
     fun setOrientation(ori: Int)
     fun setCrop(crop: Boolean)
     fun getCrop(): Boolean
-    fun onSelectedOutline(resultCode: Int)
+    fun onSelectedOutline(index: Int)
     fun scrollToPosition(page: Int)
     fun scrollPage(y: Int, top: Int, bottom: Int, margin: Int): Boolean
     fun tryHyperlink(ev: MotionEvent): Boolean

@@ -6,14 +6,10 @@ import androidx.recyclerview.awidget.ARecyclerView
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.core.App
 import cn.archko.pdf.core.cache.ReflowViewCache
-import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.utils.Utils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * @author: archko 2016/5/13 :11:03
@@ -22,7 +18,6 @@ class MuPDFReflowAdapter(
     private val mContext: Context,
     private val mupdfDocument: MupdfDocument?,
     private var styleHelper: StyleHelper?,
-    private var scope: CoroutineScope?,
 ) : ARecyclerView.Adapter<ReflowTextViewHolder>() {
 
     private var screenHeight = 720
@@ -57,19 +52,20 @@ class MuPDFReflowAdapter(
     }
 
     override fun onBindViewHolder(holder: ReflowTextViewHolder, position: Int) {
-        scope!!.launch {
-            val result = withContext(Dispatchers.IO) {
-                decode(position)
-            }
+        //mupdf only single thread
+        AppExecutors.instance.diskIO().execute {
+            val result = decode(position)
             result?.run {
-                holder.bindAsList(
-                    result,
-                    screenHeight,
-                    screenWidth,
-                    systemScale,
-                    reflowCache,
-                    showBookmark(position)
-                )
+                AppExecutors.instance.mainThread().execute {
+                    holder.bindAsList(
+                        result,
+                        screenHeight,
+                        screenWidth,
+                        systemScale,
+                        reflowCache,
+                        showBookmark(position)
+                    )
+                }
             }
         }
     }
@@ -93,22 +89,12 @@ class MuPDFReflowAdapter(
     override fun onViewRecycled(holder: ReflowTextViewHolder) {
         super.onViewRecycled(holder)
         val pdfHolder = holder as ReflowTextViewHolder?
-
         pdfHolder?.recycleViews(reflowCache)
         //Logcat.d("onViewRecycled end,exist count::${reflowCache.textViewCount()},${reflowCache.imageViewCount()}")
     }
 
     fun clearCacheViews() {
         reflowCache.clear()
-    }
-
-    fun setScope(scope: CoroutineScope?) {
-        this.scope = scope
-    }
-
-    companion object {
-
-        const val TYPE_TEXT = 0
     }
 
 }

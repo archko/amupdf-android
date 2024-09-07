@@ -28,7 +28,7 @@ class PDFViewModel : ViewModel() {
     var pdfPath: String? = null
 
     var mupdfDocument: MupdfDocument? = null
-    private val mPageSizes = mutableListOf<APage>()
+    val mPageSizes = mutableListOf<APage>()
     var isDestroy = false
     val links = mutableListOf<OutlineLink>()
 
@@ -67,6 +67,7 @@ class PDFViewModel : ViewModel() {
             )
 
             val cp = mupdfDocument!!.countPages()
+            mPageSizes.clear()
             emit(loadAllPageSize(cp))
         } catch (e: Exception) {
             e.printStackTrace()

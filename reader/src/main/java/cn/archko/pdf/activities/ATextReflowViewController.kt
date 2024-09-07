@@ -78,12 +78,15 @@ class ATextReflowViewController(
                         return@collectLatest
                     }
                     val cp = pdfViewModel.countPages()
-                    if (cp > 0) {
-                        Logcat.d(
-                            TAG,
-                            "open:" + (SystemClock.uptimeMillis() - start) + " cp:" + cp
+                    Logcat.d(
+                        TAG,
+                        String.format(
+                            "open.cos: %s cp:%s",
+                            (SystemClock.uptimeMillis() - start),
+                            cp,
                         )
-
+                    )
+                    if (cp > 0) {
                         postLoadDoc(cp)
                     } else {
                         context.finish()
@@ -93,49 +96,8 @@ class ATextReflowViewController(
     }
 
     private fun postLoadDoc(cp: Int) {
-        val width = mRecyclerView.width
-        var start = SystemClock.uptimeMillis()
-
-        scope.launch {
-            docViewModel.preparePageSize(width).collectLatest { pageSizeBean ->
-                Logcat.d("open3:" + (SystemClock.uptimeMillis() - start))
-                mPageSizes.clear()
-                var pageSizes: List<APage>? = null
-                if (pageSizeBean != null) {
-                    pageSizes = pageSizeBean.List
-                }
-                if (pageSizes.isNullOrEmpty()) {
-                    start = SystemClock.uptimeMillis()
-                    preparePageSize(cp)
-                    Logcat.d("open2:" + (SystemClock.uptimeMillis() - start))
-                } else {
-                    Logcat.d("open3:pageSizes>0:" + pageSizes.size)
-                    mPageSizes.addAll(pageSizes)
-                    //checkPageSize(cp)
-                }
-                doLoadDoc()
-            }
-        }
-    }
-
-    private fun getPageSize(pageNum: Int): APage? {
-        val p = pdfViewModel.loadPage(pageNum) ?: return null
-
-        //Logcat.d(TAG, "open:getPageSize.$pageNum page:$p")
-        val b = p.bounds
-        val w = b.x1 - b.x0
-        val h = b.y1 - b.y0
-        p.destroy()
-        return APage(pageNum, w, h, 1.0f/*zoomModel!!.zoom*/)
-    }
-
-    private fun preparePageSize(cp: Int) {
-        for (i in 0 until cp) {
-            val pointF = getPageSize(i)
-            if (pointF != null) {
-                mPageSizes.add(pointF)
-            }
-        }
+        mPageSizes.addAll(pdfViewModel.mPageSizes)
+        doLoadDoc()
     }
 
     override fun doLoadDoc() {
@@ -154,10 +116,7 @@ class ATextReflowViewController(
                 context,
                 pdfViewModel.mupdfDocument,
                 mStyleHelper,
-                scope,
             )
-        } else {
-            (mRecyclerView.adapter as MuPDFReflowAdapter).setScope(scope)
         }
 
         if (pos > 0) {

@@ -4,9 +4,9 @@ import android.content.Context
 import android.view.ViewGroup
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.widget.RecyclerView
+import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.core.App
 import cn.archko.pdf.core.cache.ReflowViewCache
-import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.utils.Utils
 
@@ -18,15 +18,15 @@ class MuPDFTextAdapter(
     private var styleHelper: StyleHelper?,
 ) : ARecyclerView.Adapter<ReflowTextViewHolder>() {
 
-    private var screenHeight = 720
-    private var screenWidth = 1080
+    private var screenHeight = 1080
+    private var screenWidth = 1920
     private val systemScale = Utils.getScale()
     private val reflowCache = ReflowViewCache()
     var data: List<ReflowBean>? = null
 
     init {
-        screenHeight = App.instance!!.screenHeight
         screenWidth = App.instance!!.screenWidth
+        screenHeight = App.instance!!.screenHeight
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReflowTextViewHolder {
@@ -35,7 +35,7 @@ class MuPDFTextAdapter(
         val holder = ReflowTextViewHolder(pdfView)
         val lp: RecyclerView.LayoutParams = RecyclerView.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
+            screenHeight
         )
         pdfView.layoutParams = lp
 
@@ -48,7 +48,7 @@ class MuPDFTextAdapter(
 
     override fun onBindViewHolder(holder: ReflowTextViewHolder, position: Int) {
         val result = data?.get(position)
-        result.run {
+        result?.run {
             holder.bindAsReflowBean(
                 result,
                 screenHeight,
@@ -66,9 +66,7 @@ class MuPDFTextAdapter(
 
     override fun onViewRecycled(holder: ReflowTextViewHolder) {
         super.onViewRecycled(holder)
-        if (holder is ReflowTextViewHolder) {
-            holder.recycleViews(reflowCache)
-        }
+        holder.recycleViews(reflowCache)
     }
 
     fun clearCacheViews() {

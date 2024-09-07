@@ -11,7 +11,6 @@ import android.graphics.ColorMatrixColorFilter
 import android.graphics.Rect
 import android.graphics.RectF
 import android.view.GestureDetector
-import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -35,18 +34,18 @@ import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.utils.ColorUtil.getColorMode
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
+import cn.archko.pdf.core.widgets.ViewerDividerItemDecoration
 import cn.archko.pdf.decode.DocDecodeService
 import cn.archko.pdf.decode.DocDecodeService.IView
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.widgets.PageControls
+import cn.archko.pdf.widgets.PdfRecyclerView
 import kotlinx.coroutines.CoroutineScope
 import org.vudroid.core.DecodeService
 import org.vudroid.core.DecodeServiceBase
 import org.vudroid.core.codec.CodecDocument
-import org.vudroid.core.models.CurrentPageModel
-import org.vudroid.core.models.DecodingProgressModel
 import org.vudroid.core.models.ZoomModel
 
 /**
@@ -69,18 +68,13 @@ class AScanReflowViewController(
 ) :
     OutlineListener, AViewController {
 
-    companion object {
-        const val TAG = "ScanReflow"
-    }
-
-    private lateinit var mRecyclerView: ARecyclerView
+    private lateinit var mRecyclerView: PdfRecyclerView
     private lateinit var mPageSizes: List<APage>
 
     private var crop: Boolean = false
     private var scrollOrientation = LinearLayoutManager.VERTICAL
 
     private var decodeService: DocDecodeService? = null
-    private lateinit var currentPageModel: CurrentPageModel
 
     protected var progressDialog: ProgressDialog? = null
     protected var isDocLoaded: Boolean = false
@@ -102,6 +96,7 @@ class AScanReflowViewController(
     //解码的高宽固定,避免横竖屏切换时,重新生成
     var screenWidth = 1080
     var screenHeight = 1080
+
     //显示的高宽,图片解码后,需要根据这个缩放
     var viewWidth = 1080
     var viewHeight = 1080
@@ -125,17 +120,10 @@ class AScanReflowViewController(
             scrollOrientation = pdfViewModel.bookProgress?.scrollOrientation ?: 1
         }
 
-        val progressModel = DecodingProgressModel()
-        progressModel.addEventListener(this)
-        currentPageModel = CurrentPageModel()
-        currentPageModel.addEventListener(this)
         initDecodeService()
 
         val gestureDetector = GestureDetector(context, MySimpleOnGestureListener())
-        val view = LayoutInflater.from(context)
-            .inflate(cn.archko.pdf.R.layout.reader_crop, mControllerLayout, false)
-        mRecyclerView = view.findViewById(cn.archko.pdf.R.id.recycler)
-        (mRecyclerView.parent as ViewGroup).removeView(mRecyclerView)
+        mRecyclerView = PdfRecyclerView(context)
 
         val iView = object : IView {
             override fun getWidth(): Int {
@@ -152,9 +140,9 @@ class AScanReflowViewController(
             descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
             isNestedScrollingEnabled = false
             layoutManager = ExtraSpaceLinearLayoutManager(context, LinearLayoutManager.VERTICAL)
-            setItemViewCacheSize(0)
+            this.gestureDetector = gestureDetector
 
-            //addItemDecoration(ViewerDividerItemDecoration(context, LinearLayoutManager.VERTICAL))
+            addItemDecoration(ViewerDividerItemDecoration(LinearLayoutManager.VERTICAL))
             addOnScrollListener(object : ARecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: ARecyclerView, newState: Int) {
                     if (newState == ARecyclerView.SCROLL_STATE_IDLE) {
@@ -174,6 +162,7 @@ class AScanReflowViewController(
                     viewWidth = mRecyclerView.width
                     viewHeight = mRecyclerView.height
                     screenWidth = viewWidth
+                    screenHeight = viewHeight
                     Logcat.d(
                         TAG, String.format(
                             "onGlobalLayout : w-h:%s-%s",
@@ -186,11 +175,8 @@ class AScanReflowViewController(
                 }
             })
 
-        mRecyclerView.setOnTouchListener { v, event ->
-            gestureDetector.onTouchEvent(event) == true
-        }
-
         setFilter(PdfOptionRepository.getColorMode())
+        setOrientation(scrollOrientation)
     }
 
     private fun loadDocument() {
@@ -241,7 +227,6 @@ class AScanReflowViewController(
             document.loadOutline()
         )
 
-        setOrientation(scrollOrientation)
         val dm = context.resources.displayMetrics
         pdfAdapter = object : ARecyclerView.Adapter<ReflowViewHolder>() {
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReflowViewHolder {
@@ -249,7 +234,7 @@ class AScanReflowViewController(
                 val holder = ReflowViewHolder(pdfView)
                 val lp: ARecyclerView.LayoutParams = ARecyclerView.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
-                    viewWidth
+                    viewHeight
                 )
                 pdfView.layoutParams = lp
 
@@ -266,9 +251,7 @@ class AScanReflowViewController(
 
             override fun onViewRecycled(holder: ReflowViewHolder) {
                 super.onViewRecycled(holder)
-                if (holder is ReflowViewHolder) {
-                    holder.recycleViews(reflowCache)
-                }
+                holder.recycleViews(reflowCache)
             }
         }
         mRecyclerView.adapter = pdfAdapter
@@ -382,19 +365,20 @@ class AScanReflowViewController(
         return false
     }
 
-    override fun onSingleTap(e: MotionEvent?, margin: Int): Boolean {
-        if (e == null) {
+    override fun onSingleTap(ev: MotionEvent?, margin: Int): Boolean {
+        if (ev == null) {
             return false
         }
-        if (tryHyperlink(e)) {
+        if (tryHyperlink(ev)) {
             return true
         }
         val documentView = getDocumentView()
         val height =
-            if (scrollOrientation == LinearLayoutManager.VERTICAL) documentView.height else documentView.width
+            if (scrollOrientation == LinearLayoutManager.VERTICAL) documentView.height
+            else documentView.width
         val top = height / 4
         val bottom = height * 3 / 4
-        if (scrollPage(e.y.toInt(), top, bottom, margin)) {
+        if (scrollPage(ev.y.toInt(), top, bottom, margin)) {
             return true
         }
 
@@ -468,7 +452,7 @@ class AScanReflowViewController(
     }
 
     override fun reflow(): Int {
-        return BookProgress.REFLOW_NO
+        return BookProgress.REFLOW_SCAN
     }
 
     //--------------------------------------
@@ -505,8 +489,12 @@ class AScanReflowViewController(
     override fun showController() {
     }
 
-    private fun generateCacheKey(index: Int, w: Int, h: Int, crop: Boolean): String {
-        return String.format("%s-%s-%s-%s", index, w, h, crop)
+    companion object {
+        const val TAG = "ScanReflow"
+
+        private fun generateCacheKey(index: Int, w: Int, h: Int, crop: Boolean): String {
+            return String.format("%s-%s-%s-%s", index, w, h, crop)
+        }
     }
 
     inner class ReflowViewHolder(private var pageView: ReflowView) :
@@ -529,7 +517,10 @@ class AScanReflowViewController(
                 widthHeightMap["$index-$viewWidth"] = allHeight
                 var lp = pageView.layoutParams as ARecyclerView.LayoutParams?
                 if (null == lp) {
-                    lp = ARecyclerView.LayoutParams(ARecyclerView.LayoutParams.MATCH_PARENT, allHeight)
+                    lp = ARecyclerView.LayoutParams(
+                        ARecyclerView.LayoutParams.MATCH_PARENT,
+                        allHeight
+                    )
                     pageView.layoutParams = lp
                 } else {
                     lp.width = ARecyclerView.LayoutParams.MATCH_PARENT
@@ -594,8 +585,7 @@ class AScanReflowViewController(
         }
     }
 
-    inner class ReflowView(context: Context?) :
-        LinearLayout(context) {
+    inner class ReflowView(context: Context?) : LinearLayout(context) {
         private val leftPadding = 15
         private val rightPadding = 15
 

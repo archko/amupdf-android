@@ -91,7 +91,7 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
                         RecyclerView.LayoutParams.MATCH_PARENT,
                         RecyclerView.LayoutParams.WRAP_CONTENT
                     )
-                    maxLines = 2
+                    maxLines = 3
                     val padding = Utils.dipToPixel(8f)
                     setPadding(padding, padding, padding, padding)
                 }
