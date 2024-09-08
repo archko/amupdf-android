@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -102,13 +103,19 @@ public class DecodeServiceBase implements DecodeService {
 
             DecodeTask selectTask = null;
             if (!pageTasks.isEmpty()) {
-                selectTask = pageTasks.entrySet().iterator().next().getValue();
-                pageTasks.remove(selectTask.decodeKey);
+                Map.Entry<String, DecodeTask> next = pageTasks.entrySet().iterator().next();
+                if (null != next) {
+                    selectTask = next.getValue();
+                    pageTasks.remove(selectTask.decodeKey);
+                }
             }
             if (selectTask == null) {
                 if (!nodeTasks.isEmpty()) {
-                    selectTask = nodeTasks.entrySet().iterator().next().getValue();
-                    nodeTasks.remove(selectTask.decodeKey);
+                    Map.Entry<String, DecodeTask> next = nodeTasks.entrySet().iterator().next();
+                    if (null != next) {
+                        selectTask = next.getValue();
+                        nodeTasks.remove(selectTask.decodeKey);
+                    }
                 }
             }
 
@@ -138,7 +145,10 @@ public class DecodeServiceBase implements DecodeService {
             DecodeTask selectTask = null;
             synchronized (decodingTasks) {
                 if (!decodingTasks.isEmpty()) {
-                    selectTask = decodingTasks.entrySet().iterator().next().getValue();
+                    Map.Entry<String, DecodeTask> next = decodingTasks.entrySet().iterator().next();
+                    if (null != next) {
+                        selectTask = next.getValue();
+                    }
                 }
             }
             if (selectTask == null) {

@@ -494,7 +494,11 @@ public class DocumentView extends View implements ZoomListener {
 
     @Override
     public void scrollTo(int x, int y) {
-        super.scrollTo(Math.min(Math.max(x, getLeftLimit()), getRightLimit()), Math.min(Math.max(y, getTopLimit()), getBottomLimit()));
+        try {
+            super.scrollTo(Math.min(Math.max(x, getLeftLimit()), getRightLimit()), Math.min(Math.max(y, getTopLimit()), getBottomLimit()));
+        } catch (Exception e) {
+
+        }
         viewRect = null;
     }
 

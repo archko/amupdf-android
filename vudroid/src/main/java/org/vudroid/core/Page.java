@@ -178,6 +178,9 @@ public class Page {
     }
 
     public void updateVisibility() {
+        if (null == bounds) { //tts后台滚动的时候会出现
+            return;
+        }
         if (isVisible()) {
             //if (!isBitmapTooLarge()) {
             if (getBitmap() != null && !invalidateFlag) {

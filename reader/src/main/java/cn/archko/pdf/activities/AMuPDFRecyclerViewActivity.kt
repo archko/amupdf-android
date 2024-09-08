@@ -599,6 +599,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             TTSEngine.TtsProgressListener {
             override fun onStart(key: ReflowBean) {
                 try {
+                    if(window.decorView.visibility != View.VISIBLE){
+                        return
+                    }
                     val arr = key.page!!.split("-")
                     val page = Utils.parseInt(arr[0])
                     val current = getCurrentPos()
