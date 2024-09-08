@@ -599,7 +599,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             TTSEngine.TtsProgressListener {
             override fun onStart(key: ReflowBean) {
                 try {
-                    if(window.decorView.visibility != View.VISIBLE){
+                    if (window.decorView.visibility != View.VISIBLE) {
                         return
                     }
                     val arr = key.page!!.split("-")
@@ -775,8 +775,17 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             }
         }
-        Logcat.d("onResume ")
         updateControls()
+        if (TTSEngine.get().isSpeaking && TTSEngine.get().ttsContent.size > 0) {
+            try {
+                val arr = TTSEngine.get().ttsContent[0].page!!.split("-")
+                val page = Utils.parseInt(arr[0])
+                Logcat.d("onResume $page, $arr")
+                handler.post { onSelectedOutline(page) }
+            } catch (e: Exception) {
+                Logcat.e(e)
+            }
+        }
     }
 
     override fun onPause() {
