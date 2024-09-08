@@ -192,6 +192,9 @@ public class DocumentView extends View implements ZoomListener {
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         super.onScrollChanged(l, t, oldl, oldt);
         // bounds could be not updated
+        if (!isInitialized) {
+            return;
+        }
         currentPageChanged();
         if (inZoom) {
             return;
@@ -225,6 +228,9 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     public void showDocument(boolean crop) {
+        if (!isInitialized) {
+            return;
+        }
         this.crop = crop;
         // use post to ensure that document view has width and height before decoding begin
         post(() -> {
