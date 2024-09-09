@@ -17,3 +17,7 @@ local.properties
 /buildSrc/build
 *.aab
 *.pepk
+feature.md
+*.jks
+*.aab
+*.pepk
