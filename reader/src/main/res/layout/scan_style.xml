@@ -23,8 +23,8 @@
             android:layout_height="40dp"
             android:stepSize="0.1"
             android:text="@string/menu_font_size"
-            app:labelBehavior="visible"
-            app:tickVisible="false"
+            app:labelBehavior="withinBounds"
+            app:tickVisible="true"
             android:layout_gravity="center_vertical" />
 
 </LinearLayout>

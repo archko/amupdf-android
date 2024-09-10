@@ -96,7 +96,7 @@ class AScanReflowViewController(
             slider = mStyleControls!!.findViewById(R.id.slider)
             slider?.apply {
                 valueFrom = 0.5f
-                valueTo = 2.2f
+                valueTo = 2.4f
                 value = getFontSize()
             }
 
@@ -620,7 +620,7 @@ class AScanReflowViewController(
                 false,
                 index,
                 callback,
-                2.2f,
+                1.5f,
                 RectF(0f, 0f, 1f, 1f),
                 dpi,
                 getFontSize()
