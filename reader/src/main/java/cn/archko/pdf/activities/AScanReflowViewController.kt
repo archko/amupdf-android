@@ -496,8 +496,13 @@ class AScanReflowViewController(
         private var index: Int = 0
 
         private fun updateImage(args: Any?, reflowViewCache: ReflowViewCache?) {
-            if (args is List<*>) {
-                val bitmaps = args as List<Bitmap>
+            if (args is Array<*>) {
+                val bitmaps = args[0] as List<Bitmap>
+                val pageNumber = args[1]
+                if (pageNumber != index) {
+                    Logcat.d(TAG, "updateImage.not same page:$pageNumber, $index")
+                    return
+                }
                 var allHeight = 0
                 for (bitmap in bitmaps) {
                     allHeight += pageView.addImageView(

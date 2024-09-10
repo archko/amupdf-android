@@ -363,8 +363,8 @@ public class DocDecodeService {
         }
     }
 
-    private void finishDecoding(DecodeTask task, Bitmap bitmap, Object args) {
-        updateImage(task, bitmap, args);
+    private void finishDecoding(DecodeTask task, Bitmap bitmap, List<Bitmap> bitmaps) {
+        updateImage(task, bitmap, bitmaps);
     }
 
     private void preloadNextPage(int pageNumber) {
@@ -404,7 +404,10 @@ public class DocDecodeService {
         return containerView.getHeight();
     }
 
-    private void updateImage(final DecodeTask task, Bitmap bitmap, Object args) {
+    private void updateImage(final DecodeTask task, Bitmap bitmap, List<Bitmap> bitmaps) {
+        Object[] args = new Object[2];
+        args[0] = bitmaps;
+        args[1] = task.pageNumber;
         task.decodeCallback.decodeComplete(bitmap, false, args);
     }
 
