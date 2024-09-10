@@ -10,6 +10,7 @@ import android.graphics.ColorMatrixColorFilter
 import android.graphics.Rect
 import android.graphics.RectF
 import android.view.GestureDetector
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -17,10 +18,12 @@ import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
+import cn.archko.pdf.R
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.ReflowViewCache
@@ -41,6 +44,7 @@ import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.widgets.PageControls
 import cn.archko.pdf.widgets.PdfRecyclerView
+import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import org.vudroid.core.DecodeService
 import org.vudroid.core.DecodeServiceBase
@@ -69,6 +73,54 @@ class AScanReflowViewController(
 
     private lateinit var mRecyclerView: PdfRecyclerView
     private lateinit var mPageSizes: List<APage>
+    protected var mStyleControls: View? = null
+    private var fontSizeLabel: TextView? = null
+    private var fontMinus: View? = null
+    private var fontPlus: View? = null
+
+    private fun fontSize(): Float {
+        val mmkv = MMKV.mmkvWithID("scan")
+        return mmkv.decodeFloat("font", 1f)
+    }
+
+    private fun initStyleControls() {
+        pageControls?.hide()
+        if (null == mStyleControls) {
+            mStyleControls = LayoutInflater.from(context).inflate(R.layout.scan_style, null, false)
+            fontSizeLabel = mStyleControls!!.findViewById(R.id.font_size_label)
+            fontMinus = mStyleControls!!.findViewById(R.id.linespace_minus)
+            fontPlus = mStyleControls!!.findViewById(R.id.linespace_plus)
+
+            val lp = RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+            mControllerLayout.addView(mStyleControls, lp)
+        }
+
+        fontMinus?.setOnClickListener {
+            var old = fontSize()
+            if (old <= 0.6f) {
+                return@setOnClickListener
+            }
+            old = old.minus(0.1f)
+            applyFontSize(old)
+        }
+        fontPlus?.setOnClickListener {
+            var old = fontSize()
+            if (old > 2.2f) {
+                return@setOnClickListener
+            }
+            old = old.plus(0.1f)
+            applyFontSize(old)
+        }
+    }
+
+    private fun applyFontSize(old: Float?) {
+        fontSizeLabel?.text = String.format("%s倍", old)
+        notifyDataSetChanged()
+    }
 
     private var crop: Boolean = false
     private var scrollOrientation = LinearLayoutManager.VERTICAL
@@ -219,6 +271,8 @@ class AScanReflowViewController(
             pdfViewModel.getCurrentPage(),
             document.loadOutline()
         )
+
+        initStyleControls()
 
         val dm = context.resources.displayMetrics
         pdfAdapter = object : ARecyclerView.Adapter<ReflowViewHolder>() {
