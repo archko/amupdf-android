@@ -17,8 +17,9 @@ public class DecodeTask {
     public final RectF pageSliceBounds;
     public boolean crop = true;
     public int dpi = 0;
+    public final float fontSize;
 
-    public DecodeTask(PageTreeNode node, boolean crop, int pageNumber, DecodeService.DecodeCallback decodeCallback, float zoom, String decodeKey, RectF pageSliceBounds, int dpi) {
+    public DecodeTask(PageTreeNode node, boolean crop, int pageNumber, DecodeService.DecodeCallback decodeCallback, float zoom, String decodeKey, RectF pageSliceBounds, int dpi, float fontSize) {
         this.node = node;
         this.crop = crop;
         this.type = node == null ? TYPE_PAGE : TYPE_NODE;
@@ -28,6 +29,7 @@ public class DecodeTask {
         this.decodeKey = decodeKey;
         this.pageSliceBounds = pageSliceBounds;
         this.dpi = dpi;
+        this.fontSize = fontSize;
     }
 
     @Override

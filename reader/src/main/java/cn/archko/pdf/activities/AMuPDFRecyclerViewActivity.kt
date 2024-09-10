@@ -274,9 +274,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                         }
                         viewController?.getCurrentPos()
                             ?.let { pageControls?.updatePageProgress(it) }
-                        if (viewMode == ViewMode.REFLOW) {
-                            mReflowLayout.visibility = View.VISIBLE
-                        }
+                        mReflowLayout.visibility = View.VISIBLE
                     }
                 } else {
                     if (mReflowLayout.visibility == View.VISIBLE) {

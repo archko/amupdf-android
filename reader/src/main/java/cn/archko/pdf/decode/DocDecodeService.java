@@ -245,8 +245,8 @@ public class DocDecodeService {
         initDecodeThread();
     }
 
-    public void decodePage(String decodeKey, PageTreeNode node, boolean crop, int pageNumber, final DecodeService.DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds, int dpi) {
-        final DecodeTask decodeTask = new DecodeTask(node, crop, pageNumber, decodeCallback, zoom, decodeKey, pageSliceBounds, dpi);
+    public void decodePage(String decodeKey, PageTreeNode node, boolean crop, int pageNumber, final DecodeService.DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds, int dpi, float fontSize) {
+        final DecodeTask decodeTask = new DecodeTask(node, crop, pageNumber, decodeCallback, zoom, decodeKey, pageSliceBounds, dpi, fontSize);
         Message message = Message.obtain();
         message.obj = decodeTask;
         message.what = MSG_DECODE_START;
@@ -320,7 +320,7 @@ public class DocDecodeService {
         if (task.dpi > 0) {
             bitmaps = ReflowHelper.INSTANCE.k2pdf2bitmap(
                     k2PdfOpt,
-                    1f,
+                    task.fontSize,
                     bitmap,
                     getTargetWidth(),
                     getTargetHeight(),

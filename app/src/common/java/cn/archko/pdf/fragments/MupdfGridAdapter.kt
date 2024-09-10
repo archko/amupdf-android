@@ -146,7 +146,8 @@ class MupdfGridAdapter(
                 callback,
                 1f,
                 RectF(0f, 0f, 1f, 1f),
-                0
+                0,
+                1f
             )
         }
     }

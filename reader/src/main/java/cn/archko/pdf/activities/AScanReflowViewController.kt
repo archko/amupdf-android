@@ -1,5 +1,6 @@
 package cn.archko.pdf.activities
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -18,7 +19,6 @@ import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
@@ -44,6 +44,8 @@ import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.widgets.PageControls
 import cn.archko.pdf.widgets.PdfRecyclerView
+import com.google.android.material.slider.RangeSlider
+import com.google.android.material.slider.Slider
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import org.vudroid.core.DecodeService
@@ -74,22 +76,29 @@ class AScanReflowViewController(
     private lateinit var mRecyclerView: PdfRecyclerView
     private lateinit var mPageSizes: List<APage>
     protected var mStyleControls: View? = null
-    private var fontSizeLabel: TextView? = null
-    private var fontMinus: View? = null
-    private var fontPlus: View? = null
+    private var slider: Slider? = null
 
-    private fun fontSize(): Float {
+    private fun getFontSize(): Float {
         val mmkv = MMKV.mmkvWithID("scan")
         return mmkv.decodeFloat("font", 1f)
+    }
+
+    private fun setFontSize(size: Float) {
+        val mmkv = MMKV.mmkvWithID("scan")
+        Logcat.d("font:$size")
+        mmkv.encode("font", size)
     }
 
     private fun initStyleControls() {
         pageControls?.hide()
         if (null == mStyleControls) {
             mStyleControls = LayoutInflater.from(context).inflate(R.layout.scan_style, null, false)
-            fontSizeLabel = mStyleControls!!.findViewById(R.id.font_size_label)
-            fontMinus = mStyleControls!!.findViewById(R.id.linespace_minus)
-            fontPlus = mStyleControls!!.findViewById(R.id.linespace_plus)
+            slider = mStyleControls!!.findViewById(R.id.slider)
+            slider?.apply {
+                valueFrom = 0.5f
+                valueTo = 2.2f
+                value = getFontSize()
+            }
 
             val lp = RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -98,27 +107,18 @@ class AScanReflowViewController(
             lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
             mControllerLayout.addView(mStyleControls, lp)
         }
+        slider?.addOnSliderTouchListener(object :Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: Slider) {
+            }
 
-        fontMinus?.setOnClickListener {
-            var old = fontSize()
-            if (old <= 0.6f) {
-                return@setOnClickListener
+            override fun onStopTrackingTouch(slider: Slider) {
+                applyFontSize(slider.value)
             }
-            old = old.minus(0.1f)
-            applyFontSize(old)
-        }
-        fontPlus?.setOnClickListener {
-            var old = fontSize()
-            if (old > 2.2f) {
-                return@setOnClickListener
-            }
-            old = old.plus(0.1f)
-            applyFontSize(old)
-        }
+        })
     }
 
-    private fun applyFontSize(old: Float?) {
-        fontSizeLabel?.text = String.format("%s倍", old)
+    private fun applyFontSize(old: Float) {
+        setFontSize(old)
         notifyDataSetChanged()
     }
 
@@ -622,7 +622,8 @@ class AScanReflowViewController(
                 callback,
                 2.2f,
                 RectF(0f, 0f, 1f, 1f),
-                dpi
+                dpi,
+                getFontSize()
             )
         }
 

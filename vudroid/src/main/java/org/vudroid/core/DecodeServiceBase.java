@@ -284,7 +284,7 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     public void decodePage(String decodeKey, PageTreeNode node, boolean crop, int pageNumber, final DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds) {
-        final DecodeTask decodeTask = new DecodeTask(node, crop, pageNumber, decodeCallback, zoom, decodeKey, pageSliceBounds, 0);
+        final DecodeTask decodeTask = new DecodeTask(node, crop, pageNumber, decodeCallback, zoom, decodeKey, pageSliceBounds, 0, 0f);
         Message message = Message.obtain();
         message.obj = decodeTask;
         message.what = MSG_DECODE_START;
