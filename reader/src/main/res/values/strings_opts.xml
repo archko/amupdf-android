@@ -158,6 +158,7 @@
     <string name="tab_search">Search</string>
     <string name="tab_mine">Mine</string>
 
+    <string name="menu_page_scale">Page Scale</string>
     <string name="menu_font_size">Font Size</string>
     <string name="menu_font_face">Font Face</string>
     <string name="menu_line_space">Line Space</string>

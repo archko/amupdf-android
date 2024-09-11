@@ -132,6 +132,7 @@
     <string name="tab_search">搜索</string>
     <string name="tab_mine">我的</string>
 
+    <string name="menu_page_scale">页面缩放</string>
     <string name="menu_font_size">字号</string>
     <string name="menu_font_face">字体</string>
     <string name="menu_line_space">行间距</string>

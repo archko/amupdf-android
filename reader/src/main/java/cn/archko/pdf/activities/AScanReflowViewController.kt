@@ -1,6 +1,5 @@
 package cn.archko.pdf.activities
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -44,7 +43,6 @@ import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.widgets.PageControls
 import cn.archko.pdf.widgets.PdfRecyclerView
-import com.google.android.material.slider.RangeSlider
 import com.google.android.material.slider.Slider
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
@@ -76,7 +74,8 @@ class AScanReflowViewController(
     private lateinit var mRecyclerView: PdfRecyclerView
     private lateinit var mPageSizes: List<APage>
     protected var mStyleControls: View? = null
-    private var slider: Slider? = null
+    private var fontSlider: Slider? = null
+    private var scaleSlider: Slider? = null
 
     private fun getFontSize(): Float {
         val mmkv = MMKV.mmkvWithID("scan")
@@ -89,15 +88,32 @@ class AScanReflowViewController(
         mmkv.encode("font", size)
     }
 
+    private fun getPageScale(): Float {
+        val mmkv = MMKV.mmkvWithID("scan")
+        return mmkv.decodeFloat("scale", 1.5f)
+    }
+
+    private fun setPageScale(size: Float) {
+        val mmkv = MMKV.mmkvWithID("scan")
+        Logcat.d("scale:$size")
+        mmkv.encode("scale", size)
+    }
+
     private fun initStyleControls() {
         pageControls?.hide()
         if (null == mStyleControls) {
             mStyleControls = LayoutInflater.from(context).inflate(R.layout.scan_style, null, false)
-            slider = mStyleControls!!.findViewById(R.id.slider)
-            slider?.apply {
+            fontSlider = mStyleControls!!.findViewById(R.id.font_slider)
+            fontSlider?.apply {
                 valueFrom = 0.5f
                 valueTo = 2.4f
                 value = getFontSize()
+            }
+            scaleSlider = mStyleControls!!.findViewById(R.id.scale_slider)
+            scaleSlider?.apply {
+                valueFrom = 1.0f
+                valueTo = 2.5f
+                value = getPageScale()
             }
 
             val lp = RelativeLayout.LayoutParams(
@@ -107,7 +123,7 @@ class AScanReflowViewController(
             lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
             mControllerLayout.addView(mStyleControls, lp)
         }
-        slider?.addOnSliderTouchListener(object :Slider.OnSliderTouchListener {
+        fontSlider?.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
             override fun onStartTrackingTouch(slider: Slider) {
             }
 
@@ -115,10 +131,23 @@ class AScanReflowViewController(
                 applyFontSize(slider.value)
             }
         })
+        scaleSlider?.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: Slider) {
+            }
+
+            override fun onStopTrackingTouch(slider: Slider) {
+                applyPageScale(slider.value)
+            }
+        })
     }
 
     private fun applyFontSize(old: Float) {
         setFontSize(old)
+        notifyDataSetChanged()
+    }
+
+    private fun applyPageScale(old: Float) {
+        setPageScale(old)
         notifyDataSetChanged()
     }
 
@@ -620,7 +649,7 @@ class AScanReflowViewController(
                 false,
                 index,
                 callback,
-                1.5f,
+                getPageScale(),
                 RectF(0f, 0f, 1f, 1f),
                 dpi,
                 getFontSize()
