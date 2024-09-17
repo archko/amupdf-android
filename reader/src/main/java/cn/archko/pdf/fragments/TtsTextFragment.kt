@@ -91,7 +91,7 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
                         RecyclerView.LayoutParams.MATCH_PARENT,
                         RecyclerView.LayoutParams.WRAP_CONTENT
                     )
-                    maxLines = 3
+                    maxLines = 4
                     val padding = Utils.dipToPixel(8f)
                     setPadding(padding, padding, padding, padding)
                 }
@@ -108,7 +108,7 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
 
             fun onBind(position: Int) {
                 view.setOnClickListener {
-                    mDataListener?.onSuccess(keys[position])
+                    mDataListener?.onSuccess(position, keys)
                     dismiss()
                 }
                 view.text = String.format("%s-%s", keys[position].page, keys[position].data)

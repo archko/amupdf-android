@@ -639,16 +639,17 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             }).showDialog(this)
         }
         ttsText.setOnClickListener {
-            if (TTSEngine.get().isSpeaking()) {
+            /*if (TTSEngine.get().isSpeaking()) {
                 TTSEngine.get().stop()
-            }
+            }*/
 
             TtsTextFragment.showCreateDialog(
                 this,
                 object : DataListener {
                     override fun onSuccess(vararg args: Any?) {
-                        val key = args[0] as ReflowBean
-                        TTSEngine.get().resumeFromKey(key)
+                        val position = args[0] as Int
+                        val keys = args[1] as MutableList<ReflowBean>
+                        TTSEngine.get().resumeFromKeys(keys, position)
                     }
 
                     override fun onFailed(vararg args: Any?) {
@@ -780,7 +781,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
         updateControls()
         Logcat.d("onResume $pendingPos")
-        if (pendingPos >= 0) {
+        if (pendingPos >= 0 && ttsMode) {
             handler.post {
                 onSelectedOutline(pendingPos)
                 pendingPos = -1

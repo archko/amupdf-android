@@ -211,6 +211,29 @@ public class TTSEngine {
         return true;
     }
 
+    public boolean resumeFromKeys(List<ReflowBean> beans, int pos) {
+        if (null == textToSpeech) {
+            Logcat.d(TAG, "no tts.");
+            return false;
+        }
+        if (beans.size() < pos) {
+            Logcat.d(TAG, "something wrong.");
+        }
+        keys.clear();
+        textToSpeech.stop();
+        List<ReflowBean> list = new ArrayList<>();
+        for (int i = pos; i < beans.size(); i++) {
+            list.add(beans.get(i));
+        }
+        ttsContent.clear();
+        ttsContent.addAll(list);
+        for (ReflowBean reflowBean : list) {
+            keys.put(reflowBean.getPage(), reflowBean);
+            resumeSpeak(reflowBean);
+        }
+        return true;
+    }
+
     public int getLast() {
         if (!ttsContent.isEmpty()) {
             ReflowBean bean = keys.get(ttsContent.size() - 1);
