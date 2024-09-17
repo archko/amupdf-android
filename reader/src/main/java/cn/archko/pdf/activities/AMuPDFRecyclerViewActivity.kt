@@ -86,6 +86,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private var viewMode: ViewMode = ViewMode.CROP
     private var ttsMode = false
     private val handler = Handler(Looper.getMainLooper())
+    private var pendingPos = -1
 
     /**
      * 用AMupdf打开,传入强制切边参数,如果是-1,是没有设置,如果设置1表示强制切边,如果是0不切边,让切边按钮失效
@@ -597,13 +598,16 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             TTSEngine.TtsProgressListener {
             override fun onStart(key: ReflowBean) {
                 try {
-                    if (window.decorView.visibility != View.VISIBLE) {
-                        return
-                    }
                     val arr = key.page!!.split("-")
                     val page = Utils.parseInt(arr[0])
-                    val current = getCurrentPos()
                     //Logcat.d("onStart:$key, current:$current")
+                    if (window.decorView.visibility != View.VISIBLE) {
+                        pendingPos = page
+                        pdfViewModel.bookProgress?.progress = pendingPos
+                        pdfViewModel.saveBookProgress(page)
+                        return
+                    }
+                    val current = getCurrentPos()
                     if (current != page) {
                         onSelectedOutline(page)
                     }
@@ -734,6 +738,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     override fun onDestroy() {
         super.onDestroy()
+
         viewController?.onDestroy()
 
         isDocLoaded = false
@@ -774,14 +779,11 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             }
         }
         updateControls()
-        if (TTSEngine.get().isSpeaking && TTSEngine.get().ttsContent.size > 0) {
-            try {
-                val arr = TTSEngine.get().ttsContent[0].page!!.split("-")
-                val page = Utils.parseInt(arr[0])
-                Logcat.d("onResume $page, $arr")
-                handler.post { onSelectedOutline(page) }
-            } catch (e: Exception) {
-                Logcat.e(e)
+        Logcat.d("onResume $pendingPos")
+        if (pendingPos >= 0) {
+            handler.post {
+                onSelectedOutline(pendingPos)
+                pendingPos = -1
             }
         }
     }

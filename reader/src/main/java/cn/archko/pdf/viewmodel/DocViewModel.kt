@@ -227,6 +227,28 @@ class DocViewModel : ViewModel() {
         }
     }
 
+    fun saveBookProgress(currentPage: Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                if (null == bookProgress) {
+                    return@withContext
+                } else {
+                    bookProgress!!.page = currentPage
+                }
+                bookProgress!!.progress = currentPage * 100 / bookProgress!!.pageCount
+                Logcat.i(
+                    Logcat.TAG,
+                    String.format(
+                        "saveBookProgress:%s, :%s",
+                        currentPage,
+                        bookProgress
+                    )
+                )
+                addToDb(bookProgress)
+            }
+        }
+    }
+
     /*suspend fun preparePageSize(width: Int) = flow {
         var pageSizeBean: APageSizeLoader.PageSizeBean? = null
         if (bookProgress != null) {
