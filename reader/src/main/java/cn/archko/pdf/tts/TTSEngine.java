@@ -129,7 +129,9 @@ public class TTSEngine {
                 if (null != progressListener) {
                     ReflowBean key = keys.get(utteranceId);
                     Logcat.d(TAG, "onStart:" + utteranceId + " key:" + key);
-                    progressListener.onStart(key);
+                    if (null != key) {
+                        progressListener.onStart(key);
+                    }
                 }
             }
 
@@ -234,9 +236,22 @@ public class TTSEngine {
         return true;
     }
 
+    public int getFirst() {
+        if (!ttsContent.isEmpty()) {
+            ReflowBean bean = ttsContent.get(0);
+            try {
+                String[] arr = bean.getPage().split("-");
+                return Utils.parseInt(arr[0]);
+            } catch (Exception e) {
+                Logcat.e("reflow", String.format("%s, %s", bean, e));
+            }
+        }
+        return -1;
+    }
+
     public int getLast() {
         if (!ttsContent.isEmpty()) {
-            ReflowBean bean = keys.get(ttsContent.size() - 1);
+            ReflowBean bean = ttsContent.get(ttsContent.size() - 1);
             String[] arr = bean.getPage().split("-");
             try {
                 return Utils.parseInt(arr[0]);

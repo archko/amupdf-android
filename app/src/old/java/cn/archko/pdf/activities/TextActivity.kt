@@ -361,7 +361,7 @@ class TextActivity : AppCompatActivity() {
         binding.ttsSleep.setOnClickListener {
             SleepTimerDialog(object : SleepTimerDialog.TimeListener {
                 override fun onTime(minute: Int) {
-                    Logcat.d("TTSEngine.get().stop()")
+                    Logcat.d("TTSEngine.sleep.onTime()")
                     handler.postDelayed({
                         closeTts()
                     }, (minute * 60000).toLong())

@@ -30,6 +30,15 @@
         android:src="@drawable/ic_tts_play" />
 
     <ImageView
+        android:id="@+id/ttsCircle"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/button"
+        android:src="@drawable/ic_tts_cirlce" />
+
+    <ImageView
         android:id="@+id/ttsText"
         android:layout_width="44dp"
         android:layout_height="44dp"

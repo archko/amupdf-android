@@ -80,6 +80,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private lateinit var ttsLayout: View
     private lateinit var ttsPlay: View
     private lateinit var ttsClose: View
+    private lateinit var ttsCircle: View
     private lateinit var ttsSleep: View
     private lateinit var ttsText: View
     private val viewControllerCache: SparseArray<AViewController> = SparseArray<AViewController>()
@@ -176,6 +177,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         ttsLayout = findViewById(R.id.tts_layout)
         ttsPlay = findViewById(R.id.ttsPlay)
         ttsClose = findViewById(R.id.ttsClose)
+        ttsCircle = findViewById(R.id.ttsCircle)
         ttsSleep = findViewById(R.id.ttsSleep)
         ttsText = findViewById(R.id.ttsText)
         mReflowLayout = findViewById(R.id.reflow_layout)
@@ -600,7 +602,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 try {
                     val arr = key.page!!.split("-")
                     val page = Utils.parseInt(arr[0])
-                    //Logcat.d("onStart:$key, current:$current")
+                    Logcat.d("onStart:$key, page:$page")
                     if (window.decorView.visibility != View.VISIBLE) {
                         pendingPos = page
                         pdfViewModel.bookProgress?.progress = pendingPos
@@ -629,10 +631,13 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         ttsClose.setOnClickListener {
             closeTts()
         }
+        ttsCircle.setOnClickListener {
+            locatePage()
+        }
         ttsSleep.setOnClickListener {
             SleepTimerDialog(object : SleepTimerDialog.TimeListener {
                 override fun onTime(minute: Int) {
-                    Logcat.d("TTSEngine.get().stop()")
+                    Logcat.d("TTSEngine.sleep.onTime()")
                     handler.removeCallbacks(closeRunnable)
                     handler.postDelayed(closeRunnable, (minute * 60000).toLong())
                 }
@@ -663,11 +668,26 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
     }
 
+    private fun locatePage() {
+        val first = TTSEngine.get().first
+        if (first >= 0) {
+            pendingPos = first
+            locatePageForTTS()
+        }
+    }
+
     private val closeRunnable = Runnable { closeTts() }
 
     private fun closeTts() {
         ttsLayout.visibility = View.GONE
         ttsMode = false
+        val first = TTSEngine.get().first
+        if (first >= 0) {
+            pendingPos = first
+        }
+        if (window.decorView.visibility == View.VISIBLE) {
+            locatePageForTTS()
+        }
         TTSEngine.get().shutdown()
     }
 
@@ -781,16 +801,26 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
         updateControls()
         Logcat.d("onResume $pendingPos")
-        if (pendingPos >= 0 && ttsMode) {
-            handler.post {
-                onSelectedOutline(pendingPos)
-                pendingPos = -1
-            }
+        if (pendingPos >= 0) {
+            locatePageForTTS()
+        }
+    }
+
+    private fun locatePageForTTS() {
+        handler.post {
+            onSelectedOutline(pendingPos)
+            pendingPos = -1
         }
     }
 
     override fun onPause() {
         super.onPause()
+        if (ttsMode) {
+            val first = TTSEngine.get().first
+            if (first >= 0) {
+                pendingPos = first
+            }
+        }
         sensorHelper?.onPause()
         viewController?.onPause()
     }
