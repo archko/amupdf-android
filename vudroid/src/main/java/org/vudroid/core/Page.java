@@ -161,6 +161,9 @@ public class Page {
     }
 
     public boolean isVisible() {
+        if (null == bounds) {
+            return false;
+        }
         return RectF.intersects(documentView.getViewRectForPage(), bounds);
     }
 
