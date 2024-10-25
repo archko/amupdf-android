@@ -7,14 +7,14 @@
     android:background="@color/menu_bg"
     android:orientation="vertical">
 
-    <androidx.recyclerview.widget.RecyclerView
+    <androidx.recyclerview.awidget.ARecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:cacheColorHint="#00000000"
         android:divider="@color/tab_divider_color"
         android:dividerHeight="1px"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layoutManager="androidx.recyclerview.awidget.LinearLayoutManager"
         tools:itemCount="6"
         tools:listitem="@layout/item_outline" />
 
