@@ -154,7 +154,7 @@ public class Page {
             boolean changed = this.aspectRatio != 0f && abs > 0.08;
             this.aspectRatio = aspectRatio;
             if (changed) {
-                Log.d("TAG", "setAspectRatio:" + this.aspectRatio + ", " + aspectRatio + ", " + abs);
+                //Log.d("TAG", "setAspectRatio:" + this.aspectRatio + ", " + aspectRatio + ", " + abs);
                 documentView.invalidatePageSizes();
             }
         }

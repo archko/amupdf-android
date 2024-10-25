@@ -178,6 +178,7 @@
 
     <RelativeLayout
         android:id="@+id/reflow_layout"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/bottom_layout"

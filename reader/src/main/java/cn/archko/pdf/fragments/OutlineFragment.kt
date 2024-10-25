@@ -25,6 +25,7 @@ open class OutlineFragment : DialogFragment() {
     private var currentPage: Int = 0
     private var recyclerView: RecyclerView? = null
     private var nodataView: View? = null
+    private var pendingPos = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,14 +85,27 @@ open class OutlineFragment : DialogFragment() {
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (pendingPos >= 0) {
+            selection(pendingPos)
+            pendingPos = -1
+        }
+    }
+
     open fun updateSelection(currentPage: Int) {
         if (currentPage < 0 || null == outlineItems) {
             return
         }
         this.currentPage = currentPage
         if (!isResumed) {
+            pendingPos = currentPage
             return
         }
+        selection(currentPage)
+    }
+
+    private fun selection(currentPage: Int) {
         var found = -1
         for (i in outlineItems!!.indices) {
             val item = outlineItems!![i]
