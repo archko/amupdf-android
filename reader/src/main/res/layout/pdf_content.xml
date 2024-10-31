@@ -10,4 +10,4 @@
     android:paddingBottom="20dp"
     android:text="pdf_content"
     android:textColor="@android:color/black"
-    android:textSize="12sp" />
+    android:textSize="16sp" />

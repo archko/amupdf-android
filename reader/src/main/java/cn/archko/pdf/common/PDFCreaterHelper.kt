@@ -17,11 +17,11 @@ import cn.archko.pdf.core.App
 import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.common.EncodingDetect
 import cn.archko.pdf.core.common.IntentFile
+import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.utils.BitmapUtils
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.StreamUtils
-import cn.archko.pdf.core.utils.Utils
 import com.artifex.mupdf.fitz.Device
 import com.artifex.mupdf.fitz.DocumentWriter
 import com.artifex.mupdf.fitz.Image
@@ -40,6 +40,13 @@ import java.io.IOException
  */
 object PDFCreaterHelper {
 
+    /**
+     * A4: 210x297
+     * A3：297×420
+     * A2：420×594
+     * A1：594×841
+     * A0：841×1189 mm
+     */
     const val OPTS = "compress-images;compress;incremental;linearize;pretty;compress-fonts"
     private const val PAPER_WIDTH = 1080f
     private const val PAPER_HEIGHT = 1800f
@@ -47,17 +54,17 @@ object PDFCreaterHelper {
     private const val PAPER_FONT_SIZE = 17f
 
     /**
-     * 用这个创建,带cj字体的内容,会产生很大体积,而且字体不好看
+     * 用这个创建,带cjk字体的内容,会产生很大体积,而且字体不好看
      */
     fun createPdfFromText(sourcePath: String, destPath: String): Boolean {
         val text = EncodingDetect.readFile(sourcePath)
-        val mediabox = Rect(0f, 0f, 500f, 707f) //A2
+        val mediabox = Rect(0f, 0f, 420f, 594f) //A2
         val margin = 10f
-        var writer = DocumentWriter(destPath, "PDF", "")
+        val writer = DocumentWriter(destPath, "PDF", OPTS)
 
-        var snark = "<!DOCTYPE html>" +
+        val snark = "<!DOCTYPE html>" +
                 "<style>" +
-                "#body { font-family: \"Droid Sans\", sans-serif; }" +
+                "#body { font-family: \"Noto Sans\", sans-serif; }" +
                 "</style>" +
                 "<body>" +
                 text +
@@ -377,22 +384,33 @@ object PDFCreaterHelper {
     /**
      * Page width for our PDF.
      */
-    const val PDF_PAGE_WIDTH = 8.3 * 72 * 2
+    const val PDF_PAGE_WIDTH = 841
 
     /**
      * Page height for our PDF.
      */
-    const val PDF_PAGE_HEIGHT = 11.7 * 72 * 2
+    const val PDF_PAGE_HEIGHT = 1189
 
     fun createPdfUseSystemFromTxt(
         context: Context?,
         parent: ViewGroup?,
+        fontSize: Float,
+        padding: Int,
+        lineSpace: Float,
+        bgColor: Int,
         sourcePath: String?,
         destPath: String?
     ): Boolean {
         val content: String = EncodingDetect.readFile(sourcePath)
         try {
-            return doCreatePdfUseSystemFromTxt(context, parent, content, destPath)
+            return doCreatePdfUseSystemFromTxt(
+                context, parent,
+                fontSize,
+                padding,
+                lineSpace,
+                bgColor,
+                content, destPath
+            )
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
         }
@@ -409,32 +427,36 @@ object PDFCreaterHelper {
     fun doCreatePdfUseSystemFromTxt(
         context: Context?,
         parent: ViewGroup?,
+        fontSize: Float,
+        padding: Int,
+        lineSpace: Float,
+        bgColor: Int,
         content: String,
         path: String?
     ): Boolean {
         val pdfDocument = PdfDocument()
-        val pageWidth = PDF_PAGE_WIDTH.toInt()
-        val pageHeight = PDF_PAGE_HEIGHT.toInt()
+        val pageWidth = PDF_PAGE_WIDTH
+        val pageHeight = PDF_PAGE_HEIGHT
         val contentView =
             LayoutInflater.from(context).inflate(R.layout.pdf_content, parent, false) as TextView
+        applyStyle(contentView, fontSize, padding, bgColor, lineSpace)
         contentView.text = content
+
         val measureWidth = View.MeasureSpec.makeMeasureSpec(pageWidth, View.MeasureSpec.EXACTLY)
         val measuredHeight = View.MeasureSpec.makeMeasureSpec(pageHeight, View.MeasureSpec.EXACTLY)
         contentView.measure(measureWidth, measuredHeight)
         contentView.layout(0, 0, pageWidth, pageHeight)
 
-        //contentView.setPadding(Utils.dipToPixel(20), Utils.dipToPixel(20), Utils.dipToPixel(20), Utils.dipToPixel(20));
-        //contentView.setTextSize(Utils.dipToPixel(12));
         val lineCount = contentView.lineCount
         var lineHeight = contentView.lineHeight
-        if (contentView.lineSpacingMultiplier > 0) {
+        if (lineSpace > 0) {
             lineHeight = (lineHeight * contentView.lineSpacingMultiplier).toInt()
         }
         val layout = contentView.layout
         var start = 0
         var end: Int
         var pageH = 0
-        val paddingTopAndBottom: Int = Utils.dipToPixel(context, 40f)
+        val paddingTopAndBottom: Int = padding * 2// Utils.dipToPixel(context, 40f)
         //循环遍历打印每一行
         val sb = java.lang.StringBuilder()
         var i = 0
@@ -458,6 +480,10 @@ object PDFCreaterHelper {
                     context,
                     parent,
                     pdfDocument,
+                    fontSize,
+                    padding,
+                    lineSpace,
+                    bgColor,
                     pageWidth,
                     pageHeight,
                     i + 1,
@@ -470,15 +496,40 @@ object PDFCreaterHelper {
         }
         if (sb.isNotEmpty()) {
             Log.d("TextView", "last line ===")
-            createTxtPage(context, parent, pdfDocument, pageWidth, pageHeight, i, sb.toString())
+            createTxtPage(
+                context, parent, pdfDocument,
+                fontSize,
+                padding,
+                lineSpace,
+                bgColor,
+                pageWidth, pageHeight, i, sb.toString()
+            )
         }
         return savePdf(path, pdfDocument)
+    }
+
+    private fun applyStyle(
+        contentView: TextView,
+        fontSize: Float,
+        padding: Int,
+        bgColor: Int,
+        lineSpace: Float
+    ) {
+        contentView.textSize = fontSize
+        contentView.setPadding(padding, padding, padding, padding)
+        contentView.setBackgroundColor(bgColor)
+        contentView.setLineSpacing(0f, lineSpace)
+        Logcat.d("size:$fontSize, padding:$padding, line:$lineSpace,color:$bgColor")
     }
 
     private fun createTxtPage(
         context: Context?,
         parent: ViewGroup?,
         pdfDocument: PdfDocument,
+        fontSize: Float,
+        padding: Int,
+        lineSpace: Float,
+        bgColor: Int,
         pageWidth: Int,
         pageHeight: Int,
         pageNo: Int,
@@ -486,6 +537,8 @@ object PDFCreaterHelper {
     ) {
         val contentView =
             LayoutInflater.from(context).inflate(R.layout.pdf_content, parent, false) as TextView
+        applyStyle(contentView, fontSize, padding, bgColor, lineSpace)
+        contentView.text = content
         contentView.text = content
         val pageInfo: PdfDocument.PageInfo =
             PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNo)

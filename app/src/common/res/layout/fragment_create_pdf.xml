@@ -43,22 +43,37 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="10dp"
-        tools:visibility="gone">
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
-            android:text="@string/create_pdf_tip" />
+            android:text="@string/create_pdf_tip"
+            android:visibility="gone" />
 
-        <Button
-            android:id="@+id/btnAddTxt"
-            android:layout_width="wrap_content"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            android:text="@string/create_btn_select_text" />
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnAddTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="@string/create_btn_select_text" />
+
+            <Button
+                android:id="@+id/btnCreateFromTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginBottom="4dp"
+                android:text="@string/create_btn_text" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
         <TextView
             android:id="@+id/txt_path"
@@ -66,7 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
-            android:text="" />
+            tools:text="/storage/0/a.txt" />
 
         <TextView
             android:layout_width="match_parent"
@@ -82,15 +97,99 @@
             android:autofillHints=""
             android:hint="@string/create_text_name"
             android:inputType="text"
-            android:text="" />
+            android:text="new.pdf" />
 
-        <Button
-            android:id="@+id/btnCreateFromTxt"
-            android:layout_width="wrap_content"
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
-            android:text="@string/create_btn_text" />
+            android:text="Preview:"
+            android:textStyle="bold" />
+
+        <ScrollView
+            android:scrollbars="none"
+            android:overScrollMode="never"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="4dp"
+                    android:text="Font size:" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/fontSlider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:stepSize="1"
+                    android:text="Font size"
+                    android:theme="@style/Theme.RangeSlider"
+                    android:valueFrom="12"
+                    android:valueTo="30"
+                    app:labelBehavior="floating"
+                    app:tickVisible="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="Page Padding:" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/paddingSlider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:stepSize="1"
+                    android:text="Padding"
+                    android:theme="@style/Theme.RangeSlider"
+                    android:valueFrom="10"
+                    android:valueTo="60"
+                    app:labelBehavior="floating"
+                    app:tickVisible="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="Line Space *" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/lineSlider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:stepSize="0.1"
+                    android:text="Line Space *"
+                    android:theme="@style/Theme.RangeSlider"
+                    android:valueFrom="1.0"
+                    android:valueTo="2.0"
+                    app:labelBehavior="floating"
+                    app:tickVisible="true" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtPreview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:lineSpacingMultiplier="1.2"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="20dp"
+                    android:paddingRight="20dp"
+                    android:paddingBottom="20dp"
+                    android:text="The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.over the lazy dog.\n有一只狗跑的很快.有一只狗跑的很快.有一只狗跑的很快.有一只狗跑的很快."
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+        </ScrollView>
 
         <LinearLayout
             android:id="@+id/layout_tmp"

@@ -3,6 +3,7 @@ package cn.archko.pdf.fragments
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -25,12 +26,16 @@ import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.common.IntentFile
+import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.FileUtils
+import cn.archko.pdf.core.utils.Utils
 import coil.load
+import com.google.android.material.slider.Slider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
 import java.io.File
 import java.util.Collections
 
@@ -48,6 +53,7 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
     private var txtPath: String? = null
 
     private var type: Int = TYPE_IMAGE
+    private var bgColor = Color.WHITE
 
     fun setListener(dataListener: DataListener?) {
         mDataListener = dataListener
@@ -128,12 +134,20 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
         }
         var path = FileUtils.getStorageDir("book").absolutePath + File.separator + name
 
+        val fontSize = binding.fontSlider.value
+        val padding = Utils.dipToPixel(binding.paddingSlider.value)
+        val lineSpace = binding.lineSlider.value
+
         progressDialog.show()
         lifecycleScope.launch {
             val result = withContext(Dispatchers.IO) {
                 PDFCreaterHelper.createPdfUseSystemFromTxt(
                     activity,
                     binding.layoutTmp,
+                    fontSize,
+                    padding,
+                    lineSpace,
+                    bgColor,
                     txtPath,
                     path
                 )
@@ -204,6 +218,33 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
         itemTouchHelper.attachToRecyclerView(binding.recyclerView)
 
         updateUi()
+
+        binding.fontSlider.value = 16f
+        binding.paddingSlider.value = 20f
+        binding.lineSlider.value = 1.2f
+
+        binding.fontSlider.addOnChangeListener(Slider.OnChangeListener { slider, value, fromUser ->
+            binding.txtPreview.textSize = value
+        })
+
+        binding.paddingSlider.addOnChangeListener(Slider.OnChangeListener { slider, value, fromUser ->
+            val padding = Utils.dipToPixel(value)
+            binding.txtPreview.setPadding(padding, padding, padding, padding)
+        })
+
+        binding.lineSlider.addOnChangeListener(Slider.OnChangeListener { slider, value, fromUser ->
+            binding.txtPreview.setLineSpacing(0f, value)
+        })
+
+        binding.txtPreview.setOnClickListener {
+            ColorPickerDialog()
+                .withColor(bgColor)
+                .withListener { _, color ->
+                    bgColor = color
+                    binding.txtPreview.setBackgroundColor(color)
+                }
+                .show(requireActivity().supportFragmentManager, "colorPicker")
+        }
     }
 
     inner class ViewHolder(root: View) : BaseViewHolder<String>(root) {
@@ -320,7 +361,6 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         }
     }
-
 
     companion object {
 
