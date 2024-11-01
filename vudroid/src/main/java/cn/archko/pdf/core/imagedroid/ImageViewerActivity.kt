@@ -4,11 +4,13 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.SensorHelper
 import cn.archko.pdf.core.common.StatusBarHelper
 import com.davemorrissey.labs.subscaleview.ImageSource
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.OnImageEventListener
 import com.davemorrissey.labs.subscaleview.decoder.CompatDecoderFactory
 import com.davemorrissey.labs.subscaleview.decoder.SkiaImageDecoder
 import com.davemorrissey.labs.subscaleview.decoder.SkiaPooledImageRegionDecoder
@@ -64,9 +66,32 @@ class ImageViewerActivity : AppCompatActivity(R.layout.image_viewer) {
             )
         }
 
+        binding.imageView.setOnImageEventListener(object : OnImageEventListener {
+            override fun onReady() {
+            }
+
+            override fun onImageLoaded() {
+            }
+
+            override fun onPreviewLoadError(e: Exception?) {
+            }
+
+            override fun onImageLoadError(e: Exception?) {
+                Toast.makeText(this@ImageViewerActivity, "can not load image", Toast.LENGTH_LONG)
+                    .show()
+                finish()
+            }
+
+            override fun onTileLoadError(e: Exception?) {
+            }
+
+            override fun onPreviewReleased() {
+            }
+        })
+
         addToRecent = intent.getBooleanExtra("addToRecent", false)
 
-        binding.imageView.setImage(ImageSource.uri(path!!))
+        binding.imageView.setImage(ImageSource.uri(path))
     }
 
     override fun onResume() {
