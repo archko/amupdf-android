@@ -6,10 +6,10 @@
         android:id="@+id/deleteItem"
         android:title="@string/menu_opt_delete_page"
         app:showAsAction="never" />
-    <item
+    <!--<item
         android:id="@+id/addItem"
         android:title="@string/menu_opt_insert_image"
-        app:showAsAction="never" />
+        app:showAsAction="never" />-->
     <item
         android:id="@+id/extractImagesItem"
         android:title="@string/menu_opt_extract_image"

@@ -245,6 +245,10 @@ public class DocDecodeService {
         initDecodeThread();
     }
 
+    public List<APage> getPageList() {
+        return aPageList;
+    }
+
     public void decodePage(String decodeKey, PageTreeNode node, boolean crop, int pageNumber, final DecodeService.DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds, int dpi, float fontSize) {
         final DecodeTask decodeTask = new DecodeTask(node, crop, pageNumber, decodeCallback, zoom, decodeKey, pageSliceBounds, dpi, fontSize);
         Message message = Message.obtain();

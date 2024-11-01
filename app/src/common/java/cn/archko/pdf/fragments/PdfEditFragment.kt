@@ -35,6 +35,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.vudroid.core.DecodeServiceBase
 import org.vudroid.core.codec.CodecDocument
+import org.vudroid.pdfdroid.codec.PdfDocument
 
 /**
  * @author: archko 2023/3/8 :14:34
@@ -87,51 +88,39 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.toolbar.setNavigationOnClickListener { dismiss() }
-        binding.toolbar.setOnMenuItemClickListener { item ->
-            if (R.id.saveItem == item?.itemId) {
-                //pdfEditViewModel.save()
-            } else if (R.id.extractHtmlItem == item?.itemId) {
-                val name = FileUtils.getNameWithoutExt(path)
-                val dir = FileUtils.getStorageDir(name).absolutePath
-
-                progressDialog.show()
-                progressDialog.setCanceledOnTouchOutside(false)
-
-                job = lifecycleScope.launch {
-                    val result = withContext(Dispatchers.IO) {
-                        decodeService?.pageCount?.let {
-                            PDFCreaterHelper.extractToHtml(
-                                0, it,
-                                requireActivity(),
-                                "$dir/$name.html",
-                                path!!
-                            )
-                        }
-                    }
-                    if (result == true) {
-                        Toast.makeText(
-                            activity,
-                            R.string.edit_extract_success,
-                            Toast.LENGTH_SHORT
-                        )
-                            .show()
-                    } else {
-                        Toast.makeText(
-                            activity,
-                            R.string.edit_extract_error,
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    progressDialog.dismiss()
-                }
-            }
-            true
-        }
 
         val colorMatrix = getColorMode(1)
         binding.autoCropButton.colorFilter = ColorMatrixColorFilter(ColorMatrix(colorMatrix))
         binding.autoCropButton.setOnClickListener { toggleCrop() }
 
+        binding.toolbar.setOnMenuItemClickListener { item ->
+            menuClick(item, 0)
+            true
+        }
+
+        loadDoc()
+    }
+
+    private fun toggleCrop() {
+        crop = !crop
+        val resId =
+            if (crop) cn.archko.pdf.R.drawable.ic_crop else cn.archko.pdf.R.drawable.ic_no_crop
+        binding.autoCropButton.setImageResource(resId)
+        binding.recyclerView.stopScroll()
+
+        pdfAdapter.setCrop(crop)
+    }
+
+    private fun showPopupMenu(view: View, position: Int) {
+        val popupMenu = PopupMenu(requireActivity(), view)
+        popupMenu.menuInflater.inflate(R.menu.edit_menus, popupMenu.menu)
+        popupMenu.setOnMenuItemClickListener { item: MenuItem ->
+            menuClick(item, position)
+        }
+        popupMenu.show()
+    }
+
+    private fun loadDoc() {
         val iView = object : IView {
             override fun getWidth(): Int {
                 return binding.recyclerView.width
@@ -172,9 +161,8 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
                     }
 
                     override fun longClick(t: View?, pos: Int, view: View) {
-                        //showPopupMenu(view, pos)
+                        showPopupMenu(view, pos)
                     }
-
                 })
             binding.recyclerView.layoutManager = LinearLayoutManager(activity)
             binding.recyclerView.adapter = pdfAdapter
@@ -182,48 +170,55 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
 
             val document: CodecDocument = decodeService!!.open(it, true)
             pdfAdapter.notifyDataSetChanged()
+            pdfEditViewModel.setPdfDocument(
+                requireContext(),
+                (document as PdfDocument).core,
+                path!!,
+                decodeService!!.pageList
+            )
         }
     }
 
-    private fun toggleCrop() {
-        crop = !crop
-        val resId =
-            if (crop) cn.archko.pdf.R.drawable.ic_crop else cn.archko.pdf.R.drawable.ic_no_crop
-        binding.autoCropButton.setImageResource(resId)
-        binding.recyclerView.stopScroll()
-
-        pdfAdapter.setCrop(crop)
-    }
-
-    private fun showPopupMenu(view: View, position: Int) {
-        val popupMenu = PopupMenu(requireActivity(), view)
-        popupMenu.menuInflater.inflate(R.menu.edit_menus, popupMenu.menu)
-        popupMenu.setOnMenuItemClickListener { item: MenuItem ->
-            if (R.id.deleteItem == item.itemId) {
+    private fun deletePage(position: Int) {
+        lifecycleScope.launch {
+            val result = withContext(Dispatchers.IO) {
                 pdfEditViewModel.deletePage(position)
-                pdfAdapter.notifyItemRemoved(position)
-            } else if (R.id.addItem == item.itemId) {
-            } else if (R.id.extractImagesItem == item.itemId) {
-                val width = pdfEditViewModel.aPageList[0].width.toInt()
-                val dialog = ExtractDialog(requireActivity(),
-                    width,
-                    position,
-                    pdfEditViewModel.countPages(),
-                    object : ExtractDialog.ExtractListener {
-                        override fun export(index: Int, width: Int) {
-                            extract(index - 1, index, width)
-                        }
 
-                        override fun exportRange(start: Int, end: Int, width: Int) {
-                            extract(start - 1, end, width)
-                        }
-
-                    })
-                dialog.show()
             }
-            true
+            if (result) {
+                BitmapCache.getInstance().clear()
+                loadDoc()
+            }
         }
-        popupMenu.show()
+    }
+
+    private fun menuClick(item: MenuItem, position: Int): Boolean {
+        if (R.id.saveItem == item.itemId) {
+            pdfEditViewModel.save()
+        } else if (R.id.deleteItem == item.itemId) {
+            deletePage(position)
+        } else if (R.id.extractImagesItem == item.itemId || R.id.extractHtmlItem == item.itemId) {
+            if (pdfEditViewModel.aPageList.size < 1) {
+                return true
+            }
+            val width = pdfEditViewModel.aPageList[0].width.toInt()
+            val dialog = ExtractDialog(requireActivity(),
+                width,
+                position,
+                pdfEditViewModel.countPages(),
+                object : ExtractDialog.ExtractListener {
+                    override fun export(index: Int, width: Int) {
+                        extract(index - 1, index, width)
+                    }
+
+                    override fun exportRange(start: Int, end: Int, width: Int) {
+                        extract(start - 1, end, width)
+                    }
+
+                })
+            dialog.show()
+        }
+        return true
     }
 
     private fun extract(start: Int, end: Int, width: Int) {

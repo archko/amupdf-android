@@ -2,13 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
+    <!--<item
         android:id="@+id/saveItem"
         android:title="@string/edit_item_save"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />-->
     <item
         android:id="@+id/extractHtmlItem"
         android:title="@string/edit_extract_html"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 
 </menu>

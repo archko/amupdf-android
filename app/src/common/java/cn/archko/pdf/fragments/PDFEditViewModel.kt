@@ -5,11 +5,11 @@ import android.text.TextUtils
 import android.util.Log
 import android.widget.Toast
 import cn.archko.mupdf.R
-import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.core.App
 import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.listeners.MupdfListener
+import com.artifex.mupdf.fitz.Document
 import com.artifex.mupdf.fitz.Outline
 import com.artifex.mupdf.fitz.PDFDocument
 import com.artifex.mupdf.fitz.Page
@@ -19,7 +19,7 @@ class PDFEditViewModel : MupdfListener {
 
     var pdfPath: String? = null
     var mupdfDocument: MupdfDocument? = null
-    val aPageList = mutableListOf<APage>()
+    var aPageList = mutableListOf<APage>()
     var zoom = 1.0f
     var isEdit = false
     val opt = K2PdfOpt()
@@ -94,8 +94,26 @@ class PDFEditViewModel : MupdfListener {
         return mupdfDocument?.loadOutline()
     }
 
-    fun deletePage(page: Int) {
-        if (null != mupdfDocument) {
+    fun setPdfDocument(
+        context: Context,
+        pdfDocument: Document?,
+        path: String?,
+        list: MutableList<APage>?
+    ) {
+        pdfDocument?.run {
+            pdfPath = path
+            if (list != null) {
+                aPageList = list
+            } else {
+                aPageList.clear()
+            }
+            mupdfDocument = MupdfDocument(context)
+            mupdfDocument!!.setDocument(pdfDocument)
+        }
+    }
+
+    fun deletePage(page: Int): Boolean {
+        if (null != mupdfDocument && aPageList.size > page) {
             isEdit = true
             val pdfDocument = mupdfDocument!!.getDocument() as PDFDocument
             pdfDocument.deletePage(page)
@@ -104,7 +122,10 @@ class PDFEditViewModel : MupdfListener {
                 "TAG",
                 "deletePage.$page, cp:${pdfDocument.countPages()}, size:${aPageList.size}"
             )
+            save()
+            return true
         }
+        return false
     }
 
     fun insertPage(page: Int, path: String) {
@@ -119,13 +140,13 @@ class PDFEditViewModel : MupdfListener {
     }
 
     fun save() {
-        if (null != mupdfDocument && isEdit) {
+        if (null != mupdfDocument && !TextUtils.isEmpty(pdfPath) && isEdit) {
             val pdfDocument = mupdfDocument!!.getDocument() as PDFDocument
-            pdfDocument.save(pdfPath, PDFCreaterHelper.OPTS)
-            Toast.makeText(App.instance, R.string.edit_save_success, Toast.LENGTH_SHORT).show()
+            pdfDocument.save(pdfPath, "garbage")
+            //Toast.makeText(App.instance, R.string.edit_save_success, Toast.LENGTH_SHORT).show()
             isEdit = false
         } else {
-            Toast.makeText(App.instance, R.string.edit_no_modification, Toast.LENGTH_SHORT).show()
+            //Toast.makeText(App.instance, R.string.edit_no_modification, Toast.LENGTH_SHORT).show()
         }
     }
 

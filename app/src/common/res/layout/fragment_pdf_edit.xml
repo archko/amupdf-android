@@ -5,15 +5,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/toolbar_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
-            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:menu="@menu/edit_toolbar_menus"
             app:navigationIcon="@drawable/ic_back"
             app:title="@string/edit_title" />
 
@@ -21,9 +24,7 @@
             android:id="@+id/autoCropButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="center"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:background="@drawable/button"
@@ -33,7 +34,7 @@
             android:insetBottom="0dp"
             android:src="@drawable/ic_no_crop" />
 
-    </RelativeLayout>
+    </LinearLayout>
 
     <cn.archko.pdf.widgets.PdfRecyclerView
         android:id="@+id/recyclerView"
