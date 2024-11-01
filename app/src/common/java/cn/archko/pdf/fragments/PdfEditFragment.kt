@@ -180,13 +180,16 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
     }
 
     private fun deletePage(position: Int) {
+        progressDialog.show()
         lifecycleScope.launch {
             val result = withContext(Dispatchers.IO) {
                 pdfEditViewModel.deletePage(position)
 
             }
+            progressDialog.dismiss()
             if (result) {
                 BitmapCache.getInstance().clear()
+                decodeService?.recycle()
                 loadDoc()
             }
         }
