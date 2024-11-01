@@ -193,9 +193,9 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
     }
 
     private fun menuClick(item: MenuItem, position: Int): Boolean {
-        if (R.id.saveItem == item.itemId) {
+        /*if (R.id.saveItem == item.itemId) {
             pdfEditViewModel.save()
-        } else if (R.id.deleteItem == item.itemId) {
+        } else */if (R.id.deleteItem == item.itemId) {
             deletePage(position)
         } else if (R.id.extractImagesItem == item.itemId || R.id.extractHtmlItem == item.itemId) {
             if (pdfEditViewModel.aPageList.size < 1) {
