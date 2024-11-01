@@ -7,6 +7,7 @@ import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
+import android.util.Size
 import cn.archko.pdf.R
 import cn.archko.pdf.core.App
 import cn.archko.pdf.core.cache.BitmapPool
@@ -66,20 +67,24 @@ class PdfFetcher(
         return bitmap
     }
 
-    private fun renderDjvuPage(page: DjvuPage, width: Int, height: Int): Bitmap {
-        val xscale = 1f * width / page.width
-        val yscale = 1f * height / page.height
-        var w: Int = width
-        var h: Int = height
+    private fun caculateSize(pWidth: Int, pHeight: Int, tWidth: Int, tHeight: Int): Size {
+        val xscale = 1f * tWidth / pWidth
+        val yscale = 1f * tHeight / pHeight
+        var w: Int = tWidth
+        var h: Int = tHeight
         if (xscale > yscale) {
-            h = (page.height * xscale).toInt()
+            h = (pHeight * xscale).toInt()
         } else {
-            w = (page.width * yscale).toInt()
+            w = (pWidth * yscale).toInt()
         }
+        return Size(w, h)
+    }
+
+    private fun renderDjvuPage(page: DjvuPage, width: Int, height: Int): Bitmap {
+        val size = caculateSize(page.width, page.height, width, height)
         val bitmap = page.renderBitmap(
-            Rect(0, 0, w, h),
-            w,
-            h,
+            Rect(0, 0, size.width, size.height),
+            size.width, size.height,
             RectF(0f, 0f, 1f, 1f),
             1f
         )
@@ -104,16 +109,10 @@ class PdfFetcher(
         val ctm = Matrix()
         val xscale = 1f * width / pWidth
         val yscale = 1f * height / pHeight
-        var w: Int = width
-        var h: Int = height
-        if (xscale > yscale) {
-            h = (pWidth * xscale).toInt()
-        } else {
-            w = (pHeight * yscale).toInt()
-        }
+        val size = caculateSize(pWidth.toInt(), pHeight.toInt(), width, height)
 
         ctm.scale(xscale, yscale)
-        val bitmap = BitmapPool.getInstance().acquire(w, h)
+        val bitmap = BitmapPool.getInstance().acquire(size.width, size.height)
         val dev =
             AndroidDrawDevice(bitmap, 0, 0, 0, 0, bitmap.getWidth(), bitmap.getHeight())
         page.run(dev, ctm, null as Cookie?)
@@ -137,19 +136,11 @@ class PdfFetcher(
     }
 
     private fun renderPdfPageSys(page: PdfRenderer.Page, width: Int, height: Int): Bitmap {
-        val xscale = 1f * width / page.width
-        val yscale = 1f * height / page.height
-        var w: Int = width
-        var h: Int = height
-        if (xscale > yscale) {
-            h = (page.height * xscale).toInt()
-        } else {
-            w = (page.width * yscale).toInt()
-        }
+        val size = caculateSize(page.width, page.height, width, height)
 
         val bitmap = BitmapPool
             .getInstance()
-            .acquire(w, h, Bitmap.Config.ARGB_8888)
+            .acquire(size.width, size.height, Bitmap.Config.ARGB_8888)
         page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
         page.close()
         return bitmap
