@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <android/log.h>
 
@@ -66,7 +67,7 @@ Java_org_ebookdroid_core_crop_PageCropper_nativeGetCropBounds(JNIEnv *env, jclas
                                                               jfloat bottom) {
 
     uint8_t *src;
-    src = (uint8_t * )((*env)->GetDirectBufferAddress(env, pixels));
+    src = (uint8_t *) ((*env)->GetDirectBufferAddress(env, pixels));
     if (!src) {
         ERROR("Can not get direct buffer");
         return 0;
@@ -104,7 +105,7 @@ Java_org_ebookdroid_core_crop_PageCropper_nativeGetColumn(JNIEnv *env, jclass cl
                                                           jint height, jfloat x, jfloat y) {
 
     uint8_t *src;
-    src = (uint8_t * )((*env)->GetDirectBufferAddress(env, pixels));
+    src = (uint8_t *) ((*env)->GetDirectBufferAddress(env, pixels));
     if (!src) {
         ERROR("Can not get direct buffer");
         return 0;
@@ -157,6 +158,27 @@ calculateAvgLum(uint8_t *src, int width, int height, int sub_x, int sub_y, int s
     midBright /= (sub_w * sub_h);
 
     return midBright;
+}
+
+int isRectWhite(uint8_t *src, int width, int height, int sub_x, int sub_y, int sub_w, int sub_h,
+                int avgLum) {
+    int count = 0;
+
+    int x, y;
+    for (y = 0; y < sub_h; y++) {
+        for (x = 0; x < sub_w; x++) {
+            int i = ((y + sub_y) * width + sub_x + x) * 4;
+            int minLum = MIN(src[i + 2], MIN(src[i + 1], src[i]));
+            int maxLum = MAX(src[i + 2], MAX(src[i + 1], src[i]));
+            int lum = (minLum + maxLum) / 2;
+            if ((lum < avgLum) && ((avgLum - lum) * 10 > avgLum)) {
+                count++;
+            }
+        }
+    }
+    float white = (float) count / (sub_w * sub_h);
+    //DEBUG("White: %f %d", white, count);
+    return white < WHITE_THRESHOLD ? 1 : 0;
 }
 
 float getLeftBound(uint8_t *src, int width, int height, int avgLum) {
@@ -277,26 +299,5 @@ float getBottomBound(uint8_t *src, int width, int height, int avgLum) {
         }
     }
     return whiteCount > 0 ? (float) (MIN(height, y + 2 * H_LINE_SIZE)) / height : 1;
-}
-
-int isRectWhite(uint8_t *src, int width, int height, int sub_x, int sub_y, int sub_w, int sub_h,
-                int avgLum) {
-    int count = 0;
-
-    int x, y;
-    for (y = 0; y < sub_h; y++) {
-        for (x = 0; x < sub_w; x++) {
-            int i = ((y + sub_y) * width + sub_x + x) * 4;
-            int minLum = MIN(src[i + 2], MIN(src[i + 1], src[i]));
-            int maxLum = MAX(src[i + 2], MAX(src[i + 1], src[i]));
-            int lum = (minLum + maxLum) / 2;
-            if ((lum < avgLum) && ((avgLum - lum) * 10 > avgLum)) {
-                count++;
-            }
-        }
-    }
-    float white = (float) count / (sub_w * sub_h);
-    //DEBUG("White: %f %d", white, count);
-    return white < WHITE_THRESHOLD ? 1 : 0;
 }
 

@@ -25,12 +25,12 @@ android {
         jvmTarget = "17"
     }
 
-    /*externalNativeBuild {
-        cmake {
-            path "src/main/cpp/CMakeLists.txt"
-        }
-    }*/
-    //android.ndkVersion "25.2.9519653"
+    //externalNativeBuild {
+    //    cmake {
+    //        path = File("src/main/cpp/CMakeLists.txt")
+    //    }
+    //}
+    //android.ndkVersion = "26.1.10909125"
 
     packaging {
         jniLibs.keepDebugSymbols += "*/armeabi-v7a/*.so"
