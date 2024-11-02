@@ -15,6 +15,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.awidget.GridLayoutManager
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.FragmentPdfEditBinding
@@ -92,6 +93,7 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
         val colorMatrix = getColorMode(1)
         binding.autoCropButton.colorFilter = ColorMatrixColorFilter(ColorMatrix(colorMatrix))
         binding.autoCropButton.setOnClickListener { toggleCrop() }
+        binding.btnExtract.setOnClickListener { extractImages(0) }
 
         binding.toolbar.setOnMenuItemClickListener { item ->
             menuClick(item, 0)
@@ -164,7 +166,7 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
                         showPopupMenu(view, pos)
                     }
                 })
-            binding.recyclerView.layoutManager = LinearLayoutManager(activity)
+            binding.recyclerView.layoutManager = GridLayoutManager(activity, 1)
             binding.recyclerView.adapter = pdfAdapter
             binding.recyclerView.setHasFixedSize(true)
 
@@ -191,40 +193,45 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
                 BitmapCache.getInstance().clear()
                 decodeService?.recycle()
                 loadDoc()
+                val layoutManager = binding.recyclerView.layoutManager as GridLayoutManager
+                layoutManager.scrollToPositionWithOffset(position, 0)
             }
         }
     }
 
     private fun menuClick(item: MenuItem, position: Int): Boolean {
-        /*if (R.id.saveItem == item.itemId) {
-            pdfEditViewModel.save()
-        } else */if (R.id.deleteItem == item.itemId) {
+        if (R.id.deleteItem == item.itemId) {
             deletePage(position)
-        } else if (R.id.extractImagesItem == item.itemId || R.id.extractHtmlItem == item.itemId) {
-            if (pdfEditViewModel.aPageList.size < 1) {
-                return true
-            }
-            val width = pdfEditViewModel.aPageList[0].width.toInt()
-            val dialog = ExtractDialog(requireActivity(),
-                width,
-                position,
-                pdfEditViewModel.countPages(),
-                object : ExtractDialog.ExtractListener {
-                    override fun export(index: Int, width: Int) {
-                        extract(index - 1, index, width)
-                    }
-
-                    override fun exportRange(start: Int, end: Int, width: Int) {
-                        extract(start - 1, end, width)
-                    }
-
-                })
-            dialog.show()
+        } else if (R.id.extractImagesItem == item.itemId) {
+            if (extractImages(position)) return true
         }
         return true
     }
 
-    private fun extract(start: Int, end: Int, width: Int) {
+    private fun extractImages(position: Int): Boolean {
+        if (pdfEditViewModel.aPageList.size < 1) {
+            return true
+        }
+        val width = pdfEditViewModel.aPageList[0].width.toInt()
+        val dialog = ExtractDialog(requireActivity(),
+            width,
+            position,
+            pdfEditViewModel.countPages(),
+            object : ExtractDialog.ExtractListener {
+                override fun export(index: Int, width: Int) {
+                    doExtract(index - 1, index, width)
+                }
+
+                override fun exportRange(start: Int, end: Int, width: Int) {
+                    doExtract(start - 1, end, width)
+                }
+
+            })
+        dialog.show()
+        return false
+    }
+
+    private fun doExtract(start: Int, end: Int, width: Int) {
         val name = FileUtils.getNameWithoutExt(path)
         val dir = FileUtils.getStorageDir(name).absolutePath
 
@@ -250,10 +257,8 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
             if (result == 0) {
                 Toast.makeText(activity, R.string.edit_extract_success, Toast.LENGTH_SHORT)
                     .show()
-                //Toast.makeText(activity, "导出成功到$dir", Toast.LENGTH_SHORT).show()
             } else if (result == -2) {
                 Toast.makeText(activity, R.string.edit_extract_error, Toast.LENGTH_SHORT).show()
-                //Toast.makeText(activity, "导出错误!", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(activity, "取消导出,已导出:${result}张", Toast.LENGTH_SHORT)
                     .show()

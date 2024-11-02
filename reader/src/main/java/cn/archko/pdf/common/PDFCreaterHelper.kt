@@ -384,12 +384,12 @@ object PDFCreaterHelper {
     /**
      * Page width for our PDF.
      */
-    const val PDF_PAGE_WIDTH = 841
+    private const val PDF_PAGE_WIDTH = 841
 
     /**
      * Page height for our PDF.
      */
-    const val PDF_PAGE_HEIGHT = 1189
+    private const val PDF_PAGE_HEIGHT = 1189
 
     fun createPdfUseSystemFromTxt(
         context: Context?,
@@ -447,7 +447,7 @@ object PDFCreaterHelper {
         contentView.measure(measureWidth, measuredHeight)
         contentView.layout(0, 0, pageWidth, pageHeight)
 
-        val lineCount = contentView.lineCount
+        val lineCountPerPage = contentView.lineCount
         var lineHeight = contentView.lineHeight
         if (lineSpace > 0) {
             lineHeight = (lineHeight * contentView.lineSpacingMultiplier).toInt()
@@ -456,11 +456,12 @@ object PDFCreaterHelper {
         var start = 0
         var end: Int
         var pageH = 0
-        val paddingTopAndBottom: Int = padding * 2// Utils.dipToPixel(context, 40f)
+        val paddingTopAndBottom: Int = 0// Utils.dipToPixel(context, 40f)
         //循环遍历打印每一行
-        val sb = java.lang.StringBuilder()
+        val sb = StringBuilder()
         var i = 0
-        while (i < lineCount) {
+        var page = 1
+        while (i < lineCountPerPage) {
             end = layout.getLineEnd(i)
             val line = content.substring(start, end) //指定行的内容
             start = end
@@ -470,10 +471,11 @@ object PDFCreaterHelper {
                 Log.d(
                     "TextView",
                     String.format(
-                        "============page line:%s,lh:%s,ph:%s==========",
-                        i,
+                        "============page:%s, count:%s, lineHeight-pheight:%s-%s==========",
+                        page,
+                        lineCountPerPage,
                         lineHeight,
-                        pageHeight
+                        pageH
                     )
                 )
                 createTxtPage(
@@ -486,23 +488,24 @@ object PDFCreaterHelper {
                     bgColor,
                     pageWidth,
                     pageHeight,
-                    i + 1,
+                    page,
                     sb.toString()
                 )
+                page++
                 pageH = 0
                 sb.setLength(0)
             }
             i++
         }
         if (sb.isNotEmpty()) {
-            Log.d("TextView", "last line ===")
+            Logcat.d("TextView", "last page:$page")
             createTxtPage(
                 context, parent, pdfDocument,
                 fontSize,
                 padding,
                 lineSpace,
                 bgColor,
-                pageWidth, pageHeight, i, sb.toString()
+                pageWidth, pageHeight, page, sb.toString()
             )
         }
         return savePdf(path, pdfDocument)
@@ -539,12 +542,11 @@ object PDFCreaterHelper {
             LayoutInflater.from(context).inflate(R.layout.pdf_content, parent, false) as TextView
         applyStyle(contentView, fontSize, padding, bgColor, lineSpace)
         contentView.text = content
-        contentView.text = content
         val pageInfo: PdfDocument.PageInfo =
             PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNo)
                 .create()
         val page: PdfDocument.Page = pdfDocument.startPage(pageInfo)
-        val canvas: Canvas = page.getCanvas()
+        val canvas: Canvas = page.canvas
         val measureWidth = View.MeasureSpec.makeMeasureSpec(pageWidth, View.MeasureSpec.EXACTLY)
         val measuredHeight = View.MeasureSpec.makeMeasureSpec(pageHeight, View.MeasureSpec.EXACTLY)
         contentView.measure(measureWidth, measuredHeight)

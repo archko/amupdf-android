@@ -9,14 +9,15 @@
         android:id="@+id/toolbar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/toc_color_bg"
         android:orientation="horizontal">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
-            android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:menu="@menu/edit_toolbar_menus"
+            android:layout_weight="1"
+            android:background="@color/transparent"
             app:navigationIcon="@drawable/ic_back"
             app:title="@string/edit_title" />
 
@@ -33,6 +34,20 @@
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:src="@drawable/ic_no_crop" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btnExtract"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/button"
+            android:contentDescription="@string/extract_title"
+            android:gravity="center"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:src="@drawable/ic_export" />
 
     </LinearLayout>
 

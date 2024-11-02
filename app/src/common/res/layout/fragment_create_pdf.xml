@@ -132,7 +132,7 @@
                     android:stepSize="1"
                     android:text="Font size"
                     android:theme="@style/Theme.RangeSlider"
-                    android:valueFrom="12"
+                    android:valueFrom="10"
                     android:valueTo="30"
                     app:labelBehavior="floating"
                     app:tickVisible="true" />
@@ -150,7 +150,7 @@
                     android:stepSize="1"
                     android:text="Padding"
                     android:theme="@style/Theme.RangeSlider"
-                    android:valueFrom="10"
+                    android:valueFrom="8"
                     android:valueTo="60"
                     app:labelBehavior="floating"
                     app:tickVisible="true" />
