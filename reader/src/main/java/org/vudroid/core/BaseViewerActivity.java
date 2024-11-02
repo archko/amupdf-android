@@ -172,7 +172,7 @@ public abstract class BaseViewerActivity extends FragmentActivity implements Dec
         BitmapPool.getInstance().clear();
     }
 
-    private SimpleGestureListener simpleGestureListener = new SimpleGestureListener() {
+    private final SimpleGestureListener simpleGestureListener = new SimpleGestureListener() {
 
         @Override
         public void onSingleTapConfirmed(MotionEvent ev, int currentPage) {

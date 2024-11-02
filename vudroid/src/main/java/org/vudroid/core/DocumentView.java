@@ -338,6 +338,10 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     public Page getEventPage(MotionEvent e) {
+        if (decodeService.getPageCount() < 1) {
+            return null;
+        }
+
         Page page = null;
 
         float evtX = e.getX();
@@ -510,7 +514,7 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     /**
-     * 对于缩图,需要更多的预期高度,两个方向都要处理.
+     * 对于缩略图,需要更多的预期高度,两个方向都要处理.
      * 有了缩略图,getViewRect()就可以不用预加载空间了.
      *
      * @return
@@ -644,12 +648,7 @@ public class DocumentView extends View implements ZoomListener {
         //Log.d(TAG, "height:" + height);
     }
 
-    private Page tryHyperlink(MotionEvent e) {
-        if (decodeService.getPageCount() < 1) {
-            return null;
-        }
-
-        Page page = getEventPage(e);
+    private Page tryHyperlink(MotionEvent e, Page page) {
         if (null != page) {
             float scale = calculateScale(page);
             int scrollX = getScrollX();
@@ -784,8 +783,9 @@ public class DocumentView extends View implements ZoomListener {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            Page page = tryHyperlink(e);
-            if (page != null) {
+            Page page = getEventPage(e);
+            Page evPage = tryHyperlink(e, page);
+            if (evPage != null) {
                 return true;
             }
             if (null != simpleGestureListener) {
