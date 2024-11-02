@@ -22,6 +22,7 @@ import cn.archko.mupdf.databinding.FragmentPdfEditBinding
 import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.BitmapPool
+import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.listeners.ClickListener
 import cn.archko.pdf.core.listeners.DataListener
@@ -114,6 +115,9 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
     }
 
     private fun showPopupMenu(view: View, position: Int) {
+        if (!IntentFile.isPdf(path!!)){
+            return
+        }
         val popupMenu = PopupMenu(requireActivity(), view)
         popupMenu.menuInflater.inflate(R.menu.edit_menus, popupMenu.menu)
         popupMenu.setOnMenuItemClickListener { item: MenuItem ->

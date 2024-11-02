@@ -47,7 +47,7 @@ object PDFCreaterHelper {
      * A1：594×841
      * A0：841×1189 mm
      */
-    const val OPTS = "compress-images;compress;incremental;linearize;pretty;compress-fonts"
+    const val OPTS = "compress-images;compress;incremental;linearize;pretty;compress-fonts;garbage"
     private const val PAPER_WIDTH = 1080f
     private const val PAPER_HEIGHT = 1800f
     private const val PAPER_PADDING = 40f
