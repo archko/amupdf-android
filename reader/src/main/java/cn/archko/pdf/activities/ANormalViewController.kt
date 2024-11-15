@@ -179,6 +179,7 @@ class ANormalViewController(
         val codecContext = DecodeServiceBase.openContext(mPath)
         if (null == codecContext) {
             Toast.makeText(context, "open file error", Toast.LENGTH_SHORT).show()
+            context.finish()
         }
         return DecodeServiceBase(codecContext)
     }

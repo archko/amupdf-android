@@ -320,6 +320,18 @@ object IntentFile {
                 || path.endsWith(".xlsx", true)
     }
 
+    fun isEpub(path: String): Boolean {
+        return path.endsWith(".epub", true)
+    }
+
+    fun isMobi(path: String): Boolean {
+        return path.endsWith(".mobi", true)
+                || path.endsWith(".azw", true)
+                || path.endsWith(".azw2", true)
+                || path.endsWith(".azw3", true)
+                || path.endsWith(".azw4", true)
+    }
+
     fun isDjvu(name: String): Boolean {
         val fname = name.lowercase(Locale.getDefault())
         return fname.endsWith("djvu") || fname.endsWith("djv")

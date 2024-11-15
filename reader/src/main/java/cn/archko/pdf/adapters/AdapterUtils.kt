@@ -7,7 +7,7 @@ import cn.archko.pdf.R
  * @author: archko 2024/3/12 :13:39
  */
 object AdapterUtils {
-    val exts: MutableList<String> = ArrayList()
+    /*val exts: MutableList<String> = ArrayList()
 
     init {
         exts.add("pdf")
@@ -31,7 +31,7 @@ object AdapterUtils {
         exts.add("xlsx")
         exts.add("json")
         exts.add("js")
-    }
+    }*/
 
     fun getExtensionWithDot(name: String?): String {
         if (name == null) {
@@ -60,6 +60,8 @@ object AdapterUtils {
         } else if (".djvu".equals(ext) || ".djv".equals(ext)) {
             drawableId = R.drawable.ic_book_djvu
         } else if (".epub".equals(ext) || ".mobi".equals(ext)
+            || ".azw".equals(ext) || ".azw2".equals(ext)
+            || ".azw3".equals(ext) || ".azw4".equals(ext)
         ) {
             drawableId = R.drawable.ic_book_epub_zip
         } else if (".png".equals(ext) || ".jpg".equals(ext) || ".jpeg".equals(ext)

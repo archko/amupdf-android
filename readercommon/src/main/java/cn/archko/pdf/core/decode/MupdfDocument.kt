@@ -260,7 +260,7 @@ class MupdfDocument(private val context: Context) {
 
         const val LAYOUTW = 1080
         const val LAYOUTH = 1800
-        const val LAYOUTEM = 40
+        const val LAYOUTEM = 42
 
         //=================================================
         fun render(
