@@ -39,8 +39,8 @@ public class LibMobi {
 
     public static File convertMobiToEpub(File file) {
         String input = file.getAbsolutePath();
-        int hashCode = (input + file.length() + file.lastModified()).hashCode();
-        File outputFile = FileUtils.getDiskCacheDir(App.Companion.getInstance(), hashCode + ".epub");
+        int hashCode = String.format("%s%-s%s", file.getName(), file.length(), file.lastModified()).hashCode();
+        File outputFile = FileUtils.getDiskCacheDir(App.Companion.getInstance(), String.format("%s-%s%s",file.getName(), hashCode, ".epub"));
         Logcat.d(String.format("convertMobiToEpub: file=%s, convertFilePath=%s",
                 input, outputFile.getAbsoluteFile()));
 
@@ -119,8 +119,8 @@ public class LibMobi {
      */
     public static File convertDocxToHtml(File file) {
         String input = file.getAbsolutePath();
-        int hashCode = (input + file.length() + file.lastModified()).hashCode();
-        File outputFile = FileUtils.getDiskCacheDir(App.Companion.getInstance(), hashCode + ".epub");
+        int hashCode = String.format("%s%-s%s", file.getName(), file.length(), file.lastModified()).hashCode();
+        File outputFile = FileUtils.getDiskCacheDir(App.Companion.getInstance(), String.format("%s-%s%s",file.getName(), hashCode, ".epub"));
         if (outputFile.exists()) {
             return outputFile;
         }
@@ -164,6 +164,11 @@ public class LibMobi {
         return null;
     }
 
+    /**
+     * 转换为epub,存在相同的目录
+     * @param input
+     * @return
+     */
     public static boolean convertDocxToHtml(String input) {
         File file = new File(input);
         String name = FileUtils.getNameWithoutExt(input);
@@ -192,7 +197,7 @@ public class LibMobi {
             result = converter.convertToHtml(file);
             String html = result.getValue(); // The generated HTML
 
-            int hashCode = (input + file.length() + file.lastModified()).hashCode();
+            int hashCode = String.format("%s%-s%s", file.getName(), file.length(), file.lastModified()).hashCode();
             String outputHtml = folderPath + File.separator + hashCode + ".html";
             Log.d("", String.format("convertDocxToHtml: file=%s, folder=%s, convertFilePath=%s", input, folderPath, outputHtml));
             boolean res = StreamUtils.saveStringToFile("<html><head></head><body>" + html + "</body></html>", outputHtml);
