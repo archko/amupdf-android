@@ -80,12 +80,12 @@ class ExtractDialog(
                 binding.extract.tvStart.text =
                     String.format(
                         context.getString(R.string.edit_from_page),
-                        binding.extract.rangeSlider.values[0]
+                        binding.extract.rangeSlider.values[0].toString()
                     )
                 binding.extract.tvEnd.text =
                     String.format(
                         context.getString(R.string.edit_to_page),
-                        binding.extract.rangeSlider.values[1]
+                        binding.extract.rangeSlider.values[1].toString()
                     )
             }
         })

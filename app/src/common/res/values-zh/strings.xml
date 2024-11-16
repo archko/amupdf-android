@@ -15,7 +15,7 @@
     <string name="extract_title">导出图片</string>
     <string name="extract_selection">导出选中范围</string>
     <string name="extract_current">导出当前页</string>
-    <string name="extract_tip">选择导出的分辨率,默认为1080宽,最小为原始图片宽,图片最大宽可达3600</string>
+    <string name="extract_tip">选择导出的分辨率,默认为1080宽,最小为原始图片宽,图片最大宽可达4000</string>
     <string name="extract_resolution">导出分辨率</string>
     <string name="extract_page_range">页面范围</string>
     <string name="extract_range">范围</string>

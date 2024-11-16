@@ -27,7 +27,7 @@
         android:text="@string/extract_resolution"
         android:theme="@style/Theme.RangeSlider"
         android:valueFrom="1080.0"
-        android:valueTo="3600.0"
+        android:valueTo="4000.0"
         app:labelBehavior="visible"
         app:tickVisible="false" />
 

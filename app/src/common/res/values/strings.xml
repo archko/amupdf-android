@@ -17,7 +17,7 @@
     <string name="extract_title">Extract Images</string>
     <string name="extract_selection">Extract Selection</string>
     <string name="extract_current">Extract Current</string>
-    <string name="extract_tip">Select resolution,default width=1080, max width=3600</string>
+    <string name="extract_tip">Select resolution,default width=1080, max width=4000</string>
     <string name="extract_resolution">Extract Resolution</string>
     <string name="extract_page_range">Page Rang</string>
     <string name="extract_range">Rang</string>
