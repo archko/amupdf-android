@@ -52,8 +52,8 @@
     <string name="create_image_btn_add_image">添加图片</string>
     <string name="create_image_btn_save">保存</string>
     <string name="create_epub_title">转为epub</string>
-    <string name="create_epub_tips">将Mobi,Azw转为epub,与当前的图片保存目录一致</string>
-    <string name="create_epub_add_mobi">添加Mobi,Azw</string>
+    <string name="create_epub_tips">将Mobi,Azw,Docx转为epub,与当前的图片保存目录一致</string>
+    <string name="create_epub_add_mobi">添加Mobi,Azw,Docx</string>
     <string name="create_epub_add_azw">添加Azw</string>
     <string name="create_epub_convert">转为Epub</string>
     <string name="create_epub_convert_success">转为Epub成功</string>

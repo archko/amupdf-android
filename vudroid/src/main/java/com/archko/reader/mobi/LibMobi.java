@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import cn.archko.pdf.core.App;
+import cn.archko.pdf.core.common.IntentFile;
 import cn.archko.pdf.core.common.Logcat;
 import cn.archko.pdf.core.utils.FileUtils;
 import cn.archko.pdf.core.utils.StreamUtils;
@@ -62,34 +63,50 @@ public class LibMobi {
         return outputFile;
     }
 
-    public static int convertMobiToEpubBatch(List<String> paths) {
+    /**
+     * 转为epub,存储相同的目录
+     *
+     * @param path
+     * @return
+     */
+    public static int convertMobiToEpub(String input) {
+        String name = FileUtils.getNameWithoutExt(input);
+        String folderPath = input.substring(0, input.lastIndexOf("/"));
+        File outputFile = new File(folderPath + File.separator + name + ".epub");
+        Logcat.d(String.format("convertMobiToEpubBatch: file=%s, convertFilePath=%s",
+                input, outputFile.getAbsoluteFile()));
+
+        int res = -1;
+        if (!outputFile.exists()) {
+            try {
+                res = LibMobi.convertToEpub(input, outputFile.getAbsolutePath());
+            } catch (Exception e) {
+                Log.e("", e.getMessage());
+            }
+        } else {
+            res = 0;
+        }
+        if (res != 0) {
+            if (outputFile.exists()) {
+                outputFile.delete();
+            }
+        }
+        return res;
+    }
+
+    public static int convertToEpubBatch(List<String> paths) {
         int count = 0;
         for (String path : paths) {
-            File file = new File(path);
-            String input = file.getAbsolutePath();
-            String name = FileUtils.getNameWithoutExt(input);
-            String folderPath = input.substring(0, input.lastIndexOf("/"));
-            File outputFile = new File(folderPath + File.separator + name + ".epub");
-            Logcat.d(String.format("convertMobiToEpubBatch: file=%s, convertFilePath=%s",
-                    input, outputFile.getAbsoluteFile()));
-
-            int res = -1;
-            if (!outputFile.exists()) {
-                try {
-                    res = LibMobi.convertToEpub(input, outputFile.getAbsolutePath());
-                } catch (Exception e) {
-                    Log.e("", e.getMessage());
+            if (IntentFile.INSTANCE.isMobi(path)) {
+                int res = convertMobiToEpub(path);
+                if (res == 0) {
+                    count++;
                 }
-            } else {
-                res = 0;
-            }
-
-            if (res != 0) {
-                if (outputFile.exists()) {
-                    outputFile.delete();
+            } else if (IntentFile.INSTANCE.isDocx(path)) {
+                boolean res = convertDocxToHtml(path);
+                if (res) {
+                    count++;
                 }
-            } else {
-                count++;
             }
         }
         return count;
@@ -132,7 +149,6 @@ public class LibMobi {
             Log.d("", String.format("convertDocxToHtml: file=%s, folder=%s, convertFilePath=%s", input, folderPath, outputHtml));
             boolean res = StreamUtils.saveStringToFile("<html><head></head><body>" + html + "</body></html>", outputHtml);
             if (res) {
-                //new HTMLToEpub("", "archko", file.getName(), outputEpub).run(output, images);
                 res = convertToEpub("archko", file.getName(), outputFile.getAbsolutePath(), outputHtml, images);
                 for (Map.Entry<String, String> image : images.entrySet()) {
                     new File(image.getValue()).delete();
@@ -146,6 +162,54 @@ public class LibMobi {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static boolean convertDocxToHtml(String input) {
+        File file = new File(input);
+        String name = FileUtils.getNameWithoutExt(input);
+        String folderPath = input.substring(0, input.lastIndexOf("/"));
+        File outputFile = new File(folderPath + File.separator + name + ".epub");
+        if (outputFile.exists()) {
+            return true;
+        }
+        Map<String, String> images = new HashMap<>();
+        DocumentConverter converter = new DocumentConverter().
+                imageConverter(image -> {
+                    String imageName = image.hashCode() + "." + image.getContentType().replace("image/", "");
+                    Log.d("", "ImageConverter:" + imageName);
+
+                    File imageFile = new File(folderPath, imageName);
+                    StreamUtils.saveStreamToFile(image.getInputStream(), imageFile);
+                    images.put(imageName, imageFile.getAbsolutePath());
+
+                    Map<String, String> map = new HashMap<>();
+                    map.put("src", imageName);
+                    return map;
+                });
+
+        Result<String> result = null;
+        try {
+            result = converter.convertToHtml(file);
+            String html = result.getValue(); // The generated HTML
+
+            int hashCode = (input + file.length() + file.lastModified()).hashCode();
+            String outputHtml = folderPath + File.separator + hashCode + ".html";
+            Log.d("", String.format("convertDocxToHtml: file=%s, folder=%s, convertFilePath=%s", input, folderPath, outputHtml));
+            boolean res = StreamUtils.saveStringToFile("<html><head></head><body>" + html + "</body></html>", outputHtml);
+            if (res) {
+                res = convertToEpub("archko", file.getName(), outputFile.getAbsolutePath(), outputHtml, images);
+                for (Map.Entry<String, String> image : images.entrySet()) {
+                    new File(image.getValue()).delete();
+                }
+                new File(outputHtml).delete();
+                if (res) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private static InputStream getResource(String path) throws FileNotFoundException {

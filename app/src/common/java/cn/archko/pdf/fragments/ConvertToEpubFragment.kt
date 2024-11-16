@@ -121,7 +121,7 @@ class ConvertToEpubFragment : DialogFragment(R.layout.fragment_convert_to_epub) 
                     val parseParams = IntentFile.getPath(requireContext(), oneUri)
                     if (parseParams != null) {
                         val ext = AdapterUtils.getExtensionWithDot(parseParams)
-                        if (IntentFile.isMobi(ext)) {
+                        if (IntentFile.isMobi(ext) || IntentFile.isDocx(ext)) {
                             paths.add(parseParams)
                         }
                     }
@@ -132,7 +132,7 @@ class ConvertToEpubFragment : DialogFragment(R.layout.fragment_convert_to_epub) 
                             val parseParams = IntentFile.getPath(requireContext(), uri)
                             if (parseParams != null) {
                                 val ext = AdapterUtils.getExtensionWithDot(parseParams)
-                                if (IntentFile.isMobi(ext)) {
+                                if (IntentFile.isMobi(ext) || IntentFile.isDocx(ext)) {
                                     paths.add(parseParams)
                                 }
                             }
@@ -177,7 +177,7 @@ class ConvertToEpubFragment : DialogFragment(R.layout.fragment_convert_to_epub) 
         progressDialog.show()
         lifecycleScope.launch {
             val result = withContext(Dispatchers.IO) {
-                LibMobi.convertMobiToEpubBatch(bookPaths)
+                LibMobi.convertToEpubBatch(bookPaths)
             }
             Toast.makeText(activity, R.string.create_epub_convert_success, Toast.LENGTH_LONG).show()
             progressDialog.dismiss()

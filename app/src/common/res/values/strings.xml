@@ -55,7 +55,7 @@
     <string name="create_image_btn_save">Save</string>
     <string name="create_epub_title">Convert To Epub</string>
     <string name="create_epub_tips">Convert Mobi, Azw to Epub, saved in the same Directory</string>
-    <string name="create_epub_add_mobi">Add Mobi,Azw</string>
+    <string name="create_epub_add_mobi">Add Mobi,Azw, Docx</string>
     <string name="create_epub_add_azw">Add Azw</string>
     <string name="create_epub_convert">Convert</string>
     <string name="create_epub_convert_success">Convert successfully</string>
