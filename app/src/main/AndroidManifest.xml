@@ -113,6 +113,10 @@
                 <data android:pathPattern="/.*\.cbz" />
                 <data android:pathPattern="/.*\.epub" />
                 <data android:pathPattern="/.*\.mobi" />
+                <data android:pathPattern="/.*\.azw" />
+                <data android:pathPattern="/.*\.azw2" />
+                <data android:pathPattern="/.*\.azw3" />
+                <data android:pathPattern="/.*\.azw4" />
                 <data android:pathPattern="/.*\.fb2" />
                 <data android:pathPattern="/.*\.xml" />
                 <data android:pathPattern="/.*\.html" />

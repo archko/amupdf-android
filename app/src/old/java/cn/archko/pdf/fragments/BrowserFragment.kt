@@ -102,6 +102,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             R.id.action_set_as_home -> setAsHome()
             R.id.action_extract -> extractImage()
             R.id.action_create -> createPdf()
+            R.id.action_convert_epub -> convertToEpub()
         }
         return super.onOptionsItemSelected(menuItem)
     }
@@ -116,6 +117,10 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
 
     fun createPdf() {
         PdfCreationFragment.showCreateDialog(requireActivity(), null)
+    }
+
+    fun convertToEpub() {
+        ConvertToEpubFragment.showCreateDialog(requireActivity(), null)
     }
 
     private fun editPdf(path: String?) {

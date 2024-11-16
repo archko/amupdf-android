@@ -5,6 +5,7 @@
 
     <string name="create_pdf_label">创建PDF</string>
     <string name="menu_create">创建PDF</string>
+    <string name="menu_convert_epub">转为Epub</string>
     <string name="create_pdf_select_old">选择旧的 pdf</string>
     <string name="create_pdf_save">保存pdf</string>
     <string name="create_pdf_select_old_tip">如果没有则创建新的pdf</string>
@@ -50,6 +51,12 @@
     <string name="create_image_name_hint">填写生成pdf的文件名</string>
     <string name="create_image_btn_add_image">添加图片</string>
     <string name="create_image_btn_save">保存</string>
+    <string name="create_epub_title">转为epub</string>
+    <string name="create_epub_tips">将Mobi,Azw转为epub,与当前的图片保存目录一致</string>
+    <string name="create_epub_add_mobi">添加Mobi,Azw</string>
+    <string name="create_epub_add_azw">添加Azw</string>
+    <string name="create_epub_convert">转为Epub</string>
+    <string name="create_epub_convert_success">转为Epub成功</string>
     <string name="edit_btn_image">导出为图片</string>
     <string name="edit_btn_merge">合并</string>
     <string name="edit_btn_select">选择pdf文件</string>
