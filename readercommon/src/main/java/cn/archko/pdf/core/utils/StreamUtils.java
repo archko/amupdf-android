@@ -33,10 +33,12 @@ public class StreamUtils {
 
     /**
      * 将字符串保存到指定的文件中
+     *
+     * @return
      */
-    public static void saveStringToFile(String text, String filePath) {
+    public static boolean saveStringToFile(String text, String filePath) {
         File file = new File(filePath);
-        saveStringToFile(text, file);
+        return saveStringToFile(text, file);
     }
 
     /**

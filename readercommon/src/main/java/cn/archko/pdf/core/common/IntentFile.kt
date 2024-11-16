@@ -332,6 +332,10 @@ object IntentFile {
                 || path.endsWith(".azw4", true)
     }
 
+    fun isDocx(path: String): Boolean {
+        return path.endsWith(".docx", true)
+    }
+
     fun isDjvu(name: String): Boolean {
         val fname = name.lowercase(Locale.getDefault())
         return fname.endsWith("djvu") || fname.endsWith("djv")

@@ -10,14 +10,27 @@ import org.vudroid.pdfdroid.codec.PdfDocument;
 
 import java.io.File;
 
+import cn.archko.pdf.core.common.IntentFile;
+
 public class MobiContext implements CodecContext {
 
     public CodecDocument openDocument(String fileName) {
-        File result = LibMobi.convertMobiToEpub(new File(fileName));
-        if (null == result || !result.exists()) {
-            return null;
+        String path = "";
+        if (IntentFile.INSTANCE.isMobi(fileName)) {
+            File result = LibMobi.convertMobiToEpub(new File(fileName));
+            if (null == result || !result.exists()) {
+                return null;
+            }
+            path = result.getAbsolutePath();
+        } else if (IntentFile.INSTANCE.isDocx(fileName)) {
+            File result = LibMobi.convertDocxToHtml(new File(fileName));
+            if (null == result || !result.exists()) {
+                return null;
+            }
+            path = result.getAbsolutePath();
         }
-        return PdfDocument.openDocument(result.getAbsolutePath(), "");
+
+        return PdfDocument.openDocument(path, "");
     }
 
     public void setContentResolver(ContentResolver contentResolver) {
