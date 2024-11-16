@@ -17,25 +17,23 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.FragmentPdfOptBinding
 import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.core.adapters.BaseViewHolder
-import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.core.common.IntentFile
+import cn.archko.pdf.core.entity.ResponseHandler
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.Utils
 import com.artifex.mupdf.fitz.Document
 import com.google.android.material.slider.RangeSlider
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * @author: archko 2023/3/8 :14:34
@@ -49,8 +47,6 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
     private var txtPath: String? = null
 
     private var type: Int = TYPE_MERGE
-    private var scope: CoroutineScope? = null
-    private val customerDispatcher = AppExecutors.instance.diskIO().asCoroutineDispatcher()
 
     fun setListener(dataListener: DataListener?) {
         mDataListener = dataListener
@@ -140,34 +136,50 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
             width = binding.extract.resolutionSlider.value.toInt()
         }
 
-        if (scope?.isActive == true) {
-            scope?.cancel()
-        }
-        scope = CoroutineScope(Job() + customerDispatcher)
-        scope!!.launch {
-            val result = withContext(Dispatchers.IO) {
-                PDFCreaterHelper.extractToImages(
-                    requireActivity(),
-                    width,
-                    dir,
-                    txtPath!!,
-                    start,
-                    end
-                )
-            }
-            if (result == 0) {
-                Toast.makeText(activity, R.string.edit_extract_success, Toast.LENGTH_SHORT)
-                    .show()
-            } else if (result == -2) {
-                Toast.makeText(activity, R.string.edit_extract_error, Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(
-                    activity,
-                    String.format(getString(R.string.edit_extract_cancel_pages, result)),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            progressDialog.dismiss()
+        lifecycleScope.launch {
+            flow {
+                try {
+                    val result = PDFCreaterHelper.extractToImages(
+                        requireActivity(),
+                        width,
+                        dir,
+                        txtPath!!,
+                        start,
+                        end
+                    )
+                    emit(ResponseHandler.Success(result))
+                } catch (e: Exception) {
+                    emit(ResponseHandler.Failure())
+                }
+            }.flowOn(Dispatchers.IO)
+                .collectLatest { response ->
+                    progressDialog.dismiss()
+                    if (response is ResponseHandler.Success<Int>) {
+                        if (response.data == 0) {
+                            Toast.makeText(
+                                activity,
+                                R.string.edit_extract_success,
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        } else if (response.data == -2) {
+                            Toast.makeText(
+                                activity,
+                                R.string.edit_extract_error,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                activity,
+                                String.format(
+                                    getString(R.string.edit_extract_cancel_pages),
+                                    response.data.toString()
+                                ),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
         }
     }
 
@@ -181,47 +193,57 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
 
         progressDialog.show()
 
-        if (scope?.isActive == true) {
-            scope?.cancel()
-        }
-        scope = CoroutineScope(Job() + customerDispatcher)
-        scope!!.launch {
-            var start: Int = 0
-            var end: Int = 0
-            if (binding.extract.extractLayout.visibility == View.VISIBLE) {
-                start = binding.extract.rangeSlider.values[0].toInt() - 1
-                end = binding.extract.rangeSlider.values[1].toInt()
-            }
-            val result = withContext(Dispatchers.IO) {
-                PDFCreaterHelper.extractToHtml(
-                    start, end,
-                    requireActivity(),
-                    "$dir/$name.html",
-                    txtPath!!
-                )
-            }
-            withContext(Dispatchers.Main) {
-                if (result) {
-                    Toast.makeText(activity, R.string.edit_extract_success, Toast.LENGTH_SHORT)
-                        .show()
-                } else {
-                    Toast.makeText(activity, R.string.edit_extract_error, Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            flow {
+                try {
+                    var start: Int = 0
+                    var end: Int = 0
+                    if (binding.extract.extractLayout.visibility == View.VISIBLE) {
+                        start = binding.extract.rangeSlider.values[0].toInt() - 1
+                        end = binding.extract.rangeSlider.values[1].toInt()
+                    }
+                    val result = PDFCreaterHelper.extractToHtml(
+                        start, end,
+                        requireActivity(),
+                        "$dir/$name.html",
+                        txtPath!!
+                    )
+
+                    emit(ResponseHandler.Success(result))
+                } catch (e: Exception) {
+                    emit(ResponseHandler.Failure())
                 }
-                progressDialog.dismiss()
-            }
+            }.flowOn(Dispatchers.IO)
+                .collectLatest { response ->
+                    progressDialog.dismiss()
+                    if (response is ResponseHandler.Success<Boolean>) {
+                        if (response.data) {
+                            Toast.makeText(
+                                activity,
+                                R.string.edit_extract_success,
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        } else {
+                            Toast.makeText(
+                                activity,
+                                R.string.edit_extract_error,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Log.d("TAG", "onDestroy")
-        scope?.cancel()
     }
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         Log.d("TAG", "onDismiss")
-        scope?.cancel()
     }
 
     override fun onCreateView(
@@ -296,12 +318,12 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
                 binding.extract.tvStart.text =
                     String.format(
                         getString(R.string.edit_from_page),
-                        binding.extract.rangeSlider.values[0]
+                        binding.extract.rangeSlider.values[0].toString()
                     )
                 binding.extract.tvEnd.text =
                     String.format(
                         getString(R.string.edit_to_page),
-                        binding.extract.rangeSlider.values[1]
+                        binding.extract.rangeSlider.values[1].toString()
                     )
             }
         })

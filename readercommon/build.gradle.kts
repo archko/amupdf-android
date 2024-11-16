@@ -41,9 +41,6 @@ android {
 dependencies {
     api(libs.androidx.core.ktx)
     api(libs.androidx.appcompat)
-    //implementation(libs.androidx.activity.compose)
-    //implementation(libs.androidx.lifecycle.viewModelCompose)
-    //implementation(libs.androidx.navigation.compose)
     api(libs.androidx.lifecycle.viewmodelKtx)
 
     implementation(libs.room.runtime)
