@@ -171,7 +171,7 @@ public class DecodeServiceBase implements DecodeService {
     };
 
     public static CodecContext openContext(String path) {
-        if (IntentFile.INSTANCE.isMobi(path) || IntentFile.INSTANCE.isDocx(path)) {
+        if (IntentFile.INSTANCE.isEpub(path) ||IntentFile.INSTANCE.isMobi(path) || IntentFile.INSTANCE.isDocx(path)) {
             return new MobiContext();
         } else if (IntentFile.INSTANCE.isMuPdf(path)) {
             return new PdfContext();

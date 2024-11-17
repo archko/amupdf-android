@@ -178,7 +178,7 @@ object PdfOptionRepository {
     }
 
     @JvmField
-    val FONT_DIR = "amupdf/fonts/"
+    val FONT_DIR = "Fonts/"
 
     @JvmField
     val SYSTEM_FONT = "System Font"
