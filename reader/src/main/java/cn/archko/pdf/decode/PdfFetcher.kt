@@ -12,6 +12,8 @@ import cn.archko.pdf.R
 import cn.archko.pdf.core.App
 import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.common.IntentFile
+import cn.archko.pdf.core.utils.BitmapUtils
+import cn.archko.pdf.core.utils.FileUtils
 import coil.ImageLoader
 import coil.decode.DataSource
 import coil.fetch.DrawableResult
@@ -26,6 +28,7 @@ import com.artifex.mupdf.fitz.android.AndroidDrawDevice
 import org.vudroid.djvudroid.codec.DjvuContext
 import org.vudroid.djvudroid.codec.DjvuPage
 import java.io.File
+import java.nio.ByteBuffer
 
 /**
  * @author: archko 2024/8/133 :08:02
@@ -34,17 +37,54 @@ class PdfFetcher(
     private val data: PdfFetcherData,
     private val options: Options
 ) : Fetcher {
+
+    private fun cacheBitmap(bitmap: Bitmap?) {
+        if (bitmap == null) {
+            return
+        }
+        val dir = FileUtils.getExternalCacheDir(App.instance)
+        val cacheDir = File(dir, "image")
+        if (!cacheDir.exists()) {
+            cacheDir.mkdirs()
+        }
+        val path = "${cacheDir.absolutePath}/${data.path.hashCode()}"
+        val bmp = Bitmap.createBitmap(
+            bitmap.width,
+            bitmap.height,
+            bitmap.config!!
+        )
+        val buffer = ByteBuffer.allocate(bitmap.getByteCount())
+        bitmap.copyPixelsToBuffer(buffer)
+        buffer.position(0)
+        bmp.copyPixelsFromBuffer(buffer);
+        BitmapUtils.saveBitmapToFile(bmp, path)
+    }
+
+    private fun loadBitmapFromCache(): Bitmap? {
+        val dir = FileUtils.getExternalCacheDir(App.instance)
+        val cacheDir = File(dir, "image")
+        val key = "${cacheDir.absolutePath}/${data.path.hashCode()}"
+        val bmp = BitmapFactory.decodeFile(key)
+        return bmp
+    }
+
     override suspend fun fetch(): FetchResult {
         println("PdfFetcher:${data.path}")
-        var bitmap = if (IntentFile.isDjvu(data.path)) {
-            decodeDjvu()
-        } else if (IntentFile.isPdf(data.path)) {
-            decodePdfSys()
-        } else {
-            decodeMuPdf()
-        }
-        if (bitmap == null) {
-            bitmap = BitmapFactory.decodeResource(App.instance!!.resources, R.drawable.ic_book_text)
+        var bitmap = loadBitmapFromCache()
+        if (null == bitmap) {
+            bitmap = if (IntentFile.isDjvu(data.path)) {
+                decodeDjvu()
+            } else if (IntentFile.isPdf(data.path)) {
+                decodePdfSys()
+            } else {
+                decodeMuPdf()
+            }
+            if (bitmap == null) {
+                bitmap =
+                    BitmapFactory.decodeResource(App.instance!!.resources, R.drawable.ic_book_text)
+            } else {
+                cacheBitmap(bitmap)
+            }
         }
 
         return DrawableResult(
@@ -100,6 +140,7 @@ class PdfFetcher(
                 data.width,
                 data.height
             ) else null
+
         return bitmap
     }
 
