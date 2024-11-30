@@ -18,11 +18,14 @@ class PdfApp : App(), ImageLoaderFactory {
     private val MAX_DISK_CACHE_SIZE_PERCENTAGE = 0.2
 
     override fun newImageLoader(): ImageLoader {
+        var directory = externalCacheDir?.resolve("image_cache")
+        if (directory == null) {
+            directory = cacheDir.resolve("image_cache")
+        }
         val imageLoader = ImageLoader.Builder(this)
             .components(fun ComponentRegistry.Builder.() {
                 //add(MupdfFetcher.Factory())
-                add(PdfFetcher.Factory())
-                    .add(PdfFetcherKeyer())
+                add(PdfFetcher.Factory()).add(PdfFetcherKeyer())
             })
             .memoryCache {
                 MemoryCache.Builder(this)
@@ -31,7 +34,7 @@ class PdfApp : App(), ImageLoaderFactory {
             }
             .diskCache {
                 DiskCache.Builder()
-                    .directory(cacheDir.resolve("image_cache"))
+                    .directory(directory)
                     .maxSizePercent(MAX_DISK_CACHE_SIZE_PERCENTAGE)
                     .build()
             }

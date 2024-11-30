@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.graphics.RectF
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
 import android.util.Size
@@ -14,6 +13,7 @@ import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.utils.BitmapUtils
 import cn.archko.pdf.core.utils.FileUtils
+import cn.archko.pdf.widgets.CoverDrawable
 import coil.ImageLoader
 import coil.decode.DataSource
 import coil.fetch.DrawableResult
@@ -39,7 +39,7 @@ class PdfFetcher(
 ) : Fetcher {
 
     private fun cacheBitmap(bitmap: Bitmap?) {
-        if (bitmap == null) {
+        if (null == bitmap) {
             return
         }
         val dir = FileUtils.getExternalCacheDir(App.instance)
@@ -57,7 +57,7 @@ class PdfFetcher(
         bitmap.copyPixelsToBuffer(buffer)
         buffer.position(0)
         bmp.copyPixelsFromBuffer(buffer);
-        BitmapUtils.saveBitmapToFile(bmp, path)
+        BitmapUtils.saveBitmapToFile(bmp, File(path))
     }
 
     private fun loadBitmapFromCache(): Bitmap? {
@@ -69,9 +69,9 @@ class PdfFetcher(
     }
 
     override suspend fun fetch(): FetchResult {
-        println("PdfFetcher:${data.path}")
         var bitmap = loadBitmapFromCache()
-        if (null == bitmap) {
+        //println("PdfFetcher:${data.path}, $bitmap")
+        if (bitmap == null) {
             bitmap = if (IntentFile.isDjvu(data.path)) {
                 decodeDjvu()
             } else if (IntentFile.isPdf(data.path)) {
@@ -79,18 +79,20 @@ class PdfFetcher(
             } else {
                 decodeMuPdf()
             }
-            if (bitmap == null) {
-                bitmap =
-                    BitmapFactory.decodeResource(App.instance!!.resources, R.drawable.ic_book_text)
-            } else {
-                cacheBitmap(bitmap)
-            }
         }
 
+        if (bitmap == null) {
+            bitmap = BitmapFactory.decodeResource(App.instance!!.resources, R.drawable.ic_book_text)
+        } else {
+            cacheBitmap(bitmap)
+        }
+
+        val drawable = CoverDrawable(bitmap)
+
         return DrawableResult(
-            drawable = BitmapDrawable(options.context.resources, bitmap),
+            drawable = drawable,
             isSampled = false,
-            dataSource = DataSource.DISK
+            dataSource = DataSource.MEMORY
         )
     }
 
@@ -140,7 +142,6 @@ class PdfFetcher(
                 data.width,
                 data.height
             ) else null
-
         return bitmap
     }
 

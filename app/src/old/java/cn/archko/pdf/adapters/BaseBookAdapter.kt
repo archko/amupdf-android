@@ -5,13 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import cn.archko.mupdf.R
 import cn.archko.pdf.core.adapters.BaseViewHolder
-import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.listeners.OnItemClickListener
 import cn.archko.pdf.core.utils.FileUtils
@@ -31,8 +31,21 @@ open class BaseBookAdapter(
 
     protected var mInflater: LayoutInflater
 
+    private var coverWidth = 135
+    private var coverHeight = 180
+
     init {
         mInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val screenHeight: Int = Utils.getScreenHeightPixelWithOrientation(context)
+        val screenWidth: Int = Utils.getScreenWidthPixelWithOrientation(context)
+        var h: Int = (screenHeight - Utils.dipToPixel(12f)) / 3
+        var w: Int = (screenWidth - Utils.dipToPixel(12f)) / 3
+        if (h < w) {
+            w = h
+        }
+        h = w * 4 / 3
+        coverWidth = w
+        coverHeight = h
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<FileBean> {
@@ -213,6 +226,14 @@ open class BaseBookAdapter(
 
                 AdapterUtils.setIcon(".$ext", mIcon!!)
 
+                var lp = mIcon!!.layoutParams
+                if (null == lp) {
+                    lp = LinearLayout.LayoutParams(coverWidth, coverHeight)
+                    mIcon!!.setLayoutParams(lp)
+                } else {
+                    lp.width = coverWidth
+                    lp.height = coverHeight
+                }
                 entry.file?.absolutePath?.let { FetcherUtils.load(it, mIcon!!.context, mIcon!!) }
             }
         }
