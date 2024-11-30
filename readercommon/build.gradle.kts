@@ -53,8 +53,12 @@ dependencies {
 
     api("com.tencent.bugly:crashreport:4.1.9.3")
     implementation("com.github.albfernandez:juniversalchardet:2.4.0")
-    api("com.artifex.mupdf:mupdf-fitz:1.24.3")
-    api(libs.sardine)
+    api("com.artifex.mupdf:mupdf-fitz:1.25.0")
+    api(libs.sardine) {
+        exclude("stax")
+        exclude("stax-api")
+        exclude("xpp3")
+    }
 
     api(project(":pdf-recyclerview"))
 }
