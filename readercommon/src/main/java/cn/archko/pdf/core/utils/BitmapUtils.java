@@ -23,6 +23,10 @@ import cn.archko.pdf.core.common.Logcat;
  */
 public class BitmapUtils {
 
+    public static boolean saveBitmapToFile(Bitmap bitmap, String path) {
+        return saveBitmapToFile(bitmap, new File(path), Bitmap.CompressFormat.JPEG, 100);
+    }
+
     public static boolean saveBitmapToFile(Bitmap bitmap, File file) {
         return saveBitmapToFile(bitmap, file, Bitmap.CompressFormat.JPEG, 100);
     }
