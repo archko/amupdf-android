@@ -211,7 +211,7 @@
         android:layout_width="135dp"
         android:layout_height="188dp"
         android:paddingBottom="8dp"
-        android:src="@drawable/icon"
+        android:src="@mipmap/icon"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_cancel" />
