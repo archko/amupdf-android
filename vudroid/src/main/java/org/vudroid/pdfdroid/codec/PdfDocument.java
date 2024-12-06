@@ -10,46 +10,49 @@ import org.vudroid.core.codec.OutlineLink;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.archko.pdf.core.App;
 import cn.archko.pdf.core.common.IntentFile;
 import cn.archko.pdf.core.decode.MupdfDocument;
 import cn.archko.pdf.core.entity.ReflowBean;
+import cn.archko.pdf.core.utils.Utils;
 
 public class PdfDocument implements CodecDocument {
 
-    private Document core;
+    private Document document;
 
-    public void setCore(Document core) {
-        this.core = core;
+    public void setDocument(Document document) {
+        this.document = document;
     }
 
-    public Document getCore() {
-        return core;
+    public Document getDocument() {
+        return document;
     }
 
     public CodecPage getPage(int pageNumber) {
-        return PdfPage.createPage(core, pageNumber);
+        return PdfPage.createPage(document, pageNumber);
     }
 
     public int getPageCount() {
-        return core.countPages();
+        return document.countPages();
     }
 
     public static PdfDocument openDocument(String fname, String pwd) {
-        //return new PdfDocument(open(FITZMEMORY, fname, pwd));
-        PdfDocument document = new PdfDocument();
+        PdfDocument pdfDocument = new PdfDocument();
         Document core = null;
         System.out.println("Trying to open " + fname);
         try {
             core = Document.openDocument(fname);
             if (IntentFile.INSTANCE.isReflowable(fname)) {
-                core.layout(MupdfDocument.LAYOUTW, MupdfDocument.LAYOUTH, MupdfDocument.LAYOUTEM);
+                int w = Utils.getScreenWidthPixelWithOrientation(App.Companion.getInstance());
+                int h = Utils.getScreenHeightPixelWithOrientation(App.Companion.getInstance());
+                core.layout(w, h, 32);
             }
-            document.setCore(core);
+            pdfDocument.setDocument(core);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
-        return document;
+        return pdfDocument;
     }
 
     @Override
@@ -59,24 +62,24 @@ public class PdfDocument implements CodecDocument {
     }
 
     public synchronized void recycle() {
-        if (null != core) {
-            core.destroy();
+        if (null != document) {
+            document.destroy();
         }
     }
 
     @Override
     public List<OutlineLink> loadOutline() {
-        Outline[] outlines = core.loadOutline();
+        Outline[] outlines = document.loadOutline();
         List<OutlineLink> links = new ArrayList<>();
         if (outlines != null) {
-            downOutline(core, outlines, links);
+            downOutline(document, outlines, links);
         }
         return links;
     }
 
     @Override
     public List<ReflowBean> decodeReflowText(int index) {
-        List<ReflowBean> beans = MupdfDocument.Companion.decodeReflowText(index, core);
+        List<ReflowBean> beans = MupdfDocument.Companion.decodeReflowText(index, document);
         return beans;
     }
 

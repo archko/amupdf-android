@@ -16,7 +16,7 @@ import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
 import org.vudroid.core.codec.OutlineLink;
 import org.vudroid.djvudroid.codec.DjvuContext;
-import org.vudroid.mobi.codec.MobiContext;
+import org.vudroid.epub.codec.EpubContext;
 import org.vudroid.pdfdroid.codec.PdfContext;
 
 import java.io.IOException;
@@ -172,7 +172,7 @@ public class DecodeServiceBase implements DecodeService {
 
     public static CodecContext openContext(String path) {
         if (IntentFile.INSTANCE.isEpub(path) ||IntentFile.INSTANCE.isMobi(path) || IntentFile.INSTANCE.isDocx(path)) {
-            return new MobiContext();
+            return new EpubContext();
         } else if (IntentFile.INSTANCE.isMuPdf(path)) {
             return new PdfContext();
         } else if (IntentFile.INSTANCE.isDjvu(path)) {

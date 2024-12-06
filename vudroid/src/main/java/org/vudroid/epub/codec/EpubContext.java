@@ -1,19 +1,18 @@
-package org.vudroid.mobi.codec;
+package org.vudroid.epub.codec;
 
 import android.content.ContentResolver;
+import android.util.Log;
 
 import com.archko.reader.mobi.LibMobi;
-import com.artifex.mupdf.fitz.Context;
 
 import org.vudroid.core.codec.CodecContext;
 import org.vudroid.core.codec.CodecDocument;
-import org.vudroid.pdfdroid.codec.PdfDocument;
 
 import java.io.File;
 
 import cn.archko.pdf.core.common.IntentFile;
 
-public class MobiContext implements CodecContext {
+public class EpubContext implements CodecContext {
 
     public CodecDocument openDocument(String fileName) {
         String path = fileName;
@@ -30,13 +29,14 @@ public class MobiContext implements CodecContext {
             }
             path = result.getAbsolutePath();
         }
+        Log.d("TAG", "open epub:" + path);
 
         //String css="@font-face {font-family:\"msyh\" ,\"simsun\",\"menlo\"; font-weight:normal; font-style:normal;}";
         //String css="@font-face {font-family:\"DroidSansMono\" ,\"simsun\",\"menlo\"; font-weight:normal; font-style:normal;}";
         //String css="* {line-height:2f,font-size:1.8em, font-family: 'DroidSansMono', 'NotoSans' ,'MiSansVF', 'menlo' ! important;}";
         //Context.setUserCSS(css);
 
-        return PdfDocument.openDocument(path, "");
+        return EpubDocument.openDocument(path, "");
     }
 
     public void setContentResolver(ContentResolver contentResolver) {

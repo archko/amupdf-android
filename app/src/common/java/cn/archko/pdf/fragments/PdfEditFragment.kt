@@ -178,7 +178,7 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
             pdfAdapter.notifyDataSetChanged()
             pdfEditViewModel.setPdfDocument(
                 requireContext(),
-                (document as PdfDocument).core,
+                (document as PdfDocument).document,
                 path!!,
                 decodeService!!.pageList
             )

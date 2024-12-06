@@ -61,7 +61,7 @@ public class PdfPage implements CodecPage {
         return page;
     }
 
-    static PdfPage createPage(Document core, int pageno) {
+    public static PdfPage createPage(Document core, int pageno) {
         PdfPage pdfPage = new PdfPage(core, pageno);
         pdfPage.page = core.loadPage(pageno);
         return pdfPage;
