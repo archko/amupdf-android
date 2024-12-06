@@ -144,7 +144,6 @@
         <activity
             android:name="cn.archko.pdf.activities.EditActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
-            android:label="@string/about_title"
             android:screenOrientation="fullSensor"></activity>
         <!--<activity
             android:name="cn.archko.pdf.activities.TextActivity"

@@ -49,9 +49,9 @@ dependencies {
 
     api(libs.coil.kt)
     api(libs.recyclerview)
-    api("com.tencent:mmkv:1.3.4")
+    api(libs.mmkv)
 
-    api("com.tencent.bugly:crashreport:4.1.9.3")
+    api(libs.crashreport)
     implementation("com.github.albfernandez:juniversalchardet:2.4.0")
     api("com.artifex.mupdf:mupdf-fitz:1.25.0")
     api(libs.sardine) {

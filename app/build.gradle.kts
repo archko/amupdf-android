@@ -96,16 +96,11 @@ android {
 
     android.applicationVariants.all {
         val buildType = this.buildType.name
-        val flavorName = this.flavorName
         val variant = this
         outputs.all {
             if (this is com.android.build.gradle.internal.api.ApkVariantOutputImpl) {
                 //修改apk名称
-                if (buildType == "release") {
-                    this.outputFileName = "Dragon Viewer-${variant.versionName}.apk"
-                } else if (buildType == "debug") {
-                    this.outputFileName = "Dragon Viewer-${buildType}-${variant.versionName}.apk"
-                }
+                this.outputFileName = "Dragon Viewer-${variant.versionName}.apk"
             }
         }
     }
