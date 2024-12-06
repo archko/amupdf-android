@@ -10,7 +10,7 @@ public class ZoomModel extends EventDispatcher {
     private static final float INCREMENT_DELTA = 0.05f;
     private boolean horizontalScrollEnabled;
     private boolean isCommited;
-    private float MAX_ZOOM = 8.0f;
+    private float MAX_ZOOM = 12.0f;
 
     public void setZoom(float zoom) {
         zoom = Math.min(Math.max(zoom, 1.0f), MAX_ZOOM);

@@ -151,7 +151,7 @@ public class Page {
     public void setAspectRatio(float aspectRatio) {
         if (this.aspectRatio != aspectRatio) {
             float abs = Math.abs(aspectRatio - this.aspectRatio);
-            boolean changed = this.aspectRatio != 0f && abs > 0.08;
+            boolean changed = this.aspectRatio != 0f && abs > 0.008;
             this.aspectRatio = aspectRatio;
             if (changed) {
                 //Log.d("TAG", "setAspectRatio:" + this.aspectRatio + ", " + aspectRatio + ", " + abs);
