@@ -9,6 +9,7 @@ import android.os.ParcelFileDescriptor
 import android.util.Size
 import cn.archko.pdf.R
 import cn.archko.pdf.core.App
+import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.utils.BitmapUtils
@@ -42,6 +43,7 @@ class PdfFetcher(
         if (null == bitmap) {
             return
         }
+        BitmapCache.getInstance().addBitmap(data.path, bitmap)
         val dir = FileUtils.getExternalCacheDir(App.instance)
         val cacheDir = File(dir, "image")
         if (!cacheDir.exists()) {
@@ -61,10 +63,14 @@ class PdfFetcher(
     }
 
     private fun loadBitmapFromCache(): Bitmap? {
+        var bmp = BitmapCache.getInstance().getBitmap(data.path)
+        if (null != bmp) {
+            return bmp
+        }
         val dir = FileUtils.getExternalCacheDir(App.instance)
         val cacheDir = File(dir, "image")
         val key = "${cacheDir.absolutePath}/${data.path.hashCode()}"
-        val bmp = BitmapFactory.decodeFile(key)
+        bmp = BitmapFactory.decodeFile(key)
         return bmp
     }
 
