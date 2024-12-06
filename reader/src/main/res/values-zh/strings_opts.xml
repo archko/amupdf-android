@@ -131,6 +131,9 @@
     <string name="tab_favorite">收藏</string>
     <string name="tab_search">搜索</string>
     <string name="tab_mine">我的</string>
+    <string name="tab_about_app">应用信息</string>
+    <string name="tab_about_changelog">更新</string>
+    <string name="tab_about_thirdpaty">第三方库</string>
 
     <string name="menu_page_scale">页面缩放</string>
     <string name="menu_font_size">字号</string>

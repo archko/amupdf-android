@@ -4,14 +4,9 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.webkit.WebView
-import android.widget.BaseExpandableListAdapter
-import android.widget.ExpandableListView
-import android.widget.TextView
+import android.widget.TabHost
 import cn.archko.mupdf.R
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.LengthUtils
@@ -23,18 +18,40 @@ import com.google.android.material.appbar.MaterialToolbar
  * @author: archko 2018/12/16 :9:43
  */
 class AboutActivity : AnalysticActivity() {
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            finish()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
+
+    private lateinit var browserTabHost: TabHost
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.about)
+
+        val appView = initAppView()
+        val updateView = initUpdateView()
+        val thirdPatyView = initThirdpatyView()
+
+        browserTabHost = findViewById(R.id.browserTabHost)
+        browserTabHost.setup()
+
+        browserTabHost.addTab(
+            browserTabHost
+                .newTabSpec("App")
+                .setIndicator(getString(cn.archko.pdf.R.string.tab_about_app))
+                .setContent { appView }
+        )
+        browserTabHost.addTab(
+            browserTabHost
+                .newTabSpec("Changelog")
+                .setIndicator(getString(cn.archko.pdf.R.string.tab_about_changelog))
+                .setContent { updateView }
+        )
+        browserTabHost.addTab(
+            browserTabHost
+                .newTabSpec("Thirdpaty")
+                .setIndicator(getString(cn.archko.pdf.R.string.tab_about_thirdpaty))
+                .setContent { thirdPatyView }
+        )
+
         var name = "Dragon"
         var version = ""
         try {
@@ -48,9 +65,29 @@ class AboutActivity : AnalysticActivity() {
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
         toolbar.setNavigationOnClickListener { finish() }
         toolbar.title = text
-        val view = findViewById<View>(R.id.about_parts) as ExpandableListView
-        view.setAdapter(PartsAdapter())
-        view.expandGroup(0)
+    }
+
+    private fun initAppView(): View {
+        val content = PARTS[0].getContent(this@AboutActivity)
+        return initView(content)
+    }
+
+    private fun initView(content: CharSequence?): WebView {
+        val view = WebView(this@AboutActivity)
+
+        view.loadData(content.toString(), "text/html", "UTF-8")
+
+        return view
+    }
+
+    private fun initThirdpatyView(): View {
+        val content = PARTS[1].getContent(this@AboutActivity)
+        return initView(content)
+    }
+
+    private fun initUpdateView(): View {
+        val content = PARTS[2].getContent(this@AboutActivity)
+        return initView(content)
     }
 
     override fun onPause() {
@@ -76,70 +113,6 @@ class AboutActivity : AnalysticActivity() {
                 }
             }
             return content
-        }
-    }
-
-    inner class PartsAdapter : BaseExpandableListAdapter() {
-        override fun getGroupCount(): Int {
-            return PARTS.size
-        }
-
-        override fun getChildrenCount(groupPosition: Int): Int {
-            return 1
-        }
-
-        override fun getGroup(groupPosition: Int): Part {
-            return PARTS[groupPosition]
-        }
-
-        override fun getChild(groupPosition: Int, childPosition: Int): Part {
-            return PARTS[groupPosition]
-        }
-
-        override fun getGroupId(groupPosition: Int): Long {
-            return groupPosition.toLong()
-        }
-
-        override fun getChildId(groupPosition: Int, childPosition: Int): Long {
-            return childPosition.toLong()
-        }
-
-        override fun hasStableIds(): Boolean {
-            return true
-        }
-
-        override fun getGroupView(
-            groupPosition: Int, isExpanded: Boolean, convertView: View?,
-            parent: ViewGroup
-        ): View {
-            var container: View? = null
-            var view: TextView? = null
-            container = convertView
-                ?: LayoutInflater.from(this@AboutActivity)
-                    .inflate(R.layout.about_part, parent, false)
-            view = container!!.findViewById<View>(R.id.about_partText) as TextView
-            view.setText(getGroup(groupPosition).labelId)
-            return container
-        }
-
-        override fun getChildView(
-            groupPosition: Int, childPosition: Int, isLastChild: Boolean,
-            convertView: View?, parent: ViewGroup
-        ): View {
-            var view: WebView? = null
-            view = if (convertView !is WebView) {
-                WebView(this@AboutActivity)
-            } else {
-                convertView
-            }
-            val content = getChild(groupPosition, childPosition).getContent(this@AboutActivity)
-            view.loadData(content.toString(), "text/html", "UTF-8")
-            //view.setBackgroundColor(Color.GRAY);
-            return view
-        }
-
-        override fun isChildSelectable(groupPosition: Int, childPosition: Int): Boolean {
-            return false
         }
     }
 
