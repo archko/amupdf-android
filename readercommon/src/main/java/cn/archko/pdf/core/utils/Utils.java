@@ -75,6 +75,13 @@ public class Utils {
         return width;
     }
 
+    public static int getDensityDpi(Context context) {
+        DisplayMetrics dm = new DisplayMetrics();
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        wm.getDefaultDisplay().getMetrics(dm);
+        return dm.densityDpi;
+    }
+
     public static void saveBitmap(Bitmap bitmap) {
         Bitmap b = Bitmap.createBitmap(bitmap);
         Canvas canvas = new Canvas();

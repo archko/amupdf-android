@@ -12,12 +12,13 @@ public class EpubDocument extends PdfDocument {
     public static EpubDocument openDocument(String fname, String pwd) {
         EpubDocument epubDocument = new EpubDocument();
         Document document = null;
-        System.out.println("Trying to open " + fname);
         try {
             document = Document.openDocument(fname);
             int w = Utils.getScreenWidthPixelWithOrientation(App.Companion.getInstance());
             int h = Utils.getScreenHeightPixelWithOrientation(App.Companion.getInstance());
-            document.layout(w, h, 32);
+            int fontSize = 8 * Utils.getDensityDpi(App.Companion.getInstance()) / 72;
+            System.out.printf("font:%s, open:%s%n", fontSize, fname);
+            document.layout(w, h, fontSize);
             epubDocument.setDocument(document);
         } catch (Exception e) {
             e.printStackTrace();
