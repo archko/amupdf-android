@@ -21,4 +21,6 @@
     <declare-styleable name="SeekArcTheme">
         <attr name="seekArcStyle" format="reference"></attr>
     </declare-styleable>
+
+    <attr name="list_background" format="color" />
 </resources>

@@ -2,6 +2,7 @@
     <style name="AppTheme" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:statusBarColor">@color/md_theme_inversePrimary</item>
         <item name="android:windowSharedElementsUseOverlay">false</item>
+        <item name="list_background">@drawable/background_tiled_dark</item>
 
         <item name="colorPrimary">@color/md_theme_primary</item>
         <item name="colorOnPrimary">@color/md_theme_onPrimary</item>
