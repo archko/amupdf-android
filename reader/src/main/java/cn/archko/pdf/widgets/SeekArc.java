@@ -182,7 +182,7 @@ public class SeekArc extends View {
 
         // Defaults, may need to link this into theme settings
         int arcColor = res.getColor(R.color.progress_gray);
-        int progressColor = res.getColor(cn.archko.pdf.R.color.md_theme_primary);
+        int progressColor = res.getColor(R.color.progress_color);
         int thumbHalfheight = 0;
         int thumbHalfWidth = 0;
         mThumb = res.getDrawable(cn.archko.pdf.R.drawable.seek_arc_thumb);

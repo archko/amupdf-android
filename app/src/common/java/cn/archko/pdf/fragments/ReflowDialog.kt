@@ -44,7 +44,7 @@ class ReflowDialog(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window!!.setBackgroundDrawable(ColorDrawable(context.resources.getColor(cn.archko.pdf.R.color.md_theme_background)))
+        window!!.setBackgroundDrawable(ColorDrawable(context.resources.getColor(cn.archko.pdf.R.color.dialog_background)))
         window!!.setLayout(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT

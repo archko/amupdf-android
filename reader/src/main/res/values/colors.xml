@@ -26,8 +26,12 @@
     <color name="button_normal">#00000000</color>
     <color name="button_pressed">#FF2572AC</color>
 
-    <color name="progress_color">#CCFF8D8D</color>
+    <!--<color name="progress_color">#CCFF8D8D</color>-->
+    <color name="progress_color">@color/md_theme_primary</color>
     <color name="toc_color_bg">#CCD2D2D2</color>
     <color name="bg_reflow_color">#33D2D2D2</color>
     <color name="progress_gray">#FFD8D8D8</color>
+    <color name="dialog_background">@color/md_theme_background</color>
+    <color name="ic_back">@color/md_theme_primary</color>
+
 </resources>
