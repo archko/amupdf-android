@@ -17,6 +17,10 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
 import android.util.SparseArray
+import android.view.MenuItem
+import android.view.View
+import android.widget.ImageButton
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.app.ActivityCompat
@@ -34,7 +38,6 @@ import cn.archko.pdf.fragments.BrowserFragment
 import cn.archko.pdf.fragments.FavoriteFragment
 import cn.archko.pdf.fragments.HistoryFragment
 import cn.archko.pdf.fragments.SearchFragment
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import vn.chungha.flowbus.collectFlowBus
@@ -43,11 +46,15 @@ import java.lang.ref.WeakReference
 /**
  * @author archko
  */
-open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
+open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
+    PopupMenu.OnMenuItemClickListener {
 
     private lateinit var mViewPager: ViewPager2
     private lateinit var mPagerAdapter: TabsAdapter
-    private lateinit var toolbar: MaterialToolbar
+
+    private lateinit var searchBtn: ImageButton
+    private lateinit var settingBtn: ImageButton
+    private lateinit var menuBtn: ImageButton
     private val titles = arrayOfNulls<String>(3)
 
     private lateinit var tabLayout: TabLayout
@@ -69,31 +76,13 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
         onBackPressedDispatcher.addCallback(this, onBackPress)
 
         setContentView(R.layout.tabs_home)
-        toolbar = findViewById(R.id.toolbar)
 
-        toolbar.inflateMenu(R.menu.menu_history)
-        toolbar.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.action_about -> startActivity(
-                    Intent(
-                        this@HomeActivity,
-                        AboutActivity::class.java
-                    )
-                )
-
-                R.id.action_options -> PdfOptionsActivity.start(this@HomeActivity)
-                R.id.action_search -> {
-                    showSearchDialog()
-                }
-
-                else -> {
-                    val fragment: Fragment? = mPagerAdapter.getItemFragment(mViewPager.currentItem)
-                    Logcat.d("menu:" + item.itemId + " fragment:" + fragment + " index:" + mViewPager.currentItem)
-                    fragment?.onOptionsItemSelected(item)
-                }
-            }
-            false
-        }
+        searchBtn = findViewById(R.id.search)
+        settingBtn = findViewById(R.id.setting)
+        menuBtn = findViewById(R.id.menu)
+        searchBtn.setOnClickListener { showSearchDialog() }
+        settingBtn.setOnClickListener { PdfOptionsActivity.start(this@HomeActivity) }
+        menuBtn.setOnClickListener { prepareMenu(menuBtn) }
 
         checkForExternalPermission()
 
@@ -167,6 +156,114 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
         //MobclickAgent.onPageEnd(TAG)
         //MobclickAgent.onPause(mContext); // BaseActivity中已经统一调用，此处无需再调用
     }
+
+    private fun prepareMenu(anchorView: View) {
+        val popupMenu = PopupMenu(this, anchorView)
+
+        onPrepareCustomMenu(popupMenu)
+        popupMenu.setOnMenuItemClickListener(this)
+        popupMenu.show()
+    }
+
+    private fun onPrepareCustomMenu(menuBuilder: PopupMenu) {
+        menuBuilder.inflate(R.menu.menu_history)
+    }
+
+    override fun onMenuItemClick(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_about -> startActivity(
+                Intent(
+                    this@HomeActivity,
+                    AboutActivity::class.java
+                )
+            )
+
+            else -> {
+                val fragment: Fragment? = mPagerAdapter.getItemFragment(mViewPager.currentItem)
+                Logcat.d("menu:" + item.itemId + " fragment:" + fragment + " index:" + mViewPager.currentItem)
+                if (fragment is HistoryFragment) {
+                    fragment.onOptionSelected(item)
+                } else if (fragment is BrowserFragment) {
+                    fragment.onOptionSelected(item)
+                }
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun loadView() {
+        tabLayout = findViewById(R.id.tabs)
+        mViewPager = findViewById(R.id.pager)
+
+        addTab()
+        mPagerAdapter = TabsAdapter(this)
+        mViewPager.adapter = mPagerAdapter
+
+        TabLayoutMediator(tabLayout, mViewPager) { tab, position ->
+            tab.text = mTabs[position].title
+        }.attach()
+
+        // 滑动监听
+        mViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                /*toolbar.menu.clear()
+                if (position == 0) {
+                    toolbar.inflateMenu(R.menu.menu_history)
+                } else if (position == 1) {
+                    toolbar.inflateMenu(R.menu.menu_browser)
+                } else if (position == 2) {
+                    toolbar.inflateMenu(R.menu.menu_favorite)
+                }*/
+            }
+        })
+
+        /*val primaryColor = ThemeStore.primaryColor(this)
+        val normalColor: Int =
+            ToolbarContentTintHelper.toolbarSubtitleColor(this, primaryColor)
+        val selectedColor: Int =
+            ToolbarContentTintHelper.toolbarTitleColor(this, primaryColor)
+        //TabLayoutUtil.setTabIconColors(tabs, normalColor, selectedColor)
+        tabLayout.setTabTextColors(normalColor, selectedColor)
+        tabLayout.setSelectedTabIndicatorColor(ThemeStore.accentColor(this))*/
+    }
+
+    private fun addTab() {
+        titles[0] = getString(cn.archko.pdf.R.string.tab_history)
+        titles[1] = getString(cn.archko.pdf.R.string.tab_browser)
+        titles[2] = getString(cn.archko.pdf.R.string.tab_favorite)
+
+        var title = titles[0]
+        var bundle = Bundle()
+        mTabs.add(SamplePagerItem(HistoryFragment::class.java, bundle, title!!))
+
+        title = titles[1]
+        bundle = Bundle()
+        mTabs.add(SamplePagerItem(BrowserFragment::class.java, bundle, title!!))
+
+        title = titles[2]
+        bundle = Bundle()
+        mTabs.add(SamplePagerItem(FavoriteFragment::class.java, bundle, title!!))
+    }
+
+    private fun showSearchDialog() {
+        val ft = supportFragmentManager.beginTransaction()
+        val prev = supportFragmentManager.findFragmentByTag("dialog")
+        if (prev != null) {
+            ft.remove(prev)
+        }
+        ft.addToBackStack(null)
+
+        // Create and show the dialog.
+        val fileInfoFragment = SearchFragment()
+        val bundle = Bundle()
+        fileInfoFragment.arguments = bundle
+        fileInfoFragment.show(ft, "dialog")
+    }
+
+    //========================================
 
     private fun checkForExternalPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -276,88 +373,6 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
     }
 
     //========================================
-
-    private fun loadView() {
-        tabLayout = findViewById(R.id.tabs)
-        mViewPager = findViewById(R.id.pager)
-
-        addTab()
-        mPagerAdapter = TabsAdapter(this)
-        mViewPager.adapter = mPagerAdapter
-
-        TabLayoutMediator(tabLayout, mViewPager) { tab, position ->
-            tab.text = mTabs[position].title
-        }.attach()
-
-        // 滑动监听
-        mViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                toolbar.menu.clear()
-                if (position == 0) {
-                    toolbar.inflateMenu(R.menu.menu_history)
-                } else if (position == 1) {
-                    toolbar.inflateMenu(R.menu.menu_browser)
-                } else if (position == 2) {
-                    toolbar.inflateMenu(R.menu.menu_favorite)
-                }
-            }
-        })
-    }
-
-    private fun addTab() {
-        titles[0] = getString(cn.archko.pdf.R.string.tab_history)
-        titles[1] = getString(cn.archko.pdf.R.string.tab_browser)
-        titles[2] = getString(cn.archko.pdf.R.string.tab_favorite)
-
-        var title = titles[0]
-        var bundle = Bundle()
-        mTabs.add(SamplePagerItem(HistoryFragment::class.java, bundle, title!!))
-
-        title = titles[1]
-        bundle = Bundle()
-        mTabs.add(SamplePagerItem(BrowserFragment::class.java, bundle, title!!))
-
-        title = titles[2]
-        bundle = Bundle()
-        mTabs.add(SamplePagerItem(FavoriteFragment::class.java, bundle, title!!))
-    }
-
-    /*override fun onBackPressed() {
-        if (Build.VERSION.SDK_INT < 33) {
-            onBackEvent()
-        }
-    }*/
-
-    /*override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val flag = super.onCreateOptionsMenu(menu)
-        this.searchMenuItem = menu.add(R.string.menu_search)
-        MenuItemCompat.setShowAsAction(this.searchMenuItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM)
-        return flag
-    }
-
-    override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
-        if (menuItem === this.searchMenuItem) {
-            showSearchDialog()
-        }
-        return super.onOptionsItemSelected(menuItem)
-    }*/
-
-    protected fun showSearchDialog() {
-        val ft = supportFragmentManager.beginTransaction()
-        val prev = supportFragmentManager.findFragmentByTag("dialog")
-        if (prev != null) {
-            ft.remove(prev)
-        }
-        ft.addToBackStack(null)
-
-        // Create and show the dialog.
-        val fileInfoFragment = SearchFragment()
-        val bundle = Bundle()
-        fileInfoFragment.arguments = bundle
-        fileInfoFragment.show(ft, "dialog")
-    }
 
     inner class TabsAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
 

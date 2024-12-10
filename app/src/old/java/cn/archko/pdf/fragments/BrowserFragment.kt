@@ -97,14 +97,13 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         )
     }
 
-    override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
+    open fun onOptionSelected(menuItem: MenuItem) {
         when (menuItem.itemId) {
             R.id.action_set_as_home -> setAsHome()
             R.id.action_extract -> extractImage()
             R.id.action_create -> createPdf()
             R.id.action_convert_epub -> convertToEpub()
         }
-        return super.onOptionsItemSelected(menuItem)
     }
 
     fun extractImage() {

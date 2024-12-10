@@ -152,7 +152,7 @@ class HistoryFragment : BrowserFragment() {
         return false
     }
 
-    override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
+    override fun onOptionSelected(menuItem: MenuItem) {
         when (menuItem.itemId) {
             R.id.action_backup -> backup()
             R.id.action_config_webdav -> configWebdav()
@@ -171,8 +171,6 @@ class HistoryFragment : BrowserFragment() {
                 applyStyle()
             }
         }
-
-        return super.onOptionsItemSelected(menuItem)
     }
 
     private fun backup() {
@@ -345,7 +343,7 @@ class HistoryFragment : BrowserFragment() {
         val entryList = args[1] as ArrayList<FileBean>
         mSwipeRefreshWidget.isRefreshing = false
         bookAdapter?.submitList(entryList)
-        bookAdapter?.notifyDataSetChanged()
+        //bookAdapter?.notifyDataSetChanged()
         updateLoadingStatus(totalCount)
     }
 
