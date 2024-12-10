@@ -34,6 +34,8 @@ import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.GlobalEvent
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.filesystem.FileExtensionFilter
+import cn.archko.pdf.core.filesystem.FileSystemScanner
 import cn.archko.pdf.fragments.BrowserFragment
 import cn.archko.pdf.fragments.FavoriteFragment
 import cn.archko.pdf.fragments.HistoryFragment
@@ -41,7 +43,9 @@ import cn.archko.pdf.fragments.SearchFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import vn.chungha.flowbus.collectFlowBus
+import java.io.File
 import java.lang.ref.WeakReference
+import java.util.Locale
 
 /**
  * @author archko
@@ -103,6 +107,28 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
             mPath = savedInstanceState.getString("path", null)
         }
         parseIntent()
+
+        /*val defaultHome = Environment.getExternalStorageDirectory().absolutePath
+        FileSystemScanner(this).startScan(object : FileExtensionFilter() {
+            override fun accept(file: File?, name: String?): Boolean {
+                if (null == file) {
+                    return false
+                }
+                val fname = file.name.lowercase(Locale.ROOT)
+                if (fname.startsWith(".")) {
+                    return false
+                }
+                if (file.isDirectory) {
+                    return true
+                }
+
+                return IntentFile.isMuPdf(fname)
+                        || IntentFile.isImage(fname)
+                        || IntentFile.isText(fname)
+                        || IntentFile.isDjvu(fname)
+                        || IntentFile.isMobi(fname)
+            }
+        }, defaultHome + "/book")*/
     }
 
     override fun onNewIntent(intent: Intent, caller: ComponentCaller) {

@@ -161,6 +161,7 @@ class HistoryFragment : BrowserFragment() {
             R.id.action_restore -> restore()
             R.id.action_extract -> extractImage()
             R.id.action_create -> createPdf()
+            R.id.action_convert_epub -> convertToEpub()
             R.id.action_style -> {
                 if (mStyle == STYLE_LIST) {
                     mStyle = STYLE_GRID
