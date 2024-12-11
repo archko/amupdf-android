@@ -119,7 +119,7 @@ open class ANormalViewController(
         setFilter(PdfOptionRepository.getColorMode())
     }
 
-    private fun loadDocument() {
+    fun loadDocument() {
         instance.diskIO().execute {
             try {
                 document = decodeService!!.open(mPath, true)
