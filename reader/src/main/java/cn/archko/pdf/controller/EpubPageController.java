@@ -1,9 +1,7 @@
 package cn.archko.pdf.controller;
 
-import android.graphics.Color;
 import android.view.View;
 
-import cn.archko.pdf.core.entity.BookProgress;
 import cn.archko.pdf.viewmodel.DocViewModel;
 
 /**
@@ -11,7 +9,7 @@ import cn.archko.pdf.viewmodel.DocViewModel;
  *
  * @author archko
  */
-public class EpubPageController extends DefaultPageController {
+public class EpubPageController extends PdfPageController {
 
     private final static String TAG = "EpubPageController";
 
@@ -25,37 +23,12 @@ public class EpubPageController extends DefaultPageController {
         oriButton.setVisibility(View.VISIBLE);
         ttsButton.setVisibility(View.VISIBLE);
         ocrButton.setVisibility(View.VISIBLE);
+        fontButton.setVisibility(View.VISIBLE);
     }
 
     public void update(int count, int page, ViewMode viewMode) {
         super.update(count, page);
 
-        showReflow(docViewModel.getReflow());
-
-        reflowButton.setVisibility(View.VISIBLE);
-        imageButton.setVisibility(View.VISIBLE);
-        autoCropButton.setVisibility(View.VISIBLE);
-        outlineButton.setVisibility(View.VISIBLE);
-        ttsButton.setVisibility(View.VISIBLE);
-        ocrButton.setVisibility(View.VISIBLE);
-
-        if (viewMode == ViewMode.REFLOW_SCAN) {
-            oriButton.setVisibility(View.GONE);
-        } else {
-            oriButton.setVisibility(View.VISIBLE);
-        }
-    }
-
-    public void showReflow(int reflow) {
-        boolean shouldReflow = reflow == BookProgress.REFLOW_TXT;
-        if (shouldReflow) {
-            reflowButton.setColorFilter(Color.argb(0xFF, 172, 114, 37));
-        } else {
-            reflowButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
-        }
-    }
-
-    @Override
-    public void setReflowButton(int reflow) {
+        fontButton.setVisibility(View.VISIBLE);
     }
 }

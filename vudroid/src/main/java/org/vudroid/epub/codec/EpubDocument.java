@@ -16,7 +16,7 @@ public class EpubDocument extends PdfDocument {
             document = Document.openDocument(fname);
             int w = Utils.getScreenWidthPixelWithOrientation(App.Companion.getInstance());
             int h = Utils.getScreenHeightPixelWithOrientation(App.Companion.getInstance());
-            int fontSize = 8 * Utils.getDensityDpi(App.Companion.getInstance()) / 72;
+            float fontSize = 8f * Utils.getDensityDpi(App.Companion.getInstance()) / 72;
             System.out.printf("font:%s, open:%s%n", fontSize, fname);
             document.layout(w, h, fontSize);
             epubDocument.setDocument(document);

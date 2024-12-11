@@ -37,11 +37,11 @@ public abstract class DefaultPageController implements IPageController, View.OnC
     protected ImageButton mBackButton;
     protected int ori = LinearLayout.VERTICAL;
     protected int count = 1;
-    protected PageControllerListener controlerListener;
+    protected PageControllerListener controllerListener;
     protected DocViewModel docViewModel;
 
     public DefaultPageController(View view, DocViewModel docViewModel, PageControllerListener controlListener) {
-        this.controlerListener = controlListener;
+        this.controllerListener = controlListener;
         this.docViewModel = docViewModel;
 
         topLayout = view.findViewById(R.id.top_layout);
@@ -104,7 +104,7 @@ public abstract class DefaultPageController implements IPageController, View.OnC
     }
 
     public void gotoPage(int page) {
-        controlerListener.gotoPage(page);
+        controllerListener.gotoPage(page);
     }
 
     public void toggleControls() {
@@ -142,49 +142,21 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         bottomLayout.setVisibility(View.GONE);
     }
 
-    public ImageButton getReflowButton() {
-        return reflowButton;
-    }
-
-    public ImageButton getImageButton() {
-        return imageButton;
-    }
-
-    public ImageButton getOutlineButton() {
-        return outlineButton;
-    }
-
-    public ImageButton getAutoCropButton() {
-        return autoCropButton;
-    }
-
-    public ImageButton getOcrButton() {
-        return ocrButton;
-    }
-
-    public ImageButton getTtsButton() {
-        return ttsButton;
-    }
-
-    public ImageButton getOriButton() {
-        return oriButton;
-    }
-
     @Override
     public void onClick(View v) {
         int id = v.getId();
         if (R.id.outlineButton == id) {
-            controlerListener.showOutline();
+            controllerListener.showOutline();
         } else if (R.id.back_button == id) {
-            controlerListener.back();
+            controllerListener.back();
         } else if (R.id.reflowButton == id) {
-            controlerListener.toggleReflow();
+            controllerListener.toggleReflow();
         } else if (R.id.imageButton == id) {
-            controlerListener.toggleReflowImage();
+            controllerListener.toggleReflowImage();
         } else if (R.id.autoCropButton == id) {
-            controlerListener.toggleCrop();
+            controllerListener.toggleCrop();
         } else if (R.id.ttsButton == id) {
-            controlerListener.toggleTts();
+            controllerListener.toggleTts();
         } else if (R.id.oriButton == id) {
             if (ori == LinearLayout.VERTICAL) {
                 ori = LinearLayout.HORIZONTAL;
@@ -192,11 +164,11 @@ public abstract class DefaultPageController implements IPageController, View.OnC
                 ori = LinearLayout.VERTICAL;
             }
             updateOrientation();
-            controlerListener.changeOrientation(ori);
+            controllerListener.changeOrientation(ori);
         } else if (R.id.ocrButton == id) {
-            controlerListener.ocr();
+            controllerListener.ocr();
         } else if (R.id.fontButton == id) {
-            controlerListener.showFontDialog();
+            controllerListener.showFontDialog();
         }
     }
 

@@ -37,13 +37,13 @@ import org.vudroid.core.models.ZoomModel
  * 通用的带切边功能的controller
  * @author: archko 2020/5/15 :12:43
  */
-class ANormalViewController(
-    private var context: FragmentActivity,
+open class ANormalViewController(
+    protected var context: FragmentActivity,
     private val scope: CoroutineScope,
-    private val mControllerLayout: RelativeLayout,
+    protected val mControllerLayout: RelativeLayout,
     private var docViewModel: DocViewModel,
     private var mPath: String,
-    private var pageController: IPageController?,
+    protected var pageController: IPageController?,
     private var controllerListener: ControllerListener?,
 ) :
     OutlineListener, AViewController {
@@ -57,8 +57,8 @@ class ANormalViewController(
 
     private var mPageSizes: List<APage>? = null
     private var scrollOrientation = LinearLayoutManager.VERTICAL
-    protected var isDocLoaded: Boolean = false
-    private var document: CodecDocument? = null
+    private var isDocLoaded: Boolean = false
+    protected var document: CodecDocument? = null
 
     private var simpleGestureListener: SimpleGestureListener = object :
         SimpleGestureListener {
@@ -151,7 +151,7 @@ class ANormalViewController(
         loadDocument()
     }
 
-    private fun doLoadDoc(pageSizeBean: APageSizeLoader.PageSizeBean, document: CodecDocument) {
+    open fun doLoadDoc(pageSizeBean: APageSizeLoader.PageSizeBean, document: CodecDocument) {
         Logcat.d("doLoadDoc:${pageSizeBean.crop}, ${pageSizeBean.List!!.size}")
         this.mPageSizes = pageSizeBean.List!!
         if (null == mPageSizes) {

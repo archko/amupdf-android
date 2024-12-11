@@ -25,11 +25,13 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
 import cn.archko.pdf.common.PdfOptionRepository
+import cn.archko.pdf.controller.AEpubViewController
 import cn.archko.pdf.controller.ANormalViewController
 import cn.archko.pdf.controller.AScanReflowViewController
 import cn.archko.pdf.controller.ATextReflowViewController
 import cn.archko.pdf.controller.ATextViewController
 import cn.archko.pdf.controller.ControllerListener
+import cn.archko.pdf.controller.EpubPageController
 import cn.archko.pdf.controller.IPageController
 import cn.archko.pdf.controller.PageControllerListener
 import cn.archko.pdf.controller.PdfPageController
@@ -598,6 +600,15 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     pageListener
                 )
             }
+        } else if (IntentFile.isReflowable(mPath!!) || IntentFile.isMobi(mPath!!)) {
+            if (pageController is EpubPageController) {
+            } else {
+                pageController = EpubPageController(
+                    mContentView,
+                    docViewModel,
+                    pageListener
+                )
+            }
         } else {
             if (pageController is PdfPageController) {
             } else {
@@ -919,6 +930,17 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             controllerListener: ControllerListener?,
         ): AViewController {
             if (viewMode == ViewMode.CROP) {
+                if (IntentFile.isEpub(path) || IntentFile.isMobi(path)) {
+                    return AEpubViewController(
+                        context,
+                        scope,
+                        controllerLayout,
+                        docViewModel,
+                        path,
+                        pageController,
+                        controllerListener,
+                    )
+                }
                 return ANormalViewController(
                     context,
                     scope,
@@ -959,6 +981,17 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     controllerListener,
                 )
             } else {
+                if (IntentFile.isEpub(path) || IntentFile.isMobi(path)) {
+                    return AEpubViewController(
+                        context,
+                        scope,
+                        controllerLayout,
+                        docViewModel,
+                        path,
+                        pageController,
+                        controllerListener,
+                    )
+                }
                 return ANormalViewController(
                     context,
                     scope,

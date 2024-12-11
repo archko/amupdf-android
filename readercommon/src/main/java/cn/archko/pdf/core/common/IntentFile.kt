@@ -213,11 +213,13 @@ object IntentFile {
         val dir = File(dirPath)
         return if (dir.isDirectory) {
             val files = dir.listFiles()
-            for (i in files.indices) {
-                if (files[i].isDirectory) {
-                    deleteDir(files[i].absolutePath)
-                } else {
-                    success = success and files[i].delete()
+            if (files != null) {
+                for (i in files.indices) {
+                    if (files[i].isDirectory) {
+                        deleteDir(files[i].absolutePath)
+                    } else {
+                        success = success and files[i].delete()
+                    }
                 }
             }
             success = success and dir.delete()
@@ -285,6 +287,7 @@ object IntentFile {
                 || path.endsWith(".webp", true)
                 || path.endsWith(".heic", true)
                 || path.endsWith(".bmp", true)
+                || path.endsWith(".gif", true)
                 || path.endsWith(".jfif", true)
                 || path.endsWith(".jfif-tbnl", true)
                 || path.endsWith(".tif", true)
@@ -301,11 +304,8 @@ object IntentFile {
                 || path.endsWith(".cbz", true)
                 || path.endsWith(".epub", true)
                 || path.endsWith(".mobi", true)
-                //|| path.endsWith(".ppt", true)
                 || path.endsWith(".pptx", true)
-                //|| path.endsWith(".doc", true)    //会崩溃
                 || path.endsWith(".docx", true)
-                //|| path.endsWith(".xls", true)
                 || path.endsWith(".xlsx", true)
     }
 
@@ -313,10 +313,8 @@ object IntentFile {
         return path.endsWith(".cbz", true)
                 || path.endsWith(".epub", true)
                 || path.endsWith(".mobi", true)
-                //|| path.endsWith(".ppt", true)
                 || path.endsWith(".pptx", true)
                 || path.endsWith(".docx", true)
-                //|| path.endsWith(".xls", true)
                 || path.endsWith(".xlsx", true)
     }
 
