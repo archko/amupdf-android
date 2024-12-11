@@ -27,7 +27,6 @@ import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.ReflowViewCache
 import cn.archko.pdf.core.common.APageSizeLoader
-import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.core.common.AppExecutors.Companion.instance
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.APage
@@ -64,7 +63,7 @@ class AScanReflowViewController(
     private var context: FragmentActivity,
     private val scope: CoroutineScope,
     private val mControllerLayout: RelativeLayout,
-    private var pdfViewModel: DocViewModel,
+    private var docViewModel: DocViewModel,
     private var mPath: String,
     private var pageControls: PageControls?,
     private var controllerListener: ControllerListener?,
@@ -194,9 +193,9 @@ class AScanReflowViewController(
     private fun initView() {
         val zoomModel = ZoomModel()
 
-        pdfViewModel.bookProgress?.run {
+        docViewModel.bookProgress?.run {
             zoomModel.zoom = this.zoomLevel / 1000
-            scrollOrientation = pdfViewModel.bookProgress?.scrollOrientation ?: 1
+            scrollOrientation = docViewModel.bookProgress?.scrollOrientation ?: 1
         }
 
         initDecodeService()
@@ -262,7 +261,7 @@ class AScanReflowViewController(
         instance.diskIO().execute {
             try {
                 document = decodeService!!.open(mPath, true)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
             }
             instance.mainThread().execute {
                 if (null == document) {
@@ -283,7 +282,7 @@ class AScanReflowViewController(
 
     override fun init() {
         Logcat.d(TAG, "init:")
-        crop = pdfViewModel.checkCrop()
+        crop = docViewModel.checkCrop()
 
         loadDocument()
     }
@@ -296,8 +295,8 @@ class AScanReflowViewController(
         }
 
         controllerListener?.doLoadedDoc(
-            mPageSizes!!.size,
-            pdfViewModel.getCurrentPage(),
+            mPageSizes.size,
+            docViewModel.getCurrentPage(),
             document.loadOutline()
         )
 
@@ -332,7 +331,7 @@ class AScanReflowViewController(
         }
         mRecyclerView.adapter = pdfAdapter
 
-        gotoPage(pdfViewModel.getCurrentPage())
+        gotoPage(docViewModel.getCurrentPage())
     }
 
     private fun initDecodeService() {
@@ -539,18 +538,18 @@ class AScanReflowViewController(
     }
 
     override fun onPause() {
-        if (null != pdfViewModel.bookProgress) {
-            pdfViewModel.bookProgress!!.reflow = BookProgress.REFLOW_SCAN
+        if (null != docViewModel.bookProgress) {
+            docViewModel.bookProgress!!.reflow = BookProgress.REFLOW_SCAN
             var savePos = getCurrentPos() + 1
             val lastPos = getLastPos()
             if (lastPos == mPageSizes.size - 1) {
                 savePos = lastPos
             }
-            pdfViewModel.saveBookProgress(
+            docViewModel.saveBookProgress(
                 mPath,
                 mPageSizes.size,
                 savePos,
-                pdfViewModel.bookProgress!!.zoomLevel,
+                docViewModel.bookProgress!!.zoomLevel,
                 -1,
                 0
             )
@@ -632,7 +631,7 @@ class AScanReflowViewController(
 
             val callback = object : DecodeService.DecodeCallback {
                 override fun decodeComplete(bitmap: Bitmap?, param: Boolean, args: Any?) {
-                    AppExecutors.instance.mainThread().execute {
+                    instance.mainThread().execute {
                         updateImage(args, reflowViewCache)
                     }
                 }

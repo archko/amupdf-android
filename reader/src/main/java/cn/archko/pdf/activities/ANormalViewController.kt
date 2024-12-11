@@ -123,7 +123,7 @@ class ANormalViewController(
         instance.diskIO().execute {
             try {
                 document = decodeService!!.open(mPath, true)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
             }
             instance.mainThread().execute {
                 if (null == document) {
