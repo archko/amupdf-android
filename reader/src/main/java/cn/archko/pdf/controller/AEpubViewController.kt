@@ -14,7 +14,6 @@ import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
 import com.google.android.material.slider.Slider
-import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import org.vudroid.core.codec.CodecDocument
 import org.vudroid.epub.codec.EpubDocument
@@ -46,32 +45,15 @@ class AEpubViewController(
     protected var mStyleControls: View? = null
     private var fontSlider: Slider? = null
 
-    private fun getDefFontSize(): Float {
-        val fontSize = 8f * Utils.getDensityDpi(instance) / 72
-        return fontSize
-    }
-
-
-    private fun getFontSize(): Float {
-        val mmkv = MMKV.mmkvWithID("epub")
-        return mmkv.decodeFloat("font", getDefFontSize())
-    }
-
-    private fun setFontSize(size: Float) {
-        val mmkv = MMKV.mmkvWithID("epub")
-        Logcat.d("font:$size")
-        mmkv.encode("font", size)
-    }
-
     private fun initStyleControls() {
         pageController?.hide()
         if (null == mStyleControls) {
-            mStyleControls = LayoutInflater.from(context).inflate(R.layout.scan_style, null, false)
+            mStyleControls = LayoutInflater.from(context).inflate(R.layout.epub_style, null, false)
             fontSlider = mStyleControls!!.findViewById(R.id.font_slider)
             fontSlider?.apply {
-                valueFrom = 5f
-                valueTo = 20f
-                value = getFontSize()
+                valueFrom = 30f
+                valueTo = 80f
+                value = EpubDocument.getFontSize()
             }
 
             val lp = RelativeLayout.LayoutParams(
@@ -91,13 +73,13 @@ class AEpubViewController(
         })
     }
 
-    private fun applyFontSize(old: Float) {
-        setFontSize(old)
+    private fun applyFontSize(newSize: Float) {
+        EpubDocument.setFontSize(newSize)
         val w = Utils.getScreenWidthPixelWithOrientation(instance)
         val h = Utils.getScreenHeightPixelWithOrientation(instance)
-        val fontSize = 8f * Utils.getDensityDpi(instance) / 72
-        System.out.printf("applyFontSize:%s, %s, %s", fontSize, w, h)
-        (document as EpubDocument).document.layout(w.toFloat(), h.toFloat(), fontSize)
+        Logcat.d(String.format("applyFontSize:%s, %s, %s", newSize, w, h))
+        (document as EpubDocument).document.layout(w.toFloat(), h.toFloat(), newSize)
+        notifyDataSetChanged()
     }
 
     override fun doLoadDoc(pageSizeBean: APageSizeLoader.PageSizeBean, document: CodecDocument) {

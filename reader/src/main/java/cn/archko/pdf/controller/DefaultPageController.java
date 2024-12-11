@@ -31,7 +31,7 @@ public abstract class DefaultPageController implements IPageController, View.OnC
     protected ImageButton oriButton;
     protected ImageButton ttsButton;
     protected ImageButton ocrButton;
-    protected ImageButton fontButton;
+    //protected ImageButton fontButton;
     protected TextView pathView;
     protected TextView titleView;
     protected ImageButton mBackButton;
@@ -57,7 +57,7 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         oriButton = view.findViewById(R.id.oriButton);
         ttsButton = view.findViewById(R.id.ttsButton);
         ocrButton = view.findViewById(R.id.ocrButton);
-        fontButton = view.findViewById(R.id.fontButton);
+        //fontButton = view.findViewById(R.id.fontButton);
         pathView = view.findViewById(R.id.path);
         titleView = view.findViewById(R.id.title);
         mBackButton = view.findViewById(R.id.back_button);
@@ -70,7 +70,7 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         ttsButton.setOnClickListener(this);
         mBackButton.setOnClickListener(this);
         ocrButton.setOnClickListener(this);
-        fontButton.setOnClickListener(this);
+        //fontButton.setOnClickListener(this);
 
         mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -167,8 +167,6 @@ public abstract class DefaultPageController implements IPageController, View.OnC
             controllerListener.changeOrientation(ori);
         } else if (R.id.ocrButton == id) {
             controllerListener.ocr();
-        } else if (R.id.fontButton == id) {
-            controllerListener.showFontDialog();
         }
     }
 

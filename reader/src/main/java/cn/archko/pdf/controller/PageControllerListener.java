@@ -22,6 +22,4 @@ public interface PageControllerListener {
     void toggleTts();
 
     void ocr();
-
-    void showFontDialog();
 }

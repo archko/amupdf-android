@@ -585,9 +585,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         override fun ocr() {
             this@AMuPDFRecyclerViewActivity.ocr()
         }
-
-        override fun showFontDialog() {
-        }
     }
 
     private fun createControls() {
