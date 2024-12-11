@@ -29,7 +29,7 @@ abstract class ABaseViewController(
     val mControllerLayout: RelativeLayout,
     var docViewModel: DocViewModel,
     var mPath: String,
-    var pageControls: PageControls?,
+    var pageController: IPageController?,
     var controllerListener: ControllerListener?,
 ) :
     OutlineListener, AViewController {
@@ -230,7 +230,7 @@ abstract class ABaseViewController(
     }
 
     open fun initStyleControls() {
-        pageControls?.hide()
+        pageController?.hide()
     }
 
     fun updateReflowAdapter() {

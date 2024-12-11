@@ -64,7 +64,7 @@ class AScanReflowViewController(
     private val mControllerLayout: RelativeLayout,
     private var docViewModel: DocViewModel,
     private var mPath: String,
-    private var pageControls: PageControls?,
+    private var pageController: IPageController?,
     private var controllerListener: ControllerListener?,
 ) :
     OutlineListener, AViewController {
@@ -98,7 +98,7 @@ class AScanReflowViewController(
     }
 
     private fun initStyleControls() {
-        pageControls?.hide()
+        pageController?.hide()
         if (null == mStyleControls) {
             mStyleControls = LayoutInflater.from(context).inflate(R.layout.scan_style, null, false)
             fontSlider = mStyleControls!!.findViewById(R.id.font_slider)
@@ -292,6 +292,8 @@ class AScanReflowViewController(
         if (null == mPageSizes) {
             return
         }
+
+        docViewModel.setPageCount(mPageSizes.size)
 
         controllerListener?.doLoadedDoc(
             mPageSizes.size,
@@ -501,8 +503,8 @@ class AScanReflowViewController(
     }
 
     private fun updateProgress(index: Int) {
-        if (pageControls?.visibility() == View.VISIBLE) {
-            pageControls?.updatePageProgress(index)
+        if (pageController?.visibility() == View.VISIBLE) {
+            pageController?.updatePageProgress(index)
         }
     }
 

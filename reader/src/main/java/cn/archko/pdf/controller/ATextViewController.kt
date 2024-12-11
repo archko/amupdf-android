@@ -29,7 +29,7 @@ class ATextViewController(
     mControllerLayout: RelativeLayout,
     docViewModel: DocViewModel,
     mPath: String,
-    pageControls: PageControls?,
+    pageController: IPageController?,
     controllerListener: ControllerListener?,
 ) : ATextBaseViewController(
     context,
@@ -37,7 +37,7 @@ class ATextViewController(
     mControllerLayout,
     docViewModel,
     mPath,
-    pageControls,
+    pageController,
     controllerListener
 ),
     OutlineListener, AViewController {
@@ -59,6 +59,7 @@ class ATextViewController(
         initReflowMode(docViewModel.getCurrentPage())
         (mRecyclerView.adapter as MuPDFTextAdapter).data = list
 
+        docViewModel.setPageCount(viewModel.countPages())
         controllerListener?.doLoadedDoc(
             viewModel.countPages(),
             docViewModel.getCurrentPage(),
@@ -135,9 +136,9 @@ class ATextViewController(
 
     override fun updateProgress(index: Int) {
         if ((mRecyclerView.adapter?.itemCount
-                ?: 0) > 0 && pageControls?.visibility() == View.VISIBLE
+                ?: 0) > 0 && pageController?.visibility() == View.VISIBLE
         ) {
-            pageControls?.updatePageProgress(index)
+            pageController?.updatePageProgress(index)
         }
     }
 

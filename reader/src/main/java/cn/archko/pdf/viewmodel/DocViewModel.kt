@@ -80,6 +80,17 @@ class DocViewModel : ViewModel() {
         bookProgress?.page = pos
     }
 
+    fun getPageCount(): Int {
+        if (bookProgress == null) {
+            return 0
+        }
+        return bookProgress!!.pageCount
+    }
+
+    fun setPageCount(count: Int) {
+        bookProgress?.pageCount = count
+    }
+
     fun getCurrentPage(pageCount: Int): Int {
         if (bookProgress == null) {
             return 0

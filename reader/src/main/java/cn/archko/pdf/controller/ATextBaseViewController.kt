@@ -26,7 +26,7 @@ abstract class ATextBaseViewController(
     mControllerLayout: RelativeLayout,
     docViewModel: DocViewModel,
     mPath: String,
-    pageControls: PageControls?,
+    pageController: IPageController?,
     controllerListener: ControllerListener?,
 ) : ABaseViewController(
     context,
@@ -34,7 +34,7 @@ abstract class ATextBaseViewController(
     mControllerLayout,
     docViewModel,
     mPath,
-    pageControls,
+    pageController,
     controllerListener
 ) {
 
@@ -54,7 +54,7 @@ abstract class ATextBaseViewController(
     private var fgSetting: View? = null
 
     override fun initStyleControls() {
-        pageControls?.hide()
+        pageController?.hide()
         if (null == mStyleControls) {
             mStyleControls = LayoutInflater.from(context).inflate(R.layout.text_style, null, false)
             fontSeekBar = mStyleControls!!.findViewById(R.id.font_seek_bar)

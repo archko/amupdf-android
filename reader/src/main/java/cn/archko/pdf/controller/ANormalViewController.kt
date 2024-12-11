@@ -41,9 +41,9 @@ class ANormalViewController(
     private var context: FragmentActivity,
     private val scope: CoroutineScope,
     private val mControllerLayout: RelativeLayout,
-    private var pdfViewModel: DocViewModel,
+    private var docViewModel: DocViewModel,
     private var mPath: String,
-    private var pageControls: PageControls?,
+    private var pageController: IPageController?,
     private var controllerListener: ControllerListener?,
 ) :
     OutlineListener, AViewController {
@@ -80,11 +80,11 @@ class ANormalViewController(
 
         var offsetX = 0
         var offsetY = 0
-        pdfViewModel.bookProgress?.run {
+        docViewModel.bookProgress?.run {
             zoomModel.zoom = this.zoomLevel / 1000
             offsetX = this.offsetX
             offsetY = this.offsetY
-            scrollOrientation = pdfViewModel.bookProgress?.scrollOrientation ?: 1
+            scrollOrientation = docViewModel.bookProgress?.scrollOrientation ?: 1
         }
 
         val progressModel = DecodingProgressModel()
@@ -144,9 +144,9 @@ class ANormalViewController(
 
     override fun init() {
         Logcat.d("init:")
-        crop = pdfViewModel.checkCrop()
+        crop = docViewModel.checkCrop()
 
-        gotoPage(pdfViewModel.getCurrentPage())
+        gotoPage(docViewModel.getCurrentPage())
 
         loadDocument()
     }
@@ -158,9 +158,11 @@ class ANormalViewController(
             return
         }
 
+        docViewModel.setPageCount(mPageSizes!!.size)
+
         controllerListener?.doLoadedDoc(
             mPageSizes!!.size,
-            pdfViewModel.getCurrentPage(),
+            docViewModel.getCurrentPage(),
             document.loadOutline()
         )
     }
@@ -192,8 +194,8 @@ class ANormalViewController(
         if (pos > 0) {
             documentView.goToPage(
                 pos,
-                pdfViewModel.bookProgress!!.offsetX,
-                pdfViewModel.bookProgress!!.offsetY
+                docViewModel.bookProgress!!.offsetX,
+                docViewModel.bookProgress!!.offsetY
             )
         }
         //mPageControls?.hide()
@@ -273,8 +275,8 @@ class ANormalViewController(
     }
 
     private fun updateProgress(index: Int) {
-        if (pageControls?.visibility() == View.VISIBLE) {
-            pageControls?.updatePageProgress(index)
+        if (pageController?.visibility() == View.VISIBLE) {
+            pageController?.updatePageProgress(index)
         }
     }
 
@@ -342,13 +344,13 @@ class ANormalViewController(
     }
 
     override fun onPause() {
-        if (null != pdfViewModel.bookProgress && null != mPageSizes && mPageSizes!!.isNotEmpty()) {
+        if (null != docViewModel.bookProgress && null != mPageSizes && mPageSizes!!.isNotEmpty()) {
             var savePos = getCurrentPos()
             /*val lastPos = getLastPos()
             if (lastPos == documentView.pageCount - 1) {
                 savePos = lastPos
             }*/
-            pdfViewModel.saveBookProgress(
+            docViewModel.saveBookProgress(
                 mPath,
                 mPageSizes!!.size,
                 savePos,

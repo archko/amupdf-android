@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -31,6 +30,11 @@ import cn.archko.pdf.controller.AScanReflowViewController
 import cn.archko.pdf.controller.ATextReflowViewController
 import cn.archko.pdf.controller.ATextViewController
 import cn.archko.pdf.controller.ControllerListener
+import cn.archko.pdf.controller.IPageController
+import cn.archko.pdf.controller.PageControlerListener
+import cn.archko.pdf.controller.PdfPageController
+import cn.archko.pdf.controller.TextPageController
+import cn.archko.pdf.controller.ViewMode
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.common.Event
@@ -52,7 +56,6 @@ import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TTSActivity
 import cn.archko.pdf.tts.TTSEngine
 import cn.archko.pdf.viewmodel.DocViewModel
-import cn.archko.pdf.controller.PageControls
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -77,7 +80,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private var viewController: AViewController? = null
     private val docViewModel: DocViewModel = DocViewModel()
 
-    private var pageControls: PageControls? = null
+    private var pageController: IPageController? = null
     private var outlineLinks = mutableListOf<OutlineLink>()
     private var outlineFragment: OutlineFragment? = null
     private lateinit var mReflowLayout: RelativeLayout
@@ -126,12 +129,14 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         loadBookmark()
         initView()
 
+        createControls()
+
         initTouchParams()
 
         initViewController()
 
         viewController?.init()
-        updateControls()
+        //updateControls()
     }
 
     private fun clean() {
@@ -165,7 +170,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             val result = withContext(Dispatchers.IO) {
                 mPath!!.run { docViewModel.loadBookProgressByPath(this) }
             }
-
         }
     }
 
@@ -187,15 +191,14 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         ttsText = findViewById(R.id.ttsText)
         mReflowLayout = findViewById(R.id.reflow_layout)
 
-        pageControls = createControls()
-
         documentLayout = findViewById(R.id.document_layout)
     }
 
     private fun updateControls() {
-        pageControls?.apply {
+        pageController?.apply {
             updateTitle(mPath)
-            showReflow(docViewModel.getReflow())
+            update(docViewModel.getPageCount(), getCurrentPos())
+            /*showReflow(docViewModel.getReflow())
             showReflowImage(docViewModel.getReflow())
             orientation = docViewModel.bookProgress?.scrollOrientation ?: 1
             if (IntentFile.isText(mPath!!)) {
@@ -221,7 +224,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             if (viewMode == ViewMode.REFLOW_SCAN) {
                 oriButton.visibility = View.GONE
             }
-            updatePageProgress(getCurrentPos())
+            updatePageProgress(getCurrentPos())*/
         }
     }
 
@@ -248,8 +251,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 }
 
                 var showFlag = false
-                if (pageControls?.visibility() == View.VISIBLE) {
-                    pageControls?.hide()
+                if (pageController?.visibility() == View.VISIBLE) {
+                    pageController?.hide()
                     showFlag = true
                 }
                 if (mReflowLayout.visibility == View.VISIBLE) {
@@ -267,8 +270,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 }
                 if (viewMode == ViewMode.REFLOW || viewMode == ViewMode.REFLOW_SCAN) {
                     var showFlag = false
-                    if (pageControls?.visibility() == View.VISIBLE) {
-                        pageControls?.hide()
+                    if (pageController?.visibility() == View.VISIBLE) {
+                        pageController?.hide()
                         showFlag = true
                     }
                     if (mReflowLayout.visibility == View.VISIBLE) {
@@ -276,25 +279,25 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                         showFlag = true
                     }
                     if (!showFlag) {
-                        pageControls?.apply {
+                        pageController?.apply {
                             updateControls()
                             show()
                         }
                         viewController?.getCurrentPos()
-                            ?.let { pageControls?.updatePageProgress(it) }
+                            ?.let { pageController?.updatePageProgress(it) }
                         mReflowLayout.visibility = View.VISIBLE
                     }
                 } else {
                     if (mReflowLayout.visibility == View.VISIBLE) {
                         mReflowLayout.visibility = View.GONE
                     }
-                    if (pageControls?.visibility() == View.VISIBLE) {
-                        pageControls?.hide()
+                    if (pageController?.visibility() == View.VISIBLE) {
+                        pageController?.hide()
                         viewController?.getCurrentPos()
-                            ?.let { pageControls?.updatePageProgress(it) }
+                            ?.let { pageController?.updatePageProgress(it) }
                     } else {
                         if (viewController?.onSingleTap(ev, margin) != true) {
-                            pageControls?.apply {
+                            pageController?.apply {
                                 updateControls()
                                 show()
                             }
@@ -349,7 +352,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             mReflowLayout,
             docViewModel,
             mPath!!,
-            pageControls!!,
+            pageController!!,
             controllerListener
         )
 
@@ -392,6 +395,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         BitmapCache.getInstance().clear()
 
         docViewModel.setCurrentPage(pos)
+
+        createControls()
         updateControls()
 
         if (!initViewController()) {
@@ -404,7 +409,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     private fun doLoadDoc(count: Int, pos: Int, outlineLinks: List<OutlineLink>?) {
         try {
-            pageControls?.apply {
+            pageController?.apply {
                 update(count, pos)
             }
 
@@ -518,86 +523,87 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun setReflowButton(reflow: Int) {
-        val crop: Boolean
-        if (reflow == BookProgress.REFLOW_TXT) {
-            crop = false
-            pageControls?.reflowButton!!.setColorFilter(Color.argb(0xFF, 172, 114, 37))
-            pageControls?.imageButton!!.setColorFilter(Color.argb(0xFF, 255, 255, 255))
-        } else if (reflow == BookProgress.REFLOW_SCAN) {
-            crop = false
-            pageControls?.reflowButton!!.setColorFilter(Color.argb(0xFF, 255, 255, 255))
-            pageControls?.imageButton!!.setColorFilter(Color.argb(0xFF, 172, 114, 37))
-        } else {
-            pageControls?.reflowButton!!.setColorFilter(Color.argb(0xFF, 255, 255, 255))
-            pageControls?.imageButton!!.setColorFilter(Color.argb(0xFF, 255, 255, 255))
-            crop = docViewModel.checkCrop()
-        }
-
-        setCropButton(crop)
+        pageController?.setReflowButton(reflow)
         val pos = getCurrentPos()
         if (pos > 0) {
             viewController?.scrollToPosition(pos + 1)
         }
     }
 
-    private fun createControls(): PageControls {
-        pageControls = PageControls(
-            mContentView,
-            object : PageControls.ControlListener {
-                override fun toggleReflow() {
-                    this@AMuPDFRecyclerViewActivity.toggleReflow()
-                }
+    private val pageListener = object : PageControlerListener {
+        override fun toggleReflow() {
+            this@AMuPDFRecyclerViewActivity.toggleReflow()
+        }
 
-                override fun toggleReflowImage() {
-                    this@AMuPDFRecyclerViewActivity.toggleReflowImage()
-                }
+        override fun toggleReflowImage() {
+            this@AMuPDFRecyclerViewActivity.toggleReflowImage()
+        }
 
-                override fun toggleCrop() {
-                    this@AMuPDFRecyclerViewActivity.toggleCrop()
-                }
+        override fun toggleCrop() {
+            this@AMuPDFRecyclerViewActivity.toggleCrop()
+        }
 
-                override fun showOutline() {
-                    this@AMuPDFRecyclerViewActivity.showOutline()
-                }
+        override fun showOutline() {
+            this@AMuPDFRecyclerViewActivity.showOutline()
+        }
 
-                override fun gotoPage(page: Int) {
-                    viewController?.scrollToPosition(page)
-                }
+        override fun gotoPage(page: Int) {
+            viewController?.scrollToPosition(page)
+        }
 
-                override fun back() {
-                    this@AMuPDFRecyclerViewActivity.finish()
-                }
+        override fun back() {
+            this@AMuPDFRecyclerViewActivity.finish()
+        }
 
-                override fun changeOrientation(ori: Int) {
-                    changeOri(ori)
-                }
+        override fun changeOrientation(ori: Int) {
+            changeOri(ori)
+        }
 
-                override fun toggleTts() {
-                    if (ttsMode) {
+        override fun toggleTts() {
+            if (ttsMode) {
+            } else {
+                TTSEngine.get().getTTS { status: Int ->
+                    if (status == TextToSpeech.SUCCESS) {
+                        ttsLayout.visibility = View.VISIBLE
+                        ttsMode = true
+                        startTts()
                     } else {
-                        TTSEngine.get().getTTS { status: Int ->
-                            if (status == TextToSpeech.SUCCESS) {
-                                ttsLayout.visibility = View.VISIBLE
-                                ttsMode = true
-                                startTts()
-                            } else {
-                                Log.e(TTSActivity.TAG, "初始化失败")
-                                Toast.makeText(
-                                    this@AMuPDFRecyclerViewActivity,
-                                    getString(R.string.tts_failed),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
+                        Log.e(TTSActivity.TAG, "初始化失败")
+                        Toast.makeText(
+                            this@AMuPDFRecyclerViewActivity,
+                            getString(R.string.tts_failed),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
-
-                override fun ocr() {
-                    this@AMuPDFRecyclerViewActivity.ocr()
-                }
             }
-        )
-        return pageControls!!
+        }
+
+        override fun ocr() {
+            this@AMuPDFRecyclerViewActivity.ocr()
+        }
+    }
+
+    private fun createControls() {
+        if (IntentFile.isText(mPath!!)) {
+            if (pageController is TextPageController) {
+            } else {
+                pageController = TextPageController(
+                    mContentView,
+                    docViewModel,
+                    pageListener
+                )
+            }
+        } else {
+            if (pageController is PdfPageController) {
+            } else {
+                pageController = PdfPageController(
+                    mContentView,
+                    docViewModel,
+                    pageListener
+                )
+            }
+        }
     }
 
     private fun startTts() {
@@ -736,14 +742,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         return viewController!!.getCurrentPos()
     }
 
-    private fun setCropButton(crop: Boolean) {
-        if (crop) {
-            pageControls?.autoCropButton!!.setImageResource(R.drawable.ic_crop)
-        } else {
-            pageControls?.autoCropButton!!.setImageResource(R.drawable.ic_no_crop)
-        }
-    }
-
     override fun onSelectedOutline(index: Int) {
         viewController?.onSelectedOutline(index)
         updateProgress(index)
@@ -755,8 +753,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun updateProgress(index: Int) {
-        if (isDocLoaded && pageControls?.visibility() == View.VISIBLE) {
-            pageControls?.updatePageProgress(index)
+        if (isDocLoaded && pageController?.visibility() == View.VISIBLE) {
+            pageController?.updatePageProgress(index)
         }
     }
 
@@ -884,7 +882,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             controllerLayout: RelativeLayout,
             docViewModel: DocViewModel,
             path: String,
-            pageSeekBarControls: PageControls,
+            pageSeekBarControls: IPageController,
             controllerListener: ControllerListener?,
         ): AViewController {
             //var aViewController = viewControllerCache.get(viewMode.ordinal)
@@ -913,7 +911,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             controllerLayout: RelativeLayout,
             docViewModel: DocViewModel,
             path: String,
-            pageSeekBarControls: PageControls,
+            pageController: IPageController,
             controllerListener: ControllerListener?,
         ): AViewController {
             if (viewMode == ViewMode.CROP) {
@@ -923,7 +921,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     controllerLayout,
                     docViewModel,
                     path,
-                    pageSeekBarControls,
+                    pageController,
                     controllerListener,
                 )
             } else if (viewMode == ViewMode.REFLOW) {
@@ -933,7 +931,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     controllerLayout,
                     docViewModel,
                     path,
-                    pageSeekBarControls,
+                    pageController,
                     controllerListener,
                 )
             } else if (viewMode == ViewMode.REFLOW_SCAN) {
@@ -943,7 +941,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     controllerLayout,
                     docViewModel,
                     path,
-                    pageSeekBarControls,
+                    pageController,
                     controllerListener,
                 )
             } else if (viewMode == ViewMode.TEXT) {
@@ -953,7 +951,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     controllerLayout,
                     docViewModel,
                     path,
-                    pageSeekBarControls,
+                    pageController,
                     controllerListener,
                 )
             } else {
@@ -963,14 +961,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     controllerLayout,
                     docViewModel,
                     path,
-                    pageSeekBarControls,
+                    pageController,
                     controllerListener,
                 )
             }
         }
-    }
-
-    enum class ViewMode {
-        NORMAL, CROP, REFLOW, REFLOW_SCAN, TEXT
     }
 }

@@ -28,7 +28,7 @@ class ATextReflowViewController(
     mControllerLayout: RelativeLayout,
     docViewModel: DocViewModel,
     mPath: String,
-    pageControls: PageControls?,
+    pageController: IPageController?,
     controllerListener: ControllerListener?,
 ) : ATextBaseViewController(
     context,
@@ -36,7 +36,7 @@ class ATextReflowViewController(
     mControllerLayout,
     docViewModel,
     mPath,
-    pageControls,
+    pageController,
     controllerListener
 ), OutlineListener, AViewController {
 
@@ -96,6 +96,7 @@ class ATextReflowViewController(
     override fun doLoadDoc() {
         initReflowMode(docViewModel.getCurrentPage())
 
+        docViewModel.setPageCount(mPageSizes.size)
         controllerListener?.doLoadedDoc(
             pdfViewModel.countPages(),
             docViewModel.getCurrentPage(),
@@ -131,8 +132,8 @@ class ATextReflowViewController(
     }
 
     override fun updateProgress(index: Int) {
-        if (pdfViewModel.mupdfDocument != null && pageControls?.visibility() == View.VISIBLE) {
-            pageControls?.updatePageProgress(index)
+        if (pdfViewModel.mupdfDocument != null && pageController?.visibility() == View.VISIBLE) {
+            pageController?.updatePageProgress(index)
         }
     }
 

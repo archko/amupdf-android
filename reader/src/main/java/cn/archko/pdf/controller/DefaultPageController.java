@@ -1,6 +1,5 @@
 package cn.archko.pdf.controller;
 
-import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -8,81 +7,64 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import cn.archko.pdf.R;
-import cn.archko.pdf.core.entity.BookProgress;
 import cn.archko.pdf.core.utils.FileUtils;
+import cn.archko.pdf.viewmodel.DocViewModel;
 
 /**
- * page seek controls
+ * 公用的顶部栏,有公共的按钮与对应的处理事件
  *
  * @author archko
  */
-public class PageControls implements View.OnClickListener {
+public abstract class DefaultPageController implements IPageController, View.OnClickListener {
 
-    private final static String TAG = "PageControls";
+    private final static String TAG = "PdfPageController";
 
     protected View topLayout;
     protected View bottomLayout;
     protected SeekBar mPageSlider;
     protected TextView mPageNumber;
 
-    private ImageButton mReflowButton;
-    private ImageButton mImageButton;
-    private ImageButton mOutlineButton;
-    private ImageButton mAutoCropButton;
-    private ImageButton mOriButton;
-    private ImageButton ttsButton;
-    private ImageButton ocrButton;
-    private TextView mPath;
-    private TextView mTitle;
-    private ImageButton mBackButton;
-    private int ori = LinearLayout.VERTICAL;
-    private int count = 1;
-    private ControlListener controlListener;
+    protected ImageButton reflowButton;
+    protected ImageButton imageButton;
+    protected ImageButton outlineButton;
+    protected ImageButton autoCropButton;
+    protected ImageButton oriButton;
+    protected ImageButton ttsButton;
+    protected ImageButton ocrButton;
+    protected TextView pathView;
+    protected TextView titleView;
+    protected ImageButton mBackButton;
+    protected int ori = LinearLayout.VERTICAL;
+    protected int count = 1;
+    protected PageControlerListener controlerListener;
+    protected DocViewModel docViewModel;
 
-    public interface ControlListener {
-        void changeOrientation(int ori);
-
-        void back();
-
-        void showOutline();
-
-        void gotoPage(int page);
-
-        void toggleReflow();
-
-        void toggleReflowImage();
-
-        void toggleCrop();
-
-        void toggleTts();
-
-        void ocr();
-    }
-
-    public PageControls(View view, ControlListener controlListener) {
-        this.controlListener = controlListener;
+    public DefaultPageController(View view, DocViewModel docViewModel, PageControlerListener controlListener) {
+        this.controlerListener = controlListener;
+        this.docViewModel = docViewModel;
 
         topLayout = view.findViewById(R.id.top_layout);
         bottomLayout = view.findViewById(R.id.bottom_layout);
 
         mPageSlider = view.findViewById(R.id.seek_bar);
         mPageNumber = view.findViewById(R.id.page_num);
-        mReflowButton = view.findViewById(R.id.reflowButton);
-        mImageButton = view.findViewById(R.id.imageButton);
-        mOutlineButton = view.findViewById(R.id.outlineButton);
-        mAutoCropButton = view.findViewById(R.id.autoCropButton);
-        mOriButton = view.findViewById(R.id.oriButton);
+
+        reflowButton = view.findViewById(R.id.reflowButton);
+        imageButton = view.findViewById(R.id.imageButton);
+        outlineButton = view.findViewById(R.id.outlineButton);
+        autoCropButton = view.findViewById(R.id.autoCropButton);
+        oriButton = view.findViewById(R.id.oriButton);
         ttsButton = view.findViewById(R.id.ttsButton);
         ocrButton = view.findViewById(R.id.ocrButton);
-        mPath = view.findViewById(R.id.path);
-        mTitle = view.findViewById(R.id.title);
+        pathView = view.findViewById(R.id.path);
+        titleView = view.findViewById(R.id.title);
         mBackButton = view.findViewById(R.id.back_button);
 
-        mReflowButton.setOnClickListener(this);
-        mImageButton.setOnClickListener(this);
-        mOutlineButton.setOnClickListener(this);
-        mAutoCropButton.setOnClickListener(this);
-        mOriButton.setOnClickListener(this);
+        imageButton.setOnClickListener(this);
+        outlineButton.setOnClickListener(this);
+        reflowButton.setOnClickListener(this);
+        autoCropButton.setOnClickListener(this);
+        oriButton.setOnClickListener(this);
         ttsButton.setOnClickListener(this);
         mBackButton.setOnClickListener(this);
         ocrButton.setOnClickListener(this);
@@ -114,12 +96,12 @@ public class PageControls implements View.OnClickListener {
     }
 
     public void updateTitle(String path) {
-        mPath.setText(FileUtils.getDir((path)));
-        mTitle.setText(FileUtils.getName(path));
+        pathView.setText(FileUtils.getDir((path)));
+        titleView.setText(FileUtils.getName(path));
     }
 
-    private void gotoPage(int page) {
-        controlListener.gotoPage(page);
+    public void gotoPage(int page) {
+        controlerListener.gotoPage(page);
     }
 
     public void toggleControls() {
@@ -138,11 +120,11 @@ public class PageControls implements View.OnClickListener {
         this.ori = ori;
     }
 
-    private void updateOrientation() {
+    public void updateOrientation() {
         if (ori == LinearLayout.VERTICAL) {
-            mOriButton.setImageResource(R.drawable.ic_vertical);
+            oriButton.setImageResource(R.drawable.ic_vertical);
         } else {
-            mOriButton.setImageResource(R.drawable.ic_horizontal);
+            oriButton.setImageResource(R.drawable.ic_horizontal);
         }
     }
 
@@ -157,63 +139,49 @@ public class PageControls implements View.OnClickListener {
         bottomLayout.setVisibility(View.GONE);
     }
 
-    public void showReflow(int reflow) {
-        boolean shouldReflow = reflow == BookProgress.REFLOW_TXT;
-        if (shouldReflow) {
-            mReflowButton.setColorFilter(Color.argb(0xFF, 172, 114, 37));
-        } else {
-            mReflowButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
-        }
-    }
-
-    public void showReflowImage(int reflow) {
-        boolean shouldReflow = reflow == BookProgress.REFLOW_SCAN;
-        if (shouldReflow) {
-            mImageButton.setColorFilter(Color.argb(0xFF, 172, 114, 37));
-        } else {
-            mImageButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
-        }
-    }
-
     public ImageButton getReflowButton() {
-        return mReflowButton;
+        return reflowButton;
     }
 
     public ImageButton getImageButton() {
-        return mImageButton;
+        return imageButton;
+    }
+
+    public ImageButton getOutlineButton() {
+        return outlineButton;
     }
 
     public ImageButton getAutoCropButton() {
-        return mAutoCropButton;
+        return autoCropButton;
+    }
+
+    public ImageButton getOcrButton() {
+        return ocrButton;
     }
 
     public ImageButton getTtsButton() {
         return ttsButton;
     }
 
-    public ImageButton getOutlineButton() {
-        return mOutlineButton;
-    }
-
     public ImageButton getOriButton() {
-        return mOriButton;
+        return oriButton;
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
         if (R.id.outlineButton == id) {
-            controlListener.showOutline();
+            controlerListener.showOutline();
         } else if (R.id.back_button == id) {
-            controlListener.back();
+            controlerListener.back();
         } else if (R.id.reflowButton == id) {
-            controlListener.toggleReflow();
+            controlerListener.toggleReflow();
         } else if (R.id.imageButton == id) {
-            controlListener.toggleReflowImage();
+            controlerListener.toggleReflowImage();
         } else if (R.id.autoCropButton == id) {
-            controlListener.toggleCrop();
+            controlerListener.toggleCrop();
         } else if (R.id.ttsButton == id) {
-            controlListener.toggleTts();
+            controlerListener.toggleTts();
         } else if (R.id.oriButton == id) {
             if (ori == LinearLayout.VERTICAL) {
                 ori = LinearLayout.HORIZONTAL;
@@ -221,20 +189,23 @@ public class PageControls implements View.OnClickListener {
                 ori = LinearLayout.VERTICAL;
             }
             updateOrientation();
-            controlListener.changeOrientation(ori);
+            controlerListener.changeOrientation(ori);
         } else if (R.id.ocrButton == id) {
-            controlListener.ocr();
+            controlerListener.ocr();
         }
     }
 
+    @Override
     public int visibility() {
         return bottomLayout.getVisibility();
     }
 
+    @Override
     public int topVisibility() {
         return topLayout.getVisibility();
     }
 
+    @Override
     public int bottomVisibility() {
         return bottomLayout.getVisibility();
     }
