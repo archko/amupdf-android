@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 /**
+ * text,html,json,js.eg.
  * @author: archko 2024/8/15 :12:43
  */
 class ATextViewController(

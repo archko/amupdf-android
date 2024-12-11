@@ -18,6 +18,7 @@ import kotlinx.coroutines.CoroutineScope
 import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
 
 /**
+ * 文本相关的,一是普通文本,二是文本重排的
  * @author: archko 2020/5/15 :12:43
  */
 abstract class ATextBaseViewController(

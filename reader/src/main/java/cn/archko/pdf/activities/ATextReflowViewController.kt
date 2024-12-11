@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 /**
+ * 应用于pdf,epub,mobi,azw3文本重排
  * @author: archko 2020/5/15 :12:43
  */
 class ATextReflowViewController(

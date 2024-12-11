@@ -35,6 +35,7 @@ import org.vudroid.core.models.DecodingProgressModel
 import org.vudroid.core.models.ZoomModel
 
 /**
+ * 通用的带切边功能的controller
  * @author: archko 2020/5/15 :12:43
  */
 class ANormalViewController(
