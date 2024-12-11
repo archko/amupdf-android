@@ -31,15 +31,16 @@ public abstract class DefaultPageController implements IPageController, View.OnC
     protected ImageButton oriButton;
     protected ImageButton ttsButton;
     protected ImageButton ocrButton;
+    protected ImageButton fontButton;
     protected TextView pathView;
     protected TextView titleView;
     protected ImageButton mBackButton;
     protected int ori = LinearLayout.VERTICAL;
     protected int count = 1;
-    protected PageControlerListener controlerListener;
+    protected PageControllerListener controlerListener;
     protected DocViewModel docViewModel;
 
-    public DefaultPageController(View view, DocViewModel docViewModel, PageControlerListener controlListener) {
+    public DefaultPageController(View view, DocViewModel docViewModel, PageControllerListener controlListener) {
         this.controlerListener = controlListener;
         this.docViewModel = docViewModel;
 
@@ -56,6 +57,7 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         oriButton = view.findViewById(R.id.oriButton);
         ttsButton = view.findViewById(R.id.ttsButton);
         ocrButton = view.findViewById(R.id.ocrButton);
+        fontButton = view.findViewById(R.id.fontButton);
         pathView = view.findViewById(R.id.path);
         titleView = view.findViewById(R.id.title);
         mBackButton = view.findViewById(R.id.back_button);
@@ -68,6 +70,7 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         ttsButton.setOnClickListener(this);
         mBackButton.setOnClickListener(this);
         ocrButton.setOnClickListener(this);
+        fontButton.setOnClickListener(this);
 
         mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -192,6 +195,8 @@ public abstract class DefaultPageController implements IPageController, View.OnC
             controlerListener.changeOrientation(ori);
         } else if (R.id.ocrButton == id) {
             controlerListener.ocr();
+        } else if (R.id.fontButton == id) {
+            controlerListener.showFontDialog();
         }
     }
 

@@ -16,13 +16,16 @@ public class PdfPageController extends DefaultPageController {
 
     private final static String TAG = "PdfPageController";
 
-    public PdfPageController(View view, DocViewModel docViewModel, PageControlerListener controlerListener) {
+    public PdfPageController(View view, DocViewModel docViewModel, PageControllerListener controlerListener) {
         super(view, docViewModel, controlerListener);
 
         reflowButton.setVisibility(View.VISIBLE);
         imageButton.setVisibility(View.VISIBLE);
         autoCropButton.setVisibility(View.VISIBLE);
         outlineButton.setVisibility(View.VISIBLE);
+        oriButton.setVisibility(View.VISIBLE);
+        ttsButton.setVisibility(View.VISIBLE);
+        ocrButton.setVisibility(View.VISIBLE);
     }
 
     public void update(int count, int page, ViewMode viewMode) {
@@ -30,6 +33,14 @@ public class PdfPageController extends DefaultPageController {
 
         showReflow(docViewModel.getReflow());
         showReflowImage(docViewModel.getReflow());
+
+        reflowButton.setVisibility(View.VISIBLE);
+        imageButton.setVisibility(View.VISIBLE);
+        autoCropButton.setVisibility(View.VISIBLE);
+        outlineButton.setVisibility(View.VISIBLE);
+        ttsButton.setVisibility(View.VISIBLE);
+        ocrButton.setVisibility(View.VISIBLE);
+
         if (viewMode == ViewMode.REFLOW_SCAN) {
             oriButton.setVisibility(View.GONE);
         } else {

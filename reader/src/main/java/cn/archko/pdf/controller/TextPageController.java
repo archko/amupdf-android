@@ -13,7 +13,7 @@ public class TextPageController extends DefaultPageController {
 
     private final static String TAG = "TextPageController";
 
-    public TextPageController(View view, DocViewModel docViewModel, PageControlerListener controlerListener) {
+    public TextPageController(View view, DocViewModel docViewModel, PageControllerListener controlerListener) {
         super(view, docViewModel, controlerListener);
         reflowButton.setVisibility(View.GONE);
         imageButton.setVisibility(View.GONE);

@@ -3,7 +3,7 @@ package cn.archko.pdf.controller;
 /**
  * @author: archko 2024/12/11 :11:34
  */
-public interface PageControlerListener {
+public interface PageControllerListener {
 
     void changeOrientation(int ori);
 
@@ -22,4 +22,6 @@ public interface PageControlerListener {
     void toggleTts();
 
     void ocr();
+
+    void showFontDialog();
 }

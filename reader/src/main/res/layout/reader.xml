@@ -96,6 +96,16 @@
                 android:src="@drawable/ic_ocr" />
 
             <ImageButton
+                android:id="@+id/fontButton"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/button"
+                android:contentDescription="@string/font_title"
+                android:src="@drawable/ic_font"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <ImageButton
                 android:id="@+id/oriButton"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
@@ -178,12 +188,12 @@
 
     <RelativeLayout
         android:id="@+id/reflow_layout"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/bottom_layout"
         android:background="@color/bg_reflow_color"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
     </RelativeLayout>
 </RelativeLayout>

@@ -31,7 +31,7 @@ import cn.archko.pdf.controller.ATextReflowViewController
 import cn.archko.pdf.controller.ATextViewController
 import cn.archko.pdf.controller.ControllerListener
 import cn.archko.pdf.controller.IPageController
-import cn.archko.pdf.controller.PageControlerListener
+import cn.archko.pdf.controller.PageControllerListener
 import cn.archko.pdf.controller.PdfPageController
 import cn.archko.pdf.controller.TextPageController
 import cn.archko.pdf.controller.ViewMode
@@ -530,7 +530,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
     }
 
-    private val pageListener = object : PageControlerListener {
+    private val pageListener = object :
+        PageControllerListener {
         override fun toggleReflow() {
             this@AMuPDFRecyclerViewActivity.toggleReflow()
         }
@@ -581,6 +582,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
         override fun ocr() {
             this@AMuPDFRecyclerViewActivity.ocr()
+        }
+
+        override fun showFontDialog() {
         }
     }
 
