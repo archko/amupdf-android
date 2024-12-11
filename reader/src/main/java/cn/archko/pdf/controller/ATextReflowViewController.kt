@@ -1,4 +1,4 @@
-package cn.archko.pdf.activities
+package cn.archko.pdf.controller
 
 import android.os.SystemClock
 import android.view.View
@@ -14,7 +14,6 @@ import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.viewmodel.PDFViewModel
-import cn.archko.pdf.widgets.PageControls
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch

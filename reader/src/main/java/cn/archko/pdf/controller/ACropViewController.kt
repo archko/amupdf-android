@@ -1,4 +1,4 @@
-//package cn.archko.pdf.activities
+package cn.archko.pdf.controller//package cn.archko.pdf.activities
 //
 //import android.app.ProgressDialog
 //import android.content.res.Configuration
@@ -29,7 +29,7 @@
 //import cn.archko.pdf.listeners.OutlineListener
 //import cn.archko.pdf.viewmodel.DocViewModel
 //import cn.archko.pdf.widgets.APDFView
-//import cn.archko.pdf.widgets.PageControls
+//import cn.archko.pdf.controller.PageControls
 //import kotlinx.coroutines.CoroutineScope
 //import org.vudroid.core.DecodeServiceBase
 //import org.vudroid.core.codec.CodecDocument

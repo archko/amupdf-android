@@ -1,4 +1,4 @@
-package cn.archko.pdf.widgets;
+package cn.archko.pdf.controller;
 
 import android.graphics.Color;
 import android.view.View;

@@ -26,6 +26,11 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
 import cn.archko.pdf.common.PdfOptionRepository
+import cn.archko.pdf.controller.ANormalViewController
+import cn.archko.pdf.controller.AScanReflowViewController
+import cn.archko.pdf.controller.ATextReflowViewController
+import cn.archko.pdf.controller.ATextViewController
+import cn.archko.pdf.controller.ControllerListener
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.common.Event
@@ -47,7 +52,7 @@ import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TTSActivity
 import cn.archko.pdf.tts.TTSEngine
 import cn.archko.pdf.viewmodel.DocViewModel
-import cn.archko.pdf.widgets.PageControls
+import cn.archko.pdf.controller.PageControls
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -1,4 +1,4 @@
-package cn.archko.pdf.activities
+package cn.archko.pdf.controller
 
 import android.view.MotionEvent
 import android.view.View
@@ -16,7 +16,6 @@ import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.viewmodel.TextViewModel
-import cn.archko.pdf.widgets.PageControls
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

@@ -1,4 +1,4 @@
-package cn.archko.pdf.activities
+package cn.archko.pdf.controller
 
 import android.content.Context
 import android.content.res.Configuration
@@ -40,7 +40,6 @@ import cn.archko.pdf.decode.DocDecodeService.IView
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
-import cn.archko.pdf.widgets.PageControls
 import cn.archko.pdf.widgets.PdfRecyclerView
 import com.google.android.material.slider.Slider
 import com.tencent.mmkv.MMKV

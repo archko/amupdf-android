@@ -1,4 +1,4 @@
-package cn.archko.pdf.activities
+package cn.archko.pdf.controller
 
 import android.view.MotionEvent
 import org.vudroid.core.codec.OutlineLink

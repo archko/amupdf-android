@@ -1,4 +1,4 @@
-package cn.archko.pdf.activities
+package cn.archko.pdf.controller
 
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -24,7 +24,6 @@ import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TTSEngine
 import cn.archko.pdf.viewmodel.DocViewModel
-import cn.archko.pdf.widgets.PageControls
 import kotlinx.coroutines.CoroutineScope
 import org.vudroid.core.DecodeService
 import org.vudroid.core.DecodeServiceBase
