@@ -230,22 +230,6 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
             tab.text = mTabs[position].title
         }.attach()
 
-        // 滑动监听
-        mViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                /*toolbar.menu.clear()
-                if (position == 0) {
-                    toolbar.inflateMenu(R.menu.menu_history)
-                } else if (position == 1) {
-                    toolbar.inflateMenu(R.menu.menu_browser)
-                } else if (position == 2) {
-                    toolbar.inflateMenu(R.menu.menu_favorite)
-                }*/
-            }
-        })
-
         /*val primaryColor = ThemeStore.primaryColor(this)
         val normalColor: Int =
             ToolbarContentTintHelper.toolbarSubtitleColor(this, primaryColor)

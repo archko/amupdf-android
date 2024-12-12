@@ -238,23 +238,26 @@ class HistoryViewModel : ViewModel() {
                     progressDao.deleteProgress(absolutePath)
                 }
 
+                val old = mutableListOf<FileBean>()
+                old.addAll(list)
                 var fb: FileBean? = null
-                list.forEach {
+                old.forEach {
                     if (null != it.file && TextUtils.equals(it.file!!.absolutePath, absolutePath)) {
                         fb = it
                         return@forEach
                     }
                 }
                 fb?.let {
-                    list.remove(fb)
+                    old.remove(fb)
                 }
 
                 deleteCachePage(path)
 
-                return@withContext arrayOf<Any>(list.size + 1, list)
+                return@withContext arrayOf<Any>(old.size + 1, old)
             }
             withContext(Dispatchers.Main) {
                 _uiFileModel.value = args
+                list = args[1] as MutableList<FileBean>
             }
         }
     }

@@ -9,12 +9,15 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.mupdf.R
 import cn.archko.pdf.adapters.BaseBookAdapter
+import cn.archko.pdf.adapters.BookAdapter
 import cn.archko.pdf.adapters.GridBookAdapter
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.App
@@ -79,7 +82,7 @@ class HistoryFragment : BrowserFragment() {
         Logcat.d(TAG, "onCreate:$mStyle")
 
         if (mStyle == STYLE_LIST) {
-            return BaseBookAdapter(
+            return BookAdapter(
                 activity as Context,
                 beanItemCallback,
                 itemClickListener
@@ -237,7 +240,8 @@ class HistoryFragment : BrowserFragment() {
         this.pathTextView.visibility = View.GONE
         recyclerView.setOnScrollListener(onScrollListener)
         mListMoreView = ListMoreView(recyclerView)
-        //recyclerView.addFootView(mListMoreView.getLoadMoreView())
+
+        addDecoration()
 
         addObserver()
         return view
@@ -246,11 +250,11 @@ class HistoryFragment : BrowserFragment() {
     private fun applyStyle() {
         removeItemDecorations()
         if (mStyle == STYLE_LIST) {
+            addDecoration()
             recyclerView.layoutManager =
                 LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-            recyclerView.addItemDecoration(ColorItemDecoration(requireContext()))
             if (bookAdapter is GridBookAdapter) {
-                bookAdapter = BaseBookAdapter(
+                bookAdapter = BookAdapter(
                     activity as Context,
                     beanItemCallback,
                     itemClickListener
@@ -260,8 +264,9 @@ class HistoryFragment : BrowserFragment() {
                 recyclerView.smoothScrollToPosition(0)
             }
         } else {
+            addDecoration()
             recyclerView.layoutManager = GridLayoutManager(activity, 3)
-            if (bookAdapter is BaseBookAdapter) {
+            if (bookAdapter is BookAdapter) {
                 bookAdapter = GridBookAdapter(
                     activity as Context,
                     beanItemCallback,
@@ -272,6 +277,13 @@ class HistoryFragment : BrowserFragment() {
                 recyclerView.smoothScrollToPosition(0)
             }
         }
+    }
+
+    private fun addDecoration() {
+        val decoration = DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
+        AppCompatResources.getDrawable(requireContext(), cn.archko.pdf.R.drawable.divider_light)
+            ?.let { decoration.setDrawable(it) }
+        recyclerView.addItemDecoration(decoration)
     }
 
     private fun removeItemDecorations() {
