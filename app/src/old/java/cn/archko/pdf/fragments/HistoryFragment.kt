@@ -277,6 +277,7 @@ class HistoryFragment : BrowserFragment() {
                 recyclerView.smoothScrollToPosition(0)
             }
         }
+        onRefresh()
     }
 
     private fun addDecoration() {
@@ -356,7 +357,6 @@ class HistoryFragment : BrowserFragment() {
         val entryList = args[1] as ArrayList<FileBean>
         mSwipeRefreshWidget.isRefreshing = false
         bookAdapter?.submitList(entryList)
-        //bookAdapter?.notifyDataSetChanged()
         updateLoadingStatus(totalCount)
     }
 
