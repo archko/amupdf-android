@@ -49,7 +49,7 @@ open class ANormalViewController(
     OutlineListener, AViewController {
     private var crop: Boolean = true
 
-    private lateinit var documentView: DocumentView
+    protected lateinit var documentView: DocumentView
     private lateinit var frameLayout: FrameLayout
     private var decodeService: DecodeService? = null
 
@@ -138,6 +138,29 @@ open class ANormalViewController(
                 isDocLoaded = true
                 doLoadDoc(decodeService!!.pageSizeBean, document!!)
                 documentView.showDocument(crop)
+            }
+        }
+    }
+
+    fun reloadDocument() {
+        instance.diskIO().execute {
+            try {
+                document = decodeService!!.open(mPath, true)
+            } catch (_: Exception) {
+            }
+            instance.mainThread().execute {
+                if (null == document) {
+                    Toast.makeText(
+                        context,
+                        "Open Failed",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    context.finish()
+                    return@execute
+                }
+                isDocLoaded = true
+                doLoadDoc(decodeService!!.pageSizeBean, document!!)
+                documentView.reloadAndShowDocument(crop)
             }
         }
     }

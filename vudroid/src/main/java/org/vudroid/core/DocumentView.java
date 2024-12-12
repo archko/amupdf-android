@@ -233,6 +233,15 @@ public class DocumentView extends View implements ZoomListener {
         });
     }
 
+    public void reloadAndShowDocument(boolean crop) {
+        this.crop = crop;
+        post(() -> {
+            isInitialized = false;
+            init();
+            updatePageVisibility();
+        });
+    }
+
     public void goToPage(int toPage) {
         if (isInitialized) {
             goToPageImpl(toPage);
