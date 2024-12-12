@@ -42,7 +42,7 @@ class AEpubViewController(
 ),
     OutlineListener, AViewController {
 
-    protected var mStyleControls: View? = null
+    private var mStyleControls: View? = null
     private var fontSlider: Slider? = null
 
     private fun initStyleControls() {
@@ -51,7 +51,7 @@ class AEpubViewController(
             mStyleControls = LayoutInflater.from(context).inflate(R.layout.epub_style, null, false)
             fontSlider = mStyleControls!!.findViewById(R.id.font_slider)
             fontSlider?.apply {
-                valueFrom = 30f
+                valueFrom = 20f
                 valueTo = 80f
                 value = EpubDocument.getFontSize()
             }
@@ -79,7 +79,8 @@ class AEpubViewController(
         val h = Utils.getScreenHeightPixelWithOrientation(instance)
         Logcat.d(String.format("applyFontSize:%s, %s, %s", newSize, w, h))
         //(document as EpubDocument).document.layout(w.toFloat(), h.toFloat(), newSize)
-        //notifyDataSetChanged()
+        loadDocument()
+        notifyDataSetChanged()
     }
 
     override fun doLoadDoc(pageSizeBean: APageSizeLoader.PageSizeBean, document: CodecDocument) {

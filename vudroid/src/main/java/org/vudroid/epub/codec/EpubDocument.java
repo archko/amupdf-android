@@ -11,8 +11,8 @@ import cn.archko.pdf.core.utils.Utils;
 
 public class EpubDocument extends PdfDocument {
 
-    public static float getDefFontSize() {
-        float fontSize = 8f * Utils.getDensityDpi(App.Companion.getInstance()) / 72;
+    public static int getDefFontSize() {
+        int fontSize = (int) (8f * Utils.getDensityDpi(App.Companion.getInstance()) / 72);
         return fontSize;
     }
 
