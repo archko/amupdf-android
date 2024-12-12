@@ -60,6 +60,8 @@
     <string name="opts_new_viewer">Open with new viewer</string>
     <string name="opts_cropper">New Croper</string>
     <string name="opts_orientation">Orientation</string>
+    <string name="opts_scan">Auto Scan</string>
+    <string name="opts_scan_folder">Auto Scan Folder</string>
     <string name="opts_color_mode">Color Mode</string>
     <string name="opts_default_orientation">7</string>
     <string-array name="opts_orientation_labels">

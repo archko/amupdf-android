@@ -52,6 +52,7 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
     protected var bookAdapter: BaseRecyclerAdapter<FileBean>? = null
     protected lateinit var libraryViewModel: LibraryViewModel
     private lateinit var binding: ListLibraryBinding
+    private var scanFolder: String? = null
 
     private var coverWidth = 135
     private var coverHeight = 180
@@ -71,6 +72,7 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
             }
         }
 
+        scanFolder = PdfOptionRepository.getScanFolder()
         mStyle = PdfOptionRepository.getLibraryStyle()
         libraryViewModel = LibraryViewModel()
 
@@ -165,7 +167,7 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
 
         binding.sort.setOnClickListener { v -> prepareMenu(v, R.menu.menu_sort) }
         binding.style.setOnClickListener { v -> prepareMenu(v, R.menu.menu_style) }
-        //scan()
+        scan()
 
         binding.keyword.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -231,7 +233,11 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
     }
 
     private fun scan() {
-        var scanFolder = PdfOptionRepository.getScanFolder()
+        val scan = PdfOptionRepository.getAutoScan()
+        if (!scan) {
+            libraryViewModel.shutdown()
+            return
+        }
         if (TextUtils.isEmpty(scanFolder)) {
             val defaultHome = Environment.getExternalStorageDirectory().absolutePath
             scanFolder = "$defaultHome/book"

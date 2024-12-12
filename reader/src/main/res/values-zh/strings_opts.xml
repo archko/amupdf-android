@@ -60,6 +60,8 @@
     <string name="opts_new_viewer">用新阅读器打开</string>
     <string name="opts_cropper">新的切边方案</string>
     <string name="opts_orientation">屏幕方向</string>
+    <string name="opts_scan">自动扫描</string>
+    <string name="opts_scan_folder">自动扫描目录</string>
     <string name="opts_color_mode">颜色模式</string>
     <string name="opts_default_orientation">7</string>
     <string-array name="opts_orientation_labels">

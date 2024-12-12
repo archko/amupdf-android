@@ -13,8 +13,8 @@ object FetcherUtils {
     fun load(path: String, context: Context, imageView: ImageView) {
         val fetcherData = PdfFetcherData(
             path = path,
-            width = Utils.dipToPixel(135f),
-            height = Utils.dipToPixel(180f),
+            width = 135,
+            height = 180,
         )
         imageView.load(fetcherData) {
             error(cn.archko.mupdf.R.drawable.ic_book)

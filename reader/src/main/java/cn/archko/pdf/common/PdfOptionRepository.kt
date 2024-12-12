@@ -189,7 +189,15 @@ object PdfOptionRepository {
     }
 
     fun getScanFolder(): String? {
-        return mmkv.decodeString(PdfOptionKeys.PREF_SCAN_FOLDER)
+        return mmkv.decodeString(PdfOptionKeys.PREF_SCAN_FOLDER, "")
+    }
+
+    fun setAutoScan(auto: Boolean) {
+        mmkv.encode(PdfOptionKeys.PREF_AUTO_SCAN, auto)
+    }
+
+    fun getAutoScan(): Boolean {
+        return mmkv.decodeBool(PdfOptionKeys.PREF_AUTO_SCAN, true)
     }
 
     @JvmField
@@ -261,6 +269,7 @@ object PdfOptionKeys {
     const val PREF_COLORMODE = ("colorMode")
     const val PREF_STYLE = ("style")
     const val PREF_LIBRARY_STYLE = ("libraryStyle")
+    const val PREF_AUTO_SCAN = ("autoScan")
     const val PREF_SCAN_FOLDER = ("scanFolder")
 
     //============== font and style ==============

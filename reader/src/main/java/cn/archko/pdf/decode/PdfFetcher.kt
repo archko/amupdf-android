@@ -2,8 +2,11 @@ package cn.archko.pdf.decode
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.RectF
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
 import android.util.Size
@@ -12,6 +15,7 @@ import cn.archko.pdf.core.App
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.common.IntentFile
+import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.utils.BitmapUtils
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.widgets.CoverDrawable
@@ -92,6 +96,8 @@ class PdfFetcher(
             cacheBitmap(bitmap)
         }
 
+        /*val paint = bitmap?.let { paint(it) }
+        val drawable = BitmapDrawable(paint)*/
         val drawable = CoverDrawable(bitmap)
 
         return DrawableResult(
@@ -201,5 +207,38 @@ class PdfFetcher(
         ): Fetcher {
             return PdfFetcher(data, options)
         }
+    }
+
+    private fun paint(image: Bitmap): Bitmap {
+        val left = 15
+        val top = 10
+        val width = 135 + left
+        val height = 180 + top
+
+        val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+
+        bmp.eraseColor(Color.TRANSPARENT)
+
+        val c = Canvas(bmp)
+
+        val cornerBmp: Bitmap = BitmapFactory.decodeResource(App.instance!!.resources, R.drawable.components_thumbnail_corner)
+        val leftBmp: Bitmap = BitmapFactory.decodeResource(App.instance!!.resources, R.drawable.components_thumbnail_left)
+        val topBmp: Bitmap = BitmapFactory.decodeResource(App.instance!!.resources, R.drawable.components_thumbnail_top)
+
+        c.drawBitmap(cornerBmp, null, Rect(0, 0, left, top), null)
+        c.drawBitmap(topBmp, null, Rect(left, 0, width, top), null)
+        c.drawBitmap(leftBmp, null, Rect(0, top, left, height), null)
+        val imgWidth = image.width
+        val imgHeight = image.height
+        Logcat.d("image:$imgWidth, $imgHeight")
+        val right = imgWidth
+        var bottom = (135f * imgHeight / imgWidth).toInt()
+        if (bottom > imgHeight) {
+            bottom = imgHeight
+        }
+
+        c.drawBitmap(image, Rect(0, 0, right, bottom), Rect(left, top, width, height), null)
+
+        return bmp
     }
 }
