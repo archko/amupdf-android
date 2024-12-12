@@ -10,15 +10,29 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/keyword"
+        <RelativeLayout
+            android:id="@+id/layout_search"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="keyword"
-            android:lines="1"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp" />
+            android:layout_weight="1">
+
+            <EditText
+                android:id="@+id/keyword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="keyword"
+                android:paddingStart="3dip"
+                android:paddingEnd="20dp" />
+
+            <ImageView
+                android:id="@+id/img_close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="4dp"
+                android:src="@drawable/ic_close_white_24dp" />
+        </RelativeLayout>
 
         <ImageButton
             android:id="@+id/sort"

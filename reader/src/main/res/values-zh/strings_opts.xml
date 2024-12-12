@@ -20,6 +20,14 @@
     <string name="menu_about">关于</string>
     <string name="menu_tools">PDF工具</string>
     <string name="menu_style">样式(列表/网格)</string>
+    <string name="menu_style_list">列表</string>
+    <string name="menu_style_grid">网格</string>
+    <string name="menu_sort_name">名字</string>
+    <string name="menu_sort_name_desc">名字倒序</string>
+    <string name="menu_sort_create">创建时间</string>
+    <string name="menu_sort_size">大小</string>
+    <string name="menu_sort_create_desc">创建时间倒序</string>
+    <string name="menu_sort_size_desc">大小倒序</string>
     <string name="menu_extract">导出</string>
 
     <string name="menu_progress_outline">进度/目录/切割/重排</string>

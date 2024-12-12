@@ -20,6 +20,14 @@
     <string name="menu_about">About</string>
     <string name="menu_tools">PDFTools</string>
     <string name="menu_style">List Style(List/Grid)</string>
+    <string name="menu_style_list">List</string>
+    <string name="menu_style_grid">Grid</string>
+    <string name="menu_sort_name">Name</string>
+    <string name="menu_sort_name_desc">Name Desc</string>
+    <string name="menu_sort_create">Create</string>
+    <string name="menu_sort_create_desc">Create Desc</string>
+    <string name="menu_sort_size">Size</string>
+    <string name="menu_sort_size_desc">Size Desc</string>
     <string name="menu_extract">Extract</string>
 
     <string name="menu_progress_outline">Progress/OutLine/Crop/Reflow</string>

@@ -24,8 +24,6 @@ import java.util.Locale
 class LibraryViewModel : ViewModel() {
     companion object {
 
-        const val PAGE_SIZE = 20
-        const val MAX_TIME = 1300L
     }
 
     private val progressDao by lazy { Graph.database.progressDao() }
@@ -88,7 +86,7 @@ class LibraryViewModel : ViewModel() {
         }
     }
 
-    suspend fun scan(path: String) = flow {
+    suspend fun scan(path: String?) = flow {
         try {
             fileSystemScanner.addListener(listener)
             fileSystemScanner.addListener(progressListener)

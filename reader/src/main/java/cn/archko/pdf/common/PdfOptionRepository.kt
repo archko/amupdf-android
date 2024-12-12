@@ -1,7 +1,6 @@
 package cn.archko.pdf.common
 
 import android.graphics.Color
-import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.utils.Utils
 import com.tencent.mmkv.MMKV
 
@@ -177,6 +176,14 @@ object PdfOptionRepository {
         return mmkv.decodeInt(PdfOptionKeys.PREF_STYLE, 0)
     }
 
+    fun setScanFolder(path: String) {
+        mmkv.encode(PdfOptionKeys.PREF_SCAN_FOLDER, path)
+    }
+
+    fun getScanFolder(): String? {
+        return mmkv.decodeString(PdfOptionKeys.PREF_SCAN_FOLDER)
+    }
+
     @JvmField
     val FONT_DIR = "Fonts/"
 
@@ -245,6 +252,7 @@ object PdfOptionKeys {
     const val PREF_CROPPER = ("cropper")
     const val PREF_COLORMODE = ("colorMode")
     const val PREF_STYLE = ("style")
+    const val PREF_SCAN_FOLDER = ("scan_folder")
 
     //============== font and style ==============
     const val FONT_KEY_TYPE = ("font_key_type")
