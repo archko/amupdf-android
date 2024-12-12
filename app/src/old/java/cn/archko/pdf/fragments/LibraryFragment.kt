@@ -49,10 +49,11 @@ import java.util.Locale
 class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener {
 
     private var mStyle: Int = STYLE_LIST
-    protected var bookAdapter: BaseRecyclerAdapter<FileBean>? = null
-    protected lateinit var libraryViewModel: LibraryViewModel
+    private var bookAdapter: BaseRecyclerAdapter<FileBean>? = null
+    private lateinit var libraryViewModel: LibraryViewModel
     private lateinit var binding: ListLibraryBinding
     private var scanFolder: String? = null
+    private var autoScan = true
 
     private var coverWidth = 135
     private var coverHeight = 180
@@ -62,6 +63,7 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        libraryViewModel = LibraryViewModel()
 
         vn.chungha.flowbus.collectFlowBus<ScanEvent>(scope = this, isSticky = true) {
             Logcat.d(HistoryFragment.TAG, "action_scan:${it.obj}")
@@ -73,8 +75,8 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
         }
 
         scanFolder = PdfOptionRepository.getScanFolder()
+        autoScan = PdfOptionRepository.getAutoScan()
         mStyle = PdfOptionRepository.getLibraryStyle()
-        libraryViewModel = LibraryViewModel()
 
         val screenHeight: Int = Utils.getScreenHeightPixelWithOrientation(context)
         val screenWidth: Int = Utils.getScreenWidthPixelWithOrientation(context)
@@ -233,8 +235,7 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
     }
 
     private fun scan() {
-        val scan = PdfOptionRepository.getAutoScan()
-        if (!scan) {
+        if (!autoScan) {
             libraryViewModel.shutdown()
             return
         }

@@ -1,118 +1,174 @@
-package cn.archko.pdf.activities;
+package cn.archko.pdf.activities
 
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.text.TextUtils;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.appbar.MaterialToolbar;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import cn.archko.pdf.R;
-import cn.archko.pdf.common.PdfOptionKeys;
-import cn.archko.pdf.common.PdfOptionRepository;
-import cn.archko.pdf.core.adapters.BaseRecyclerAdapter;
-import cn.archko.pdf.core.adapters.BaseViewHolder;
-import cn.archko.pdf.core.common.Logcat;
-import cn.archko.pdf.core.widgets.ColorItemDecoration;
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
+import android.os.Bundle
+import android.text.TextUtils
+import android.view.View
+import android.view.ViewGroup
+import android.widget.CheckBox
+import android.widget.CompoundButton
+import android.widget.EditText
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import cn.archko.pdf.R
+import cn.archko.pdf.common.PdfOptionKeys
+import cn.archko.pdf.common.PdfOptionRepository.getAutoScan
+import cn.archko.pdf.common.PdfOptionRepository.getAutocrop
+import cn.archko.pdf.common.PdfOptionRepository.getColorMode
+import cn.archko.pdf.common.PdfOptionRepository.getDirsFirst
+import cn.archko.pdf.common.PdfOptionRepository.getFullscreen
+import cn.archko.pdf.common.PdfOptionRepository.getKeepOn
+import cn.archko.pdf.common.PdfOptionRepository.getOrientation
+import cn.archko.pdf.common.PdfOptionRepository.getScanFolder
+import cn.archko.pdf.common.PdfOptionRepository.getShowExtension
+import cn.archko.pdf.common.PdfOptionRepository.setAutoScan
+import cn.archko.pdf.common.PdfOptionRepository.setAutocrop
+import cn.archko.pdf.common.PdfOptionRepository.setColorMode
+import cn.archko.pdf.common.PdfOptionRepository.setDirsFirst
+import cn.archko.pdf.common.PdfOptionRepository.setFullscreen
+import cn.archko.pdf.common.PdfOptionRepository.setImageOcr
+import cn.archko.pdf.common.PdfOptionRepository.setKeepOn
+import cn.archko.pdf.common.PdfOptionRepository.setOrientation
+import cn.archko.pdf.common.PdfOptionRepository.setScanFolder
+import cn.archko.pdf.common.PdfOptionRepository.setShowExtension
+import cn.archko.pdf.common.PdfOptionRepository.setStyle
+import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
+import cn.archko.pdf.core.adapters.BaseViewHolder
+import cn.archko.pdf.core.common.Event
+import cn.archko.pdf.core.common.Logcat.d
+import cn.archko.pdf.core.common.ScanEvent
+import cn.archko.pdf.core.widgets.ColorItemDecoration
+import com.google.android.material.appbar.MaterialToolbar
+import vn.chungha.flowbus.busEvent
 
 /**
  * @author: archko 2018/12/12 :15:43
  */
-public class PdfOptionsActivity extends FragmentActivity {
+class PdfOptionsActivity : FragmentActivity() {
+    private var adapter: BaseRecyclerAdapter<Prefs>? = null
 
-    public final static String TAG = "PdfOptionsActivity";
+    public override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.preferences)
 
-    private BaseRecyclerAdapter<Prefs> adapter;
+        val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
+        toolbar.setNavigationOnClickListener { finish() }
 
-    @Override
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
-        setContentView(R.layout.preferences);
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.addItemDecoration(ColorItemDecoration(this))
 
-        MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(view -> finish());
-
-        RecyclerView recyclerView = findViewById(android.R.id.list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addItemDecoration(new ColorItemDecoration(this));
-
-        adapter = new BaseRecyclerAdapter<>(this) {
-            @NonNull
-            @Override
-            public BaseViewHolder<Prefs> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        adapter = object : BaseRecyclerAdapter<Prefs>(this) {
+            override fun onCreateViewHolder(
+                parent: ViewGroup,
+                viewType: Int
+            ): BaseViewHolder<Prefs> {
                 if (viewType == TYPE_LIST) {
-                    View view = mInflater.inflate(R.layout.list_preferences, parent, false);
-                    return new PrefsListHolder(view);
+                    val view = mInflater.inflate(R.layout.list_preferences, parent, false)
+                    return PrefsListHolder(view)
                 } else if (viewType == TYPE_EDIT) {
-                    View view = mInflater.inflate(R.layout.list_preferences, parent, false);
-                    return new PrefsEditHolder(view);
+                    val view = mInflater.inflate(R.layout.list_preferences, parent, false)
+                    return PrefsEditHolder(view)
                 } else {
-                    View view = mInflater.inflate(R.layout.check_preferences, parent, false);
-                    return new PrefsCheckHolder(view);
+                    val view = mInflater.inflate(R.layout.check_preferences, parent, false)
+                    return PrefsCheckHolder(view)
                 }
             }
 
-            @Override
-            public int getItemViewType(int position) {
-                Prefs prefs = getData().get(position);
-                return prefs.type;
+            override fun getItemViewType(position: Int): Int {
+                val prefs = data[position]!!
+                return prefs.type
             }
-        };
+        }
 
-        initPrefsFromMMkv();
-        adapter.setData(prefsList);
-        recyclerView.setAdapter(adapter);
+        initPrefsFromMMkv()
+        adapter?.setData(prefsList)
+        recyclerView.adapter = adapter
     }
 
-    private List<Prefs> prefsList = new ArrayList<>();
+    private val prefsList: MutableList<Prefs?> = ArrayList()
 
-    private void initPrefsFromMMkv() {
-        Prefs prefs;
-        prefs = new Prefs(TYPE_LIST, getString(R.string.opts_orientation), getString(R.string.opts_orientation),
-                PdfOptionKeys.PREF_ORIENTATION,
-                getResources().getStringArray(R.array.opts_orientations),
-                getResources().getStringArray(R.array.opts_orientation_labels),
-                PdfOptionRepository.INSTANCE.getOrientation());
-        prefsList.add(prefs);
+    private fun initPrefsFromMMkv() {
+        var prefs = Prefs(
+            TYPE_LIST,
+            getString(R.string.opts_orientation),
+            getString(R.string.opts_orientation),
+            PdfOptionKeys.PREF_ORIENTATION,
+            resources.getStringArray(R.array.opts_orientations),
+            resources.getStringArray(R.array.opts_orientation_labels),
+            getOrientation()
+        )
+        prefsList.add(prefs)
 
         //prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_ocr_view), getString(R.string.opts_ocr_view), PdfOptionKeys.PREF_OCR, PdfOptionRepository.INSTANCE.getImageOcr());
         //prefsList.add(prefs);
+        prefs = Prefs(
+            TYPE_CHECK,
+            getString(R.string.opts_fullscreen),
+            getString(R.string.opts_fullscreen),
+            PdfOptionKeys.PREF_FULLSCREEN,
+            getFullscreen()
+        )
+        prefsList.add(prefs)
 
-        prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_fullscreen), getString(R.string.opts_fullscreen), PdfOptionKeys.PREF_FULLSCREEN, PdfOptionRepository.INSTANCE.getFullscreen());
-        prefsList.add(prefs);
+        prefs = Prefs(
+            TYPE_CHECK,
+            getString(R.string.opts_autocrop),
+            getString(R.string.opts_autocrop_summary),
+            PdfOptionKeys.PREF_AUTOCROP,
+            getAutocrop()
+        )
+        prefsList.add(prefs)
 
-        prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_autocrop), getString(R.string.opts_autocrop_summary), PdfOptionKeys.PREF_AUTOCROP, PdfOptionRepository.INSTANCE.getAutocrop());
-        prefsList.add(prefs);
+        prefs = Prefs(
+            TYPE_CHECK,
+            getString(R.string.opts_keep_on),
+            getString(R.string.opts_keep_on),
+            PdfOptionKeys.PREF_KEEP_ON,
+            getKeepOn()
+        )
+        prefsList.add(prefs)
 
-        prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_keep_on), getString(R.string.opts_keep_on), PdfOptionKeys.PREF_KEEP_ON, PdfOptionRepository.INSTANCE.getKeepOn());
-        prefsList.add(prefs);
+        prefs = Prefs(
+            TYPE_CHECK,
+            getString(R.string.opts_dirs_first),
+            getString(R.string.opts_dirs_first),
+            PdfOptionKeys.PREF_DIRS_FIRST,
+            getDirsFirst()
+        )
+        prefsList.add(prefs)
 
-        prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_dirs_first), getString(R.string.opts_dirs_first), PdfOptionKeys.PREF_DIRS_FIRST, PdfOptionRepository.INSTANCE.getDirsFirst());
-        prefsList.add(prefs);
+        prefs = Prefs(
+            TYPE_CHECK,
+            getString(R.string.opts_show_extension),
+            getString(R.string.opts_show_extension),
+            PdfOptionKeys.PREF_SHOW_EXTENSION,
+            getShowExtension()
+        )
+        prefsList.add(prefs)
 
-        prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_show_extension), getString(R.string.opts_show_extension), PdfOptionKeys.PREF_SHOW_EXTENSION, PdfOptionRepository.INSTANCE.getShowExtension());
-        prefsList.add(prefs);
+        prefs = Prefs(
+            TYPE_CHECK,
+            getString(R.string.opts_scan),
+            getString(R.string.opts_scan),
+            PdfOptionKeys.PREF_AUTO_SCAN,
+            getAutoScan()
+        )
+        prefsList.add(prefs)
 
-        prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_scan), getString(R.string.opts_scan), PdfOptionKeys.PREF_AUTO_SCAN, PdfOptionRepository.INSTANCE.getAutoScan());
-        prefsList.add(prefs);
-
-        prefs = new Prefs(TYPE_EDIT, getString(R.string.opts_scan_folder), getString(R.string.opts_scan_folder), PdfOptionKeys.PREF_SCAN_FOLDER, PdfOptionRepository.INSTANCE.getScanFolder());
-        prefsList.add(prefs);
+        prefs = Prefs(
+            TYPE_EDIT,
+            getString(R.string.opts_scan_folder),
+            getString(R.string.opts_scan_folder),
+            PdfOptionKeys.PREF_SCAN_FOLDER,
+            getScanFolder()
+        )
+        prefsList.add(prefs)
 
         /*prefs = new Prefs(TYPE_LIST, getString(R.string.opts_list_style), getString(R.string.opts_list_style),
                 PdfOptionKeys.PREF_STYLE,
@@ -120,192 +176,195 @@ public class PdfOptionsActivity extends FragmentActivity {
                 getResources().getStringArray(R.array.opts_list_style_labels),
                 PdfOptionRepository.INSTANCE.getStyle());
         prefsList.add(prefs);*/
-
-        prefs = new Prefs(TYPE_LIST, getString(R.string.opts_color_mode), getString(R.string.opts_color_mode),
-                PdfOptionKeys.PREF_COLORMODE,
-                getResources().getStringArray(R.array.opts_color_modes),
-                getResources().getStringArray(R.array.opts_color_mode_labels),
-                PdfOptionRepository.INSTANCE.getColorMode());
-        prefsList.add(prefs);
+        prefs = Prefs(
+            TYPE_LIST, getString(R.string.opts_color_mode), getString(R.string.opts_color_mode),
+            PdfOptionKeys.PREF_COLORMODE,
+            resources.getStringArray(R.array.opts_color_modes),
+            resources.getStringArray(R.array.opts_color_mode_labels),
+            getColorMode()
+        )
+        prefsList.add(prefs)
     }
 
-    private static final int TYPE_CHECK = 0;
-    private static final int TYPE_LIST = 1;
-    private static final int TYPE_EDIT = 2;
+    private class Prefs {
+        var type: Int = TYPE_CHECK
+        var labels: Array<String>? = null
+        var vals: Array<String>? = null
+        var key: String
+        var title: String
+        var summary: String
+        var value: Any? = null
+        var index: Int = 0
 
-    private static class Prefs {
-        int type = TYPE_CHECK;
-        String[] labels;
-        Object[] vals;
-        String key;
-        String title;
-        String summary;
-        Object val;
-        int index;
-
-        public Prefs(int type, String title, String summary, String key, Object val) {
-            this.type = type;
-            this.title = title;
-            this.summary = summary;
-            this.key = key;
-            this.val = val;
+        constructor(type: Int, title: String, summary: String, key: String, value: Any?) {
+            this.type = type
+            this.title = title
+            this.summary = summary
+            this.key = key
+            this.value = value
         }
 
-        public Prefs(int type, String title, String summary, String key, Object[] vals, String[] labels, int index) {
-            this.type = type;
-            this.title = title;
-            this.summary = summary;
-            this.key = key;
-            this.vals = vals;
-            this.labels = labels;
-            this.index = index;
+        constructor(
+            type: Int,
+            title: String,
+            summary: String,
+            key: String,
+            vals: Array<String>,
+            labels: Array<String>,
+            index: Int
+        ) {
+            this.type = type
+            this.title = title
+            this.summary = summary
+            this.key = key
+            this.vals = vals
+            this.labels = labels
+            this.index = index
         }
 
-        @Override
-        public String toString() {
+        override fun toString(): String {
             return "Prefs{" +
                     "type=" + type +
-                    ", labels=" + Arrays.toString(labels) +
-                    ", vals=" + Arrays.toString(vals) +
+                    ", labels=" + labels.contentToString() +
+                    ", vals=" + vals.contentToString() +
                     ", key='" + key + '\'' +
                     ", title='" + title + '\'' +
                     ", summary='" + summary + '\'' +
-                    ", val=" + val +
+                    ", val=" + value +
                     ", index=" + index +
-                    '}';
+                    '}'
         }
     }
 
-    private static class AbsPrefsHolder extends BaseViewHolder<Prefs> {
+    private open class AbsPrefsHolder(itemView: View) : BaseViewHolder<Prefs>(itemView) {
+        var title: TextView =
+            itemView.findViewById(R.id.title)
+        var summary: TextView =
+            itemView.findViewById(R.id.summary)
 
-        TextView title;
-        TextView summary;
-
-        public AbsPrefsHolder(View itemView) {
-            super(itemView);
-            title = itemView.findViewById(R.id.title);
-            summary = itemView.findViewById(R.id.summary);
-        }
-
-        @Override
-        public void onBind(Prefs data, int position) {
-            title.setText(data.title);
-            summary.setText(data.summary);
+        override fun onBind(data: Prefs, position: Int) {
+            title.text = data.title
+            summary.text = data.summary
         }
     }
 
-    private class PrefsListHolder extends AbsPrefsHolder {
-
-        public PrefsListHolder(View itemView) {
-            super(itemView);
+    private inner class PrefsListHolder(itemView: View) : AbsPrefsHolder(itemView) {
+        override fun onBind(data: Prefs, position: Int) {
+            super.onBind(data, position)
+            summary.text = data.labels?.get(data.index) ?: ""
+            itemView.setOnClickListener { v: View? -> showListDialog(data, summary) }
         }
 
-        @Override
-        public void onBind(Prefs data, int position) {
-            super.onBind(data, position);
-            summary.setText(data.labels[data.index]);
-            itemView.setOnClickListener(v -> showListDialog(data, summary));
+        fun showListDialog(data: Prefs, summary: TextView) {
+            val builder = AlertDialog.Builder(this@PdfOptionsActivity)
+            builder.setTitle("请选择")
+            builder.setSingleChoiceItems(
+                data.labels,
+                data.index
+            ) { dialog: DialogInterface, which: Int ->
+                dialog.dismiss()
+                summary.text = data.labels?.get(which) ?: ""
+                data.index = which
+                setCheckListVal(data.key, data.vals?.get(which) ?: false)
+            }
+            builder.create().show()
         }
 
-        private void showListDialog(Prefs data, TextView summary) {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(PdfOptionsActivity.this);
-            builder.setTitle("请选择");
-            builder.setSingleChoiceItems(data.labels,
-                    data.index,
-                    (dialog, which) -> {
-                        dialog.dismiss();
-                        summary.setText(data.labels[which]);
-                        setCheckListVal(data.key, data.vals[which]);
-                    });
-            builder.create().show();
-        }
-
-        private void setCheckListVal(String key, Object val) {
+        fun setCheckListVal(key: String?, value: Any) {
             if (TextUtils.equals(key, PdfOptionKeys.PREF_ORIENTATION)) {
-                PdfOptionRepository.INSTANCE.setOrientation(Integer.parseInt(val.toString()));
+                setOrientation(value.toString().toInt())
             } else if (TextUtils.equals(key, PdfOptionKeys.PREF_COLORMODE)) {
-                PdfOptionRepository.INSTANCE.setColorMode(Integer.parseInt(val.toString()));
+                setColorMode(value.toString().toInt())
             } else if (TextUtils.equals(key, PdfOptionKeys.PREF_STYLE)) {
-                PdfOptionRepository.INSTANCE.setStyle(Integer.parseInt(val.toString()));
+                setStyle(value.toString().toInt())
             }
         }
     }
 
-    private static class PrefsCheckHolder extends AbsPrefsHolder {
+    private class PrefsCheckHolder(itemView: View) : AbsPrefsHolder(itemView) {
+        private val checkBox: CheckBox = itemView.findViewById(R.id.checkbox)
 
-        private CheckBox checkBox;
-
-        public PrefsCheckHolder(View itemView) {
-            super(itemView);
-            checkBox = itemView.findViewById(R.id.checkbox);
+        override fun onBind(data: Prefs, position: Int) {
+            super.onBind(data, position)
+            setCheckVal(data.key, data.value as Boolean)
+            checkBox.isChecked = data.value as Boolean
+            checkBox.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
+                setCheckVal(
+                    data.key,
+                    isChecked
+                )
+            }
         }
 
-        @Override
-        public void onBind(Prefs data, int position) {
-            super.onBind(data, position);
-            setCheckVal(data.key, (boolean) data.val);
-            checkBox.setChecked((boolean) data.val);
-            checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> setCheckVal(data.key, isChecked));
-        }
-
-        private void setCheckVal(String key, boolean val) {
+        fun setCheckVal(key: String?, value: Boolean) {
             if (TextUtils.equals(key, PdfOptionKeys.PREF_OCR)) {
-                PdfOptionRepository.INSTANCE.setImageOcr(val);
+                setImageOcr(value)
             } else if (TextUtils.equals(key, PdfOptionKeys.PREF_FULLSCREEN)) {
-                PdfOptionRepository.INSTANCE.setFullscreen(val);
+                setFullscreen(value)
             } else if (TextUtils.equals(key, PdfOptionKeys.PREF_AUTOCROP)) {
-                PdfOptionRepository.INSTANCE.setAutocrop(val);
+                setAutocrop(value)
             } else if (TextUtils.equals(key, PdfOptionKeys.PREF_KEEP_ON)) {
-                PdfOptionRepository.INSTANCE.setKeepOn(val);
+                setKeepOn(value)
             } else if (TextUtils.equals(key, PdfOptionKeys.PREF_DIRS_FIRST)) {
-                PdfOptionRepository.INSTANCE.setDirsFirst(val);
+                setDirsFirst(value)
             } else if (TextUtils.equals(key, PdfOptionKeys.PREF_SHOW_EXTENSION)) {
-                PdfOptionRepository.INSTANCE.setShowExtension(val);
+                setShowExtension(value)
+            } else if (TextUtils.equals(key, PdfOptionKeys.PREF_AUTO_SCAN)) {
+                setAutoScan(value)
+                if (value) {
+                    busEvent(ScanEvent(Event.ACTION_SCAN, null))
+                } else {
+                    busEvent(ScanEvent(Event.ACTION_DONOT_SCAN, null))
+                }
             }
         }
     }
 
-    private class PrefsEditHolder extends AbsPrefsHolder {
-
-        public PrefsEditHolder(View itemView) {
-            super(itemView);
+    private inner class PrefsEditHolder(itemView: View) : AbsPrefsHolder(itemView) {
+        override fun onBind(data: Prefs, position: Int) {
+            super.onBind(data, position)
+            d(String.format("bind:%s", data))
+            title.text = data.title
+            summary.text = String.format("%s:%s", data.summary, data.value)
+            itemView.setOnClickListener { v: View? -> showEditDialog(data, summary) }
         }
 
-        @Override
-        public void onBind(Prefs data, int position) {
-            super.onBind(data, position);
-            Logcat.d(String.format("bind:%s", data));
-            title.setText(data.title);
-            summary.setText(String.format("%s:%s", data.summary, data.val));
-            itemView.setOnClickListener(v -> showEditDialog(data, summary));
+        fun showEditDialog(data: Prefs, summary: TextView?) {
+            val builder = AlertDialog.Builder(this@PdfOptionsActivity)
+            val editText = EditText(this@PdfOptionsActivity)
+            editText.setText(data.value.toString())
+            builder.setTitle("Scan Folder")
+            builder.setView(editText)
+            builder.setPositiveButton("OK") { dialog: DialogInterface, _: Int ->
+                val path = editText.text.toString()
+                data.value = path
+                setEditVal(data.key, path)
+                adapter!!.notifyDataSetChanged()
+                dialog.dismiss()
+            }
+            builder.setNegativeButton(
+                "Cancel"
+            ) { dialog: DialogInterface, _: Int -> dialog.dismiss() }
+            builder.create().show()
         }
 
-        private void showEditDialog(Prefs data, TextView summary) {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(PdfOptionsActivity.this);
-            EditText editText = new EditText(PdfOptionsActivity.this);
-            editText.setText(String.valueOf(data.val));
-            builder.setTitle("Scan Folder");
-            builder.setView(editText);
-            builder.setNegativeButton("OK", (dialog, which) -> {
-                String path = editText.getText().toString();
-                data.val = path;
-                setEditVal(data.key, path);
-                adapter.notifyDataSetChanged();
-                dialog.dismiss();
-            });
-            builder.setPositiveButton("Cancel", (dialog, which) -> dialog.dismiss());
-            builder.create().show();
-        }
-
-        private void setEditVal(String key, String val) {
-            Logcat.d(String.format("key:%s-%s", key, val));
+        fun setEditVal(key: String, value: String) {
+            d(String.format("key:%s-%s", key, value))
             if (TextUtils.equals(key, PdfOptionKeys.PREF_SCAN_FOLDER)) {
-                PdfOptionRepository.INSTANCE.setScanFolder(val);
+                setScanFolder(value)
             }
         }
     }
 
-    public static void start(Context context) {
-        context.startActivity(new Intent(context, PdfOptionsActivity.class));
+    companion object {
+        const val TAG: String = "PdfOptionsActivity"
+
+        private const val TYPE_CHECK = 0
+        private const val TYPE_LIST = 1
+        private const val TYPE_EDIT = 2
+
+        fun start(context: Context) {
+            context.startActivity(Intent(context, PdfOptionsActivity::class.java))
+        }
     }
 }
