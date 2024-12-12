@@ -176,6 +176,14 @@ object PdfOptionRepository {
         return mmkv.decodeInt(PdfOptionKeys.PREF_STYLE, 0)
     }
 
+    fun setLibraryStyle(style: Int) {
+        mmkv.encode(PdfOptionKeys.PREF_LIBRARY_STYLE, style)
+    }
+
+    fun getLibraryStyle(): Int {
+        return mmkv.decodeInt(PdfOptionKeys.PREF_LIBRARY_STYLE, 0)
+    }
+
     fun setScanFolder(path: String) {
         mmkv.encode(PdfOptionKeys.PREF_SCAN_FOLDER, path)
     }
@@ -252,7 +260,8 @@ object PdfOptionKeys {
     const val PREF_CROPPER = ("cropper")
     const val PREF_COLORMODE = ("colorMode")
     const val PREF_STYLE = ("style")
-    const val PREF_SCAN_FOLDER = ("scan_folder")
+    const val PREF_LIBRARY_STYLE = ("libraryStyle")
+    const val PREF_SCAN_FOLDER = ("scanFolder")
 
     //============== font and style ==============
     const val FONT_KEY_TYPE = ("font_key_type")

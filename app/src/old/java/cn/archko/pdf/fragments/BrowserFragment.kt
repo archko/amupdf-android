@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -101,26 +102,10 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     open fun onOptionSelected(menuItem: MenuItem) {
         when (menuItem.itemId) {
             R.id.action_set_as_home -> setAsHome()
-            R.id.action_extract -> extractImage()
-            R.id.action_create -> createPdf()
-            R.id.action_convert_epub -> convertToEpub()
+            R.id.action_extract -> extractImage(requireActivity())
+            R.id.action_create -> createPdf(requireActivity())
+            R.id.action_convert_epub -> convertToEpub(requireActivity())
         }
-    }
-
-    fun extractImage() {
-        PdfOperationFragment.showCreateDialog(
-            PdfOperationFragment.TYPE_EXTRACT_IMAGES,
-            requireActivity(),
-            null
-        )
-    }
-
-    fun createPdf() {
-        PdfCreationFragment.showCreateDialog(requireActivity(), null)
-    }
-
-    fun convertToEpub() {
-        ConvertToEpubFragment.showCreateDialog(requireActivity(), null)
     }
 
     private fun editPdf(path: String?) {
@@ -579,5 +564,21 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
 
         @JvmField
         val PREF_HOME = "Home"
+
+        fun extractImage(context: FragmentActivity) {
+            PdfOperationFragment.showCreateDialog(
+                PdfOperationFragment.TYPE_EXTRACT_IMAGES,
+                context,
+                null
+            )
+        }
+
+        fun createPdf(context: FragmentActivity) {
+            PdfCreationFragment.showCreateDialog(context, null)
+        }
+
+        fun convertToEpub(context: FragmentActivity) {
+            ConvertToEpubFragment.showCreateDialog(context, null)
+        }
     }
 }

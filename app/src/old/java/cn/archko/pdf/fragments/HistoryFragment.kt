@@ -165,9 +165,9 @@ class HistoryFragment : BrowserFragment() {
             R.id.action_backup_webdav -> backupToWebdav()
             R.id.action_restore_webdav -> restoreFromWebdav()
             R.id.action_restore -> restore()
-            R.id.action_extract -> extractImage()
-            R.id.action_create -> createPdf()
-            R.id.action_convert_epub -> convertToEpub()
+            R.id.action_extract -> extractImage(requireActivity())
+            R.id.action_create -> createPdf(requireActivity())
+            R.id.action_convert_epub -> convertToEpub(requireActivity())
             R.id.action_style -> {
                 if (mStyle == STYLE_LIST) {
                     mStyle = STYLE_GRID
@@ -292,7 +292,9 @@ class HistoryFragment : BrowserFragment() {
 
     private fun removeItemDecorations() {
         for (i in 0 until recyclerView.itemDecorationCount) {
-            recyclerView.removeItemDecorationAt(i)
+            if (i < recyclerView.itemDecorationCount) {
+                recyclerView.removeItemDecorationAt(i)
+            }
         }
     }
 

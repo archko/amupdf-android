@@ -36,7 +36,7 @@ class LibraryViewModel : ViewModel() {
     val uiFileModel: LiveData<MutableList<FileBean>>
         get() = _uiFileModel
 
-    val listener = object : FileSystemScanner.Listener {
+    private val listener = object : FileSystemScanner.Listener {
         override fun onFileScan(parent: File?, files: Array<out File>?) {
             doOnFileScan(parent, files)
         }
@@ -57,18 +57,17 @@ class LibraryViewModel : ViewModel() {
             Logcat.d(Logcat.TAG, "onDirDeleted:$f")
         }
     }
-    val progressListener = object : FileSystemScanner.ProgressListener {
-        override fun showProgress(show: Boolean) {
-            if (!show) {
-                Logcat.d(Logcat.TAG, "onFileScaned: ${fileMap.size}")
-                val fileList = mutableListOf<FileBean>()
-                for (entry in fileMap.entries) {
-                    fileList.addAll(entry.value)
-                }
-                Logcat.d(Logcat.TAG, "onFileScaned: ${fileMap.size}, ${fileList.size}")
-                _uiFileModel.value = fileList
-                list = fileList
+
+    private val progressListener = FileSystemScanner.ProgressListener { show ->
+        if (!show) {
+            Logcat.d(Logcat.TAG, "onFileScaned: ${fileMap.size}")
+            val fileList = mutableListOf<FileBean>()
+            for (entry in fileMap.entries) {
+                fileList.addAll(entry.value)
             }
+            Logcat.d(Logcat.TAG, "onFileScaned: ${fileMap.size}, ${fileList.size}")
+            _uiFileModel.value = fileList
+            list = fileList
         }
     }
 
@@ -123,4 +122,8 @@ class LibraryViewModel : ViewModel() {
         .collectLatest {
             Logcat.d(Logcat.TAG, "success")
         }
+
+    fun shutdown() {
+        fileSystemScanner.shutdown()
+    }
 }

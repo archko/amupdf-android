@@ -164,7 +164,12 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
     }
 
     private fun onPrepareCustomMenu(menuBuilder: PopupMenu) {
-        menuBuilder.inflate(R.menu.menu_history)
+        val index = mViewPager.currentItem
+        if (index == 1) {
+            menuBuilder.inflate(R.menu.menu_history)
+        } else {
+            menuBuilder.inflate(R.menu.menu_library)
+        }
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
@@ -182,6 +187,10 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
                 if (fragment is HistoryFragment) {
                     fragment.onOptionSelected(item)
                 } else if (fragment is BrowserFragment) {
+                    fragment.onOptionSelected(item)
+                } else if (fragment is FavoriteFragment) {
+                    fragment.onOptionSelected(item)
+                } else if (fragment is LibraryFragment) {
                     fragment.onOptionSelected(item)
                 }
                 return true
