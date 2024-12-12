@@ -12,4 +12,6 @@ interface ControllerListener {
     fun onDoubleTap(ev: MotionEvent?, currentPage: Int): Boolean
 
     fun doLoadedDoc(count: Int, pos: Int, outlineLinks: List<OutlineLink>?)
+
+    fun reloadDoc()
 }

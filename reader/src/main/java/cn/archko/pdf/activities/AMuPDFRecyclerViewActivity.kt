@@ -312,6 +312,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             override fun doLoadedDoc(count: Int, pos: Int, outlineLinks: List<OutlineLink>?) {
                 this@AMuPDFRecyclerViewActivity.doLoadDoc(count, pos, outlineLinks)
             }
+
+            override fun reloadDoc() {
+                applyViewMode(getCurrentPos())
+            }
         }
     }
 

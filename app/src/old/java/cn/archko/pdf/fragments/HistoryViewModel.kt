@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cn.archko.pdf.core.App
 import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.BookProgressParser
 import cn.archko.pdf.core.common.Graph
@@ -262,6 +263,14 @@ class HistoryViewModel : ViewModel() {
         if (path != null) {
             APageSizeLoader.deletePageSizeFromFile(path)
             TtsHelper.deleteFromFile(path)
+
+            val dir = FileUtils.getExternalCacheDir(App.instance)
+            val cacheDir = File(dir, "image")
+            if (!cacheDir.exists()) {
+                cacheDir.mkdirs()
+            }
+            val path = "${cacheDir.absolutePath}/${path.hashCode()}"
+            FileUtils.deleteFile(path)
         }
     }
 }

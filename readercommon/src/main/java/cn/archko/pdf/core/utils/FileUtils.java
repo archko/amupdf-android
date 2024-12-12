@@ -28,10 +28,10 @@ import cn.archko.pdf.core.App;
 
 public final class FileUtils {
 
-    private static ArrayList<String> mounts = new ArrayList<String>();
-    private static ArrayList<String> mountsPR = new ArrayList<String>();
-    private static ArrayList<String> aliases = new ArrayList<String>();
-    private static ArrayList<String> aliasesPR = new ArrayList<String>();
+    private static ArrayList<String> mounts = new ArrayList<>();
+    private static ArrayList<String> mountsPR = new ArrayList<>();
+    private static ArrayList<String> aliases = new ArrayList<>();
+    private static ArrayList<String> aliasesPR = new ArrayList<>();
 
     static {
         File[] files = Environment.getRootDirectory().listFiles();
@@ -58,7 +58,7 @@ public final class FileUtils {
     private FileUtils() {
     }
 
-    public static final String getRealPath(String absolutePath) {
+    public static String getRealPath(String absolutePath) {
         String sdcard = Environment.getExternalStorageDirectory().getPath();
         String filepath = absolutePath;
         if (absolutePath.contains(sdcard)) {
@@ -67,11 +67,11 @@ public final class FileUtils {
         return filepath;
     }
 
-    public static final String getStoragePath(String path) {
+    public static String getStoragePath(String path) {
         return Environment.getExternalStorageDirectory().getPath() + "/" + (path);
     }
 
-    public static final File getStorageDir(String dir) {
+    public static File getStorageDir(String dir) {
         //String path = Environment.getExternalStorageDirectory().getPath() + "/" + dir;
         String sdcardRoot = getStorageDirPath();
         File file = new File(sdcardRoot + "/" + dir);
@@ -81,7 +81,7 @@ public final class FileUtils {
         return file;
     }
 
-    public static final String getStorageDirPath() {
+    public static String getStorageDirPath() {
         File externalFileRootDir = App.Companion.getInstance().getExternalFilesDir(null);
         do {
             externalFileRootDir = Objects.requireNonNull(externalFileRootDir).getParentFile();
@@ -93,7 +93,7 @@ public final class FileUtils {
         return sdcardRoot;
     }
 
-    public static final String getDir(File file) {
+    public static String getDir(File file) {
         if (file == null) {
             return "";
         }
@@ -101,7 +101,7 @@ public final class FileUtils {
         return file.getAbsolutePath().substring(0, file.getAbsolutePath().length() - name.length());
     }
 
-    public static final String getDir(String absPath) {
+    public static String getDir(String absPath) {
         if (absPath == null) {
             return "";
         }
@@ -112,7 +112,7 @@ public final class FileUtils {
         return absPath.substring(0, index + 1);
     }
 
-    public static final String getFileSize(final long size) {
+    public static String getFileSize(final long size) {
         if (size > 1073741824) {
             return String.format("%.2f", size / 1073741824.0) + " GB";
         } else if (size > 1048576) {
@@ -125,15 +125,15 @@ public final class FileUtils {
 
     }
 
-    public static final String getFileDate(final long time) {
+    public static String getFileDate(final long time) {
         return new SimpleDateFormat("dd MMM yyyy").format(time);
     }
 
-    public static final String getAbsolutePath(final File file) {
+    public static String getAbsolutePath(final File file) {
         return file != null ? file.getAbsolutePath() : null;
     }
 
-    public static final String getCanonicalPath(final File file) {
+    public static String getCanonicalPath(final File file) {
         try {
             return file != null ? file.getCanonicalPath() : null;
         } catch (final IOException ex) {
@@ -141,7 +141,7 @@ public final class FileUtils {
         }
     }
 
-    public static final String invertMountPrefix(final String fileName) {
+    public static String invertMountPrefix(final String fileName) {
         for (int i = 0, n = Math.min(aliases.size(), mounts.size()); i < n; i++) {
             final String alias = aliases.get(i);
             final String mount = mounts.get(i);
@@ -165,7 +165,7 @@ public final class FileUtils {
         return null;
     }
 
-    public static final String getName(final String absPath) {
+    public static String getName(final String absPath) {
         if (absPath == null) {
             return "";
         }
@@ -176,7 +176,7 @@ public final class FileUtils {
         return absPath.substring(index + 1);
     }
 
-    public static final String getNameWithoutExt(final String absPath) {
+    public static String getNameWithoutExt(final String absPath) {
         if (absPath == null) {
             return "";
         }
@@ -191,7 +191,7 @@ public final class FileUtils {
         return absPath.substring(index + 1, end);
     }
 
-    public static final String getExtension(final File file) {
+    public static String getExtension(final File file) {
         if (file == null) {
             return "";
         }
@@ -203,7 +203,7 @@ public final class FileUtils {
         return name.substring(index + 1);
     }
 
-    public static final String getExtension(String name) {
+    public static String getExtension(String name) {
         if (TextUtils.isEmpty(name)) {
             return name;
         }
@@ -214,7 +214,7 @@ public final class FileUtils {
         return name.substring(index + 1);
     }
 
-    public static final FilePath parseFilePath(final String path, final Collection<String> extensions) {
+    public static FilePath parseFilePath(final String path, final Collection<String> extensions) {
         final File file = new File(path);
         final FilePath result = new FilePath();
         result.path = LengthUtils.safeString(file.getParent());
@@ -252,13 +252,13 @@ public final class FileUtils {
             if (outs != null) {
                 try {
                     outs.close();
-                } catch (final IOException ex) {
+                } catch (final IOException ignored) {
                 }
             }
             if (ins != null) {
                 try {
                     ins.close();
-                } catch (final IOException ex) {
+                } catch (final IOException ignored) {
                 }
             }
         }
@@ -297,13 +297,13 @@ public final class FileUtils {
                     if (outs != null) {
                         try {
                             outs.close();
-                        } catch (final IOException ex) {
+                        } catch (final IOException ignored) {
                         }
                     }
                     if (ins != null) {
                         try {
                             ins.close();
-                        } catch (final IOException ex) {
+                        } catch (final IOException ignored) {
                         }
                     }
                 }
@@ -332,13 +332,13 @@ public final class FileUtils {
             if (out != null) {
                 try {
                     out.close();
-                } catch (final IOException ex) {
+                } catch (final IOException ignored) {
                 }
             }
             if (in != null) {
                 try {
                     in.close();
-                } catch (final IOException ex) {
+                } catch (final IOException ignored) {
                 }
             }
         }
@@ -366,13 +366,13 @@ public final class FileUtils {
             if (out != null) {
                 try {
                     out.close();
-                } catch (final IOException ex) {
+                } catch (final IOException ignored) {
                 }
             }
             if (in != null) {
                 try {
                     in.close();
-                } catch (final IOException ex) {
+                } catch (final IOException ignored) {
                 }
             }
         }
@@ -388,7 +388,7 @@ public final class FileUtils {
         }
     }
 
-    public static interface CopingProgress {
+    public interface CopingProgress {
 
         void progress(long bytes);
     }
@@ -404,7 +404,7 @@ public final class FileUtils {
         }
     }
 
-    public static final File getDiskCacheDir(final Context context, final String uniqueName) {
+    public static File getDiskCacheDir(final Context context, final String uniqueName) {
         final String cachePath = Environment.MEDIA_MOUNTED.equals(Environment
                 .getExternalStorageState()) ? getExternalCacheDir(
                 context).getPath() : context.getCacheDir().getPath();
@@ -418,7 +418,7 @@ public final class FileUtils {
      * @param context The {@link Context} to use
      * @return The external cache directory
      */
-    public static final File getExternalCacheDir(final Context context) {
+    public static File getExternalCacheDir(final Context context) {
         final File mCacheDir = context.getExternalCacheDir();
         if (mCacheDir != null) {
             return mCacheDir;
@@ -435,6 +435,43 @@ public final class FileUtils {
         }
 
         dir.mkdirs();
+    }
+
+    public static void deleteDir(File dir) {
+        if (dir.exists()) {
+            File[] files = dir.listFiles();
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteDir(file);
+                } else {
+                    deleteFile(file);
+                }
+            }
+        }
+    }
+
+    public static void deleteFile(File file) {
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                deleteDir(file);
+            } else {
+                file.delete();
+            }
+        }
+    }
+
+    public static void deleteFile(String path) {
+        if (TextUtils.isEmpty(path)) {
+            return;
+        }
+        File file = new File(path);
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                deleteDir(file);
+            } else {
+                file.delete();
+            }
+        }
     }
 
     //---------------------------
