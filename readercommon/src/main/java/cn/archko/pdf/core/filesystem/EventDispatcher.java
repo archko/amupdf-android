@@ -1,7 +1,5 @@
 package cn.archko.pdf.core.filesystem;
 
-import android.app.Activity;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -10,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import cn.archko.pdf.core.common.AppExecutors;
 import cn.archko.pdf.core.common.Logcat;
 import cn.archko.pdf.core.utils.LengthUtils;
 
@@ -17,8 +16,6 @@ import cn.archko.pdf.core.utils.LengthUtils;
  * @author: archko 2024/12/9 :16:30
  */
 public class EventDispatcher {
-
-    private final Activity m_base;
 
     private final InvokationType m_type;
 
@@ -43,7 +40,7 @@ public class EventDispatcher {
      * @param target    target object
      * @param listeners a list of listener interfaces
      */
-    public EventDispatcher(final Activity base, final InvokationType type, final Class<?>... listeners) {
+    public EventDispatcher(final InvokationType type, final Class<?>... listeners) {
         if (LengthUtils.isEmpty(listeners)) {
             throw new IllegalArgumentException("Listeners list cannot be empty");
         }
@@ -57,7 +54,6 @@ public class EventDispatcher {
             }
         }
 
-        m_base = base;
         m_type = type;
         m_handler = new Handler();
         m_interfaces = listeners;
@@ -143,7 +139,7 @@ public class EventDispatcher {
                 final Task task = new Task(targets, method, args);
                 switch (m_type) {
                     case AsyncUI:
-                        m_base.runOnUiThread(task);
+                        AppExecutors.Companion.getInstance().mainThread().execute(task);
                         break;
                     case SeparatedThread:
                         new Thread(task).start();

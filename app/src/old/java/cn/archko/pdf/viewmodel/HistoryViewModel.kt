@@ -1,4 +1,4 @@
-package cn.archko.pdf.fragments
+package cn.archko.pdf.viewmodel
 
 import android.os.Environment
 import android.text.TextUtils
@@ -16,6 +16,7 @@ import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.utils.DateUtils
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.StreamUtils
+import cn.archko.pdf.fragments.BackupViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -30,6 +31,9 @@ import java.io.File
  */
 class HistoryViewModel : ViewModel() {
     companion object {
+
+        const val STYLE_LIST = 0
+        const val STYLE_GRID = 1
 
         const val PAGE_SIZE = 20
         const val MAX_TIME = 1300L

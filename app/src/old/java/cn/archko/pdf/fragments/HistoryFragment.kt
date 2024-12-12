@@ -32,6 +32,9 @@ import cn.archko.pdf.core.entity.ResponseHandler
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.LengthUtils
 import cn.archko.pdf.core.widgets.ColorItemDecoration
+import cn.archko.pdf.viewmodel.HistoryViewModel
+import cn.archko.pdf.viewmodel.HistoryViewModel.Companion.STYLE_GRID
+import cn.archko.pdf.viewmodel.HistoryViewModel.Companion.STYLE_LIST
 import cn.archko.pdf.widgets.IMoreView
 import cn.archko.pdf.widgets.ListMoreView
 import kotlinx.coroutines.Dispatchers
@@ -456,9 +459,5 @@ class HistoryFragment : BrowserFragment() {
         const val TAG = "HistoryFragment"
         const val PREF_BROWSER = "pref_browser"
         const val PREF_BROWSER_KEY_FIRST = "pref_browser_key_first"
-
-        const val STYLE_LIST = 0
-
-        const val STYLE_GRID = 1
     }
 }

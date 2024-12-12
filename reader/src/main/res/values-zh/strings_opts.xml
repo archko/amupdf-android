@@ -127,6 +127,7 @@
     <string name="opts_on">开</string>
     <string name="opts_off">关</string>
 
+    <string name="tab_library">书库</string>
     <string name="tab_history">历史</string>
     <string name="tab_browser">浏览器</string>
     <string name="tab_favorite">收藏</string>

@@ -1,4 +1,4 @@
-package cn.archko.pdf.fragments
+package cn.archko.pdf.viewmodel
 
 import android.os.Environment
 import android.text.TextUtils
@@ -17,6 +17,7 @@ import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.entity.LoadResult
 import cn.archko.pdf.core.entity.State
 import cn.archko.pdf.core.utils.FileUtils
+import cn.archko.pdf.fragments.BrowserFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

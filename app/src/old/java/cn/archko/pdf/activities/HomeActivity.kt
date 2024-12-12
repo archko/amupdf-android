@@ -34,18 +34,14 @@ import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.GlobalEvent
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
-import cn.archko.pdf.core.filesystem.FileExtensionFilter
-import cn.archko.pdf.core.filesystem.FileSystemScanner
 import cn.archko.pdf.fragments.BrowserFragment
 import cn.archko.pdf.fragments.FavoriteFragment
 import cn.archko.pdf.fragments.HistoryFragment
-import cn.archko.pdf.fragments.SearchFragment
+import cn.archko.pdf.fragments.LibraryFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import vn.chungha.flowbus.collectFlowBus
-import java.io.File
 import java.lang.ref.WeakReference
-import java.util.Locale
 
 /**
  * @author archko
@@ -56,10 +52,10 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
     private lateinit var mViewPager: ViewPager2
     private lateinit var mPagerAdapter: TabsAdapter
 
-    private lateinit var searchBtn: ImageButton
+    //private lateinit var searchBtn: ImageButton
     private lateinit var settingBtn: ImageButton
     private lateinit var menuBtn: ImageButton
-    private val titles = arrayOfNulls<String>(3)
+    private val titles = arrayOfNulls<String>(4)
 
     private lateinit var tabLayout: TabLayout
     internal var mTabs: MutableList<SamplePagerItem> = ArrayList()
@@ -81,10 +77,8 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
 
         setContentView(R.layout.tabs_home)
 
-        searchBtn = findViewById(R.id.search)
         settingBtn = findViewById(R.id.setting)
         menuBtn = findViewById(R.id.menu)
-        searchBtn.setOnClickListener { showSearchDialog() }
         settingBtn.setOnClickListener { PdfOptionsActivity.start(this@HomeActivity) }
         menuBtn.setOnClickListener { prepareMenu(menuBtn) }
 
@@ -107,28 +101,6 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
             mPath = savedInstanceState.getString("path", null)
         }
         parseIntent()
-
-        /*val defaultHome = Environment.getExternalStorageDirectory().absolutePath
-        FileSystemScanner(this).startScan(object : FileExtensionFilter() {
-            override fun accept(file: File?, name: String?): Boolean {
-                if (null == file) {
-                    return false
-                }
-                val fname = file.name.lowercase(Locale.ROOT)
-                if (fname.startsWith(".")) {
-                    return false
-                }
-                if (file.isDirectory) {
-                    return true
-                }
-
-                return IntentFile.isMuPdf(fname)
-                        || IntentFile.isImage(fname)
-                        || IntentFile.isText(fname)
-                        || IntentFile.isDjvu(fname)
-                        || IntentFile.isMobi(fname)
-            }
-        }, defaultHome + "/book")*/
     }
 
     override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
@@ -241,36 +213,26 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
     }
 
     private fun addTab() {
-        titles[0] = getString(cn.archko.pdf.R.string.tab_history)
-        titles[1] = getString(cn.archko.pdf.R.string.tab_browser)
-        titles[2] = getString(cn.archko.pdf.R.string.tab_favorite)
+        titles[0] = getString(cn.archko.pdf.R.string.tab_library)
+        titles[1] = getString(cn.archko.pdf.R.string.tab_history)
+        titles[2] = getString(cn.archko.pdf.R.string.tab_browser)
+        titles[3] = getString(cn.archko.pdf.R.string.tab_favorite)
 
         var title = titles[0]
         var bundle = Bundle()
-        mTabs.add(SamplePagerItem(HistoryFragment::class.java, bundle, title!!))
+        mTabs.add(SamplePagerItem(LibraryFragment::class.java, bundle, title!!))
 
         title = titles[1]
         bundle = Bundle()
-        mTabs.add(SamplePagerItem(BrowserFragment::class.java, bundle, title!!))
+        mTabs.add(SamplePagerItem(HistoryFragment::class.java, bundle, title!!))
 
         title = titles[2]
         bundle = Bundle()
+        mTabs.add(SamplePagerItem(BrowserFragment::class.java, bundle, title!!))
+
+        title = titles[3]
+        bundle = Bundle()
         mTabs.add(SamplePagerItem(FavoriteFragment::class.java, bundle, title!!))
-    }
-
-    private fun showSearchDialog() {
-        val ft = supportFragmentManager.beginTransaction()
-        val prev = supportFragmentManager.findFragmentByTag("dialog")
-        if (prev != null) {
-            ft.remove(prev)
-        }
-        ft.addToBackStack(null)
-
-        // Create and show the dialog.
-        val fileInfoFragment = SearchFragment()
-        val bundle = Bundle()
-        fileInfoFragment.arguments = bundle
-        fileInfoFragment.show(ft, "dialog")
     }
 
     //========================================

@@ -1,13 +1,10 @@
 package cn.archko.pdf.core.filesystem;
 
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.FileObserver;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,8 +33,8 @@ public class FileSystemScanner {
 
     private ScanTask m_scanTask;
 
-    public FileSystemScanner(final Activity activity) {
-        this.listeners = new EventDispatcher(activity, EventDispatcher.InvokationType.AsyncUI, Listener.class, ProgressListener.class);
+    public FileSystemScanner() {
+        this.listeners = new EventDispatcher(EventDispatcher.InvokationType.AsyncUI, Listener.class, ProgressListener.class);
     }
 
     public void shutdown() {

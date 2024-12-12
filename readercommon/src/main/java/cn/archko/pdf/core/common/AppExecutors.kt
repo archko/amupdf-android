@@ -3,6 +3,7 @@ package cn.archko.pdf.core.common
 import android.os.Handler
 import android.os.Looper
 import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 /**
@@ -12,7 +13,7 @@ import java.util.concurrent.Executors
  * webservice requests).
  */
 open class AppExecutors(
-    private val diskIO: Executor,
+    private val diskIO: ExecutorService,
     private val networkIO: Executor,
     private val mainThread: Executor
 ) {
@@ -30,7 +31,7 @@ open class AppExecutors(
         MainThreadExecutor()
     )
 
-    fun diskIO(): Executor {
+    fun diskIO(): ExecutorService {
         return diskIO
     }
 

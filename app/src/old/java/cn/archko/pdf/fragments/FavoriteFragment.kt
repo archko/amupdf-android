@@ -12,6 +12,7 @@ import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.GlobalEvent
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.FileBean
+import cn.archko.pdf.viewmodel.FavoriteViewModel
 import cn.archko.pdf.widgets.IMoreView
 import cn.archko.pdf.widgets.ListMoreView
 

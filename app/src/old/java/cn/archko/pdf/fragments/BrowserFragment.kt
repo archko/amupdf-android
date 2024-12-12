@@ -32,6 +32,7 @@ import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.listeners.OnItemClickListener
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.widgets.ColorItemDecoration
+import cn.archko.pdf.viewmodel.BookViewModel
 import java.io.File
 
 /**
