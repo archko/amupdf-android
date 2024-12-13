@@ -209,7 +209,7 @@ class PdfFetcher(
         }
     }
 
-    private fun paint(image: Bitmap): Bitmap {
+    /*private fun paint(image: Bitmap): Bitmap {
         val left = 15
         val top = 10
         val width = 135 + left
@@ -240,5 +240,5 @@ class PdfFetcher(
         c.drawBitmap(image, Rect(0, 0, right, bottom), Rect(left, top, width, height), null)
 
         return bmp
-    }
+    }*/
 }

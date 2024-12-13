@@ -206,6 +206,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
         addTab()
         mPagerAdapter = TabsAdapter(this)
         mViewPager.adapter = mPagerAdapter
+        mViewPager.setCurrentItem(1,false)
 
         TabLayoutMediator(tabLayout, mViewPager) { tab, position ->
             tab.text = mTabs[position].title
