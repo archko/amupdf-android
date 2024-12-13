@@ -1,5 +1,6 @@
 package cn.archko.pdf.viewmodel
 
+import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -125,5 +126,28 @@ class LibraryViewModel : ViewModel() {
 
     fun shutdown() {
         fileSystemScanner.shutdown()
+    }
+
+    fun search(text: String) = flow {
+        try {
+            if (TextUtils.isEmpty(text)) {
+                emit(ResponseHandler.Success(list))
+                return@flow
+            }
+            val result: MutableList<FileBean> = mutableListOf()
+            for (fb in list) {
+                if (null != fb.label && fb.label!!.contains(text)) {
+                    result.add(fb)
+                }
+            }
+
+            emit(ResponseHandler.Success(result))
+        } catch (e: JSONException) {
+            emit(ResponseHandler.Failure())
+            e.printStackTrace()
+        } catch (e: Exception) {
+            emit(ResponseHandler.Failure())
+            Logcat.e(Logcat.TAG, e.message)
+        }
     }
 }

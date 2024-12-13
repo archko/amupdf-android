@@ -30,6 +30,7 @@ import cn.archko.pdf.core.common.Event.Companion.ACTION_SCAN
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.common.ScanEvent
 import cn.archko.pdf.core.entity.FileBean
+import cn.archko.pdf.core.entity.ResponseHandler
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.fragments.BrowserFragment.Companion.convertToEpub
 import cn.archko.pdf.fragments.BrowserFragment.Companion.createPdf
@@ -38,6 +39,9 @@ import cn.archko.pdf.utils.FetcherUtils
 import cn.archko.pdf.viewmodel.HistoryViewModel.Companion.STYLE_GRID
 import cn.archko.pdf.viewmodel.HistoryViewModel.Companion.STYLE_LIST
 import cn.archko.pdf.viewmodel.LibraryViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -66,7 +70,8 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
         libraryViewModel = LibraryViewModel()
 
         vn.chungha.flowbus.collectFlowBus<ScanEvent>(scope = this, isSticky = true) {
-            Logcat.d(HistoryFragment.TAG, "action_scan:${it.obj}")
+            Logcat.d(HistoryFragment.TAG, "action_scan:${it.name}")
+            autoScan = PdfOptionRepository.getAutoScan()
             if (TextUtils.equals(ACTION_SCAN, it.name)) {
                 scan()
             } else if (TextUtils.equals(ACTION_DONOT_SCAN, it.name)) {
@@ -169,6 +174,10 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
 
         binding.sort.setOnClickListener { v -> prepareMenu(v, R.menu.menu_sort) }
         binding.style.setOnClickListener { v -> prepareMenu(v, R.menu.menu_style) }
+        binding.imgClose.setOnClickListener {
+            binding.keyword.setText(null)
+            search("")
+        }
         scan()
 
         binding.keyword.addTextChangedListener(object : TextWatcher {
@@ -183,9 +192,22 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
                     binding.imgClose.visibility = View.GONE
                 } else {
                     binding.imgClose.visibility = View.VISIBLE
+                    search(s.toString())
                 }
             }
         })
+    }
+
+    private fun search(text: String) {
+        lifecycleScope.launch {
+            libraryViewModel.search(text)
+                .flowOn(Dispatchers.IO)
+                .collectLatest { res ->
+                    if (res is ResponseHandler.Success) {
+                        emitFileBeans(res.data)
+                    }
+                }
+        }
     }
 
     private fun prepareMenu(anchorView: View?, menuId: Int) {
@@ -254,7 +276,7 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
         }
     }
 
-    fun emitFileBeans(fileList: List<FileBean>) {
+    private fun emitFileBeans(fileList: List<FileBean>) {
         bookAdapter?.data = fileList
         bookAdapter?.notifyDataSetChanged()
     }
@@ -345,17 +367,17 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
                 val ext = bookProgress.ext!!.lowercase(Locale.ROOT)
 
                 AdapterUtils.setIcon(".$ext", mIcon!!)
-
-                var lp = mIcon!!.layoutParams
-                if (null == lp) {
-                    lp = LinearLayout.LayoutParams(coverWidth, coverHeight)
-                    mIcon!!.setLayoutParams(lp)
-                } else {
-                    lp.width = coverWidth
-                    lp.height = coverHeight
-                }
-                entry.file?.absolutePath?.let { FetcherUtils.load(it, mIcon!!.context, mIcon!!) }
             }
+
+            var lp = mIcon!!.layoutParams
+            if (null == lp) {
+                lp = LinearLayout.LayoutParams(coverWidth, coverHeight)
+                mIcon!!.setLayoutParams(lp)
+            } else {
+                lp.width = coverWidth
+                lp.height = coverHeight
+            }
+            entry.file?.absolutePath?.let { FetcherUtils.load(it, mIcon!!.context, mIcon!!) }
         }
     }
 

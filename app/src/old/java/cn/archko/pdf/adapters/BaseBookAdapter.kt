@@ -225,17 +225,17 @@ open class BaseBookAdapter(
                 val ext = bookProgress.ext!!.lowercase(Locale.ROOT)
 
                 AdapterUtils.setIcon(".$ext", mIcon!!)
-
-                var lp = mIcon!!.layoutParams
-                if (null == lp) {
-                    lp = LinearLayout.LayoutParams(coverWidth, coverHeight)
-                    mIcon!!.setLayoutParams(lp)
-                } else {
-                    lp.width = coverWidth
-                    lp.height = coverHeight
-                }
-                entry.file?.absolutePath?.let { FetcherUtils.load(it, mIcon!!.context, mIcon!!) }
             }
+
+            var lp = mIcon!!.layoutParams
+            if (null == lp) {
+                lp = LinearLayout.LayoutParams(coverWidth, coverHeight)
+                mIcon!!.setLayoutParams(lp)
+            } else {
+                lp.width = coverWidth
+                lp.height = coverHeight
+            }
+            entry.file?.absolutePath?.let { FetcherUtils.load(it, mIcon!!.context, mIcon!!) }
         }
     }
 }
