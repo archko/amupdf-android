@@ -2,9 +2,9 @@ incoming features
 
 ### 7.3
 - epub layout fit to screen width and height
+- change fontsize for epub/mobi/azw3
 - refector about page.
-- add library, scaning books?
-- change font for epub/mobi
-- support doc, azw, comic ?
+- add library, scaning books, sort, search, change view(list/grid)
+- support docx, azw3
 - support text selection?
 - support opds?
