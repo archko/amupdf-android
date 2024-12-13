@@ -4,6 +4,8 @@ import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import cn.archko.pdf.common.PdfOptionRepository
+import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.core.common.Graph
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
@@ -11,12 +13,14 @@ import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.entity.ResponseHandler
 import cn.archko.pdf.core.filesystem.FileExtensionFilter
 import cn.archko.pdf.core.filesystem.FileSystemScanner
+import cn.archko.pdf.core.utils.CompareUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import org.json.JSONException
 import java.io.File
+import java.util.Collections
 import java.util.Locale
 
 /**
@@ -31,6 +35,7 @@ class LibraryViewModel : ViewModel() {
 
     var list: MutableList<FileBean> = mutableListOf()
     private val fileSystemScanner = FileSystemScanner()
+    private var comparator: Comparator<FileBean> = CompareUtils.NAME_ASC
     private val fileMap = mutableMapOf<String, MutableList<FileBean>>()
 
     private val _uiFileModel = MutableLiveData<MutableList<FileBean>>()
@@ -61,14 +66,20 @@ class LibraryViewModel : ViewModel() {
 
     private val progressListener = FileSystemScanner.ProgressListener { show ->
         if (!show) {
-            Logcat.d(Logcat.TAG, "onFileScaned: ${fileMap.size}")
-            val fileList = mutableListOf<FileBean>()
-            for (entry in fileMap.entries) {
-                fileList.addAll(entry.value)
+            AppExecutors.instance.networkIO().execute {
+                comparator = CompareUtils.getSortor(PdfOptionRepository.getSort())
+                Logcat.d(Logcat.TAG, "onFileScaned: ${fileMap.size}")
+                val fileList = mutableListOf<FileBean>()
+                for (entry in fileMap.entries) {
+                    fileList.addAll(entry.value)
+                }
+                Collections.sort(fileList, comparator);
+                Logcat.d(Logcat.TAG, "onFileScaned: ${fileMap.size}, ${fileList.size}")
+                AppExecutors.instance.mainThread().execute {
+                    _uiFileModel.value = fileList
+                    list = fileList
+                }
             }
-            Logcat.d(Logcat.TAG, "onFileScaned: ${fileMap.size}, ${fileList.size}")
-            _uiFileModel.value = fileList
-            list = fileList
         }
     }
 
@@ -77,7 +88,7 @@ class LibraryViewModel : ViewModel() {
             val fileList = mutableListOf<FileBean>()
             Logcat.d(Logcat.TAG, "onFileScan:$parent, ${files.size}")
             for (file in files) {
-                if (file.isFile) {
+                if (file.isFile && !file.isHidden) {
                     val entry = FileBean(FileBean.NORMAL, file, true)
                     fileList.add(entry)
                 }
@@ -141,6 +152,27 @@ class LibraryViewModel : ViewModel() {
                 }
             }
 
+            emit(ResponseHandler.Success(result))
+        } catch (e: JSONException) {
+            emit(ResponseHandler.Failure())
+            e.printStackTrace()
+        } catch (e: Exception) {
+            emit(ResponseHandler.Failure())
+            Logcat.e(Logcat.TAG, e.message)
+        }
+    }
+
+    fun sort(cmp: Comparator<FileBean>) = flow {
+        try {
+            val result: MutableList<FileBean> = mutableListOf()
+            result.addAll(list)
+            if (cmp == comparator) {
+                emit(ResponseHandler.Success(result))
+                return@flow
+            }
+
+            comparator = cmp
+            Collections.sort(result, comparator);
             emit(ResponseHandler.Success(result))
         } catch (e: JSONException) {
             emit(ResponseHandler.Failure())

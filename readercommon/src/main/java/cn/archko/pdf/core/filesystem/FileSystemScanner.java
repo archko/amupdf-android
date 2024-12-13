@@ -234,7 +234,7 @@ public class FileSystemScanner {
             final File[] files = dir.listFiles((FilenameFilter) filter);
             // Sort file list
             if (LengthUtils.isNotEmpty(files)) {
-                //Arrays.sort(files, StringUtils.NFC);
+                //Arrays.sort(files, CompareUtils.NFC);
             }
             // Call the file scan callback
             l.onFileScan(dir, files);
@@ -246,7 +246,7 @@ public class FileSystemScanner {
 
             if (LengthUtils.isNotEmpty(childDirs)) {
                 // Sort child dir list
-                //Arrays.sort(childDirs, StringUtils.NFC);
+                //Arrays.sort(childDirs, CompareUtils.NFC);
                 // Add children for deep ordered scanning
                 synchronized (this) {
                     for (int i = childDirs.length - 1; i >= 0; i--) {

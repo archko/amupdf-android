@@ -31,6 +31,7 @@ import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.common.ScanEvent
 import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.entity.ResponseHandler
+import cn.archko.pdf.core.utils.CompareUtils
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.fragments.BrowserFragment.Companion.convertToEpub
 import cn.archko.pdf.fragments.BrowserFragment.Companion.createPdf
@@ -231,14 +232,44 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
                 applyStyle()
             }
 
-            R.id.action_sort_name -> {}
-            R.id.action_sort_name_desc -> {}
-            R.id.action_sort_create -> {}
-            R.id.action_sort_create_desc -> {}
-            R.id.action_sort_size -> {}
-            R.id.action_sort_size_desc -> {}
+            R.id.action_sort_name -> {
+                sort(0, CompareUtils.NAME_ASC)
+            }
+
+            R.id.action_sort_name_desc -> {
+                sort(1, CompareUtils.NAME_DESC)
+            }
+
+            R.id.action_sort_create -> {
+                sort(2, CompareUtils.MODIFY_ASC)
+            }
+
+            R.id.action_sort_create_desc -> {
+                sort(3, CompareUtils.MODIFY_DESC)
+            }
+
+            R.id.action_sort_size -> {
+                sort(4, CompareUtils.SIZE_ASC)
+            }
+
+            R.id.action_sort_size_desc -> {
+                sort(5, CompareUtils.SIZE_DESC)
+            }
         }
         return false
+    }
+
+    private fun sort(sort: Int, comp: Comparator<FileBean>) {
+        lifecycleScope.launch {
+            PdfOptionRepository.setSort(sort)
+            libraryViewModel.sort(comp)
+                .flowOn(Dispatchers.IO)
+                .collectLatest { res ->
+                    if (res is ResponseHandler.Success) {
+                        emitFileBeans(res.data)
+                    }
+                }
+        }
     }
 
     private fun addDecoration() {

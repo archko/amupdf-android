@@ -200,6 +200,14 @@ object PdfOptionRepository {
         return mmkv.decodeBool(PdfOptionKeys.PREF_AUTO_SCAN, true)
     }
 
+    fun setSort(sort: Int) {
+        mmkv.encode(PdfOptionKeys.PREF_LIBRARY_SORT, sort)
+    }
+
+    fun getSort(): Int {
+        return mmkv.decodeInt(PdfOptionKeys.PREF_LIBRARY_SORT, 0)
+    }
+
     @JvmField
     val FONT_DIR = "Fonts/"
 
@@ -271,6 +279,7 @@ object PdfOptionKeys {
     const val PREF_LIBRARY_STYLE = ("libraryStyle")
     const val PREF_AUTO_SCAN = ("autoScan")
     const val PREF_SCAN_FOLDER = ("scanFolder")
+    const val PREF_LIBRARY_SORT = ("prefLibrarySort")
 
     //============== font and style ==============
     const val FONT_KEY_TYPE = ("font_key_type")
