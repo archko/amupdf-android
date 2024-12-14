@@ -10,7 +10,7 @@
         android:layout_height="44dp"
         android:layout_marginStart="8dp"
         android:background="@drawable/button"
-        android:src="@drawable/ic_close" />
+        android:src="@drawable/ic_close_black" />
 
     <ImageView
         android:id="@+id/ttsSleep"
@@ -18,7 +18,7 @@
         android:layout_height="44dp"
         android:layout_marginStart="8dp"
         android:background="@drawable/button"
-        android:src="@drawable/ic_sleep" />
+        android:src="@drawable/ic_sleep_black" />
 
     <ImageView
         android:id="@+id/ttsPlay"
@@ -27,7 +27,7 @@
         android:layout_gravity="center"
         android:layout_marginStart="8dp"
         android:background="@drawable/button"
-        android:src="@drawable/ic_tts_play" />
+        android:src="@drawable/ic_tts_play_black" />
 
     <ImageView
         android:id="@+id/ttsCircle"
@@ -36,7 +36,7 @@
         android:layout_gravity="center"
         android:layout_marginStart="8dp"
         android:background="@drawable/button"
-        android:src="@drawable/ic_tts_cirlce" />
+        android:src="@drawable/ic_tts_cirlce_black" />
 
     <ImageView
         android:id="@+id/ttsText"
@@ -45,6 +45,6 @@
         android:layout_gravity="center"
         android:layout_marginStart="8dp"
         android:background="@drawable/button"
-        android:src="@drawable/ic_voice_text" />
+        android:src="@drawable/ic_voice_text_black" />
 
 </LinearLayout>

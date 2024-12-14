@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/transparent"
-            app:navigationIcon="@drawable/ic_back"
+            app:navigationIcon="@drawable/ic_back_black"
             app:title="@string/edit_title" />
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -48,7 +48,7 @@
             android:gravity="center"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:src="@drawable/ic_export" />
+            android:src="@drawable/ic_export_black" />
 
     </LinearLayout>
 
