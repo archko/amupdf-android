@@ -9,8 +9,7 @@ import com.tencent.mmkv.MMKV
  */
 object PdfOptionRepository {
 
-    private val TAG: String = "PdfPreferencesRepo"
-    val mmkv = MMKV.defaultMMKV()
+    private val mmkv: MMKV = MMKV.defaultMMKV()
 
     fun setOrientation(ori: Int) {
         mmkv.encode(PdfOptionKeys.PREF_ORIENTATION, ori)
@@ -52,24 +51,12 @@ object PdfOptionRepository {
         return mmkv.decodeBool(PdfOptionKeys.PREF_AUTOCROP, true)
     }
 
-    fun getVerticalScrollLock(): Boolean {
-        return mmkv.decodeBool(PdfOptionKeys.PREF_VERTICAL_SCROLL_LOCK, true)
-    }
-
     fun setKeepOn(enable: Boolean) {
         mmkv.encode(PdfOptionKeys.PREF_KEEP_ON, enable)
     }
 
     fun getKeepOn(): Boolean {
         return mmkv.decodeBool(PdfOptionKeys.PREF_KEEP_ON, true)
-    }
-
-    fun setDartTheme(dartTheme: Boolean) {
-        mmkv.encode(PdfOptionKeys.PREF_DART_THEME, dartTheme)
-    }
-
-    fun getDartTheme(): Boolean {
-        return mmkv.decodeBool(PdfOptionKeys.PREF_DART_THEME, false)
     }
 
     fun setFontType(fontType: Int) {
@@ -208,8 +195,16 @@ object PdfOptionRepository {
         return mmkv.decodeInt(PdfOptionKeys.PREF_LIBRARY_SORT, 0)
     }
 
+    fun setDecodeBlock(sort: Int) {
+        mmkv.encode(PdfOptionKeys.PREF_DECODE_BLOCK, sort)
+    }
+
+    fun getDecodeBlock(): Int {
+        return mmkv.decodeInt(PdfOptionKeys.PREF_DECODE_BLOCK, 2)
+    }
+
     @JvmField
-    val FONT_DIR = "Fonts/"
+    val FONT_DIR = "fonts/"
 
     @JvmField
     val SYSTEM_FONT = "System Font"
@@ -262,24 +257,22 @@ object PdfOptionKeys {
 
     const val PREF_ORIENTATION = ("orientation")
     const val PREF_OCR = ("image_ocr")
-    const val PREF_OVERRIDE_FILE = ("override_file")
     const val PREF_FULLSCREEN = ("fullscreen")
     const val PREF_AUTOCROP = ("autocrop")
-    const val PREF_VERTICAL_SCROLL_LOCK = ("verticalScrollLock")
-    const val PREF_SIDE_MARGINS = ("sideMargins2") // sideMargins was boolean
 
+    const val PREF_LEFT_MARGIN = ("leftMargin")
     const val PREF_TOP_MARGIN = ("topMargin")
+    const val PREF_RIGHT_MARGIN = ("rightMargin")
+    const val PREF_BOTTOM_MARGIN = ("bottomMargin")
     const val PREF_KEEP_ON = ("keepOn")
-    const val PREF_DART_THEME = ("pref_dart_theme")
     const val PREF_DIRS_FIRST = ("dirsFirst")
-    const val PREF_NEW_VIEWER = ("newViewer")
-    const val PREF_CROPPER = ("cropper")
     const val PREF_COLORMODE = ("colorMode")
     const val PREF_STYLE = ("style")
     const val PREF_LIBRARY_STYLE = ("libraryStyle")
     const val PREF_AUTO_SCAN = ("autoScan")
     const val PREF_SCAN_FOLDER = ("scanFolder")
     const val PREF_LIBRARY_SORT = ("prefLibrarySort")
+    const val PREF_DECODE_BLOCK = ("decodeBlock")
 
     //============== font and style ==============
     const val FONT_KEY_TYPE = ("font_key_type")

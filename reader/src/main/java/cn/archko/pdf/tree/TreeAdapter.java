@@ -191,7 +191,7 @@ public class TreeAdapter<T extends RvTree> extends RecyclerView.Adapter<TreeAdap
             int rotateDegree = node.isExpand() ? 90 : 0;
             icon.setRotation(0);
             icon.setRotation(rotateDegree);
-            icon.setImageResource(R.drawable.ic_arrow_right_white_24dp);
+            icon.setImageResource(R.drawable.ic_arrow_right);
         }
 
         @Override

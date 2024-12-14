@@ -9,13 +9,15 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
+import com.tencent.mmkv.MMKV;
+
 import java.lang.ref.SoftReference;
 import java.util.Arrays;
 
 import cn.archko.pdf.core.cache.BitmapPool;
 
 public class PageTreeNode {
-    private static final int SLICE_SIZE = 256 * 256 * 4;
+    private static int SLICE_SIZE = 256 * 256 * 4;
     private Bitmap bitmap;
     private SoftReference<Bitmap> bitmapWeakReference;
     private boolean decodingNow;
@@ -47,6 +49,16 @@ public class PageTreeNode {
     }
 
     PageTreeNode(DocumentView documentView, RectF localPageSliceBounds, Page page, int treeNodeDepthLevel, PageTreeNode parent, ColorFilter filter) {
+        int decodeBlock = MMKV.defaultMMKV().decodeInt("decodeBlock", 2);
+        if (decodeBlock == 0) {
+            SLICE_SIZE = 128 * 128;
+        } else if (decodeBlock == 1) {
+            SLICE_SIZE = 256 * 256;
+        } else if (decodeBlock == 2) {
+            SLICE_SIZE = 512 * 512;
+        } else if (decodeBlock == 3) {
+            SLICE_SIZE = 1024 * 1024;
+        }
         this.documentView = documentView;
         this.pageSliceBounds = evaluatePageSliceBounds(localPageSliceBounds, parent);
         this.page = page;

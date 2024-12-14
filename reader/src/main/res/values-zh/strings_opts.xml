@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="auto_crop">自动切边</string>
-    <string name="in_reflow_mode">重排模式</string>
-    <string name="leaving_reflow_mode">正在离开重排模式</string>
     <string name="toggle_reflow_mode">切换重排模式</string>
     <string name="toggle_reflow_image">图片重排模式</string>
     <string name="outline_title">目录</string>
     <string name="bookmark_title">书签</string>
     <string name="font_title">字体大小</string>
 
-    <string name="menu_goto_page">跳转到页…</string>
     <string name="menu_set_as_home">设为主目录</string>
     <string name="menu_search">搜索</string>
     <string name="menu_backup">备份历史</string>
@@ -44,26 +41,15 @@
     <string name="menu_opt_no_crop">不切边</string>
     <string name="menu_opt_edit">编辑</string>
 
-    <string name="cake_menu_reflow">文本重排</string>
-    <string name="cake_menu_ocr">识别文本</string>
-    <string name="cake_menu_auto_crop">自动切边</string>
-    <string name="cake_menu_ourline">查看大纲</string>
-    <string name="cake_menu_seek">查看进度</string>
-    <string name="cake_menu_scroll_ori">滚动方向</string>
-    <string name="cake_menu_exit">退出App</string>
-
     <string name="go_home">主目录</string>
 
     <string name="options">设置</string>
     <string name="opts_dirs_first">目录优先</string>
     <string name="opts_show_extension">显示文件扩展名</string>
-    <string name="opts_new_viewer">用新阅读器打开</string>
-    <string name="opts_cropper">新的切边方案</string>
     <string name="opts_orientation">屏幕方向</string>
     <string name="opts_scan">自动扫描</string>
     <string name="opts_scan_folder">自动扫描目录</string>
     <string name="opts_color_mode">颜色模式</string>
-    <string name="opts_default_orientation">7</string>
     <string-array name="opts_orientation_labels">
         <item>自动</item>
         <item>不变</item>
@@ -102,13 +88,10 @@
     <string name="opts_viewer">PDF 查看器</string>
     <string name="opts_selector">文件选择器</string>
     <string name="opts_ocr_view">图片文本识别/查看</string>
-    <string name="opts_override_file_view">压缩后覆盖原文件</string>
     <string name="opts_fullscreen">全屏</string>
     <string name="opts_autocrop">自动切边</string>
     <string name="opts_autocrop_summary">自动切去空白边界</string>
 
-    <string name="opts_vertical_scroll_lock">垂直滚动锁定</string>
-    <string name="opts_vertical_scroll_lock_sub">要水平滚动,你要先滚动屏幕的1/5.</string>
     <string name="opts_fastscroll">快速滚动</string>
     <string name="opts_fastscroll_summary">显示快速滚动滑块</string>
 
@@ -156,7 +139,7 @@
     <string name="menu_font_fg">前景</string>
 
     <string name="dialog_title_font">选择字体</string>
-    <string name="dialog_sub_title_font">请将字体放入 /sdcard/amupdf/fonts 目录</string>
+    <string name="dialog_sub_title_font">请将字体放入 /sdcard/fonts 目录</string>
     <string name="dialog_item_title_font">%s:测试字体</string>
 
     <string name="title_home">主目录:</string>
@@ -166,4 +149,6 @@
     <string name="no_bookmark">没有书签,先添加一个吧</string>
 
     <string name="tts_failed">初始化语音引擎失败</string>
+
+    <string name="opts_decode_block_title">位图尺寸</string>
 </resources>

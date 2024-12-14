@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="auto_crop">Auto Crop</string>
-    <string name="in_reflow_mode">Reflow mode</string>
-    <string name="leaving_reflow_mode">Leaving reflow mode</string>
     <string name="toggle_reflow_mode">Toggle reflow mode</string>
     <string name="toggle_reflow_image">Reflow as Image</string>
     <string name="outline_title">Outline</string>
     <string name="bookmark_title">Bookmark</string>
     <string name="font_title">Font Size</string>
 
-    <string name="menu_goto_page">Go to page…</string>
     <string name="menu_set_as_home">Set as home</string>
     <string name="menu_search">Search</string>
     <string name="menu_backup">BackUp History</string>
@@ -44,26 +41,16 @@
     <string name="menu_opt_no_crop">no crop</string>
     <string name="menu_opt_edit">Edit</string>
 
-    <string name="cake_menu_reflow">Reflow</string>
-    <string name="cake_menu_ocr">Ocr</string>
-    <string name="cake_menu_auto_crop">Crop</string>
-    <string name="cake_menu_ourline">Outline</string>
-    <string name="cake_menu_seek">Seek</string>
-    <string name="cake_menu_scroll_ori">Direction</string>
-    <string name="cake_menu_exit">ExitApp</string>
-
     <string name="go_home">Home</string>
 
     <string name="options">Settings</string>
     <string name="opts_dirs_first">List directories first</string>
     <string name="opts_show_extension">Show file extension</string>
-    <string name="opts_new_viewer">Open with new viewer</string>
-    <string name="opts_cropper">New Croper</string>
     <string name="opts_orientation">Orientation</string>
     <string name="opts_scan">Auto Scan</string>
     <string name="opts_scan_folder">Auto Scan Folder</string>
     <string name="opts_color_mode">Color Mode</string>
-    <string name="opts_default_orientation">7</string>
+    <string name="opts_default_orientation" translatable="false">7</string>
     <string-array name="opts_orientation_labels">
         <item>automatic</item>
         <item>harder to change</item>
@@ -117,15 +104,11 @@
     <string name="opts_viewer">PDF Viewer</string>
     <string name="opts_selector">File Chooser</string>
     <string name="opts_ocr_view">Ocr/View</string>
-    <string name="opts_override_file_view">Override File After Compressed</string>
     <string name="opts_fullscreen">Fullscreen</string>
     <string name="opts_autocrop">Auto Crop</string>
     <string name="opts_fastscroll">Fast scroll</string>
     <string name="opts_autocrop_summary">Auto Crop blank bounds</string>
     <string name="opts_fastscroll_summary">Show Fast scroll bar</string>
-
-    <string name="opts_vertical_scroll_lock">Vertical scroll lock</string>
-    <string name="opts_vertical_scroll_lock_sub">To scroll horizontally, you must first move horizontally 1/5 of the screen width.</string>
 
     <string name="opts_side_margin">Extra side margins</string>
     <string name="opts_default_side_margin" translatable="false">0</string>
@@ -192,5 +175,21 @@
     <string name="no_bookmark">No bookmark,add one?</string>
 
     <string name="tts_failed">Init tts engine failed.</string>
+
+    <string name="opts_decode_block_title">Bitmap size</string>
+    <string name="opts_default_decode_block" translatable="false">2</string>
+    <string-array name="opts_decode_block_label">
+        <item>128*128</item>
+        <item>256*256</item>
+        <item>512*512</item>
+        <item>1024*1024</item>
+    </string-array>
+
+    <string-array name="opts_decode_block">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
 
 </resources>

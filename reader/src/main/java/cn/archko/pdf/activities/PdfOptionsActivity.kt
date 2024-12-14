@@ -20,6 +20,7 @@ import cn.archko.pdf.common.PdfOptionKeys
 import cn.archko.pdf.common.PdfOptionRepository.getAutoScan
 import cn.archko.pdf.common.PdfOptionRepository.getAutocrop
 import cn.archko.pdf.common.PdfOptionRepository.getColorMode
+import cn.archko.pdf.common.PdfOptionRepository.getDecodeBlock
 import cn.archko.pdf.common.PdfOptionRepository.getDirsFirst
 import cn.archko.pdf.common.PdfOptionRepository.getFullscreen
 import cn.archko.pdf.common.PdfOptionRepository.getKeepOn
@@ -29,6 +30,7 @@ import cn.archko.pdf.common.PdfOptionRepository.getShowExtension
 import cn.archko.pdf.common.PdfOptionRepository.setAutoScan
 import cn.archko.pdf.common.PdfOptionRepository.setAutocrop
 import cn.archko.pdf.common.PdfOptionRepository.setColorMode
+import cn.archko.pdf.common.PdfOptionRepository.setDecodeBlock
 import cn.archko.pdf.common.PdfOptionRepository.setDirsFirst
 import cn.archko.pdf.common.PdfOptionRepository.setFullscreen
 import cn.archko.pdf.common.PdfOptionRepository.setImageOcr
@@ -105,8 +107,6 @@ class PdfOptionsActivity : FragmentActivity() {
         )
         prefsList.add(prefs)
 
-        //prefs = new Prefs(TYPE_CHECK, getString(R.string.opts_ocr_view), getString(R.string.opts_ocr_view), PdfOptionKeys.PREF_OCR, PdfOptionRepository.INSTANCE.getImageOcr());
-        //prefsList.add(prefs);
         prefs = Prefs(
             TYPE_CHECK,
             getString(R.string.opts_fullscreen),
@@ -182,6 +182,17 @@ class PdfOptionsActivity : FragmentActivity() {
             resources.getStringArray(R.array.opts_color_modes),
             resources.getStringArray(R.array.opts_color_mode_labels),
             getColorMode()
+        )
+        prefsList.add(prefs)
+
+        prefs = Prefs(
+            TYPE_LIST,
+            getString(R.string.opts_decode_block_title),
+            getString(R.string.opts_decode_block_title),
+            PdfOptionKeys.PREF_DECODE_BLOCK,
+            resources.getStringArray(R.array.opts_decode_block),
+            resources.getStringArray(R.array.opts_decode_block_label),
+            getDecodeBlock()
         )
         prefsList.add(prefs)
     }
@@ -277,6 +288,8 @@ class PdfOptionsActivity : FragmentActivity() {
                 setColorMode(value.toString().toInt())
             } else if (TextUtils.equals(key, PdfOptionKeys.PREF_STYLE)) {
                 setStyle(value.toString().toInt())
+            } else if (TextUtils.equals(key, PdfOptionKeys.PREF_DECODE_BLOCK)) {
+                setDecodeBlock(value.toString().toInt())
             }
         }
     }

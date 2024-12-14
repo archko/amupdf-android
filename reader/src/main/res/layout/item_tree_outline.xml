@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="4dp"
+        android:layout_marginStart="4dp"
         android:textColor="@color/white"
         android:textSize="16sp" />
 
@@ -22,9 +22,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="4dp"
-        android:layout_toRightOf="@id/tag"
-        android:layout_toLeftOf="@id/layout_page"
+        android:layout_marginStart="4dp"
+        android:layout_toEndOf="@id/tag"
+        android:layout_toStartOf="@id/layout_page"
         android:textColor="@color/white"
         android:textSize="14sp" />
 
@@ -32,7 +32,7 @@
         android:id="@+id/layout_page"
         android:orientation="horizontal"
         android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
@@ -41,7 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:paddingRight="8dp"
+            android:paddingEnd="8dp"
             android:text="33"
             android:textColor="@color/white"
             android:textSize="14sp" />
@@ -49,7 +49,7 @@
         <ImageView
             android:id="@+id/icon"
             android:background="@drawable/button"
-            android:src="@drawable/ic_arrow_right_white_24dp"
+            android:src="@drawable/ic_arrow_right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
