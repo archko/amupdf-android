@@ -268,7 +268,7 @@ class PdfOptionsActivity : FragmentActivity() {
 
         fun showListDialog(data: Prefs, summary: TextView) {
             val builder = AlertDialog.Builder(this@PdfOptionsActivity)
-            builder.setTitle("请选择")
+            builder.setTitle(data.title)
             builder.setSingleChoiceItems(
                 data.labels,
                 data.index
@@ -346,7 +346,7 @@ class PdfOptionsActivity : FragmentActivity() {
             val builder = AlertDialog.Builder(this@PdfOptionsActivity)
             val editText = EditText(this@PdfOptionsActivity)
             editText.setText(data.value.toString())
-            builder.setTitle("Scan Folder")
+            builder.setTitle(data.title)
             builder.setView(editText)
             builder.setPositiveButton("OK") { dialog: DialogInterface, _: Int ->
                 val path = editText.text.toString()

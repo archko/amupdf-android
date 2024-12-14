@@ -3,7 +3,7 @@
     <background android:drawable="@color/white" />
     <foreground>
         <inset
-            android:drawable="@mipmap/logo"
+            android:drawable="@mipmap/icon"
             android:inset="23%" />
     </foreground>
 
