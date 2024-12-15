@@ -38,4 +38,6 @@ interface AViewController {
     fun setFilter(colorMode: Int)
     fun decodePageForTts(currentPos: Int)
     fun reflow(): Int
+    fun prev(string: String?)
+    fun next(string: String?)
 }

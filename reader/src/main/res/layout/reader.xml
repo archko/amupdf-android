@@ -23,13 +23,14 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="42dp"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
             android:paddingEnd="4dp">
 
             <ImageButton
                 android:id="@+id/back_button"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
-                android:layout_marginStart="4dp"
                 android:background="@drawable/button"
                 android:contentDescription="back"
                 android:scaleType="center"
@@ -40,76 +41,99 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
 
-            <ImageButton
-                android:id="@+id/ttsButton"
-                android:layout_width="42dp"
+            <HorizontalScrollView
+                android:layout_width="wrap_content"
                 android:layout_height="42dp"
-                android:background="@drawable/button"
-                android:contentDescription="tts"
-                android:src="@drawable/ic_tts"
-                android:visibility="visible"
-                tools:visibility="visible" />
+                android:scrollbars="none">
 
-            <ImageButton
-                android:id="@+id/autoCropButton"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@drawable/button"
-                android:contentDescription="@string/auto_crop"
-                android:src="@drawable/ic_crop"
-                android:visibility="visible"
-                tools:visibility="visible" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
 
-            <ImageButton
-                android:id="@+id/reflowButton"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@drawable/button"
-                android:contentDescription="@string/toggle_reflow_mode"
-                android:src="@drawable/ic_reflow"
-                android:visibility="visible"
-                tools:visibility="visible" />
+                    <ImageButton
+                        android:id="@+id/ttsButton"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="tts"
+                        android:src="@drawable/ic_tts"
+                        android:visibility="visible"
+                        tools:visibility="visible" />
 
-            <ImageButton
-                android:id="@+id/imageButton"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@drawable/button"
-                android:contentDescription="@string/toggle_reflow_image"
-                android:src="@drawable/ic_image_text"
-                android:visibility="visible"
-                tools:visibility="visible" />
+                    <ImageButton
+                        android:id="@+id/autoCropButton"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="@string/auto_crop"
+                        android:src="@drawable/ic_crop"
+                        android:visibility="visible"
+                        tools:visibility="visible" />
 
-            <ImageButton
-                android:id="@+id/outlineButton"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@drawable/button"
-                android:contentDescription="@string/outline_title"
-                android:src="@drawable/ic_toc" />
+                    <ImageButton
+                        android:id="@+id/reflowButton"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="@string/toggle_reflow_mode"
+                        android:src="@drawable/ic_reflow"
+                        android:visibility="visible"
+                        tools:visibility="visible" />
 
-            <ImageButton
-                android:id="@+id/ocrButton"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@drawable/button"
-                android:contentDescription="@string/outline_title"
-                android:src="@drawable/ic_ocr" />
+                    <ImageButton
+                        android:id="@+id/imageButton"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="@string/toggle_reflow_image"
+                        android:src="@drawable/ic_image_text"
+                        android:visibility="visible"
+                        tools:visibility="visible" />
 
-            <ImageButton
-                android:id="@+id/oriButton"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@drawable/button"
-                android:contentDescription="@string/opts_orientation"
-                android:src="@drawable/ic_vertical" />
+                    <ImageButton
+                        android:id="@+id/outlineButton"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="@string/outline_title"
+                        android:src="@drawable/ic_toc" />
+
+                    <ImageButton
+                        android:id="@+id/ocrButton"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="@string/outline_title"
+                        android:src="@drawable/ic_ocr" />
+
+                    <ImageButton
+                        android:id="@+id/oriButton"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="@string/opts_orientation"
+                        android:src="@drawable/ic_vertical" />
+
+                    <ImageButton
+                        android:id="@+id/searchButton"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/button"
+                        android:contentDescription=""
+                        android:src="@drawable/ic_search" />
+                </LinearLayout>
+            </HorizontalScrollView>
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/layout_path"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="8dp">
+            android:padding="8dp"
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <TextView
                 android:id="@+id/path"
@@ -119,7 +143,8 @@
                 android:singleLine="true"
                 android:text=""
                 android:textColor="@android:color/white"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/title"
@@ -130,6 +155,60 @@
                 android:text=""
                 android:textColor="@android:color/white"
                 android:textSize="15sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_search"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <EditText
+                android:id="@+id/keyword"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:text=""
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
+
+            <ImageButton
+                android:id="@+id/prevButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/button"
+                android:contentDescription=""
+                android:src="@drawable/ic_arrow_left"
+                android:visibility="visible"
+                tools:visibility="visible" />
+
+            <ImageButton
+                android:id="@+id/nextButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/button"
+                android:contentDescription=""
+                android:src="@drawable/ic_arrow_right"
+                android:visibility="visible"
+                tools:visibility="visible" />
+
+            <ImageButton
+                android:id="@+id/closeButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/button"
+                android:contentDescription=""
+                android:src="@drawable/ic_close"
+                android:visibility="visible"
+                tools:visibility="visible" />
 
         </LinearLayout>
     </LinearLayout>

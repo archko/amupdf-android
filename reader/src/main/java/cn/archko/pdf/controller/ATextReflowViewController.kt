@@ -145,6 +145,12 @@ class ATextReflowViewController(
         return BookProgress.REFLOW_TXT
     }
 
+    override fun prev(string: String?) {
+    }
+
+    override fun next(string: String?) {
+    }
+
     //--------------------------------------
 
     override fun onPause() {

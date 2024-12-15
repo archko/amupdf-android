@@ -43,6 +43,7 @@ public class PdfPageController extends DefaultPageController {
 
         if (viewMode == ViewMode.REFLOW_SCAN) {
             oriButton.setVisibility(View.GONE);
+            searchButton.setVisibility(View.GONE);
         } else {
             oriButton.setVisibility(View.VISIBLE);
         }

@@ -1,5 +1,8 @@
 incoming features
 
+### 7.4
+- add search
+
 ### 7.3
 - epub layout fit to screen width and height
 - change fontsize for epub/mobi/azw3

@@ -419,6 +419,16 @@ public class DecodeServiceBase implements DecodeService {
         return thumb;
     }
 
+    @Override
+    public void prev(String text) {
+
+    }
+
+    @Override
+    public void next(String text) {
+
+    }
+
     Rect getScaledSize(final DecodeTask task, final APage vuPage, float scale, boolean crop) {
         Rect rect = new Rect();
         rect.right = getScaledWidth(task, vuPage, scale, crop);

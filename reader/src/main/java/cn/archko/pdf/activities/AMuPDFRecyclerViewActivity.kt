@@ -536,8 +536,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
     }
 
-    private val pageListener = object :
-        PageControllerListener {
+    private val pageListener = object : PageControllerListener {
         override fun toggleReflow() {
             this@AMuPDFRecyclerViewActivity.toggleReflow()
         }
@@ -567,8 +566,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
 
         override fun toggleTts() {
-            if (ttsMode) {
-            } else {
+            if (!ttsMode) {
                 TTSEngine.get().getTTS { status: Int ->
                     if (status == TextToSpeech.SUCCESS) {
                         ttsLayout.visibility = View.VISIBLE
@@ -588,6 +586,14 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
         override fun ocr() {
             this@AMuPDFRecyclerViewActivity.ocr()
+        }
+
+        override fun prev(string: String?) {
+            viewController?.prev(string)
+        }
+
+        override fun next(string: String?) {
+            viewController?.next(string)
         }
     }
 

@@ -22,4 +22,8 @@ public interface PageControllerListener {
     void toggleTts();
 
     void ocr();
+
+    void prev(String string);
+
+    void next(String string);
 }

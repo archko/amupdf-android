@@ -6,10 +6,12 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.TextPaint;
-import android.util.Log;
+
+import com.artifex.mupdf.fitz.Quad;
 
 import org.vudroid.R;
 
@@ -25,6 +27,7 @@ public class Page {
     private PageTreeNode node;
     private DocumentView documentView;
     public List<Hyperlink> links;
+    public Quad[][] mSearchBoxes;
     private final TextPaint textPaint = textPaint();
     private Paint fillPaint = null;
     private final Paint strokePaint = strokePaint();
@@ -99,6 +102,7 @@ public class Page {
         //canvas.drawLine(bounds.left, bounds.top, bounds.right, bounds.top, strokePaint);
         canvas.drawLine(bounds.left, bounds.bottom, bounds.right / 5, bounds.bottom, strokePaint);
         drawPageLinks(canvas);
+        drawSearchResult(canvas);
     }
 
     protected String getKey() {
@@ -319,6 +323,23 @@ public class Page {
                     linkPaint.setColor(documentView.getContext().getResources().getColor(R.color.link_uri));
                 }
                 canvas.drawRect(rect, linkPaint);
+            }
+        }
+    }
+
+    private void drawSearchResult(Canvas canvas) {
+        if (mSearchBoxes != null) {
+            float scale = documentView.calculateScale(this);
+            for (Quad[] searchBox : mSearchBoxes) {
+                for (Quad q : searchBox) {
+                    Path path = new Path();
+                    path.moveTo(q.ul_x * scale, q.ul_y * scale);
+                    path.lineTo(q.ll_x * scale, q.ll_y * scale);
+                    path.lineTo(q.lr_x * scale, q.lr_y * scale);
+                    path.lineTo(q.ur_x * scale, q.ur_y * scale);
+                    path.close();
+                    canvas.drawPath(path, linkPaint);
+                }
             }
         }
     }

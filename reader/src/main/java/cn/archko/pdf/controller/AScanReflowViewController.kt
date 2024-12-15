@@ -532,6 +532,12 @@ class AScanReflowViewController(
         return BookProgress.REFLOW_SCAN
     }
 
+    override fun prev(string: String?) {
+    }
+
+    override fun next(string: String?) {
+    }
+
     //--------------------------------------
 
     override fun onResume() {

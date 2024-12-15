@@ -48,6 +48,10 @@ public interface DecodeService {
 
     Bitmap decodeThumb(int page);
 
+    void prev(String text);
+
+    void next(String text);
+
     interface DecodeCallback {
         void decodeComplete(Bitmap bitmap, boolean isThumb, Object args);
 

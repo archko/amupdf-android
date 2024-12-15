@@ -20,6 +20,7 @@ public class TextPageController extends DefaultPageController {
         outlineButton.setVisibility(View.GONE);
         autoCropButton.setVisibility(View.GONE);
         ocrButton.setVisibility(View.GONE);
+        searchButton.setVisibility(View.GONE);
         ttsButton.setVisibility(View.VISIBLE);
     }
 
