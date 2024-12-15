@@ -32,7 +32,7 @@ dependencies {
     api(project(":subsampling-scale-image-view"))
 
     //docx to html
-    api("org.zwobble.mammoth:mammoth:1.5.0")  //最新是1.7.0依赖问题导致崩溃
+    api(libs.mammoth)
     //html to epub
     api("io.documentnode:epub4j-core:4.2.1") {
         exclude("xmlpull")
