@@ -2,6 +2,8 @@ package org.vudroid.pdfdroid.codec;
 
 import com.artifex.mupdf.fitz.Document;
 import com.artifex.mupdf.fitz.Outline;
+import com.artifex.mupdf.fitz.Page;
+import com.artifex.mupdf.fitz.Quad;
 
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
@@ -81,6 +83,12 @@ public class PdfDocument implements CodecDocument {
     public List<ReflowBean> decodeReflowText(int index) {
         List<ReflowBean> beans = MupdfDocument.Companion.decodeReflowText(index, document);
         return beans;
+    }
+
+    @Override
+    public Quad[][] search(String text, int pageNum) {
+        CodecPage page = getPage(pageNum);
+        return ((PdfPage) page).page.search(text);
     }
 
     public static void downOutline(Document core, Outline[] outlines, List<OutlineLink> links) {

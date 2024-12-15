@@ -1,5 +1,7 @@
 package cn.archko.pdf.imagedroid.codec;
 
+import com.artifex.mupdf.fitz.Quad;
+
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
 import org.vudroid.core.codec.OutlineLink;
@@ -97,5 +99,10 @@ public class AlbumDocument implements CodecDocument {
     @Override
     public List<ReflowBean> decodeReflowText(int index) {
         return Collections.emptyList();
+    }
+
+    @Override
+    public Quad[][] search(String text, int pageNum) {
+        return new Quad[0][];
     }
 }

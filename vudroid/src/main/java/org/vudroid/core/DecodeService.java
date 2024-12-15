@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.view.View;
 
+import com.artifex.mupdf.fitz.Quad;
+
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
 import org.vudroid.core.codec.OutlineLink;
@@ -48,13 +50,17 @@ public interface DecodeService {
 
     Bitmap decodeThumb(int page);
 
-    void prev(String text);
+    void prev(String text, int page, SearchCallback sc);
 
-    void next(String text);
+    void next(String text, int page, SearchCallback sc);
 
     interface DecodeCallback {
         void decodeComplete(Bitmap bitmap, boolean isThumb, Object args);
 
         boolean shouldRender(int pageNumber, boolean isFullPage);
+    }
+
+    interface SearchCallback {
+        void result(Quad[][] result, int index);
     }
 }

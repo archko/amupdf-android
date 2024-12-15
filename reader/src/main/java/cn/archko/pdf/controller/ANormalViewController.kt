@@ -339,9 +339,11 @@ open class ANormalViewController(
     }
 
     override fun prev(string: String?) {
+        documentView.prev(string)
     }
 
     override fun next(string: String?) {
+        documentView.next(string)
     }
 
     //--------------------------------------

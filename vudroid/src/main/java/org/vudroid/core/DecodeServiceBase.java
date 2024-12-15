@@ -3,6 +3,7 @@ package org.vudroid.core;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -10,6 +11,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
+
+import com.artifex.mupdf.fitz.Quad;
 
 import org.vudroid.core.codec.CodecContext;
 import org.vudroid.core.codec.CodecDocument;
@@ -171,7 +174,7 @@ public class DecodeServiceBase implements DecodeService {
     };
 
     public static CodecContext openContext(String path) {
-        if (IntentFile.INSTANCE.isEpub(path) ||IntentFile.INSTANCE.isMobi(path) || IntentFile.INSTANCE.isDocx(path)) {
+        if (IntentFile.INSTANCE.isEpub(path) || IntentFile.INSTANCE.isMobi(path) || IntentFile.INSTANCE.isDocx(path)) {
             return new EpubContext();
         } else if (IntentFile.INSTANCE.isMuPdf(path)) {
             return new PdfContext();
@@ -420,13 +423,43 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     @Override
-    public void prev(String text) {
-
+    public void prev(String text, int page, SearchCallback sc) {
+        search(text, page, sc);
     }
 
     @Override
-    public void next(String text) {
+    public void next(String text, int page, SearchCallback sc) {
+        search(text, page, sc);
+    }
 
+    private void search(String text, int page, SearchCallback sc) {
+        AsyncTask<Void, Void, Quad[][]> asyncTask = new AsyncTask<>() {
+
+            @Override
+            protected Quad[][] doInBackground(Void... voids) {
+                int count = aPageList.size();
+                int pageNum;
+                if (page == -1) {
+                    pageNum = 0;
+                } else {
+                    pageNum = page + 1;
+                }
+                for (int i = pageNum; i < count; i++) {
+                    Quad[][] result = document.search(text, i);
+                    Log.d("", String.format("%s, %s ,%s", page, text, result));
+                    if (result != null) {
+                        return result;
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Quad[][] quads) {
+                sc.result(quads, page);
+            }
+        };
+        asyncTask.execute();
     }
 
     Rect getScaledSize(final DecodeTask task, final APage vuPage, float scale, boolean crop) {

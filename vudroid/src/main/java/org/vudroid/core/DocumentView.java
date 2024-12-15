@@ -15,11 +15,16 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.artifex.mupdf.fitz.Quad;
+
 import org.vudroid.core.events.ZoomListener;
 import org.vudroid.core.models.CurrentPageModel;
 import org.vudroid.core.models.DecodingProgressModel;
 import org.vudroid.core.models.ZoomModel;
 import org.vudroid.core.multitouch.MultiTouchZoom;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import cn.archko.pdf.core.entity.APage;
 import cn.archko.pdf.core.link.Hyperlink;
@@ -777,6 +782,28 @@ public class DocumentView extends View implements ZoomListener {
         } else {
             filter = new ColorMatrixColorFilter(new ColorMatrix(colorMatrix));
         }
+    }
+
+    protected Map<Integer, Quad[][]> searchResults = new HashMap<>();
+
+    public void prev(String text) {
+        int first = getCurrentPage();
+        decodeService.prev(text, first, (result, index) -> {
+            searchResults.put(index, result);
+            invalidate();
+        });
+    }
+
+    public void next(String text) {
+        int first = getCurrentPage();
+        decodeService.next(text, first, (result, index) -> {
+            searchResults.put(index, result);
+            invalidate();
+        });
+    }
+
+    public Quad[][] getSearchBox(int index) {
+        return null;
     }
 
     private class MySimpleOnGestureListener extends GestureDetector.SimpleOnGestureListener {

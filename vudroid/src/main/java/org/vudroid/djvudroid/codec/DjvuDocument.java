@@ -1,5 +1,7 @@
 package org.vudroid.djvudroid.codec;
 
+import com.artifex.mupdf.fitz.Quad;
+
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.OutlineLink;
 
@@ -76,6 +78,11 @@ public class DjvuDocument implements CodecDocument {
         ReflowBean bean = new ReflowBean(rest, ReflowBean.TYPE_STRING, index + "-0");
         list.add(bean);
         return list;
+    }
+
+    @Override
+    public Quad[][] search(String text, int pageNum) {
+        return new Quad[0][];
     }
 
     /*public List<? extends RectF> searchText(final int pageNuber, final String pattern) {

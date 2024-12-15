@@ -27,7 +27,6 @@ public class Page {
     private PageTreeNode node;
     private DocumentView documentView;
     public List<Hyperlink> links;
-    public Quad[][] mSearchBoxes;
     private final TextPaint textPaint = textPaint();
     private Paint fillPaint = null;
     private final Paint strokePaint = strokePaint();
@@ -328,6 +327,7 @@ public class Page {
     }
 
     private void drawSearchResult(Canvas canvas) {
+        Quad[][] mSearchBoxes = documentView.getSearchBox(index);
         if (mSearchBoxes != null) {
             float scale = documentView.calculateScale(this);
             for (Quad[] searchBox : mSearchBoxes) {

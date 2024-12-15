@@ -132,8 +132,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="8dp"
-            android:visibility="gone"
-            tools:visibility="visible">
+            android:visibility="visible">
 
             <TextView
                 android:id="@+id/path"
@@ -165,7 +164,7 @@
             android:orientation="horizontal"
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
-            android:visibility="gone"
+            android:visibility="visible"
             tools:visibility="visible">
 
             <EditText
