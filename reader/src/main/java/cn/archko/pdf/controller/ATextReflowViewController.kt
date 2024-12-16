@@ -154,6 +154,9 @@ class ATextReflowViewController(
     override fun clearSearch() {
     }
 
+    override fun showSearch() {
+    }
+
     //--------------------------------------
 
     override fun onPause() {

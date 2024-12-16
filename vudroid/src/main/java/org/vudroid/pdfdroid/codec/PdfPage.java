@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.archko.pdf.core.cache.BitmapPool;
+import cn.archko.pdf.core.common.ParseTextMain;
+import cn.archko.pdf.core.entity.ReflowBean;
 import cn.archko.pdf.core.link.Hyperlink;
 
 
@@ -135,6 +137,16 @@ public class PdfPage implements CodecPage {
         }
 
         return hyperlinks;
+    }
+
+    public List<ReflowBean> getReflowBean() {
+        byte[] result = ((Page) page).textAsText("preserve-whitespace,inhibit-spaces");
+        if (null != result) {
+            List<ReflowBean> reflowBeans = ParseTextMain.INSTANCE.parseAsTextList(result, (int) pageHandle);
+            return reflowBeans;
+        }
+
+        return null;
     }
 
     public synchronized void recycle() {

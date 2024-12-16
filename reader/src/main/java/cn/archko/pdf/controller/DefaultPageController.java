@@ -1,7 +1,6 @@
 package cn.archko.pdf.controller;
 
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -36,11 +35,10 @@ public abstract class DefaultPageController implements IPageController, View.OnC
     protected TextView titleView;
     protected View layoutTitle;
     protected View layoutSearch;
-    protected EditText keyword;
     protected ImageButton searchButton;
-    protected ImageButton nextBtn;
-    protected ImageButton prevBtn;
-    protected ImageButton closeBtn;
+    //protected ImageButton nextBtn;
+    //protected ImageButton prevBtn;
+    //protected ImageButton closeBtn;
     protected ImageButton mBackButton;
     protected int ori = LinearLayout.VERTICAL;
     protected int count = 1;
@@ -68,11 +66,10 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         titleView = view.findViewById(R.id.title);
         layoutTitle = view.findViewById(R.id.layout_path);
         layoutSearch = view.findViewById(R.id.layout_search);
-        keyword = view.findViewById(R.id.keyword);
         searchButton = view.findViewById(R.id.searchButton);
-        nextBtn = view.findViewById(R.id.nextButton);
-        prevBtn = view.findViewById(R.id.prevButton);
-        closeBtn = view.findViewById(R.id.closeButton);
+        //nextBtn = view.findViewById(R.id.nextButton);
+        //prevBtn = view.findViewById(R.id.prevButton);
+        //closeBtn = view.findViewById(R.id.closeButton);
         mBackButton = view.findViewById(R.id.back_button);
 
         imageButton.setOnClickListener(this);
@@ -83,10 +80,11 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         ttsButton.setOnClickListener(this);
         mBackButton.setOnClickListener(this);
         ocrButton.setOnClickListener(this);
-        nextBtn.setOnClickListener(this);
-        prevBtn.setOnClickListener(this);
-        closeBtn.setOnClickListener(this);
+        //nextBtn.setOnClickListener(this);
+        //prevBtn.setOnClickListener(this);
+        //closeBtn.setOnClickListener(this);
         searchButton.setOnClickListener(this);
+        //showSearchButton.setOnClickListener(this);
 
         mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -183,23 +181,17 @@ public abstract class DefaultPageController implements IPageController, View.OnC
             controllerListener.changeOrientation(ori);
         } else if (R.id.ocrButton == id) {
             controllerListener.ocr();
-        } else if (R.id.closeButton == id) {
+        } else if (R.id.searchButton == id) {
+            controllerListener.showSearch();
+        } /*else if (R.id.closeButton == id) {
             layoutSearch.setVisibility(View.GONE);
             layoutTitle.setVisibility(View.VISIBLE);
             controllerListener.clearSearch();
-        } else if (R.id.searchButton == id) {
-            if (layoutSearch.getVisibility() == View.VISIBLE) {
-                layoutSearch.setVisibility(View.GONE);
-                layoutTitle.setVisibility(View.VISIBLE);
-            } else {
-                layoutSearch.setVisibility(View.VISIBLE);
-                layoutTitle.setVisibility(View.GONE);
-            }
         } else if (R.id.nextButton == id) {
-            controllerListener.next(keyword.getText().toString());
+            controllerListener.next();
         } else if (R.id.prevButton == id) {
-            controllerListener.prev(keyword.getText().toString());
-        }
+            controllerListener.prev();
+        }*/
     }
 
     @Override

@@ -3,7 +3,6 @@ package org.vudroid.core;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -16,7 +15,6 @@ import org.vudroid.core.codec.CodecContext;
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
 import org.vudroid.core.codec.OutlineLink;
-import org.vudroid.core.codec.PageTextBox;
 import org.vudroid.djvudroid.codec.DjvuContext;
 import org.vudroid.epub.codec.EpubContext;
 import org.vudroid.pdfdroid.codec.PdfContext;
@@ -432,27 +430,7 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     private void search(String text, int page, SearchCallback sc) {
-        AsyncTask<Void, Void, List<PageTextBox>> asyncTask = new AsyncTask<>() {
 
-            @Override
-            protected List<PageTextBox> doInBackground(Void... voids) {
-                int count = aPageList.size();
-                for (int i = page; i < count; i++) {
-                    List<PageTextBox> result = document.search(text, i);
-                    Log.d("", String.format("%s, %s ,%s", page, text, result));
-                    if (result != null) {
-                        return result;
-                    }
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(List<PageTextBox> quads) {
-                sc.result(quads, page);
-            }
-        };
-        asyncTask.execute();
     }
 
     Rect getScaledSize(final DecodeTask task, final APage vuPage, float scale, boolean crop) {

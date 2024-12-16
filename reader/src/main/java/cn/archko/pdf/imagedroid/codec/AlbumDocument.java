@@ -3,7 +3,7 @@ package cn.archko.pdf.imagedroid.codec;
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
 import org.vudroid.core.codec.OutlineLink;
-import org.vudroid.core.codec.PageTextBox;
+import org.vudroid.core.codec.SearchResult;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -101,7 +101,7 @@ public class AlbumDocument implements CodecDocument {
     }
 
     @Override
-    public List<PageTextBox> search(String text, int pageNum) {
+    public List<SearchResult> search(String text, int pageNum) {
         return null;
     }
 }

@@ -19,7 +19,9 @@ import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.entity.TtsBean
+import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.listeners.SimpleGestureListener
+import cn.archko.pdf.fragments.SearchFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TTSEngine
@@ -29,6 +31,7 @@ import org.vudroid.core.DecodeService
 import org.vudroid.core.DecodeServiceBase
 import org.vudroid.core.DocumentView
 import org.vudroid.core.codec.CodecDocument
+import org.vudroid.core.codec.SearchResult
 import org.vudroid.core.models.CurrentPageModel
 import org.vudroid.core.models.DecodingProgressModel
 import org.vudroid.core.models.ZoomModel
@@ -59,6 +62,7 @@ open class ANormalViewController(
     private var scrollOrientation = LinearLayoutManager.VERTICAL
     private var isDocLoaded: Boolean = false
     protected var document: CodecDocument? = null
+    private var searchFragment: SearchFragment? = null
 
     private var simpleGestureListener: SimpleGestureListener = object :
         SimpleGestureListener {
@@ -348,6 +352,28 @@ open class ANormalViewController(
 
     override fun clearSearch() {
         documentView.clearSearch()
+    }
+
+    override fun showSearch() {
+        if (searchFragment == null) {
+            searchFragment = SearchFragment()
+        }
+        searchFragment?.run {
+            setDocument(document)
+            setListener(object : DataListener {
+                override fun onSuccess(vararg args: Any?) {
+                    val searchResult = args[0] as SearchResult
+                    val searchResults = args[1] as List<SearchResult>
+                    scrollToPosition(searchResult.page)
+                    documentView.setSearchResult(searchResults)
+                }
+
+                override fun onFailed(vararg args: Any?) {
+                }
+
+            })
+        }
+        searchFragment?.showDialog(context)
     }
 
     //--------------------------------------

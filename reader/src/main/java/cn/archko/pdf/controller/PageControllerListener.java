@@ -28,4 +28,6 @@ public interface PageControllerListener {
     void next(String string);
 
     void clearSearch();
+
+    void showSearch();
 }

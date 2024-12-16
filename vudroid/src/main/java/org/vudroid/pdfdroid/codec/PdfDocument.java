@@ -8,12 +8,14 @@ import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
 import org.vudroid.core.codec.OutlineLink;
 import org.vudroid.core.codec.PageTextBox;
+import org.vudroid.core.codec.SearchResult;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.archko.pdf.core.App;
 import cn.archko.pdf.core.common.IntentFile;
+import cn.archko.pdf.core.common.ParseTextMain;
 import cn.archko.pdf.core.decode.MupdfDocument;
 import cn.archko.pdf.core.entity.ReflowBean;
 import cn.archko.pdf.core.utils.Utils;
@@ -86,23 +88,41 @@ public class PdfDocument implements CodecDocument {
     }
 
     @Override
-    public List<PageTextBox> search(String text, int pageNum) {
-        CodecPage page = getPage(pageNum);
-        Object[] results = ((PdfPage) page).page.search(text);
-        if (results == null || results.length == 0) {
-            return null;
+    public List<SearchResult> search(String text, int pageNum) {
+        List<SearchResult> searchResults = new ArrayList<>();
+        int count = document.countPages();
+        for (int i = 0; i < count; i++) {
+            CodecPage page = getPage(i);
+            Object[] results = ((PdfPage) page).page.search(text);
+            if (results == null || results.length == 0) {
+                continue;
+            }
+
+            List<PageTextBox> boxes = new ArrayList<>();
+            for (Object result : results) {
+                Quad[] quads = (Quad[]) result;
+                for (Quad q : quads) {
+                    com.artifex.mupdf.fitz.Rect fitzRect = q.toRect();
+                    PageTextBox rectF = new PageTextBox(fitzRect.x0, fitzRect.y0, fitzRect.x1, fitzRect.y1);
+                    boxes.add(rectF);
+                }
+            }
+            StringBuilder sb = new StringBuilder();
+            byte[] result = ((PdfPage) page).page.textAsText("preserve-whitespace,inhibit-spaces");
+            if (null != result) {
+                List<ReflowBean> reflowBeans = ParseTextMain.INSTANCE.parseAsTextList(result, i);
+                if (reflowBeans != null && !reflowBeans.isEmpty()) {
+                    for (ReflowBean bean : reflowBeans) {
+                        sb.append(bean.getData()).append(" ");
+                    }
+                }
+            }
+
+            SearchResult searchResult = new SearchResult(i, boxes, sb.toString());
+            searchResults.add(searchResult);
         }
 
-        List<PageTextBox> boxes = new ArrayList<>();
-        for (Object result : results) {
-            Quad[] quads = (Quad[]) result;
-            for (Quad q : quads) {
-                com.artifex.mupdf.fitz.Rect fitzRect = q.toRect();
-                PageTextBox rectF = new PageTextBox(fitzRect.x0, fitzRect.y0, fitzRect.x1, fitzRect.y1);
-                boxes.add(rectF);
-            }
-        }
-        return boxes;
+        return searchResults;
     }
 
     public static void downOutline(Document core, Outline[] outlines, List<OutlineLink> links) {

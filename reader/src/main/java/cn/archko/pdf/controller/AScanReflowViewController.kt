@@ -541,6 +541,9 @@ class AScanReflowViewController(
     override fun clearSearch() {
     }
 
+    override fun showSearch() {
+    }
+
     //--------------------------------------
 
     override fun onResume() {

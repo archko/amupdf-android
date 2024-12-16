@@ -3,7 +3,6 @@ package org.vudroid.djvudroid.codec;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.util.Log;
 
 import org.vudroid.core.codec.CodecPage;
 import org.vudroid.core.codec.CodecPageInfo;
@@ -15,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import cn.archko.pdf.core.cache.BitmapPool;
+import cn.archko.pdf.core.entity.ReflowBean;
 import cn.archko.pdf.core.link.Hyperlink;
 import cn.archko.pdf.core.utils.LengthUtils;
 
@@ -180,6 +180,14 @@ public class DjvuPage implements CodecPage {
             return hyperlinks;
         }
         return Collections.emptyList();
+    }
+
+    public List<ReflowBean> getReflowBean() {
+        String rest = getPageHTML();
+        List<ReflowBean> list = new ArrayList<>();
+        ReflowBean bean = new ReflowBean(rest, ReflowBean.TYPE_STRING, pageHandle + "-0");
+        list.add(bean);
+        return list;
     }
 
     static void normalize(final RectF r, final float width, final float height) {

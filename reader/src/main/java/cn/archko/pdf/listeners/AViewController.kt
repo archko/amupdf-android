@@ -41,4 +41,5 @@ interface AViewController {
     fun prev(string: String?)
     fun next(string: String?)
     fun clearSearch()
+    fun showSearch()
 }

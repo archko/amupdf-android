@@ -6,6 +6,7 @@ import android.graphics.RectF;
 
 import java.util.List;
 
+import cn.archko.pdf.core.entity.ReflowBean;
 import cn.archko.pdf.core.link.Hyperlink;
 
 public interface CodecPage {
@@ -22,6 +23,8 @@ public interface CodecPage {
     boolean isRecycle();
 
     List<Hyperlink> getPageLinks();
+
+    List<ReflowBean> getReflowBean();
 
     void loadPage(int pageNumber);
 }

@@ -15,16 +15,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import org.vudroid.core.codec.PageTextBox;
+import org.vudroid.core.codec.SearchResult;
 import org.vudroid.core.events.ZoomListener;
 import org.vudroid.core.models.CurrentPageModel;
 import org.vudroid.core.models.DecodingProgressModel;
 import org.vudroid.core.models.ZoomModel;
 import org.vudroid.core.multitouch.MultiTouchZoom;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import cn.archko.pdf.core.entity.APage;
 import cn.archko.pdf.core.link.Hyperlink;
@@ -784,31 +783,31 @@ public class DocumentView extends View implements ZoomListener {
         }
     }
 
-    protected Map<Integer, List<PageTextBox>> searchResults = new HashMap<>();
+    protected List<SearchResult> searchResults = new ArrayList<>();
 
     public void prev(String text) {
-        int first = getCurrentPage();
-        decodeService.prev(text, first, (result, index) -> {
-            searchResults.put(index, result);
-            invalidate();
-        });
     }
 
     public void next(String text) {
-        int first = getCurrentPage();
-        decodeService.next(text, first, (result, index) -> {
-            searchResults.put(index, result);
-            invalidate();
-        });
     }
 
-    public List<PageTextBox> getSearchBox(int index) {
-        return searchResults.get(index);
+    public SearchResult getSearchResult(int index) {
+        for (SearchResult result : searchResults) {
+            if (result.page == index) {
+                return result;
+            }
+        }
+        return null;
     }
 
     public void clearSearch() {
         searchResults.clear();
-        invalidate();
+        updatePageVisibility();
+    }
+
+    public void setSearchResult(List<SearchResult> searchResults) {
+        this.searchResults = searchResults;
+        updatePageVisibility();
     }
 
     private class MySimpleOnGestureListener extends GestureDetector.SimpleOnGestureListener {

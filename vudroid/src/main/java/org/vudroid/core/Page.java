@@ -12,11 +12,13 @@ import android.text.TextPaint;
 
 import org.vudroid.R;
 import org.vudroid.core.codec.PageTextBox;
+import org.vudroid.core.codec.SearchResult;
 
 import java.lang.ref.SoftReference;
 import java.util.List;
 
 import cn.archko.pdf.core.cache.BitmapCache;
+import cn.archko.pdf.core.common.Logcat;
 import cn.archko.pdf.core.link.Hyperlink;
 
 public class Page {
@@ -194,7 +196,6 @@ public class Page {
             return;
         }
         if (isVisible()) {
-            //if (!isBitmapTooLarge()) {
             if (getBitmap() != null && !invalidateFlag) {
                 restoreBitmapReference();
             } else {
@@ -202,7 +203,6 @@ public class Page {
                     decodePageThumb();
                 }
             }
-            //}
             node.updateVisibility();
         } else {
             recycle();
@@ -328,10 +328,15 @@ public class Page {
     }
 
     private void drawSearchResult(Canvas canvas) {
-        List<PageTextBox> searchBox = documentView.getSearchBox(index);
-        if (searchBox != null && !searchBox.isEmpty()) {
-            for (PageTextBox rectF : searchBox) {
+        SearchResult result = documentView.getSearchResult(index);
+        List<PageTextBox> searchBoxs = null;
+        if (null != result) {
+            searchBoxs = result.boxes;
+        }
+        if (searchBoxs != null && !searchBoxs.isEmpty()) {
+            for (PageTextBox rectF : searchBoxs) {
                 final RectF rect = getPageRegion(bounds, rectF);
+                Logcat.d(String.format("result:%s, rect:%s, %s", index, rect, rectF));
                 if (rect != null) {
                     canvas.drawRect(rect, searchPaint);
                 }

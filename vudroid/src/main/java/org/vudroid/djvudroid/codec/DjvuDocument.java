@@ -3,6 +3,7 @@ package org.vudroid.djvudroid.codec;
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.OutlineLink;
 import org.vudroid.core.codec.PageTextBox;
+import org.vudroid.core.codec.SearchResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,21 +71,32 @@ public class DjvuDocument implements CodecDocument {
 
     public List<ReflowBean> decodeReflowText(int index) {
         DjvuPage page = getPage(index);
-        String rest = page.getPageHTML();
-        page.recycle();
-        List<ReflowBean> list = new ArrayList<>();
-        ReflowBean bean = new ReflowBean(rest, ReflowBean.TYPE_STRING, index + "-0");
-        list.add(bean);
-        return list;
+        return page.getReflowBean();
     }
 
     @Override
-    public List<PageTextBox> search(String pattern, int pageNum) {
-        final List<PageTextBox> list = DjvuPage.getPageText(documentHandle,
-                pageNum,
-                contextHandle,
-                pattern.toLowerCase(Locale.ROOT));
-        return list;
+    public List<SearchResult> search(String pattern, int pageNum) {
+        List<SearchResult> searchResults = new ArrayList<>();
+        int count = getPageCount();
+        for (int i = 0; i < count; i++) {
+            final List<PageTextBox> results = DjvuPage.getPageText(documentHandle,
+                    pageNum,
+                    contextHandle,
+                    pattern.toLowerCase(Locale.ROOT));
+            if (results == null || results.isEmpty()) {
+                continue;
+            }
+            StringBuilder sb = new StringBuilder();
+            List<ReflowBean> reflowBeans = decodeReflowText(i);
+            if (reflowBeans != null && !reflowBeans.isEmpty()) {
+                for (ReflowBean bean : reflowBeans) {
+                    sb.append(bean.getData()).append(" ");
+                }
+            }
+            searchResults.add(new SearchResult(i, results, sb.toString()));
+        }
+
+        return searchResults;
     }
 
     /*public List<? extends RectF> searchText(final int pageNuber, final String pattern) {

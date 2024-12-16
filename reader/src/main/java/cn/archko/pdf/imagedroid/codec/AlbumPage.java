@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.archko.pdf.core.entity.ReflowBean;
 import cn.archko.pdf.core.link.Hyperlink;
 
 public class AlbumPage implements CodecPage {
@@ -117,6 +118,11 @@ public class AlbumPage implements CodecPage {
         List<Hyperlink> hyperlinks = new ArrayList<>();
 
         return hyperlinks;
+    }
+
+    @Override
+    public List<ReflowBean> getReflowBean() {
+        return null;
     }
 
     public synchronized void recycle() {

@@ -162,6 +162,9 @@ class ATextViewController(
     override fun clearSearch() {
     }
 
+    override fun showSearch() {
+    }
+
     //--------------------------------------
 
     override fun onPause() {
