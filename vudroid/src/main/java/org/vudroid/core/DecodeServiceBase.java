@@ -419,20 +419,6 @@ public class DecodeServiceBase implements DecodeService {
         return thumb;
     }
 
-    @Override
-    public void prev(String text, int page, SearchCallback sc) {
-        search(text, page, sc);
-    }
-
-    @Override
-    public void next(String text, int page, SearchCallback sc) {
-        search(text, page, sc);
-    }
-
-    private void search(String text, int page, SearchCallback sc) {
-
-    }
-
     Rect getScaledSize(final DecodeTask task, final APage vuPage, float scale, boolean crop) {
         Rect rect = new Rect();
         rect.right = getScaledWidth(task, vuPage, scale, crop);
