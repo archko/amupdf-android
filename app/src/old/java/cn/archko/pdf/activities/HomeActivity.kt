@@ -49,12 +49,12 @@ import java.lang.ref.WeakReference
 open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
     PopupMenu.OnMenuItemClickListener {
 
-    private lateinit var mViewPager: ViewPager2
-    private lateinit var mPagerAdapter: TabsAdapter
+    private var mViewPager: ViewPager2? = null
+    private var mPagerAdapter: TabsAdapter? = null
 
     //private lateinit var searchBtn: ImageButton
-    private lateinit var settingBtn: ImageButton
-    private lateinit var menuBtn: ImageButton
+    private var settingBtn: ImageButton? = null
+    private var menuBtn: ImageButton? = null
     private val titles = arrayOfNulls<String>(4)
 
     private lateinit var tabLayout: TabLayout
@@ -79,8 +79,8 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
 
         settingBtn = findViewById(R.id.setting)
         menuBtn = findViewById(R.id.menu)
-        settingBtn.setOnClickListener { PdfOptionsActivity.start(this@HomeActivity) }
-        menuBtn.setOnClickListener { prepareMenu(menuBtn) }
+        settingBtn!!.setOnClickListener { PdfOptionsActivity.start(this@HomeActivity) }
+        menuBtn!!.setOnClickListener { prepareMenu(menuBtn!!) }
 
         checkForExternalPermission()
 
@@ -93,7 +93,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
         collectFlowBus<GlobalEvent>(isSticky = true) {
             if (TextUtils.equals(it.name, Event.ACTION_ISFIRST) && it.obj as Boolean) {
                 Logcat.d(TAG, "ACTION_ISFIRST:${it.name}")
-                mViewPager.currentItem = 1
+                mViewPager?.currentItem = 1
             }
         }
 
@@ -131,10 +131,10 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
     }
 
     private fun onBackEvent(): Boolean {
-        if (null == mPagerAdapter) {
+        if (null == mPagerAdapter || null == mViewPager) {
             return false
         }
-        val itemFragment = mPagerAdapter.getItemFragment(mViewPager.currentItem)
+        val itemFragment = mPagerAdapter?.getItemFragment(mViewPager!!.currentItem)
         if (itemFragment is BrowserFragment) {
             if (itemFragment.onBackPressed()) {
                 return true
@@ -164,7 +164,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
     }
 
     private fun onPrepareCustomMenu(menuBuilder: PopupMenu) {
-        val index = mViewPager.currentItem
+        val index = mViewPager?.currentItem
         if (index == 1) {
             menuBuilder.inflate(R.menu.menu_history)
         } else {
@@ -182,8 +182,8 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
             )
 
             else -> {
-                val fragment: Fragment? = mPagerAdapter.getItemFragment(mViewPager.currentItem)
-                Logcat.d("menu:" + item.itemId + " fragment:" + fragment + " index:" + mViewPager.currentItem)
+                val fragment: Fragment? = mViewPager?.let { mPagerAdapter?.getItemFragment(it.currentItem) }
+                Logcat.d("menu:" + item.itemId + " fragment:" + fragment + " index:" + mViewPager?.currentItem)
                 if (fragment is HistoryFragment) {
                     fragment.onOptionSelected(item)
                 } else if (fragment is BrowserFragment) {
@@ -205,10 +205,10 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
 
         addTab()
         mPagerAdapter = TabsAdapter(this)
-        mViewPager.adapter = mPagerAdapter
-        mViewPager.setCurrentItem(1,false)
+        mViewPager?.adapter = mPagerAdapter
+        mViewPager?.setCurrentItem(1, false)
 
-        TabLayoutMediator(tabLayout, mViewPager) { tab, position ->
+        TabLayoutMediator(tabLayout, mViewPager!!) { tab, position ->
             tab.text = mTabs[position].title
         }.attach()
 
