@@ -164,7 +164,7 @@
             android:orientation="horizontal"
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
-            android:visibility="visible"
+            android:visibility="gone"
             tools:visibility="visible">
 
             <EditText
