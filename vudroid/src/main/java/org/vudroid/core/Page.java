@@ -39,6 +39,7 @@ public class Page {
     private boolean invalidateFlag;
     protected boolean crop = true;
     private ColorFilter filter;
+    private List<PageTextBox> searchBoxs;
 
     Page(DocumentView documentView, int index, boolean crop, ColorFilter filter) {
         this.documentView = documentView;
@@ -187,14 +188,17 @@ public class Page {
         node.invalidateNodeBounds();
     }
 
-    private boolean isBitmapTooLarge() {
-        return documentView.getZoomModel().getZoom() > 1.5f;
-    }
-
     public void updateVisibility() {
         if (null == bounds) { //tts后台滚动的时候会出现
             return;
         }
+        SearchResult result = documentView.getSearchResult(index);
+        if (null != result) {
+            searchBoxs = result.boxes;
+        } else {
+            searchBoxs = null;
+        }
+
         if (isVisible()) {
             if (getBitmap() != null && !invalidateFlag) {
                 restoreBitmapReference();
@@ -328,11 +332,6 @@ public class Page {
     }
 
     private void drawSearchResult(Canvas canvas) {
-        SearchResult result = documentView.getSearchResult(index);
-        List<PageTextBox> searchBoxs = null;
-        if (null != result) {
-            searchBoxs = result.boxes;
-        }
         if (searchBoxs != null && !searchBoxs.isEmpty()) {
             for (PageTextBox rectF : searchBoxs) {
                 final RectF rect = getPageRegion(bounds, rectF);

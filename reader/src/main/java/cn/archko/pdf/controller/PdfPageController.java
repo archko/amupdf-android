@@ -14,8 +14,6 @@ import cn.archko.pdf.viewmodel.DocViewModel;
  */
 public class PdfPageController extends DefaultPageController {
 
-    private final static String TAG = "PdfPageController";
-
     public PdfPageController(View view, DocViewModel docViewModel, PageControllerListener controlerListener) {
         super(view, docViewModel, controlerListener);
 
