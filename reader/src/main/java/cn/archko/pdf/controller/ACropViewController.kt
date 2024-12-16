@@ -441,6 +441,9 @@ class ACropViewController(
     override fun next(string: String?) {
     }
 
+    override fun clearSearch() {
+    }
+
     //--------------------------------------
 
     override fun onResume() {

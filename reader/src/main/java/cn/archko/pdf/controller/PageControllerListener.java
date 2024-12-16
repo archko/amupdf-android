@@ -26,4 +26,6 @@ public interface PageControllerListener {
     void prev(String string);
 
     void next(String string);
+
+    void clearSearch();
 }

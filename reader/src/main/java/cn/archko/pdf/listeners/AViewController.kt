@@ -40,4 +40,5 @@ interface AViewController {
     fun reflow(): Int
     fun prev(string: String?)
     fun next(string: String?)
+    fun clearSearch()
 }

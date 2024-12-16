@@ -15,8 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.artifex.mupdf.fitz.Quad;
-
+import org.vudroid.core.codec.PageTextBox;
 import org.vudroid.core.events.ZoomListener;
 import org.vudroid.core.models.CurrentPageModel;
 import org.vudroid.core.models.DecodingProgressModel;
@@ -24,6 +23,7 @@ import org.vudroid.core.models.ZoomModel;
 import org.vudroid.core.multitouch.MultiTouchZoom;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import cn.archko.pdf.core.entity.APage;
@@ -784,7 +784,7 @@ public class DocumentView extends View implements ZoomListener {
         }
     }
 
-    protected Map<Integer, Object[]> searchResults = new HashMap<>();
+    protected Map<Integer, List<PageTextBox>> searchResults = new HashMap<>();
 
     public void prev(String text) {
         int first = getCurrentPage();
@@ -802,8 +802,13 @@ public class DocumentView extends View implements ZoomListener {
         });
     }
 
-    public Object[] getSearchBox(int index) {
+    public List<PageTextBox> getSearchBox(int index) {
         return searchResults.get(index);
+    }
+
+    public void clearSearch() {
+        searchResults.clear();
+        invalidate();
     }
 
     private class MySimpleOnGestureListener extends GestureDetector.SimpleOnGestureListener {

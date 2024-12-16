@@ -1,25 +1,23 @@
 package org.vudroid.djvudroid.codec;
 
-import com.artifex.mupdf.fitz.Quad;
-
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.OutlineLink;
+import org.vudroid.core.codec.PageTextBox;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import cn.archko.pdf.core.entity.ReflowBean;
 
 public class DjvuDocument implements CodecDocument {
     private long contextHandle;
     private long documentHandle;
-    private final Object waitObject;
     private List<OutlineLink> docOutline;
 
     private DjvuDocument(long contextHandle, long documentHandle, Object waitObject) {
         this.contextHandle = contextHandle;
         this.documentHandle = documentHandle;
-        this.waitObject = waitObject;
     }
 
     static DjvuDocument openDocument(String fileName, DjvuContext djvuContext, Object waitObject) {
@@ -81,8 +79,12 @@ public class DjvuDocument implements CodecDocument {
     }
 
     @Override
-    public Object[] search(String text, int pageNum) {
-        return new Object[0];
+    public List<PageTextBox> search(String pattern, int pageNum) {
+        final List<PageTextBox> list = DjvuPage.getPageText(documentHandle,
+                pageNum,
+                contextHandle,
+                pattern.toLowerCase(Locale.ROOT));
+        return list;
     }
 
     /*public List<? extends RectF> searchText(final int pageNuber, final String pattern) {

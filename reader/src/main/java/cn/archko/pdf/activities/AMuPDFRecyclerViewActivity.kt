@@ -595,6 +595,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         override fun next(string: String?) {
             viewController?.next(string)
         }
+
+        override fun clearSearch() {
+            viewController?.clearSearch()
+        }
     }
 
     private fun createControls() {

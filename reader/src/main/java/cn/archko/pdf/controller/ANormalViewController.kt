@@ -346,6 +346,10 @@ open class ANormalViewController(
         documentView.next(string)
     }
 
+    override fun clearSearch() {
+        documentView.clearSearch()
+    }
+
     //--------------------------------------
 
     override fun onResume() {

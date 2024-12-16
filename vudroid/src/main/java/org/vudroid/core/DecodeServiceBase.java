@@ -12,12 +12,11 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
-import com.artifex.mupdf.fitz.Quad;
-
 import org.vudroid.core.codec.CodecContext;
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
 import org.vudroid.core.codec.OutlineLink;
+import org.vudroid.core.codec.PageTextBox;
 import org.vudroid.djvudroid.codec.DjvuContext;
 import org.vudroid.epub.codec.EpubContext;
 import org.vudroid.pdfdroid.codec.PdfContext;
@@ -433,19 +432,13 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     private void search(String text, int page, SearchCallback sc) {
-        AsyncTask<Void, Void, Object[]> asyncTask = new AsyncTask<>() {
+        AsyncTask<Void, Void, List<PageTextBox>> asyncTask = new AsyncTask<>() {
 
             @Override
-            protected Object[] doInBackground(Void... voids) {
+            protected List<PageTextBox> doInBackground(Void... voids) {
                 int count = aPageList.size();
-                int pageNum;
-                if (page == -1) {
-                    pageNum = 0;
-                } else {
-                    pageNum = page + 1;
-                }
-                for (int i = pageNum; i < count; i++) {
-                    Object[] result = document.search(text, i);
+                for (int i = page; i < count; i++) {
+                    List<PageTextBox> result = document.search(text, i);
                     Log.d("", String.format("%s, %s ,%s", page, text, result));
                     if (result != null) {
                         return result;
@@ -455,7 +448,7 @@ public class DecodeServiceBase implements DecodeService {
             }
 
             @Override
-            protected void onPostExecute(Object[] quads) {
+            protected void onPostExecute(List<PageTextBox> quads) {
                 sc.result(quads, page);
             }
         };

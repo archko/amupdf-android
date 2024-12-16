@@ -4,11 +4,10 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.view.View;
 
-import com.artifex.mupdf.fitz.Quad;
-
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
 import org.vudroid.core.codec.OutlineLink;
+import org.vudroid.core.codec.PageTextBox;
 
 import java.util.List;
 
@@ -61,6 +60,6 @@ public interface DecodeService {
     }
 
     interface SearchCallback {
-        void result(Object[] result, int index);
+        void result(List<PageTextBox> result, int index);
     }
 }

@@ -15,5 +15,5 @@ public interface CodecDocument {
 
     List<ReflowBean> decodeReflowText(int index);
 
-    Object[] search(String text, int pageNum);
+    List<PageTextBox> search(String text, int pageNum);
 }

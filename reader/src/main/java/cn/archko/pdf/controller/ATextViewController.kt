@@ -159,6 +159,9 @@ class ATextViewController(
     override fun next(string: String?) {
     }
 
+    override fun clearSearch() {
+    }
+
     //--------------------------------------
 
     override fun onPause() {

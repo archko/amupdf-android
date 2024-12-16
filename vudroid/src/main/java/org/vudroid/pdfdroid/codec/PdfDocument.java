@@ -7,6 +7,7 @@ import com.artifex.mupdf.fitz.Quad;
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
 import org.vudroid.core.codec.OutlineLink;
+import org.vudroid.core.codec.PageTextBox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,13 +86,23 @@ public class PdfDocument implements CodecDocument {
     }
 
     @Override
-    public Object[] search(String text, int pageNum) {
+    public List<PageTextBox> search(String text, int pageNum) {
         CodecPage page = getPage(pageNum);
-        Object[] quads = ((PdfPage) page).page.search(text);
-        if (quads == null || quads.length == 0) {
+        Object[] results = ((PdfPage) page).page.search(text);
+        if (results == null || results.length == 0) {
             return null;
         }
-        return quads;
+
+        List<PageTextBox> boxes = new ArrayList<>();
+        for (Object result : results) {
+            Quad[] quads = (Quad[]) result;
+            for (Quad q : quads) {
+                com.artifex.mupdf.fitz.Rect fitzRect = q.toRect();
+                PageTextBox rectF = new PageTextBox(fitzRect.x0, fitzRect.y0, fitzRect.x1, fitzRect.y1);
+                boxes.add(rectF);
+            }
+        }
+        return boxes;
     }
 
     public static void downOutline(Document core, Outline[] outlines, List<OutlineLink> links) {

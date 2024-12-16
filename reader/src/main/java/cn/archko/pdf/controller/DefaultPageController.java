@@ -86,8 +86,7 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         nextBtn.setOnClickListener(this);
         prevBtn.setOnClickListener(this);
         closeBtn.setOnClickListener(this);
-
-        searchButton.setVisibility(View.GONE);
+        searchButton.setOnClickListener(this);
 
         mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -187,6 +186,7 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         } else if (R.id.closeButton == id) {
             layoutSearch.setVisibility(View.GONE);
             layoutTitle.setVisibility(View.VISIBLE);
+            controllerListener.clearSearch();
         } else if (R.id.searchButton == id) {
             if (layoutSearch.getVisibility() == View.VISIBLE) {
                 layoutSearch.setVisibility(View.GONE);

@@ -6,14 +6,12 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.TextPaint;
 
-import com.artifex.mupdf.fitz.Quad;
-
 import org.vudroid.R;
+import org.vudroid.core.codec.PageTextBox;
 
 import java.lang.ref.SoftReference;
 import java.util.List;
@@ -31,6 +29,7 @@ public class Page {
     private Paint fillPaint = null;
     private final Paint strokePaint = strokePaint();
     private final Paint linkPaint = linkPaint();
+    private final Paint searchPaint = searchPaint();
     public static final int ZOOM_THRESHOLD = 2;
     private boolean decodingNow;
     private Bitmap bitmap;
@@ -109,18 +108,25 @@ public class Page {
     }
 
     private Paint strokePaint() {
-        final Paint strokePaint = new Paint();
-        strokePaint.setColor(Color.BLACK);
-        strokePaint.setStyle(Paint.Style.STROKE);
-        strokePaint.setStrokeWidth(2);
-        return strokePaint;
+        final Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(2);
+        return paint;
     }
 
     private Paint linkPaint() {
-        final Paint linkPaint = new Paint();
-        linkPaint.setColor(Color.parseColor("#80FFFF00"));
-        linkPaint.setStyle(Paint.Style.FILL);
-        return linkPaint;
+        final Paint paint = new Paint();
+        paint.setColor(Color.parseColor("#80FFFF00"));
+        paint.setStyle(Paint.Style.FILL);
+        return paint;
+    }
+
+    private Paint searchPaint() {
+        final Paint paint = new Paint();
+        paint.setColor(Color.parseColor("#80FF9800"));
+        paint.setStyle(Paint.Style.FILL);
+        return paint;
     }
 
     private Paint fillPaint() {
@@ -303,11 +309,6 @@ public class Page {
         node.invalidate();
     }
 
-    public void postInvalidate(Bitmap bitmap) {
-        setAspectRatio(documentView.decodeService.getPageWidth(index, crop), documentView.decodeService.getPageHeight(index, crop));
-        documentView.postInvalidate();
-    }
-
     private void drawPageLinks(Canvas canvas) {
         if (null == links || links.isEmpty()) {
             return;
@@ -327,19 +328,12 @@ public class Page {
     }
 
     private void drawSearchResult(Canvas canvas) {
-        Object[] mSearchBoxes = documentView.getSearchBox(index);
-        if (mSearchBoxes != null && mSearchBoxes.length > 0) {
-            float scale = documentView.calculateScale(this);
-            for (Object searchBox : mSearchBoxes) {
-                Quad[] quads = (Quad[]) searchBox;
-                for (Quad q : quads) {
-                    Path path = new Path();
-                    path.moveTo(q.ul_x * scale, q.ul_y * scale);
-                    path.lineTo(q.ll_x * scale, q.ll_y * scale);
-                    path.lineTo(q.lr_x * scale, q.lr_y * scale);
-                    path.lineTo(q.ur_x * scale, q.ur_y * scale);
-                    path.close();
-                    canvas.drawPath(path, linkPaint);
+        List<PageTextBox> searchBox = documentView.getSearchBox(index);
+        if (searchBox != null && !searchBox.isEmpty()) {
+            for (PageTextBox rectF : searchBox) {
+                final RectF rect = getPageRegion(bounds, rectF);
+                if (rect != null) {
+                    canvas.drawRect(rect, searchPaint);
                 }
             }
         }
