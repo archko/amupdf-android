@@ -327,11 +327,12 @@ public class Page {
     }
 
     private void drawSearchResult(Canvas canvas) {
-        Quad[][] mSearchBoxes = documentView.getSearchBox(index);
-        if (mSearchBoxes != null) {
+        Object[] mSearchBoxes = documentView.getSearchBox(index);
+        if (mSearchBoxes != null && mSearchBoxes.length > 0) {
             float scale = documentView.calculateScale(this);
-            for (Quad[] searchBox : mSearchBoxes) {
-                for (Quad q : searchBox) {
+            for (Object searchBox : mSearchBoxes) {
+                Quad[] quads = (Quad[]) searchBox;
+                for (Quad q : quads) {
                     Path path = new Path();
                     path.moveTo(q.ul_x * scale, q.ul_y * scale);
                     path.lineTo(q.ll_x * scale, q.ll_y * scale);

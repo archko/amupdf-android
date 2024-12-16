@@ -81,8 +81,8 @@ public class DjvuDocument implements CodecDocument {
     }
 
     @Override
-    public Quad[][] search(String text, int pageNum) {
-        return new Quad[0][];
+    public Object[] search(String text, int pageNum) {
+        return new Object[0];
     }
 
     /*public List<? extends RectF> searchText(final int pageNuber, final String pattern) {

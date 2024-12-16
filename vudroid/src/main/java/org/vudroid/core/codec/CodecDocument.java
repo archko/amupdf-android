@@ -1,7 +1,5 @@
 package org.vudroid.core.codec;
 
-import com.artifex.mupdf.fitz.Quad;
-
 import java.util.List;
 
 import cn.archko.pdf.core.entity.ReflowBean;
@@ -17,5 +15,5 @@ public interface CodecDocument {
 
     List<ReflowBean> decodeReflowText(int index);
 
-    Quad[][] search(String text, int pageNum);
+    Object[] search(String text, int pageNum);
 }

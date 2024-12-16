@@ -87,6 +87,8 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         prevBtn.setOnClickListener(this);
         closeBtn.setOnClickListener(this);
 
+        searchButton.setVisibility(View.GONE);
+
         mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 gotoPage((seekBar.getProgress()));
@@ -194,9 +196,9 @@ public abstract class DefaultPageController implements IPageController, View.OnC
                 layoutTitle.setVisibility(View.GONE);
             }
         } else if (R.id.nextButton == id) {
-            controllerListener.prev(keyword.toString());
+            controllerListener.next(keyword.getText().toString());
         } else if (R.id.prevButton == id) {
-            controllerListener.next(keyword.toString());
+            controllerListener.prev(keyword.getText().toString());
         }
     }
 

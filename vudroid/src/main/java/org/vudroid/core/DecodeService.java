@@ -61,6 +61,6 @@ public interface DecodeService {
     }
 
     interface SearchCallback {
-        void result(Quad[][] result, int index);
+        void result(Object[] result, int index);
     }
 }

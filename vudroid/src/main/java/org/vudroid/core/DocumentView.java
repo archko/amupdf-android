@@ -784,7 +784,7 @@ public class DocumentView extends View implements ZoomListener {
         }
     }
 
-    protected Map<Integer, Quad[][]> searchResults = new HashMap<>();
+    protected Map<Integer, Object[]> searchResults = new HashMap<>();
 
     public void prev(String text) {
         int first = getCurrentPage();
@@ -802,8 +802,8 @@ public class DocumentView extends View implements ZoomListener {
         });
     }
 
-    public Quad[][] getSearchBox(int index) {
-        return null;
+    public Object[] getSearchBox(int index) {
+        return searchResults.get(index);
     }
 
     private class MySimpleOnGestureListener extends GestureDetector.SimpleOnGestureListener {

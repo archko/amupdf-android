@@ -433,10 +433,10 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     private void search(String text, int page, SearchCallback sc) {
-        AsyncTask<Void, Void, Quad[][]> asyncTask = new AsyncTask<>() {
+        AsyncTask<Void, Void, Object[]> asyncTask = new AsyncTask<>() {
 
             @Override
-            protected Quad[][] doInBackground(Void... voids) {
+            protected Object[] doInBackground(Void... voids) {
                 int count = aPageList.size();
                 int pageNum;
                 if (page == -1) {
@@ -445,7 +445,7 @@ public class DecodeServiceBase implements DecodeService {
                     pageNum = page + 1;
                 }
                 for (int i = pageNum; i < count; i++) {
-                    Quad[][] result = document.search(text, i);
+                    Object[] result = document.search(text, i);
                     Log.d("", String.format("%s, %s ,%s", page, text, result));
                     if (result != null) {
                         return result;
@@ -455,7 +455,7 @@ public class DecodeServiceBase implements DecodeService {
             }
 
             @Override
-            protected void onPostExecute(Quad[][] quads) {
+            protected void onPostExecute(Object[] quads) {
                 sc.result(quads, page);
             }
         };
