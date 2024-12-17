@@ -69,7 +69,7 @@ recyclerview = "1.4.0-rc01"
 sardine = "0.9"
 k2pdfopt = "0.1.6"
 
-versionCode = "421"
+versionCode = "430"
 versionName = "7.3.1"
 
 [libraries]
