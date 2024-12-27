@@ -1,6 +1,9 @@
 <resources>
     <style name="AppTheme" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:statusBarColor">@color/md_theme_onPrimary</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">false</item>
         <item name="android:windowSharedElementsUseOverlay">false</item>
         <item name="list_background">@drawable/background_tiled_dark</item>
 

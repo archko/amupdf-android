@@ -267,7 +267,7 @@ class PdfOptionsActivity : FragmentActivity() {
         }
 
         fun showListDialog(data: Prefs, summary: TextView) {
-            val builder = AlertDialog.Builder(this@PdfOptionsActivity)
+            val builder = AlertDialog.Builder(this@PdfOptionsActivity, androidx.appcompat.R.style.Theme_AppCompat_Dialog)
             builder.setTitle(data.title)
             builder.setSingleChoiceItems(
                 data.labels,
