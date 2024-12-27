@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/imageView"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ff212121" />
+    android:background="#ff212121">
+
+    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ImageView
+        android:id="@+id/gifView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+</RelativeLayout>

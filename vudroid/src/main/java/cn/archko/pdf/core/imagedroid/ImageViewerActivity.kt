@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import cn.archko.pdf.core.common.IntentFile
@@ -14,6 +15,9 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.OnImageEven
 import com.davemorrissey.labs.subscaleview.decoder.CompatDecoderFactory
 import com.davemorrissey.labs.subscaleview.decoder.SkiaImageDecoder
 import com.davemorrissey.labs.subscaleview.decoder.SkiaPooledImageRegionDecoder
+import com.github.penfeizhou.animation.gif.GifDrawable
+import com.github.penfeizhou.animation.loader.FileLoader
+import com.github.penfeizhou.animation.webp.WebPDrawable
 import org.vudroid.R
 import org.vudroid.databinding.ImageViewerBinding
 
@@ -38,7 +42,22 @@ class ImageViewerActivity : AppCompatActivity(R.layout.image_viewer) {
             return
         }
 
-        if (path!!.endsWith("tif") || path.endsWith("tiff")) {
+        if (path!!.endsWith("gif") || path.endsWith("webp")) {
+            binding.imageView.visibility = View.GONE
+            binding.gifView.visibility = View.VISIBLE
+            val fileLoader = FileLoader(path)
+            if (path.endsWith("gif")) {
+                val drawable = GifDrawable(fileLoader)
+                binding.gifView.setImageDrawable(drawable)
+            } else if (path.endsWith("webp")
+            ) {
+                val drawable = WebPDrawable(fileLoader)
+                binding.gifView.setImageDrawable(drawable)
+            }
+            return
+        }
+
+        if (path.endsWith("tif") || path.endsWith("tiff")) {
             binding.imageView.setBitmapDecoderFactory(
                 CompatDecoderFactory(
                     MupdfImageDecoder::class.java,

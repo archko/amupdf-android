@@ -37,4 +37,7 @@ dependencies {
     api("io.documentnode:epub4j-core:4.2.1") {
         exclude("xmlpull")
     }
+
+    api ("com.github.penfeizhou.android.animation:awebp:3.0.1")
+    api ("com.github.penfeizhou.android.animation:gif:3.0.1")
 }
