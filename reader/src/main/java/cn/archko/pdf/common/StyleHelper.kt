@@ -1,11 +1,7 @@
 package cn.archko.pdf.common
 
 import androidx.activity.ComponentActivity
-import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.entity.StyleBean
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * @author: archko 2019-06-19 :12:27
@@ -40,10 +36,12 @@ class StyleHelper(
 
     private fun loadStyleFromSP() {
         styleBean = StyleBean(
-            PdfOptionRepository.getTextSize(),
-            PdfOptionRepository.getBgColor(),
-            PdfOptionRepository.getFgColor(),
-            PdfOptionRepository.getLineSpacingMult(),
+            textSize = PdfOptionRepository.getTextSize(),
+            fontWeight= 400,
+            letterSpacing= 0.5f,
+            lineSpacingMult = PdfOptionRepository.getLineSpacingMult(),
+            bgColor = PdfOptionRepository.getBgColor(),
+            fgColor = PdfOptionRepository.getFgColor(),
             PdfOptionRepository.getLeftPadding(),
             PdfOptionRepository.getTopPadding(),
             PdfOptionRepository.getRightPadding(),

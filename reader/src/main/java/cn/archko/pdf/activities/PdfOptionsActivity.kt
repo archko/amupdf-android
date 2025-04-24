@@ -194,7 +194,7 @@ class PdfOptionsActivity : FragmentActivity() {
             resources.getStringArray(R.array.opts_decode_block_label),
             getDecodeBlock()
         )
-        prefsList.add(prefs)
+        ///prefsList.add(prefs)
     }
 
     private class Prefs {
