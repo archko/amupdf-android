@@ -317,7 +317,7 @@ class TextActivity : AppCompatActivity() {
                     ttsMode = true
                     startTts()
                 } else {
-                    Log.e(TTSActivity.TAG, "初始化失败")
+                    Logcat.e(TTSActivity.TAG, "初始化失败")
                     Toast.makeText(
                         this@TextActivity,
                         getString(R.string.tts_failed),

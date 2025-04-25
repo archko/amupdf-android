@@ -9,7 +9,6 @@ import android.os.Handler
 import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.text.TextUtils
-import android.util.Log
 import android.util.SparseArray
 import android.view.MotionEvent
 import android.view.View
@@ -55,7 +54,6 @@ import cn.archko.pdf.fragments.SleepTimerDialog
 import cn.archko.pdf.fragments.TtsTextFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
-import cn.archko.pdf.tts.TTSActivity
 import cn.archko.pdf.tts.TTSEngine
 import cn.archko.pdf.viewmodel.DocViewModel
 import com.tencent.mmkv.MMKV
@@ -573,7 +571,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                         ttsMode = true
                         startTts()
                     } else {
-                        Log.e(TTSActivity.TAG, "初始化失败")
+                        Logcat.e(TAG, "初始化失败")
                         Toast.makeText(
                             this@AMuPDFRecyclerViewActivity,
                             getString(R.string.tts_failed),

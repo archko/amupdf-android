@@ -69,8 +69,8 @@ recyclerview = "1.4.0"
 sardine = "0.9"
 k2pdfopt = "0.1.6"
 
-versionCode = "430"
-versionName = "7.3.1"
+versionCode = "435"
+versionName = "7.4.0"
 
 [libraries]
 accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
