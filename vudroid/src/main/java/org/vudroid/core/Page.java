@@ -114,7 +114,7 @@ public class Page {
         final Paint paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(2);
+        paint.setStrokeWidth(3);
         return paint;
     }
 

@@ -30,7 +30,7 @@ import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.Utils
-import coil.load
+import coil3.load
 import com.google.android.material.slider.Slider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -2,9 +2,8 @@ package cn.archko.pdf.utils
 
 import android.content.Context
 import android.widget.ImageView
-import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.decode.PdfFetcherData
-import coil.load
+import coil3.load
 
 /**
  * @author: archko 2024/8/15 :22:12

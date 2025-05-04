@@ -19,12 +19,14 @@ import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.utils.BitmapUtils
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.widgets.CoverDrawable
-import coil.ImageLoader
-import coil.decode.DataSource
-import coil.fetch.DrawableResult
-import coil.fetch.FetchResult
-import coil.fetch.Fetcher
-import coil.request.Options
+import coil3.BitmapImage
+import coil3.ImageLoader
+import coil3.asImage
+import coil3.decode.DataSource
+import coil3.fetch.FetchResult
+import coil3.fetch.Fetcher
+import coil3.fetch.ImageFetchResult
+import coil3.request.Options
 import com.artifex.mupdf.fitz.Cookie
 import com.artifex.mupdf.fitz.Document
 import com.artifex.mupdf.fitz.Matrix
@@ -96,14 +98,13 @@ class PdfFetcher(
             cacheBitmap(bitmap)
         }
 
-        /*val paint = bitmap?.let { paint(it) }
-        val drawable = BitmapDrawable(paint)*/
-        val drawable = CoverDrawable(bitmap)
+        //val drawable = CoverDrawable(bitmap)
+        val imageBitmap: BitmapImage = bitmap.asImage()
 
-        return DrawableResult(
-            drawable = drawable,
-            isSampled = false,
-            dataSource = DataSource.MEMORY
+        return ImageFetchResult(
+            image = imageBitmap,
+            dataSource = DataSource.MEMORY,
+            isSampled = false
         )
     }
 
@@ -204,7 +205,7 @@ class PdfFetcher(
             data: PdfFetcherData,
             options: Options,
             imageLoader: ImageLoader
-        ): Fetcher {
+        ): Fetcher? {
             return PdfFetcher(data, options)
         }
     }
