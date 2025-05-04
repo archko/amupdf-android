@@ -16,7 +16,7 @@ object FetcherUtils {
             height = 180,
         )
         imageView.load(fetcherData) {
-            error(cn.archko.mupdf.R.drawable.ic_book)
+            //error(cn.archko.mupdf.R.drawable.ic_book)
         }
         /*val req = ImageRequest.Builder(context)
             .data(fetcherData)
