@@ -552,7 +552,7 @@ public class DocumentView extends View implements ZoomListener {
                 page.draw(canvas);
             }
         } else {
-            for (int i = current; i >= 0; i--) {
+            for (int i = current; i < pages.size(); i++) {
                 page = pages.valueAt(i);
                 if (page.isVisible()) {
                     page.draw(canvas);
@@ -561,7 +561,7 @@ public class DocumentView extends View implements ZoomListener {
                 }
             }
 
-            for (int i = current; i < pages.size(); i++) {
+            for (int i = current; i >= 0; i--) {
                 page = pages.valueAt(i);
                 if (page.isVisible()) {
                     page.draw(canvas);
