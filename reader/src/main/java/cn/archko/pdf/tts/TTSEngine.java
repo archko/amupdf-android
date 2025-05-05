@@ -49,7 +49,6 @@ public class TTSEngine {
     //保存正在进行中的数据列表
     private final Map<String, ReflowBean> keys = new HashMap<>();
     private final List<ReflowBean> ttsContent = new ArrayList<>();
-    private ReflowBean speakingBean = null;
 
     public boolean isInitStatus() {
         return initStatus;
@@ -139,12 +138,13 @@ public class TTSEngine {
                 if (null != key) {
                     progressListener.onDone(key);
                 }
-                next();
+                if (ttsContent.isEmpty()) {
+                    progressListener.onFinish();
+                }
             }
 
             @Override
             public void onError(String utteranceId) {
-                speakingBean = null;
                 ReflowBean key = keys.remove(utteranceId);
                 Logcat.d(TAG, String.format("onError:%s, %s", utteranceId, key));
                 ttsContent.remove(key);
@@ -152,18 +152,7 @@ public class TTSEngine {
         });
     }
 
-    void next() {
-        if (!ttsContent.isEmpty()) {
-            ReflowBean bean = ttsContent.get(0);
-            doSpeak(bean);
-        } else {
-            progressListener.onFinish();
-            speakingBean = null;
-        }
-    }
-
     public void stop() {
-        speakingBean = null;
         if (null != textToSpeech) {
             textToSpeech.stop();
         }
@@ -287,7 +276,6 @@ public class TTSEngine {
             Logcat.d(TAG, "textToSpeech not initialized");
             return;
         }
-        speakingBean = bean;
         textToSpeech.speak(bean.getData(), TextToSpeech.QUEUE_ADD, null, bean.getPage());
     }
 
@@ -296,15 +284,11 @@ public class TTSEngine {
     }
 
     public void speak(final List<ReflowBean> beans) {
-        ReflowBean first = null;
         for (ReflowBean bean : beans) {
-            if (null == first) {
-                first = bean;
-            }
             keys.put(bean.getPage(), bean);
             ttsContent.add(bean);
+            doSpeak(bean);
         }
-        doSpeak(first);
     }
 
     public void speak(final ReflowBean bean) {

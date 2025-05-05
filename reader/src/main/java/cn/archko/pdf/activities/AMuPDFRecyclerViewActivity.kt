@@ -642,6 +642,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     val arr = key.page!!.split("-")
                     val page = Utils.parseInt(arr[0])
                     Logcat.d("onStart:$key, page:$page")
+                    viewController?.setSpeakingPage(page)
                     if (window.decorView.visibility != View.VISIBLE) {
                         pendingPos = page
                         docViewModel.bookProgress?.progress = pendingPos
@@ -652,7 +653,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     if (current != page) {
                         onSelectedOutline(page)
                     }
-                    viewController?.setSpeakingPage(page)
                 } catch (e: Exception) {
                     Logcat.e(e)
                 }
@@ -709,7 +709,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 })
         }
         lifecycleScope.launch {
-            val result = withContext(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
                 viewController?.decodePageForTts(getCurrentPos())
             }
         }
