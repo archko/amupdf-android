@@ -659,8 +659,12 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             }
 
             override fun onDone(key: ReflowBean) {
-
                 resetSpeakingPage()
+            }
+
+            override fun onFinish() {
+                resetSpeakingPage()
+                closeTts()
             }
         })
         ttsPlay.setOnClickListener {
@@ -726,16 +730,18 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private val closeRunnable = Runnable { closeTts() }
 
     private fun closeTts() {
-        ttsLayout.visibility = View.GONE
-        ttsMode = false
-        val first = TTSEngine.get().first
-        if (first >= 0) {
-            pendingPos = first
+        handler.post {
+            ttsLayout.visibility = View.GONE
+            ttsMode = false
+            val first = TTSEngine.get().first
+            if (first >= 0) {
+                pendingPos = first
+            }
+            if (window.decorView.visibility == View.VISIBLE) {
+                locatePageForTTS()
+            }
+            TTSEngine.get().shutdown()
         }
-        if (window.decorView.visibility == View.VISIBLE) {
-            locatePageForTTS()
-        }
-        TTSEngine.get().shutdown()
     }
 
     private fun changeOri(ori: Int) {

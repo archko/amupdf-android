@@ -331,7 +331,7 @@ open class ANormalViewController(
 
     override fun setSpeakingPage(page: Int) {
         documentView.speakingPage = page
-        documentView.invalidate()
+        documentView.postInvalidate()
     }
 
     /**

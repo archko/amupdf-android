@@ -136,6 +136,9 @@ public class TTSEngine {
                 //Logcat.d(TAG, "onDone:" + utteranceId);
                 ReflowBean key = keys.remove(utteranceId);
                 ttsContent.remove(key);
+                if (null != key) {
+                    progressListener.onDone(key);
+                }
                 next();
             }
 
@@ -154,6 +157,7 @@ public class TTSEngine {
             ReflowBean bean = ttsContent.get(0);
             doSpeak(bean);
         } else {
+            progressListener.onFinish();
             speakingBean = null;
         }
     }
@@ -318,5 +322,7 @@ public class TTSEngine {
         void onStart(ReflowBean utteranceId);
 
         void onDone(ReflowBean utteranceId);
+
+        void onFinish();
     }
 }

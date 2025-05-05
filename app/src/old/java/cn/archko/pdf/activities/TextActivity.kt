@@ -347,6 +347,9 @@ class TextActivity : AppCompatActivity() {
                     Logcat.e(e)
                 }
             }
+
+            override fun onFinish() {
+            }
         })
         binding.ttsPlay.setOnClickListener {
             if (TTSEngine.get().isSpeaking()) {
