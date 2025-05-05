@@ -2,9 +2,9 @@ package cn.archko.pdf.viewmodel
 
 import android.text.TextUtils
 import androidx.lifecycle.ViewModel
-import cn.archko.pdf.core.common.TtsHelper
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.common.TextHelper
+import cn.archko.pdf.core.common.TtsHelper
 import cn.archko.pdf.core.entity.LoadResult
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.entity.State
@@ -73,16 +73,14 @@ class TextViewModel : ViewModel() {
             for (i in currentPos until count) {
                 val str = data[i].data
                 if (str != null && !TextUtils.isEmpty(str.trim())) {
-                    TTSEngine.get().speak(data[i])
                     list.add(ReflowBean(str, page = "$i-$i"))
                 }
             }
             Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
+            PDFViewModel.speak(list, 0)
             TtsHelper.saveToFile(count, pdfPath!!, list)
         } else {
-            for (bean in ttsBean.list) {
-                TTSEngine.get().speak(bean)
-            }
+            PDFViewModel.speak(ttsBean.list, 0)
         }
     }
 }

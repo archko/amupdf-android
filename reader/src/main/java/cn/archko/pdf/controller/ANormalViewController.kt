@@ -26,6 +26,7 @@ import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TTSEngine
 import cn.archko.pdf.viewmodel.DocViewModel
+import cn.archko.pdf.viewmodel.PDFViewModel
 import kotlinx.coroutines.CoroutineScope
 import org.vudroid.core.DecodeService
 import org.vudroid.core.DecodeServiceBase
@@ -322,14 +323,15 @@ open class ANormalViewController(
             }
             Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
             TtsHelper.saveToFile(count, mPath, list)
-            for (i in currentPos until list.size) {
-                TTSEngine.get().speak(list[i])
-            }
+            PDFViewModel.speak(list, currentPos)
         } else {
-            for (i in currentPos until ttsBean.list.size) {
-                TTSEngine.get().speak(ttsBean.list[i])
-            }
+            PDFViewModel.speak(ttsBean.list, currentPos)
         }
+    }
+
+    override fun setSpeakingPage(page: Int) {
+        documentView.speakingPage = page
+        documentView.invalidate()
     }
 
     /**

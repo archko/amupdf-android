@@ -49,6 +49,7 @@ public class TTSEngine {
     //保存正在进行中的数据列表
     private final Map<String, ReflowBean> keys = new HashMap<>();
     private final List<ReflowBean> ttsContent = new ArrayList<>();
+    private ReflowBean speakingBean = null;
 
     public boolean isInitStatus() {
         return initStatus;
@@ -60,12 +61,6 @@ public class TTSEngine {
         public void onInit(int status) {
             if (status == TextToSpeech.SUCCESS) {
                 initStatus = true;
-                String content = "语言数据丢失或不支持该语言";
-                //textToSpeech.speak(content, TextToSpeech.QUEUE_ADD, null, null);
-                //textToSpeech.speak("requestedVisible:true, getLeash:Surface(name=Surface(name=ea7ad61 NavigationBar0", TextToSpeech.QUEUE_ADD, null, null);
-                //textToSpeech.speak("TTS是语音合成应用的一种，它将储存于电脑中的文件，如帮助文件或者网页，转换成自然语音输出。\n" +
-                //        "著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。", TextToSpeech.QUEUE_ADD, null, null);
-                //设置首选语言为中文,注意，语言可能是不可用的，结果将指示此
                 int result = textToSpeech.setLanguage(Locale.CHINA);
                 Log.e(TAG, "初始化:" + result);
                 if (result == TextToSpeech.LANG_AVAILABLE) {
@@ -141,10 +136,12 @@ public class TTSEngine {
                 //Logcat.d(TAG, "onDone:" + utteranceId);
                 ReflowBean key = keys.remove(utteranceId);
                 ttsContent.remove(key);
+                next();
             }
 
             @Override
             public void onError(String utteranceId) {
+                speakingBean = null;
                 ReflowBean key = keys.remove(utteranceId);
                 Logcat.d(TAG, String.format("onError:%s, %s", utteranceId, key));
                 ttsContent.remove(key);
@@ -152,7 +149,17 @@ public class TTSEngine {
         });
     }
 
+    void next() {
+        if (!ttsContent.isEmpty()) {
+            ReflowBean bean = ttsContent.get(0);
+            doSpeak(bean);
+        } else {
+            speakingBean = null;
+        }
+    }
+
     public void stop() {
+        speakingBean = null;
         if (null != textToSpeech) {
             textToSpeech.stop();
         }
@@ -271,13 +278,29 @@ public class TTSEngine {
         return textToSpeech.isSpeaking();
     }
 
-    public void resumeSpeak(final ReflowBean bean) {
+    private void doSpeak(ReflowBean bean) {
         if (textToSpeech == null) {
             Logcat.d(TAG, "textToSpeech not initialized");
             return;
         }
-
+        speakingBean = bean;
         textToSpeech.speak(bean.getData(), TextToSpeech.QUEUE_ADD, null, bean.getPage());
+    }
+
+    public void resumeSpeak(final ReflowBean bean) {
+        doSpeak(bean);
+    }
+
+    public void speak(final List<ReflowBean> beans) {
+        ReflowBean first = null;
+        for (ReflowBean bean : beans) {
+            if (null == first) {
+                first = bean;
+            }
+            keys.put(bean.getPage(), bean);
+            ttsContent.add(bean);
+        }
+        doSpeak(first);
     }
 
     public void speak(final ReflowBean bean) {
@@ -288,7 +311,7 @@ public class TTSEngine {
 
         keys.put(bean.getPage(), bean);
         ttsContent.add(bean);
-        textToSpeech.speak(bean.getData(), TextToSpeech.QUEUE_ADD, null, bean.getPage());
+        doSpeak(bean);
     }
 
     public interface TtsProgressListener {

@@ -54,6 +54,7 @@ public class DocumentView extends View implements ZoomListener {
     private final GestureDetector mGestureDetector;
     boolean crop = false;
     private SimpleGestureListener simpleGestureListener;
+    private int speakingPage=-1;
 
     float widthAccum = 0;
 
@@ -789,6 +790,14 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     public void next(String text) {
+    }
+
+    public int getSpeakingPage() {
+        return speakingPage;
+    }
+
+    public void setSpeakingPage(int speakingPage) {
+        this.speakingPage = speakingPage;
     }
 
     public SearchResult getSearchResult(int index) {

@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.view.MotionEvent
 import android.view.View
+import org.vudroid.core.Page
 
 /**
  * @author: archko 2020/5/15 :12:43
@@ -42,4 +43,5 @@ interface AViewController {
     fun next(string: String?)
     fun clearSearch()
     fun showSearch()
+    fun setSpeakingPage(page: Int)
 }

@@ -141,6 +141,9 @@ class ATextReflowViewController(
         pdfViewModel.decodeTextForTts(currentPos)
     }
 
+    override fun setSpeakingPage(page: Int) {
+    }
+
     override fun reflow(): Int {
         return BookProgress.REFLOW_TXT
     }

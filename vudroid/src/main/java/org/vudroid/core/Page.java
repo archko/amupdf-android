@@ -32,6 +32,7 @@ public class Page {
     private final Paint strokePaint = strokePaint();
     private final Paint linkPaint = linkPaint();
     private final Paint searchPaint = searchPaint();
+    private final Paint speakingPaint = speakingPaint();
     public static final int ZOOM_THRESHOLD = 2;
     private boolean decodingNow;
     private Bitmap bitmap;
@@ -104,6 +105,7 @@ public class Page {
         canvas.drawLine(bounds.left, bounds.bottom, bounds.right / 5, bounds.bottom, strokePaint);
         drawPageLinks(canvas);
         drawSearchResult(canvas);
+        drawSpeaking(canvas);
     }
 
     protected String getKey() {
@@ -129,6 +131,14 @@ public class Page {
         final Paint paint = new Paint();
         paint.setColor(Color.parseColor("#80FF9800"));
         paint.setStyle(Paint.Style.FILL);
+        return paint;
+    }
+
+    private Paint speakingPaint() {
+        final Paint paint = new Paint();
+        paint.setColor(Color.RED);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(6);
         return paint;
     }
 
@@ -340,6 +350,13 @@ public class Page {
                     canvas.drawRect(rect, searchPaint);
                 }
             }
+        }
+    }
+
+    private void drawSpeaking(Canvas canvas) {
+        if (documentView.getSpeakingPage() == index) {
+            final RectF rect = new RectF(bounds.left + 3, bounds.top + 3, bounds.right - 3, bounds.bottom - 3);
+            canvas.drawRect(rect, speakingPaint);
         }
     }
 

@@ -447,6 +447,9 @@ class ACropViewController(
     override fun showSearch() {
     }
 
+    override fun setSpeakingPage(page: Int) {
+    }
+
     //--------------------------------------
 
     override fun onResume() {

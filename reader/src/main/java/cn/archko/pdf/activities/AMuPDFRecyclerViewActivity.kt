@@ -652,16 +652,20 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     if (current != page) {
                         onSelectedOutline(page)
                     }
+                    viewController?.setSpeakingPage(page)
                 } catch (e: Exception) {
                     Logcat.e(e)
                 }
             }
 
             override fun onDone(key: ReflowBean) {
+
+                resetSpeakingPage()
             }
         })
         ttsPlay.setOnClickListener {
             if (TTSEngine.get().isSpeaking()) {
+                resetSpeakingPage()
                 TTSEngine.get().stop()
             } else {
                 TTSEngine.get().resume()
@@ -705,6 +709,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 viewController?.decodePageForTts(getCurrentPos())
             }
         }
+    }
+
+    fun resetSpeakingPage() {
+        viewController?.setSpeakingPage(-1)
     }
 
     private fun locatePage() {
@@ -839,6 +847,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     private fun locatePageForTTS() {
         handler.post {
+            resetSpeakingPage()
             onSelectedOutline(pendingPos)
             pendingPos = -1
         }
