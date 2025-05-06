@@ -1,7 +1,7 @@
 incoming features
 
 ### 7.4
-- add search
+- add search, app crashed when searching,
 
 ### 7.3
 - epub layout fit to screen width and height
