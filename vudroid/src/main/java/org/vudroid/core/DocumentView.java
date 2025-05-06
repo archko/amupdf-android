@@ -37,6 +37,7 @@ public class DocumentView extends View implements ZoomListener {
     private final CurrentPageModel currentPageModel;
     DecodeService decodeService;
     private final SparseArray<Page> pages = new SparseArray<>();
+    private final List<Page> lastPages = new ArrayList<>();
     private boolean isInitialized = false;
     private int pageToGoTo = -1;
     private int xToScroll;
@@ -54,7 +55,7 @@ public class DocumentView extends View implements ZoomListener {
     private final GestureDetector mGestureDetector;
     boolean crop = false;
     private SimpleGestureListener simpleGestureListener;
-    private int speakingPage=-1;
+    private int speakingPage = -1;
 
     float widthAccum = 0;
 
@@ -213,11 +214,25 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void updatePageVisibility() {
+        List<Page> lastVisible = new ArrayList<>(lastPages);
+        List<Page> visibleList = new ArrayList<>();
         Page page;
         for (int i = 0; i < pages.size(); i++) {
             page = pages.valueAt(i);
-            page.updateVisibility();
+            if (page.isVisible()) {
+                visibleList.add(page);
+            }
         }
+        for (Page p : visibleList) {
+            p.updateVisibility();
+            //lastVisible.remove(p);
+        }
+        for (Page p : lastVisible) {
+            p.updateVisibility();
+        }
+        //Log.d(TAG, String.format("updatePageVisibility:%s-%s-%s", visibleList.size(), lastVisible.size(), lastPages.size()));
+        lastPages.clear();
+        lastPages.addAll(visibleList);
     }
 
     public void commitZoom() {
@@ -531,10 +546,10 @@ public class DocumentView extends View implements ZoomListener {
             float left = getScrollX();
             float top = getScrollY();
             if (oriention == HORIZONTAL) {
-                width = width * 1.8f;
+                width = width * 1.2f;
                 left = left - width * 0.2f;
             } else {
-                height = height * 1.8f;
+                height = height * 1.2f;
                 top = top - height * 0.2f;
             }
             viewRect = new RectF(left, top, getScrollX() + width, getScrollY() + height);

@@ -75,6 +75,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private var sensorHelper: SensorHelper? = null
 
     private var isDocLoaded: Boolean = false
+    private var isResumed: Boolean = false
 
     private var documentLayout: FrameLayout? = null
     private var viewController: AViewController? = null
@@ -117,7 +118,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         if (TextUtils.isEmpty(mPath)) {
             Toast.makeText(
                 this@AMuPDFRecyclerViewActivity,
-                "error file path:$mPath",
+                "error file path",
                 Toast.LENGTH_SHORT
             ).show()
             return
@@ -153,14 +154,14 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
         if (TextUtils.isEmpty(mPath)) {
             mPath = intent.getStringExtra("path")
-            if (Intent.ACTION_VIEW == intent.action) {
-                if (TextUtils.isEmpty(mPath)) {
+            if (TextUtils.isEmpty(mPath)) {
+                if (Intent.ACTION_VIEW == intent.action) {
                     val uri = getIntent().data
                     val path = IntentFile.getPath(this, uri)
                     mPath = path
+                } else {
+                    mPath = intent.getStringExtra("path")
                 }
-            } else {
-                mPath = intent.getStringExtra("path")
             }
         }
     }
@@ -641,14 +642,14 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 try {
                     val arr = key.page!!.split("-")
                     val page = Utils.parseInt(arr[0])
-                    Logcat.d("onStart:$key, page:$page")
-                    viewController?.setSpeakingPage(page)
-                    if (window.decorView.visibility != View.VISIBLE) {
+                    //Logcat.d("onStart:$key, page:$page")
+                    if (!isResumed) {
                         pendingPos = page
                         docViewModel.bookProgress?.progress = pendingPos
                         docViewModel.saveBookProgress(page)
                         return
                     }
+                    viewController?.setSpeakingPage(page)
                     val current = getCurrentPos()
                     if (current != page) {
                         onSelectedOutline(page)
@@ -659,17 +660,16 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             }
 
             override fun onDone(key: ReflowBean) {
-                resetSpeakingPage()
+                resetSpeakingPage(-1)
             }
 
             override fun onFinish() {
-                resetSpeakingPage()
                 closeTts()
             }
         })
         ttsPlay.setOnClickListener {
             if (TTSEngine.get().isSpeaking()) {
-                resetSpeakingPage()
+                resetSpeakingPage(-1)
                 TTSEngine.get().stop()
             } else {
                 TTSEngine.get().resume()
@@ -715,8 +715,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
     }
 
-    fun resetSpeakingPage() {
-        viewController?.setSpeakingPage(-1)
+    fun resetSpeakingPage(page: Int) {
+        handler.post {
+            viewController?.setSpeakingPage(page)
+        }
     }
 
     private fun locatePage() {
@@ -724,6 +726,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         if (first >= 0) {
             pendingPos = first
             locatePageForTTS()
+            resetSpeakingPage(pendingPos)
         }
     }
 
@@ -737,9 +740,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             if (first >= 0) {
                 pendingPos = first
             }
-            if (window.decorView.visibility == View.VISIBLE) {
+            if (isResumed) {
                 locatePageForTTS()
             }
+            resetSpeakingPage(pendingPos)
             TTSEngine.get().shutdown()
         }
     }
@@ -819,6 +823,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     override fun onResume() {
         super.onResume()
+        isResumed = true
         sensorHelper?.onResume()
         viewController?.onResume()
         lifecycleScope.launch {
@@ -848,12 +853,12 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         Logcat.d("onResume $pendingPos")
         if (pendingPos >= 0) {
             locatePageForTTS()
+            resetSpeakingPage(pendingPos)
         }
     }
 
     private fun locatePageForTTS() {
         handler.post {
-            resetSpeakingPage()
             onSelectedOutline(pendingPos)
             pendingPos = -1
         }
@@ -861,6 +866,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     override fun onPause() {
         super.onPause()
+        isResumed = false
         if (ttsMode) {
             val first = TTSEngine.get().first
             if (first >= 0) {
