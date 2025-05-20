@@ -18,6 +18,7 @@ import cn.archko.pdf.core.link.Hyperlink;
 
 public class AlbumPage implements CodecPage {
 
+    public static final int MAX_WIDTH = 768;
     private long pageHandle = -1;
     int pageWidth;
     int pageHeight;
@@ -86,14 +87,26 @@ public class AlbumPage implements CodecPage {
         //缩略图
         if (pageSliceBounds.width() == 1.0f) {
             BitmapFactory.Options options = new BitmapFactory.Options();
-            final int heightRatio = Math.round((float) pageWidth / (float) height);
-            final int widthRatio = Math.round((float) pageHeight / (float) width);
+            int widthRatio = 2;
+            int tWidth = pageWidth;
+            while (tWidth > MAX_WIDTH) {
+                tWidth = pageWidth / widthRatio;
+                widthRatio *= 2;
+            }
+            int heightRatio = 2;
+            int tHeight = pageWidth;
+            while (tHeight > MAX_WIDTH) {
+                tHeight = pageHeight / heightRatio;
+                heightRatio *= 2;
+            }
+            //final int heightRatio = Math.round((float) pageHeight / (float) height);
+            //final int widthRatio = Math.round((float) pageWidth / (float) width);
             // 选择宽和高中最小的比率作为inSampleSize的值，这样可以保证最终图片的宽和高
             // 一定都会大于等于目标的宽和高。
             options.inSampleSize = Math.max(heightRatio, widthRatio);
             Bitmap bitmap = BitmapFactory.decodeFile(path, options);
-            Log.d("TAG", String.format("page:%s, h-w.ratio:%s-%s, w-h:%s-%s, sample:%s",
-                    pageHandle, heightRatio, widthRatio, width, height, options.inSampleSize));
+            Log.d("TAG", String.format("page:%s, %s-%s, h-w.ratio:%s-%s, w-h:%s-%s, sample:%s",
+                    pageHandle, pageWidth, pageHeight, heightRatio, widthRatio, width, height, options.inSampleSize));
             return bitmap;
         } else {
             int pageW = Math.round(width / scale);

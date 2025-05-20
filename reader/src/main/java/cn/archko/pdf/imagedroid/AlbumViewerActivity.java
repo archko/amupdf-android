@@ -10,6 +10,7 @@ import org.vudroid.core.codec.CodecDocument;
 
 import cn.archko.pdf.core.common.AppExecutors;
 import cn.archko.pdf.imagedroid.codec.AlbumContext;
+import cn.archko.pdf.imagedroid.codec.AlbumDocument;
 
 public class AlbumViewerActivity extends BaseViewerActivity {
 
@@ -32,6 +33,12 @@ public class AlbumViewerActivity extends BaseViewerActivity {
                 progressDialog.dismiss();
                 if (null == document) {
                     Toast.makeText(this, "Open Failed", Toast.LENGTH_LONG).show();
+                    finish();
+                    return;
+                }
+                AlbumDocument albumDocument = (AlbumDocument) document;
+                if (albumDocument.getPageCount() == 0) {
+                    Toast.makeText(this, "no images", Toast.LENGTH_LONG).show();
                     finish();
                     return;
                 }
