@@ -25,6 +25,7 @@ public class EpubPageController extends PdfPageController {
         oriButton.setVisibility(View.VISIBLE);
         ttsButton.setVisibility(View.VISIBLE);
         ocrButton.setVisibility(View.VISIBLE);
+        previewButton.setVisibility(View.VISIBLE);
 
         reflowLayout = view.findViewById(R.id.reflow_layout);
         reflowLayout.setVisibility(View.VISIBLE);

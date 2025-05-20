@@ -31,6 +31,7 @@ public abstract class DefaultPageController implements IPageController, View.OnC
     protected ImageButton oriButton;
     protected ImageButton ttsButton;
     protected ImageButton ocrButton;
+    protected ImageButton previewButton;
     //protected TextView pathView;
     protected TextView titleView;
     protected View layoutTitle;
@@ -62,6 +63,7 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         oriButton = view.findViewById(R.id.oriButton);
         ttsButton = view.findViewById(R.id.ttsButton);
         ocrButton = view.findViewById(R.id.ocrButton);
+        previewButton = view.findViewById(R.id.previewButton);
         //pathView = view.findViewById(R.id.path);
         titleView = view.findViewById(R.id.title);
         layoutTitle = view.findViewById(R.id.layout_path);
@@ -80,6 +82,7 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         ttsButton.setOnClickListener(this);
         mBackButton.setOnClickListener(this);
         ocrButton.setOnClickListener(this);
+        previewButton.setOnClickListener(this);
         //nextBtn.setOnClickListener(this);
         //prevBtn.setOnClickListener(this);
         //closeBtn.setOnClickListener(this);
@@ -182,6 +185,8 @@ public abstract class DefaultPageController implements IPageController, View.OnC
             controllerListener.changeOrientation(ori);
         } else if (R.id.ocrButton == id) {
             controllerListener.ocr();
+        } else if (R.id.previewButton == id) {
+            controllerListener.preview();
         } else if (R.id.searchButton == id) {
             controllerListener.showSearch();
         } /*else if (R.id.closeButton == id) {

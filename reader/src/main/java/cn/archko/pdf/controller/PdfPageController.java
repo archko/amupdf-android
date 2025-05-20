@@ -24,6 +24,7 @@ public class PdfPageController extends DefaultPageController {
         oriButton.setVisibility(View.VISIBLE);
         ttsButton.setVisibility(View.VISIBLE);
         ocrButton.setVisibility(View.VISIBLE);
+        previewButton.setVisibility(View.VISIBLE);
     }
 
     public void update(int count, int page, ViewMode viewMode) {
@@ -44,6 +45,7 @@ public class PdfPageController extends DefaultPageController {
             searchButton.setVisibility(View.GONE);
         } else {
             oriButton.setVisibility(View.VISIBLE);
+            previewButton.setVisibility(View.VISIBLE);
         }
     }
 

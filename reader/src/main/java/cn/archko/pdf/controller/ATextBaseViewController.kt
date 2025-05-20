@@ -171,4 +171,7 @@ abstract class ATextBaseViewController(
         updateReflowAdapter()
     }
 
+    override fun toggleThumbnail() {
+    }
+
 }

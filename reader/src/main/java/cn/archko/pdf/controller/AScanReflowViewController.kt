@@ -547,6 +547,9 @@ class AScanReflowViewController(
     override fun setSpeakingPage(page: Int) {
     }
 
+    override fun toggleThumbnail() {
+    }
+
     //--------------------------------------
 
     override fun onResume() {

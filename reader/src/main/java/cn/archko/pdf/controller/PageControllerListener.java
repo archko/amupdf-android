@@ -30,4 +30,6 @@ public interface PageControllerListener {
     void clearSearch();
 
     void showSearch();
+
+    void preview();
 }

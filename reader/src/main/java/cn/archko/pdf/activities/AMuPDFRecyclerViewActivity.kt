@@ -602,6 +602,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         override fun showSearch() {
             viewController?.showSearch();
         }
+
+        override fun preview() {
+            viewController?.toggleThumbnail()
+        }
     }
 
     private fun createControls() {

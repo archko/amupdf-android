@@ -32,6 +32,7 @@ public class Page {
     private final Paint strokePaint = strokePaint();
     private final Paint linkPaint = linkPaint();
     private final Paint searchPaint = searchPaint();
+    private RectF speakingRect = new RectF();
     private final Paint speakingPaint = speakingPaint();
     public static final int ZOOM_THRESHOLD = 2;
     private boolean decodingNow;
@@ -355,8 +356,8 @@ public class Page {
 
     private void drawSpeaking(Canvas canvas) {
         if (documentView.getSpeakingPage() == index) {
-            final RectF rect = new RectF(bounds.left + 3, bounds.top + 3, bounds.right - 3, bounds.bottom - 3);
-            canvas.drawRect(rect, speakingPaint);
+            speakingRect.set(bounds.left + 3, bounds.top + 3, bounds.right - 3, bounds.bottom - 3);
+            canvas.drawRect(speakingRect, speakingPaint);
         }
     }
 

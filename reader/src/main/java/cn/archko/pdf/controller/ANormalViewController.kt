@@ -5,10 +5,11 @@ import android.graphics.Bitmap
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.common.APageSizeLoader
@@ -19,8 +20,10 @@ import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.entity.TtsBean
+import cn.archko.pdf.core.listeners.ClickListener
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.listeners.SimpleGestureListener
+import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.fragments.SearchFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
@@ -54,8 +57,10 @@ open class ANormalViewController(
     private var crop: Boolean = true
 
     protected lateinit var documentView: DocumentView
-    private lateinit var frameLayout: FrameLayout
+    private lateinit var frameLayout: RelativeLayout
     private var decodeService: DecodeService? = null
+    private var thumbnailView: ThumbnailView? = null
+    private var recyclerView: ARecyclerView? = null
 
     private lateinit var currentPageModel: CurrentPageModel
 
@@ -73,6 +78,15 @@ open class ANormalViewController(
 
         override fun onDoubleTap(ev: MotionEvent, currentPage: Int) {
             controllerListener?.onDoubleTap(ev, currentPage)
+        }
+    }
+    val clickListener = object : ClickListener<View> {
+        override fun click(t: View?, pos: Int) {
+            recyclerView?.visibility = View.GONE
+            scrollToPosition(pos)
+        }
+
+        override fun longClick(t: View?, pos: Int, view: View) {
         }
     }
 
@@ -120,6 +134,17 @@ open class ANormalViewController(
         frameLayout = createMainContainer()
         frameLayout.addView(documentView)
         zoomModel.addEventListener(this)
+
+        val lp = RelativeLayout.LayoutParams(
+            Utils.dipToPixel(120f),
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+        recyclerView = ARecyclerView(context)
+        frameLayout.addView(recyclerView, lp)
+        thumbnailView = ThumbnailView(context, recyclerView!!, clickListener)
+        thumbnailView?.setPath(mPath)
+        recyclerView?.visibility = View.GONE
 
         setFilter(PdfOptionRepository.getColorMode())
     }
@@ -172,8 +197,8 @@ open class ANormalViewController(
         )
     }
 
-    private fun createMainContainer(): FrameLayout {
-        return FrameLayout(context)
+    private fun createMainContainer(): RelativeLayout {
+        return RelativeLayout(context)
     }
 
     private fun initDecodeService() {
@@ -332,6 +357,18 @@ open class ANormalViewController(
     override fun setSpeakingPage(page: Int) {
         documentView.speakingPage = page
         documentView.postInvalidate()
+    }
+
+    override fun toggleThumbnail() {
+        recyclerView?.let {
+            val show: Boolean = it.isVisible
+            if (show) {
+                recyclerView?.visibility = View.GONE
+            } else {
+                recyclerView?.visibility = View.VISIBLE
+                thumbnailView?.gotoPage(getCurrentPos())
+            }
+        }
     }
 
     /**

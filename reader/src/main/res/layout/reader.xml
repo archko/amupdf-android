@@ -116,6 +116,16 @@
                         android:src="@drawable/ic_vertical" />
 
                     <ImageButton
+                        android:id="@+id/previewButton"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/button"
+                        android:contentDescription=""
+                        android:src="@drawable/ic_pdf_preview"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                    <ImageButton
                         android:id="@+id/searchButton"
                         android:layout_width="42dp"
                         android:layout_height="42dp"
