@@ -153,11 +153,11 @@ class FileViewModel() : ViewModel() {
             App.instance!!.getSharedPreferences(PREF_TAG, 0)!!
                 .getString(PREF_HOME, null)
         if (null == path) {
-            Toast.makeText(
-                App.instance,
-                App.instance!!.getString(R.string.toast_set_as_home),
-                Toast.LENGTH_SHORT
-            )
+            //Toast.makeText(
+            //    App.instance,
+            //    App.instance!!.getString(R.string.toast_set_as_home),
+            //    Toast.LENGTH_SHORT
+            //)
             path = sdcardRoot
         }
         if (path.length > 1 && path.endsWith("/")) {

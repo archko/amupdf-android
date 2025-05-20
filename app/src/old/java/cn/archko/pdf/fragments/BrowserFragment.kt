@@ -265,11 +265,11 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         var path: String? = activity?.getSharedPreferences(PREF_TAG, 0)!!
             .getString(PREF_HOME, null)
         if (null == path) {
-            Toast.makeText(
-                activity,
-                resources.getString(R.string.toast_set_as_home),
-                Toast.LENGTH_SHORT
-            ).show()
+            //Toast.makeText(
+            //    activity,
+            //    resources.getString(R.string.toast_set_as_home),
+            //    Toast.LENGTH_SHORT
+            //).show()
             path = defaultHome
         }
         if (path!!.length > 1 && path.endsWith("/")) {
