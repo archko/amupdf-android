@@ -73,17 +73,22 @@ class ThumbnailView(
     }
 
     fun gotoPage(position: Int) {
-        this.selectedPosition = position
         if (null != document) {
-            recyclerView.scrollToPosition(position)
-            pdfAdapter?.setPosition(selectedPosition)
-            pdfAdapter?.notifyDataSetChanged()
+            scrollToPosition(position)
         } else {
             loadDoc()
-            recyclerView.scrollToPosition(position)
-            pdfAdapter?.setPosition(selectedPosition)
-            pdfAdapter?.notifyDataSetChanged()
+            scrollToPosition(position)
         }
+    }
+
+    private fun scrollToPosition(position: Int){
+        if (selectedPosition == position){
+            return
+        }
+        this.selectedPosition = position
+        pdfAdapter?.setPosition(position)
+        recyclerView.scrollToPosition(position)
+        pdfAdapter?.notifyDataSetChanged()
     }
 
     fun setPath(path: String) {

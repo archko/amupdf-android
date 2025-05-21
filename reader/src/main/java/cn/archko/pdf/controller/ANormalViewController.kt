@@ -22,7 +22,6 @@ import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.entity.TtsBean
 import cn.archko.pdf.core.listeners.ClickListener
 import cn.archko.pdf.core.listeners.DataListener
-import cn.archko.pdf.core.listeners.SimpleGestureListener
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.fragments.SearchFragment
 import cn.archko.pdf.listeners.AViewController
@@ -33,6 +32,7 @@ import cn.archko.pdf.viewmodel.PDFViewModel
 import kotlinx.coroutines.CoroutineScope
 import org.vudroid.core.DecodeService
 import org.vudroid.core.DecodeServiceBase
+import org.vudroid.core.DocViewListener
 import org.vudroid.core.DocumentView
 import org.vudroid.core.codec.CodecDocument
 import org.vudroid.core.codec.SearchResult
@@ -70,14 +70,18 @@ open class ANormalViewController(
     protected var document: CodecDocument? = null
     private var searchFragment: SearchFragment? = null
 
-    private var simpleGestureListener: SimpleGestureListener = object :
-        SimpleGestureListener {
+    private var simpleGestureListener: DocViewListener = object :
+        DocViewListener {
         override fun onSingleTapConfirmed(ev: MotionEvent, currentPage: Int) {
             controllerListener?.onSingleTapConfirmed(ev, currentPage)
         }
 
         override fun onDoubleTap(ev: MotionEvent, currentPage: Int) {
             controllerListener?.onDoubleTap(ev, currentPage)
+        }
+
+        override fun setCurrentPage(page: Int) {
+            updateProgress(page)
         }
     }
     val clickListener = object : ClickListener<View> {
@@ -307,6 +311,9 @@ open class ANormalViewController(
     private fun updateProgress(index: Int) {
         if (pageController?.visibility() == View.VISIBLE) {
             pageController?.updatePageProgress(index)
+        }
+        if (recyclerView?.visibility == View.VISIBLE) {
+            thumbnailView?.gotoPage(index)
         }
     }
 

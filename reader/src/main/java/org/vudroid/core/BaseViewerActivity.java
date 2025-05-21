@@ -29,7 +29,6 @@ import cn.archko.pdf.core.cache.BitmapPool;
 import cn.archko.pdf.core.common.AppExecutors;
 import cn.archko.pdf.core.common.SensorHelper;
 import cn.archko.pdf.core.common.StatusBarHelper;
-import cn.archko.pdf.core.listeners.SimpleGestureListener;
 import cn.archko.pdf.core.utils.Utils;
 
 public abstract class BaseViewerActivity extends FragmentActivity implements DecodingProgressListener, CurrentPageListener {
@@ -172,7 +171,16 @@ public abstract class BaseViewerActivity extends FragmentActivity implements Dec
         BitmapPool.getInstance().clear();
     }
 
-    private final SimpleGestureListener simpleGestureListener = new SimpleGestureListener() {
+    protected void updateScrollByPage(int page) {
+        seekbarControls.updatePageProgress(page);
+    }
+
+    private final DocViewListener simpleGestureListener = new DocViewListener() {
+
+        @Override
+        public void setCurrentPage(int page) {
+            updateScrollByPage(page);
+        }
 
         @Override
         public void onSingleTapConfirmed(MotionEvent ev, int currentPage) {

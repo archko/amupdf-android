@@ -27,7 +27,6 @@ import java.util.List;
 
 import cn.archko.pdf.core.entity.APage;
 import cn.archko.pdf.core.link.Hyperlink;
-import cn.archko.pdf.core.listeners.SimpleGestureListener;
 import cn.archko.pdf.core.utils.ColorUtil;
 
 public class DocumentView extends View implements ZoomListener {
@@ -54,7 +53,7 @@ public class DocumentView extends View implements ZoomListener {
 
     private final GestureDetector mGestureDetector;
     boolean crop = false;
-    private SimpleGestureListener simpleGestureListener;
+    private DocViewListener docViewListener;
     private int speakingPage = -1;
 
     float widthAccum = 0;
@@ -92,7 +91,7 @@ public class DocumentView extends View implements ZoomListener {
                         int oriention, int scrollX, int scrollY,
                         DecodingProgressModel progressModel,
                         CurrentPageModel currentPageModel,
-                        SimpleGestureListener simpleGestureListener) {
+                        DocViewListener docViewListener) {
         super(context);
         this.zoomModel = zoomModel;
         this.oriention = oriention;
@@ -106,7 +105,7 @@ public class DocumentView extends View implements ZoomListener {
         setFocusableInTouchMode(true);
         initMultiTouchZoomIfAvailable(zoomModel);
         mGestureDetector = new GestureDetector(context, new MySimpleOnGestureListener());
-        this.simpleGestureListener = simpleGestureListener;
+        this.docViewListener = docViewListener;
     }
 
     private void initMultiTouchZoomIfAvailable(ZoomModel zoomModel) {
@@ -208,9 +207,9 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void currentPageChanged() {
-        //post(() -> {
-        //    currentPageModel.setCurrentPage(getCurrentPage());
-        //});
+        post(() -> {
+            docViewListener.setCurrentPage(getCurrentPage());
+        });
     }
 
     private void updatePageVisibility() {
@@ -843,12 +842,12 @@ public class DocumentView extends View implements ZoomListener {
             if (evPage != null) {
                 return true;
             }
-            if (null != simpleGestureListener) {
+            if (null != docViewListener) {
                 int index = 0;
                 if (null != page) {
                     index = page.index;
                 }
-                simpleGestureListener.onSingleTapConfirmed(e, index);
+                docViewListener.onSingleTapConfirmed(e, index);
                 return true;
             }
 
@@ -857,13 +856,13 @@ public class DocumentView extends View implements ZoomListener {
 
         @Override
         public boolean onDoubleTap(MotionEvent ev) {
-            if (null != simpleGestureListener) {
+            if (null != docViewListener) {
                 Page page = getEventPage(ev);
                 int index = 0;
                 if (null != page) {
                     index = page.index;
                 }
-                simpleGestureListener.onDoubleTap(ev, index);
+                docViewListener.onDoubleTap(ev, index);
             }
             return false;
         }
