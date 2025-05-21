@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.GridLayoutManager
+import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.core.listeners.ClickListener
@@ -37,6 +38,7 @@ class ThumbnailView(
     private var crop: Boolean = false
     var document: CodecDocument? = null
     private var selectedPosition: Int = 0
+    private var layoutManager: LinearLayoutManager? = null
 
     private fun loadDoc() {
         val iView = object : IView {
@@ -63,7 +65,8 @@ class ThumbnailView(
                 crop,
                 clickListener
             )
-            recyclerView.layoutManager = GridLayoutManager(context, 1)
+            layoutManager = LinearLayoutManager(context)
+            recyclerView.layoutManager = layoutManager
             recyclerView.adapter = pdfAdapter
             recyclerView.setHasFixedSize(true)
 
@@ -81,13 +84,13 @@ class ThumbnailView(
         }
     }
 
-    private fun scrollToPosition(position: Int){
-        if (selectedPosition == position){
+    private fun scrollToPosition(position: Int) {
+        if (selectedPosition == position) {
             return
         }
         this.selectedPosition = position
         pdfAdapter?.setPosition(position)
-        recyclerView.scrollToPosition(position)
+        layoutManager?.scrollToPositionWithOffset(position, 120)
         pdfAdapter?.notifyDataSetChanged()
     }
 
