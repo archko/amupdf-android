@@ -147,7 +147,6 @@ open class SearchFragment : DialogFragment(R.layout.dialog_search_doc) {
                         RecyclerView.LayoutParams.MATCH_PARENT,
                         RecyclerView.LayoutParams.WRAP_CONTENT
                     )
-                    textSize = Utils.sp2px(11f)
                     val padding = Utils.dipToPixel(16f)
                     setPadding(padding, padding, padding, padding)
                 }
