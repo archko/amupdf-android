@@ -148,8 +148,8 @@ public class Utils {
      * @param spValue
      * @return
      */
-    public static int sp2px(float spValue) {
+    public static float sp2px(float spValue) {
         final float fontScale = App.Companion.getInstance().getResources().getDisplayMetrics().scaledDensity;
-        return (int) (spValue * fontScale + 0.5f);
+        return (spValue * fontScale + 0.5f);
     }
 }

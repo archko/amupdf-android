@@ -88,7 +88,7 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         //closeBtn.setOnClickListener(this);
         searchButton.setOnClickListener(this);
         //showSearchButton.setOnClickListener(this);
-        searchButton.setVisibility(View.GONE);
+        //searchButton.setVisibility(View.GONE);
 
         mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onStopTrackingTouch(SeekBar seekBar) {

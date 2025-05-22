@@ -45,7 +45,7 @@ class APDFView(
         val paint = Paint()
         paint.color = Color.BLUE
         paint.isAntiAlias = true
-        paint.textSize = Utils.sp2px(30f).toFloat()
+        paint.textSize = Utils.sp2px(30f)
         paint.textAlign = Paint.Align.CENTER
         return paint
     }

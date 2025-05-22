@@ -37,7 +37,6 @@ open class SearchFragment : DialogFragment(R.layout.dialog_search_doc) {
     private var textAdapter: TextAdapter? = null
     private var document: CodecDocument? = null
 
-
     fun setDocument(document: CodecDocument?) {
         this.document = document
     }
@@ -148,8 +147,8 @@ open class SearchFragment : DialogFragment(R.layout.dialog_search_doc) {
                         RecyclerView.LayoutParams.MATCH_PARENT,
                         RecyclerView.LayoutParams.WRAP_CONTENT
                     )
-                    maxLines = 4
-                    val padding = Utils.dipToPixel(8f)
+                    textSize = Utils.sp2px(11f)
+                    val padding = Utils.dipToPixel(16f)
                     setPadding(padding, padding, padding, padding)
                 }
 
@@ -169,7 +168,7 @@ open class SearchFragment : DialogFragment(R.layout.dialog_search_doc) {
                     mDataListener?.onSuccess(searchResult, searchResults)
                     dismiss()
                 }
-                view.text = String.format("%s-%s", searchResult.page, searchResult.text)
+                view.text = String.format("Page:%s->%s", searchResult.page, searchResult.text)
             }
         }
     }

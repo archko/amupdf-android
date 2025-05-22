@@ -93,14 +93,13 @@ public class PdfDocument implements CodecDocument {
         int count = document.countPages();
         for (int i = 0; i < count; i++) {
             CodecPage page = getPage(i);
-            Object[] results = ((PdfPage) page).page.search(text);
+            Quad[][] results = ((PdfPage) page).page.search(text);
             if (results == null || results.length == 0) {
                 continue;
             }
 
             List<PageTextBox> boxes = new ArrayList<>();
-            for (Object result : results) {
-                Quad[] quads = (Quad[]) result;
+            for (Quad[] quads : results) {
                 for (Quad q : quads) {
                     com.artifex.mupdf.fitz.Rect fitzRect = q.toRect();
                     PageTextBox rectF = new PageTextBox(fitzRect.x0, fitzRect.y0, fitzRect.x1, fitzRect.y1);
