@@ -2,6 +2,7 @@ package cn.archko.pdf.core.common
 
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.text.Html
 import android.text.TextUtils
 import cn.archko.pdf.core.entity.BitmapBean
@@ -61,16 +62,23 @@ object ParseTextMain {
         internal fun parse(lists: List<String>): String {
             val sb = StringBuilder()
             var isImage = false
-            var lastBreak = false
+            var maxNumberCharOfLine = 20
+            for (s in lists) {
+                if (s.length > maxNumberCharOfLine) {
+                    maxNumberCharOfLine = s.length
+                }
+            }
+
+            var lastLine: Line? = null
             for (s in lists) {
                 val ss = s.trim { it <= ' ' }
                 if (ss.isNotEmpty()) {
                     if (ss.startsWith(IMAGE_START_MARK)) {
                         isImage = true
-                        sb.append("&nbsp;<br>")
+                        sb.append(LINE_END)
                     }
                     if (!isImage) {
-                        lastBreak = parseLine(ss, sb, MAX_PAGEINDEX, lastBreak)
+                        lastLine = parseLine(ss, sb, MAX_PAGEINDEX, lastLine, maxNumberCharOfLine)
                     } else {
                         sb.append(ss)
                     }
@@ -84,7 +92,7 @@ object ParseTextMain {
         }
 
         fun parseAsText(content: String): String {
-            //Logcat.d("parse:==>" + content);
+            //Logcat.d("parse:==>" + content)
             val sb = StringBuilder()
             val list = ArrayList<String>()
             var aChar: Char
@@ -97,7 +105,7 @@ object ParseTextMain {
                     sb.append(aChar)
                 }
             }
-            //Logcat.d("result=>>" + result);
+            //Logcat.d("result=>>" + result)
             return parse(list)
         }
 
@@ -109,7 +117,18 @@ object ParseTextMain {
             var isImage = false
             val reflowBeans = ArrayList<ReflowBean>()
             var reflowBean: ReflowBean? = null
-            var lastBreak = true
+            var maxNumberCharOfLine = 20
+            var hasImage = false
+            for (s in lists) {  //图片第一行会有很多字符
+                if (s.startsWith(IMAGE_START_MARK)) {
+                    hasImage = true
+                }
+                if (s.length > maxNumberCharOfLine && !hasImage) {
+                    maxNumberCharOfLine = s.length
+                }
+            }
+
+            var lastLine: Line? = null
             for (s in lists) {
                 val ss = s.trim()
                 if (!TextUtils.isEmpty(ss)) {
@@ -129,7 +148,7 @@ object ParseTextMain {
                                 ReflowBean(null, ReflowBean.TYPE_STRING, pageIndex.toString())
                             reflowBeans.add(reflowBean)
                         }
-                        lastBreak = parseLine(ss, sb, pageIndex, lastBreak)
+                        lastLine = parseLine(ss, sb, pageIndex, lastLine, maxNumberCharOfLine - 5)
                         reflowBean.data = sb.toString()
                     } else {
                         sb.append(ss)
@@ -144,16 +163,40 @@ object ParseTextMain {
                 }
             }
 
-            if (Logcat.loggable) {
-                for (rb in reflowBeans) {
-                    Logcat.longLog("result", rb.toString())
-                }
-            }
+            //if (Logcat.loggable) {
+            //    for (rb in reflowBeans) {
+            //        Logcat.longLog("result", rb.toString())
+            //    }
+            //}
             return reflowBeans
         }
 
         /**
-         * process line break
+         * 重排的数据是按行获取的,只有纯文本,要把行合并起来.合并需要区分是否这一行就是结束.
+         * 如果这行是开始标志
+         *     则判断上一行是否有结束.没有则添加结束标志.
+         *     追加本行
+         * 如果这行有结束标志
+         *     上行没有结束符
+         *         行字数小于标准字数
+         *             加结束符
+         *     追加本行内容,加结束符
+         * 如果这行没有结束标志
+         *     上行有结束符
+         *         追加本行内容
+         *     上行没有结束符
+         *         上行小于标准字数
+         *             本行字数小于标准字数
+         *                 上行添加结束符
+         *                 追加本行内容,加结束符
+         *             本行字数大于标准字数
+         *                 上行添加结束符
+         *                 追加本行内容
+         *         上行大于标准字数
+         *             本行字数小于标准字数
+         *                 追加本行内容,加结束符
+         *             本行字数大于标准字数
+         *                 追加本行内容
          * @param ss source
          * @param sb parsed string
          * @param pageIndex
@@ -163,88 +206,122 @@ object ParseTextMain {
             ss: String,
             sb: StringBuilder,
             pageIndex: Int,
-            lastBreak: Boolean
-        ): Boolean {
-            var headBreak = false
-            var tailBreak = false
-            //1.处理结尾字符,如果是前几页,且一行字符<LINE_LENGTH,有可能是目录.添加尾部换行符.
+            lastLine: Line?,
+            maxNumberCharOfLine: Int
+        ): Line {
+            val line = StringBuilder()
+            val thisLine = Line(ss.length < maxNumberCharOfLine)
+            //1.处理结尾字符
             val end = ss.substring(ss.length - 1)
-            //if (lastBreak && (ss.length < LINE_LENGTH && pageIndex < MAX_PAGEINDEX)) {
-            //    Logcat.d("step1.break")
-            //    //if (!END_MARK.contains(end)) {
-            //    tailBreak = true
-            //    //}
-            //}
 
-            //2.如果尾部没有换行符,则判断尾部的字符.通常是以标点结束的.或者是程序相关的字符结尾.
-            if (!tailBreak) {
-                if (END_MARK.contains(end) || PROGRAM_MARK.contains(end)) {
-                    Logcat.d("step2.break")
-                    tailBreak = true
-                }
+            //2.判断尾部的字符是否是结束符.通常是以标点结束的.或者是程序相关的字符结尾.
+            val isEnd = if (END_MARK.contains(end) || PROGRAM_MARK.contains(end)) {
+                Logcat.d("step2.line.end.break:$ss")
+                true
+            } else {
+                false
             }
 
-            //3.从前面开始,如果以START_MARK开头,则可能需要在之前添加换行符.
+            //3.判断是否是新一行开始
             var lineLength = ss.length
             if (lineLength > 6) {
                 lineLength = 6
             }
             val start = ss.substring(0, lineLength)
-            var find = START_MARK.matcher(start).find()
+            var isStartLine = START_MARK.matcher(start).find()
             //Logcat.d("find:$find")
-            if (!find) {
+            if (!isStartLine) {
                 if (ss.startsWith("“|\"|'")) {
-                    find = true
+                    isStartLine = true
                 }
             }
-            if (find) {
-                Logcat.d("step3.break,length:${ss.length}")
-                headBreak = true
-                //如果是//开头的,一般是注释.需要添加尾部换行符.这里有可能会判断错误.但能保证程序注释会换行.
-                if (ss.length < LINE_LENGTH || ss.startsWith("//")) {
-                    tailBreak = true
+            if (!isStartLine) {
+                if (START_MARK2.matcher(start).find()) {
+                    isStartLine = true
                 }
             }
-            //4.如果上一次是有换行符的,而这一行的字符数较小,有可能是标题目录.所以需要加换行符.
-            //这是针对一些,不是以"第xx"开头的标题.此时头尾都有可能要加,如果之前没有加的话.
-            if (ss.length < LINE_LENGTH) {
-                if (lastBreak) {
-                    Logcat.d("step4.break")
-                    if (!headBreak) {
-                        headBreak = true
-                    }
-                    if (!tailBreak) {
-                        tailBreak = true
-                    }
-                } else {
-                    //如果上一行没有断句,有可能是没有标点的结束,这时,如果是"2."这样开头的,有可能是要前后都要换行.
-                    if (START_MARK2.matcher(start).find()) {
-                        Logcat.d("step4.1.break")
-                        headBreak = true
-                        tailBreak = true
+            if (isStartLine) {
+                Logcat.d("step3.line break,length:${ss.length}")
+                //如果是开始行,上行如果没有结束符,则添加上.
+                lastLine?.run {
+                    if (!this.isEnd) {
+                        line.append(LINE_END)
                     }
                 }
-                //if(ss.substring(0, 1).matches("^[0-9]+$".toRegex())) {
-                //    sb.append("<br>")
-                //}
+                line.append(ss)
+                if (isEnd) {
+                    line.append(LINE_END)
+                }
+                thisLine.isEnd = isEnd
+                thisLine.text = line.toString()
+                sb.append(line)
+                if (Logcat.loggable) {
+                    Logcat.d("count:${maxNumberCharOfLine} :$line")
+                }
+                return thisLine
             }
-            if (headBreak && !lastBreak) {
-                sb.append("&nbsp;<br>")
+
+            //4.如果这行有结束标志
+            if (isEnd) {
+                lastLine?.run {
+                    //上行没有结束符,行字数小于标准字数,加结束符
+                    if (!this.isEnd && lastLine.isNotALine) {
+                        line.append(LINE_END)
+                    }
+                }
+                line.append(ss)
+                line.append(LINE_END)
+                thisLine.isEnd = true
+                thisLine.text = line.toString()
+                sb.append(line)
+                if (Logcat.loggable) {
+                    Logcat.d("count1:${maxNumberCharOfLine} :$line")
+                }
+                return thisLine
+            } else {
+                //5.如果这行没有结束标志
+                val lastLineIsEnd = (lastLine == null || lastLine.isEnd)
+                //上行有结束符
+                if (lastLineIsEnd) {
+                    line.append(ss)
+                    thisLine.isEnd = false
+                } else { //上行没有结束符
+                    if (lastLine.isNotALine) { //上行小于标准字数
+                        if (ss.length < maxNumberCharOfLine) {//本行字数小于标准字数
+                            line.append(LINE_END)
+                            line.append(ss)
+                            line.append(LINE_END)
+                            thisLine.isEnd = true
+                        } else {  //本行字数大于标准字数
+                            line.append(LINE_END)
+                            line.append(ss)
+                        }
+                    } else {    //上行大于标准字数
+                        if (ss.length < maxNumberCharOfLine) {//本行字数小于标准字数
+                            //追加本行内容,加结束符
+                            line.append(ss)
+                            line.append(LINE_END)
+                            thisLine.isEnd = true
+                        } else {  //本行字数大于标准字数
+                            line.append(ss)
+                        }
+                    }
+                }
             }
-            sb.append(ss)
             if (isLetterDigitOrChinese(end)) {
                 Logcat.d("isLetterDigitOrChinese:$end")
-                sb.append("&nbsp;")
+                line.append(LINE_END)
             }
-            if (tailBreak) {
-                sb.append("&nbsp;<br>")
+            thisLine.text = line.toString()
+            sb.append(line)
+            if (Logcat.loggable) {
+                Logcat.d("count2:${maxNumberCharOfLine} :$line")
             }
-            Logcat.d("headBreak:${headBreak},tailBreak:$tailBreak,source:$ss")
-            return tailBreak
+            return thisLine
         }
 
         fun parseAsList(content: String, pageIndex: Int): List<ReflowBean> {
-            //Logcat.d("parse:==>" + content);
+            //Logcat.d("parse:==>" + content)
             val sb = StringBuilder()
             val list = ArrayList<String>()
             var aChar: Char
@@ -258,12 +335,12 @@ object ParseTextMain {
                     sb.append(aChar)
                 }
             }
-            //Logcat.d("result=>>" + result);
+            //Logcat.d("result=>>" + result)
             return parseList(list, pageIndex)
         }
 
         fun parseAsTextList(content: String, pageIndex: Int): List<ReflowBean> {
-            //Logcat.d("parse:==>" + content);
+            //Logcat.d("parse:==>" + content)
             val sb = StringBuilder()
             val list = ArrayList<String>()
             var aChar: Char
@@ -276,7 +353,7 @@ object ParseTextMain {
                     sb.append(aChar)
                 }
             }
-            //Logcat.d("result=>>${list.size}");
+            //Logcat.d("result=>>${list.size}")
             return parseTextList(list, pageIndex)
         }
 
@@ -307,6 +384,15 @@ object ParseTextMain {
         }
     }
 
+    private class Line(var isNotALine: Boolean) {
+        var text: String? = ""
+        var isEnd: Boolean = false
+
+        override fun toString(): String {
+            return "Line(isNotALine=$isNotALine, isEnd=$isEnd, text=$text)"
+        }
+    }
+
     @JvmStatic
     fun main(args: Array<String>) {
     }
@@ -321,7 +407,7 @@ object ParseTextMain {
      * //|var|val|let|这是程序的注释.需要换行,或者是程序的开头.
      */
     internal val START_MARK =
-        Pattern.compile("(第\\w*[^章]章)|总结|小结|●|■|//|var|val|let|fun|public|private|static|abstract|protected|import|export|pack|overri|open|class|void|for|while")
+        Pattern.compile("(第\\w*[^章]章)|总结|小结|○|●|■|—|//|var|val|let|fun|public|private|static|abstract|protected|import|export|pack|overri|open|class|void|for|while")
     internal val START_MARK2 = Pattern.compile("\\d+\\.")
 
     /**
@@ -332,7 +418,7 @@ object ParseTextMain {
     /**
      * 如果遇到的是代码,通常是以这些结尾
      */
-    internal const val PROGRAM_MARK = "\\]>){};,'\""
+    internal const val PROGRAM_MARK = ";,]>){}"
 
     /**
      * 解析pdf得到的文本,取出其中的图片
@@ -353,6 +439,7 @@ object ParseTextMain {
      * 最大的页面是30页,如果是30页前的,一行小于25字,认为可能是目录.在这之后的,文本重排时不认为是目录.合并为一行.
      */
     internal const val MAX_PAGEINDEX = 20
+    private const val LINE_END = "&nbsp;<br>"
 
     //========================== decode image ==========================
     private const val IMAGE_HEADER = "base64,"
@@ -372,19 +459,24 @@ object ParseTextMain {
         if (TextUtils.isEmpty(base64Source)) {
             return null
         }
-        //Logcat.longLog("text", base64Source);
+        //Logcat.longLog("text", base64Source)
         if (!base64Source.contains(IMAGE_HEADER)) {
             return null
         }
         val index = base64Source.indexOf(IMAGE_HEADER)
         base64Source = base64Source.substring(index + IMAGE_HEADER.length)
-        //Logcat.d("base:" + base64Source);
-        val bitmap = BitmapUtils.base64ToBitmap(
-            base64Source.replace(
-                "\"/></p>".toRegex(),
-                ""
-            ) /*.replaceAll("\\s", "")*/
-        )
+        //Logcat.d("base:$base64Source")
+        var bitmap: Bitmap? = null
+        try {
+            bitmap = BitmapUtils.base64ToBitmap(
+                base64Source.replace(
+                    "\"/></p>".toRegex(),
+                    ""
+                ) /*.replaceAll("\\s", "")*/
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         if (null == bitmap
             || (bitmap.width < minImgHeight
                     && bitmap.height < minImgHeight)
