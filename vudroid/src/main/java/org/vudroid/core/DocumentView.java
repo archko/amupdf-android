@@ -825,12 +825,20 @@ public class DocumentView extends View implements ZoomListener {
 
     public void clearSearch() {
         searchResults.clear();
-        updatePageVisibility();
+        updatePageSearchBox();
+    }
+
+    private void updatePageSearchBox() {
+        Page page;
+        for (int i = 0; i < pages.size(); i++) {
+            page = pages.valueAt(i);
+            page.updatePageSearchBox();
+        }
     }
 
     public void setSearchResult(List<SearchResult> searchResults) {
         this.searchResults = searchResults;
-        updatePageVisibility();
+        updatePageSearchBox();
     }
 
     private class MySimpleOnGestureListener extends GestureDetector.SimpleOnGestureListener {

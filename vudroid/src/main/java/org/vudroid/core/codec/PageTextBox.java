@@ -5,6 +5,7 @@ import android.graphics.RectF;
 import androidx.annotation.Nullable;
 
 public class PageTextBox extends RectF {
+
     public PageTextBox() {
     }
 
@@ -12,14 +13,20 @@ public class PageTextBox extends RectF {
         super(left, top, right, bottom);
     }
 
+    public PageTextBox(int page, float left, float top, float right, float bottom) {
+        super(left, top, right, bottom);
+        this.page = page;
+    }
+
     public PageTextBox(@Nullable RectF r) {
         super(r);
     }
 
     public String text;
+    public int page;
 
     @Override
     public String toString() {
-        return "PageTextBox(" + left + ", " + top + ", " + right + ", " + bottom + ": " + text + ")";
+        return "PageTextBox(" + page + ", " + left + ", " + top + ", " + right + ", " + bottom + ": " + text + ")";
     }
 }

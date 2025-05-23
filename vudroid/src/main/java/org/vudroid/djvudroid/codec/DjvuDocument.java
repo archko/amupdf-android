@@ -86,6 +86,9 @@ public class DjvuDocument implements CodecDocument {
             if (results == null || results.isEmpty()) {
                 continue;
             }
+            for (PageTextBox textBox : results) {
+                textBox.page = i;
+            }
             StringBuilder sb = new StringBuilder();
             List<ReflowBean> reflowBeans = decodeReflowText(i);
             if (reflowBeans != null && !reflowBeans.isEmpty()) {

@@ -102,7 +102,7 @@ public class PdfDocument implements CodecDocument {
             for (Quad[] quads : results) {
                 for (Quad q : quads) {
                     com.artifex.mupdf.fitz.Rect fitzRect = q.toRect();
-                    PageTextBox rectF = new PageTextBox(fitzRect.x0, fitzRect.y0, fitzRect.x1, fitzRect.y1);
+                    PageTextBox rectF = new PageTextBox(i, fitzRect.x0, fitzRect.y0, fitzRect.x1, fitzRect.y1);
                     boxes.add(rectF);
                 }
             }

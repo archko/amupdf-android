@@ -15,6 +15,7 @@ import org.vudroid.core.codec.PageTextBox;
 import org.vudroid.core.codec.SearchResult;
 
 import java.lang.ref.SoftReference;
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.archko.pdf.core.cache.BitmapCache;
@@ -42,6 +43,7 @@ public class Page {
     protected boolean crop = true;
     private ColorFilter filter;
     private List<PageTextBox> searchBoxs;
+    private List<RectF> searchRectFs;
 
     Page(DocumentView documentView, int index, boolean crop, ColorFilter filter) {
         this.documentView = documentView;
@@ -130,7 +132,7 @@ public class Page {
 
     private Paint searchPaint() {
         final Paint paint = new Paint();
-        paint.setColor(Color.parseColor("#80FF9800"));
+        paint.setColor(Color.parseColor("#50FF9800"));
         paint.setStyle(Paint.Style.FILL);
         return paint;
     }
@@ -197,17 +199,13 @@ public class Page {
     void setBounds(RectF pageBounds) {
         bounds = pageBounds;
         node.invalidateNodeBounds();
+
+        updatePageSearchBox();
     }
 
     public void updateVisibility() {
         if (null == bounds) { //tts后台滚动的时候会出现
             return;
-        }
-        SearchResult result = documentView.getSearchResult(index);
-        if (null != result) {
-            searchBoxs = result.boxes;
-        } else {
-            searchBoxs = null;
         }
 
         if (isVisible()) {
@@ -221,6 +219,34 @@ public class Page {
             node.updateVisibility();
         } else {
             recycle();
+        }
+    }
+
+    public void updatePageSearchBox() {
+        searchBoxs = null;
+        SearchResult result = documentView.getSearchResult(index);
+        if (null != result && result.boxes != searchBoxs) {
+            searchBoxs = result.boxes;
+            initSearchRectFs(result.boxes);
+        } else {
+            searchBoxs = null;
+        }
+    }
+
+    private void initSearchRectFs(List<PageTextBox> boxes) {
+        if (searchRectFs == null) {
+            searchRectFs = new ArrayList<>();
+        } else {
+            searchRectFs.clear();
+        }
+        if (boxes != null && !boxes.isEmpty()) {
+            for (PageTextBox rectF : boxes) {
+                if (rectF.page == index) {
+                    final RectF rect = getPageRegion(bounds, new RectF(rectF));
+                    Logcat.d(String.format("result:%s, rect:%s, %s", index, bounds, rectF));
+                    searchRectFs.add(rect);
+                }
+            }
         }
     }
 
@@ -343,13 +369,9 @@ public class Page {
     }
 
     private void drawSearchResult(Canvas canvas) {
-        if (searchBoxs != null && !searchBoxs.isEmpty()) {
-            for (PageTextBox rectF : searchBoxs) {
-                final RectF rect = getPageRegion(bounds, new RectF(rectF));
-                Logcat.d(String.format("result:%s, rect:%s, %s", index, bounds, rectF));
-                if (rect != null) {
-                    canvas.drawRect(rect, searchPaint);
-                }
+        if (searchRectFs != null) {
+            for (RectF rect : searchRectFs) {
+                canvas.drawRect(rect, searchPaint);
             }
         }
     }
