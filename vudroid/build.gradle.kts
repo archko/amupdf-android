@@ -34,10 +34,10 @@ dependencies {
     //docx to html
     api(libs.mammoth)
     //html to epub
-    api("io.documentnode:epub4j-core:4.2.1") {
+    api("io.documentnode:epub4j-core:4.2.2") {
         exclude("xmlpull")
     }
 
-    api ("com.github.penfeizhou.android.animation:awebp:3.0.1")
-    api ("com.github.penfeizhou.android.animation:gif:3.0.1")
+    api ("com.github.penfeizhou.android.animation:awebp:3.0.5")
+    api ("com.github.penfeizhou.android.animation:gif:3.0.5")
 }
