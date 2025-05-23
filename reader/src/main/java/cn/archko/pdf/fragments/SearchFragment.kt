@@ -2,21 +2,26 @@ package cn.archko.pdf.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
 import android.text.TextUtils
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
+import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
+import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.ResponseHandler
 import cn.archko.pdf.core.listeners.DataListener
-import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.core.widgets.ColorItemDecoration
 import cn.archko.pdf.databinding.DialogSearchDocBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -36,6 +41,7 @@ open class SearchFragment : DialogFragment(R.layout.dialog_search_doc) {
     private var mDataListener: DataListener? = null
     private var textAdapter: TextAdapter? = null
     private var document: CodecDocument? = null
+    private var keyword: String? = null
 
     fun setDocument(document: CodecDocument?) {
         this.document = document
@@ -81,9 +87,11 @@ open class SearchFragment : DialogFragment(R.layout.dialog_search_doc) {
 
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
         binding.recyclerView.adapter = textAdapter
+        binding.recyclerView.addItemDecoration(ColorItemDecoration(activity))
 
         binding.closeButton.setOnClickListener {
-            textAdapter?.searchResults?.clear()
+            keyword = null
+            textAdapter?.data?.clear()
             textAdapter?.notifyDataSetChanged()
         }
         binding.searchButton.setOnClickListener {
@@ -93,10 +101,11 @@ open class SearchFragment : DialogFragment(R.layout.dialog_search_doc) {
 
     private fun search(text: String) {
         if (TextUtils.isEmpty(text) || document == null) {
-            textAdapter?.searchResults?.clear()
+            textAdapter?.data?.clear()
             textAdapter?.notifyDataSetChanged()
             return
         }
+        keyword = text
         lifecycleScope.launch {
             flow {
                 try {
@@ -113,9 +122,8 @@ open class SearchFragment : DialogFragment(R.layout.dialog_search_doc) {
             }.flowOn(Dispatchers.IO)
                 .collectLatest { res ->
                     if (res is ResponseHandler.Success) {
-                        textAdapter?.searchResults?.clear()
                         if (res.data != null) {
-                            textAdapter?.searchResults?.addAll(res.data!!)
+                            textAdapter?.data = (res.data!!)
                             textAdapter?.notifyDataSetChanged()
                         }
                     }
@@ -130,44 +138,54 @@ open class SearchFragment : DialogFragment(R.layout.dialog_search_doc) {
     inner class TextAdapter(
         var context: Context,
     ) :
-        RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-        var searchResults: MutableList<SearchResult> = ArrayList()
-
-        override fun getItemCount(): Int {
-            return searchResults.size
-        }
+        BaseRecyclerAdapter<SearchResult>(context) {
 
         override fun onCreateViewHolder(
             parent: ViewGroup,
             viewType: Int
-        ): RecyclerView.ViewHolder {
-            val view = TextView(context)
-                .apply {
-                    layoutParams = RecyclerView.LayoutParams(
-                        RecyclerView.LayoutParams.MATCH_PARENT,
-                        RecyclerView.LayoutParams.WRAP_CONTENT
-                    )
-                    val padding = Utils.dipToPixel(16f)
-                    setPadding(padding, padding, padding, padding)
-                }
-
+        ): BaseViewHolder<SearchResult> {
+            val view =
+                mInflater.inflate(R.layout.item_search_doc, parent, false)
             return TextHolder(view)
         }
 
-        override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
-            val pdfHolder = viewHolder as TextHolder
-            pdfHolder.onBind(position)
-        }
+        inner class TextHolder(internal var view: View) : BaseViewHolder<SearchResult>(view) {
 
-        inner class TextHolder(internal var view: TextView) : RecyclerView.ViewHolder(view) {
+            private val page = view.findViewById<AppCompatTextView>(R.id.page)
+            private val content = view.findViewById<AppCompatTextView>(R.id.content)
 
-            fun onBind(position: Int) {
-                val searchResult = searchResults[position]
+            override fun onBind(searchResult: SearchResult?, position: Int) {
                 view.setOnClickListener {
-                    mDataListener?.onSuccess(searchResult, searchResults)
+                    mDataListener?.onSuccess(searchResult, data)
                     dismiss()
                 }
-                view.text = String.format("Page:%s->%s", searchResult.page, searchResult.text)
+                page.text = String.format("%s", searchResult?.page?.plus(1))
+
+                // 高亮关键词
+                val text = searchResult?.text
+                val spannableString = SpannableString(text)
+                val keyword = this@SearchFragment.keyword
+
+                if (!keyword.isNullOrEmpty() && !text.isNullOrEmpty()) {
+                    val startIndex = text.indexOf(keyword, 0, ignoreCase = true)
+                    if (startIndex != -1) {
+                        val endIndex = startIndex + keyword.length
+                        val foregroundColorSpan = ForegroundColorSpan(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.red
+                            )
+                        ) // 定义你想要的高亮颜色
+                        spannableString.setSpan(
+                            foregroundColorSpan,
+                            startIndex,
+                            endIndex,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                    }
+                }
+
+                content.text = spannableString
             }
         }
     }
