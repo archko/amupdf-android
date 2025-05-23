@@ -1,5 +1,11 @@
 incoming features
 
+### 7.5 roadmap
+remove dir setting toast
+fix album view thumb
+add thumb pdf viewer
+add search,update mupdf to 1.26.0
+
 ### 7.4
 - add search, app crashed when searching,
 
