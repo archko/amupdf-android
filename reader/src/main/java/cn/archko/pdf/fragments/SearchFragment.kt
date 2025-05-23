@@ -6,9 +6,14 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
+import android.widget.TextView.OnEditorActionListener
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
@@ -97,6 +102,22 @@ open class SearchFragment : DialogFragment(R.layout.dialog_search_doc) {
         binding.searchButton.setOnClickListener {
             search(binding.keyword.text.toString())
         }
+        binding.keyword.setOnEditorActionListener(object : OnEditorActionListener {
+            override fun onEditorAction(
+                v: TextView?,
+                actionId: Int,
+                event: KeyEvent?
+            ): Boolean {
+                if (actionId == EditorInfo.IME_ACTION_DONE ||
+                    (event != null && event.keyCode == KeyEvent.KEYCODE_ENTER)
+                ) {
+                    val keyword = binding.keyword.getText().toString()
+                    search(keyword)
+                    return true
+                }
+                return false
+            }
+        })
     }
 
     private fun search(text: String) {
@@ -125,6 +146,10 @@ open class SearchFragment : DialogFragment(R.layout.dialog_search_doc) {
                         if (res.data != null) {
                             textAdapter?.data = (res.data!!)
                             textAdapter?.notifyDataSetChanged()
+                            if (res.data!!.isEmpty()) {
+                                Toast.makeText(requireContext(), "No Results", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
                         }
                     }
                 }

@@ -345,8 +345,8 @@ public class Page {
     private void drawSearchResult(Canvas canvas) {
         if (searchBoxs != null && !searchBoxs.isEmpty()) {
             for (PageTextBox rectF : searchBoxs) {
-                final RectF rect = getPageRegion(bounds, rectF);
-                Logcat.d(String.format("result:%s, rect:%s, %s", index, rect, rectF));
+                final RectF rect = getPageRegion(bounds, new RectF(rectF));
+                Logcat.d(String.format("result:%s, rect:%s, %s", index, bounds, rectF));
                 if (rect != null) {
                     canvas.drawRect(rect, searchPaint);
                 }
