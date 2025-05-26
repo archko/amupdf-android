@@ -40,6 +40,11 @@
     <string name="menu_opt_crop">Auto crop bound</string>
     <string name="menu_opt_no_crop">no crop</string>
     <string name="menu_opt_edit">Edit</string>
+    <string name="menu_thumb">Thumb View</string>
+    <string name="menu_ocr">Ocr</string>
+    <string name="menu_tts">Read Page</string>
+    <string name="menu_clear_search">Clear Search</string>
+    <string name="menu_open_search">Open Search</string>
 
     <string name="go_home">Home</string>
 

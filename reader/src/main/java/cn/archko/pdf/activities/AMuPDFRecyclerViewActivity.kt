@@ -63,6 +63,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.vudroid.core.codec.OutlineLink
 import vn.chungha.flowbus.busEvent
+import androidx.core.view.isVisible
+import androidx.core.content.edit
 
 /**
  * @author: archko 2019/8/25 :12:43
@@ -168,7 +170,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     private fun loadBookmark() {
         lifecycleScope.launch {
-            val result = withContext(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
                 mPath!!.run { docViewModel.loadBookProgressByPath(this) }
             }
         }
@@ -256,7 +258,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     pageController?.hide()
                     showFlag = true
                 }
-                if (mReflowLayout.visibility == View.VISIBLE) {
+                if (mReflowLayout.isVisible) {
                     mReflowLayout.visibility = View.GONE
                     showFlag = true
                 }
@@ -275,7 +277,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                         pageController?.hide()
                         showFlag = true
                     }
-                    if (mReflowLayout.visibility == View.VISIBLE) {
+                    if (mReflowLayout.isVisible) {
                         mReflowLayout.visibility = View.GONE
                         showFlag = true
                     }
@@ -289,7 +291,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                         mReflowLayout.visibility = View.VISIBLE
                     }
                 } else {
-                    if (mReflowLayout.visibility == View.VISIBLE) {
+                    if (mReflowLayout.isVisible) {
                         mReflowLayout.visibility = View.GONE
                     }
                     if (pageController?.visibility() == View.VISIBLE) {
@@ -430,9 +432,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             if (isFirst) {
                 showOutline()
 
-                sp.edit()
-                    .putBoolean(PREF_READER_KEY_FIRST, false)
-                    .apply()
+                sp.edit {
+                    putBoolean(PREF_READER_KEY_FIRST, false)
+                }
             }
 
             //checkout bookmark
@@ -487,7 +489,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             } else {
                 ViewMode.NORMAL
             }
-            if (mReflowLayout.visibility == View.VISIBLE) {
+            if (mReflowLayout.isVisible) {
                 mReflowLayout.visibility = View.GONE
             }
         } else {
@@ -520,7 +522,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             viewMode = ViewMode.REFLOW_SCAN
             docViewModel.storeReflow(BookProgress.REFLOW_SCAN)
         }
-        if (mReflowLayout.visibility == View.VISIBLE) {
+        if (mReflowLayout.isVisible) {
             mReflowLayout.visibility = View.GONE
         }
 
@@ -600,7 +602,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
 
         override fun showSearch() {
-            viewController?.showSearch();
+            viewController?.showSearch()
         }
 
         override fun preview() {
@@ -747,7 +749,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             if (isResumed) {
                 locatePageForTTS()
             }
-            resetSpeakingPage(pendingPos)
+            resetSpeakingPage(-1)
             TTSEngine.get().shutdown()
         }
     }
@@ -764,9 +766,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         } else {
             Toast.makeText(this, "no outline", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    private fun showBookmark() {
     }
 
     private fun toggleCrop() {

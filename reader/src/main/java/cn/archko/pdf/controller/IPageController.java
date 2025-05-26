@@ -26,4 +26,6 @@ public interface IPageController {
     int topVisibility();
 
     int bottomVisibility();
+
+    void showSearch();
 }

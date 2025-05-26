@@ -37,9 +37,9 @@ public abstract class DefaultPageController implements IPageController, View.OnC
     protected View layoutTitle;
     protected View layoutSearch;
     protected ImageButton searchButton;
-    //protected ImageButton nextBtn;
-    //protected ImageButton prevBtn;
-    //protected ImageButton closeBtn;
+    protected ImageButton nextBtn;
+    protected ImageButton prevBtn;
+    protected ImageButton closeBtn;
     protected ImageButton mBackButton;
     protected int ori = LinearLayout.VERTICAL;
     protected int count = 1;
@@ -69,9 +69,9 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         layoutTitle = view.findViewById(R.id.layout_path);
         layoutSearch = view.findViewById(R.id.layout_search);
         searchButton = view.findViewById(R.id.searchButton);
-        //nextBtn = view.findViewById(R.id.nextButton);
-        //prevBtn = view.findViewById(R.id.prevButton);
-        //closeBtn = view.findViewById(R.id.closeButton);
+        nextBtn = view.findViewById(R.id.nextButton);
+        prevBtn = view.findViewById(R.id.prevButton);
+        closeBtn = view.findViewById(R.id.closeButton);
         mBackButton = view.findViewById(R.id.back_button);
 
         imageButton.setOnClickListener(this);
@@ -83,12 +83,10 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         mBackButton.setOnClickListener(this);
         ocrButton.setOnClickListener(this);
         previewButton.setOnClickListener(this);
-        //nextBtn.setOnClickListener(this);
-        //prevBtn.setOnClickListener(this);
-        //closeBtn.setOnClickListener(this);
+        nextBtn.setOnClickListener(this);
+        prevBtn.setOnClickListener(this);
+        closeBtn.setOnClickListener(this);
         searchButton.setOnClickListener(this);
-        //showSearchButton.setOnClickListener(this);
-        //searchButton.setVisibility(View.GONE);
 
         mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -189,15 +187,15 @@ public abstract class DefaultPageController implements IPageController, View.OnC
             controllerListener.preview();
         } else if (R.id.searchButton == id) {
             controllerListener.showSearch();
-        } /*else if (R.id.closeButton == id) {
+        } else if (R.id.closeButton == id) {
             layoutSearch.setVisibility(View.GONE);
             layoutTitle.setVisibility(View.VISIBLE);
             controllerListener.clearSearch();
         } else if (R.id.nextButton == id) {
-            controllerListener.next();
+            controllerListener.next("");
         } else if (R.id.prevButton == id) {
-            controllerListener.prev();
-        }*/
+            controllerListener.prev("");
+        }
     }
 
     @Override
@@ -213,5 +211,11 @@ public abstract class DefaultPageController implements IPageController, View.OnC
     @Override
     public int bottomVisibility() {
         return bottomLayout.getVisibility();
+    }
+
+    @Override
+    public void showSearch() {
+        layoutSearch.setVisibility(View.VISIBLE);
+        layoutTitle.setVisibility(View.GONE);
     }
 }

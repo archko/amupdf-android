@@ -243,7 +243,7 @@ public class Page {
             for (PageTextBox rectF : boxes) {
                 if (rectF.page == index) {
                     final RectF rect = getPageRegion(bounds, new RectF(rectF));
-                    Logcat.d(String.format("result:%s, rect:%s, %s", index, bounds, rectF));
+                    //Logcat.d(String.format("result:%s, rect:%s, %s", index, bounds, rectF));
                     searchRectFs.add(rect);
                 }
             }

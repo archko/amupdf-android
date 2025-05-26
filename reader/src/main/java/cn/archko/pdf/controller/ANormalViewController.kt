@@ -412,6 +412,7 @@ open class ANormalViewController(
                     val searchResults = args[1] as List<SearchResult>
                     scrollToPosition(searchResult.page)
                     documentView.setSearchResult(searchResults)
+                    pageController?.showSearch()
                 }
 
                 override fun onFailed(vararg args: Any?) {

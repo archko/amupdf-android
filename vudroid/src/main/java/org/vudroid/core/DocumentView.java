@@ -25,6 +25,7 @@ import org.vudroid.core.multitouch.MultiTouchZoom;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import cn.archko.pdf.core.entity.APage;
 import cn.archko.pdf.core.link.Hyperlink;
 import cn.archko.pdf.core.utils.ColorUtil;
@@ -428,7 +429,7 @@ public class DocumentView extends View implements ZoomListener {
         }
         final float ratio = newZoom / oldZoom;
         invalidatePageSizes();
-        scrollTo((int) ((getScrollX() + getWidth() / 2) * ratio - getWidth() / 2), (int) ((getScrollY() + getHeight() / 2) * ratio - getHeight() / 2));
+        scrollTo((int) ((getScrollX() + getWidth() / 2f) * ratio - getWidth() / 2f), (int) ((getScrollY() + getHeight() / 2f) * ratio - getHeight() / 2f));
         postInvalidate();
     }
 
@@ -519,7 +520,7 @@ public class DocumentView extends View implements ZoomListener {
     public void scrollTo(int x, int y) {
         try {
             super.scrollTo(Math.min(Math.max(x, getLeftLimit()), getRightLimit()), Math.min(Math.max(y, getTopLimit()), getBottomLimit()));
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
         viewRect = null;
@@ -801,9 +802,51 @@ public class DocumentView extends View implements ZoomListener {
     protected List<SearchResult> searchResults = new ArrayList<>();
 
     public void prev(String text) {
+        int curr = getCurrentPage();
+        SearchResult closest = getClosest(curr);
+
+        if (closest != null) {
+            if (closest.page == curr) {
+                int index = searchResults.indexOf(closest);
+                // 当前页刚好是某个搜索结果，尝试跳转到上一个
+                if (index > 0) {
+                    goToPage(searchResults.get(index - 1).page, 0, 0);
+                } else {
+                    Log.d(TAG, "已经是第一个搜索结果");
+                }
+            } else {
+                goToPage(closest.page, 0, 0);
+            }
+        }
+    }
+
+    @Nullable
+    private SearchResult getClosest(int curr) {
+        SearchResult closest = null;
+        int minDiff = Integer.MAX_VALUE;
+        for (SearchResult result : searchResults) {
+            int diff = Math.abs(result.page - curr);
+            if (diff < minDiff) {
+                minDiff = diff;
+                closest = result;
+            }
+        }
+        return closest;
     }
 
     public void next(String text) {
+        int curr = getCurrentPage();
+        SearchResult closest = getClosest(curr);
+        if (closest != null) {
+            if (closest.page == curr) {
+                int index = searchResults.indexOf(closest);
+                if (index < searchResults.size() - 1) {
+                    goToPage(searchResults.get(index + 1).page, 0, 0);
+                }
+            } else {
+                goToPage(closest.page, 0, 0);
+            }
+        }
     }
 
     public int getSpeakingPage() {

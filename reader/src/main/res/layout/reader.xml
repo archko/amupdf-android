@@ -53,7 +53,7 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:background="@drawable/button"
-                        android:contentDescription="tts"
+                        android:contentDescription="@string/menu_tts"
                         android:src="@drawable/ic_tts"
                         android:visibility="visible"
                         tools:visibility="visible" />
@@ -101,7 +101,7 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:background="@drawable/button"
-                        android:contentDescription="@string/outline_title"
+                        android:contentDescription="@string/menu_ocr"
                         android:src="@drawable/ic_ocr" />
 
                     <ImageButton
@@ -117,7 +117,7 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:background="@drawable/button"
-                        android:contentDescription=""
+                        android:contentDescription="@string/menu_thumb"
                         android:src="@drawable/ic_pdf_preview"
                         android:visibility="gone"
                         tools:visibility="visible" />
@@ -127,7 +127,7 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:background="@drawable/button"
-                        android:contentDescription=""
+                        android:contentDescription="@string/menu_search"
                         android:src="@drawable/ic_search" />
                 </LinearLayout>
             </HorizontalScrollView>
@@ -164,7 +164,7 @@
 
         </LinearLayout>
 
-        <!--<LinearLayout
+        <LinearLayout
             android:id="@+id/layout_search"
             android:layout_width="match_parent"
             android:layout_height="40dp"
@@ -179,18 +179,18 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="@drawable/button"
-                android:contentDescription=""
+                android:contentDescription="@string/menu_clear_search"
                 android:src="@drawable/ic_close"
                 android:visibility="visible"
                 tools:visibility="visible" />
 
-            <ImageButton
+            <!--<ImageButton
                 android:id="@+id/showSearchButton"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="@drawable/button"
-                android:contentDescription=""
-                android:src="@drawable/ic_search" />
+                android:contentDescription="@string/menu_open_search"
+                android:src="@drawable/ic_search" />-->
 
             <ImageButton
                 android:id="@+id/prevButton"
@@ -212,7 +212,7 @@
                 android:visibility="visible"
                 tools:visibility="visible" />
 
-        </LinearLayout>-->
+        </LinearLayout>
     </LinearLayout>
 
     <FrameLayout

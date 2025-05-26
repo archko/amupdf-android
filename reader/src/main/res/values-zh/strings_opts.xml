@@ -40,6 +40,11 @@
     <string name="menu_opt_crop">自动切边</string>
     <string name="menu_opt_no_crop">不切边</string>
     <string name="menu_opt_edit">编辑</string>
+    <string name="menu_thumb">缩略图</string>
+    <string name="menu_ocr">Ocr</string>
+    <string name="menu_tts">朗读页面</string>
+    <string name="menu_clear_search">清除搜索</string>
+    <string name="menu_open_search">打开搜索</string>
 
     <string name="go_home">主目录</string>
 
