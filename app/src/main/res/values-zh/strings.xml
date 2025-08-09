@@ -49,4 +49,8 @@
     <string name="sodk_editor_password_for_document">密码</string>
     <string name="sodk_editor_ok">确定</string>
     <string name="sodk_editor_cancel">取消</string>
+
+    <string name="show_as_dir">是否浏览该图片所在目录？</string>
+    <string name="show_as_dir_ok">浏览</string>
+    <string name="show_as_dir_cancel">否</string>
 </resources>

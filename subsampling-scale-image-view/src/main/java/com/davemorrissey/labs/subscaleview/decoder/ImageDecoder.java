@@ -25,6 +25,6 @@ public interface ImageDecoder {
      * @return the decoded bitmap
      * @throws Exception if decoding fails.
      */
-    @NonNull Bitmap decode(Context context, @NonNull Uri uri) throws Exception;
+    Bitmap decode(Context context, @NonNull Uri uri) throws Exception;
 
 }

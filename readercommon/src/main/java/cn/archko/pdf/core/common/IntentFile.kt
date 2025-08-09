@@ -16,7 +16,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.Locale
+import java.util.*
 
 object IntentFile {
 
@@ -292,6 +292,14 @@ object IntentFile {
                 || path.endsWith(".jfif-tbnl", true)
                 || path.endsWith(".tif", true)
                 || path.endsWith(".tiff", true)
+    }
+
+    fun isTiffImage(path: String?): Boolean {
+        return !TextUtils.isEmpty(path) &&
+                (path!!.endsWith(".jfif", true)
+                || path.endsWith(".jfif-tbnl", true)
+                || path.endsWith(".tif", true)
+                || path.endsWith(".tiff", true))
     }
 
     fun isPdf(path: String): Boolean {

@@ -219,7 +219,7 @@ public class SubsamplingScaleImageView extends View {
     private int maxTileHeight = TILE_SIZE_AUTO;
 
     // An executor service for loading of images
-    private Executor executor = AsyncTask.THREAD_POOL_EXECUTOR;
+    private Executor executor = AsyncTask.SERIAL_EXECUTOR;
 
     // Whether tiles should be loaded while gestures and animations are still in progress
     private boolean eagerLoadingEnabled = true;

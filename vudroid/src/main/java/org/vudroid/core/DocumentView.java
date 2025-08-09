@@ -68,6 +68,7 @@ public class DocumentView extends View implements ZoomListener {
     public void setOriention(int oriention) {
         if (this.oriention != oriention) {
             this.oriention = oriention;
+            zoomModel.setZoom(1f);
             pageToGoTo = getCurrentPage();
             if (null != decodeService) {
                 decodeService.setOriention(oriention);

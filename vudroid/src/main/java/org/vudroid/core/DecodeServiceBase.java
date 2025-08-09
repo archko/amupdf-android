@@ -21,12 +21,7 @@ import org.vudroid.pdfdroid.codec.PdfContext;
 
 import java.io.IOException;
 import java.lang.ref.SoftReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import cn.archko.pdf.core.cache.BitmapCache;
@@ -200,6 +195,30 @@ public class DecodeServiceBase implements DecodeService {
 
     public void setContainerView(View containerView) {
         this.containerView = containerView;
+    }
+
+    public CodecDocument set(String path, boolean cachePage, CodecDocument document) {
+        this.path = path;
+        this.cachePage = cachePage;
+        this.document = document;
+
+        int count = document.getPageCount();
+        pageSizeBean = new APageSizeLoader.PageSizeBean();
+        pageSizeBean.setList(aPageList);
+        try {
+            for (int i = 0; i < count; i++) {
+                CodecPage codecPage = document.getPage(i);
+                APage aPage = new APage(i, codecPage.getWidth(), codecPage.getHeight(), 1f);
+                aPageList.add(aPage);
+                codecPage.recycle();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+            path = null;
+            aPageList.clear();
+            cachePage = false;
+        }
+        return document;
     }
 
     public CodecDocument open(String path, boolean cachePage) {

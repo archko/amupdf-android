@@ -45,7 +45,7 @@ public interface ImageRegionDecoder {
      * @param sampleSize Sample size.
      * @return The decoded region. It is safe to return null if decoding fails.
      */
-    @NonNull Bitmap decodeRegion(@NonNull Rect sRect, int sampleSize);
+    Bitmap decodeRegion(@NonNull Rect sRect, int sampleSize);
 
     /**
      * Status check. Should return false before initialisation and after recycle.

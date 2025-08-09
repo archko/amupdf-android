@@ -1,15 +1,6 @@
 package org.vudroid.core;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.RectF;
-
-import com.tencent.mmkv.MMKV;
+import android.graphics.*;
 
 import java.lang.ref.SoftReference;
 import java.util.Arrays;
@@ -49,16 +40,6 @@ public class PageTreeNode {
     }
 
     PageTreeNode(DocumentView documentView, RectF localPageSliceBounds, Page page, int treeNodeDepthLevel, PageTreeNode parent, ColorFilter filter) {
-        int decodeBlock = MMKV.defaultMMKV().decodeInt("decodeBlock", 2);
-        /*if (decodeBlock == 0) {
-            SLICE_SIZE = 128 * 128;
-        } else if (decodeBlock == 1) {
-            SLICE_SIZE = 256 * 256;
-        } else if (decodeBlock == 2) {
-            SLICE_SIZE = 512 * 512;
-        } else if (decodeBlock == 3) {
-            SLICE_SIZE = 1024 * 1024;
-        }*/
         this.documentView = documentView;
         this.pageSliceBounds = evaluatePageSliceBounds(localPageSliceBounds, parent);
         this.page = page;
@@ -167,6 +148,9 @@ public class PageTreeNode {
     }
 
     private boolean thresholdHit() {
+        if (treeNodeDepthLevel == 2) {
+            return true;
+        }
         float zoom = documentView.zoomModel.getZoom();
         int mainWidth = documentView.getWidth();
         float height = page.getPageHeight(mainWidth, zoom);

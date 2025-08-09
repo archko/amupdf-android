@@ -50,5 +50,9 @@
     <string name="sodk_editor_password_for_document">Password</string>
     <string name="sodk_editor_ok">OK</string>
     <string name="sodk_editor_cancel">cancel</string>
+
+    <string name="show_as_dir">Show images for dir？</string>
+    <string name="show_as_dir_ok">Show</string>
+    <string name="show_as_dir_cancel">No</string>
     
 </resources>

@@ -38,6 +38,7 @@ dependencies {
         exclude("xmlpull")
     }
 
-    api ("com.github.penfeizhou.android.animation:awebp:3.0.5")
-    api ("com.github.penfeizhou.android.animation:gif:3.0.5")
+    api(libs.penfeizhou.awebp)
+    api(libs.android.gif.drawable)
+    api(libs.tiff.loader)
 }

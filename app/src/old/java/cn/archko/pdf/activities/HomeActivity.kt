@@ -38,9 +38,11 @@ import cn.archko.pdf.fragments.BrowserFragment
 import cn.archko.pdf.fragments.FavoriteFragment
 import cn.archko.pdf.fragments.HistoryFragment
 import cn.archko.pdf.fragments.LibraryFragment
+import cn.archko.pdf.imagedroid.AlbumViewerActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import vn.chungha.flowbus.collectFlowBus
+import java.io.File
 import java.lang.ref.WeakReference
 
 /**
@@ -109,16 +111,45 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
     }
 
     private fun parseIntent() {
-        if (null == intent) {
-            return
-        }
         if (TextUtils.isEmpty(mPath)) {
             mPath = IntentFile.processIntentAction(intent, this)
         }
-        if (!TextUtils.isEmpty(mPath)) {
+        if (TextUtils.isEmpty(mPath)) {
+            return
+        }
+        val file = File(mPath!!)
+        if (file.isFile && IntentFile.isTiffImage(mPath)) {
             PDFViewerHelper.openImage(mPath, this)
+            intent = null
+            return
+        }
+
+        if (intent == null) {
+            return
+        }
+
+        if (mPath.isNullOrEmpty()) {
+            return
         }
         intent = null
+
+        // 如果是图片，弹出“是否浏览目录”
+        if (file.isFile && IntentFile.isImage(mPath!!)) {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(R.string.app_name)
+                .setMessage(R.string.show_as_dir)
+                .setPositiveButton(R.string.show_as_dir_ok) { _, _ ->
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    intent.setClass(this, AlbumViewerActivity::class.java)
+                    intent.putExtra("dir", file.parentFile?.absolutePath)
+                    this.startActivity(intent)
+                }
+                .setNegativeButton(R.string.show_as_dir_cancel) { _, _ ->
+                    PDFViewerHelper.openImage(mPath, this)
+                }
+                .setOnCancelListener { }
+                .show()
+        }
     }
 
     private val onBackPress = object : OnBackPressedCallback(true) {
