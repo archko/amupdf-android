@@ -76,8 +76,8 @@ class TiffNewImageRegionDecoder @Keep constructor() : ImageRegionDecoder {
             tiffLoader!!.decodeRegionToBitmapDirect(
                 sRect.left,
                 sRect.top,
-                sRect.right,
-                sRect.bottom,
+                sRect.width(),
+                sRect.height(),
                 scale,
                 bitmap
             )

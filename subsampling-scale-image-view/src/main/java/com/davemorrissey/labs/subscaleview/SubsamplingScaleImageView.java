@@ -601,10 +601,17 @@ public class SubsamplingScaleImageView extends View {
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                 if (panEnabled && readySent && vTranslate != null && e1 != null && e2 != null && (Math.abs(e1.getX() - e2.getX()) > 50 || Math.abs(e1.getY() - e2.getY()) > 50) && (Math.abs(velocityX) > 500 || Math.abs(velocityY) > 500) && !isZooming) {
-                    PointF vTranslateEnd = new PointF(vTranslate.x + (velocityX * 0.25f), vTranslate.y + (velocityY * 0.25f));
+                    float velocityMultiplier = 0.35f; 
+                    PointF vTranslateEnd = new PointF(vTranslate.x + (velocityX * velocityMultiplier), vTranslate.y + (velocityY * velocityMultiplier));
                     float sCenterXEnd = ((getWidth() / 2f) - vTranslateEnd.x) / scale;
                     float sCenterYEnd = ((getHeight() / 2f) - vTranslateEnd.y) / scale;
-                    new AnimationBuilder(new PointF(sCenterXEnd, sCenterYEnd)).withEasing(EASE_OUT_QUAD).withPanLimited(false).withOrigin(ORIGIN_FLING).start();
+                    // 使用更平滑的缓动效果，延长动画时间
+                    new AnimationBuilder(new PointF(sCenterXEnd, sCenterYEnd))
+                            .withEasing(EASE_OUT_QUAD) // 改为EASE_OUT_QUAD使减速更平滑
+                            .withDuration(1500)
+                            .withPanLimited(false)
+                            .withOrigin(ORIGIN_FLING)
+                            .start();
                     return true;
                 }
                 return super.onFling(e1, e2, velocityX, velocityY);
