@@ -1012,9 +1012,20 @@ public class SubsamplingScaleImageView extends View {
                 sCenter.y = sHeight() / 2f;
             }
         }
-        float doubleTapZoomScale = Math.min(maxScale, SubsamplingScaleImageView.this.doubleTapZoomScale);
-        boolean zoomIn = (scale <= doubleTapZoomScale * 0.9) || scale == minScale;
-        float targetScale = zoomIn ? doubleTapZoomScale : minScale();
+    
+        // 计算使图片高度和宽度充满屏幕的缩放比例
+        int vPadding = getPaddingBottom() + getPaddingTop();
+        int hPadding = getPaddingLeft() + getPaddingRight();
+        float targetScaleHeight = (getHeight() - vPadding) / (float) sHeight();
+        float targetScaleWidth = (getWidth() - hPadding) / (float) sWidth();
+    
+        // 选择合适的目标缩放比例
+        float targetScale = Math.max(targetScaleHeight, targetScaleWidth);
+        targetScale = Math.min(maxScale, targetScale);
+    
+        boolean zoomIn = (scale <= targetScale * 0.9) || scale == minScale;
+        targetScale = zoomIn ? targetScale : minScale();
+    
         if (doubleTapZoomStyle == ZOOM_FOCUS_CENTER_IMMEDIATE) {
             setScaleAndCenter(targetScale, sCenter);
         } else if (doubleTapZoomStyle == ZOOM_FOCUS_CENTER || !zoomIn || !panEnabled) {
