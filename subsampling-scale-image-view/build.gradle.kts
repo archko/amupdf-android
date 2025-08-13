@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.davemorrissey.labs.subscaleview"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 14
@@ -15,5 +15,5 @@ android {
 
 dependencies {
     api("androidx.annotation:annotation:1.8.0")
-    api("androidx.exifinterface:exifinterface:1.3.7")
+    api("androidx.exifinterface:exifinterface:1.4.1")
 }

@@ -1,7 +1,7 @@
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
-    kotlin("kapt")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -45,7 +45,7 @@ dependencies {
 
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
-    kapt(libs.room.compiler)
+    add("ksp", libs.room.compiler)
 
     api(libs.coil.kt)
     api(libs.recyclerview)
@@ -53,7 +53,7 @@ dependencies {
 
     api(libs.crashreport)
     api(libs.juniversalchardet)
-    api("com.artifex.mupdf:mupdf-fitz:1.26.0")
+    api("com.artifex.mupdf:mupdf-fitz:1.26.3")
     api(libs.sardine) {
         exclude("stax")
         exclude("stax-api")

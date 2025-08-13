@@ -1,8 +1,7 @@
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
-    kotlin("kapt")
-    //alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -116,31 +115,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodelKtx)
     implementation(libs.androidx.lifecycle.livedata)
 
-    /*implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.lifecycle.viewModelCompose)
-    implementation(libs.androidx.navigation.compose)
-
-    implementation(libs.androidx.paging.runtime)
-    implementation(libs.androidx.paging.compose)
-
-    implementation(libs.androidx.compose.runtime)
-    implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.compose.foundation.layout)
-    implementation(libs.androidx.compose.ui.util)
-    implementation(libs.androidx.compose.material.iconsExtended)
-    implementation(libs.androidx.compose.material3.adaptive)
-    implementation(libs.androidx.compose.material3.adaptive.layout)
-    implementation(libs.androidx.compose.material3.adaptive.navigation)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.material3.android)
-
-    implementation(libs.accompanist.systemuicontroller)
-    implementation(libs.accompanist.swiperefresh)
-    implementation(libs.coil.kt.compose)
-
-    implementation(libs.flinger)
-    implementation(project(":core-ui"))*/
-
     implementation(libs.androidx.activity)
     implementation(libs.androidx.fragment)
 
@@ -163,7 +137,7 @@ dependencies {
 
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
-    kapt(libs.room.compiler)
+    add("ksp", libs.room.compiler)
 
     implementation(project(":reader"))
     implementation(project(":paddle-ocr"))

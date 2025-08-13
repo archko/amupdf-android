@@ -230,6 +230,7 @@ public class Page {
             initSearchRectFs(result.boxes);
         } else {
             searchBoxs = null;
+            searchRectFs = null;
         }
     }
 
