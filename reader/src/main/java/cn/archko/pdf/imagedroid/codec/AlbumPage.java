@@ -1,14 +1,13 @@
 package cn.archko.pdf.imagedroid.codec;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapRegionDecoder;
-import android.graphics.Rect;
-import android.graphics.RectF;
+import android.graphics.*;
 import android.util.Log;
+
+import com.archko.reader.image.TiffLoader;
 
 import org.vudroid.core.codec.CodecPage;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,14 +22,17 @@ public class AlbumPage implements CodecPage {
     int pageWidth;
     int pageHeight;
     private BitmapRegionDecoder decoder;
+    private AlbumDocument albumDocument;
     private String path;
+    private TiffLoader tiffLoader;
 
-    static AlbumPage createPage(String fname, int pageno) {
-        AlbumPage pdfPage = new AlbumPage(pageno, fname);
+    static AlbumPage createPage(AlbumDocument albumDocument, String fname, int pageno) {
+        AlbumPage pdfPage = new AlbumPage(albumDocument, pageno, fname);
         return pdfPage;
     }
 
-    public AlbumPage(long pageno, String fname) {
+    public AlbumPage(AlbumDocument albumDocument, long pageno, String fname) {
+        this.albumDocument = albumDocument;
         this.pageHandle = pageno;
         this.path = fname;
     }
@@ -77,9 +79,8 @@ public class AlbumPage implements CodecPage {
      * @return 位图
      */
     public Bitmap renderBitmap(Rect cropBound, int width, int height, RectF pageSliceBounds, float scale) {
-        if (null == decoder || decoder.isRecycled()) {
-            loadPage(0);
-        }
+        loadPage(0);
+
         if (pageHeight == 0 || pageWidth == 0) {
             decodeBound();
         }
@@ -114,17 +115,52 @@ public class AlbumPage implements CodecPage {
 
             int patchX = Math.round(pageSliceBounds.left * pageWidth);
             int patchY = Math.round(pageSliceBounds.top * pageHeight);
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            final int heightRatio = Math.round((float) pageW / 1080);
-            final int widthRatio = Math.round((float) pageH / 1080);
-            options.inSampleSize = Math.max(heightRatio, widthRatio);
 
-            Rect rect = new Rect(patchX, patchY, patchX + pageW, patchY + pageH);
-            Bitmap bitmap = decoder.decodeRegion(rect, options);
-            Log.d("TAG", String.format("page:%s, h-w.ratio:%s-%s, w-h:%s-%s, patch:%s-%s, %s, w-h:%s-%s",
-                    pageHandle, heightRatio, widthRatio, pageW, pageH, patchX, patchY, pageSliceBounds, bitmap.getWidth(), bitmap.getHeight()));
+            // 确保区域不超出边界
+            patchX = Math.max(0, Math.min(patchX, pageWidth - 1));
+            patchY = Math.max(0, Math.min(patchY, pageHeight - 1));
+
+            int endX = Math.min(patchX + pageW, pageWidth);
+            int endY = Math.min(patchY + pageH, pageHeight);
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            Rect rect = new Rect(patchX, patchY, endX, endY);
+            options.inSampleSize = calculateInSampleSizeForRegion(rect, width, height);
+            //Log.d("TAG", String.format("page:%s, w-h:%s-%s, region.w-h:%s-%s, patch:%s-%s, sample:%s, %s, rect:%s, %s",
+            //        pageHandle, pageW, pageH, width, height, patchX, patchY, options.inSampleSize, pageSliceBounds, rect, path));
+            Bitmap bitmap = null;
+            try {
+                bitmap = decoder.decodeRegion(rect, options);
+            } catch (Exception e) {
+                Log.d("TAG", String.format("错误:%s, w-h:%s-%s, 区域:w-h:%s-%s, region.w-h:%s-%s, patch:%s-%s, sample:%s, %s, rect:%s, %s",
+                        pageHandle, pageWidth, pageHeight, pageW, pageH, width, height, patchX, patchY, options.inSampleSize, pageSliceBounds, rect, path));
+
+                Log.e("TAG", String.format("decode.error:%s", e));
+                bitmap = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.RGB_565);
+            }
             return bitmap;
         }
+    }
+
+    private int calculateInSampleSizeForRegion(
+            android.graphics.Rect region,
+            int reqWidth,
+            int reqHeight
+    ) {
+        int regionWidth = region.width();
+        int regionHeight = region.height();
+        var inSampleSize = 1;
+
+        if (regionHeight > reqHeight || regionWidth > reqWidth) {
+            int halfHeight = regionHeight / 2;
+            int halfWidth = regionWidth / 2;
+
+            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 
     public List<Hyperlink> getPageLinks() {
@@ -141,9 +177,6 @@ public class AlbumPage implements CodecPage {
     public synchronized void recycle() {
         if (pageHandle >= 0) {
             pageHandle = -1;
-        }
-        if (null != decoder) {
-            decoder.recycle();
         }
     }
 

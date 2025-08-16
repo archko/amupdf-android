@@ -5,7 +5,7 @@ import android.app.Application
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.CrashHandler
 import cn.archko.pdf.core.common.Graph
-import com.tencent.bugly.crashreport.CrashReport
+//import com.tencent.bugly.crashreport.CrashReport
 import com.tencent.mmkv.MMKV
 import vn.chungha.flowbus.FlowBusInitApplication
 
@@ -19,7 +19,7 @@ open class App : Application() {
         Graph.provide(this)
         MMKV.initialize(this)
         FlowBusInitApplication.initializer(this)
-        CrashReport.initCrashReport(getApplicationContext(), "aaeff47e9b", false);
+        //CrashReport.initCrashReport(getApplicationContext(), "aaeff47e9b", false);
 
         Thread.setDefaultUncaughtExceptionHandler(CrashHandler())
         val displayMetrics = resources.displayMetrics

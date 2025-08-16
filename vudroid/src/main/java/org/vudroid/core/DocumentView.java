@@ -1,12 +1,7 @@
 package org.vudroid.core;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
-import android.graphics.Rect;
-import android.graphics.RectF;
+import android.graphics.*;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.GestureDetector;
@@ -26,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.Nullable;
+import cn.archko.pdf.core.cache.BitmapCache;
 import cn.archko.pdf.core.entity.APage;
 import cn.archko.pdf.core.link.Hyperlink;
 import cn.archko.pdf.core.utils.ColorUtil;
@@ -70,11 +66,12 @@ public class DocumentView extends View implements ZoomListener {
             this.oriention = oriention;
             zoomModel.setZoom(1f);
             pageToGoTo = getCurrentPage();
+            BitmapCache.getInstance().clearNode();
             if (null != decodeService) {
                 decodeService.setOriention(oriention);
             }
 
-            //should invalidate current page and node
+            System.out.println(String.format("setOriention:%s, page:%s", oriention,pageToGoTo));
 
             requestLayout();
         }

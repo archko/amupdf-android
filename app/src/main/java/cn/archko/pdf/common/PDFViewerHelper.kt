@@ -146,7 +146,12 @@ class PDFViewerHelper {
 
         fun openImage(path: String?, activity: Context) {
             val intent = Intent(Intent.ACTION_VIEW)
-            intent.setClass(activity, ImageViewerActivity::class.java)
+            if (IntentFile.isGif(path)){
+                intent.setClass(activity, ImageViewerActivity::class.java)
+            }else{
+                intent.setClass(activity, AlbumViewerActivity::class.java)
+            }
+
             intent.setData(Uri.parse(path))
             intent.putExtra("path", path)
             activity.startActivity(intent)
