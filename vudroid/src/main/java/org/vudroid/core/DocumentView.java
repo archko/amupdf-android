@@ -659,9 +659,9 @@ public class DocumentView extends View implements ZoomListener {
         return zoomModel;
     }
 
-    public void scrollPage(int height) {
+    public void scrollPage(int width, int height) {
         mCurrentFlingRunnable = new FlingRunnable(getContext());
-        mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), 0, height, 0);
+        mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), width, height, 0);
         post(mCurrentFlingRunnable);
         //Log.d(TAG, "height:" + height);
     }

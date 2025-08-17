@@ -13,7 +13,7 @@ import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.imagedroid.ImageViewerActivity
 import cn.archko.pdf.imagedroid.AlbumViewerActivity
 import java.io.File
-import java.util.Locale
+import java.util.*
 
 /**
  * @author: archko 2020/1/4 :2:06 下午
@@ -68,7 +68,7 @@ class PDFViewerHelper {
          */
         fun openAMupdf(clickedFile: File, activity: Context) {
             val fname = clickedFile.name.lowercase(Locale.ROOT)
-            if (IntentFile.isImage(fname)) {
+            if (IntentFile.isImage(fname) || IntentFile.isTiffImage(fname)) {
                 openImage(clickedFile, activity)
                 return
             } /*else if (IntentFile.isText(fname)) {
@@ -90,7 +90,7 @@ class PDFViewerHelper {
 
         fun openAMupdfNoCrop(clickedFile: File, activity: Context) {
             val fname = clickedFile.name.lowercase(Locale.ROOT)
-            if (IntentFile.isImage(fname)) {
+            if (IntentFile.isImage(fname) || IntentFile.isTiffImage(fname)) {
                 openImage(clickedFile, activity)
                 return
             }
@@ -146,9 +146,9 @@ class PDFViewerHelper {
 
         fun openImage(path: String?, activity: Context) {
             val intent = Intent(Intent.ACTION_VIEW)
-            if (IntentFile.isGif(path)){
+            if (IntentFile.isGif(path)) {
                 intent.setClass(activity, ImageViewerActivity::class.java)
-            }else{
+            } else {
                 intent.setClass(activity, AlbumViewerActivity::class.java)
             }
 

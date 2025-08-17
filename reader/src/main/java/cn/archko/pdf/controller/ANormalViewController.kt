@@ -269,10 +269,10 @@ open class ANormalViewController(
 
     override fun scrollPage(y: Int, top: Int, bottom: Int, margin: Int): Boolean {
         if (y < top) {
-            documentView.scrollPage(-frameLayout.height + margin)
+            documentView.scrollPage(0, -frameLayout.height + margin)
             return true
         } else if (y > bottom) {
-            documentView.scrollPage(frameLayout.height - margin)
+            documentView.scrollPage(0, frameLayout.height - margin)
             return true
         }
         return false
