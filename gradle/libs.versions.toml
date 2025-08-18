@@ -30,8 +30,6 @@ minSdk = "21"
 mmkv = "1.3.4"
 okhttp = "4.12.0"
 crashreport = "4.1.9.3"
-roboelectric = "4.5.1"
-rome = "1.18.0"
 room = "2.7.2"
 secrets = "2.0.1"
 
@@ -45,7 +43,7 @@ retrofitKotlinxSerializationJson = "0.8.0"
 paging = "3.3.2"
 converterGson = "2.9.0"
 gson = "2.13.1"
-tiff-loader = "1.0.0"
+tiff-android = "1.1.1"
 penfeizhou = "3.0.5"
 android-gif-drawable = "1.2.29"
 
@@ -113,9 +111,6 @@ retrofit-kotlin-serialization = { module = "com.jakewharton.retrofit:retrofit2-k
 retrofit-converterGson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 retrofit-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 
-robolectric = { module = "org.robolectric:robolectric", version.ref = "roboelectric" }
-rometools-modules = { module = "com.rometools:rome-modules", version.ref = "rome" }
-rometools-rome = { module = "com.rometools:rome", version.ref = "rome" }
 secrets-gradlePlugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secrets" }
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
@@ -144,7 +139,7 @@ juniversalchardet = { module = "com.github.albfernandez:juniversalchardet", vers
 
 penfeizhou-awebp = { group = "com.github.penfeizhou.android.animation", name = "awebp", version.ref = "penfeizhou" }
 android-gif-drawable = { module = "pl.droidsonroids.gif:android-gif-drawable", version.ref = "android-gif-drawable" }
-tiff-loader = { module = "com.archko.reader.image:tiff-loader", version.ref = "tiff-loader" }
+tiff-loader = { module = "com.archko.reader.image:library-android", version.ref = "tiff-android" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

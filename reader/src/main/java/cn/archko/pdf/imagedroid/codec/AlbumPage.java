@@ -53,8 +53,8 @@ public class AlbumPage implements CodecPage {
             }
             tiffLoader.openTiff(path);
             TiffInfo tiffInfo = tiffLoader.getTiffInfo();
-            pageWidth = tiffInfo.width;
-            pageHeight = tiffInfo.height;
+            pageWidth = tiffInfo.getWidth();
+            pageHeight = tiffInfo.getHeight();
         } else {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
