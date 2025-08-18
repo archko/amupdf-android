@@ -23,9 +23,9 @@ public class AlbumDocument implements CodecDocument {
 
     private static FileFilter createFileFilter() {
         return file -> {
-            if (file.length() > 10_000_000) {
+            /*if (file.length() > 10_000_000) {
                 return false;
-            }
+            }*/
             if (file.isHidden()) {
                 return false;
             }

@@ -1,11 +1,10 @@
 package cn.archko.pdf.imagedroid.codec;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapRegionDecoder;
-import android.graphics.Rect;
-import android.graphics.RectF;
+import android.graphics.*;
 import android.util.Log;
+
+import com.archko.reader.image.TiffInfo;
+import com.archko.reader.image.TiffLoader;
 
 import org.vudroid.core.codec.CodecPage;
 
@@ -13,6 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.archko.pdf.core.cache.BitmapPool;
+import cn.archko.pdf.core.common.IntentFile;
 import cn.archko.pdf.core.entity.ReflowBean;
 import cn.archko.pdf.core.link.Hyperlink;
 
@@ -24,6 +25,8 @@ public class AlbumPage implements CodecPage {
     int pageHeight;
     private BitmapRegionDecoder decoder;
     private String path;
+    private TiffLoader tiffLoader;
+    private boolean isTiff = false;
 
     static AlbumPage createPage(String fname, int pageno) {
         AlbumPage pdfPage = new AlbumPage(pageno, fname);
@@ -33,6 +36,7 @@ public class AlbumPage implements CodecPage {
     public AlbumPage(long pageno, String fname) {
         this.pageHandle = pageno;
         this.path = fname;
+        isTiff = IntentFile.INSTANCE.isTiffImage(fname);
     }
 
     public int getWidth() {
@@ -43,11 +47,21 @@ public class AlbumPage implements CodecPage {
     }
 
     private void decodeBound() {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(path, options);
-        pageWidth = options.outWidth;
-        pageHeight = options.outHeight;
+        if (isTiff) {
+            if (tiffLoader == null) {
+                tiffLoader = new TiffLoader();
+            }
+            tiffLoader.openTiff(path);
+            TiffInfo tiffInfo = tiffLoader.getTiffInfo();
+            pageWidth = tiffInfo.width;
+            pageHeight = tiffInfo.height;
+        } else {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(path, options);
+            pageWidth = options.outWidth;
+            pageHeight = options.outHeight;
+        }
     }
 
     public int getHeight() {
@@ -58,7 +72,11 @@ public class AlbumPage implements CodecPage {
     }
 
     public void loadPage(int pageno) {
-        if (null == decoder || decoder.isRecycled()) {
+        if (isTiff) {
+            if (tiffLoader == null) {
+                tiffLoader = new TiffLoader();
+            }
+        } else if (null == decoder || decoder.isRecycled()) {
             try {
                 decoder = BitmapRegionDecoder.newInstance(path, false);
             } catch (IOException e) {
@@ -77,9 +95,16 @@ public class AlbumPage implements CodecPage {
      * @return 位图
      */
     public Bitmap renderBitmap(Rect cropBound, int width, int height, RectF pageSliceBounds, float scale) {
-        if (null == decoder || decoder.isRecycled()) {
-            loadPage(0);
+        if (!isTiff) {
+            return renderImageBitmap(cropBound, width, height, pageSliceBounds, scale);
+        } else {
+            return renderTifBitmap(cropBound, width, height, pageSliceBounds, scale);
         }
+    }
+
+    public Bitmap renderImageBitmap(Rect cropBound, int width, int height, RectF pageSliceBounds, float scale) {
+        loadPage(0);
+
         if (pageHeight == 0 || pageWidth == 0) {
             decodeBound();
         }
@@ -114,17 +139,109 @@ public class AlbumPage implements CodecPage {
 
             int patchX = Math.round(pageSliceBounds.left * pageWidth);
             int patchY = Math.round(pageSliceBounds.top * pageHeight);
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            final int heightRatio = Math.round((float) pageW / 1080);
-            final int widthRatio = Math.round((float) pageH / 1080);
-            options.inSampleSize = Math.max(heightRatio, widthRatio);
 
-            Rect rect = new Rect(patchX, patchY, patchX + pageW, patchY + pageH);
-            Bitmap bitmap = decoder.decodeRegion(rect, options);
-            Log.d("TAG", String.format("page:%s, h-w.ratio:%s-%s, w-h:%s-%s, patch:%s-%s, %s, w-h:%s-%s",
-                    pageHandle, heightRatio, widthRatio, pageW, pageH, patchX, patchY, pageSliceBounds, bitmap.getWidth(), bitmap.getHeight()));
+            // 确保区域不超出边界
+            patchX = Math.max(0, Math.min(patchX, pageWidth));
+            patchY = Math.max(0, Math.min(patchY, pageHeight));
+
+            int endX = Math.min(patchX + pageW, pageWidth);
+            int endY = Math.min(patchY + pageH, pageHeight);
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            Rect rect = new Rect(patchX, patchY, endX, endY);
+            options.inSampleSize = calculateInSampleSizeForRegion(rect, width, height);
+            //Log.d("TAG", String.format("page:%s, w-h:%s-%s, region.w-h:%s-%s, patch:%s-%s, sample:%s, %s, rect:%s, %s",
+            //        pageHandle, pageW, pageH, width, height, patchX, patchY, options.inSampleSize, pageSliceBounds, rect, path));
+            Bitmap bitmap = null;
+            try {
+                bitmap = decoder.decodeRegion(rect, options);
+            } catch (Exception e) {
+                Log.d("TAG", String.format("错误:%s, w-h:%s-%s, 区域:w-h:%s-%s, region.w-h:%s-%s, patch:%s-%s, sample:%s, %s, rect:%s, %s",
+                        pageHandle, pageWidth, pageHeight, pageW, pageH, width, height, patchX, patchY, options.inSampleSize, pageSliceBounds, rect, path));
+
+                Log.e("TAG", String.format("decode.error:%s", e));
+                bitmap = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.RGB_565);
+            }
             return bitmap;
         }
+    }
+
+    public Bitmap renderTifBitmap(Rect cropBound, int width, int height, RectF pageSliceBounds, float scale) {
+        loadPage(0);
+
+        if (pageHeight == 0 || pageWidth == 0) {
+            decodeBound();
+        }
+
+        //缩略图
+        if (pageSliceBounds.width() == 1.0f) {
+            Bitmap bitmap = BitmapPool.getInstance().acquire(width, height);
+            tiffLoader.decodeRegionToBitmapDirect(
+                    0,
+                    0,
+                    pageWidth,
+                    pageHeight,
+                    scale,
+                    bitmap
+            );
+            Log.d("TAG", String.format("page:%s, page.w-h:%s-%s, scale:%s, w-h:%s-%s",
+                    pageHandle, pageWidth, pageHeight, scale, width, height));
+            return bitmap;
+        } else {
+            int pageW = (int) (width / scale);
+            int pageH = (int) (height / scale);
+            int patchX = Math.round(pageSliceBounds.left * pageWidth);
+            int patchY = Math.round(pageSliceBounds.top * pageHeight);
+
+            // 确保区域不超出边界
+            //patchX = Math.max(0, Math.min(patchX, pageWidth));
+            //patchY = Math.max(0, Math.min(patchY, pageHeight));
+
+            int bitmapWidth = (int) (pageW * scale);
+            int bitmapHeight = (int) (pageH * scale);
+
+            Log.d("TAG", String.format("tiff.decode:%s, 原始w-h:%s-%s, :%s-%s, region.w-h:%s-%s, fixed:%s-%s, patch:%s-%s, scale:%s, %s",
+                    pageHandle, pageWidth, pageHeight, pageW, pageH, width, height, bitmapWidth, bitmapHeight, patchX, patchY, scale, pageSliceBounds));
+            Bitmap bitmap = BitmapPool.getInstance().acquire(bitmapWidth, bitmapHeight);
+            try {
+                tiffLoader.decodeRegionToBitmapDirect(
+                        patchX,
+                        patchY,
+                        pageW,
+                        pageH,
+                        scale,
+                        bitmap
+                );
+            } catch (Exception e) {
+                Log.d("TAG", String.format("tiff错误:%s, w-h:%s-%s, region.w-h:%s-%s, patch:%s-%s, %s",
+                        pageHandle, pageWidth, pageHeight, width, height, patchX, patchY, pageSliceBounds));
+
+                Log.e("TAG", String.format("decode.tiff.error:%s", e));
+                bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+            }
+            return bitmap;
+        }
+    }
+
+    private int calculateInSampleSizeForRegion(
+            android.graphics.Rect region,
+            int reqWidth,
+            int reqHeight
+    ) {
+        int regionWidth = region.width();
+        int regionHeight = region.height();
+        var inSampleSize = 1;
+
+        if (regionHeight > reqHeight || regionWidth > reqWidth) {
+            int halfHeight = regionHeight / 2;
+            int halfWidth = regionWidth / 2;
+
+            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 
     public List<Hyperlink> getPageLinks() {
@@ -142,8 +259,11 @@ public class AlbumPage implements CodecPage {
         if (pageHandle >= 0) {
             pageHandle = -1;
         }
-        if (null != decoder) {
+        if (decoder != null) {
             decoder.recycle();
+        }
+        if (tiffLoader != null) {
+            tiffLoader.close();
         }
     }
 

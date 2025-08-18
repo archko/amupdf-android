@@ -4,15 +4,10 @@
     android:layout_height="match_parent"
     android:background="#ff212121">
 
-    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-        android:id="@+id/imageView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
     <pl.droidsonroids.gif.GifImageView
         android:id="@+id/gifView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
 </RelativeLayout>

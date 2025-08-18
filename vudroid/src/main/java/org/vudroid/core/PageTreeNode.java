@@ -152,9 +152,15 @@ public class PageTreeNode {
             return true;
         }
         float zoom = documentView.zoomModel.getZoom();
-        int mainWidth = documentView.getWidth();
-        float height = page.getPageHeight(mainWidth, zoom);
-        return (mainWidth * zoom * height) / (treeNodeDepthLevel * treeNodeDepthLevel) > SLICE_SIZE;
+        if (documentView.getOriention() == DocumentView.VERTICAL) {
+            int mainWidth = documentView.getWidth();
+            float height = page.getPageHeight(mainWidth, zoom);
+            return (mainWidth * zoom * height) / (treeNodeDepthLevel * treeNodeDepthLevel) > SLICE_SIZE;
+        } else {
+            int mainHeight = documentView.getHeight();
+            float width = page.getPageWidth(mainHeight, zoom);
+            return (mainHeight * zoom * width) / (treeNodeDepthLevel * treeNodeDepthLevel) > SLICE_SIZE;
+        }
     }
 
     public Bitmap getBitmap() {
@@ -166,7 +172,7 @@ public class PageTreeNode {
     }
 
     private String getCacheKey() {
-        return String.format("page:%s-level:%s-%s", page.index, treeNodeDepthLevel, pageSliceBounds);
+        return String.format("page:%s-level:%s-%s-%s-%s-%s", page.index, treeNodeDepthLevel, pageSliceBounds.left, pageSliceBounds.top, pageSliceBounds.right, pageSliceBounds.bottom);
     }
 
     private void restoreBitmapReference() {

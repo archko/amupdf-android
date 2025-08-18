@@ -288,18 +288,20 @@ object IntentFile {
                 || path.endsWith(".heic", true)
                 || path.endsWith(".bmp", true)
                 || path.endsWith(".gif", true)
-                || path.endsWith(".jfif", true)
-                || path.endsWith(".jfif-tbnl", true)
-                || path.endsWith(".tif", true)
-                || path.endsWith(".tiff", true)
+    }
+
+    fun isGif(path: String?): Boolean {
+        return !TextUtils.isEmpty(path) &&
+                (path!!.endsWith(".webp", true)
+                        || path.endsWith(".gif", true))
     }
 
     fun isTiffImage(path: String?): Boolean {
         return !TextUtils.isEmpty(path) &&
                 (path!!.endsWith(".jfif", true)
-                || path.endsWith(".jfif-tbnl", true)
-                || path.endsWith(".tif", true)
-                || path.endsWith(".tiff", true))
+                        || path.endsWith(".jfif-tbnl", true)
+                        || path.endsWith(".tif", true)
+                        || path.endsWith(".tiff", true))
     }
 
     fun isPdf(path: String): Boolean {

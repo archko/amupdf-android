@@ -19,7 +19,7 @@ open class App : Application() {
         Graph.provide(this)
         MMKV.initialize(this)
         FlowBusInitApplication.initializer(this)
-        CrashReport.initCrashReport(getApplicationContext(), "aaeff47e9b", false);
+        CrashReport.initCrashReport(applicationContext, "aaeff47e9b", false);
 
         Thread.setDefaultUncaughtExceptionHandler(CrashHandler())
         val displayMetrics = resources.displayMetrics

@@ -4,12 +4,7 @@ import android.app.ProgressDialog;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
+import android.view.*;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -184,19 +179,36 @@ public abstract class BaseViewerActivity extends FragmentActivity implements Dec
 
         @Override
         public void onSingleTapConfirmed(MotionEvent ev, int currentPage) {
-            int height = documentView.getHeight();
-            int top = height / 4;
-            int bottom = height * 3 / 4;
-            //Log.d(VIEW_LOG_TAG, "height:"+height+" y:"+e.getY()+" mMargin:"+mMargin);
+            if (documentView.getOriention() == DocumentView.VERTICAL) {
+                int height = documentView.getHeight();
+                int top = height / 4;
+                int bottom = height * 3 / 4;
+                //Log.d(VIEW_LOG_TAG, "height:"+height+" y:"+e.getY()+" mMargin:"+mMargin);
 
-            height = height - mMargin;
-            if ((int) ev.getY() < top) {
-                documentView.scrollPage(-height);
-            } else if ((int) ev.getY() > bottom) {
-                documentView.scrollPage(height);
+                height = height - mMargin;
+                if ((int) ev.getY() < top) {
+                    documentView.scrollPage(0, -height);
+                } else if ((int) ev.getY() > bottom) {
+                    documentView.scrollPage(0, height);
+                } else {
+                    seekbarControls.updatePageProgress(currentPage);
+                    seekbarControls.toggleControls();
+                }
             } else {
-                seekbarControls.updatePageProgress(currentPage);
-                seekbarControls.toggleControls();
+                int width = documentView.getHeight();
+                int left = width / 4;
+                int right = width * 3 / 4;
+                //Log.d(VIEW_LOG_TAG, "height:"+height+" y:"+e.getY()+" mMargin:"+mMargin);
+
+                width = width - mMargin;
+                if ((int) ev.getY() < left) {
+                    documentView.scrollPage(-width, 0);
+                } else if ((int) ev.getY() > right) {
+                    documentView.scrollPage(width, 0);
+                } else {
+                    seekbarControls.updatePageProgress(currentPage);
+                    seekbarControls.toggleControls();
+                }
             }
         }
 

@@ -66,6 +66,10 @@ public class BitmapCache {
         nodeCache.clear();
     }
 
+    public final void clearNode() {
+        nodeCache.clear();
+    }
+
     /**
      * 页面缩略图的缓存大小,通常按页面高宽的1/4,如果页面非常大,比如4000,那么缓存能存10多屏
      */

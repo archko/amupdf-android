@@ -80,6 +80,7 @@ class BookViewModel : ViewModel() {
                 || IntentFile.isText(fname)
                 || IntentFile.isDjvu(fname)
                 || IntentFile.isMobi(fname)
+                || IntentFile.isTiffImage(fname)
     }
 
     fun loadFiles(home: String, currentPath: String, dirsFirst: Boolean, showExtension: Boolean) =
