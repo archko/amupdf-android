@@ -45,7 +45,7 @@ retrofitKotlinxSerializationJson = "0.8.0"
 paging = "3.3.2"
 converterGson = "2.9.0"
 gson = "2.13.1"
-tiff-loader = "1.0.0"
+tiff-loader = "1.1.2"
 penfeizhou = "3.0.5"
 android-gif-drawable = "1.2.29"
 
@@ -144,7 +144,7 @@ juniversalchardet = { module = "com.github.albfernandez:juniversalchardet", vers
 
 penfeizhou-awebp = { group = "com.github.penfeizhou.android.animation", name = "awebp", version.ref = "penfeizhou" }
 android-gif-drawable = { module = "pl.droidsonroids.gif:android-gif-drawable", version.ref = "android-gif-drawable" }
-tiff-loader = { module = "com.archko.reader.image:tiff-loader", version.ref = "tiff-loader" }
+tiff-loader = { module = "com.archko.reader.image:library-android", version.ref = "tiff-loader" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

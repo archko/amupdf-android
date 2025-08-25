@@ -1,6 +1,10 @@
 package cn.archko.pdf.imagedroid.codec;
 
-import android.graphics.*;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapRegionDecoder;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.Log;
 
 import com.archko.reader.image.TiffInfo;
@@ -12,7 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.archko.pdf.core.cache.BitmapPool;
 import cn.archko.pdf.core.common.IntentFile;
 import cn.archko.pdf.core.entity.ReflowBean;
 import cn.archko.pdf.core.link.Hyperlink;
@@ -53,8 +56,8 @@ public class AlbumPage implements CodecPage {
             }
             tiffLoader.openTiff(path);
             TiffInfo tiffInfo = tiffLoader.getTiffInfo();
-            pageWidth = tiffInfo.width;
-            pageHeight = tiffInfo.height;
+            pageWidth = tiffInfo.getWidth();
+            pageHeight = tiffInfo.getHeight();
         } else {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
@@ -175,14 +178,12 @@ public class AlbumPage implements CodecPage {
 
         //缩略图
         if (pageSliceBounds.width() == 1.0f) {
-            Bitmap bitmap = BitmapPool.getInstance().acquire(width, height);
-            tiffLoader.decodeRegionToBitmapDirect(
+            Bitmap bitmap = tiffLoader.decodeRegionToBitmap(
                     0,
                     0,
                     pageWidth,
                     pageHeight,
-                    scale,
-                    bitmap
+                    scale
             );
             Log.d("TAG", String.format("page:%s, page.w-h:%s-%s, scale:%s, w-h:%s-%s",
                     pageHandle, pageWidth, pageHeight, scale, width, height));
@@ -202,23 +203,13 @@ public class AlbumPage implements CodecPage {
 
             Log.d("TAG", String.format("tiff.decode:%s, 原始w-h:%s-%s, :%s-%s, region.w-h:%s-%s, fixed:%s-%s, patch:%s-%s, scale:%s, %s",
                     pageHandle, pageWidth, pageHeight, pageW, pageH, width, height, bitmapWidth, bitmapHeight, patchX, patchY, scale, pageSliceBounds));
-            Bitmap bitmap = BitmapPool.getInstance().acquire(bitmapWidth, bitmapHeight);
-            try {
-                tiffLoader.decodeRegionToBitmapDirect(
-                        patchX,
-                        patchY,
-                        pageW,
-                        pageH,
-                        scale,
-                        bitmap
-                );
-            } catch (Exception e) {
-                Log.d("TAG", String.format("tiff错误:%s, w-h:%s-%s, region.w-h:%s-%s, patch:%s-%s, %s",
-                        pageHandle, pageWidth, pageHeight, width, height, patchX, patchY, pageSliceBounds));
-
-                Log.e("TAG", String.format("decode.tiff.error:%s", e));
-                bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
-            }
+            Bitmap bitmap = tiffLoader.decodeRegionToBitmap(
+                    patchX,
+                    patchY,
+                    pageW,
+                    pageH,
+                    scale
+            );
             return bitmap;
         }
     }

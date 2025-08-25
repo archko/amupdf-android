@@ -72,7 +72,7 @@ public class BitmapPool {
         }
         boolean isRelease = simplePool.release(bitmap);
         if (!isRelease) {
-            System.out.println("recycle bitmap:" + bitmap);
+            //System.out.println("recycle bitmap:" + bitmap);
             bitmap.recycle();
         }
     }
