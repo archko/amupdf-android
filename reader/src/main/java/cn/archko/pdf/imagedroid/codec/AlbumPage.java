@@ -149,6 +149,31 @@ public class AlbumPage implements CodecPage {
 
             BitmapFactory.Options options = new BitmapFactory.Options();
             Rect rect = new Rect(patchX, patchY, endX, endY);
+            
+            // 检查rect的宽高是否小于1
+            if (rect.width() < 1 || rect.height() < 1) {
+                // 创建1024x800的错误位图，中间绘制error文字
+                Bitmap errorBitmap = Bitmap.createBitmap(1024, 800, Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(errorBitmap);
+                
+                // 填充背景
+                canvas.drawColor(Color.LTGRAY);
+                
+                // 绘制error文字
+                Paint paint = new Paint();
+                paint.setColor(Color.RED);
+                paint.setTextSize(40);
+                paint.setTextAlign(Paint.Align.CENTER);
+                paint.setAntiAlias(true);
+                
+                // 计算文字居中位置
+                float x = errorBitmap.getWidth() / 2f;
+                float y = errorBitmap.getHeight() / 2f - (paint.descent() + paint.ascent()) / 2f;
+                canvas.drawText("error", x, y, paint);
+                
+                return errorBitmap;
+            }
+            
             options.inSampleSize = calculateInSampleSizeForRegion(rect, width, height);
             //Log.d("TAG", String.format("page:%s, w-h:%s-%s, region.w-h:%s-%s, patch:%s-%s, sample:%s, %s, rect:%s, %s",
             //        pageHandle, pageW, pageH, width, height, patchX, patchY, options.inSampleSize, pageSliceBounds, rect, path));
