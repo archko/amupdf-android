@@ -43,7 +43,7 @@ retrofitKotlinxSerializationJson = "0.8.0"
 paging = "3.3.2"
 converterGson = "2.9.0"
 gson = "2.13.1"
-tiff-android = "1.1.1"
+tiff-android = "1.1.2"
 penfeizhou = "3.0.5"
 android-gif-drawable = "1.2.29"
 

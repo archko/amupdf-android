@@ -175,14 +175,12 @@ public class AlbumPage implements CodecPage {
 
         //缩略图
         if (pageSliceBounds.width() == 1.0f) {
-            Bitmap bitmap = BitmapPool.getInstance().acquire(width, height);
-            tiffLoader.decodeRegionToBitmapDirect(
+            Bitmap bitmap = tiffLoader.decodeRegionToBitmap(
                     0,
                     0,
                     pageWidth,
                     pageHeight,
-                    scale,
-                    bitmap
+                    scale
             );
             Log.d("TAG", String.format("page:%s, page.w-h:%s-%s, scale:%s, w-h:%s-%s",
                     pageHandle, pageWidth, pageHeight, scale, width, height));
@@ -202,15 +200,14 @@ public class AlbumPage implements CodecPage {
 
             Log.d("TAG", String.format("tiff.decode:%s, 原始w-h:%s-%s, :%s-%s, region.w-h:%s-%s, fixed:%s-%s, patch:%s-%s, scale:%s, %s",
                     pageHandle, pageWidth, pageHeight, pageW, pageH, width, height, bitmapWidth, bitmapHeight, patchX, patchY, scale, pageSliceBounds));
-            Bitmap bitmap = BitmapPool.getInstance().acquire(bitmapWidth, bitmapHeight);
+            Bitmap bitmap = null;
             try {
-                tiffLoader.decodeRegionToBitmapDirect(
+                bitmap = tiffLoader.decodeRegionToBitmap(
                         patchX,
                         patchY,
                         pageW,
                         pageH,
-                        scale,
-                        bitmap
+                        scale
                 );
             } catch (Exception e) {
                 Log.d("TAG", String.format("tiff错误:%s, w-h:%s-%s, region.w-h:%s-%s, patch:%s-%s, %s",
