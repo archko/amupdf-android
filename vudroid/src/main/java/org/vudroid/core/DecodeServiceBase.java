@@ -29,7 +29,7 @@ import cn.archko.pdf.core.cache.BitmapPool;
 import cn.archko.pdf.core.common.APageSizeLoader;
 import cn.archko.pdf.core.common.IntentFile;
 import cn.archko.pdf.core.entity.APage;
-import cn.archko.pdf.core.utils.CropUtils;
+import cn.archko.pdf.core.utils.SmartCropUtils;
 
 public class DecodeServiceBase implements DecodeService {
     private static final int PAGE_POOL_SIZE = 6;
@@ -281,10 +281,7 @@ public class DecodeServiceBase implements DecodeService {
                 new RectF(0, 0, 1, 1),
                 1 / ratio);
 
-        RectF cropBounds = CropUtils.getJavaCropBounds(
-                thumb,
-                new Rect(0, 0, thumb.getWidth(), thumb.getHeight())
-        );
+        Rect cropBounds = SmartCropUtils.INSTANCE.detectSmartCropBounds(thumb);
         BitmapPool.getInstance().release(thumb);
 
         int leftBound = (int) (cropBounds.left * ratio);

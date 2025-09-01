@@ -14,7 +14,7 @@ import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.common.ParseTextMain
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.utils.BitmapUtils
-import cn.archko.pdf.core.utils.CropUtils
+import cn.archko.pdf.core.utils.SmartCropUtils
 import com.artifex.mupdf.fitz.Cookie
 import com.artifex.mupdf.fitz.DisplayList
 import com.artifex.mupdf.fitz.Document
@@ -324,10 +324,7 @@ class MupdfDocument(private val context: Context) {
             val matrix =
                 Matrix(ctm.a / ratio, ctm.d / ratio)
             render(page, matrix, thumb, 0, 0, 0)
-            val rectF = CropUtils.getJavaCropBounds(
-                thumb,
-                Rect(0, 0, thumb.getWidth(), thumb.getHeight())
-            )
+            val rectF = SmartCropUtils.detectSmartCropBounds(thumb)
 
             //scale to original image
             val xscale = 1f * pageW / rectF.width()
@@ -370,10 +367,7 @@ class MupdfDocument(private val context: Context) {
                 BitmapPool.getInstance().acquire(thumbw.toInt(), thumbh.toInt())
             val matrix = Matrix(1 / ratio)
             render(page, matrix, thumb, 0, 0, 0)
-            val rectF = CropUtils.getJavaCropBounds(
-                thumb,
-                Rect(0, 0, thumb.getWidth(), thumb.getHeight())
-            )
+            val rectF = SmartCropUtils.detectSmartCropBounds(thumb)
 
             val leftBound = (rectF.left * ratio)
             val topBound = (rectF.top * ratio)

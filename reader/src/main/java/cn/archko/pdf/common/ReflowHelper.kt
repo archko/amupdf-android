@@ -2,15 +2,14 @@ package cn.archko.pdf.common
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Rect
 import android.util.Log
 import android.view.ViewGroup
 import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.utils.BitmapUtils
-import cn.archko.pdf.core.utils.CropUtils
 import cn.archko.pdf.core.utils.FileUtils
+import cn.archko.pdf.core.utils.SmartCropUtils
 import com.artifex.mupdf.fitz.Matrix
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice
 import com.github.axet.k2pdfopt.K2PdfOpt
@@ -84,16 +83,13 @@ object ReflowHelper {
 
         for (i in 0 until count) {
             val bmp = opt.renderPage(i)
-            val cropBounds = CropUtils.getJavaCropBounds(
-                bmp,
-                Rect(0, 0, bmp.getWidth(), bmp.getHeight())
-            )
+            val cropBounds = SmartCropUtils.detectSmartCropBounds(bmp)
             val nBitmap = Bitmap.createBitmap(
                 bmp,
-                cropBounds.left.toInt(),
-                cropBounds.top.toInt(),
-                cropBounds.width().toInt(),
-                cropBounds.height().toInt()
+                cropBounds.left,
+                cropBounds.top,
+                cropBounds.width(),
+                cropBounds.height()
             )
             Log.d(
                 "TAG", String.format(
@@ -157,16 +153,13 @@ object ReflowHelper {
             val end = System.currentTimeMillis() - start
             start = System.currentTimeMillis()
             //只需要切边上下就够了.
-            val cropBounds = CropUtils.getJavaCropTopBottomBounds(
-                bmp,
-                Rect(0, 0, bmp.getWidth(), bmp.getHeight())
-            )
+            val cropBounds = SmartCropUtils.detectSmartCropBounds(bmp)
             val nBitmap = Bitmap.createBitmap(
                 bmp,
-                cropBounds.left.toInt(),
-                cropBounds.top.toInt(),
-                cropBounds.width().toInt(),
-                cropBounds.height().toInt()
+                cropBounds.left,
+                cropBounds.top,
+                cropBounds.width(),
+                cropBounds.height()
             )
             val cropEnd = System.currentTimeMillis() - start
             Log.d(
