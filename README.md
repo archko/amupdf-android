@@ -17,6 +17,7 @@ I want to create a simple PDF reader that supports smooth scrolling, displays hi
 * export pdf to image/html
 * create pdf from image/txt
 * webdave store/restore reading histories
+* tiff, bigtiff
 
 ### native-lib
 https://github.com/archko/amupdf-nativelib
