@@ -25,6 +25,7 @@ interface AViewController {
     fun onSelectedOutline(index: Int)
     fun scrollToPosition(page: Int)
     fun scrollPage(y: Int, top: Int, bottom: Int, margin: Int): Boolean
+    fun scrollPageHorizontal(x: Int, left: Int, right: Int, margin: Int): Boolean
     fun tryHyperlink(ev: MotionEvent): Boolean
 
     fun onResume()

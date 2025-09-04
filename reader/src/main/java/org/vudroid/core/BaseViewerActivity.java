@@ -195,15 +195,16 @@ public abstract class BaseViewerActivity extends FragmentActivity implements Dec
                     seekbarControls.toggleControls();
                 }
             } else {
-                int width = documentView.getHeight();
+                // Horizontal orientation - use width and x coordinate
+                int width = documentView.getWidth();
                 int left = width / 4;
                 int right = width * 3 / 4;
-                //Log.d(VIEW_LOG_TAG, "height:"+height+" y:"+e.getY()+" mMargin:"+mMargin);
+                //Log.d(VIEW_LOG_TAG, "width:"+width+" x:"+ev.getX()+" mMargin:"+mMargin);
 
                 width = width - mMargin;
-                if ((int) ev.getY() < left) {
+                if ((int) ev.getX() < left) {
                     documentView.scrollPage(-width, 0);
-                } else if ((int) ev.getY() > right) {
+                } else if ((int) ev.getX() > right) {
                     documentView.scrollPage(width, 0);
                 } else {
                     seekbarControls.updatePageProgress(currentPage);

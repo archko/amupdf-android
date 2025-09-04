@@ -438,6 +438,21 @@ class AScanReflowViewController(
         return false
     }
 
+    override fun scrollPageHorizontal(x: Int, left: Int, right: Int, margin: Int): Boolean {
+        if (x < left) {
+            var scrollX = mRecyclerView.scrollX
+            scrollX -= mRecyclerView.width
+            mRecyclerView.scrollBy(scrollX + margin, 0)
+            return true
+        } else if (x > right) {
+            var scrollX = mRecyclerView.scrollX
+            scrollX += mRecyclerView.width
+            mRecyclerView.scrollBy(scrollX + margin, 0)
+            return true
+        }
+        return false
+    }
+
     override fun tryHyperlink(ev: MotionEvent): Boolean {
         return false
     }

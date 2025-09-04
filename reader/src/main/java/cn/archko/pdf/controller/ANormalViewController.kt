@@ -252,6 +252,7 @@ open class ANormalViewController(
     }
 
     override fun setOrientation(ori: Int) {
+        scrollOrientation = ori
         documentView.oriention = ori
     }
 
@@ -278,6 +279,17 @@ open class ANormalViewController(
         return false
     }
 
+    override fun scrollPageHorizontal(x: Int, left: Int, right: Int, margin: Int): Boolean {
+        if (x < left) {
+            documentView.scrollPage(-frameLayout.width + margin, 0)
+            return true
+        } else if (x > right) {
+            documentView.scrollPage(frameLayout.width - margin, 0)
+            return true
+        }
+        return false
+    }
+
     override fun tryHyperlink(ev: MotionEvent): Boolean {
         return false
     }
@@ -287,12 +299,22 @@ open class ANormalViewController(
             return false
         }
         val documentView = getDocumentView()
-        val height =
-            if (scrollOrientation == LinearLayoutManager.VERTICAL) documentView.height else documentView.width
-        val top = height / 4
-        val bottom = height * 3 / 4
-        if (scrollPage(ev.y.toInt(), top, bottom, margin)) {
-            return true
+
+        if (scrollOrientation == LinearLayoutManager.VERTICAL) {
+            val height = documentView.height
+            val top = height / 4
+            val bottom = height * 3 / 4
+            if (scrollPage(ev.y.toInt(), top, bottom, margin)) {
+                return true
+            }
+        } else {
+            // Horizontal orientation - use x coordinate and width
+            val width = documentView.width
+            val left = width / 4
+            val right = width * 3 / 4
+            if (scrollPageHorizontal(ev.x.toInt(), left, right, margin)) {
+                return true
+            }
         }
         return false
     }
