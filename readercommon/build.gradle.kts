@@ -53,7 +53,7 @@ dependencies {
 
     api(libs.crashreport)
     api(libs.juniversalchardet)
-    api("com.artifex.mupdf:mupdf-fitz:1.26.0")
+    api(libs.mupdf.fitz)
     api(libs.sardine) {
         exclude("stax")
         exclude("stax-api")

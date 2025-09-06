@@ -28,6 +28,7 @@ ksp = "2.1.20-2.0.0"
 mammoth = "1.5.0" #1.7.0依赖问题导致崩溃,1.8.0不崩溃但无法解析,1.5.0有些docx转换失败
 minSdk = "21"
 mmkv = "1.3.4"
+mupdfFitz = "1.26.3"
 okhttp = "4.12.0"
 crashreport = "4.1.9.3"
 room = "2.7.2"
@@ -99,6 +100,7 @@ kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime",
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 mammoth = { module = "org.zwobble.mammoth:mammoth", version.ref = "mammoth" }
+mupdf-fitz = { module = "com.artifex.mupdf:mupdf-fitz", version.ref = "mupdfFitz" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
