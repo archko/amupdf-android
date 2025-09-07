@@ -8,7 +8,17 @@ import java.util.Arrays;
 import cn.archko.pdf.core.cache.BitmapPool;
 
 public class PageTreeNode {
-    private static int SLICE_SIZE = 256 * 384 * 4;
+    private static int SLICE_SIZE = calculateSliceSize();
+
+    private static int calculateSliceSize() {
+        int slice = dpToPx(128);
+        return slice * slice * 4;
+    }
+
+    private static int dpToPx(int dp) {
+        float density = android.content.res.Resources.getSystem().getDisplayMetrics().density;
+        return Math.round(dp * density);
+    }
     private Bitmap bitmap;
     private SoftReference<Bitmap> bitmapWeakReference;
     private boolean decodingNow;

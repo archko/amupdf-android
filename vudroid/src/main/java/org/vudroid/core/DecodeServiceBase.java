@@ -116,7 +116,7 @@ public class DecodeServiceBase implements DecodeService {
             }
 
             if (selectTask == null) {
-                Log.d(TAG, String.format("no task:%s-%s", pageTasks.size(), nodeTasks.size()));
+                //Log.d(TAG, String.format("no task:%s-%s", pageTasks.size(), nodeTasks.size()));
             } else {
                 decodingTasks.put(selectTask.decodeKey, selectTask);
                 mDecodeHandler.sendEmptyMessage(MSG_DECODE_TASK);
