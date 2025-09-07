@@ -2,6 +2,7 @@ package org.vudroid.core;
 
 import android.content.Context;
 import android.graphics.*;
+import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.GestureDetector;
@@ -34,6 +35,14 @@ public class DocumentView extends View implements ZoomListener {
     DecodeService decodeService;
     private final SparseArray<Page> pages = new SparseArray<>();
     private final List<Page> lastPages = new ArrayList<>();
+    private final Handler updateHandler = new Handler();
+    private final Runnable updateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            updatePageVisibilityImpl();
+        }
+    };
+    private long lastRenderTime = 0L;
     private boolean isInitialized = false;
     private int pageToGoTo = -1;
     private int xToScroll;
@@ -146,7 +155,7 @@ public class DocumentView extends View implements ZoomListener {
             return;
         }
 
-        //因为切边的操作,导致有些页面比较小.所以底部加两个页面,滚动就可以正常了
+        //因为切边的操作,导致有些��面比较小.所以底部加两个页面,滚动就可以正常了
         Page nextPage = null;
         if (pages.size() > toPage + 1) {
             nextPage = pages.get(toPage + 1);
@@ -212,23 +221,54 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void updatePageVisibility() {
-        List<Page> lastVisible = new ArrayList<>(lastPages);
+        final long now = System.currentTimeMillis();
+        final long elapsed = now - lastRenderTime;
+        updateHandler.removeCallbacks(updateRunnable);
+        if (elapsed < 16) {
+            updateHandler.postDelayed(updateRunnable, 16 - elapsed);
+        } else {
+            updatePageVisibilityImpl();
+        }
+    }
+
+    private void updatePageVisibilityImpl() {
+        lastRenderTime = System.currentTimeMillis();
         List<Page> visibleList = new ArrayList<>();
-        Page page;
-        for (int i = 0; i < pages.size(); i++) {
-            page = pages.valueAt(i);
+        
+        int currentPage = binarySearchCurrentPage();
+        if (currentPage == -1) {
+            currentPage = 0;
+        }
+        
+        // 向前遍历直到遇到不可见页
+        for (int i = currentPage; i >= 0; i--) {
+            Page page = pages.valueAt(i);
             if (page.isVisible()) {
-                visibleList.add(page);
+                visibleList.add(0, page);
+                page.updateVisibility();
+            } else {
+                break;
             }
         }
-        for (Page p : visibleList) {
-            p.updateVisibility();
-            //lastVisible.remove(p);
+        
+        // 向后遍历直到遇到不可见页
+        for (int i = currentPage + 1; i < pages.size(); i++) {
+            Page page = pages.valueAt(i);
+            if (page.isVisible()) {
+                visibleList.add(page);
+                page.updateVisibility();
+            } else {
+                break;
+            }
         }
-        for (Page p : lastVisible) {
-            p.updateVisibility();
+        
+        // 处理从可见变为不可见的页面
+        for (Page page : lastPages) {
+            if (!visibleList.contains(page)) {
+                page.updateVisibility();
+            }
         }
-        //Log.d(TAG, String.format("updatePageVisibility:%s-%s-%s", visibleList.size(), lastVisible.size(), lastPages.size()));
+        
         lastPages.clear();
         lastPages.addAll(visibleList);
     }
