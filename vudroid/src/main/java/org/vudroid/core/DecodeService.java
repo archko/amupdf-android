@@ -49,6 +49,8 @@ public interface DecodeService {
 
     Bitmap decodeThumb(int page);
 
+    void resetCrop();
+
     interface DecodeCallback {
         void decodeComplete(Bitmap bitmap, boolean isThumb, Object args);
 

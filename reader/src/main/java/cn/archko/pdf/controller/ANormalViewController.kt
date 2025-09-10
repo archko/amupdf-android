@@ -58,7 +58,7 @@ open class ANormalViewController(
 
     protected lateinit var documentView: DocumentView
     private lateinit var frameLayout: RelativeLayout
-    private var decodeService: DecodeService? = null
+    var decodeService: DecodeService? = null
     private var thumbnailView: ThumbnailView? = null
     private var recyclerView: ARecyclerView? = null
 

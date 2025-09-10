@@ -60,9 +60,11 @@ class APage {
         return height
     }
 
-    fun setCropBounds(cropBounds: Rect) {
+    fun setCropBounds(cropBounds: Rect?) {
         this.cropBounds = cropBounds
-        this.cropScale = cropBounds.width() / width
+        cropBounds?.run {
+            cropScale = cropBounds.width() / width
+        }
     }
 
     fun getCropWidth(): Int {

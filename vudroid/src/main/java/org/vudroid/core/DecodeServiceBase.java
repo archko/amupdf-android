@@ -124,7 +124,7 @@ public class DecodeServiceBase implements DecodeService {
             if (selectTask == null) {
                 if (!cropTasks.isEmpty()) {
                     selectTask = cropTasks.remove(0);
-                    Log.d(TAG, String.format("no node, crop.task:%s-%s", cropTasks.size(), selectTask));
+                    //Log.d(TAG, String.format("no node, crop.task:%s-%s", cropTasks.size(), selectTask));
                     if (selectTask != null) {
                         decodingTasks.put(selectTask.decodeKey, selectTask);
                         mDecodeHandler.sendEmptyMessage(MSG_DECODE_TASK);
@@ -287,6 +287,14 @@ public class DecodeServiceBase implements DecodeService {
 
     public APageSizeLoader.PageSizeBean getPageSizeBean() {
         return pageSizeBean;
+    }
+
+    @Override
+    public void resetCrop() {
+        for (var page:aPageList){
+            page.setCropBounds(null);
+        }
+        APageSizeLoader.INSTANCE.deletePageSizeFromFile(path);
     }
 
     private void cropPage(CodecPage vuPage, APage page) {

@@ -28,7 +28,7 @@ class AEpubViewController(
     scope: CoroutineScope,
     mControllerLayout: RelativeLayout,
     docViewModel: DocViewModel,
-    mPath: String,
+    var mPath: String,
     pageController: IPageController?,
     controllerListener: ControllerListener?,
 ) : ANormalViewController(
@@ -78,6 +78,7 @@ class AEpubViewController(
         val w = Utils.getScreenWidthPixelWithOrientation(instance)
         val h = Utils.getScreenHeightPixelWithOrientation(instance)
         Logcat.d(String.format("applyFontSize:%s, %s, %s", newSize, w, h))
+        decodeService?.resetCrop()
         controllerListener?.reloadDoc()
     }
 
