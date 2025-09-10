@@ -569,7 +569,7 @@ public class DecodeServiceBase implements DecodeService {
                 Log.d(TAG, String.format("don't processCropTask:%s", task.pageNumber));
             }
         }
-        if (task.pageNumber == (aPageList.size() - 1)) {
+        if (cropTasks.isEmpty()) {
             if (cachePage) {
                 Log.d(TAG, String.format("processCropTask.save:%s->%s", task.pageNumber, aPageList.size()));
                 APageSizeLoader.INSTANCE.savePageSizeToFile(true, path, aPageList);
