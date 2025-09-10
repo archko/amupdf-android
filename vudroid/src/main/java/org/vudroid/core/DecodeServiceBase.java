@@ -260,6 +260,9 @@ public class DecodeServiceBase implements DecodeService {
         } else {
             pageSizeBean = new APageSizeLoader.PageSizeBean();
             pageSizeBean.setList(aPageList);
+            if (crop && cachePage) {
+                createCropTasksForAllPages();
+            }
         }
         try {
             for (int i = 0; i < count; i++) {
