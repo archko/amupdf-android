@@ -566,7 +566,7 @@ public class DecodeServiceBase implements DecodeService {
                 aPage.setCropBounds(cropBounds);
                 //Log.d(TAG, String.format("processCropTask:%s, %s", task.pageNumber, cropBounds));
             } else {
-                Log.d(TAG, String.format("don't processCropTask:%s", task.pageNumber));
+                //Log.d(TAG, String.format("don't processCropTask:%s", task.pageNumber));
             }
         }
         if (cropTasks.isEmpty()) {
