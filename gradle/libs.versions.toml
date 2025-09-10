@@ -9,16 +9,11 @@ androidxAppCompat = "1.7.1"
 androidxBrowser = "1.8.0"
 androidxCore = "1.16.0"
 androidxCoreSplashscreen = "1.0.1"
-androidxDataStore = "1.1.5"
 androidxConstraintlayout = "1.0.1"
-androidxNavigation = "2.8.3"
-androidxWindowManager = "1.3.0"
-androidxLifecycle = "2.9.1"
+androidxLifecycle = "2.9.3"
 coil = "3.3.0"
 # @keep
 compileSdk = "36"
-hilt = "2.56.2"
-hiltExt = "1.2.0"
 junit = "4.13.2"
 kotlin = "2.1.20"
 kotlinxCoroutines = "1.10.1"
@@ -28,22 +23,17 @@ ksp = "2.1.20-2.0.0"
 mammoth = "1.5.0" #1.7.0依赖问题导致崩溃,1.8.0不崩溃但无法解析,1.5.0有些docx转换失败
 minSdk = "21"
 mmkv = "1.3.4"
-mupdfFitz = "1.26.3"
+mupdfFitz = "1.26.4"
 okhttp = "4.12.0"
 crashreport = "4.1.9.3"
 room = "2.7.2"
-secrets = "2.0.1"
 
 constraintLayout = "2.2.1"
 umengCommon = "9.6.5"
 umengAsms = "1.8.0"
 colorPickerDialog = "0.2.2"
 flinger = "1.1.1"
-retrofit = "2.9.0"
-retrofitKotlinxSerializationJson = "0.8.0"
 paging = "3.3.2"
-converterGson = "2.9.0"
-gson = "2.13.1"
 tiff-android = "1.1.2"
 penfeizhou = "3.0.5"
 android-gif-drawable = "1.2.29"
@@ -51,7 +41,7 @@ android-gif-drawable = "1.2.29"
 # @keep
 targetSdk = "35"
 version-catalog-update = "0.8.0"
-material = "1.13.0-rc01"
+material = "1.13.0"
 material3 = "1.1.2"
 material3Android = "1.3.1"
 multidex = "2.0.1"
@@ -63,8 +53,8 @@ sardine = "0.9"
 k2pdfopt = "0.1.6"
 juniversalchardet = "2.5.0"
 
-versionCode = "460"
-versionName = "7.6.0"
+versionCode = "470"
+versionName = "7.7.0"
 
 [libraries]
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
@@ -85,14 +75,6 @@ androidx-lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-
 coil-kt = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coil" }
 coil-kt-network-okhttp = { group = "io.coil-kt.coil3-network-okhttp", name = "coil", version.ref = "coil" }
 
-androidx-window = { module = "androidx.window:window", version.ref = "androidxWindowManager" }
-
-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
-hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
-hilt-ext-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hiltExt" }
-hilt-ext-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hiltExt" }
-javax-inject = { module = "javax.inject:javax.inject", version = "1" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlinx-coroutines-guava = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-guava", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
@@ -108,12 +90,6 @@ room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "
 okhttp-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 okhttp3 = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 
-retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
-retrofit-kotlin-serialization = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinxSerializationJson" }
-retrofit-converterGson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
-retrofit-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-
-secrets-gradlePlugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secrets" }
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 android-tools-common = { group = "com.android.tools", name = "common", version.ref = "androidTools" }
@@ -148,7 +124,6 @@ android-application = { id = "com.android.application", version.ref = "androidGr
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

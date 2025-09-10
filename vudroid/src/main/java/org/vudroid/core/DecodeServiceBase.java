@@ -21,7 +21,12 @@ import org.vudroid.pdfdroid.codec.PdfContext;
 
 import java.io.IOException;
 import java.lang.ref.SoftReference;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
 import cn.archko.pdf.core.cache.BitmapCache;
@@ -46,6 +51,7 @@ public class DecodeServiceBase implements DecodeService {
     private final HashMap<String, DecodeTask> nodeTasks = new HashMap<>(64, 0.75f);
     private final HashMap<String, DecodeTask> pageTasks = new HashMap<>(32, 0.75f);
     private final ConcurrentHashMap<String, DecodeTask> decodingTasks = new ConcurrentHashMap<>(2);
+    private final List<DecodeTask> cropTasks = new ArrayList<>();
     private final SparseArray<SoftReference<CodecPage>> pages = new SparseArray<>();
     private final Queue<Integer> pageEvictionQueue = new LinkedList<>();
     private int oriention = DocumentView.VERTICAL;
@@ -116,6 +122,14 @@ public class DecodeServiceBase implements DecodeService {
             }
 
             if (selectTask == null) {
+                if (!cropTasks.isEmpty()) {
+                    selectTask = cropTasks.remove(0);
+                    Log.d(TAG, String.format("no node, crop.task:%s-%s", cropTasks.size(), selectTask));
+                    if (selectTask != null) {
+                        decodingTasks.put(selectTask.decodeKey, selectTask);
+                        mDecodeHandler.sendEmptyMessage(MSG_DECODE_TASK);
+                    }
+                }
                 //Log.d(TAG, String.format("no task:%s-%s", pageTasks.size(), nodeTasks.size()));
             } else {
                 decodingTasks.put(selectTask.decodeKey, selectTask);
@@ -151,8 +165,12 @@ public class DecodeServiceBase implements DecodeService {
                 mHandler.sendEmptyMessage(MSG_DECODE_SELECT);
             } else {
                 try {
-                    Log.d(TAG, String.format("add task:%s-%s, %s-%s", selectTask.pageNumber, selectTask.crop, selectTask.decodeKey, selectTask.pageSliceBounds));
-                    performDecode(selectTask);
+                    if (selectTask.crop && null == selectTask.decodeCallback) {
+                        processCropTask(selectTask);
+                    } else {
+                        Log.d(TAG, String.format("add task:%s-%s, %s-%s", selectTask.pageNumber, selectTask.crop, selectTask.decodeKey, selectTask.pageSliceBounds));
+                        performDecode(selectTask);
+                    }
                 } catch (IOException e) {
                     Log.e(TAG, String.format("decode error:%s-%s", selectTask.pageNumber, selectTask.node));
                 } finally {
@@ -221,7 +239,7 @@ public class DecodeServiceBase implements DecodeService {
         return document;
     }
 
-    public CodecDocument open(String path, boolean cachePage) {
+    public CodecDocument open(String path, boolean cachePage, boolean crop) {
         this.path = path;
         this.cachePage = cachePage;
         aPageList.clear();
@@ -235,6 +253,9 @@ public class DecodeServiceBase implements DecodeService {
         if (null != psb) {
             pageSizeBean = psb;
             aPageList.addAll(psb.getList());
+            if (crop && cachePage) {
+                createCropTasksForAllPages();
+            }
             return document;
         } else {
             pageSizeBean = new APageSizeLoader.PageSizeBean();
@@ -507,6 +528,42 @@ public class DecodeServiceBase implements DecodeService {
 
     public void setOriention(int oriention) {
         this.oriention = oriention;
+    }
+
+    private void createCropTasksForAllPages() {
+        cropTasks.clear();
+        for (int i = 0; i < aPageList.size(); i++) {
+            APage page = aPageList.get(i);
+            if (page.getCropBounds() == null) {
+                String key = "";
+                cropTasks.add(new DecodeTask(null, true, page.index, null, 1f, key, null, 0, 1f));
+            }
+        }
+    }
+
+    private void processCropTask(DecodeTask task) {
+        if (isRecycled) {
+            return;
+        }
+
+        CodecPage vuPage = getPage(task.pageNumber);
+        APage aPage = aPageList.get(task.pageNumber);
+        if (task.crop) {
+            Rect cropBounds = aPage.getCropBounds();
+            if (cropBounds == null) {
+                cropBounds = cropPage(vuPage);
+                aPage.setCropBounds(cropBounds);
+                //Log.d(TAG, String.format("processCropTask:%s, %s", task.pageNumber, cropBounds));
+            } else {
+                Log.d(TAG, String.format("don't processCropTask:%s", task.pageNumber));
+            }
+        }
+        if (task.pageNumber == (aPageList.size() - 1)) {
+            if (cachePage) {
+                Log.d(TAG, String.format("processCropTask.save:%s->%s", task.pageNumber, aPageList.size()));
+                APageSizeLoader.INSTANCE.savePageSizeToFile(true, path, aPageList);
+            }
+        }
     }
 
     private int getTargetWidth() {

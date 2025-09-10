@@ -18,7 +18,7 @@ public interface DecodeService {
 
     void setContainerView(View containerView);
 
-    CodecDocument open(String path, boolean cachePage);
+    CodecDocument open(String path, boolean cachePage, boolean crop);
 
     APageSizeLoader.PageSizeBean getPageSizeBean();
 

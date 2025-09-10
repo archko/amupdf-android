@@ -58,7 +58,7 @@ public class AlbumViewerActivity extends BaseViewerActivity {
         progressDialog.show();
 
         AppExecutors.Companion.getInstance().diskIO().execute(() -> {
-            CodecDocument document = decodeService.open(path, false);
+            CodecDocument document = decodeService.open(path, false, false);
             AppExecutors.Companion.getInstance().mainThread().execute(() -> {
                 progressDialog.dismiss();
                 if (null == document) {

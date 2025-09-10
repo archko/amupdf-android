@@ -156,7 +156,7 @@ open class ANormalViewController(
     fun loadDocument() {
         instance.diskIO().execute {
             try {
-                document = decodeService!!.open(mPath, true)
+                document = decodeService!!.open(mPath, true, crop)
             } catch (_: Exception) {
             }
             instance.mainThread().execute {
