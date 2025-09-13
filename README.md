@@ -24,6 +24,8 @@ https://github.com/archko/amupdf-nativelib
 compile so, then upload it to local maven
 if you don't want to compile so, please use offical aar.
 
+libk2pdfopt, i compile upload it.
+
 ### apk
 https://www.pgyer.com/CoA1zTQ8
 

@@ -2,6 +2,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        mavenLocal()
         maven {
             url = uri("https://maven.aliyun.com/repository/public")
         }
