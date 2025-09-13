@@ -74,12 +74,15 @@ class AEpubViewController(
     }
 
     private fun applyFontSize(newSize: Float) {
-        EpubDocument.setFontSize(newSize)
-        val w = Utils.getScreenWidthPixelWithOrientation(instance)
-        val h = Utils.getScreenHeightPixelWithOrientation(instance)
-        Logcat.d(String.format("applyFontSize:%s, %s, %s", newSize, w, h))
-        decodeService?.resetCrop()
-        controllerListener?.reloadDoc()
+        val def = EpubDocument.getFontSize()
+        if (def != newSize) {
+            EpubDocument.setFontSize(newSize)
+            val w = Utils.getScreenWidthPixelWithOrientation(instance)
+            val h = Utils.getScreenHeightPixelWithOrientation(instance)
+            Logcat.d(String.format("applyFontSize:%s, %s, %s", newSize, w, h))
+            decodeService?.resetCrop()
+            controllerListener?.reloadDoc()
+        }
     }
 
     override fun doLoadDoc(pageSizeBean: APageSizeLoader.PageSizeBean, document: CodecDocument) {
