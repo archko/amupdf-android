@@ -26,7 +26,6 @@ import cn.archko.pdf.common.PDFCreaterHelper
 import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.common.IntentFile
-import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.Utils
@@ -62,7 +61,7 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var themeId = cn.archko.pdf.R.style.AppTheme
-        setStyle(DialogFragment.STYLE_NO_TITLE, themeId)
+        setStyle(STYLE_NO_TITLE, themeId)
 
         progressDialog = ProgressDialog(activity)
         progressDialog.setMessage("Waiting...")
@@ -99,12 +98,14 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
     private fun createPdfFromImage() {
         val arr = arrayListOf<String>()
         arr.addAll(adapter.data)
-        var path: String? = null
         var name = binding.pdfPath.editableText.toString()
         if (TextUtils.isEmpty(name)) {
             name = "new.pdf"
         }
-        path = FileUtils.getStorageDir("book").absolutePath + File.separator + name
+        if (!name.endsWith(".pdf")) {
+            name = "$name.pdf"
+        }
+        val path = FileUtils.getStorageDir("book").absolutePath + File.separator + name
 
         progressDialog.show()
         lifecycleScope.launch {

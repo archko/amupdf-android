@@ -173,7 +173,7 @@ object PDFCreaterHelper {
         val mediabox = Rect(0f, 0f, w.toFloat(), h.toFloat())
         val contents = "q $w 0 0 $h 0 0 cm /I Do Q\n"
         val page = mDocument.addPage(mediabox, 0, resources, contents)
-        Log.d("TAG", String.format("index:%s,page,%s", index, contents))
+        Log.d("TAG", String.format("index:%s,page,%s,w:%s,h:%s", index, contents, w, h))
         return page
     }
 
@@ -565,9 +565,8 @@ object PDFCreaterHelper {
         pageNo: Int,
         path: String
     ) {
-        val contentView =
-            LayoutInflater.from(context)
-                .inflate(R.layout.pdf_image_content, parent, false) as ImageView
+        val contentView = LayoutInflater.from(context)
+            .inflate(R.layout.pdf_image_content, parent, false) as ImageView
         val bitmap = BitmapFactory.decodeFile(path)
         contentView.setImageBitmap(bitmap)
         val pageHeight = bitmap.height * pageWidth / bitmap.width
@@ -578,7 +577,7 @@ object PDFCreaterHelper {
         )
             .create()
         val page: PdfDocument.Page = pdfDocument.startPage(pageInfo)
-        val canvas: Canvas = page.getCanvas()
+        val canvas: Canvas = page.canvas
         val measureWidth = View.MeasureSpec.makeMeasureSpec(pageWidth, View.MeasureSpec.EXACTLY)
         val measuredHeight = View.MeasureSpec.makeMeasureSpec(pageHeight, View.MeasureSpec.EXACTLY)
         contentView.measure(measureWidth, measuredHeight)
@@ -627,7 +626,7 @@ object PDFCreaterHelper {
 
         var index = 0
         for (path in resultPaths) {
-            createImagePage(context, parent, pdfDocument, PDF_PAGE_WIDTH.toInt(), index, path)
+            createImagePage(context, parent, pdfDocument, PDF_PAGE_WIDTH, index, path)
             index++
         }
         return savePdf(pdfPath, pdfDocument)
