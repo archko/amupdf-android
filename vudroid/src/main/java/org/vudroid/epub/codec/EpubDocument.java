@@ -16,19 +16,19 @@ public class EpubDocument extends PdfDocument {
         return fontSize;
     }
 
-    public static float getFontSize() {
+    public static float getFontSize(String name) {
         MMKV mmkv = MMKV.mmkvWithID("epub");
-        var fs = mmkv.decodeFloat("font", getDefFontSize());
+        var fs = mmkv.decodeFloat("font_" + name.hashCode(), getDefFontSize());
         if (fs > 80) {
             fs = 80f;
         }
         return fs;
     }
 
-    public static void setFontSize(float size) {
+    public static void setFontSize(String name, float size) {
         MMKV mmkv = MMKV.mmkvWithID("epub");
-        Logcat.d("setFontSize:$size");
-        mmkv.encode("font", size);
+        Logcat.d("setFontSize:" + size);
+        mmkv.encode("font_" + name.hashCode(), size);
     }
 
     public static EpubDocument openDocument(String fname, String pwd) {
@@ -38,7 +38,7 @@ public class EpubDocument extends PdfDocument {
             document = Document.openDocument(fname);
             int w = Utils.getScreenWidthPixelWithOrientation(App.Companion.getInstance());
             int h = Utils.getScreenHeightPixelWithOrientation(App.Companion.getInstance());
-            float fontSize = getFontSize();
+            float fontSize = getFontSize(fname);
             System.out.printf("font:%s, open:%s%n", fontSize, fname);
             document.layout(w, h, fontSize);
             epubDocument.setDocument(document);

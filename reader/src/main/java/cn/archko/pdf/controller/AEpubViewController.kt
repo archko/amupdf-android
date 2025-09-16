@@ -53,7 +53,7 @@ class AEpubViewController(
             fontSlider?.apply {
                 valueFrom = 20f
                 valueTo = 80f
-                value = EpubDocument.getFontSize()
+                value = EpubDocument.getFontSize(mPath)
             }
 
             val lp = RelativeLayout.LayoutParams(
@@ -74,9 +74,9 @@ class AEpubViewController(
     }
 
     private fun applyFontSize(newSize: Float) {
-        val def = EpubDocument.getFontSize()
+        val def = EpubDocument.getFontSize(mPath)
         if (def != newSize) {
-            EpubDocument.setFontSize(newSize)
+            EpubDocument.setFontSize(mPath, newSize)
             val w = Utils.getScreenWidthPixelWithOrientation(instance)
             val h = Utils.getScreenHeightPixelWithOrientation(instance)
             Logcat.d(String.format("applyFontSize:%s, %s, %s", newSize, w, h))
