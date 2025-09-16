@@ -78,6 +78,7 @@
             android:label="@string/app_name"
             android:screenOrientation="sensor"
             android:theme="@style/AppFullscreen"
+            android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <data android:scheme="file" />
@@ -157,9 +158,11 @@
             android:name="cn.archko.pdf.imagedroid.AlbumViewerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="fullSensor"
+            android:hardwareAccelerated="true"
             tools:ignore="DiscouragedApi" />
         <activity
             android:name="cn.archko.pdf.core.imagedroid.ImageViewerActivity"
+            android:hardwareAccelerated="true"
             android:configChanges="orientation|keyboardHidden|screenSize|uiMode|fontScale"
             android:screenOrientation="fullSensor"
             tools:ignore="DiscouragedApi" />

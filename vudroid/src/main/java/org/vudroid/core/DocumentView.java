@@ -114,6 +114,8 @@ public class DocumentView extends View implements ZoomListener {
         initMultiTouchZoomIfAvailable(zoomModel);
         mGestureDetector = new GestureDetector(context, new MySimpleOnGestureListener());
         this.docViewListener = docViewListener;
+
+        setLayerType(View.LAYER_TYPE_HARDWARE, null);
     }
 
     private void initMultiTouchZoomIfAvailable(ZoomModel zoomModel) {
