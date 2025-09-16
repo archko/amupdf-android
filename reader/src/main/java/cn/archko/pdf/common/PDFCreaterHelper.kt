@@ -129,6 +129,9 @@ object PDFCreaterHelper {
         return mDocument.countPages() > 0
     }
 
+    /**
+     * used for k2pdf
+     */
     fun createPdfFromFormatedImages(
         context: Context,
         parent: ViewGroup,
@@ -182,7 +185,6 @@ object PDFCreaterHelper {
      */
     private fun processLargeImage(imagePaths: List<String>): List<String> {
         val options = BitmapFactory.Options()
-        //默认值为false，如果设置成true，那么在解码的时候就不会返回bitmap，即bitmap = null。
         options.inJustDecodeBounds = true
         val maxHeight = 6000
 
@@ -211,14 +213,14 @@ object PDFCreaterHelper {
      * 默认不支持bmp,svg,heic,webp这些直接转换,所以先解析为jpg
      */
     private fun convertImageToJpeg(result: java.util.ArrayList<String>, path: String) {
-        val bm: Bitmap = BitmapFactory.decodeFile(path)
-        val file =
-            File(
-                FileUtils.getExternalCacheDir(App.instance).path
-                        //FileUtils.getStorageDirPath() + "/amupdf"
-                        + File.separator + "create" + File.separator + System.currentTimeMillis() + ".jpg"
-            )
-        BitmapUtils.saveBitmapToFile(bm, file, Bitmap.CompressFormat.JPEG, 100)
+        val bitmap: Bitmap = BitmapFactory.decodeFile(path)
+        val file = File(
+            FileUtils.getExternalCacheDir(App.instance).path
+                    //FileUtils.getStorageDirPath() + "/amupdf"
+                    + File.separator + "create" + File.separator + System.currentTimeMillis() + ".jpg"
+        )
+        BitmapUtils.saveBitmapToFile(bitmap, file, Bitmap.CompressFormat.JPEG, 100)
+        BitmapPool.getInstance().release(bitmap)
         Log.d("TAG", "convertImageToJpeg path:${file.absolutePath}")
 
         result.add(file.absolutePath)
@@ -258,19 +260,17 @@ object PDFCreaterHelper {
         result: ArrayList<String>,
         decoder: BitmapRegionDecoder
     ) {
-        val bm: Bitmap = decoder.decodeRegion(rect, null)
-        val file =
-            File(
-                FileUtils.getExternalCacheDir(App.instance).path
-                        //FileUtils.getStorageDirPath() + "/amupdf"
-                        + File.separator + "create" + File.separator + System.currentTimeMillis() + ".jpg"
-            )
-        BitmapUtils.saveBitmapToFile(bm, file, Bitmap.CompressFormat.JPEG, 100)
+        val bitmap: Bitmap = decoder.decodeRegion(rect, null)
+        val file = File(
+            FileUtils.getExternalCacheDir(App.instance).path
+                    //FileUtils.getStorageDirPath() + "/amupdf"
+                    + File.separator + "create" + File.separator + System.currentTimeMillis() + ".jpg"
+        )
+        BitmapUtils.saveBitmapToFile(bitmap, file, Bitmap.CompressFormat.JPEG, 100)
+        BitmapPool.getInstance().release(bitmap)
         Log.d("TAG", "new file:height:${rect.bottom - rect.top}, path:${file.absolutePath}")
 
         result.add(file.absolutePath)
-        //val bitmapPath = compressImageFitPage(file.absolutePath, bm.width, bm.height)
-        //result.add(bitmapPath)
     }
 
     var canExtract: Boolean = true
