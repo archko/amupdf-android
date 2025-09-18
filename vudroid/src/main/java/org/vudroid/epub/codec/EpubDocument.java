@@ -1,5 +1,8 @@
 package org.vudroid.epub.codec;
 
+import android.text.TextUtils;
+
+import com.artifex.mupdf.fitz.Context;
 import com.artifex.mupdf.fitz.Document;
 import com.tencent.mmkv.MMKV;
 
@@ -32,6 +35,14 @@ public class EpubDocument extends PdfDocument {
     }
 
     public static EpubDocument openDocument(String fname, String pwd) {
+        // 生成并应用自定义字体CSS
+        String css = FontCSSGenerator.INSTANCE.generateFontCSS("/sdcard/fonts/simsun.ttf");
+        if (!TextUtils.isEmpty(css)) {
+            System.out.println("应用自定义字体CSS: " + css);
+        } else {
+            System.out.println("自定义字体不可用，使用默认字体");
+        }
+        Context.setUserCSS(css);
         EpubDocument epubDocument = new EpubDocument();
         Document document = null;
         try {
