@@ -15,20 +15,20 @@ object FontCSSGenerator {
         if (!fontFile.exists()) return ""
 
         val fontName = getFontNameFromPath(fontPath)
-        val fontFamily = fontName//getFontFamily(fontName)
+        val fontFamily = fontName
 
         return buildString {
             appendLine("@font-face {")
-            appendLine("    font-family: '$fontFamily';")
+            appendLine("    font-family: '$fontFamily' !important;")
             appendLine("    src: url('file://$fontPath');")
             appendLine("}")
             appendLine()
             appendLine("body {")
-            appendLine("    font-family: '$fontFamily', serif;")
+            appendLine("    font-family: '$fontFamily', serif !important;")
             appendLine("}")
             appendLine()
-            appendLine("p, div, span {")
-            appendLine("    font-family: '$fontFamily', serif;")
+            appendLine("p, div, span, h1, h2, h3, h4, h5, h6, calibre, calibre1, calibre2, calibre3, calibre4, calibre5, calibre6, contents, contents1 {")
+            appendLine("    font-family: '$fontFamily', serif !important;")
             appendLine("}")
         }
     }
