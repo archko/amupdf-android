@@ -48,6 +48,25 @@ object ParseTextMain {
         return list
     }
 
+    /**
+     * 把 MuPdfHtmlMerger 合并后的 HTML 拆成 ReflowBean 列表
+     * 按 <p><img...></p> 识别图片，其余按文本段落
+     */
+    fun parseMergedHtmlAsReflowList(html: String, pageIndex: Int): List<ReflowBean> {
+        val doc = org.jsoup.Jsoup.parse(html)
+        val list = ArrayList<ReflowBean>()
+        for (el in doc.select("p")) {
+            if (el.children().size == 1 && el.child(0).tagName() == "img") {
+                // 图片段落
+                list.add(ReflowBean(el.outerHtml(), ReflowBean.TYPE_IMAGE, pageIndex.toString()))
+            } else {
+                // 文本段落
+                list.add(ReflowBean(el.outerHtml(), ReflowBean.TYPE_STRING, pageIndex.toString()))
+            }
+        }
+        return list
+    }
+
     class TxtParser {
         lateinit var path: String
         internal var joinLine = true

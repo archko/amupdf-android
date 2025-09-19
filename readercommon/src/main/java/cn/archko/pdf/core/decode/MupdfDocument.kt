@@ -254,6 +254,12 @@ class MupdfDocument(private val context: Context) {
         } else null
     }
 
+    fun decodeReflowHtml(index: Int): String? {
+        val p = loadPage(index) ?: return null
+        val result = p.textAsHtml2("preserve-whitespace,inhibit-spaces,preserve-images")
+        return result?.let { String(it) }
+    }
+
     companion object {
         private const val TAG = "Mupdf"
         const val ZOOM = 160f / 72

@@ -10,6 +10,8 @@ import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.core.common.MuPdfHtmlMerger
+import cn.archko.pdf.core.common.ParseTextMain
 
 /**
  * @author: archko 2016/5/13 :11:03
@@ -54,24 +56,24 @@ class MuPDFReflowAdapter(
     override fun onBindViewHolder(holder: ReflowTextViewHolder, position: Int) {
         //mupdf only single thread
         AppExecutors.instance.diskIO().execute {
-            val result = decode(position)
-            result?.run {
-                AppExecutors.instance.mainThread().execute {
-                    holder.bindAsList(
-                        result,
-                        screenHeight,
-                        screenWidth,
-                        systemScale,
-                        reflowCache,
-                        showBookmark(position)
-                    )
-                }
+            val html = mupdfDocument?.decodeReflowHtml(position) ?: return@execute
+            AppExecutors.instance.mainThread().execute {
+                holder.bindHtml(
+                    html,
+                    screenHeight,
+                    screenWidth,
+                    systemScale,
+                    reflowCache,
+                    showBookmark(position)
+                )
             }
         }
     }
 
     fun decode(pos: Int): List<ReflowBean>? {
-        return mupdfDocument?.decodeReflow(pos)
+        val html = mupdfDocument?.decodeReflowHtml(pos) ?: return null
+        val mergedHtml = MuPdfHtmlMerger().mergeParagraphs(html)
+        return ParseTextMain.parseMergedHtmlAsReflowList(mergedHtml, pos)
     }
 
     private fun showBookmark(position: Int): Boolean {

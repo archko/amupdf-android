@@ -3,6 +3,10 @@ package cn.archko.pdf.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -55,6 +59,15 @@ public class ReflowTextViewHolder extends ARecyclerView.ViewHolder {
         } else {
             pageView.addImageView(reflowBean.getData(), systemScale, screenHeight, screenWidth, reflowViewCache, showBookmark);
         }
+    }
+
+    /**
+     * 直接加载整页 HTML（图文混排）
+     */
+    public void bindHtml(String html, int screenHeight, int screenWidth,
+                         float systemScale, ReflowViewCache reflowViewCache, boolean showBookmark) {
+        recycleViews(reflowViewCache);
+        pageView.bindHtml(html, systemScale, screenHeight, screenWidth, reflowViewCache, showBookmark);
     }
 
     public void recycleViews(ReflowViewCache reflowViewCache) {
@@ -183,6 +196,43 @@ public class ReflowTextViewHolder extends ARecyclerView.ViewHolder {
                 addView(imageView, lp);
                 imageView.setImageBitmap(bean.getBitmap());
             }
+            addBookmark(showBookmark);
+        }
+
+        /**
+         * 直接加载整页 HTML（图文混排）
+         */
+        void bindHtml(String html, float systemScale, int screenHeight, int screenWidth,
+                      ReflowViewCache reflowViewCache, boolean showBookmark) {
+            // PDFTextView类中没有recycleViews方法，直接清空视图
+            removeAllViews();
+            applyStyle();
+            TextView tv = null;
+            if (null != reflowViewCache && reflowViewCache.textViewCount() > 0) {
+                tv = reflowViewCache.getAndRemoveTextView(0);
+            } else {
+                tv = new TextView(getContext());
+                tv.setTextIsSelectable(false);
+            }
+            LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+            lp.gravity = Gravity.CENTER_HORIZONTAL;
+            addView(tv, lp);
+            applyStyleForText(getContext(), tv);
+
+            // Html.fromHtml 加载图文，imageGetter 负责把 base64 <img> 解码成 Drawable
+            tv.setText(android.text.Html.fromHtml(html, new Html.ImageGetter() {
+                @Override
+                public Drawable getDrawable(String source) {
+                    BitmapBean bean = ParseTextMain.INSTANCE.decodeBitmap(source, systemScale, screenHeight, screenWidth, getContext());
+                    if (bean == null || bean.getBitmap() == null) {
+                        return new ColorDrawable(0x00000000);
+                    }
+                    BitmapDrawable drawable = new BitmapDrawable(getResources(), bean.getBitmap());
+                    drawable.setBounds(0, 0, (int) bean.getWidth(), (int) bean.getHeight());
+                    return drawable;
+                }
+            }, null));
+
             addBookmark(showBookmark);
         }
     }

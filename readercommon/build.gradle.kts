@@ -59,6 +59,7 @@ dependencies {
         exclude("stax-api")
         exclude("xpp3")
     }
+    api("org.jsoup:jsoup:1.21.2")
 
     api(project(":pdf-recyclerview"))
 }

@@ -246,10 +246,10 @@ data class PdfOption(
     var bgColor: Int = Color.WHITE,
     var fgColor: Int = Color.BLACK,
     var lineSpacingMult: Float = 1.48f,
-    var leftPadding: Int = Utils.dipToPixel(12f),
-    var topPadding: Int = Utils.dipToPixel(16f),
-    var rightPadding: Int = Utils.dipToPixel(12f),
-    var bottomPadding: Int = Utils.dipToPixel(20f),
+    var leftPadding: Int = Utils.dipToPixel(2f),
+    var topPadding: Int = Utils.dipToPixel(2f),
+    var rightPadding: Int = Utils.dipToPixel(2f),
+    var bottomPadding: Int = Utils.dipToPixel(2f),
 )
 
 object PdfOptionKeys {
