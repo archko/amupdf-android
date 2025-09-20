@@ -81,7 +81,7 @@ abstract class ATextBaseViewController(
             val progress = (styleBean?.textSize!! - START_PROGRESS).toInt()
             fontSeekBar?.progress = progress
             fontSizeLabel?.text = String.format("%s", progress + START_PROGRESS)
-            fontSeekBar?.max = 10
+            fontSeekBar?.max = 30
             fontSeekBar?.setOnSeekBarChangeListener(object :
                 SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(
@@ -137,7 +137,7 @@ abstract class ATextBaseViewController(
             if (old!! > 2.2f) {
                 return@setOnClickListener
             }
-            old = old?.plus(0.1f)
+            old = old.plus(0.1f)
             applyLineSpace(old)
         }
         bgSetting?.setOnClickListener {
