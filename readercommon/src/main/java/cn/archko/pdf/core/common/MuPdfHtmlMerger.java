@@ -146,6 +146,13 @@ public class MuPdfHtmlMerger {
         List<Node> toRemove = new ArrayList<>();
         List<Node> keepNodes = new ArrayList<>();
         for (Element p : page.select("p")) {
+            // 图片段落直接保留，跳过后续处理
+            if (p.children().size() == 1 && "img".equals(p.child(0).tagName())) {
+                keepNodes.add(p.clone());
+                toRemove.add(p);
+                continue;
+            }
+
             // 额外检测空行并标记移除
             String text = p.text().trim();
             if (text.isEmpty() || text.length() <= EMPTY_LINE_THRESHOLD) {
