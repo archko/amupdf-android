@@ -8,16 +8,29 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 public class MuPdfHtmlMerger {
     // 根据文档特征确定的典型行间距
-    private static final float TYPICAL_LINE_SPACING = 14.0f;
-    // 段落间距阈值（行间距的倍数）
-    private static final float PARAGRAPH_SPACING_RATIO = 1.0f;
-    // 缩进差异阈值（超过此值视为不同段落）
-    private static final float INDENT_THRESHOLD = 2.0f;
+    private static final float TYPICAL_LINE_SPACING = 18.0f;
+    // 段落间距阈值（行间距的倍数）- 降低阈值以合并更多行
+    private static final float PARAGRAPH_SPACING_RATIO = 1.1f;
+    // 缩进差异阈值（超过此值视为不同段落）- 增加阈值以允许更多缩进变化
+    private static final float INDENT_THRESHOLD = 3.0f;
     // 字号差异阈值
-    private static final float FONT_SIZE_THRESHOLD = 0.5f;
+    private static final float FONT_SIZE_THRESHOLD = 0.8f;
+
+    // 空行检测阈值 - 内容过少的段落视为空行
+    private static final int EMPTY_LINE_THRESHOLD = 2;
+
+    // 用于检测列表项的模式
+    private static final Pattern LIST_ITEM_PATTERN = Pattern.compile(
+            "^(\\d+\\.|\\*|\\-|•|·)\\s+.*");
+
+    // 用于检测标题的模式
+    private static final Pattern HEADING_PATTERN = Pattern.compile(
+            "^#{1,6}\\s+.*");
 
     public String mergeParagraphs(String html) {
         Document doc = Jsoup.parse(html);
@@ -64,7 +77,6 @@ public class MuPdfHtmlMerger {
         }
     }
 
-    /* 扩展：统一判断“整段保留”规则，拆成两步检测 ---------- */
     private boolean shouldKeepIntact(Element p) {
         /* 规则1：图片段落 */
         if (p.children().size() == 1 && "img".equals(p.child(0).tagName()))
@@ -86,8 +98,6 @@ public class MuPdfHtmlMerger {
             }
         }
 
-        /* 规则3：字体为 Monaco/monospace 仅作为辅助条件，不再单独判定为代码 */
-
         /* 规则4：文本以 >>> 或 > 开头（HTML 转义后）视为终端输入代码 */
         for (Element span : p.select("span")) {
             String txt = span.text().trim();
@@ -100,58 +110,56 @@ public class MuPdfHtmlMerger {
             }
         }
 
-        /* 规则5：已移除——仅保留更精确的代码特征判断 */
+        /* 规则5：检测列表项 */
+        String text = p.text().trim();
+        if (LIST_ITEM_PATTERN.matcher(text).matches()) {
+            return true;
+        }
 
-        /* 规则6：以后想加任何规则，直接在这里写 if (...) return true; */
+        /* 规则6：检测标题 */
+        if (HEADING_PATTERN.matcher(text).matches()) {
+            return true;
+        }
 
         return false;   // 默认参与合并
     }
 
-    /* 新增：代码关键字白名单（涵盖 Python/Kotlin/C/Dart/Java/Swift/Objective-C 等常用保留字与类型） */
-    private static final java.util.Set<String> CODE_KEYWORDS = java.util.Set.of(
-            // ===== Java / Kotlin / C / Objective-C 共用核心关键字 =====
+    private static final Set<String> CODE_KEYWORDS = Set.of(
+            // Java / Kotlin / C / Objective-C 共用核心关键字
             "public", "private", "protected", "class", "interface", "void",
             "if", "for", "while", "switch", "case", "default", "try", "catch",
             "return", "import", "package", "static", "final", "this",
             "extends", "implements", "throws", "new", "throw", "enum", "@Override",
-            "const", "struct", "typedef", "union", "sizeof", "extern", "register",
-            "volatile", "goto", "inline", "#include", "#define", "#ifdef", "#ifndef", "#endif",
-            "@interface", "@implementation", "@end", "@property", "@synthesize", "@protocol", "@selector",
-            // ===== Kotlin 独有 =====
-            "fun", "val", "var", "when", "object", "companion", "data", "sealed", "suspend", "reified", "crossinline", "noinline",
-            // ===== Python 独有 =====
-            "def", "elif", "else", "except", "with", "as", "lambda", "yield", "from", "global", "nonlocal", "pass",  "del", "raise", "is", "in", "not", "and", "or", "True", "False", "None",
-            // ===== Dart 独有 =====
-            "Future", "async", "await", "mixin", "extension", "late", "required", "factory", "external", "operator", "covariant", "part", "show", "hide", "deferred", "assert", "library", "export",
-            // ===== Swift 独有 =====
-            "let", "guard", "defer", "fallthrough", "associatedtype", "typealias", "where", "some", "any", "actor", "nonisolated", "convenience", "lazy", "weak", "unowned", "optional", "willSet", "didSet", "get", "set", "inout", "escaping", "autoclosure",
-            // ===== 常见基础类型 =====
-            "String", "int", "long", "double", "float", "boolean", "bool", "char", "byte", "short", "Integer", "Long", "Double", "Float", "Boolean", "Character", "Byte", "Short", "StringBuilder", "StringBuffer", "List", "Map", "Set", "Array", "Dict", "Optional", "Any", "Void", "Self", "self", "super", "id", "instancetype", "NSObject", "NSString", "NSNumber", "NSArray", "NSDictionary", "NSMutableArray", "NSMutableDictionary",
-            // ===== 常见修饰符 / 注解 =====
-            "@FunctionalInterface", "@Deprecated", "@SafeVarargs", "@SuppressWarnings", "@Nullable", "@NonNull", "@JvmStatic", "@JvmField", "@JvmOverloads", "@Composable", "@Preview"
+            "const", "struct", "typedef", "union", "sizeof", "extern",
+            "#include", "#define", "#ifdef", "#ifndef", "#endif",
+            // Kotlin 独有
+            "fun", "val", "var", "when", "object", "companion", "data",
+            // Python 独有
+            "def", "elif", "else", "except", "with", "as", "lambda", "yield",
+            // 常见基础类型
+            "String", "int", "long", "double", "float", "boolean", "bool",
+            "List", "Map", "Set", "Array", "Dict"
     );
 
     private void mergePage(Element page) {
-        /* 0. 先移除空行：仅含空白或高度≤单行高的<p> ---------------- */
-        for (Element p : page.select("p")) {
-            String txt = p.text().trim();
-            float h = new MuPdfParagraph(p).lineHeight;
-            if (txt.isEmpty() || h <= TYPICAL_LINE_SPACING) {
-                p.remove();
-            }
-        }
-
-        /* 1. 再把所有“整段保留”的段落克隆+标记 -------------------- */
+        /* 0. 先把所有“整段保留”的段落克隆+标记 */
         List<Node> toRemove = new ArrayList<>();
         List<Node> keepNodes = new ArrayList<>();
         for (Element p : page.select("p")) {
+            // 额外检测空行并标记移除
+            String text = p.text().trim();
+            if (text.isEmpty() || text.length() <= EMPTY_LINE_THRESHOLD) {
+                toRemove.add(p);
+                continue;
+            }
+
             if (shouldKeepIntact(p)) {
                 toRemove.add(p);
                 keepNodes.add(p.clone());
             }
         }
 
-        /* 1. 对剩余段落做原来的合并逻辑 ---------------------------- */
+        /* 1. 对剩余段落做合并逻辑 */
         Elements paragraphs = page.select("p");
         if (paragraphs.size() <= 1) return;
 
@@ -172,9 +180,7 @@ public class MuPdfHtmlMerger {
             } else {
                 Element mergedP = mergeGroup(currentGroup);
                 currentGroup.get(0).element.replaceWith(mergedP);
-                for (int j = 1; j < currentGroup.size(); j++) {
-                    currentGroup.get(j).element.remove();
-                }
+                removeElements(currentGroup, 1);
                 currentGroup.clear();
                 currentGroup.add(curr);
             }
@@ -182,18 +188,49 @@ public class MuPdfHtmlMerger {
         if (!currentGroup.isEmpty()) {
             Element mergedP = mergeGroup(currentGroup);
             currentGroup.get(0).element.replaceWith(mergedP);
-            for (int j = 1; j < currentGroup.size(); j++) {
-                currentGroup.get(j).element.remove();
-            }
+            removeElements(currentGroup, 1);
         }
 
-        /* 2. 把保留段插回（顺序不变） ------------------------------ */
+        /* 2. 把保留段插回（顺序不变） */
         for (Node old : toRemove) old.remove();
         for (Node keep : keepNodes) page.appendChild(keep);
+
+        // 最后清理可能的连续空段落
+        cleanEmptyParagraphs(page);
     }
 
     /**
-     * 判断两个相邻段落是否应该合并
+     * 批量移除元素
+     */
+    private void removeElements(List<MuPdfParagraph> group, int startIndex) {
+        for (int j = startIndex; j < group.size(); j++) {
+            group.get(j).element.remove();
+        }
+    }
+
+    /**
+     * 清理连续的空段落
+     */
+    private void cleanEmptyParagraphs(Element page) {
+        Elements paragraphs = page.select("p");
+        Element prev = null;
+
+        for (Element p : paragraphs) {
+            String text = p.text().trim();
+            if (text.isEmpty() || text.length() <= EMPTY_LINE_THRESHOLD) {
+                if (prev != null &&
+                        (prev.text().trim().isEmpty() ||
+                                prev.text().trim().length() <= EMPTY_LINE_THRESHOLD)) {
+                    p.remove(); // 移除连续空段落
+                    continue;
+                }
+            }
+            prev = p;
+        }
+    }
+
+    /**
+     * 判断两个相邻段落是否应该合并 - 优化版本
      */
     private boolean shouldMerge(MuPdfParagraph prev, MuPdfParagraph curr) {
         // 1. 缩进差异判断：缩进不同视为不同段落
@@ -201,65 +238,116 @@ public class MuPdfHtmlMerger {
             return false;
         }
 
-        // 2. 间距判断：超过行间距的1.2倍视为新段落
+        // 2. 间距判断：超过行间距的1.1倍视为新段落（降低了阈值）
         float spacing = curr.top - prev.bottom;
-        if (spacing > TYPICAL_LINE_SPACING * PARAGRAPH_SPACING_RATIO) {
+        // 对于非常接近的行，即使间距略大也尝试合并
+        if (spacing > TYPICAL_LINE_SPACING * PARAGRAPH_SPACING_RATIO &&
+                spacing > TYPICAL_LINE_SPACING + 2) {
             return false;
         }
 
-        // 3. 样式判断：字体或字号不同则不合并
-        if (!prev.fontFamily.equals(curr.fontFamily) ||
+        // 3. 样式判断：字体或字号不同则不合并，但增加了一定容错
+        if (!isFontFamilySimilar(prev.fontFamily, curr.fontFamily) ||
                 Math.abs(prev.fontSize - curr.fontSize) > FONT_SIZE_THRESHOLD) {
             return false;
         }
 
-        // 4. 特殊规则：以标点符号结尾的段落不与后续段落合并
+        // 4. 特殊规则：以标点符号结尾的段落处理优化
         String prevText = prev.element.text().trim();
         if (!prevText.isEmpty()) {
             char lastChar = prevText.charAt(prevText.length() - 1);
-            if (lastChar == '。' || lastChar == '：' || lastChar == '；' ||
-                    lastChar == '！' || lastChar == '？' || lastChar == '、') {
+            // 对于引号内的标点，允许合并
+            boolean inQuotes = prevText.contains("\"") || prevText.contains("'") ||
+                    prevText.contains("“") || prevText.contains("”");
+
+            if (!inQuotes && (lastChar == '。' || lastChar == '！' || lastChar == '？')) {
                 return false;
             }
         }
 
-        // 5. 特殊规则：以序号开头的段落（如"一、"）作为新段落
+        // 5. 特殊规则：以序号开头的段落处理优化
         String currText = curr.element.text().trim();
         if (currText.matches("^[一二三四五六七八九十]+、.*") ||
                 currText.matches("^[ABCDE]+、.*") ||
                 currText.matches("^［.*］.*")) {
-            return false;
+            // 如果前一段落很短，可能是标题，不合并
+            if (prev.element.text().trim().length() < 10) {
+                return false;
+            }
+        }
+
+        // 6. 特殊规则：如果当前段落以小写字母开头，很可能是前一段的继续
+        if (!currText.isEmpty() && Character.isLowerCase(currText.charAt(0))) {
+            return true;
         }
 
         return true;
     }
 
     /**
-     * 合并一组段落为一个段落
+     * 判断字体家族是否相似（中文字体或英文字体）
+     */
+    private boolean isFontFamilySimilar(String fontFamily1, String fontFamily2) {
+        // 如果字体家族完全相同，直接返回true
+        if (fontFamily1.equalsIgnoreCase(fontFamily2)) {
+            return true;
+        }
+
+        // 判断是否都是中文字体
+        boolean isChinese1 = fontFamily1.contains("宋体") || fontFamily1.contains("微软雅黑") ||
+                fontFamily1.contains("黑体") || fontFamily1.contains("楷体");
+        boolean isChinese2 = fontFamily2.contains("宋体") || fontFamily2.contains("微软雅黑") ||
+                fontFamily2.contains("黑体") || fontFamily2.contains("楷体");
+
+        if (isChinese1 && isChinese2) {
+            return true;
+        }
+
+        // 判断是否都是英文字体
+        boolean isEnglish1 = fontFamily1.contains("Arial") || fontFamily1.contains("Times") ||
+                fontFamily1.contains("Helvetica") || fontFamily1.contains("sans-serif");
+        boolean isEnglish2 = fontFamily2.contains("Arial") || fontFamily2.contains("Times") ||
+                fontFamily2.contains("Helvetica") || fontFamily2.contains("sans-serif");
+
+        return isEnglish1 && isEnglish2;
+    }
+
+    /**
+     * 合并一组段落为一个段落 - 优化版本
      */
     private Element mergeGroup(List<MuPdfParagraph> group) {
         // 使用第一个段落的样式作为基础
         MuPdfParagraph first = group.get(0);
         Element mergedPara = new Element("p");
 
-        // 仅保留左侧缩进，移除顶部和底部边距
+        // 保留左侧缩进和行高，移除顶部位置限制以增强自适应
         mergedPara.attr("style", String.format(
-                "margin-left:%.1fpt;",
+                "margin-left:%.1fpt; margin-top:0.5em; margin-bottom:0.5em;",
                 first.left));
 
-        // 合并所有span内容，并强制行高倍率为1
-        Element mergedSpan = new Element("span");
-        mergedSpan.attr("style", String.format(
-                "font-family:%s;font-size:%.1fpt;line-height:1.0;",
-                first.fontFamily, first.fontSize));
-
-        StringBuilder textBuilder = new StringBuilder();
+        // 合并所有span内容，保留各自的样式
         for (MuPdfParagraph para : group) {
-            textBuilder.append(para.element.text());
+            Elements spans = para.element.select("span");
+            if (spans.isEmpty()) {
+                // 如果没有span，直接添加文本
+                String text = para.element.text();
+                if (!text.isEmpty()) {
+                    mergedPara.append(text);
+                }
+            } else {
+                // 保留每个span的样式
+                for (Element span : spans) {
+                    Element newSpan = new Element("span");
+                    newSpan.attr("style", span.attr("style"));
+                    newSpan.text(span.text());
+                    mergedPara.appendChild(newSpan);
+                }
+            }
+            // 添加适当的空格分隔不同段落的内容
+            if (para != group.get(group.size() - 1)) {
+                mergedPara.append(" ");
+            }
         }
-
-        mergedSpan.text(textBuilder.toString());
-        mergedPara.appendChild(mergedSpan);
 
         return mergedPara;
     }
@@ -285,6 +373,12 @@ public class MuPdfHtmlMerger {
             this.top = extractValue(style, "top");
             this.left = extractValue(style, "left");
             this.lineHeight = extractValue(style, "line-height");
+
+            // 如果行高无法提取，使用典型行高
+            if (this.lineHeight <= 0) {
+                this.lineHeight = TYPICAL_LINE_SPACING;
+            }
+
             this.bottom = this.top + this.lineHeight;
 
             // 提取字体样式（从span中）
@@ -295,6 +389,11 @@ public class MuPdfHtmlMerger {
                 this.fontSize = extractValue(spanStyle, "font-size");
             } else {
                 this.fontFamily = "unknown";
+                this.fontSize = 12.0f;
+            }
+
+            // 处理可能的字体大小提取失败情况
+            if (this.fontSize <= 0) {
                 this.fontSize = 12.0f;
             }
         }

@@ -2,6 +2,7 @@ package cn.archko.pdf.common
 
 import android.graphics.Color
 import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.entity.padding
 import com.tencent.mmkv.MMKV
 
 /**
@@ -104,7 +105,7 @@ object PdfOptionRepository {
     }
 
     fun getLineSpacingMult(): Float {
-        return mmkv.decodeFloat(PdfOptionKeys.STYLE_KEY_LINE_SPACEING_MULT, 1.48f)
+        return mmkv.decodeFloat(PdfOptionKeys.STYLE_KEY_LINE_SPACEING_MULT, 1.4f)
     }
 
     fun setLeftPadding(leftPadding: Int) {
@@ -112,7 +113,7 @@ object PdfOptionRepository {
     }
 
     fun getLeftPadding(): Int {
-        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_LEFT_PADDING, Utils.dipToPixel(12f))
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_LEFT_PADDING, Utils.dipToPixel(padding))
     }
 
     fun setTopPadding(topPadding: Int) {
@@ -120,7 +121,7 @@ object PdfOptionRepository {
     }
 
     fun getTopPadding(): Int {
-        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_RIGHT_PADDING, Utils.dipToPixel(16f))
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_RIGHT_PADDING, Utils.dipToPixel(padding))
     }
 
     fun setRightPadding(rightPadding: Int) {
@@ -128,7 +129,7 @@ object PdfOptionRepository {
     }
 
     fun getRightPadding(): Int {
-        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_TOP_PADDING, Utils.dipToPixel(12f))
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_TOP_PADDING, Utils.dipToPixel(padding))
     }
 
     fun setBottomPadding(bottomPadding: Int) {
@@ -136,7 +137,7 @@ object PdfOptionRepository {
     }
 
     fun getBottomPadding(): Int {
-        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_BOTTOM_PADDING, Utils.dipToPixel(16f))
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_BOTTOM_PADDING, Utils.dipToPixel(padding))
     }
 
     fun setDirsFirst(enable: Boolean): Boolean {
@@ -246,10 +247,10 @@ data class PdfOption(
     var bgColor: Int = Color.WHITE,
     var fgColor: Int = Color.BLACK,
     var lineSpacingMult: Float = 1.48f,
-    var leftPadding: Int = Utils.dipToPixel(2f),
-    var topPadding: Int = Utils.dipToPixel(2f),
-    var rightPadding: Int = Utils.dipToPixel(2f),
-    var bottomPadding: Int = Utils.dipToPixel(2f),
+    var leftPadding: Int = Utils.dipToPixel(padding),
+    var topPadding: Int = Utils.dipToPixel(padding),
+    var rightPadding: Int = Utils.dipToPixel(padding),
+    var bottomPadding: Int = Utils.dipToPixel(padding),
 )
 
 object PdfOptionKeys {
