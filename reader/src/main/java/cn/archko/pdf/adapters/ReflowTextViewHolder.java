@@ -5,8 +5,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.text.Html;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -16,11 +14,12 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.awidget.ARecyclerView;
 import cn.archko.pdf.R;
-import cn.archko.pdf.core.common.ParseTextMain;
-import cn.archko.pdf.core.cache.ReflowViewCache;
 import cn.archko.pdf.common.StyleHelper;
+import cn.archko.pdf.core.cache.ReflowViewCache;
+import cn.archko.pdf.core.common.ParseTextMain;
 import cn.archko.pdf.core.entity.BitmapBean;
 import cn.archko.pdf.core.entity.ReflowBean;
 import cn.archko.pdf.core.utils.Utils;
@@ -220,18 +219,16 @@ public class ReflowTextViewHolder extends ARecyclerView.ViewHolder {
             applyStyleForText(getContext(), tv);
 
             // Html.fromHtml 加载图文，imageGetter 负责把 base64 <img> 解码成 Drawable
-            tv.setText(android.text.Html.fromHtml(html, new Html.ImageGetter() {
-                @Override
-                public Drawable getDrawable(String source) {
-                    BitmapBean bean = ParseTextMain.INSTANCE.decodeBitmap(source, systemScale, screenHeight, screenWidth, getContext());
-                    if (bean == null || bean.getBitmap() == null) {
-                        return new ColorDrawable(0x00000000);
-                    }
-                    BitmapDrawable drawable = new BitmapDrawable(getResources(), bean.getBitmap());
-                    drawable.setBounds(0, 0, (int) bean.getWidth(), (int) bean.getHeight());
-                    return drawable;
-                }
-            }, null));
+            tv.setText(HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY,
+                    source -> {
+                        BitmapBean bean = ParseTextMain.INSTANCE.decodeBitmap(source, systemScale, screenHeight, screenWidth, getContext());
+                        if (bean == null || bean.getBitmap() == null) {
+                            return new ColorDrawable(0x00000000);
+                        }
+                        BitmapDrawable drawable = new BitmapDrawable(getResources(), bean.getBitmap());
+                        drawable.setBounds(0, 0, (int) bean.getWidth(), (int) bean.getHeight());
+                        return drawable;
+                    }, null));
 
             addBookmark(showBookmark);
         }

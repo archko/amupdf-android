@@ -57,9 +57,10 @@ class MuPDFReflowAdapter(
         //mupdf only single thread
         AppExecutors.instance.diskIO().execute {
             val html = mupdfDocument?.decodeReflowHtml(position) ?: return@execute
+            val mergedHtml = MuPdfHtmlMerger().mergeParagraphs(html)
             AppExecutors.instance.mainThread().execute {
                 holder.bindHtml(
-                    html,
+                    mergedHtml,
                     screenHeight,
                     screenWidth,
                     systemScale,
@@ -70,11 +71,11 @@ class MuPDFReflowAdapter(
         }
     }
 
-    fun decode(pos: Int): List<ReflowBean>? {
-        val html = mupdfDocument?.decodeReflowHtml(pos) ?: return null
+    /*fun decode(pos: Int): List<ReflowBean>? {
+        val html = mupdfDocument?.decodeReflowHtml(pos)?: return null
         val mergedHtml = MuPdfHtmlMerger().mergeParagraphs(html)
         return ParseTextMain.parseMergedHtmlAsReflowList(mergedHtml, pos)
-    }
+    }*/
 
     private fun showBookmark(position: Int): Boolean {
         /*val bookmarks = pdfViewModel.bookmarks
@@ -98,5 +99,4 @@ class MuPDFReflowAdapter(
     fun clearCacheViews() {
         reflowCache.clear()
     }
-
 }
