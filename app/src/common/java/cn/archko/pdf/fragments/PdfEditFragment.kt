@@ -213,7 +213,7 @@ class PdfEditFragment : DialogFragment(R.layout.fragment_pdf_edit) {
     }
 
     private fun extractImages(position: Int): Boolean {
-        if (pdfEditViewModel.aPageList.size < 1) {
+        if (pdfEditViewModel.aPageList.isEmpty()) {
             return true
         }
         val width = pdfEditViewModel.aPageList[0].width.toInt()

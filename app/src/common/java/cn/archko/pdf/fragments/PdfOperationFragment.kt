@@ -298,7 +298,12 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
             String.format(getString(R.string.edit_to_page), count.toString())
 
         binding.extract.rangeSlider.valueFrom = 1f
-        binding.extract.rangeSlider.valueTo = count.toFloat()
+        if (count <= 1) {
+            binding.extract.rangeSlider.valueTo = 2f
+            binding.extract.rangeSlider.isEnabled = false
+            binding.extract.rangeSlider.values = listOf(1f, 2f)
+            return
+        }
         val values = mutableListOf<Float>()
         values.add(1f)
         values.add(count.toFloat())

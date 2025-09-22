@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.common.PdfOptionKeys
+import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.PdfOptionRepository.getAutoScan
 import cn.archko.pdf.common.PdfOptionRepository.getAutocrop
 import cn.archko.pdf.common.PdfOptionRepository.getColorMode
@@ -44,7 +45,9 @@ import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.Logcat.d
 import cn.archko.pdf.core.common.ScanEvent
+import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.core.widgets.ColorItemDecoration
+import cn.archko.pdf.entity.padding
 import com.google.android.material.appbar.MaterialToolbar
 import vn.chungha.flowbus.busEvent
 
@@ -91,6 +94,11 @@ class PdfOptionsActivity : FragmentActivity() {
         initPrefsFromMMkv()
         adapter?.setData(prefsList)
         recyclerView.adapter = adapter
+
+        PdfOptionRepository.setLeftPadding(Utils.dipToPixel(padding))
+        PdfOptionRepository.setRightPadding(Utils.dipToPixel(padding))
+        PdfOptionRepository.setTopPadding(Utils.dipToPixel(padding))
+        PdfOptionRepository.setBottomPadding(Utils.dipToPixel(padding))
     }
 
     private val prefsList: MutableList<Prefs?> = ArrayList()

@@ -36,9 +36,13 @@ class ExtractDialog(
         //binding.back.setOnClickListener { dismiss() }
 
         binding.btnExtract.setOnClickListener {
+            val start = binding.extract.rangeSlider.values[0].toInt()
+            val end = if (count > 1) {
+                binding.extract.rangeSlider.values[1].toInt()
+            } else start
             extractListener.exportRange(
-                binding.extract.rangeSlider.values[0].toInt(),
-                binding.extract.rangeSlider.values[1].toInt(),
+                start,
+                end,
                 binding.extract.resolutionSlider.value.toInt()
             )
         }
@@ -54,6 +58,16 @@ class ExtractDialog(
         if (width < 1080) {
             binding.extract.resolutionSlider.valueFrom = width.toFloat()
         }
+
+        if (count <= 1) {
+            binding.extract.rangeSlider.isEnabled = false
+            binding.extract.tvStart.text =
+                String.format(context.getString(R.string.edit_from_page), "1")
+            binding.extract.tvEnd.text =
+                String.format(context.getString(R.string.edit_to_page), "1")
+            return
+        }
+
         binding.extract.tvStart.text =
             String.format(context.getString(R.string.edit_from_page), "1")
         binding.extract.tvEnd.text =
