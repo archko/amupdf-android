@@ -17,7 +17,6 @@ compileSdk = "36"
 junit = "4.13.2"
 kotlin = "2.1.20"
 kotlinxCoroutines = "1.10.1"
-kotlinxDatetime = "0.6.2"
 kotlinxSerializationJson = "1.8.0"
 ksp = "2.1.20-2.0.0"
 mammoth = "1.5.0" #1.7.0依赖问题导致崩溃,1.8.0不崩溃但无法解析,1.5.0有些docx转换失败
@@ -26,7 +25,7 @@ mmkv = "2.2.3"
 mupdfFitz = "1.26.5"
 okhttp = "4.12.0"
 crashreport = "4.4.6.2"
-room = "2.7.2"
+room = "2.8.0"
 
 constraintLayout = "2.2.1"
 umengCommon = "9.6.5"
@@ -70,15 +69,12 @@ androidx-lifecycle-runtimeKtx = { group = "androidx.lifecycle", name = "lifecycl
 androidx-lifecycle-viewmodelKtx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidxLifecycle" }
 androidx-lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata", version.ref = "androidxLifecycle" }
 
-#androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "paging" }
-
 coil-kt = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coil" }
 coil-kt-network-okhttp = { group = "io.coil-kt.coil3-network-okhttp", name = "coil", version.ref = "coil" }
 
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlinx-coroutines-guava = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-guava", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
-kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 mammoth = { module = "org.zwobble.mammoth:mammoth", version.ref = "mammoth" }
