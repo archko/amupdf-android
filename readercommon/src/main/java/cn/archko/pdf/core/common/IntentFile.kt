@@ -1,24 +1,30 @@
 package cn.archko.pdf.core.common
 
-import android.content.ContentResolver
+import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
+import android.os.storage.StorageManager
 import android.provider.DocumentsContract
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.text.TextUtils
 import android.util.Log
+import androidx.annotation.Nullable
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.lang.reflect.Method
 import java.util.*
 
 object IntentFile {
+    const val PRIMARY_VOLUME_NAME: String = "primary"
 
     @JvmStatic
     fun processIntentAction(intent: Intent, context: Context): String? {
@@ -48,104 +54,230 @@ object IntentFile {
 
     @JvmStatic
     fun getFilePathByUri(context: Context, uri: Uri): String? {
-        var path: String? = null
-        // 以 file:// 开头的
-        if (ContentResolver.SCHEME_FILE == uri.scheme) {
-            path = uri.path
-            return path
-        }
-        // 以 content:// 开头的，比如 content://media/extenral/images/media/17766
-        /*if (ContentResolver.SCHEME_CONTENT == uri.scheme && Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            val cursor = context.contentResolver.query(
-                uri,
-                arrayOf(MediaStore.Images.Media.DATA, MediaStore.Video.Media.DURATION),
-                null,
-                null,
-                null
-            )
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    var columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-                    if (columnIndex > -1) {
-                        path = cursor.getString(columnIndex)
-                    }
-                    //columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
-                }
-                cursor.close()
-            }
-            return path
-        }*/
-        // 4.4及之后的 是以 content:// 开头的，比如 content://com.android.providers.media.documents/document/image%3A235700
-        if (ContentResolver.SCHEME_CONTENT == uri.scheme /*&& Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT*/) {
-            if (DocumentsContract.isDocumentUri(context, uri)) {
-                if (isExternalStorageDocument(uri)) {
-                    // ExternalStorageProvider
-                    val docId = DocumentsContract.getDocumentId(uri)
-                    val split = docId.split(":").toTypedArray()
-                    val type = split[0]
-                    if ("primary".equals(type, ignoreCase = true)) {
-                        //这种的是拿文件,没有DURATION
-                        path = Environment.getExternalStorageDirectory().toString() + "/" + split[1]
-                        return path
-                    }
-                } else if (isDownloadsDocument(uri)) {
-                    // DownloadsProvider
-                    val id = DocumentsContract.getDocumentId(uri)
-                    val contentUri = ContentUris.withAppendedId(
-                        Uri.parse("content://downloads/public_downloads"),
-                        java.lang.Long.valueOf(id)
-                    )
-                    path = getDataColumn(context, contentUri, null, null)
-                    return path
-                } else if (isMediaDocument(uri)) {
-                    // MediaProvider
-                    val docId = DocumentsContract.getDocumentId(uri)
-                    val split = docId.split(":").toTypedArray()
-                    val type = split[0]
-                    var contentUri: Uri? = null
-                    if ("image" == type) {
-                        contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                    } else if ("video" == type) {
-                        contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                    } else if ("audio" == type) {
-                        contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-                    } else if ("document" == type) {
-                        contentUri = MediaStore.Files.getContentUri("external")
-                    }
-                    val selection = "_id=?"
-                    val selectionArgs = arrayOf(split[1])
-                    path = getDataColumn(context, contentUri, selection, selectionArgs)
-                    return path
-                }
-            } else {
-                path = getRealPathFromURI(context, uri)
-            }
+        var path: String? = getRealPathFromURI(context, uri)
+        if (path == null) {
+            path = getFullPathFromTreeUri(uri, context)
         }
         return path
     }
 
-    @JvmStatic
-    //content://cn.archko.mupdf.fileProvider/external_files/book/%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%20Rust%20(%E8%8C%83%E9%95%BF%E6%98%A5)%20.pdf
-    // 由系统文件管理器选择的是,content://com.android.fileexplorer.myprovider/external_files/DCIM/Camera/VID_20211029_091852.mp4 这种的DURATION是没有的
-    // 其它管理器是content://com.speedsoftware.rootexplorer.fileprovider/root/storage/emulated/0/book/
-    fun getRealPathFromURI(context: Context, contentUri: Uri): String? {
-        var cursor: Cursor? = null
-        try {
-            val proj = arrayOf(MediaStore.Images.Media.DATA)
-            cursor = context.contentResolver.query(contentUri, proj, null, null, null)
-            val column_index = cursor!!.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            cursor.moveToFirst()
-            val path = cursor.getString(column_index)
-            return path
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        } finally {
-            cursor?.close()
+    fun getRealPathFromURI(context: Context?, uri: Uri): String? {
+        // DocumentProvider
+        if (DocumentsContract.isDocumentUri(context, uri)) {
+            // ExternalStorageProvider
+            if (isExternalStorageDocument(uri)) {
+                val docId = DocumentsContract.getDocumentId(uri)
+                val split: Array<String?> =
+                    docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                val type = split[0]
+
+                if ("primary".equals(type, ignoreCase = true)) {
+                    return Environment.getExternalStorageDirectory().toString() + "/" + split[1]
+                }
+
+                // TODO handle non-primary volumes
+            } else if (isDownloadsDocument(uri)) {
+                val id = DocumentsContract.getDocumentId(uri)
+                val contentUri = ContentUris.withAppendedId(
+                    Uri.parse("content://downloads/public_downloads"), id.toLong()
+                )
+
+                return getDataColumn(context!!, contentUri, null, null)
+            } else if (isMediaDocument(uri)) {
+                val docId = DocumentsContract.getDocumentId(uri)
+                val split: Array<String?> =
+                    docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                val type = split[0]
+
+                var contentUri: Uri? = null
+                if ("image" == type) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                } else if ("video" == type) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                } else if ("audio" == type) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                }
+
+                val selection = "_id=?"
+                val selectionArgs = arrayOf<String?>(
+                    split[1]
+                )
+
+                return getDataColumn(context!!, contentUri, selection, selectionArgs)
+            }
+        } else if ("content".equals(uri.scheme, ignoreCase = true)) {
+            // Return the remote address
+            if (isGooglePhotosUri(uri)) return uri.lastPathSegment
+
+            return getDataColumn(context!!, uri, null, null)
+        } else if ("file".equals(uri.scheme, ignoreCase = true)) {
+            return uri.path
         }
-        return getPathFromOther(context, contentUri)
+
+        return getPathFromOther(uri)
     }
 
-    private fun getPathFromOther(context: Context, contentUri: Uri): String? {
+    @Suppress("deprecation")
+    fun getFullPathFromTreeUri(treeUri: Uri?, context: Context): String? {
+        if (treeUri == null) {
+            return null
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            if (isDownloadsDocument(treeUri)) {
+                val docId = DocumentsContract.getDocumentId(treeUri)
+                val extPath =
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                        .path
+                if (docId == "downloads") {
+                    return extPath
+                } else if (docId.matches("^ms[df]\\:.*".toRegex())) {
+                    val fileName: String? = getFileName(treeUri, context)
+                    return "$extPath/$fileName"
+                } else if (docId.startsWith("raw:")) {
+                    val rawPath: String? =
+                        docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]
+                    return rawPath
+                }
+                return null
+            }
+        }
+
+        var volumePath: String? = getVolumePath(getVolumeIdFromTreeUri(treeUri), context)
+
+        if (volumePath == null) {
+            return File.separator
+        }
+
+        if (volumePath.endsWith(File.separator)) volumePath =
+            volumePath.substring(0, volumePath.length - 1)
+
+        var documentPath: String? = getDocumentPathFromTreeUri(treeUri)
+
+        if (null != documentPath && documentPath.endsWith(File.separator)) documentPath =
+            documentPath.substring(0, documentPath.length - 1)
+
+        if (null != documentPath && documentPath.isNotEmpty()) {
+            if (documentPath.startsWith(File.separator)) {
+                return volumePath + documentPath
+            } else {
+                return volumePath + File.separator + documentPath
+            }
+        } else {
+            return volumePath
+        }
+    }
+
+    fun getFileName(uri: Uri, context: Context?): String? {
+        var result: String? = null
+
+        try {
+            if (uri.scheme == "content") {
+                val cursor = context?.contentResolver
+                    ?.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
+                try {
+                    if (cursor != null && cursor.moveToFirst()) {
+                        result =
+                            cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
+                    }
+                } finally {
+                    cursor!!.close()
+                }
+            }
+            if (result == null) {
+                result = uri.getPath()
+                val cut = result!!.lastIndexOf('/')
+                if (cut != -1) {
+                    result = result.substring(cut + 1)
+                }
+            }
+        } catch (ex: Exception) {
+            Log.e("TAG", "Failed to handle file name: $ex")
+        }
+
+        return result
+    }
+
+    @Nullable
+    private fun getDirectoryPath(
+        storageVolumeClazz: Class<*>,
+        storageVolumeElement: Any?
+    ): String? {
+        try {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                val getPath: Method = storageVolumeClazz.getMethod("getPath")
+                return getPath.invoke(storageVolumeElement) as String?
+            }
+
+            val getDirectory: Method = storageVolumeClazz.getMethod("getDirectory")
+            val f = getDirectory.invoke(storageVolumeElement) as File?
+            if (f != null) return f.getPath()
+        } catch (_: java.lang.Exception) {
+            return null
+        }
+        return null
+    }
+
+    @SuppressLint("ObsoleteSdkInt")
+    private fun getVolumePath(volumeId: String?, context: Context): String? {
+        try {
+            val mStorageManager =
+                context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
+            val storageVolumeClazz = Class.forName("android.os.storage.StorageVolume")
+            val getVolumeList: Method = mStorageManager.javaClass.getMethod("getVolumeList")
+            val getUuid: Method = storageVolumeClazz.getMethod("getUuid")
+            val isPrimary: Method = storageVolumeClazz.getMethod("isPrimary")
+            val result: Any? = getVolumeList.invoke(mStorageManager)
+            if (result == null) return null
+
+            val length: Int = java.lang.reflect.Array.getLength(result)
+            for (i in 0..<length) {
+                val storageVolumeElement: Any? = java.lang.reflect.Array.get(result, i)
+                val uuid = getUuid.invoke(storageVolumeElement) as String?
+                val primary = isPrimary.invoke(storageVolumeElement) as Boolean?
+
+                // primary volume?
+                if (primary != null && PRIMARY_VOLUME_NAME.equals(volumeId)) {
+                    return getDirectoryPath(storageVolumeClazz, storageVolumeElement)
+                }
+
+                // other volumes?
+                if (uuid != null && uuid == volumeId) {
+                    return getDirectoryPath(storageVolumeClazz, storageVolumeElement)
+                }
+            }
+            // not found.
+            return null
+        } catch (_: java.lang.Exception) {
+            return null
+        }
+    }
+
+    private fun getVolumeIdFromTreeUri(treeUri: Uri?): String? {
+        val docId = DocumentsContract.getTreeDocumentId(treeUri)
+        val split: Array<String?> =
+            docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        if (split.isNotEmpty()) return split[0]
+        else return null
+    }
+
+    private fun getDocumentPathFromTreeUri(treeUri: Uri?): String? {
+        val docId = DocumentsContract.getTreeDocumentId(treeUri)
+        val split: Array<String?> =
+            docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        if ((split.size >= 2) && (split[1] != null)) return split[1]
+        else return File.separator
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is Google Photos.
+     */
+    fun isGooglePhotosUri(uri: Uri): Boolean {
+        return "com.google.android.apps.photos.content" == uri.getAuthority()
+    }
+
+    private fun getPathFromOther(contentUri: Uri): String? {
         val pathSegments = contentUri.pathSegments
         if (pathSegments != null && pathSegments.size > 1) {
             val sb = StringBuilder()
@@ -160,22 +292,28 @@ object IntentFile {
         return null
     }
 
-    @JvmStatic
-    private fun getDataColumn(
+    fun getDataColumn(
         context: Context,
         uri: Uri?,
         selection: String?,
-        selectionArgs: Array<String>?,
+        selectionArgs: Array<String?>?
     ): String? {
         var cursor: Cursor? = null
         val column = "_data"
-        val projection = arrayOf(column)
+        val projection = arrayOf<String?>(
+            column
+        )
+
         try {
-            cursor =
-                context.contentResolver.query(uri!!, projection, selection, selectionArgs, null)
+            cursor = uri?.let {
+                context.contentResolver.query(
+                    it, projection, selection, selectionArgs,
+                    null
+                )
+            }
             if (cursor != null && cursor.moveToFirst()) {
-                val column_index = cursor.getColumnIndexOrThrow(column)
-                return cursor.getString(column_index)
+                val index = cursor.getColumnIndexOrThrow(column)
+                return cursor.getString(index)
             }
         } finally {
             cursor?.close()
