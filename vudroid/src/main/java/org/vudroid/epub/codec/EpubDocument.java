@@ -15,7 +15,7 @@ import cn.archko.pdf.core.utils.Utils;
 public class EpubDocument extends PdfDocument {
 
     public static float getDefFontSize() {
-        float fontSize = (7.2f * Utils.getDensityDpi(App.Companion.getInstance()) / 72);
+        float fontSize = (9f * Utils.getDensityDpi(App.Companion.getInstance()) / 72);
         return fontSize;
     }
 
@@ -36,7 +36,7 @@ public class EpubDocument extends PdfDocument {
 
     public static EpubDocument openDocument(String fname, String pwd) {
         // 生成并应用自定义字体CSS
-        String css = FontCSSGenerator.INSTANCE.generateFontCSS("/sdcard/fonts/simsun.ttf");
+        String css = FontCSSGenerator.INSTANCE.generateFontCSS("/sdcard/fonts/simsun.ttf", "30px");
         if (!TextUtils.isEmpty(css)) {
             System.out.println("应用自定义字体CSS: " + css);
         } else {
