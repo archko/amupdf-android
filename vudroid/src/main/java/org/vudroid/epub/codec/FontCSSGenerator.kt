@@ -13,21 +13,19 @@ object FontCSSGenerator {
 
         if (!fontPath.isNullOrEmpty()) {
             val fontFile = File(fontPath)
-            if (!fontFile.exists()) {
-            } else {
-            }
+            if (fontFile.exists()) {
+                val fontName = getFontNameFromPath(fontPath)
+                val fontFamily = fontName
+                buffer.apply {
+                    appendLine("@font-face {")
+                    appendLine("    font-family: '$fontFamily' !important;")
+                    appendLine("    src: url('file://$fontPath');")
+                    appendLine("}")
 
-            val fontName = getFontNameFromPath(fontPath)
-            val fontFamily = fontName
-            buffer.apply {
-                appendLine("@font-face {")
-                appendLine("    font-family: '$fontFamily' !important;")
-                appendLine("    src: url('file://$fontPath');")
-                appendLine("}")
-
-                appendLine("* {")
-                appendLine("    font-family: '$fontFamily', serif !important;")
-                appendLine("}")
+                    appendLine("* {")
+                    appendLine("    font-family: '$fontFamily', serif !important;")
+                    appendLine("}")
+                }
             }
         }
 
