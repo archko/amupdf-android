@@ -170,7 +170,7 @@
     <string name="menu_font_fg">Forground</string>
 
     <string name="dialog_title_font">Select Font</string>
-    <string name="dialog_sub_title_font">Put fonts into /sdcard/amupdf/fonts</string>
+    <string name="dialog_sub_title_font">Put fonts into /sdcard/fonts</string>
     <string name="dialog_item_title_font">%s:testing font</string>
 
     <string name="title_home">Home:</string>

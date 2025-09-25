@@ -32,4 +32,6 @@ public interface PageControllerListener {
     void showSearch();
 
     void preview();
+
+    void selectFont();
 }

@@ -90,4 +90,8 @@ class AEpubViewController(
 
         initStyleControls()
     }
+
+    override fun selectFont() {
+        controllerListener?.reloadDoc()
+    }
 }

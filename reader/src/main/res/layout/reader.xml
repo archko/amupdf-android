@@ -129,6 +129,16 @@
                         android:background="@drawable/button"
                         android:contentDescription="@string/menu_search"
                         android:src="@drawable/ic_search" />
+
+                    <ImageButton
+                        android:id="@+id/fontButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="@string/menu_search"
+                        android:src="@drawable/ic_font"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
                 </LinearLayout>
             </HorizontalScrollView>
         </LinearLayout>

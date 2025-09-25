@@ -45,4 +45,5 @@ interface AViewController {
     fun showSearch()
     fun setSpeakingPage(page: Int)
     fun toggleThumbnail()
+    fun selectFont()
 }

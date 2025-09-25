@@ -12,6 +12,7 @@ import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.fragments.FontsFragment
+import cn.archko.pdf.fragments.FontsFragment.Companion.type_reflow
 import cn.archko.pdf.viewmodel.DocViewModel
 import kotlinx.coroutines.CoroutineScope
 import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
@@ -112,6 +113,7 @@ abstract class ATextBaseViewController(
         fontFaceChange?.setOnClickListener {
             FontsFragment.showFontsDialog(
                 context, mStyleHelper,
+                type = type_reflow,
                 object : DataListener {
                     override fun onSuccess(vararg args: Any?) {
                         updateReflowAdapter()

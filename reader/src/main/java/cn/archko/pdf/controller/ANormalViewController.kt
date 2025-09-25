@@ -400,6 +400,9 @@ open class ANormalViewController(
         }
     }
 
+    override fun selectFont() {
+    }
+
     /**
      * 重排判断是从这出的.判断是文本重排还是图片重排,依据当前的pdf文档
      * 如果是pdf之外的,直接判断为文本方式重排.

@@ -565,6 +565,9 @@ class AScanReflowViewController(
     override fun toggleThumbnail() {
     }
 
+    override fun selectFont() {
+    }
+
     //--------------------------------------
 
     override fun onResume() {

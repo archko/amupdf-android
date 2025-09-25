@@ -34,13 +34,24 @@ public class EpubDocument extends PdfDocument {
         mmkv.encode("font_" + name.hashCode(), size);
     }
 
+    //"/sdcard/fonts/simsun.ttf"
+    public static String getFontFace() {
+        MMKV mmkv = MMKV.mmkvWithID("epub");
+        var fs = mmkv.decodeString("font_face", "");
+        return fs;
+    }
+
+    public static void setFontFace(String name) {
+        MMKV mmkv = MMKV.mmkvWithID("epub");
+        Logcat.d("setFontFace:" + name);
+        mmkv.encode("font_face", name);
+    }
+
     public static EpubDocument openDocument(String fname, String pwd) {
         // 生成并应用自定义字体CSS
-        String css = FontCSSGenerator.INSTANCE.generateFontCSS("/sdcard/fonts/simsun.ttf", "10px");
+        String css = FontCSSGenerator.INSTANCE.generateFontCSS(getFontFace(), "10px");
         if (!TextUtils.isEmpty(css)) {
-            System.out.println("应用自定义字体CSS: " + css);
-        } else {
-            System.out.println("自定义字体不可用，使用默认字体");
+            System.out.println("应用自定义CSS: " + css);
         }
         Context.setUserCSS(css);
         EpubDocument epubDocument = new EpubDocument();

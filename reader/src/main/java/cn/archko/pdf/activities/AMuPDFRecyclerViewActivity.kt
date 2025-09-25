@@ -608,6 +608,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         override fun preview() {
             viewController?.toggleThumbnail()
         }
+
+        override fun selectFont() {
+            viewController?.selectFont()
+        }
     }
 
     private fun createControls() {

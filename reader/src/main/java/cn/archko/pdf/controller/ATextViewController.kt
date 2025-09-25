@@ -167,6 +167,9 @@ class ATextViewController(
     override fun setSpeakingPage(page: Int) {
     }
 
+    override fun selectFont() {
+    }
+
     override fun reflow(): Int {
         return BookProgress.REFLOW_TXT
     }

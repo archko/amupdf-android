@@ -74,14 +74,17 @@ class FontHelper(
         }
     }
 
-    fun createFont(fontName: String?): Typeface? {
-        val fontPath = FileUtils.getStoragePath(PdfOptionRepository.FONT_DIR + fontName)
-        return if (!File(fontPath).exists()) {
-            null
-        } else Typeface.createFromFile(fontPath)
-    }
+    companion object {
 
-    fun createFontByPath(fontPath: String): Typeface? {
-        return Typeface.createFromFile(fontPath)
+        fun createFont(fontName: String?): Typeface? {
+            val fontPath = FileUtils.getStoragePath(PdfOptionRepository.FONT_DIR + fontName)
+            return if (!File(fontPath).exists()) {
+                null
+            } else Typeface.createFromFile(fontPath)
+        }
+
+        fun createFontByPath(fontPath: String): Typeface? {
+            return Typeface.createFromFile(fontPath)
+        }
     }
 }

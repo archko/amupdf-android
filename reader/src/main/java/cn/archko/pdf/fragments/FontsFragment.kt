@@ -1,7 +1,6 @@
 package cn.archko.pdf.fragments
 
 import android.graphics.Typeface
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,13 +14,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
-import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
-import cn.archko.pdf.core.adapters.BaseViewHolder
+import cn.archko.pdf.common.FontHelper
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.StyleHelper
-import cn.archko.pdf.entity.FontBean
+import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
+import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.entity.FontBean
 import com.google.android.material.appbar.MaterialToolbar
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -40,6 +40,7 @@ open class FontsFragment : DialogFragment() {
     private var layoutSearch: View? = null
     private var toolbar: MaterialToolbar? = null
     private var recyclerView: RecyclerView? = null
+    private var type: String = type_reflow
 
     fun setStyleHelper(styleHelper: StyleHelper?) {
         this.mStyleHelper = styleHelper
@@ -51,10 +52,7 @@ open class FontsFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var themeId = android.R.style.Theme_Holo_Dialog
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            themeId = android.R.style.Theme_Material_Dialog
-        }
+        val themeId = android.R.style.Theme_Material_Dialog
         setStyle(STYLE_NO_FRAME, themeId)
 
         fontsViewModel = FontsViewModel()
@@ -87,16 +85,31 @@ open class FontsFragment : DialogFragment() {
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                fontsViewModel.loadFonts().collectLatest { list ->
-                    if (list.size > 0) {
-                        adapter.data = list
-                        adapter.notifyDataSetChanged()
-                    } else {
-                        Toast.makeText(
-                            this@FontsFragment.activity,
-                            R.string.dialog_sub_title_font,
-                            Toast.LENGTH_LONG
-                        ).show()
+                if (type == type_reflow) {
+                    fontsViewModel.loadFonts().collectLatest { list ->
+                        if (list.isNotEmpty()) {
+                            adapter.data = list
+                            adapter.notifyDataSetChanged()
+                        } else {
+                            Toast.makeText(
+                                this@FontsFragment.activity,
+                                R.string.dialog_sub_title_font,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                } else {
+                    fontsViewModel.loadSdcardFonts().collectLatest { list ->
+                        if (list.isNotEmpty()) {
+                            adapter.data = list
+                            adapter.notifyDataSetChanged()
+                        } else {
+                            Toast.makeText(
+                                this@FontsFragment.activity,
+                                R.string.dialog_sub_title_font,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
                 }
             }
@@ -121,7 +134,7 @@ open class FontsFragment : DialogFragment() {
         recyclerView?.adapter = adapter
     }
 
-    inner class FontHolder(private val root: View) :
+    inner class FontHolder(root: View) :
         BaseViewHolder<FontBean>(root) {
         private var title: TextView? = null
 
@@ -131,16 +144,13 @@ open class FontsFragment : DialogFragment() {
         }
 
         override fun onBind(data: FontBean?, position: Int) {
-            title?.setText(
-                String.format(
-                    getString(R.string.dialog_item_title_font),
-                    data?.fontName
-                )
+            title?.text = String.format(
+                getString(R.string.dialog_item_title_font),
+                data?.fontName
             )
             if (data?.fontType == PdfOptionRepository.CUSTOM) {
                 if (null != data.file) {
-                    val typeface =
-                        mStyleHelper?.fontHelper?.createFontByPath(data.file?.absolutePath!!)
+                    val typeface = FontHelper.createFontByPath(data.file?.absolutePath!!)
                     title?.setTypeface(typeface)
                 }
             } else {
@@ -168,10 +178,13 @@ open class FontsFragment : DialogFragment() {
     companion object {
 
         const val TAG = "FontsFragment"
+        const val type_reflow = "type_reflow"
+        const val type_select = "type_select"
 
         fun showFontsDialog(
             activity: FragmentActivity?,
             styleHelper: StyleHelper?,
+            type: String = type_reflow,
             dataListener: DataListener?
         ) {
             val ft = activity?.supportFragmentManager?.beginTransaction()
@@ -185,6 +198,7 @@ open class FontsFragment : DialogFragment() {
             val fragment = FontsFragment()
             val bundle = Bundle()
             fragment.arguments = bundle
+            fragment.type = type
 
             fragment.setListener(dataListener)
             fragment.setStyleHelper(styleHelper)

@@ -45,6 +45,7 @@ import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.core.widgets.ViewerDividerItemDecoration
 import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.fragments.FontsFragment
+import cn.archko.pdf.fragments.FontsFragment.Companion.type_reflow
 import cn.archko.pdf.fragments.SleepTimerDialog
 import cn.archko.pdf.tts.TTSActivity
 import cn.archko.pdf.tts.TTSEngine
@@ -487,6 +488,7 @@ class TextActivity : AppCompatActivity() {
         fontFaceChange?.setOnClickListener {
             FontsFragment.showFontsDialog(
                 this as FragmentActivity, mStyleHelper,
+                type_reflow,
                 object : DataListener {
                     override fun onSuccess(vararg args: Any?) {
                         updateReflowAdapter()
