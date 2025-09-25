@@ -50,10 +50,11 @@ class AEpubViewController(
         if (null == mStyleControls) {
             mStyleControls = LayoutInflater.from(context).inflate(R.layout.epub_style, null, false)
             fontSlider = mStyleControls!!.findViewById(R.id.font_slider)
+            val def = EpubDocument.getFontSize(mPath).toInt()
             fontSlider?.apply {
                 valueFrom = 20f
                 valueTo = 90f
-                value = EpubDocument.getFontSize(mPath)
+                value = def.toFloat()
             }
 
             val lp = RelativeLayout.LayoutParams(
