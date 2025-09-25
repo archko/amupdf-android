@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.common.Graph
+import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.Bookmark
@@ -38,6 +39,7 @@ class DocViewModel : ViewModel() {
     }
 
     private fun loadProgressAndBookmark(absolutePath: String, autoCrop: Int) {
+        var crop = autoCrop
         val file = File(absolutePath)
         if (file.isDirectory) {
             return
@@ -45,8 +47,11 @@ class DocViewModel : ViewModel() {
         val progress = Graph.database.progressDao().getProgress(file.name)
         bookProgress = progress
         if (null == bookProgress) {
+            if (IntentFile.isReflowable(absolutePath)) {
+                crop = 1
+            }
             bookProgress = BookProgress(FileUtils.getRealPath(absolutePath))
-            bookProgress!!.autoCrop = autoCrop
+            bookProgress!!.autoCrop = crop
             bookProgress!!._id = Graph.database.progressDao().addProgress(bookProgress!!).toInt()
         }
         bookProgress!!.readTimes += 1
@@ -57,7 +62,7 @@ class DocViewModel : ViewModel() {
             Logcat.TAG,
             String.format(
                 "loadProgressAndBookmark autoCrop:%s, path:%s, progress:%s,bookmark:%s",
-                autoCrop,
+                crop,
                 absolutePath,
                 bookProgress,
                 bookmarks

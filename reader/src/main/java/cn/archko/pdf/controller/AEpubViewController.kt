@@ -52,7 +52,7 @@ class AEpubViewController(
             fontSlider = mStyleControls!!.findViewById(R.id.font_slider)
             fontSlider?.apply {
                 valueFrom = 20f
-                valueTo = 80f
+                valueTo = 90f
                 value = EpubDocument.getFontSize(mPath)
             }
 

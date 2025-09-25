@@ -22,8 +22,8 @@ public class EpubDocument extends PdfDocument {
     public static float getFontSize(String name) {
         MMKV mmkv = MMKV.mmkvWithID("epub");
         var fs = mmkv.decodeFloat("font_" + name.hashCode(), getDefFontSize());
-        if (fs > 80) {
-            fs = 80f;
+        if (fs > 90) {
+            fs = 90f;
         }
         return fs;
     }
@@ -36,7 +36,7 @@ public class EpubDocument extends PdfDocument {
 
     public static EpubDocument openDocument(String fname, String pwd) {
         // 生成并应用自定义字体CSS
-        String css = FontCSSGenerator.INSTANCE.generateFontCSS("/sdcard/fonts/simsun.ttf", "30px");
+        String css = FontCSSGenerator.INSTANCE.generateFontCSS("/sdcard/fonts/simsun.ttf", "10px");
         if (!TextUtils.isEmpty(css)) {
             System.out.println("应用自定义字体CSS: " + css);
         } else {

@@ -1,6 +1,7 @@
 package cn.archko.pdf.core.common
 
 import android.annotation.SuppressLint
+import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
@@ -55,8 +56,11 @@ object IntentFile {
     @JvmStatic
     fun getFilePathByUri(context: Context, uri: Uri): String? {
         var path: String? = getRealPathFromURI(context, uri)
-        if (path == null) {
-            path = getFullPathFromTreeUri(uri, context)
+        if (ContentResolver.SCHEME_CONTENT == uri.scheme) {
+            path = getRealPathFromURI(context, uri)
+            if (path == null) {
+                path = getFullPathFromTreeUri(uri, context)
+            }
         }
         return path
     }
