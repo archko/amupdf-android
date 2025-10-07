@@ -3,7 +3,6 @@ package org.vudroid.epub.codec
 /**
  * @author: archko 2025/9/18 :20:09
  */
-
 import java.io.File
 
 object FontCSSGenerator {
@@ -32,7 +31,7 @@ object FontCSSGenerator {
         buffer.apply {
             // 忽略mupdf的边距
             appendLine("    @page { margin:$margin $margin !important; }")
-            appendLine("    p { margin: 30px !important; padding: 0 !important; }")
+            appendLine("    p { margin: 20px !important; padding: 0 !important; }")
             appendLine("    blockquote { margin: 0 !important; padding: 0 !important; }")
 
             // 强制所有元素的边距和内边距

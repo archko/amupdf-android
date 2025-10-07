@@ -47,7 +47,7 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
     protected lateinit var progressDialog: ProgressDialog
 
     private var mDataListener: DataListener? = null
-    private lateinit var adapter: BaseRecyclerAdapter<String>
+    private lateinit var adapter: BaseRecyclerAdapter<File>
     private var oldPdfPath: String? = null
     private var txtPath: String? = null
 
@@ -97,7 +97,7 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
 
     private fun createPdfFromImage() {
         val arr = arrayListOf<String>()
-        arr.addAll(adapter.data)
+        adapter.data.forEach { arr.add(it.absolutePath) }
         var name = binding.pdfPath.editableText.toString()
         if (TextUtils.isEmpty(name)) {
             name = "new.pdf"
@@ -202,12 +202,12 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
         binding.btnAddTxt.setOnClickListener { addTxtItem() }
         binding.btnCreateFromTxt.setOnClickListener { createPdfFromTxt() }
 
-        adapter = object : BaseRecyclerAdapter<String>(activity) {
+        adapter = object : BaseRecyclerAdapter<File>(activity) {
 
             override fun onCreateViewHolder(
                 parent: ViewGroup,
                 viewType: Int
-            ): BaseViewHolder<String> {
+            ): BaseViewHolder<File> {
                 val root = inflater.inflate(R.layout.item_image, parent, false)
                 return ViewHolder(root)
             }
@@ -248,7 +248,7 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
         }
     }
 
-    inner class ViewHolder(root: View) : BaseViewHolder<String>(root) {
+    inner class ViewHolder(root: View) : BaseViewHolder<File>(root) {
 
         var delete: View? = null
         var ivImage: ImageView? = null
@@ -258,13 +258,13 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
             ivImage = root.findViewById(R.id.ivImage)
         }
 
-        override fun onBind(data: String, position: Int) {
+        override fun onBind(data: File, position: Int) {
             delete?.setOnClickListener { deleteItem(data, position) }
-            ivImage?.load(File(data))
+            ivImage?.load(data)
         }
     }
 
-    private fun deleteItem(data: String, position: Int) {
+    private fun deleteItem(data: File, position: Int) {
         adapter.data.remove(data)
         adapter.notifyDataSetChanged()
     }
@@ -273,13 +273,13 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
             //如果Uri为null，可能是多选了
             if (result?.resultCode == Activity.RESULT_OK) {
-                val paths = mutableListOf<String>()
+                val files = mutableListOf<File>()
                 try {
                     val oneUri = result.data?.data
                     if (oneUri != null) {
                         val parseParams = IntentFile.getPath(requireContext(), oneUri)
                         if (parseParams != null) {
-                            paths.add(parseParams)
+                            files.add(File(parseParams))
                         }
                     } else {
                         for (index in 0 until (result.data?.clipData?.itemCount ?: 0)) {
@@ -287,7 +287,7 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
                             if (uri != null) {
                                 val parseParams = IntentFile.getPath(requireContext(), uri)
                                 if (parseParams != null) {
-                                    paths.add(parseParams)
+                                    files.add(File(parseParams))
                                 }
                             }
                         }
@@ -295,7 +295,9 @@ class PdfCreationFragment : DialogFragment(R.layout.fragment_create_pdf) {
                 } catch (e: Exception) {
                     Log.e(TAG, "handlePickFileResult", e)
                 }
-                adapter.data.addAll(adapter.itemCount, paths)
+                // 按修改时间倒序排序
+                files.sortByDescending { it.lastModified() }
+                adapter.data.addAll(adapter.itemCount, files)
                 adapter.notifyDataSetChanged()
             }
         }

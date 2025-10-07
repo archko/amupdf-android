@@ -15,7 +15,7 @@ import cn.archko.pdf.core.utils.Utils;
 public class EpubDocument extends PdfDocument {
 
     public static float getDefFontSize() {
-        float fontSize = (9f * Utils.getDensityDpi(App.Companion.getInstance()) / 72);
+        float fontSize = (8.4f * Utils.getDensityDpi(App.Companion.getInstance()) / 72);
         return fontSize;
     }
 
@@ -61,7 +61,7 @@ public class EpubDocument extends PdfDocument {
             int w = Utils.getScreenWidthPixelWithOrientation(App.Companion.getInstance());
             int h = Utils.getScreenHeightPixelWithOrientation(App.Companion.getInstance());
             float fontSize = getFontSize(fname);
-            System.out.printf("font:%s, open:%s%n", fontSize, fname);
+            System.out.printf("w:%s, h:%s, font:%s, open:%s%n",w,h, fontSize, fname);
             document.layout(w, h, fontSize);
             epubDocument.setDocument(document);
         } catch (Exception e) {
