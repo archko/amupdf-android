@@ -72,15 +72,15 @@ public class DocumentView extends View implements ZoomListener {
 
     public void setOriention(int oriention) {
         if (this.oriention != oriention) {
+            pageToGoTo = getCurrentPage();
             this.oriention = oriention;
             zoomModel.setZoom(1f);
-            pageToGoTo = getCurrentPage();
             BitmapCache.getInstance().clearNode();
             if (null != decodeService) {
                 decodeService.setOriention(oriention);
             }
 
-            System.out.println(String.format("setOriention:%s, page:%s", oriention,pageToGoTo));
+            Log.d(TAG, String.format("setOriention:%s, page:%s", oriention, pageToGoTo));
 
             requestLayout();
         }
@@ -314,6 +314,7 @@ public class DocumentView extends View implements ZoomListener {
     public int getCurrentPage() {
         Page page;
         int current = binarySearchCurrentPage();
+        //Log.d(TAG, String.format("getCurrentPage.current:%s, scrollY:%s", current, getScrollY()));
         if (current == -1) {
             for (int i = 0; i < pages.size(); i++) {
                 page = pages.valueAt(i);
@@ -366,13 +367,10 @@ public class DocumentView extends View implements ZoomListener {
             while (low <= high) {
                 middle = (low + high) / 2;
                 page = pages.valueAt(middle);
-                if (page.bounds.top > scrollY) {
-                    high = middle - 1;
-                } else if (page.bounds.top < scrollY) {
-                    if (page.bounds.bottom > scrollY) {
-                        return middle;
-                    }
+                if (page.bounds.bottom <= scrollY) {
                     low = middle + 1;
+                } else if (page.bounds.top > scrollY) {
+                    high = middle - 1;
                 } else {
                     return middle;
                 }
@@ -381,13 +379,10 @@ public class DocumentView extends View implements ZoomListener {
             while (low <= high) {
                 middle = (low + high) / 2;
                 page = pages.valueAt(middle);
-                if (page.bounds.left > scrollX) {
-                    high = middle - 1;
-                } else if (page.bounds.left < scrollX) {
-                    if (page.bounds.right > scrollX) {
-                        return middle;
-                    }
+                if (page.bounds.right <= scrollX) {
                     low = middle + 1;
+                } else if (page.bounds.left > scrollX) {
+                    high = middle - 1;
                 } else {
                     return middle;
                 }

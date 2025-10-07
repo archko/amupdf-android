@@ -124,7 +124,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
             android:gravity="center_vertical"
-            android:hint="http://dav.jianguoyun .eg"
+            android:hint="http://dav.jianguoyun.com"
             android:minWidth="150dp"
             android:padding="2dp"
             android:text=""
