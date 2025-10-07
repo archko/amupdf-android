@@ -3,6 +3,7 @@ package org.vudroid.core;
 import android.content.Context;
 import android.graphics.*;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.GestureDetector;
@@ -35,13 +36,8 @@ public class DocumentView extends View implements ZoomListener {
     DecodeService decodeService;
     private final SparseArray<Page> pages = new SparseArray<>();
     private final List<Page> lastPages = new ArrayList<>();
-    private final Handler updateHandler = new Handler();
-    private final Runnable updateRunnable = new Runnable() {
-        @Override
-        public void run() {
-            updatePageVisibilityImpl();
-        }
-    };
+    private final Handler updateHandler = new Handler(Looper.getMainLooper());
+    private final Runnable updateRunnable = this::updatePageVisibilityImpl;
     private long lastRenderTime = 0L;
     private boolean isInitialized = false;
     private int pageToGoTo = -1;
@@ -151,13 +147,13 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void goToPageImpl(final int toPage) {
-        Page page = pages.get(toPage);  //TODO ,page is not really page on the first time.
+        Page page = pages.get(toPage);
         if (null == page) {
             Log.d(TAG, String.format("goToPageImpl.error:%s-%s", toPage, pages.size()));
             return;
         }
 
-        //因为切边的操作,导致有些��面比较小.所以底部加两个页面,滚动就可以正常了
+        //因为切边的操作,导致有些页面比较小.所以底部加两个页面,滚动就可以正常了
         Page nextPage = null;
         if (pages.size() > toPage + 1) {
             nextPage = pages.get(toPage + 1);
@@ -212,14 +208,12 @@ public class DocumentView extends View implements ZoomListener {
             return;
         }
         // on scrollChanged can be called from scrollTo just after new layout applied so we should wait for relayout
-        post(() -> updatePageVisibility());
+        post(this::updatePageVisibility);
 
     }
 
     private void currentPageChanged() {
-        post(() -> {
-            docViewListener.setCurrentPage(getCurrentPage());
-        });
+        post(() -> docViewListener.setCurrentPage(getCurrentPage()));
     }
 
     private void updatePageVisibility() {
@@ -236,12 +230,12 @@ public class DocumentView extends View implements ZoomListener {
     private void updatePageVisibilityImpl() {
         lastRenderTime = System.currentTimeMillis();
         List<Page> visibleList = new ArrayList<>();
-        
+
         int currentPage = binarySearchCurrentPage();
         if (currentPage == -1) {
             currentPage = 0;
         }
-        
+
         // 向前遍历直到遇到不可见页
         for (int i = currentPage; i >= 0; i--) {
             Page page = pages.valueAt(i);
@@ -252,7 +246,7 @@ public class DocumentView extends View implements ZoomListener {
                 break;
             }
         }
-        
+
         // 向后遍历直到遇到不可见页
         for (int i = currentPage + 1; i < pages.size(); i++) {
             Page page = pages.valueAt(i);
@@ -263,14 +257,14 @@ public class DocumentView extends View implements ZoomListener {
                 break;
             }
         }
-        
+
         // 处理从可见变为不可见的页面
         for (Page page : lastPages) {
             if (!visibleList.contains(page)) {
                 page.updateVisibility();
             }
         }
-        
+
         lastPages.clear();
         lastPages.addAll(visibleList);
     }
@@ -330,22 +324,13 @@ public class DocumentView extends View implements ZoomListener {
                 }
             }
 
-            for (int i = current; i < pages.size(); i++) {
-                page = pages.valueAt(i);
-                if (page.isVisible()) {
-                    return pages.keyAt(i);
+            if (current < pages.size() - 2) {
+                for (int i = current + 1; i < pages.size(); i++) {
+                    page = pages.valueAt(i);
+                    if (page.isVisible()) {
+                        return pages.keyAt(i);
+                    }
                 }
-            }
-        }
-        return 0;
-    }
-
-    public int getLastVisiblePage() {
-        Page page;
-        for (int i = pages.size() - 1; i >= 0; i--) {
-            page = pages.valueAt(i);
-            if (page.isVisible()) {
-                return pages.keyAt(i);
             }
         }
         return 0;
@@ -1020,7 +1005,7 @@ public class DocumentView extends View implements ZoomListener {
         @Override
         public void run() {
             if (scroller.isFinished()) {
-                return; // remaining post that should not be handled
+                return;
             }
 
             if (scroller.computeScrollOffset()) {

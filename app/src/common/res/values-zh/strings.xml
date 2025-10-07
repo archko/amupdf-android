@@ -6,6 +6,7 @@
     <string name="create_pdf_label">创建PDF</string>
     <string name="menu_create">创建PDF</string>
     <string name="menu_convert_epub">转为Epub</string>
+    <string name="menu_encrypt_decrypt">加密/解密</string>
     <string name="create_pdf_select_old">选择旧的 pdf</string>
     <string name="create_pdf_save">保存pdf</string>
     <string name="create_pdf_select_old_tip">如果没有则创建新的pdf</string>
@@ -74,4 +75,32 @@
     <string name="edit_to_page">到%s页</string>
 
     <string name="webdav_title">Webdav config</string>
+
+    <string name="encrypt_decrypt_title">加密/解密</string>
+    <string name="encrypt_decrypt_tips">Pdf信息</string>
+    <string name="encrypt_decrypt_add">选择Pdf</string>
+    <string name="encrypt_decrypt_encrypt">加密</string>
+    <string name="encrypt_decrypt_decrypt">解密</string>
+    <string name="encrypt_decrypt_file_path">文件路径: %s</string>
+    <string name="encrypt_decrypt_file_size">文件大小: %s 字节</string>
+    <string name="encrypt_decrypt_file_name">文件名: %s</string>
+    <string name="encrypt_decrypt_page_count">页面数: %s</string>
+    <string name="encrypt_decrypt_format">格式: %s</string>
+    <string name="encrypt_decrypt_title2">标题: %s</string>
+    <string name="encrypt_decrypt_author">作者: %s</string>
+    <string name="encrypt_decrypt_subject">主题: %s</string>
+    <string name="encrypt_decrypt_keywords">关键词: %s</string>
+    <string name="encrypt_decrypt_creator">创建者: %s</string>
+    <string name="encrypt_decrypt_producer">生产者: %s</string>
+    <string name="encrypt_decrypt_creation_date">创建日期: %s</string>
+    <string name="encrypt_decrypt_modification_date">修改日期: %s</string>
+    <string name="encrypt_decrypt_encrypted">加密: %s</string>
+    <string name="encrypt_decrypt_error_read_pdf">错误: 无法读取PDF信息 - %s</string>
+    <string name="encrypt_decrypt_select_pdf_first">请先选择PDF文件</string>
+    <string name="encrypt_decrypt_input_pwd">请输入密码</string>
+    <string name="encrypt_decrypt_encrypt_success">加密成功\n%s</string>
+    <string name="encrypt_decrypt_encrypt_failed">加密失败</string>
+    <string name="encrypt_decrypt_decrypt_success">解密成功\n%s</string>
+    <string name="encrypt_decrypt_decrypt_failed">解密失败</string>
+    <string name="waiting">等待中...</string>
 </resources>

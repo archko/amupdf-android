@@ -35,9 +35,13 @@ import cn.archko.pdf.core.common.GlobalEvent
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.fragments.BrowserFragment
+import cn.archko.pdf.fragments.ConvertToEpubFragment
+import cn.archko.pdf.fragments.EncryptOrDecryptFragment
 import cn.archko.pdf.fragments.FavoriteFragment
 import cn.archko.pdf.fragments.HistoryFragment
 import cn.archko.pdf.fragments.LibraryFragment
+import cn.archko.pdf.fragments.PdfCreationFragment
+import cn.archko.pdf.fragments.PdfOperationFragment
 import cn.archko.pdf.imagedroid.AlbumViewerActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -204,30 +208,43 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_about -> startActivity(
+        if (item.itemId == R.id.action_about) {
+            startActivity(
                 Intent(
                     this@HomeActivity,
                     AboutActivity::class.java
                 )
             )
-
-            else -> {
-                val fragment: Fragment? = mViewPager?.let { mPagerAdapter?.getItemFragment(it.currentItem) }
-                Logcat.d("menu:" + item.itemId + " fragment:" + fragment + " index:" + mViewPager?.currentItem)
-                if (fragment is HistoryFragment) {
-                    fragment.onOptionSelected(item)
-                } else if (fragment is BrowserFragment) {
-                    fragment.onOptionSelected(item)
-                } else if (fragment is FavoriteFragment) {
-                    fragment.onOptionSelected(item)
-                } else if (fragment is LibraryFragment) {
-                    fragment.onOptionSelected(item)
-                }
-                return true
+            return true
+        } else {
+            var result = false
+            val fragment: Fragment? = mViewPager?.let { mPagerAdapter?.getItemFragment(it.currentItem) }
+            Logcat.d("menu:" + item.itemId + " fragment:" + fragment + " index:" + mViewPager?.currentItem)
+            if (fragment is HistoryFragment) {
+                result = fragment.onOptionSelected(item)
+            } else if (fragment is BrowserFragment) {
+                result = fragment.onOptionSelected(item)
+            } else if (fragment is FavoriteFragment) {
+                result = fragment.onOptionSelected(item)
+            } else if (fragment is LibraryFragment) {
+                result = fragment.onOptionSelected(item)
             }
+            if (!result) {
+                if (item.itemId == R.id.action_extract) {
+                    extractImage(this)
+                }
+                if (item.itemId == R.id.action_create) {
+                    createPdf(this)
+                }
+                if (item.itemId == R.id.action_convert_epub) {
+                    convertToEpub(this)
+                }
+                if (item.itemId == R.id.action_encrypt_decrypt) {
+                    encryptOrDecrypt(this)
+                }
+            }
+            return true
         }
-        return false
     }
 
     private fun loadView() {
@@ -430,5 +447,25 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
         const val PERMISSION_LENGTH = 2
         var STORAGE_PERMISSION = 0
         const val ALL_FILES_PERMISSION = 1
+
+        fun extractImage(context: FragmentActivity) {
+            PdfOperationFragment.showCreateDialog(
+                PdfOperationFragment.TYPE_EXTRACT_IMAGES,
+                context,
+                null
+            )
+        }
+
+        fun createPdf(context: FragmentActivity) {
+            PdfCreationFragment.showCreateDialog(context, null)
+        }
+
+        fun convertToEpub(context: FragmentActivity) {
+            ConvertToEpubFragment.showCreateDialog(context, null)
+        }
+
+        fun encryptOrDecrypt(context: FragmentActivity) {
+            EncryptOrDecryptFragment.showCreateDialog(context, null)
+        }
     }
 }

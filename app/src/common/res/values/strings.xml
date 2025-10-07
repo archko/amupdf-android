@@ -8,6 +8,7 @@
     <string name="create_pdf_label">Create A PDF</string>
     <string name="menu_create">Create A PDF</string>
     <string name="menu_convert_epub">Convert To Epub</string>
+    <string name="menu_encrypt_decrypt">Encrypt/Decrypt</string>
     <string name="create_pdf_select_old">Select old pdf</string>
     <string name="create_pdf_save">Save as pdf</string>
     <string name="create_pdf_select_old_tip">if donot has an old pdf,it will create one for you.</string>
@@ -76,4 +77,32 @@
     <string name="edit_to_page">To:%s</string>
 
     <string name="webdav_title">Webdav config</string>
+
+    <string name="encrypt_decrypt_title">Encrypt/Decrypt</string>
+    <string name="encrypt_decrypt_tips">Pdf info</string>
+    <string name="encrypt_decrypt_add">Select Pdf</string>
+    <string name="encrypt_decrypt_encrypt">Encrypt</string>
+    <string name="encrypt_decrypt_decrypt">Decrypt</string>
+    <string name="encrypt_decrypt_file_path">File Path: %s</string>
+    <string name="encrypt_decrypt_file_size">File Size: %s bytes</string>
+    <string name="encrypt_decrypt_file_name">File Name: %s</string>
+    <string name="encrypt_decrypt_page_count">Page Count: %s</string>
+    <string name="encrypt_decrypt_format">Format: %s</string>
+    <string name="encrypt_decrypt_title2">Title: %s</string>
+    <string name="encrypt_decrypt_author">Author: %s</string>
+    <string name="encrypt_decrypt_subject">Subject: %s</string>
+    <string name="encrypt_decrypt_keywords">Keywords: %s</string>
+    <string name="encrypt_decrypt_creator">Creator: %s</string>
+    <string name="encrypt_decrypt_producer">Producer: %s</string>
+    <string name="encrypt_decrypt_creation_date">Creation Date: %s</string>
+    <string name="encrypt_decrypt_modification_date">Modification Date: %s</string>
+    <string name="encrypt_decrypt_encrypted">Encrypted: %s</string>
+    <string name="encrypt_decrypt_error_read_pdf">Error: Failed to read PDF information - %s</string>
+    <string name="encrypt_decrypt_select_pdf_first">Please select a PDF file first</string>
+    <string name="encrypt_decrypt_input_pwd">Please input password</string>
+    <string name="encrypt_decrypt_encrypt_success">Encrypt successfully\n%s</string>
+    <string name="encrypt_decrypt_encrypt_failed">Encrypt failed</string>
+    <string name="encrypt_decrypt_decrypt_success">Decrypt successfully\n%s</string>
+    <string name="encrypt_decrypt_decrypt_failed">Decrypt failed</string>
+    <string name="waiting">Waiting...</string>
 </resources>

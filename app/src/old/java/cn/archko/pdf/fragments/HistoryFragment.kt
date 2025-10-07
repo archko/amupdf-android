@@ -158,16 +158,31 @@ class HistoryFragment : BrowserFragment() {
         return false
     }
 
-    override fun onOptionSelected(menuItem: MenuItem) {
+    override fun onOptionSelected(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
-            R.id.action_backup -> backup()
-            R.id.action_config_webdav -> configWebdav()
-            R.id.action_backup_webdav -> backupToWebdav()
-            R.id.action_restore_webdav -> restoreFromWebdav()
-            R.id.action_restore -> restore()
-            R.id.action_extract -> extractImage(requireActivity())
+            R.id.action_backup -> {
+                backup()
+                return true
+            }
+            R.id.action_config_webdav -> {
+                configWebdav()
+                return true
+            }
+            R.id.action_backup_webdav -> {
+                backupToWebdav()
+                return true
+            }
+            R.id.action_restore_webdav -> {
+                restoreFromWebdav()
+                return true
+            }
+            R.id.action_restore -> {
+                restore()
+                return true
+            }
+            /*R.id.action_extract -> extractImage(requireActivity())
             R.id.action_create -> createPdf(requireActivity())
-            R.id.action_convert_epub -> convertToEpub(requireActivity())
+            R.id.action_convert_epub -> convertToEpub(requireActivity())*/
             R.id.action_style -> {
                 if (mStyle == STYLE_LIST) {
                     mStyle = STYLE_GRID
@@ -176,8 +191,10 @@ class HistoryFragment : BrowserFragment() {
                 }
                 PdfOptionRepository.setStyle(mStyle)
                 applyStyle()
+                return true
             }
         }
+        return false
     }
 
     private fun backup() {

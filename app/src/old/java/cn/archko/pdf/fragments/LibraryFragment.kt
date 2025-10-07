@@ -33,9 +33,6 @@ import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.entity.ResponseHandler
 import cn.archko.pdf.core.utils.CompareUtils
 import cn.archko.pdf.core.utils.Utils
-import cn.archko.pdf.fragments.BrowserFragment.Companion.convertToEpub
-import cn.archko.pdf.fragments.BrowserFragment.Companion.createPdf
-import cn.archko.pdf.fragments.BrowserFragment.Companion.extractImage
 import cn.archko.pdf.utils.FetcherUtils
 import cn.archko.pdf.viewmodel.HistoryViewModel.Companion.STYLE_GRID
 import cn.archko.pdf.viewmodel.HistoryViewModel.Companion.STYLE_LIST
@@ -44,7 +41,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import java.util.Locale
+import java.util.*
 
 /**
  * @description:library list
@@ -116,11 +113,11 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
         super.onDestroy()
     }
 
-    fun onOptionSelected(menuItem: MenuItem) {
+    fun onOptionSelected(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
-            R.id.action_extract -> extractImage(requireActivity())
+            /*R.id.action_extract -> extractImage(requireActivity())
             R.id.action_create -> createPdf(requireActivity())
-            R.id.action_convert_epub -> convertToEpub(requireActivity())
+            R.id.action_convert_epub -> convertToEpub(requireActivity())*/
             R.id.action_style -> {
                 if (mStyle == STYLE_LIST) {
                     mStyle = STYLE_GRID
@@ -129,8 +126,10 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
                 }
                 PdfOptionRepository.setStyle(mStyle)
                 applyStyle()
+                return true
             }
         }
+        return false
     }
 
     private fun applyStyle() {
