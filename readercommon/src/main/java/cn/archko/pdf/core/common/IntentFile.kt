@@ -536,6 +536,13 @@ object IntentFile {
                 || path.endsWith(".azw4", true)
     }
 
+    fun isAzw(path: String): Boolean {
+        return path.endsWith(".azw", true)
+                || path.endsWith(".azw2", true)
+                || path.endsWith(".azw3", true)
+                || path.endsWith(".azw4", true)
+    }
+
     fun isDocx(path: String): Boolean {
         return path.endsWith(".docx", true)
     }

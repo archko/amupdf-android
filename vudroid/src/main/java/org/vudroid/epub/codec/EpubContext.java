@@ -16,13 +16,13 @@ public class EpubContext implements CodecContext {
 
     public CodecDocument openDocument(String fileName) {
         String path = fileName;
-        /*if (IntentFile.INSTANCE.isMobi(fileName)) {
+        if (IntentFile.INSTANCE.isAzw(fileName)) {
             File result = LibMobi.convertMobiToEpub(new File(fileName));
             if (null == result || !result.exists()) {
                 return null;
             }
             path = result.getAbsolutePath();
-        } else */if (IntentFile.INSTANCE.isDocx(fileName)) {
+        } else if (IntentFile.INSTANCE.isDocx(fileName)) {
             File result = LibMobi.convertDocxToHtml(new File(fileName));
             if (null == result || !result.exists()) {
                 return null;
