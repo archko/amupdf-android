@@ -147,7 +147,7 @@ public class LibMobi {
 
             String outputHtml = folderPath + File.separator + hashCode + ".html";
             Log.d("", String.format("convertDocxToHtml: file=%s, folder=%s, convertFilePath=%s", input, folderPath, outputHtml));
-            boolean res = StreamUtils.saveStringToFile("<html><head></head><body>" + html + "</body></html>", outputHtml);
+            boolean res = StreamUtils.saveStringToFile("<html><head><meta charSet='utf-8'/></head><body>" + html + "</body></html>", outputHtml);
             if (res) {
                 res = convertToEpub("archko", file.getName(), outputFile.getAbsolutePath(), outputHtml, images);
                 for (Map.Entry<String, String> image : images.entrySet()) {
