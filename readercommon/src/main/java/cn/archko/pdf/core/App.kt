@@ -5,8 +5,7 @@ import android.app.Application
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.CrashHandler
 import cn.archko.pdf.core.common.Graph
-import com.tencent.bugly.library.Bugly
-import com.tencent.bugly.library.BuglyBuilder
+import com.tencent.bugly.crashreport.CrashReport
 import com.tencent.mmkv.MMKV
 import vn.chungha.flowbus.FlowBusInitApplication
 
@@ -19,10 +18,7 @@ open class App : Application() {
         Graph.provide(this)
         MMKV.initialize(this)
         FlowBusInitApplication.initializer(this)
-        val appId = "aaeff47e9b"
-        val appKey = "b7958f11-2a32-4ba8-ae82-f73f89108b75"
-        val builder = BuglyBuilder(appId, appKey)
-        Bugly.init(applicationContext, builder, false)
+        CrashReport.initCrashReport(applicationContext, "aaeff47e9b", false)
 
         Thread.setDefaultUncaughtExceptionHandler(CrashHandler())
         val displayMetrics = resources.displayMetrics

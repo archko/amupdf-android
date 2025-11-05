@@ -24,7 +24,7 @@ minSdk = "23"
 mmkv = "2.2.3"
 mupdfFitz = "1.26.5"
 okhttp = "4.12.0"
-crashreport = "4.4.6.2"
+crashreport = "4.1.9.3"
 room = "2.8.0"
 
 constraintLayout = "2.2.1"
@@ -52,8 +52,8 @@ sardine = "0.9"
 k2pdfopt = "0.2.0"
 juniversalchardet = "2.5.0"
 
-versionCode = "471"
-versionName = "7.7.1"
+versionCode = "472"
+versionName = "7.7.2"
 
 [libraries]
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
@@ -108,7 +108,7 @@ constraintLayout = { group = "androidx.constraintlayout", name = "constraintlayo
 sardine = { group = "com.github.thegrizzlylabs", name = "sardine-android", version.ref = "sardine" }
 k2pdfopt = { group = "com.archko.reader", name = "k2pdfopt", version.ref = "k2pdfopt" }
 mmkv = { module = "com.tencent:mmkv", version.ref = "mmkv" }
-crashreport = { module = "com.tencent.bugly_16kb:bugly-pro", version.ref = "crashreport" }
+crashreport = { module = "com.tencent.bugly:crashreport", version.ref = "crashreport" }
 juniversalchardet = { module = "com.github.albfernandez:juniversalchardet", version.ref = "juniversalchardet" }
 
 penfeizhou-awebp = { group = "com.github.penfeizhou.android.animation", name = "awebp", version.ref = "penfeizhou" }
