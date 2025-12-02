@@ -24,6 +24,7 @@ import cn.archko.pdf.core.listeners.ClickListener
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.fragments.SearchFragment
+import cn.archko.pdf.imagedroid.codec.AlbumDocument
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TTSEngine
@@ -193,6 +194,17 @@ open class ANormalViewController(
         }
 
         docViewModel.setPageCount(mPageSizes!!.size)
+
+        if (document is AlbumDocument && mPageSizes!!.size == 1) {
+            val firstPageSize = mPageSizes!![0]
+            val width = firstPageSize.width
+            val height = firstPageSize.height
+            println("old.scrollOrientation:$scrollOrientation, width:$width-$height")
+            // 如果图片的高度小于宽度的1/3，则切换为横向滚动
+            if (height < width / 3) {
+                setOrientation(LinearLayoutManager.HORIZONTAL)
+            }
+        }
 
         controllerListener?.doLoadedDoc(
             mPageSizes!!.size,
