@@ -103,7 +103,7 @@ class PdfFetcher(
 
         return ImageFetchResult(
             image = imageBitmap,
-            dataSource = DataSource.MEMORY,
+            dataSource = DataSource.DISK,
             isSampled = false
         )
     }

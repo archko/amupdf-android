@@ -67,12 +67,8 @@ android {
     sourceSets {
         named("main") {
             //java.setSrcDirs(listOf("src/main/java", "src/common/java"))
-            java.srcDir("src/common/java")
             //java.srcDir("src/compose/java")
-            java.srcDir("src/old/java")
-            res.srcDir("src/old/res")
             //res.srcDir("src/compose/res")
-            res.srcDir("src/common/res")
         }
     }
 

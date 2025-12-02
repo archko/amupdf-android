@@ -10,7 +10,7 @@ androidxBrowser = "1.8.0"
 androidxCore = "1.16.0"
 androidxCoreSplashscreen = "1.0.1"
 androidxConstraintlayout = "1.0.1"
-androidxLifecycle = "2.9.3"
+androidxLifecycle = "2.9.6"
 coil = "3.3.0"
 # @keep
 compileSdk = "36"
@@ -52,8 +52,8 @@ sardine = "0.9"
 k2pdfopt = "0.2.0"
 juniversalchardet = "2.5.0"
 
-versionCode = "472"
-versionName = "7.7.2"
+versionCode = "480"
+versionName = "7.8.0"
 
 [libraries]
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
