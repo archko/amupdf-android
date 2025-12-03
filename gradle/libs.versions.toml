@@ -4,13 +4,10 @@ androidDesugarJdkLibs = "2.1.5"
 androidGradlePlugin = "8.10.1"
 androidTools = "31.10.0"
 androidxActivity = "1.10.1"
-fragment = "1.8.8"
+fragment = "1.8.9"
 androidxAppCompat = "1.7.1"
-androidxBrowser = "1.8.0"
-androidxCore = "1.16.0"
-androidxCoreSplashscreen = "1.0.1"
-androidxConstraintlayout = "1.0.1"
-androidxLifecycle = "2.9.6"
+androidxCore = "1.17.0"
+androidxLifecycle = "2.9.3"
 coil = "3.3.0"
 # @keep
 compileSdk = "36"
@@ -21,7 +18,7 @@ kotlinxSerializationJson = "1.8.0"
 ksp = "2.1.20-2.0.0"
 mammoth = "1.5.0" #1.7.0依赖问题导致崩溃,1.8.0不崩溃但无法解析,1.5.0有些docx转换失败
 minSdk = "23"
-mmkv = "2.2.3"
+mmkv = "2.2.4"
 mupdfFitz = "1.26.5"
 okhttp = "4.12.0"
 crashreport = "4.1.9.3"
@@ -33,7 +30,7 @@ umengAsms = "1.8.0"
 colorPickerDialog = "0.2.2"
 flinger = "1.1.1"
 paging = "3.3.2"
-tiff-android = "1.1.2"
+tiff-android = "1.1.4"
 penfeizhou = "3.0.5"
 android-gif-drawable = "1.2.29"
 
@@ -64,7 +61,6 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
-androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxCoreSplashscreen" }
 androidx-lifecycle-runtimeKtx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
 androidx-lifecycle-viewmodelKtx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidxLifecycle" }
 androidx-lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata", version.ref = "androidxLifecycle" }
@@ -73,8 +69,6 @@ coil-kt = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coil" }
 coil-kt-network-okhttp = { group = "io.coil-kt.coil3-network-okhttp", name = "coil", version.ref = "coil" }
 
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
-kotlinx-coroutines-guava = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-guava", version.ref = "kotlinxCoroutines" }
-kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 mammoth = { module = "org.zwobble.mammoth:mammoth", version.ref = "mammoth" }
@@ -96,7 +90,6 @@ room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", vers
 umeng-asms = { module = "com.umeng.umsdk:asms", version.ref = "umengAsms" }
 umeng-common = { module = "com.umeng.umsdk:common", version.ref = "umengCommon" }
 colorPickerDialog = { module = "me.jfenn.ColorPickerDialog:base", version.ref = "colorPickerDialog" }
-flinger = { module = "com.github.iamjosephmj:flinger", version.ref = "flinger" }
 
 multidex = { group = "androidx.multidex", name = "multidex", version.ref = "multidex" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
@@ -118,7 +111,6 @@ tiff-loader = { module = "com.archko.reader.image:library-android", version.ref 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
-android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

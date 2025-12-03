@@ -1,10 +1,13 @@
 package org.vudroid.djvudroid.codec;
 
+import com.archko.reader.image.DjvuLoader;
+
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.OutlineLink;
 import org.vudroid.core.codec.PageTextBox;
 import org.vudroid.core.codec.SearchResult;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -12,33 +15,25 @@ import java.util.Locale;
 import cn.archko.pdf.core.entity.ReflowBean;
 
 public class DjvuDocument implements CodecDocument {
-    private long contextHandle;
-    private long documentHandle;
+    private DjvuLoader djvuLoader;
     private List<OutlineLink> docOutline;
 
-    private DjvuDocument(long contextHandle, long documentHandle, Object waitObject) {
-        this.contextHandle = contextHandle;
-        this.documentHandle = documentHandle;
+    private DjvuDocument(DjvuLoader djvuLoader) {
+        this.djvuLoader = djvuLoader;
     }
 
-    static DjvuDocument openDocument(String fileName, DjvuContext djvuContext, Object waitObject) {
-        return new DjvuDocument(djvuContext.getContextHandle(), open(djvuContext.getContextHandle(), fileName), waitObject);
+    static DjvuDocument openDocument(String fileName, DjvuContext djvuContext) {
+        DjvuLoader loader = new DjvuLoader();
+        loader.openDjvu(new File(fileName).getAbsolutePath());
+        return new DjvuDocument(loader);
     }
-
-    private native static long open(long contextHandle, String fileName);
-
-    private native static long getPage(long docHandle, int pageNumber);
-
-    private native static int getPageCount(long docHandle);
-
-    private native static void free(long pageHandle);
 
     public DjvuPage getPage(int pageNumber) {
-        return new DjvuPage(contextHandle, documentHandle, getPage(documentHandle, pageNumber), pageNumber);
+        return new DjvuPage(djvuLoader, pageNumber);
     }
 
     public int getPageCount() {
-        return getPageCount(documentHandle);
+        return djvuLoader.getDjvuInfo().getPages();
     }
 
     @Override
@@ -48,11 +43,10 @@ public class DjvuDocument implements CodecDocument {
     }
 
     public synchronized void recycle() {
-        if (documentHandle == 0) {
-            return;
+        if (djvuLoader != null) {
+            djvuLoader.close();
+            djvuLoader = null;
         }
-        free(documentHandle);
-        documentHandle = 0;
     }
 
     @Override
@@ -64,7 +58,7 @@ public class DjvuDocument implements CodecDocument {
     public List<OutlineLink> getOutline() {
         if (docOutline == null) {
             final DjvuOutline ou = new DjvuOutline();
-            docOutline = ou.getOutline(documentHandle);
+            docOutline = ou.getOutline(djvuLoader);
         }
         return docOutline;
     }
@@ -79,10 +73,7 @@ public class DjvuDocument implements CodecDocument {
         List<SearchResult> searchResults = new ArrayList<>();
         int count = getPageCount();
         for (int i = 0; i < count; i++) {
-            final List<PageTextBox> results = DjvuPage.getPageText(documentHandle,
-                    pageNum,
-                    contextHandle,
-                    pattern.toLowerCase(Locale.ROOT));
+            final List<PageTextBox> results = DjvuPage.getPageTextSync(djvuLoader, pageNum, pattern.toLowerCase(Locale.ROOT));
             if (results == null || results.isEmpty()) {
                 continue;
             }
@@ -101,18 +92,4 @@ public class DjvuDocument implements CodecDocument {
 
         return searchResults;
     }
-
-    /*public List<? extends RectF> searchText(final int pageNuber, final String pattern) {
-        final List<PageTextBox> list = DjvuPage.getPageText(documentHandle,
-                pageNuber,
-                context.getContextHandle(),
-                pattern.toLowerCase(Locale.ROOT));
-        if (LengthUtils.isNotEmpty(list)) {
-            CodecPageInfo cpi = getPageInfo(pageNuber);
-            for (final PageTextBox ptb : list) {
-                DjvuPage.normalizeTextBox(ptb, cpi.width, cpi.height);
-            }
-        }
-        return list;
-    }*/
 }

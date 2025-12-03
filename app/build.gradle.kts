@@ -84,7 +84,7 @@ android {
     }
 
     packaging {
-        exclude("META-INF/*.kotlin_module")
+        resources.excludes.add("META-INF/*.kotlin_module")
         jniLibs.keepDebugSymbols += "*/armeabi-v7a/*.so"
         jniLibs.keepDebugSymbols += "*/arm64-v8a/*.so"
     }

@@ -3,128 +3,126 @@ package org.vudroid.djvudroid.codec;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.Log;
+
+import com.archko.reader.image.DjvuLink;
+import com.archko.reader.image.DjvuLoader;
+import com.archko.reader.image.DjvuPageInfo;
+import com.archko.reader.image.TextSearchResult;
 
 import org.vudroid.core.codec.CodecPage;
-import org.vudroid.core.codec.CodecPageInfo;
-import org.vudroid.core.codec.PageLink;
 import org.vudroid.core.codec.PageTextBox;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import cn.archko.pdf.core.cache.BitmapPool;
 import cn.archko.pdf.core.entity.ReflowBean;
 import cn.archko.pdf.core.link.Hyperlink;
-import cn.archko.pdf.core.utils.LengthUtils;
 
 public class DjvuPage implements CodecPage {
-    private long pageHandle;
-    private long contextHandle;
-    private long documentHandle;
-    private int width = 1;
-    private int height = 1;
-    private int pageNumber;
+    private final DjvuLoader djvuLoader;
+    private int width = -1;
+    private int height = -1;
+    private final int pageNumber;
 
-    DjvuPage(long contextHandle, long documentHandle, long pageHandle, int pageNumber) {
-        this.pageHandle = pageHandle;
-        this.contextHandle = contextHandle;
-        this.documentHandle = documentHandle;
+    DjvuPage(DjvuLoader djvuLoader, int pageNumber) {
+        this.djvuLoader = djvuLoader;
         this.pageNumber = pageNumber;
-        getPageInfo(contextHandle, documentHandle, pageNumber);
-    }
-
-    public void getPageInfo(long contextHandle, long documentHandle, final int pageNumber) {
-        final CodecPageInfo info = new CodecPageInfo();
-        final int res = getPageInfo(documentHandle, pageNumber, contextHandle, info);
-        if (res > -1) {
-            width = info.width;
-            height = info.height;
-        }
-    }
-
-    static void normalizeTextBox(final PageTextBox r, final float width, final float height) {
-        final float left = r.left / width;
-        final float right = r.right / width;
-        final float top = 1 - r.top / height;
-        final float bottom = 1 - r.bottom / height;
-        r.left = Math.min(left, right);
-        r.right = Math.max(left, right);
-        r.top = Math.min(top, bottom);
-        r.bottom = Math.max(top, bottom);
-    }
-
-    native static List<PageTextBox> getPageText(long docHandle, int pageNo, long contextHandle, String pattern);
-
-    public static List<PageTextBox> getPageTextSync(long docHandle, int pageNo, long contextHandle, String pattern) {
-        //TempHolder.lock.lock();
-        try {
-            return getPageText(docHandle, pageNo, contextHandle, pattern);
-        } finally {
-            //TempHolder.lock.unlock();
-        }
     }
 
     public int getWidth() {
-        if (width > 1) {
-            return width;
+        if (width == -1) {
+            DjvuPageInfo pageInfo = djvuLoader.getPageInfo(pageNumber);
+            if (pageInfo != null) {
+                width = pageInfo.getWidth();
+            } else {
+                width = 0;
+            }
         }
-        return getWidth(pageHandle);
+        return width;
     }
 
     public int getHeight() {
-        if (height > 1) {
-            return height;
+        if (height == -1) {
+            DjvuPageInfo pageInfo = djvuLoader.getPageInfo(pageNumber);
+            if (pageInfo != null) {
+                height = pageInfo.getHeight();
+            } else {
+                height = 0;
+            }
         }
-        return getHeight(pageHandle);
+        return height;
     }
 
-    public static boolean isListEmpty(List<?> objects) {
-        return objects == null || objects.size() <= 0;
-    }
-
-    public String getPageHTML() {
-        List<PageTextBox> pageText1 = getPageText1();
-        if (isListEmpty(pageText1)) {
-            return "";
-        }
-        StringBuilder res = new StringBuilder();
-        for (PageTextBox p : pageText1) {
-            res.append(p.text);
-            res.append(" ");
-        }
-
-        return res.toString();
-    }
-
-    public String getPageHTMLWithImages() {
-        return "";
-    }
-
-    public List<PageTextBox> getPageText1() {
-        final List<PageTextBox> list = getPageTextSync(documentHandle, pageNumber, contextHandle, null);
-        if (LengthUtils.isNotEmpty(list)) {
-            final float width = getWidth();
-            final float height = getHeight();
-            for (final PageTextBox ptb : list) {
-                normalizeTextBox(ptb, width, height);
+    public static List<PageTextBox> getPageTextSync(DjvuLoader loader, int pageNo, String pattern) {
+        List<PageTextBox> list = new ArrayList<>();
+        if (pattern != null && !pattern.isEmpty()) {
+            List<TextSearchResult> searchResults = loader.searchText(pageNo, pattern);
+            if (searchResults != null) {
+                for (TextSearchResult result : searchResults) {
+                    System.out.println(String.format("TextSearchResult:%s", result));
+                    PageTextBox ptb = new PageTextBox();
+                    ptb.text = result.getText();
+                    ptb.left = result.getX();
+                    ptb.top = result.getY();
+                    ptb.right = result.getWidth();
+                    ptb.bottom = result.getHeight();
+                    list.add(ptb);
+                }
             }
         }
         return list;
     }
 
-    public Bitmap renderBitmap(Rect cropBound, int width, int height, RectF pageSliceBounds, float scale) {
-        //float patchX = (cropBound.left * scale + (int) (pageSliceBounds.left * width));
-        //float patchY = (cropBound.top * scale + (int) (pageSliceBounds.top * height));
-        //Log.d("TAG", String.format("page:%s, scale:%s, patchX:%s, patchY:%s, width:%s, height:%s, %s, %s", pageNumber, scale, patchX, patchY, width, height, cropBound, pageSliceBounds));
+    /**
+     * 解码方法decodeRegionToBitmap的输出高宽是
+     * uint32_t out_width = (uint32_t) (width * scale);
+     * uint32_t out_height = (uint32_t) (height * scale);
+     * 所以传入的要*scale.
+     * 偏移量:
+     * uint32_t scaled_x = (uint32_t)(x * scale);
+     * uint32_t scaled_y = (uint32_t)(y * scale);
+     *
+     * @param cropBound       这是原始高宽的rect,如果有切边,也是按原始高宽切的.
+     * @param targetWidth     这是经过所有的缩放后目标宽
+     * @param targetHeight    这是经过所有的缩放后目标高
+     * @param pageSliceBounds
+     * @param scale           这是view的宽/原始页面*view缩放zoom
+     * @return
+     */
+    public Bitmap renderBitmap(Rect cropBound, int targetWidth, int targetHeight, RectF pageSliceBounds, float scale) {
+        // 1. 基于目标尺寸反推原始区域尺寸
+        int originalWidth = Math.round(targetWidth / scale);
+        int originalHeight = Math.round(targetHeight / scale);
 
-        final int[] buffer = new int[width * height];
-        ///renderPage(pageHandle, contextHandle, pageW, pageH, patchX, patchY, width, height, buffer);
-        renderPage(pageHandle, contextHandle, width, height, pageSliceBounds.left, pageSliceBounds.top, pageSliceBounds.width(), pageSliceBounds.height(), buffer);
+        // 2. 计算原始坐标系中的起始位置
+        int originalX = (int) (cropBound.left + pageSliceBounds.left * cropBound.width());
+        int originalY = (int) (cropBound.top + pageSliceBounds.top * cropBound.height());
 
-        Bitmap bitmap = BitmapPool.getInstance().acquire(width, height, Bitmap.Config.RGB_565);
-        bitmap.setPixels(buffer, 0, width, 0, 0, width, height);
-        return bitmap;
+        // 3. 确保原始区域不超出cropBound范围
+        if (originalX + originalWidth > cropBound.right) {
+            originalWidth = cropBound.right - originalX;
+        }
+        if (originalY + originalHeight > cropBound.bottom) {
+            originalHeight = cropBound.bottom - originalY;
+        }
+        Log.d("TAG", String.format("renderPageRegion:%s, scale:%s, patchX:%s, patchY:%s, target.w-h:%s-%s, page.w-h:%s-%s, %s, %s",
+                pageNumber, scale, originalX, originalY, targetWidth, targetHeight, originalWidth, originalHeight, cropBound, pageSliceBounds));
+        //renderPageRegion:0, scale:0.07058824, patchX:0, patchY:0, target.w-h:180-232, page.w-h:2550-3287, Rect(0, 0 - 2550, 3300), RectF(0.0, 0.0, 1.0, 1.0)
+        //renderPageRegion:0, scale:0.28235295, patchX:0, patchY:1650, target.w-h:360-466, page.w-h:1275-1650, Rect(0, 0 - 2550, 3300), RectF(0.0, 0.5, 0.5, 1.0)
+
+        // 4. 调用JNI方法
+        Bitmap bitmap = djvuLoader.decodeRegionToBitmap(
+                pageNumber,
+                originalX,
+                originalY,
+                originalWidth,
+                originalHeight,
+                scale
+        );
+
+        return bitmap != null ? bitmap : BitmapPool.getInstance().acquire(targetWidth, targetHeight, Bitmap.Config.RGB_565);
     }
 
     @Override
@@ -134,94 +132,65 @@ public class DjvuPage implements CodecPage {
     }
 
     public synchronized void recycle() {
-        if (pageHandle == 0) {
-            return;
-        }
-        free(pageHandle);
-        pageHandle = 0;
+        // No JNI to free
     }
 
     @Override
     public boolean isRecycle() {
-        return pageHandle == -1;
+        return false;
     }
 
     @Override
     public List<Hyperlink> getPageLinks() {
-        final List<Hyperlink> hyperlinks = new ArrayList<>();
-        final List<PageLink> links = getPageLinks(documentHandle, pageNumber);
-        if (links != null) {
-            final float width = getWidth();
-            final float height = getHeight();
-            for (final PageLink link : links) {
-                normalize(link.sourceRect, width, height);
+        List<DjvuLink> links = djvuLoader.getPageLinks(pageNumber);
 
-                Hyperlink hyperlink = new Hyperlink();
-                if (link.url != null && link.url.startsWith("#")) {
-                    try {
-                        link.targetPage = Integer.parseInt(link.url.substring(1)) - 1;
-                        link.url = null;
-                        hyperlink.setLinkType(Hyperlink.LINKTYPE_URL);
-                    } catch (final NumberFormatException ex) {
-                        ex.printStackTrace();
-                    }
-                } else {
-                    hyperlink.setLinkType(Hyperlink.LINKTYPE_PAGE);
-                }
-                hyperlink.setPage(link.targetPage);
-                hyperlink.setUrl(link.url);
-                hyperlink.setBbox(new Rect((int) link.sourceRect.left,
-                        (int) link.sourceRect.top,
-                        (int) link.sourceRect.top,
-                        (int) link.sourceRect.bottom));
-                hyperlinks.add(hyperlink);
+        if (links == null) {
+            return new ArrayList<>();
+        }
+
+        List<Hyperlink> hyperlinks = new ArrayList<>();
+
+        for (DjvuLink link : links) {
+            Hyperlink hyperlink = new Hyperlink();
+            hyperlink.setBbox(new Rect(
+                    link.getX(),
+                    link.getY(),
+                    (link.getX() + link.getWidth()),
+                    (link.getY() + link.getHeight())
+            ));
+
+            if (link.getPage() >= 0) {
+                // 页面链接
+                hyperlink.setLinkType(Hyperlink.LINKTYPE_PAGE);
+                hyperlink.setPage(link.getPage());
+                hyperlink.setUrl(null);
+            } else if (link.getUrl() != null) {
+                // URL链接
+                hyperlink.setLinkType(Hyperlink.LINKTYPE_URL);
+                hyperlink.setUrl(link.getUrl());
+                hyperlink.setPage(-1);
+            } else {
+                // 无效链接，跳过
+                continue;
             }
 
-            return hyperlinks;
+            hyperlinks.add(hyperlink);
         }
-        return Collections.emptyList();
+        return hyperlinks;
     }
 
     public List<ReflowBean> getReflowBean() {
-        String rest = getPageHTML();
+        String text = djvuLoader.getPageText(pageNumber);
         List<ReflowBean> list = new ArrayList<>();
-        ReflowBean bean = new ReflowBean(rest, ReflowBean.TYPE_STRING, pageHandle + "-0");
-        list.add(bean);
+        if (text != null && !text.isEmpty()) {
+            ReflowBean bean = new ReflowBean(text, ReflowBean.TYPE_STRING, pageNumber + "-0");
+            list.add(bean);
+        }
         return list;
-    }
-
-    static void normalize(final RectF r, final float width, final float height) {
-        r.left = r.left / width;
-        r.right = r.right / width;
-        r.top = r.top / height;
-        r.bottom = r.bottom / height;
     }
 
     @Override
     public void loadPage(int pageNumber) {
-
+        // No-op
     }
-
-    private native static int getPageInfo(long docHandle, int pageNumber, long contextHandle, CodecPageInfo cpi);
-
-    private static native int getWidth(long pageHandle);
-
-    private static native int getHeight(long pageHandle);
-
-    private static native boolean renderPage(long pageHandle, long contextHandle,
-                                             int targetWidth, int targetHeight,
-                                             float pageSliceX, float pageSliceY,
-                                             float pageSliceWidth, float pageSliceHeight,
-                                             int[] buffer);
-
-    //argb8888
-    private static native boolean renderPageDirect(long pageHandle, long contextHandle,
-                                                   int pageWidth, int pageHeight,
-                                                   int patchX, int patchY,
-                                                   int patchW, int patchH,
-                                                   int[] buffer);
-
-    private static native void free(long pageHandle);
-
-    private native static ArrayList<PageLink> getPageLinks(long docHandle, int pageNo);
 }

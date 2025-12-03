@@ -2,6 +2,9 @@ package com.archko.reader.mobi;
 
 import android.util.Log;
 
+import com.archko.reader.image.MobiConverter;
+import com.archko.reader.image.MobiMetadata;
+
 import org.zwobble.mammoth.DocumentConverter;
 import org.zwobble.mammoth.Result;
 
@@ -31,31 +34,46 @@ import io.documentnode.epub4j.epub.EpubWriter;
  */
 public class LibMobi {
 
-    static {
-        System.loadLibrary("mobi");
-    }
-
-    public static native int convertToEpub(String input, String output);
-
     public static File convertMobiToEpub(File file) {
         String input = file.getAbsolutePath();
         int hashCode = String.format("%s-%s%s", file.getName(), file.length(), file.lastModified()).hashCode();
-        File outputFile = FileUtils.getDiskCacheDir(App.Companion.getInstance(), String.format("%s-%s%s",file.getName(), hashCode, ".epub"));
+        File outputFile = FileUtils.getDiskCacheDir(App.Companion.getInstance(), String.format("%s-%s%s", file.getName(), hashCode, ".epub"));
         Logcat.d(String.format("convertMobiToEpub: file=%s, convertFilePath=%s",
                 input, outputFile.getAbsoluteFile()));
 
-        int res = -1;
+        boolean res = false;
         if (!outputFile.exists()) {
             try {
-                res = LibMobi.convertToEpub(input, outputFile.getAbsolutePath());
+                MobiConverter converter = new MobiConverter();
+                System.out.println("=== 测试1: 验证 MOBI 文件 ===");
+                boolean isValid = converter.isValidMobiFile(input);
+                System.out.println("文件有效性: " + ((isValid) ? "✓ 有效" : "✗ 无效"));
+
+                if (!isValid) {
+                    System.err.println("文件无效，退出测试");
+                    return null;
+                }
+
+                // 测试2: 获取元数据
+                System.out.println("\n=== 测试2: 获取文件元数据 ===");
+                MobiMetadata metadata = converter.getMetadata(input);
+                if (metadata != null) {
+                    System.out.println("标题: " + metadata.getTitle());
+                    System.out.println("作者: " + metadata.getAuthor());
+                    System.out.println("出版社: " + metadata.getPublisher());
+                    System.out.println("语言: " + metadata.getLanguage());
+                    System.out.println("有封面: " + metadata.getHasCover());
+                    //println("有目录: " + metadata.hasToc)
+                } else {
+                    System.out.println("✗ 无法获取元数据");
+                }
+                res = converter.convertToEpub(input, outputFile.getAbsolutePath());
             } catch (Exception e) {
                 Log.e("", e.getMessage());
             }
-        } else {
-            res = 0;
         }
 
-        if (res != 0) {
+        if (res) {
             if (outputFile.exists()) {
                 outputFile.delete();
             }
@@ -69,24 +87,45 @@ public class LibMobi {
      * @param path
      * @return
      */
-    public static int convertMobiToEpub(String input) {
+    public static boolean convertMobiToEpub(String input) {
         String name = FileUtils.getNameWithoutExt(input);
         String folderPath = input.substring(0, input.lastIndexOf("/"));
         File outputFile = new File(folderPath + File.separator + name + ".epub");
         Logcat.d(String.format("convertMobiToEpubBatch: file=%s, convertFilePath=%s",
                 input, outputFile.getAbsoluteFile()));
 
-        int res = -1;
+        boolean res = false;
         if (!outputFile.exists()) {
             try {
-                res = LibMobi.convertToEpub(input, outputFile.getAbsolutePath());
+                MobiConverter converter = new MobiConverter();
+                System.out.println("=== 测试1: 验证 MOBI 文件 ===");
+                boolean isValid = converter.isValidMobiFile(input);
+                System.out.println("文件有效性: " + ((isValid) ? "✓ 有效" : "✗ 无效"));
+
+                if (!isValid) {
+                    System.err.println("文件无效");
+                    return false;
+                }
+
+                // 测试2: 获取元数据
+                System.out.println("\n=== 测试2: 获取文件元数据 ===");
+                MobiMetadata metadata = converter.getMetadata(input);
+                if (metadata != null) {
+                    System.out.println("标题: " + metadata.getTitle());
+                    System.out.println("作者: " + metadata.getAuthor());
+                    System.out.println("出版社: " + metadata.getPublisher());
+                    System.out.println("语言: " + metadata.getLanguage());
+                    System.out.println("有封面: " + metadata.getHasCover());
+                    //println("有目录: " + metadata.hasToc)
+                } else {
+                    System.out.println("✗ 无法获取元数据");
+                }
+                res = converter.convertToEpub(input, outputFile.getAbsolutePath());
             } catch (Exception e) {
                 Log.e("", e.getMessage());
             }
-        } else {
-            res = 0;
         }
-        if (res != 0) {
+        if (!res) {
             if (outputFile.exists()) {
                 outputFile.delete();
             }
@@ -98,8 +137,8 @@ public class LibMobi {
         int count = 0;
         for (String path : paths) {
             if (IntentFile.INSTANCE.isMobi(path)) {
-                int res = convertMobiToEpub(path);
-                if (res == 0) {
+                boolean res = convertMobiToEpub(path);
+                if (res) {
                     count++;
                 }
             } else if (IntentFile.INSTANCE.isDocx(path)) {
@@ -120,7 +159,7 @@ public class LibMobi {
     public static File convertDocxToHtml(File file) {
         String input = file.getAbsolutePath();
         int hashCode = String.format("%s-%s%s", file.getName(), file.length(), file.lastModified()).hashCode();
-        File outputFile = FileUtils.getDiskCacheDir(App.Companion.getInstance(), String.format("%s-%s%s",file.getName(), hashCode, ".epub"));
+        File outputFile = FileUtils.getDiskCacheDir(App.Companion.getInstance(), String.format("%s-%s%s", file.getName(), hashCode, ".epub"));
         if (outputFile.exists()) {
             return outputFile;
         }
@@ -166,6 +205,7 @@ public class LibMobi {
 
     /**
      * 转换为epub,存在相同的目录
+     *
      * @param input
      * @return
      */

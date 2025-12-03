@@ -28,8 +28,6 @@ android {
 }
 dependencies {
     api(project(":readercommon"))
-    //api("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
-    //api(project(":subsampling-scale-image-view"))
 
     //docx to html
     api(libs.mammoth)
