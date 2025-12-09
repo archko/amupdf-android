@@ -296,15 +296,12 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
     //========================================
 
     private fun checkForExternalPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            requestAllFilesAccess(this)
+        } else {
             if (!checkStoragePermission()) {
                 requestStoragePermission(this, true)
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                requestAllFilesAccess(this)
-            }
-        } else {
-            loadView()
         }
     }
 

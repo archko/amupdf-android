@@ -22,6 +22,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.reflect.Method
+import java.net.URLDecoder
 import java.util.*
 
 object IntentFile {
@@ -43,31 +44,38 @@ object IntentFile {
         return path
     }
 
+    /**
+     * 这是galaxy s25打开registerForActivityResult(ActivityResultContracts.StartActivityForResult())返回的数据
+     * content://com.android.externalstorage.documents/document/primary%3Abook%2F%E5%AD%90%E4%B9%8C%E4%B9%A6%E7%AE%80%E5%85%A8%E7%AB%99mobi%E4%B9%A6%E7%B1%8D_part3%2F%E5%81%B6%E5%8F%91%E7%A9%BA%E7%BC%BA.mobi
+     * 下面是用calf打开文件选择返回的结果,content://com.android.providers.media.documents/document/document%3A148
+     * 同样在galaxy s25上,却是两种结果.
+     */
     @JvmStatic
-    fun getPath(context: Context, data: Uri?): String? {
-        if (null == data) {
+    fun getPath(context: Context, uri: Uri?): String? {
+        if (null == uri) {
             return null
         }
-        Log.d("uri", data.toString())
-        val path: String? = getFilePathByUri(context, data)
-        Log.d("path", "path:$path")
-        return path
-    }
-
-    @JvmStatic
-    fun getFilePathByUri(context: Context, uri: Uri): String? {
-        var path: String? = getRealPathFromURI(context, uri)
+        Log.d("uri", uri.toString())
+        var path: String? = null
         if (ContentResolver.SCHEME_CONTENT == uri.scheme) {
             path = getRealPathFromURI(context, uri)
             if (path == null) {
                 path = getFullPathFromTreeUri(uri, context)
             }
+        } else if (ContentResolver.SCHEME_FILE == uri.scheme) {
+            //下面是galaxy s25打开文件浏览器后选中文件的,会有编码.
+            //file:///storage/emulated/0/book/%E5%AE%B6%E4%B9%A1.pdf
+            path = uri.toString().substring("file://".length)
+            path = URLDecoder.decode(path)
         }
+        Log.d("path", "path:$path")
         return path
     }
 
+    /**
+     * 14以下的系统,可以获取真实的路径,15以后,就查不到了.这里只能匹配14及以下的.
+     */
     fun getRealPathFromURI(context: Context?, uri: Uri): String? {
-        // DocumentProvider
         if (DocumentsContract.isDocumentUri(context, uri)) {
             // ExternalStorageProvider
             if (isExternalStorageDocument(uri)) {
@@ -127,7 +135,53 @@ object IntentFile {
         return getPathFromOther(uri)
     }
 
-    @Suppress("deprecation")
+    /**
+     * 安全获取 Document ID（兼容 Android 15+）
+     * @param uri 媒体文件的 DocumentsContract URI
+     * @return 解析后的 Document ID，失败返回 null
+     */
+    fun getSafeDocumentId(uri: Uri?): String? {
+        if (uri == null) {
+            return null
+        }
+
+        // 方案1：优先尝试系统API（捕获异常）
+        try {
+            val docId = DocumentsContract.getDocumentId(uri)
+            if (docId != null && !docId.isEmpty()) {
+                return docId
+            }
+        } catch (e: java.lang.Exception) {
+            // Android 15 崩溃时走手动解析
+            e.printStackTrace()
+        }
+
+        // 方案2：手动解析 URI 路径（兼容非标准格式）
+        val path = uri.encodedPath ?: return null
+
+        // 分割路径段：content://xxx/document/document%3A148 → 路径段为 ["", "document", "document%3A148"]
+        val segments: Array<String?> =
+            path.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        if (segments.size < 3) {
+            return null
+        }
+
+        // 提取最后一段并解码（如 document%3A148 → document:148）
+        val lastSegment = segments[segments.size - 1]
+        val decodedSegment = Uri.decode(lastSegment)
+
+        // 提取 ID 部分（处理 "document:148" 或 "image:148" 格式）
+        val idParts: Array<String?> =
+            decodedSegment.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        if (idParts.size >= 2) {
+            return idParts[1] // 返回 148
+        }
+
+        // 兼容无分隔符的情况（如直接是 148）
+        return decodedSegment
+    }
+
+    //15+的系统:content://com.android.providers.media.documents/document/document%3A148
     fun getFullPathFromTreeUri(treeUri: Uri?, context: Context): String? {
         if (treeUri == null) {
             return null
@@ -141,11 +195,11 @@ object IntentFile {
                         .path
                 if (docId == "downloads") {
                     return extPath
-                } else if (docId.matches("^ms[df]\\:.*".toRegex())) {
+                } else if (docId.matches("^ms[df]:.*".toRegex())) {
                     val fileName: String? = getFileName(treeUri, context)
                     return "$extPath/$fileName"
                 } else if (docId.startsWith("raw:")) {
-                    val rawPath: String? =
+                    val rawPath: String =
                         docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]
                     return rawPath
                 }
@@ -153,19 +207,16 @@ object IntentFile {
             }
         }
 
-        var volumePath: String? = getVolumePath(getVolumeIdFromTreeUri(treeUri), context)
+        var volumePath: String? =
+            getVolumePath(getVolumeIdFromTreeUri(treeUri), context) ?: return File.separator
 
-        if (volumePath == null) {
-            return File.separator
-        }
-
-        if (volumePath.endsWith(File.separator)) volumePath =
-            volumePath.substring(0, volumePath.length - 1)
+        if (volumePath!!.endsWith(File.separator)) volumePath =
+            volumePath.dropLast(1)
 
         var documentPath: String? = getDocumentPathFromTreeUri(treeUri)
 
-        if (null != documentPath && documentPath.endsWith(File.separator)) documentPath =
-            documentPath.substring(0, documentPath.length - 1)
+        if (null != documentPath && documentPath.endsWith(File.separator))
+            documentPath = documentPath.dropLast(1)
 
         if (null != documentPath && documentPath.isNotEmpty()) {
             if (documentPath.startsWith(File.separator)) {
@@ -195,7 +246,7 @@ object IntentFile {
                 }
             }
             if (result == null) {
-                result = uri.getPath()
+                result = uri.path
                 val cut = result!!.lastIndexOf('/')
                 if (cut != -1) {
                     result = result.substring(cut + 1)
@@ -264,7 +315,7 @@ object IntentFile {
     }
 
     private fun getVolumeIdFromTreeUri(treeUri: Uri?): String? {
-        val docId = DocumentsContract.getTreeDocumentId(treeUri)
+        val docId = getSafeDocumentId(treeUri) ?: return null
         val split: Array<String?> =
             docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         if (split.isNotEmpty()) return split[0]
@@ -272,11 +323,11 @@ object IntentFile {
     }
 
     private fun getDocumentPathFromTreeUri(treeUri: Uri?): String? {
-        val docId = DocumentsContract.getTreeDocumentId(treeUri)
+        val docId = getSafeDocumentId(treeUri) ?: return null
         val split: Array<String?> =
             docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        if ((split.size >= 2) && (split[1] != null)) return split[1]
-        else return File.separator
+        return if ((split.size >= 2) && (split[1] != null)) split[1]
+        else File.separator
     }
 
     /**
@@ -291,7 +342,7 @@ object IntentFile {
      * @param uri The Uri to check.
      * @return Whether the Uri is a FileProvider URI.
      */
-    public fun isFileProviderUri(uri: Uri): Boolean {
+    fun isFileProviderUri(uri: Uri): Boolean {
         return uri.authority?.contains("fileProvider") == true
     }
 
@@ -300,7 +351,7 @@ object IntentFile {
      * @param uri The FileProvider Uri
      * @return The file path or null if cannot be extracted
      */
-    public fun getFileProviderPath(uri: Uri): String? {
+    fun getFileProviderPath(uri: Uri): String? {
         try {
             val pathSegments = uri.pathSegments
             if (pathSegments != null && pathSegments.isNotEmpty()) {

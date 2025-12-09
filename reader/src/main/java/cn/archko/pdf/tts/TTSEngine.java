@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.UtteranceProgressListener;
@@ -60,7 +61,7 @@ public class TTSEngine {
         public void onInit(int status) {
             if (status == TextToSpeech.SUCCESS) {
                 initStatus = true;
-                int result = textToSpeech.setLanguage(Locale.CHINA);
+                int result = textToSpeech.setLanguage(Locale.CHINESE);
                 Log.e(TAG, "初始化:" + result);
                 if (result == TextToSpeech.LANG_AVAILABLE) {
                     //检查文档中其他可能的结果代码。
@@ -102,21 +103,23 @@ public class TTSEngine {
         ttsContent.clear();
     }
 
-    public void getTTS(OnInitListener listener) {
-        if (listener == null) {
-            listener = this.listener;
+    public void getTTS(OnInitListener onInitListener) {
+        if (onInitListener == null) {
+            onInitListener = this.listener;
         }
         List<String> engines = getEngines(App.Companion.getInstance());
+        Log.e(TAG, "Available engines: " + engines);
         if (null == engines || engines.isEmpty()) {
-            listener.onInit(TextToSpeech.ERROR);
+            onInitListener.onInit(TextToSpeech.ERROR);
             return;
         }
         if (textToSpeech != null) {
             initStatus = true;
-            listener.onInit(TextToSpeech.SUCCESS);
+            onInitListener.onInit(TextToSpeech.SUCCESS);
             return;
         }
-        textToSpeech = new TextToSpeech(App.Companion.getInstance(), listener);
+
+        textToSpeech = new TextToSpeech(App.Companion.getInstance(), onInitListener);
         textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override
             public void onStart(String utteranceId) {
@@ -148,6 +151,7 @@ public class TTSEngine {
                 ReflowBean key = keys.remove(utteranceId);
                 Logcat.d(TAG, String.format("onError:%s, %s", utteranceId, key));
                 ttsContent.remove(key);
+                textToSpeech.shutdown();
             }
         });
     }
@@ -276,7 +280,7 @@ public class TTSEngine {
             Logcat.d(TAG, "textToSpeech not initialized");
             return;
         }
-        textToSpeech.speak(bean.getData(), TextToSpeech.QUEUE_ADD, null, bean.getPage());
+        textToSpeech.speak(bean.getData(), TextToSpeech.QUEUE_ADD, new Bundle(), bean.getPage());
     }
 
     public void resumeSpeak(final ReflowBean bean) {

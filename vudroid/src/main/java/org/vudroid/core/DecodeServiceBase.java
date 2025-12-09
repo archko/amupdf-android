@@ -184,7 +184,8 @@ public class DecodeServiceBase implements DecodeService {
     };
 
     public static CodecContext openContext(String path) {
-        if (IntentFile.INSTANCE.isEpub(path) || IntentFile.INSTANCE.isMobi(path) || IntentFile.INSTANCE.isDocx(path)) {
+        if (IntentFile.INSTANCE.isEpub(path) || IntentFile.INSTANCE.isMobi(path)
+                || IntentFile.INSTANCE.isDocx(path) || IntentFile.INSTANCE.isAzw(path)) {
             return new EpubContext();
         } else if (IntentFile.INSTANCE.isMuPdf(path)) {
             return new PdfContext();
@@ -291,7 +292,7 @@ public class DecodeServiceBase implements DecodeService {
 
     @Override
     public void resetCrop() {
-        for (var page:aPageList){
+        for (var page : aPageList) {
             page.setCropBounds(null);
         }
         APageSizeLoader.INSTANCE.deletePageSizeFromFile(path);
