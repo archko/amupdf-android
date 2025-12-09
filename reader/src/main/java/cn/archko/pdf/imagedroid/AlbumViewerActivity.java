@@ -2,6 +2,7 @@ package cn.archko.pdf.imagedroid;
 
 import android.app.ProgressDialog;
 import android.text.TextUtils;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import org.vudroid.core.BaseViewerActivity;
@@ -10,6 +11,7 @@ import org.vudroid.core.DecodeServiceBase;
 import org.vudroid.core.codec.CodecDocument;
 
 import cn.archko.pdf.core.common.AppExecutors;
+import cn.archko.pdf.core.entity.APage;
 import cn.archko.pdf.imagedroid.codec.AlbumContext;
 import cn.archko.pdf.imagedroid.codec.AlbumDocument;
 
@@ -73,6 +75,17 @@ public class AlbumViewerActivity extends BaseViewerActivity {
                     return;
                 }
                 isDocLoaded = true;
+
+                APage firstPageSize = decodeService.getPageSizeBean().getList().get(0);
+                float width = firstPageSize.getWidth();
+                float height = firstPageSize.getHeight();
+                System.out.println("old.scrollOrientation:$scrollOrientation, width:$width-$height");
+                // 如果图片的高度小于宽度的1/3，则切换为横向滚动
+                if (height < width / 3) {
+                    seekbarControls.setOrientation(LinearLayout.HORIZONTAL);
+                    documentView.setOriention(LinearLayout.HORIZONTAL);
+                }
+
                 documentView.showDocument(autoCrop);
                 seekbarControls.update(decodeService.getPageCount(), 0);
             });
