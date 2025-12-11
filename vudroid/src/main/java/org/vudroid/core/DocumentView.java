@@ -457,6 +457,10 @@ public class DocumentView extends View implements ZoomListener {
     public boolean onTouchEvent(MotionEvent ev) {
         super.onTouchEvent(ev);
 
+        if(!isInitialized) {
+            return true;
+        }
+
         if (multiTouchZoom != null) {
             if (multiTouchZoom.onTouchEvent(ev)) {
                 return true;
@@ -734,67 +738,6 @@ public class DocumentView extends View implements ZoomListener {
         } else {
             return zoomModel.getZoom() * (1.0f * getHeight() / vuPage.getHeight(crop));
         }
-    }
-
-    public int getPage() {
-        if (oriention == HORIZONTAL) {
-            if (widthAccum == 0) {
-                return 0;
-            }
-            int offset = getScrollX();
-            int index = (int) (offset / widthAccum * pages.size());
-            if (index < 0) {
-                index = 0;
-            } else if (index >= pages.size()) {
-                index = pages.size() - 1;
-            }
-            Page page = pages.get(index);
-
-            if (page.getBottom() > offset) {
-                for (int i = index; i < pages.size(); i++) {
-                    page = pages.get(i);
-                    if (offset >= page.getLeft() && offset <= page.getRight()) {
-                        return i;
-                    }
-                }
-            } else {
-                for (int i = index; i >= 0; i--) {
-                    page = pages.get(i);
-                    if (offset >= page.getLeft() && offset <= page.getRight()) {
-                        return i;
-                    }
-                }
-            }
-        } else {
-            if (heightAccum == 0) {
-                return -1;
-            }
-            int offset = getScrollY();
-            int index = (int) (offset / heightAccum * pages.size());
-            if (index < 0) {
-                index = 0;
-            } else if (index >= pages.size()) {
-                index = pages.size() - 1;
-            }
-            Page page = pages.get(index);
-
-            if (page.getBottom() < offset) {
-                for (int i = index; i < pages.size(); i++) {
-                    page = pages.get(i);
-                    if (offset >= page.getTop() && offset <= page.getBottom()) {
-                        return i;
-                    }
-                }
-            } else {
-                for (int i = index; i >= 0; i--) {
-                    page = pages.get(i);
-                    if (offset >= page.getTop() && offset <= page.getBottom()) {
-                        return i;
-                    }
-                }
-            }
-        }
-        return -1;
     }
 
     public int getPageCount() {
