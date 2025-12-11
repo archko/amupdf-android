@@ -61,6 +61,7 @@ public class DecodeServiceBase implements DecodeService {
     private final List<APage> aPageList = new ArrayList<>();
     private String path;
     private boolean cachePage = true;
+    private boolean crop = false;
     private APageSizeLoader.PageSizeBean pageSizeBean;
     private final Handler.Callback mCallback = new Handler.Callback() {
         public boolean handleMessage(Message msg) {
@@ -243,6 +244,7 @@ public class DecodeServiceBase implements DecodeService {
     public CodecDocument open(String path, boolean cachePage, boolean crop) {
         this.path = path;
         this.cachePage = cachePage;
+        this.crop = crop;
         aPageList.clear();
         long start = System.currentTimeMillis();
         document = codecContext.openDocument(path);
@@ -274,7 +276,7 @@ public class DecodeServiceBase implements DecodeService {
             }
 
             if (cachePage) {
-                APageSizeLoader.INSTANCE.savePageSizeToFile(false, path, aPageList);
+                APageSizeLoader.INSTANCE.savePageSizeToFile(crop, path, aPageList);
             }
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
@@ -573,7 +575,7 @@ public class DecodeServiceBase implements DecodeService {
         if (cropTasks.isEmpty()) {
             if (cachePage) {
                 Log.d(TAG, String.format("processCropTask.save:%s->%s", task.pageNumber, aPageList.size()));
-                APageSizeLoader.INSTANCE.savePageSizeToFile(true, path, aPageList);
+                APageSizeLoader.INSTANCE.savePageSizeToFile(this.crop, path, aPageList);
             }
         }
     }
@@ -644,7 +646,7 @@ public class DecodeServiceBase implements DecodeService {
         Log.d(TAG, String.format("recycle:%s-%s, %s", cachePage, path, aPageList));
 
         if (cachePage && !TextUtils.isEmpty(path) && aPageList != null && !aPageList.isEmpty()) {
-            APageSizeLoader.INSTANCE.savePageSizeToFile(false, path, aPageList);
+            APageSizeLoader.INSTANCE.savePageSizeToFile(this.crop, path, aPageList);
         }
 
         if (null != mHandler) {

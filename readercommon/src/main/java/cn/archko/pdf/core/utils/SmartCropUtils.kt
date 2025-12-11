@@ -138,11 +138,12 @@ public object SmartCropUtils {
         val g = (pixel shr 8) and 0xFF
         val b = pixel and 0xFF
         return (r + g + b) / 3
-    }    /*
-*
+    }    
+    
+    /*
+     *
      * 获取左边界 - 按需读取版本
      */
-
     private fun getLeftCropBound(
         bitmap: Bitmap,
         width: Int,
