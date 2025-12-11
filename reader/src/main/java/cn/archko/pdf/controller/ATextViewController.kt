@@ -157,11 +157,13 @@ class ATextViewController(
         }
     }
 
-    override fun decodePageForTts(currentPos: Int) {
-        viewModel.decodeTextForTts(
-            getCurrentPos(),
-            (mRecyclerView.adapter as MuPDFTextAdapter).data
-        )
+    override fun decodePageForTts(currentPos: Int, callback: TtsDataCallback?) {
+        val data = (mRecyclerView.adapter as MuPDFTextAdapter).data
+        if (data != null && data.isNotEmpty()) {
+            callback?.onTtsDataReady(data.subList(currentPos, data.size))
+        } else {
+            callback?.onTtsDataReady(emptyList())
+        }
     }
 
     override fun setSpeakingPage(page: Int) {

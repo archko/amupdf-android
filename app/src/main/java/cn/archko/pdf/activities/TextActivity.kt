@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.speech.tts.TextToSpeech
+import android.graphics.Bitmap
 import android.text.TextUtils
 import android.view.GestureDetector
 import android.view.Gravity
@@ -46,9 +47,10 @@ import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.fragments.FontsFragment
 import cn.archko.pdf.fragments.FontsFragment.Companion.type_reflow
 import cn.archko.pdf.fragments.SleepTimerDialog
-import cn.archko.pdf.tts.TTSActivity
-import cn.archko.pdf.tts.TTSEngine
-import cn.archko.pdf.tts.TTSEngine.TtsProgressListener
+import cn.archko.pdf.tts.TtsForegroundService
+import android.content.ComponentName
+import android.content.ServiceConnection
+import android.os.IBinder
 import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.viewmodel.TextViewModel
 import kotlinx.coroutines.Dispatchers
@@ -78,6 +80,48 @@ class TextActivity : AppCompatActivity() {
     private var footer: View? = null
     private var ttsMode = false
     private val handler = Handler(Looper.getMainLooper())
+
+    // TTS服务绑定
+    private var ttsService: TtsForegroundService? = null
+    private var isTtsServiceBound = false
+    private val ttsServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
+            val ttsBinder = binder as? TtsForegroundService.TtsServiceBinder
+            ttsService = ttsBinder?.getService()
+            isTtsServiceBound = true
+            ttsService?.setProgressListener(object : TtsForegroundService.TtsProgressListener {
+                override fun onStart(bean: ReflowBean) {
+                    // 可以在这里处理开始事件
+                }
+
+                override fun onDone(bean: ReflowBean) {
+                    try {
+                        val arr = bean.page!!.split("-")
+                        val page = Utils.parseInt(arr[0])
+                        val current = getCurrentPos()
+                        if (current != page) {
+                            handler.post { scrollToPosition(page + 1) }
+                        }
+                    } catch (e: Exception) {
+                        Logcat.e(e)
+                    }
+                }
+
+                override fun onFinish() {
+                    handler.post {
+                        closeTts()
+                    }
+                }
+            })
+            Logcat.d(TAG, "TTS service connected")
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            ttsService = null
+            isTtsServiceBound = false
+            Logcat.d(TAG, "TTS service disconnected")
+        }
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -187,6 +231,9 @@ class TextActivity : AppCompatActivity() {
 
         binding.recyclerView.adapter = adapter
 
+        // 绑定TTS服务
+        bindTtsService()
+
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 pdfViewModel.loadTextDoc(path!!)
@@ -287,6 +334,9 @@ class TextActivity : AppCompatActivity() {
         super.onDestroy()
         adapter?.clearCacheViews()
         busEvent(GlobalEvent(Event.ACTION_STOPPED, path))
+        // 解绑TTS服务
+        unbindTtsService()
+        ttsService?.stop()
         closeTts()
     }
 
@@ -311,51 +361,40 @@ class TextActivity : AppCompatActivity() {
     private fun toggleTts() {
         if (ttsMode) {
         } else {
-            TTSEngine.get().getTTS { status: Int ->
-                if (status == TextToSpeech.SUCCESS) {
-                    binding.ttsLayout.visibility = View.VISIBLE
-                    ttsMode = true
-                    startTts()
-                } else {
-                    Logcat.e(TTSActivity.TAG, "初始化失败")
-                    Toast.makeText(
-                        this@TextActivity,
-                        getString(R.string.tts_failed),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+            if (ttsService != null && ttsService?.isInitialized() == true) {
+                binding.ttsLayout.visibility = View.VISIBLE
+                ttsMode = true
+                startTts()
+            } else {
+                Logcat.e(TAG, "TTS服务未初始化")
+                Toast.makeText(
+                    this@TextActivity,
+                    getString(R.string.tts_failed),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
     private fun startTts() {
-        TTSEngine.get().setSpeakListener(object :
-            TtsProgressListener {
-            override fun onStart(utteranceId: ReflowBean) {
-            }
-
-            override fun onDone(key: ReflowBean) {
-                try {
-                    //Logcat.d("onDone:$key")
-                    val arr = key.page!!.split("-")
-                    val page = Utils.parseInt(arr[0])
-                    val current = getCurrentPos()
-                    if (current != page) {
-                        handler.post { scrollToPosition(page + 1) }
-                    }
-                } catch (e: Exception) {
-                    Logcat.e(e)
-                }
-            }
-
-            override fun onFinish() {
-            }
-        })
         binding.ttsPlay.setOnClickListener {
-            if (TTSEngine.get().isSpeaking()) {
-                TTSEngine.get().stop()
+            if (ttsService?.isSpeaking() == true) {
+                ttsService?.stop()
             } else {
-                TTSEngine.get().resume()
+                // 继续当前队列或开始新队列
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        pdfViewModel.decodeTextForTts(getCurrentPos(), adapter?.data) { ttsList ->
+                            // 重新添加到队列
+                            for (bean in ttsList) {
+                                ttsService?.addToQueue(bean)
+                            }
+                            if (!ttsService?.isSpeaking()!!) {
+                                ttsService?.speak(ttsList.firstOrNull())
+                            }
+                        }
+                    }
+                }
             }
         }
         binding.ttsClose.setOnClickListener {
@@ -364,16 +403,24 @@ class TextActivity : AppCompatActivity() {
         binding.ttsSleep.setOnClickListener {
             SleepTimerDialog(object : SleepTimerDialog.TimeListener {
                 override fun onTime(minute: Int) {
-                    Logcat.d("TTSEngine.sleep.onTime()")
-                    handler.postDelayed({
-                        closeTts()
-                    }, (minute * 60000).toLong())
+                    Logcat.d("TTS.sleep.onTime()")
+                    handler.removeCallbacks(closeRunnable)
+                    handler.postDelayed(closeRunnable, (minute * 60000).toLong())
                 }
             }).showDialog(this)
         }
         lifecycleScope.launch {
-            val result = withContext(Dispatchers.IO) {
-                pdfViewModel.decodeTextForTts(getCurrentPos(), adapter?.data)
+            withContext(Dispatchers.IO) {
+                pdfViewModel.decodeTextForTts(getCurrentPos(), adapter?.data) { ttsList ->
+                    // TTS数据准备好，添加到队列
+                    for (bean in ttsList) {
+                        ttsService?.addToQueue(bean)
+                    }
+                    if (!ttsService?.isSpeaking()!!) {
+                        // 开始朗读
+                        ttsService?.speak(ttsList.firstOrNull())
+                    }
+                }
             }
         }
     }
@@ -381,7 +428,6 @@ class TextActivity : AppCompatActivity() {
     private fun closeTts() {
         binding.ttsLayout.visibility = View.GONE
         ttsMode = false
-        TTSEngine.get().shutdown()
     }
 
     private fun initIntent() {
@@ -559,8 +605,28 @@ class TextActivity : AppCompatActivity() {
         updateReflowAdapter()
     }
 
+    private val closeRunnable = Runnable { closeTts() }
+
+    // TTS服务管理
+    private fun bindTtsService() {
+        if (!isTtsServiceBound) {
+            val intent = Intent(this, TtsForegroundService::class.java)
+            bindService(intent, ttsServiceConnection, Context.BIND_AUTO_CREATE)
+            Logcat.d(TAG, "Binding TTS service")
+        }
+    }
+
+    private fun unbindTtsService() {
+        if (isTtsServiceBound) {
+            Logcat.d(TAG, "Unbinding TTS service")
+            unbindService(ttsServiceConnection)
+            isTtsServiceBound = false
+        }
+    }
+
     companion object {
 
+        private const val TAG = "TextActivity"
         private const val START_PROGRESS = 15
         fun start(context: Context, path: String) {
             val intent = Intent(context, TextActivity::class.java)

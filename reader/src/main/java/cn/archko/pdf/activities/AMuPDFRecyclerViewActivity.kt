@@ -35,6 +35,7 @@ import cn.archko.pdf.controller.IPageController
 import cn.archko.pdf.controller.PageControllerListener
 import cn.archko.pdf.controller.PdfPageController
 import cn.archko.pdf.controller.TextPageController
+import cn.archko.pdf.controller.TtsDataCallback
 import cn.archko.pdf.controller.ViewMode
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.BitmapPool
@@ -54,7 +55,10 @@ import cn.archko.pdf.fragments.SleepTimerDialog
 import cn.archko.pdf.fragments.TtsTextFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
-import cn.archko.pdf.tts.TTSEngine
+import cn.archko.pdf.tts.TtsForegroundService
+import android.content.ComponentName
+import android.content.ServiceConnection
+import android.os.IBinder
 import cn.archko.pdf.viewmodel.DocViewModel
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
@@ -100,6 +104,55 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private val handler = Handler(Looper.getMainLooper())
     private var pendingPos = -1
 
+    // TTS服务绑定
+    private var ttsService: TtsForegroundService? = null
+    private var isTtsServiceBound = false
+    private val ttsServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
+            val ttsBinder = binder as? TtsForegroundService.TtsServiceBinder
+            ttsService = ttsBinder?.getService()
+            isTtsServiceBound = true
+            ttsService?.setProgressListener(object : TtsForegroundService.TtsProgressListener {
+                override fun onStart(bean: ReflowBean) {
+                    try {
+                        val arr = bean.page!!.split("-")
+                        val page = Utils.parseInt(arr[0])
+                        if (!isResumed) {
+                            pendingPos = page
+                            docViewModel.bookProgress?.progress = pendingPos
+                            docViewModel.saveBookProgress(page)
+                            return
+                        }
+                        viewController?.setSpeakingPage(page)
+                        val current = getCurrentPos()
+                        if (current != page) {
+                            onSelectedOutline(page)
+                        }
+                    } catch (e: Exception) {
+                        Logcat.e(e)
+                    }
+                }
+
+                override fun onDone(bean: ReflowBean) {
+                    resetSpeakingPage(-1)
+                }
+
+                override fun onFinish() {
+                    handler.post {
+                        closeTts()
+                    }
+                }
+            })
+            Logcat.d(TAG, "TTS service connected")
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            ttsService = null
+            isTtsServiceBound = false
+            Logcat.d(TAG, "TTS service disconnected")
+        }
+    }
+
     /**
      * 用AMupdf打开,传入强制切边参数,如果是-1,是没有设置,如果设置1表示强制切边,如果是0不切边,让切边按钮失效
      */
@@ -140,6 +193,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
         viewController?.init()
         //updateControls()
+
+        // 绑定TTS服务
+        bindTtsService()
     }
 
     private fun clean() {
@@ -568,19 +624,17 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
         override fun toggleTts() {
             if (!ttsMode) {
-                TTSEngine.get().getTTS { status: Int ->
-                    if (status == TextToSpeech.SUCCESS) {
-                        ttsLayout.visibility = View.VISIBLE
-                        ttsMode = true
-                        startTts()
-                    } else {
-                        Logcat.e(TAG, "初始化失败")
-                        Toast.makeText(
-                            this@AMuPDFRecyclerViewActivity,
-                            getString(R.string.tts_failed),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                if (ttsService != null && ttsService?.isInitialized() == true) {
+                    ttsLayout.visibility = View.VISIBLE
+                    ttsMode = true
+                    startTts()
+                } else {
+                    Logcat.e(TAG, "TTS服务未初始化")
+                    Toast.makeText(
+                        this@AMuPDFRecyclerViewActivity,
+                        getString(R.string.tts_failed),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
@@ -646,43 +700,28 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun startTts() {
-        TTSEngine.get().setSpeakListener(object :
-            TTSEngine.TtsProgressListener {
-            override fun onStart(key: ReflowBean) {
-                try {
-                    val arr = key.page!!.split("-")
-                    val page = Utils.parseInt(arr[0])
-                    //Logcat.d("onStart:$key, page:$page")
-                    if (!isResumed) {
-                        pendingPos = page
-                        docViewModel.bookProgress?.progress = pendingPos
-                        docViewModel.saveBookProgress(page)
-                        return
-                    }
-                    viewController?.setSpeakingPage(page)
-                    val current = getCurrentPos()
-                    if (current != page) {
-                        onSelectedOutline(page)
-                    }
-                } catch (e: Exception) {
-                    Logcat.e(e)
-                }
-            }
-
-            override fun onDone(key: ReflowBean) {
-                resetSpeakingPage(-1)
-            }
-
-            override fun onFinish() {
-                closeTts()
-            }
-        })
         ttsPlay.setOnClickListener {
-            if (TTSEngine.get().isSpeaking()) {
+            if (ttsService?.isSpeaking() == true) {
+                ttsService?.stop()
                 resetSpeakingPage(-1)
-                TTSEngine.get().stop()
             } else {
-                TTSEngine.get().resume()
+                // 继续当前队列或开始新队列
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        viewController?.decodePageForTts(getCurrentPos(), object : TtsDataCallback {
+                            override fun onTtsDataReady(data: List<ReflowBean>) {
+                                // 接收解码的数据，添加到服务队列
+                                for (bean in data) {
+                                    ttsService?.addToQueue(bean)
+                                }
+                                if (!ttsService?.isSpeaking()!!) {
+                                    // 开始朗读
+                                    ttsService?.speak(data.firstOrNull())
+                                }
+                            }
+                        })
+                    }
+                }
             }
         }
         ttsClose.setOnClickListener {
@@ -694,33 +733,57 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         ttsSleep.setOnClickListener {
             SleepTimerDialog(object : SleepTimerDialog.TimeListener {
                 override fun onTime(minute: Int) {
-                    Logcat.d("TTSEngine.sleep.onTime()")
+                    Logcat.d("TTS.sleep.onTime()")
                     handler.removeCallbacks(closeRunnable)
                     handler.postDelayed(closeRunnable, (minute * 60000).toLong())
                 }
             }).showDialog(this)
         }
         ttsText.setOnClickListener {
-            /*if (TTSEngine.get().isSpeaking()) {
-                TTSEngine.get().stop()
-            }*/
+            // 先获取当前页面的数据用于显示列表
+            viewController?.decodePageForTts(getCurrentPos(), object : TtsDataCallback {
+                override fun onTtsDataReady(data: List<ReflowBean>) {
+                    // 显示TtsTextFragment，将解码数据传递给它
+                    TtsTextFragment.showCreateDialog(
+                        this@AMuPDFRecyclerViewActivity,
+                        object : DataListener {
+                            override fun onSuccess(vararg args: Any?) {
+                                val position = args[0] as Int
+                                val selectedBean = data.getOrNull(position)
+                                if (selectedBean != null) {
+                                    // 使用选中项添加到服务队列
+                                    ttsService?.addToQueue(selectedBean)
+                                    if (!ttsService?.isSpeaking()!!) {
+                                        // 开始朗读选中项
+                                        ttsService?.speak(selectedBean)
+                                    }
+                                }
+                            }
 
-            TtsTextFragment.showCreateDialog(
-                this,
-                object : DataListener {
-                    override fun onSuccess(vararg args: Any?) {
-                        val position = args[0] as Int
-                        val keys = args[1] as MutableList<ReflowBean>
-                        TTSEngine.get().resumeFromKeys(keys, position)
-                    }
-
-                    override fun onFailed(vararg args: Any?) {
-                    }
-                })
+                            override fun onFailed(vararg args: Any?) {
+                            }
+                        },
+                        data
+                    )
+                }
+            })
         }
+
+        // 开始解码并朗读当前页面
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                viewController?.decodePageForTts(getCurrentPos())
+                viewController?.decodePageForTts(getCurrentPos(), object : TtsDataCallback {
+                    override fun onTtsDataReady(data: List<ReflowBean>) {
+                        // 接收解码的数据，添加到服务队列
+                        for (bean in data) {
+                            ttsService?.addToQueue(bean)
+                        }
+                        if (!ttsService?.isSpeaking()!!) {
+                            // 开始朗读
+                            ttsService?.speak(data.firstOrNull())
+                        }
+                    }
+                })
             }
         }
     }
@@ -732,7 +795,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun locatePage() {
-        val first = TTSEngine.get().first
+        val first = ttsService?.getCurrentBean()?.page?.let { page ->
+            Utils.parseInt(page.split("-")[0])
+        } ?: -1
         if (first >= 0) {
             pendingPos = first
             locatePageForTTS()
@@ -746,7 +811,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         handler.post {
             ttsLayout.visibility = View.GONE
             ttsMode = false
-            val first = TTSEngine.get().first
+            val first = ttsService?.getCurrentBean()?.page?.let { page ->
+                Utils.parseInt(page.split("-")[0])
+            } ?: -1
             if (first >= 0) {
                 pendingPos = first
             }
@@ -754,7 +821,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 locatePageForTTS()
             }
             resetSpeakingPage(-1)
-            TTSEngine.get().shutdown()
+            ttsService?.stop()
         }
     }
 
@@ -823,7 +890,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
         viewControllerCache.forEach { key, value -> value.onDestroy() }
 
-        TTSEngine.get().shutdown()
+        // 解绑TTS服务
+        unbindTtsService()
+        ttsService?.stop()
+
         BitmapPool.getInstance().clear()
         BitmapCache.getInstance().clear()
     }
@@ -875,7 +945,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         super.onPause()
         isResumed = false
         if (ttsMode) {
-            val first = TTSEngine.get().first
+            val first = ttsService?.getCurrentBean()?.page?.let { page ->
+                Utils.parseInt(page.split("-")[0])
+            } ?: -1
             if (first >= 0) {
                 pendingPos = first
             }
@@ -1043,6 +1115,23 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     controllerListener,
                 )
             }
+        }
+    }
+
+    // TTS服务管理
+    private fun bindTtsService() {
+        if (!isTtsServiceBound) {
+            val intent = Intent(this, TtsForegroundService::class.java)
+            bindService(intent, ttsServiceConnection, Context.BIND_AUTO_CREATE)
+            Logcat.d(TAG, "Binding TTS service")
+        }
+    }
+
+    private fun unbindTtsService() {
+        if (isTtsServiceBound) {
+            Logcat.d(TAG, "Unbinding TTS service")
+            unbindService(ttsServiceConnection)
+            isTtsServiceBound = false
         }
     }
 }

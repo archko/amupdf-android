@@ -540,7 +540,8 @@ class AScanReflowViewController(
         }
     }
 
-    override fun decodePageForTts(currentPos: Int) {
+    override fun decodePageForTts(currentPos: Int, callback: TtsDataCallback?) {
+        callback?.onTtsDataReady(emptyList())
     }
 
     override fun reflow(): Int {

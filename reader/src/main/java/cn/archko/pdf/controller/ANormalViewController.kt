@@ -26,7 +26,6 @@ import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.fragments.SearchFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
-import cn.archko.pdf.tts.TTSEngine
 import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.viewmodel.PDFViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -350,22 +349,20 @@ open class ANormalViewController(
         documentView.setFilter(colorMode)
     }
 
-    override fun decodePageForTts(currentPos: Int) {
-        val last = TTSEngine.get().getLast()
-        val count = document!!.pageCount
-        Logcat.i(Logcat.TAG, "decodePageForTts:last:$last, count:$count, currentPos:$currentPos")
-        if (last == count - 1 && last != 0) {
+    override fun decodePageForTts(currentPos: Int, callback: TtsDataCallback?) {
+        if (callback == null) {
+            Logcat.i(Logcat.TAG, "decodePageForTts: no callback provided")
             return
         }
-        if (last > 0) {
-            TTSEngine.get().reset()
-        }
+        val count = document!!.pageCount
+        Logcat.i(Logcat.TAG, "decodePageForTts: count:$count, currentPos:$currentPos")
+
         val ttsBean: TtsBean? = TtsHelper.loadFromFile(count, mPath)
         if (ttsBean?.list == null) {
             val start = System.currentTimeMillis()
             val list = mutableListOf<ReflowBean>()
             if (null != document) {
-                for (i in 0 until count) {
+                for (i in currentPos until count) {
                     val beans: List<ReflowBean>? = document!!.decodeReflowText(i)
                     if (beans != null) {
                         //这里应该只有一个元素
@@ -377,9 +374,15 @@ open class ANormalViewController(
             }
             Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
             TtsHelper.saveToFile(count, mPath, list)
-            PDFViewModel.speak(list, currentPos)
+            callback.onTtsDataReady(list)
         } else {
-            PDFViewModel.speak(ttsBean.list, currentPos)
+            // 从currentPos开始
+            val subList = if (currentPos < ttsBean.list.size) {
+                ttsBean.list.subList(currentPos, ttsBean.list.size)
+            } else {
+                emptyList()
+            }
+            callback.onTtsDataReady(subList)
         }
     }
 

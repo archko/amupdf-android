@@ -231,7 +231,7 @@ abstract class ABaseViewController(
     override fun setFilter(colorMode: Int) {
     }
 
-    override fun decodePageForTts(currentPos: Int) {
+    override fun decodePageForTts(currentPos: Int, callback: TtsDataCallback?) {
     }
 
     //--------------------------------------

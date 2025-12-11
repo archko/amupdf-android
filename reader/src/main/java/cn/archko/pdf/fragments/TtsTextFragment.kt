@@ -15,7 +15,6 @@ import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.databinding.DialogTtsTextBinding
-import cn.archko.pdf.tts.TTSEngine
 
 /**
  * @author: archko 2023/7/28 :14:34
@@ -25,6 +24,7 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
     private lateinit var binding: DialogTtsTextBinding
     private var mDataListener: DataListener? = null
     private lateinit var textAdapter: TextAdapter
+    var dataList: List<ReflowBean>? = null
 
     fun setListener(dataListener: DataListener?) {
         mDataListener = dataListener
@@ -60,7 +60,9 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
 
         textAdapter = TextAdapter(requireContext())
         textAdapter.keys.clear()
-        textAdapter.keys.addAll(TTSEngine.get().ttsContent)
+        if (dataList != null && dataList!!.isNotEmpty()) {
+            textAdapter.keys.addAll(dataList!!)
+        }
 
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
         binding.recyclerView.adapter = textAdapter
@@ -122,7 +124,8 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
 
         fun showCreateDialog(
             activity: FragmentActivity?,
-            dataListener: DataListener?
+            dataListener: DataListener?,
+            dataList: List<ReflowBean>? = null
         ) {
             val ft = activity?.supportFragmentManager?.beginTransaction()
             val prev = activity?.supportFragmentManager?.findFragmentByTag("TtsTextFragment")
@@ -133,6 +136,7 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
 
             val pdfFragment = TtsTextFragment()
             pdfFragment.setListener(dataListener)
+            pdfFragment.dataList = dataList
             pdfFragment.show(ft!!, "TtsTextFragment")
         }
     }

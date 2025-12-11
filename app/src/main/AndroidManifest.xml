@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <queries>
         <intent>
             <action android:name="android.intent.action.TTS_SERVICE" />
@@ -69,6 +70,11 @@
                 <data android:mimeType="image/*" />  <!-- djvu is image? -->
             </intent-filter>
         </activity>
+
+        <service
+            android:name="cn.archko.pdf.tts.TtsForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
 
         <activity
             android:name="cn.archko.pdf.activities.AMuPDFRecyclerViewActivity"
@@ -144,14 +150,7 @@
             android:name="cn.archko.pdf.activities.EditActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
             android:screenOrientation="fullSensor"></activity>
-        <!--<activity
-            android:name="cn.archko.pdf.activities.TextActivity"
-            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
-            android:label="Text"
-            android:screenOrientation="sensor"
-            android:theme="@style/AppFullscreen"
-            android:windowSoftInputMode="adjustResize"></activity>-->
-
+       
         <activity
             android:name="cn.archko.pdf.imagedroid.AlbumViewerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -165,29 +164,6 @@
             android:screenOrientation="fullSensor"
             tools:ignore="DiscouragedApi" />
 
-        <!--<activity
-            android:name="cn.archko.pdf.activities.ChooseFileFragmentActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Nia">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>-->
-        <!--<activity
-            android:name="cn.archko.pdf.activities.SettingsActivity"
-            android:label="@string/options"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Nia" />
-        <activity
-            android:name="cn.archko.pdf.activities.ComposeTextActivity"
-            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
-            android:label="Text"
-            android:screenOrientation="sensor"
-            android:theme="@style/AppFullscreen"
-            android:windowSoftInputMode="adjustResize"></activity>-->
         <activity
             android:name="com.baidu.ai.edge.ui.activity.OcrActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
@@ -228,36 +204,6 @@
                     android:scheme="file" />
             </intent-filter>
         </activity>
-
-        <!--<activity
-                android:name="cn.archko.pdf.activities.ComposeHomeActivity"
-                android:configChanges="orientation|keyboardHidden|screenSize"
-                android:exported="true"
-                android:theme="@style/Theme.Nia"
-                android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:mimeType="image/*" />  &lt;!&ndash; djvu is image? &ndash;&gt;
-            </intent-filter>
-        </activity>
-        <activity android:name="cn.archko.pdf.activities.ComposeAboutActivity"
-                android:configChanges="orientation|keyboardHidden|screenSize"
-                android:label="@string/about_title"
-                android:theme="@style/Theme.Nia"
-                android:screenOrientation="portrait"/>
-
-        <activity android:name="cn.archko.pdf.activities.SettingsActivity"
-                android:theme="@style/Theme.Nia"
-                android:configChanges="orientation|keyboardHidden|screenSize"
-                android:screenOrientation="portrait"/>-->
 
     </application>
 </manifest>

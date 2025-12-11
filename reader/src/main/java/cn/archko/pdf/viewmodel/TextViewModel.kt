@@ -9,7 +9,6 @@ import cn.archko.pdf.core.entity.LoadResult
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.entity.State
 import cn.archko.pdf.core.entity.TtsBean
-import cn.archko.pdf.tts.TTSEngine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -52,35 +51,34 @@ class TextViewModel : ViewModel() {
         return 0
     }
 
-    fun decodeTextForTts(currentPos: Int, data: List<ReflowBean>?) {
+    fun decodeTextForTts(currentPos: Int, data: List<ReflowBean>?, callback: (List<ReflowBean>) -> Unit) {
         if (data.isNullOrEmpty() || TextUtils.isEmpty(pdfPath)) {
+            callback(emptyList())
             return
         }
-        val last = TTSEngine.get().getLast()
+
         val count = countPages()
-        Logcat.i("reflow", "decodeTextForTts:last:$last, count:$count, currentPos:$currentPos")
-        if (last == count - 1 && last != 0) {
-            return
-        }
-        if (last > 0) {
-            TTSEngine.get().reset()
-        }
+        Logcat.i("reflow", "decodeTextForTts: count:$count, currentPos:$currentPos")
 
         val ttsBean: TtsBean? = TtsHelper.loadFromFile(count, pdfPath!!)
         if (ttsBean?.list == null) {
-            val start = System.currentTimeMillis()
             val list = mutableListOf<ReflowBean>()
             for (i in currentPos until count) {
-                val str = data[i].data
+                val str = data.getOrNull(i)?.data
                 if (str != null && !TextUtils.isEmpty(str.trim())) {
                     list.add(ReflowBean(str, page = "$i-$i"))
                 }
             }
-            Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
-            PDFViewModel.speak(list, 0)
+            Logcat.i(Logcat.TAG, "decodeTextForTts decoded ${list.size} items")
             TtsHelper.saveToFile(count, pdfPath!!, list)
+            callback(list)
         } else {
-            PDFViewModel.speak(ttsBean.list, 0)
+            val subList = if (currentPos < ttsBean.list.size) {
+                ttsBean.list.subList(currentPos, ttsBean.list.size)
+            } else {
+                emptyList()
+            }
+            callback(subList)
         }
     }
 }

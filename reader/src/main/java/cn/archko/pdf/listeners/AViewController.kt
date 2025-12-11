@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.view.MotionEvent
 import android.view.View
+import cn.archko.pdf.controller.TtsDataCallback
 
 /**
  * @author: archko 2020/5/15 :12:43
@@ -37,7 +38,7 @@ interface AViewController {
     fun notifyDataSetChanged()
     fun notifyItemChanged(pos: Int)
     fun setFilter(colorMode: Int)
-    fun decodePageForTts(currentPos: Int)
+    fun decodePageForTts(currentPos: Int, callback: TtsDataCallback? = null)
     fun reflow(): Int
     fun prev(string: String?)
     fun next(string: String?)

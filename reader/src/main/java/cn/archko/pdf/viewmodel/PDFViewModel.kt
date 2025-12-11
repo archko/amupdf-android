@@ -12,7 +12,6 @@ import cn.archko.pdf.core.entity.LoadResult
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.entity.State
 import cn.archko.pdf.core.entity.TtsBean
-import cn.archko.pdf.tts.TTSEngine
 import com.artifex.mupdf.fitz.Page
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -125,48 +124,33 @@ class PDFViewModel : ViewModel() {
         return mupdfDocument?.loadPage(pageNum)
     }
 
-    fun decodeTextForTts(currentPos: Int) {
+    fun decodeTextForTts(currentPos: Int, callback: (List<ReflowBean>) -> Unit) {
         if (null == mupdfDocument || TextUtils.isEmpty(pdfPath)) {
+            callback(emptyList())
             return
         }
-        val last = TTSEngine.get().getLast()
         val count = countPages()
-        Logcat.i(Logcat.TAG, "decodePageForTts:last:$last, count:$count, currentPos:$currentPos")
-        if (last == count - 1 && last != 0) {
-            return
-        }
-        if (last > 0) {
-            TTSEngine.get().reset()
-        }
+        Logcat.i(Logcat.TAG, "decodePageForTts: count:$count, currentPos:$currentPos")
+
         val ttsBean: TtsBean? = TtsHelper.loadFromFile(count, pdfPath!!)
         if (ttsBean?.list == null) {
-            val start = System.currentTimeMillis()
             val list = mutableListOf<ReflowBean>()
             for (i in currentPos until count) {
                 val beans: List<ReflowBean>? = mupdfDocument!!.decodeReflowText(i)
                 if (beans != null) {
-                    //理论上只有一个数据
-                    for (j in beans.indices) {
-                        list.add(beans[j])
-                    }
+                    list.addAll(beans)
                 }
             }
-            Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
+            Logcat.i(Logcat.TAG, "decodeTextForTts decoded ${list.size} items")
             TtsHelper.saveToFile(count, pdfPath!!, list)
-            speak(list, currentPos)
+            callback(list)
         } else {
-            speak(ttsBean.list, currentPos)
-        }
-    }
-
-    companion object {
-
-        fun speak(list: List<ReflowBean>, currentPos: Int) {
-            if (currentPos == 0) {
-                TTSEngine.get().speak(list)
+            val subList = if (currentPos < ttsBean.list.size) {
+                ttsBean.list.subList(currentPos, ttsBean.list.size)
             } else {
-                TTSEngine.get().speak(list.subList(currentPos, list.size))
+                emptyList()
             }
+            callback(subList)
         }
     }
 }

@@ -137,8 +137,10 @@ class ATextReflowViewController(
         }
     }
 
-    override fun decodePageForTts(currentPos: Int) {
-        pdfViewModel.decodeTextForTts(currentPos)
+    override fun decodePageForTts(currentPos: Int, callback: TtsDataCallback?) {
+        pdfViewModel.decodeTextForTts(currentPos) { data ->
+            callback?.onTtsDataReady(data)
+        }
     }
 
     override fun setSpeakingPage(page: Int) {
