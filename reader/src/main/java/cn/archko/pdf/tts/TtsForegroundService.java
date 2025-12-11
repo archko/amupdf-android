@@ -206,23 +206,13 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
 
             @Override
             public void onError(String utteranceId) {
-                Logcat.d(TAG, "onError: " + utteranceId);
+                Logcat.d(TAG, "onError: " + utteranceId + ", stopping and clearing queue");
                 if (utteranceId != null) {
-                    ReflowBean errorBean = keyMap.remove(utteranceId);
-                    if (errorBean != null) {
-                        ttsQueue.remove(errorBean);
-                    }
+                    keyMap.remove(utteranceId);
                 }
-                // 继续下一个
-                if (currentIndex < ttsQueue.size()) {
-                    speakNext();
-                } else {
-                    isSpeaking = false;
-                    stopForegroundIfNeeded();
-                    if (wakeLock.isHeld()) {
-                        wakeLock.release();
-                    }
-                }
+
+                // 朗读失败，则停止并且清空
+                stopAndClear();
             }
         });
     }
@@ -267,6 +257,21 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
         if (textToSpeech != null) {
             textToSpeech.stop();
         }
+        isSpeaking = false;
+        if (progressListener != null) {
+            progressListener.onFinish();
+        }
+        stopForegroundIfNeeded();
+        if (wakeLock.isHeld()) {
+            wakeLock.release();
+        }
+    }
+
+    public void stopAndClear() {
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+        }
+        reset(); // 清空队列
         isSpeaking = false;
         if (progressListener != null) {
             progressListener.onFinish();
