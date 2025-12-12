@@ -104,6 +104,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private val handler = Handler(Looper.getMainLooper())
     private var pendingPos = -1
 
+    // TTS数据缓存
+    private var cachedTtsData: List<ReflowBean>? = null
+
     // TTS服务绑定
     private var ttsService: TtsForegroundService? = null
     private var isTtsServiceBound = false
@@ -210,6 +213,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             finish()
             return
         }
+        val oldPath = mPath
         if (TextUtils.isEmpty(mPath)) {
             mPath = intent.getStringExtra("path")
             if (TextUtils.isEmpty(mPath)) {
@@ -221,6 +225,12 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     mPath = intent.getStringExtra("path")
                 }
             }
+        }
+
+        // 如果文档路径改变，清空TTS缓存
+        if (!TextUtils.isEmpty(oldPath) && oldPath != mPath) {
+            clearTtsDataCache()
+            Logcat.d(TAG, "Cleared TTS cache due to document change")
         }
     }
 
@@ -705,23 +715,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 ttsService?.stop()
                 resetSpeakingPage(-1)
             } else {
-                // 继续当前队列或开始新队列
-                lifecycleScope.launch {
-                    withContext(Dispatchers.IO) {
-                        viewController?.decodePageForTts(getCurrentPos(), object : TtsDataCallback {
-                            override fun onTtsDataReady(data: List<ReflowBean>) {
-                                // 接收解码的数据，添加到服务队列
-                                for (bean in data) {
-                                    ttsService?.addToQueue(bean)
-                                }
-                                if (!ttsService?.isSpeaking()!!) {
-                                    // 开始朗读
-                                    ttsService?.speak(data.firstOrNull())
-                                }
-                            }
-                        })
-                    }
-                }
+                startSpeakingFromCurrentPage()
             }
         }
         ttsClose.setOnClickListener {
@@ -740,52 +734,19 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             }).showDialog(this)
         }
         ttsText.setOnClickListener {
-            // 先获取当前页面的数据用于显示列表
-            viewController?.decodePageForTts(getCurrentPos(), object : TtsDataCallback {
-                override fun onTtsDataReady(data: List<ReflowBean>) {
-                    // 显示TtsTextFragment，将解码数据传递给它
-                    TtsTextFragment.showCreateDialog(
-                        this@AMuPDFRecyclerViewActivity,
-                        object : DataListener {
-                            override fun onSuccess(vararg args: Any?) {
-                                val position = args[0] as Int
-                                val selectedBean = data.getOrNull(position)
-                                if (selectedBean != null) {
-                                    // 使用选中项添加到服务队列
-                                    ttsService?.addToQueue(selectedBean)
-                                    if (!ttsService?.isSpeaking()!!) {
-                                        // 开始朗读选中项
-                                        ttsService?.speak(selectedBean)
-                                    }
-                                }
-                            }
-
-                            override fun onFailed(vararg args: Any?) {
-                            }
-                        },
-                        data
-                    )
-                }
-            })
-        }
-
-        // 开始解码并朗读当前页面
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
+            if (cachedTtsData.isNullOrEmpty()) {
                 viewController?.decodePageForTts(getCurrentPos(), object : TtsDataCallback {
                     override fun onTtsDataReady(data: List<ReflowBean>) {
-                        // 接收解码的数据，添加到服务队列
-                        for (bean in data) {
-                            ttsService?.addToQueue(bean)
-                        }
-                        if (!ttsService?.isSpeaking()!!) {
-                            // 开始朗读
-                            ttsService?.speak(data.firstOrNull())
-                        }
+                        cachedTtsData = data
+                        showTtsTextSelectionDialog(data)
                     }
                 })
+            } else {
+                showTtsTextSelectionDialog(cachedTtsData!!)
             }
         }
+
+        startSpeakingFromCurrentPage()
     }
 
     fun resetSpeakingPage(page: Int) {
@@ -1133,5 +1094,71 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             unbindService(ttsServiceConnection)
             isTtsServiceBound = false
         }
+    }
+
+    // TTS 朗读功能
+    private fun startSpeakingFromCurrentPage() {
+        if (cachedTtsData.isNullOrEmpty()) {
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    viewController?.decodePageForTts(getCurrentPos(), object : TtsDataCallback {
+                        override fun onTtsDataReady(data: List<ReflowBean>) {
+                            cachedTtsData = data
+                            val start = getCurrentPos()
+                            processTtsDataFromCurrentPosition(data, start)
+                        }
+                    })
+                }
+            }
+        } else {
+            val start = getCurrentPos()
+            processTtsDataFromCurrentPosition(cachedTtsData!!, start)
+        }
+    }
+
+    private fun processTtsDataFromCurrentPosition(data: List<ReflowBean>, startPage: Int) {
+        var startIndex = 0
+        for (i in data.indices) {
+            val bean = data[i]
+            if (bean.page != null) {
+                try {
+                    val arr = bean.page!!.split("-")
+                    val page = arr[0].toInt()
+                    if (page >= startPage) {
+                        startIndex = i
+                        break
+                    }
+                } catch (e: Exception) {
+                    Logcat.e(TAG, "parse page error: ${bean.page}")
+                }
+            }
+        }
+        val subData = if (startIndex < data.size) data.subList(startIndex, data.size) else emptyList()
+        if (subData.isNotEmpty()) {
+            ttsService?.addToQueue(subData)
+            if (!ttsService?.isSpeaking()!!) {
+                ttsService?.speak(subData.firstOrNull())
+            }
+        }
+    }
+
+    private fun showTtsTextSelectionDialog(data: List<ReflowBean>) {
+        TtsTextFragment.showCreateDialog(
+            this,
+            object : DataListener {
+                override fun onSuccess(vararg args: Any?) {
+                    val position = args[0] as Int
+                    processTtsDataFromCurrentPosition(data, position)
+                }
+
+                override fun onFailed(vararg args: Any?) {
+                }
+            },
+            data
+        )
+    }
+
+    private fun clearTtsDataCache() {
+        cachedTtsData = null
     }
 }

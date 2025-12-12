@@ -135,7 +135,7 @@ class PDFViewModel : ViewModel() {
         val ttsBean: TtsBean? = TtsHelper.loadFromFile(count, pdfPath!!)
         if (ttsBean?.list == null) {
             val list = mutableListOf<ReflowBean>()
-            for (i in currentPos until count) {
+            for (i in 0 until count) {
                 val beans: List<ReflowBean>? = mupdfDocument!!.decodeReflowText(i)
                 if (beans != null) {
                     list.addAll(beans)
@@ -145,12 +145,7 @@ class PDFViewModel : ViewModel() {
             TtsHelper.saveToFile(count, pdfPath!!, list)
             callback(list)
         } else {
-            val subList = if (currentPos < ttsBean.list.size) {
-                ttsBean.list.subList(currentPos, ttsBean.list.size)
-            } else {
-                emptyList()
-            }
-            callback(subList)
+            callback(ttsBean.list)
         }
     }
 }

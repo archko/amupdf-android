@@ -362,7 +362,7 @@ open class ANormalViewController(
             val start = System.currentTimeMillis()
             val list = mutableListOf<ReflowBean>()
             if (null != document) {
-                for (i in currentPos until count) {
+                for (i in 0 until count) {
                     val beans: List<ReflowBean>? = document!!.decodeReflowText(i)
                     if (beans != null) {
                         //这里应该只有一个元素
@@ -376,13 +376,7 @@ open class ANormalViewController(
             TtsHelper.saveToFile(count, mPath, list)
             callback.onTtsDataReady(list)
         } else {
-            // 从currentPos开始
-            val subList = if (currentPos < ttsBean.list.size) {
-                ttsBean.list.subList(currentPos, ttsBean.list.size)
-            } else {
-                emptyList()
-            }
-            callback.onTtsDataReady(subList)
+            callback.onTtsDataReady(ttsBean.list)
         }
     }
 

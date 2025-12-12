@@ -6,7 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.media.AudioManager;
+import android.content.res.Configuration;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -14,13 +14,12 @@ import android.os.PowerManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 
-import androidx.core.app.NotificationCompat;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.core.app.NotificationCompat;
 import cn.archko.pdf.core.common.Logcat;
 import cn.archko.pdf.core.entity.ReflowBean;
 
@@ -52,7 +51,6 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
     // 前台服务相关
     private boolean isForegroundStarted = false;
     private PowerManager.WakeLock wakeLock;
-    private AudioManager audioManager;
 
     @Override
     public void onCreate() {
@@ -60,7 +58,6 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
         Logcat.d(TAG, "onCreate");
 
         createNotificationChannel();
-        initAudioManager();
         initWakeLock();
         initializeTts();
     }
@@ -137,10 +134,6 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
         }
     }
 
-    private void initAudioManager() {
-        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-    }
-
     private void initWakeLock() {
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "TtsForegroundService:TTS");
@@ -154,7 +147,14 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
             isInitialized = true;
-            textToSpeech.setLanguage(java.util.Locale.CHINA);
+            Configuration config = getResources().getConfiguration();
+            java.util.Locale locale;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                locale = config.getLocales().get(0);
+            } else {
+                locale = config.locale;
+            }
+            textToSpeech.setLanguage(locale);
             setupTtsListener();
             Logcat.d(TAG, "TTS initialized successfully");
         } else {
@@ -166,6 +166,7 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
         textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override
             public void onStart(String utteranceId) {
+                Logcat.d(TAG, String.format("onStart:%s, index:%s, size:%s", utteranceId, currentIndex, ttsQueue.size()));
                 isSpeaking = true;
                 startForegroundIfNeeded();
                 if (progressListener != null && utteranceId != null) {
@@ -178,7 +179,7 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
 
             @Override
             public void onDone(String utteranceId) {
-                Logcat.d(TAG, "onDone: " + utteranceId);
+                Logcat.d(TAG, String.format("onDone:%s, index:%s, size:%s", utteranceId, currentIndex, ttsQueue.size()));
                 if (utteranceId != null) {
                     ReflowBean finishedBean = keyMap.remove(utteranceId);
                     if (finishedBean != null) {
@@ -248,6 +249,13 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
 
     public void addToQueue(ReflowBean bean) {
         ttsQueue.add(bean);
+        if (!isSpeaking && isInitialized) {
+            speakNext();
+        }
+    }
+
+    public void addToQueue(List<ReflowBean> beans) {
+        ttsQueue.addAll(beans);
         if (!isSpeaking && isInitialized) {
             speakNext();
         }
