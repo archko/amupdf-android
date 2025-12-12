@@ -300,11 +300,6 @@ public class DecodeServiceBase implements DecodeService {
         APageSizeLoader.INSTANCE.deletePageSizeFromFile(path);
     }
 
-    private void cropPage(CodecPage vuPage, APage page) {
-        Rect rect = cropPage(vuPage);
-        page.setCropBounds(rect);
-    }
-
     private Rect cropPage(CodecPage vuPage) {
         int width = 300;
         float ratio = 1f * vuPage.getWidth() / width;

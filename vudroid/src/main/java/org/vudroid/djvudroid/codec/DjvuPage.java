@@ -99,14 +99,6 @@ public class DjvuPage implements CodecPage {
         // 2. 计算原始坐标系中的起始位置
         int originalX = (int) (cropBound.left + pageSliceBounds.left * cropBound.width());
         int originalY = (int) (cropBound.top + pageSliceBounds.top * cropBound.height());
-
-        // 3. 确保原始区域不超出cropBound范围
-        if (originalX + originalWidth > cropBound.right) {
-            originalWidth = cropBound.right - originalX;
-        }
-        if (originalY + originalHeight > cropBound.bottom) {
-            originalHeight = cropBound.bottom - originalY;
-        }
         Log.d("TAG", String.format("renderPageRegion:%s, scale:%s, patchX:%s, patchY:%s, target.w-h:%s-%s, page.w-h:%s-%s, %s, %s",
                 pageNumber, scale, originalX, originalY, targetWidth, targetHeight, originalWidth, originalHeight, cropBound, pageSliceBounds));
         //renderPageRegion:0, scale:0.07058824, patchX:0, patchY:0, target.w-h:180-232, page.w-h:2550-3287, Rect(0, 0 - 2550, 3300), RectF(0.0, 0.0, 1.0, 1.0)

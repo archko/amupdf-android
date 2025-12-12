@@ -3,7 +3,7 @@ package org.vudroid.epub.codec;
 import android.content.ContentResolver;
 import android.util.Log;
 
-import com.archko.reader.mobi.LibMobi;
+import cn.archko.pdf.core.utils.LibMobi;
 
 import org.vudroid.core.codec.CodecContext;
 import org.vudroid.core.codec.CodecDocument;

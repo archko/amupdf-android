@@ -25,7 +25,7 @@ import cn.archko.pdf.core.adapters.BaseRecyclerListAdapter
 import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.listeners.DataListener
-import com.archko.reader.mobi.LibMobi
+import cn.archko.pdf.core.utils.LibMobi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

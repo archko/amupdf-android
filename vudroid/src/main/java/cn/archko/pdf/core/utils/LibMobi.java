@@ -1,4 +1,4 @@
-package com.archko.reader.mobi;
+package cn.archko.pdf.core.utils;
 
 import android.util.Log;
 
@@ -21,8 +21,6 @@ import java.util.Map;
 import cn.archko.pdf.core.App;
 import cn.archko.pdf.core.common.IntentFile;
 import cn.archko.pdf.core.common.Logcat;
-import cn.archko.pdf.core.utils.FileUtils;
-import cn.archko.pdf.core.utils.StreamUtils;
 import io.documentnode.epub4j.domain.Author;
 import io.documentnode.epub4j.domain.Book;
 import io.documentnode.epub4j.domain.Metadata;
