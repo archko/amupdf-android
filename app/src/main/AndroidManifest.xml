@@ -158,7 +158,7 @@
             android:hardwareAccelerated="true"
             tools:ignore="DiscouragedApi" />
         <activity
-            android:name="cn.archko.pdf.core.imagedroid.ImageViewerActivity"
+            android:name="cn.archko.pdf.imagedroid.ImageViewerActivity"
             android:hardwareAccelerated="true"
             android:configChanges="orientation|keyboardHidden|screenSize|uiMode|fontScale"
             android:screenOrientation="fullSensor"

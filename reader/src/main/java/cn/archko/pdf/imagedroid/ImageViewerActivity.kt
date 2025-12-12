@@ -1,4 +1,4 @@
-package cn.archko.pdf.core.imagedroid;
+package cn.archko.pdf.imagedroid;
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -61,4 +61,3 @@ class ImageViewerActivity : AppCompatActivity(R.layout.image_viewer) {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
     }
-}

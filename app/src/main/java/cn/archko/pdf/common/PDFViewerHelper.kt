@@ -10,7 +10,7 @@ import android.view.MenuItem
 import androidx.core.content.FileProvider
 import cn.archko.pdf.activities.AMuPDFRecyclerViewActivity
 import cn.archko.pdf.core.common.IntentFile
-import cn.archko.pdf.core.imagedroid.ImageViewerActivity
+import cn.archko.pdf.imagedroid.ImageViewerActivity
 import cn.archko.pdf.imagedroid.AlbumViewerActivity
 import java.io.File
 import java.util.*
