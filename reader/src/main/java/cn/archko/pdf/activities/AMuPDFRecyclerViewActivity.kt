@@ -634,7 +634,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
         override fun toggleTts() {
             if (!ttsMode) {
-                if (ttsService != null && ttsService?.isInitialized() == true) {
+                if (ttsService != null && ttsService?.isInitialized == true) {
                     ttsLayout.visibility = View.VISIBLE
                     ttsMode = true
                     startTts()
@@ -711,7 +711,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     private fun startTts() {
         ttsPlay.setOnClickListener {
-            if (ttsService?.isSpeaking() == true) {
+            if (ttsService?.isSpeaking == true) {
                 ttsService?.stop()
                 resetSpeakingPage(-1)
             } else {
@@ -756,7 +756,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun locatePage() {
-        val first = ttsService?.getCurrentBean()?.page?.let { page ->
+        val first = ttsService?.currentBean?.page?.let { page ->
             Utils.parseInt(page.split("-")[0])
         } ?: -1
         if (first >= 0) {
@@ -772,7 +772,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         handler.post {
             ttsLayout.visibility = View.GONE
             ttsMode = false
-            val first = ttsService?.getCurrentBean()?.page?.let { page ->
+            val first = ttsService?.currentBean?.page?.let { page ->
                 Utils.parseInt(page.split("-")[0])
             } ?: -1
             if (first >= 0) {
@@ -906,7 +906,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         super.onPause()
         isResumed = false
         if (ttsMode) {
-            val first = ttsService?.getCurrentBean()?.page?.let { page ->
+            val first = ttsService?.currentBean?.page?.let { page ->
                 Utils.parseInt(page.split("-")[0])
             } ?: -1
             if (first >= 0) {
@@ -1136,9 +1136,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         val subData = if (startIndex < data.size) data.subList(startIndex, data.size) else emptyList()
         if (subData.isNotEmpty()) {
             ttsService?.addToQueue(subData)
-            if (!ttsService?.isSpeaking()!!) {
-                ttsService?.speak(subData.firstOrNull())
-            }
         }
     }
 

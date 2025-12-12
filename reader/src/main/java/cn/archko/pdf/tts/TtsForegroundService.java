@@ -15,9 +15,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import androidx.core.app.NotificationCompat;
 import cn.archko.pdf.core.common.Logcat;
@@ -42,11 +40,9 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
     private TtsProgressListener progressListener;
 
     // 数据队列
-    private final List<ReflowBean> ttsQueue = new ArrayList<>();
-    private final Map<String, ReflowBean> keyMap = new HashMap<>();
+    private final List<ReflowBean> beanList = new ArrayList<>();
     private ReflowBean currentBean;
     private int currentIndex = 0;
-    private boolean isSpeaking = false;
 
     // 前台服务相关
     private boolean isForegroundStarted = false;
@@ -107,7 +103,7 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
 
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("文档朗读")
-                .setContentText(isSpeaking ? "正在朗读..." : "已暂停")
+                .setContentText(isSpeaking() ? "正在朗读..." : "已暂停")
                 .setSmallIcon(android.R.drawable.ic_media_play)
                 .addAction(android.R.drawable.ic_delete, "停止", stopPendingIntent)
                 .setOngoing(true)
@@ -166,71 +162,52 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
         textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override
             public void onStart(String utteranceId) {
-                Logcat.d(TAG, String.format("onStart:%s, index:%s, size:%s", utteranceId, currentIndex, ttsQueue.size()));
-                isSpeaking = true;
+                Logcat.d(TAG, String.format("onStart:%s, index:%s, size:%s", utteranceId, currentIndex, beanList.size()));
                 startForegroundIfNeeded();
-                if (progressListener != null && utteranceId != null) {
-                    ReflowBean bean = keyMap.get(utteranceId);
-                    if (bean != null) {
-                        progressListener.onStart(bean);
-                    }
+                if (progressListener != null && currentBean != null) {
+                    progressListener.onStart(currentBean);
                 }
             }
 
             @Override
             public void onDone(String utteranceId) {
-                Logcat.d(TAG, String.format("onDone:%s, index:%s, size:%s", utteranceId, currentIndex, ttsQueue.size()));
-                if (utteranceId != null) {
-                    ReflowBean finishedBean = keyMap.remove(utteranceId);
-                    if (finishedBean != null) {
-                        if (progressListener != null) {
-                            progressListener.onDone(finishedBean);
-                        }
-                        ttsQueue.remove(finishedBean);
-                    }
+                Logcat.d(TAG, String.format("onDone:%s, index:%s, size:%s", utteranceId, currentIndex, beanList.size()));
+                if (progressListener != null && currentBean != null) {
+                    progressListener.onDone(currentBean);
                 }
 
-                // 检查是否还有内容需要朗读
-                if (currentIndex < ttsQueue.size()) {
-                    speakNext();
-                } else {
-                    isSpeaking = false;
-                    stopForegroundIfNeeded();
-                    if (wakeLock.isHeld()) {
-                        wakeLock.release();
-                    }
-                    if (progressListener != null) {
-                        progressListener.onFinish();
-                    }
-                }
+                // 直接进行下一个
+                playNext();
             }
 
             @Override
             public void onError(String utteranceId) {
                 Logcat.d(TAG, "onError: " + utteranceId + ", stopping and clearing queue");
-                if (utteranceId != null) {
-                    keyMap.remove(utteranceId);
-                }
-
                 // 朗读失败，则停止并且清空
                 stopAndClear();
             }
         });
     }
 
-    private void speakNext() {
-        if (currentIndex < ttsQueue.size()) {
-            currentBean = ttsQueue.get(currentIndex);
+    private void playNext() {
+        if (currentIndex < beanList.size()) {
+            currentBean = beanList.get(currentIndex);
             String text = currentBean.getData();
             if (text != null && !text.trim().isEmpty()) {
-                HashMap<String, String> params = new HashMap<>();
-                params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, currentBean.getPage());
-                keyMap.put(currentBean.getPage(), currentBean);
-                textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, params);
+                textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, null, currentBean.getPage());
                 currentIndex++;
             } else {
                 currentIndex++;
-                speakNext(); // 跳过空内容
+                playNext(); // 跳过空内容
+            }
+        } else {
+            // 所有项目播放完成
+            stopForegroundIfNeeded();
+            if (wakeLock.isHeld()) {
+                wakeLock.release();
+            }
+            if (progressListener != null) {
+                progressListener.onFinish();
             }
         }
     }
@@ -243,21 +220,24 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
         if (isInitialized) {
             reset();
             addToQueue(bean);
-            speakNext();
+            playNext();
         }
     }
 
     public void addToQueue(ReflowBean bean) {
-        ttsQueue.add(bean);
-        if (!isSpeaking && isInitialized) {
-            speakNext();
+        beanList.add(bean);
+        if (!isSpeaking() && isInitialized && beanList.size() == 1) {
+            currentIndex = 0;
+            playNext();
         }
     }
 
     public void addToQueue(List<ReflowBean> beans) {
-        ttsQueue.addAll(beans);
-        if (!isSpeaking && isInitialized) {
-            speakNext();
+        Logcat.d(TAG, "addToQueue beans size: " + beans.size());
+        beanList.addAll(beans);
+        if (!isSpeaking() && isInitialized) {
+            currentIndex = 0;
+            playNext();
         }
     }
 
@@ -265,7 +245,6 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
         if (textToSpeech != null) {
             textToSpeech.stop();
         }
-        isSpeaking = false;
         if (progressListener != null) {
             progressListener.onFinish();
         }
@@ -280,7 +259,6 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
             textToSpeech.stop();
         }
         reset(); // 清空队列
-        isSpeaking = false;
         if (progressListener != null) {
             progressListener.onFinish();
         }
@@ -294,7 +272,6 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
         if (textToSpeech != null) {
             textToSpeech.stop();
         }
-        isSpeaking = false;
         stopForegroundIfNeeded();
         if (wakeLock.isHeld()) {
             wakeLock.release();
@@ -302,7 +279,7 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
     }
 
     public boolean isSpeaking() {
-        return isSpeaking;
+        return textToSpeech.isSpeaking();
     }
 
     public boolean isInitialized() {
@@ -310,15 +287,13 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
     }
 
     public void reset() {
-        keyMap.clear();
-        ttsQueue.clear();
+        beanList.clear();
         currentIndex = 0;
         currentBean = null;
-        isSpeaking = false;
     }
 
     public int getQueueSize() {
-        return ttsQueue.size();
+        return beanList.size();
     }
 
     public ReflowBean getCurrentBean() {
@@ -326,7 +301,7 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
     }
 
     public List<ReflowBean> getQueue() {
-        return new ArrayList<>(ttsQueue);
+        return new ArrayList<>(beanList);
     }
 
     private void shutdown() {
