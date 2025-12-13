@@ -203,13 +203,12 @@ public class DocumentView extends View implements ZoomListener {
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         super.onScrollChanged(l, t, oldl, oldt);
         // bounds could be not updated
-        currentPageChanged();
         if (inZoom) {
             return;
         }
         // on scrollChanged can be called from scrollTo just after new layout applied so we should wait for relayout
+        currentPageChanged();
         post(this::updatePageVisibility);
-
     }
 
     private void currentPageChanged() {
