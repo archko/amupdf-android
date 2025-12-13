@@ -2,6 +2,7 @@ package cn.archko.pdf.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +26,7 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
     private var mDataListener: DataListener? = null
     private lateinit var textAdapter: TextAdapter
     var dataList: List<ReflowBean>? = null
+    var currentPage: Int = 0
 
     fun setListener(dataListener: DataListener?) {
         mDataListener = dataListener
@@ -67,6 +69,14 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
         binding.recyclerView.adapter = textAdapter
         binding.recyclerView.setHasFixedSize(true)
+
+        // Auto scroll to current page
+        if (currentPage > 0 && textAdapter.itemCount > 0) {
+            val index = textAdapter.keys.indexOfFirst { Utils.parseInt(it.page?.split("-")?.firstOrNull() ?: "") == currentPage }
+            if (index >= 0) {
+                binding.recyclerView.scrollToPosition(index)
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -87,17 +97,7 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
             parent: ViewGroup,
             viewType: Int
         ): RecyclerView.ViewHolder {
-            val view = TextView(context)
-                .apply {
-                    layoutParams = RecyclerView.LayoutParams(
-                        RecyclerView.LayoutParams.MATCH_PARENT,
-                        RecyclerView.LayoutParams.WRAP_CONTENT
-                    )
-                    maxLines = 4
-                    val padding = Utils.dipToPixel(8f)
-                    setPadding(padding, padding, padding, padding)
-                }
-
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_tts, parent, false)
             return TextHolder(view)
         }
 
@@ -106,14 +106,16 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
             pdfHolder.onBind(position)
         }
 
-        inner class TextHolder(internal var view: TextView) : RecyclerView.ViewHolder(view) {
+        inner class TextHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+            private val textView: TextView = itemView.findViewById(R.id.text)
 
             fun onBind(position: Int) {
-                view.setOnClickListener {
+                textView.setOnClickListener {
                     mDataListener?.onSuccess(position, keys)
                     dismiss()
                 }
-                view.text = String.format("%s-%s", keys[position].page, keys[position].data)
+                textView.text = "Page ${keys[position].page}: ${keys[position].data}"
             }
         }
     }
@@ -125,7 +127,8 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
         fun showCreateDialog(
             activity: FragmentActivity?,
             dataListener: DataListener?,
-            dataList: List<ReflowBean>? = null
+            dataList: List<ReflowBean>? = null,
+            currentPage: Int = 0
         ) {
             val ft = activity?.supportFragmentManager?.beginTransaction()
             val prev = activity?.supportFragmentManager?.findFragmentByTag("TtsTextFragment")
@@ -137,6 +140,7 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
             val pdfFragment = TtsTextFragment()
             pdfFragment.setListener(dataListener)
             pdfFragment.dataList = dataList
+            pdfFragment.currentPage = currentPage
             pdfFragment.show(ft!!, "TtsTextFragment")
         }
     }

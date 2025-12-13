@@ -1117,6 +1117,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun processTtsDataFromCurrentPosition(data: List<ReflowBean>, startPage: Int) {
+        ttsService?.stop()
         var startIndex = 0
         for (i in data.indices) {
             val bean = data[i]
@@ -1151,7 +1152,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 override fun onFailed(vararg args: Any?) {
                 }
             },
-            data
+            data,
+            getCurrentPos()
         )
     }
 

@@ -245,9 +245,7 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
         if (textToSpeech != null) {
             textToSpeech.stop();
         }
-        if (progressListener != null) {
-            progressListener.onFinish();
-        }
+        reset();
         stopForegroundIfNeeded();
         if (wakeLock.isHeld()) {
             wakeLock.release();
@@ -258,7 +256,7 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
         if (textToSpeech != null) {
             textToSpeech.stop();
         }
-        reset(); // 清空队列
+        reset();
         if (progressListener != null) {
             progressListener.onFinish();
         }

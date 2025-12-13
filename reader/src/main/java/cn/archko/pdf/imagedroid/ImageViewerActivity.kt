@@ -3,15 +3,14 @@ package cn.archko.pdf.imagedroid;
 import android.content.res.Configuration
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import cn.archko.pdf.R
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.SensorHelper
 import cn.archko.pdf.core.common.StatusBarHelper
+import cn.archko.pdf.databinding.ImageViewerBinding
 import com.github.penfeizhou.animation.loader.FileLoader
 import com.github.penfeizhou.animation.webp.WebPDrawable
-import org.vudroid.R
-import org.vudroid.databinding.ImageViewerBinding
 import pl.droidsonroids.gif.GifDrawable
 
 class ImageViewerActivity : AppCompatActivity(R.layout.image_viewer) {
@@ -61,3 +60,4 @@ class ImageViewerActivity : AppCompatActivity(R.layout.image_viewer) {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
     }
+}

@@ -105,38 +105,39 @@ public class BitmapPool {
             mPool = new Object[maxPoolSize];
         }
 
-    @Override
-    @SuppressWarnings("unchecked")
+        @Override
+        @SuppressWarnings("unchecked")
     public synchronized T acquire() {
-        if (mPoolSize > 0) {
-            final int lastPooledIndex = mPoolSize - 1;
-            T instance = (T) mPool[lastPooledIndex];
-            mPool[lastPooledIndex] = null;
-            mPoolSize--;
-            return instance;
+            if (mPoolSize > 0) {
+                final int lastPooledIndex = mPoolSize - 1;
+                T instance = (T) mPool[lastPooledIndex];
+                mPool[lastPooledIndex] = null;
+                mPoolSize--;
+                return instance;
+            }
+            return null;
         }
-        return null;
-    }
 
-    @Override
+        @Override
     public synchronized boolean release(@NonNull T instance) {
-        if (isInPool(instance)) {
-            return true;
-        }
-        if (mPoolSize < mPool.length) {
-            mPool[mPoolSize] = instance;
-            mPoolSize++;
-            return true;
-        }
-        return false;
-    }
-
-    private synchronized boolean isInPool(@NonNull T instance) {
-        for (int i = 0; i < mPoolSize; i++) {
-            if (mPool[i] == instance) {
+            if (isInPool(instance)) {
                 return true;
             }
+            if (mPoolSize < mPool.length) {
+                mPool[mPoolSize] = instance;
+                mPoolSize++;
+                return true;
+            }
+            return false;
         }
-        return false;
+
+    private synchronized boolean isInPool(@NonNull T instance) {
+            for (int i = 0; i < mPoolSize; i++) {
+                if (mPool[i] == instance) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
