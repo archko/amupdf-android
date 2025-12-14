@@ -58,9 +58,10 @@ class TextViewModel : ViewModel() {
         }
 
         val count = countPages()
+        val fileSize = java.io.File(pdfPath!!).length()
         Logcat.i("reflow", "decodeTextForTts: count:$count, currentPos:$currentPos")
 
-        val ttsBean: TtsBean? = TtsHelper.loadFromFile(count, pdfPath!!)
+        val ttsBean: TtsBean? = TtsHelper.loadFromFile(count, pdfPath!!, fileSize)
         if (ttsBean?.list == null) {
             val list = mutableListOf<ReflowBean>()
             for (i in currentPos until count) {
@@ -70,7 +71,7 @@ class TextViewModel : ViewModel() {
                 }
             }
             Logcat.i(Logcat.TAG, "decodeTextForTts decoded ${list.size} items")
-            TtsHelper.saveToFile(count, pdfPath!!, list)
+            TtsHelper.saveToFile(count, pdfPath!!, fileSize, list)
             callback(list)
         } else {
             val subList = if (currentPos < ttsBean.list.size) {

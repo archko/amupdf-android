@@ -6,5 +6,6 @@ package cn.archko.pdf.core.entity
 data class TtsBean(
     val path: String,
     val pc: Int,
+    val fileSize: Long,
     val list: List<ReflowBean>
 )

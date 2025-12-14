@@ -355,9 +355,10 @@ open class ANormalViewController(
             return
         }
         val count = document!!.pageCount
+        val fileSize = java.io.File(mPath).length()
         Logcat.i(Logcat.TAG, "decodePageForTts: count:$count, currentPos:$currentPos")
 
-        val ttsBean: TtsBean? = TtsHelper.loadFromFile(count, mPath)
+        val ttsBean: TtsBean? = TtsHelper.loadFromFile(count, mPath, fileSize)
         if (ttsBean?.list == null) {
             val start = System.currentTimeMillis()
             val list = mutableListOf<ReflowBean>()
@@ -373,7 +374,7 @@ open class ANormalViewController(
                 }
             }
             Logcat.i(Logcat.TAG, "decodeTextForTts.cos:${System.currentTimeMillis() - start}")
-            TtsHelper.saveToFile(count, mPath, list)
+            TtsHelper.saveToFile(count, mPath, fileSize, list)
             callback.onTtsDataReady(list)
         } else {
             callback.onTtsDataReady(ttsBean.list)

@@ -18,13 +18,14 @@ object TtsHelper {
     fun loadFromFile(
         pageCount: Int,
         path: String,
+        fileSize: Long,
     ): TtsBean? {
         var bean: TtsBean? = null
         try {
             val saveFile = getSaveFile(File(path))
             val content = StreamUtils.readStringFromFile(saveFile)
             if (!TextUtils.isEmpty(content)) {
-                bean = fromJson(pageCount, path, JSONObject(content))
+                bean = fromJson(pageCount, path, fileSize, JSONObject(content))
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -35,27 +36,25 @@ object TtsHelper {
     fun saveToFile(
         pageCount: Int,
         path: String,
+        fileSize: Long,
         list: List<ReflowBean>,
     ) {
         val file = File(path)
         val saveFile = getSaveFile(file)
-        val content = toJson(pageCount, path, list)
+        val content = toJson(pageCount, path, fileSize, list)
         StreamUtils.saveStringToFile(content, saveFile)
     }
 
-    private fun fromJson(pageCount: Int, path: String, jo: JSONObject): TtsBean? {
+    private fun fromJson(pageCount: Int, path: String, fileSize: Long, jo: JSONObject): TtsBean? {
         val ja = jo.optJSONArray("reflow")
-        val pc = jo.optInt("pc")
-        if (null == ja || pc != pageCount) {
-            Log.d("TAG", "new page count:$pageCount")
-            return null
-        }
-        if (path != jo.optString("path")) {
-            Log.d("TAG", "new path:$path")
+        val pc = jo.optInt("pageCount")
+        val savedFileSize = jo.optLong("fileSize", -1L)
+        if (null == ja || pc != pageCount || savedFileSize != fileSize) {
+            Log.d("TAG", "new page count:$pageCount or file size mismatch")
             return null
         }
         val list = fromJson(ja)
-        val bean = TtsBean(path, pageCount, list)
+        val bean = TtsBean(path, pc, fileSize, list)
         return bean
     }
 
@@ -69,11 +68,11 @@ object TtsHelper {
         return list
     }
 
-    private fun toJson(pc: Int, path: String, list: List<ReflowBean>): String {
+    private fun toJson(pc: Int, path: String, fileSize: Long, list: List<ReflowBean>): String {
         val jo = JSONObject()
         try {
-            jo.put("pc", pc)
-            jo.put("path", path)
+            jo.put("pageCount", pc)
+            jo.put("fileSize", fileSize)
             jo.put("reflow", toJsons(list))
         } catch (e: Exception) {
             e.printStackTrace()
@@ -102,6 +101,6 @@ object TtsHelper {
 
     private fun getSaveFile(file: File) = File(
         FileUtils.getStorageDirPath() + "/amupdf"
-                + File.separator + "page" + File.separator + file.nameWithoutExtension + "_tts.json"
+                + File.separator + "tts" + File.separator + file.nameWithoutExtension + "_tts.json"
     )
 }
