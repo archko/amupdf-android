@@ -12,6 +12,7 @@ import android.speech.tts.UtteranceProgressListener
 import androidx.core.app.NotificationCompat
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.ReflowBean
+import java.util.Locale
 
 /**
  * TTS前台服务，用于后台持续朗读
@@ -85,8 +86,11 @@ class TtsForegroundService : Service(), TextToSpeech.OnInitListener {
     }
 
     private fun createNotification(): Notification {
+        val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+
         val stopIntent = Intent(this, TtsForegroundService::class.java)
         stopIntent.action = "STOP"
+        
         val stopPendingIntent = PendingIntent.getService(
             this, 0, stopIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0)
@@ -133,13 +137,7 @@ class TtsForegroundService : Service(), TextToSpeech.OnInitListener {
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
             isInitialized = true
-            val config = resources.configuration
-            val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                config.locales[0]
-            } else {
-                config.locale
-            }
-            textToSpeech?.setLanguage(locale)
+            textToSpeech?.language = Locale.getDefault()
             setupTtsListener()
             Logcat.d(TAG, "TTS initialized successfully")
         } else {
