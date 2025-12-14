@@ -225,8 +225,17 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
     }
 
     public void addToQueue(ReflowBean bean) {
-        beanList.add(bean);
-        if (!isSpeaking() && isInitialized && beanList.size() == 1) {
+        String data = bean.getData();
+        int segmentCount = data == null || data.length() <= 300 ? 1 : (int) Math.ceil(data.length() / 300.0);
+        if (data == null || data.length() <= 300) {
+            beanList.add(bean);
+        } else {
+            for (int i = 0, index = 0; i < data.length(); i += 300, index++) {
+                String sub = data.substring(i, Math.min(i + 300, data.length()));
+                beanList.add(new ReflowBean(sub, bean.getType(), bean.getPage() + "-" + index));
+            }
+        }
+        if (!isSpeaking() && isInitialized && beanList.size() == segmentCount) {
             currentIndex = 0;
             playNext();
         }
@@ -234,7 +243,19 @@ public class TtsForegroundService extends Service implements TextToSpeech.OnInit
 
     public void addToQueue(List<ReflowBean> beans) {
         Logcat.d(TAG, "addToQueue beans size: " + beans.size());
-        beanList.addAll(beans);
+        List<ReflowBean> allSegments = new ArrayList<>();
+        for (ReflowBean bean : beans) {
+            String data = bean.getData();
+            if (data != null && data.length() > 300) {
+                for (int i = 0, index = 0; i < data.length(); i += 300, index++) {
+                    String sub = data.substring(i, Math.min(i + 300, data.length()));
+                    allSegments.add(new ReflowBean(sub, bean.getType(), bean.getPage() + "-" + index));
+                }
+            } else {
+                allSegments.add(bean);
+            }
+        }
+        beanList.addAll(allSegments);
         if (!isSpeaking() && isInitialized) {
             currentIndex = 0;
             playNext();
