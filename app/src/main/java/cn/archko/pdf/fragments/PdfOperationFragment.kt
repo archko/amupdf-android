@@ -304,6 +304,7 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
             binding.extract.rangeSlider.values = listOf(1f, 2f)
             return
         }
+        binding.extract.rangeSlider.valueTo = count.toFloat()
         val values = mutableListOf<Float>()
         values.add(1f)
         values.add(count.toFloat())
@@ -311,13 +312,13 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
         binding.extract.rangeSlider.setLabelFormatter { value ->
             value.toInt().toString()
         }
-
+    
         binding.extract.rangeSlider.addOnSliderTouchListener(object :
             RangeSlider.OnSliderTouchListener {
             @SuppressLint("RestrictedApi")
             override fun onStartTrackingTouch(slider: RangeSlider) {
             }
-
+    
             @SuppressLint("RestrictedApi")
             override fun onStopTrackingTouch(slider: RangeSlider) {
                 binding.extract.tvStart.text =
