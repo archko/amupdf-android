@@ -17,7 +17,7 @@ kotlinxCoroutines = "1.10.1"
 kotlinxSerializationJson = "1.8.0"
 ksp = "2.1.20-2.0.0"
 mammoth = "1.5.0" #1.7.0依赖问题导致崩溃,1.8.0不崩溃但无法解析,1.5.0有些docx转换失败
-minSdk = "23"
+minSdk = "24"
 mmkv = "2.2.4"
 mupdfFitz = "1.26.5"
 okhttp = "4.12.0"
@@ -48,6 +48,7 @@ recyclerview = "1.4.0"
 sardine = "0.9"
 k2pdfopt = "0.2.0"
 juniversalchardet = "2.5.0"
+ppocrv5ncnn = "1.0.0"
 
 versionCode = "480"
 versionName = "7.8.0"
@@ -100,6 +101,7 @@ recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version
 constraintLayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintLayout" }
 sardine = { group = "com.github.thegrizzlylabs", name = "sardine-android", version.ref = "sardine" }
 k2pdfopt = { group = "com.archko.reader", name = "k2pdfopt", version.ref = "k2pdfopt" }
+ppocrv5ncnn = { group = "com.tencent.ppocrv5ncnn", name = "ppocrv5ncnn", version.ref = "ppocrv5ncnn" }
 mmkv = { module = "com.tencent:mmkv", version.ref = "mmkv" }
 crashreport = { module = "com.tencent.bugly:crashreport", version.ref = "crashreport" }
 juniversalchardet = { module = "com.github.albfernandez:juniversalchardet", version.ref = "juniversalchardet" }

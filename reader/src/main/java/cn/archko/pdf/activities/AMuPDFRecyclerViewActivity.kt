@@ -1,13 +1,15 @@
 package cn.archko.pdf.activities
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Handler
+import android.os.IBinder
 import android.os.Looper
-import android.speech.tts.TextToSpeech
 import android.text.TextUtils
 import android.util.SparseArray
 import android.view.MotionEvent
@@ -19,7 +21,9 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.Toast
+import androidx.core.content.edit
 import androidx.core.util.forEach
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
@@ -50,15 +54,13 @@ import cn.archko.pdf.core.entity.Bookmark
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.fragments.OcrFragment
 import cn.archko.pdf.fragments.OutlineFragment
 import cn.archko.pdf.fragments.SleepTimerDialog
 import cn.archko.pdf.fragments.TtsTextFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TtsForegroundService
-import android.content.ComponentName
-import android.content.ServiceConnection
-import android.os.IBinder
 import cn.archko.pdf.viewmodel.DocViewModel
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
@@ -67,8 +69,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.vudroid.core.codec.OutlineLink
 import vn.chungha.flowbus.busEvent
-import androidx.core.view.isVisible
-import androidx.core.content.edit
 
 /**
  * @author: archko 2019/8/25 :12:43
@@ -943,20 +943,13 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         const val PREF_READER = "pref_reader_amupdf"
         const val PREF_READER_KEY_FIRST = "pref_reader_key_first"
 
-        fun startOcrActivity(context: Context, bitmap: Bitmap?, path: String?, pos: Int) {
+        fun startOcrActivity(context: FragmentActivity, bitmap: Bitmap?, path: String?, pos: Int) {
             if (null == bitmap && TextUtils.isEmpty(path)) {
                 return
             }
-            //OcrActivity.start(context, bitmap, path, pos.toString())
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            intent.setClassName(context, "com.baidu.ai.edge.ui.activity.OcrActivity")
-            intent.putExtra("path", path)
             val key = System.currentTimeMillis().toString()
             BitmapCache.getInstance().addBitmap(key, bitmap!!)
-            intent.putExtra("key", key)
-            intent.putExtra("name", pos.toString())
-            context.startActivity(intent)
+            OcrFragment.showOcrDialog(context, key)
         }
     }
 
@@ -1134,7 +1127,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 }
             }
         }
-        val subData = if (startIndex < data.size) data.subList(startIndex, data.size) else emptyList()
+        val subData =
+            if (startIndex < data.size) data.subList(startIndex, data.size) else emptyList()
         if (subData.isNotEmpty()) {
             ttsService?.addToQueue(subData)
         }

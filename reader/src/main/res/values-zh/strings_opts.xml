@@ -156,4 +156,7 @@
     <string name="tts_failed">初始化语音引擎失败</string>
 
     <string name="opts_decode_block_title">位图尺寸</string>
+
+    <string name="ocr_title">OCR 识别</string>
+    <string name="ocr_recognize">OCR 识别</string>
 </resources>

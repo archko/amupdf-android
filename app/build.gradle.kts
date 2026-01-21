@@ -136,7 +136,6 @@ dependencies {
     add("ksp", libs.room.compiler)
 
     implementation(project(":reader"))
-    implementation(project(":paddle-ocr"))
 
     // https://mvnrepository.com/artifact/com.github.axet/k2pdfopt
     implementation(libs.k2pdfopt)

@@ -59,4 +59,6 @@ dependencies {
 
     api(project(":vudroid"))
     api(project(":pdf-recyclerview"))
+
+    implementation(libs.ppocrv5ncnn)
 }

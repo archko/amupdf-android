@@ -197,4 +197,7 @@
         <item>3</item>
     </string-array>
 
+    <string name="ocr_title">OCR Recognition</string>
+    <string name="ocr_recognize">Recognize</string>
+
 </resources>
