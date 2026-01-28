@@ -535,10 +535,14 @@ object IntentFile {
                 || path.endsWith(".heic", true)
                 || path.endsWith(".bmp", true)
                 || path.endsWith(".gif", true)
-                || path.endsWith(".dng")
-                || path.endsWith(".arw")
-                || path.endsWith(".nef")
-                || path.endsWith(".cr2")
+                || path.endsWith(".dng", true)
+                || path.endsWith(".arw", true)
+                || path.endsWith(".nef", true)
+                || path.endsWith(".cr2", true)
+                || path.endsWith(".cr3", true)
+                || path.endsWith(".arw", true)
+                || path.endsWith(".raf", true)
+                || path.endsWith(".orf", true)
     }
 
     fun isGif(path: String?): Boolean {

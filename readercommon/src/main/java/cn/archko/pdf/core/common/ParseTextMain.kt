@@ -48,35 +48,10 @@ object ParseTextMain {
         return list
     }
 
-    /**
-     * 把 MuPdfHtmlMerger 合并后的 HTML 拆成 ReflowBean 列表
-     * 按 <p><img...></p> 识别图片，其余按文本段落
-     */
-    fun parseMergedHtmlAsReflowList(html: String, pageIndex: Int): List<ReflowBean> {
-        val doc = org.jsoup.Jsoup.parse(html)
-        val list = ArrayList<ReflowBean>()
-        for (el in doc.select("p")) {
-            if (el.children().size == 1 && el.child(0).tagName() == "img") {
-                // 图片段落
-                list.add(ReflowBean(el.outerHtml(), ReflowBean.TYPE_IMAGE, pageIndex.toString()))
-            } else {
-                // 文本段落
-                list.add(ReflowBean(el.outerHtml(), ReflowBean.TYPE_STRING, pageIndex.toString()))
-            }
-        }
-        return list
-    }
-
     class TxtParser {
         lateinit var path: String
-        internal var joinLine = true
-        internal var deleteEmptyLine = true
 
         constructor() {}
-
-        constructor(path: String) {
-            this.path = path
-        }
 
         internal fun parse(lists: List<String>): String {
             val sb = StringBuilder()
@@ -219,7 +194,6 @@ object ParseTextMain {
          * @param ss source
          * @param sb parsed string
          * @param pageIndex
-         * @param lastBreak wethere last line has a break char.
          */
         private fun parseLine(
             ss: String,
@@ -235,7 +209,7 @@ object ParseTextMain {
 
             //2.判断尾部的字符是否是结束符.通常是以标点结束的.或者是程序相关的字符结尾.
             val isEnd = if (END_MARK.contains(end) || PROGRAM_MARK.contains(end)) {
-                Logcat.d("step2.line.end.break:$ss")
+                //Logcat.d("step2.line.end.break:$ss")
                 true
             } else {
                 false
@@ -260,7 +234,7 @@ object ParseTextMain {
                 }
             }
             if (isStartLine) {
-                Logcat.d("step3.line break,length:${ss.length}")
+                //Logcat.d("step3.line break,length:${ss.length}")
                 //如果是开始行,上行如果没有结束符,则添加上.
                 lastLine?.run {
                     if (!this.isEnd) {
@@ -275,7 +249,7 @@ object ParseTextMain {
                 thisLine.text = line.toString()
                 sb.append(line)
                 if (Logcat.loggable) {
-                    Logcat.d("count:${maxNumberCharOfLine} :$line")
+                    //Logcat.d("count:${maxNumberCharOfLine} :$line")
                 }
                 return thisLine
             }
@@ -294,7 +268,7 @@ object ParseTextMain {
                 thisLine.text = line.toString()
                 sb.append(line)
                 if (Logcat.loggable) {
-                    Logcat.d("count1:${maxNumberCharOfLine} :$line")
+                    //Logcat.d("count1:${maxNumberCharOfLine} :$line")
                 }
                 return thisLine
             } else {
@@ -328,13 +302,13 @@ object ParseTextMain {
                 }
             }
             if (isLetterDigitOrChinese(end)) {
-                Logcat.d("isLetterDigitOrChinese:$end")
+                //Logcat.d("isLetterDigitOrChinese:$end")
                 line.append(LINE_END)
             }
             thisLine.text = line.toString()
             sb.append(line)
             if (Logcat.loggable) {
-                Logcat.d("count2:${maxNumberCharOfLine} :$line")
+                //Logcat.d("count2:${maxNumberCharOfLine} :$line")
             }
             return thisLine
         }
@@ -389,11 +363,11 @@ object ParseTextMain {
                 }
             }
 
-            if (Logcat.loggable) {
-                for (rb in reflowBeans) {
-                    Logcat.longLog("result", rb.toString())
-                }
-            }
+            //if (Logcat.loggable) {
+            //    for (rb in reflowBeans) {
+            //        Logcat.longLog("result", rb.toString())
+            //    }
+            //}
             return reflowBeans
         }
 

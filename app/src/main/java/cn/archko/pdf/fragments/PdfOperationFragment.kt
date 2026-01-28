@@ -304,6 +304,7 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
             binding.extract.rangeSlider.values = listOf(1f, 2f)
             return
         }
+        binding.extract.rangeSlider.valueTo = count.toFloat()
         val values = mutableListOf<Float>()
         values.add(1f)
         values.add(count.toFloat())

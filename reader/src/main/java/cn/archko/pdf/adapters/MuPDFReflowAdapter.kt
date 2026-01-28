@@ -7,11 +7,10 @@ import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.core.App
 import cn.archko.pdf.core.cache.ReflowViewCache
 import cn.archko.pdf.core.common.AppExecutors
+import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.utils.Utils
-import cn.archko.pdf.core.common.MuPdfHtmlMerger
-import cn.archko.pdf.core.common.ParseTextMain
 
 /**
  * @author: archko 2016/5/13 :11:03
@@ -56,26 +55,28 @@ class MuPDFReflowAdapter(
     override fun onBindViewHolder(holder: ReflowTextViewHolder, position: Int) {
         //mupdf only single thread
         AppExecutors.instance.diskIO().execute {
-            val html = mupdfDocument?.decodeReflowHtml(position) ?: return@execute
-            val mergedHtml = MuPdfHtmlMerger().mergeParagraphs(html)
-            AppExecutors.instance.mainThread().execute {
-                holder.bindHtml(
-                    mergedHtml,
-                    screenHeight,
-                    screenWidth,
-                    systemScale,
-                    reflowCache,
-                    showBookmark(position)
-                )
+            val result = decode(position)
+            result?.run {
+                /*forEach { bean ->
+                    Logcat.longLog("data", bean.data.toString())
+                }*/
+                AppExecutors.instance.mainThread().execute {
+                    holder.bindAsList(
+                        result,
+                        screenHeight,
+                        screenWidth,
+                        systemScale,
+                        reflowCache,
+                        showBookmark(position)
+                    )
+                }
             }
         }
     }
 
-    /*fun decode(pos: Int): List<ReflowBean>? {
-        val html = mupdfDocument?.decodeReflowHtml(pos)?: return null
-        val mergedHtml = MuPdfHtmlMerger().mergeParagraphs(html)
-        return ParseTextMain.parseMergedHtmlAsReflowList(mergedHtml, pos)
-    }*/
+    fun decode(pos: Int): List<ReflowBean>? {
+        return mupdfDocument?.decodeReflow(pos)
+    }
 
     private fun showBookmark(position: Int): Boolean {
         /*val bookmarks = pdfViewModel.bookmarks
