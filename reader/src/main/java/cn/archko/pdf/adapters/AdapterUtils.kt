@@ -54,33 +54,49 @@ object AdapterUtils {
     }
 
     fun setIcon(ext: String?, imageView: ImageView) {
-        var drawableId = R.drawable.ic_book_text
-        if (".pdf".equals(ext)) {
+        var drawableId = R.drawable.ic_book_unknown
+        if (".pdf" == ext) {
             drawableId = R.drawable.ic_book_pdf
-        } else if (".djvu".equals(ext) || ".djv".equals(ext)) {
+        } else if (".djvu" == ext || ".djv" == ext) {
             drawableId = R.drawable.ic_book_djvu
-        } else if (".epub".equals(ext) || ".mobi".equals(ext)
-            || ".azw".equals(ext) || ".azw2".equals(ext)
-            || ".azw3".equals(ext) || ".azw4".equals(ext)
+        } else if (".epub" == ext) {
+            drawableId = R.drawable.ic_book_epub
+        } else if (".mobi" == ext) {
+            drawableId = R.drawable.ic_book_mobi
+        } else if (".fb2" == ext || ".fb3" == ext) {
+            drawableId = R.drawable.ic_book_fb2
+        } else if (".azw" == ext || ".azw2" == ext
+            || ".azw3" == ext || ".azw4" == ext
         ) {
-            drawableId = R.drawable.ic_book_epub_zip
-        } else if (".png".equals(ext) || ".jpg".equals(ext) || ".jpeg".equals(ext)
-            || ".bmp".equals(ext) || ".svg".equals(ext) || ".gif".equals(ext)
-            || ".jfif".equals(ext) || ".jfif-tbnl".equals(ext)
-            || ".tif".equals(ext) || ".tiff".equals(ext)
-            || ".heic".equals(ext) || ".webp".equals(ext)
+            drawableId = R.drawable.ic_book_azw3
+        } else if (".png" == ext || ".jpg" == ext || ".jpeg" == ext
+            || ".bmp" == ext || ".svg" == ext || ".gif" == ext
+            || ".heic" == ext || ".webp" == ext
         ) {
             drawableId = R.drawable.ic_book_image
-        } /*else if ("txt".equals(ext) || "log".equals(ext)
-            || "js".equals(ext) || "json".equals(ext)
-            || "html".equals(ext) || "xhtml".equals(ext)
+        } else if (".dng" == ext || ".nef" == ext
+            || ".cr2" == ext || ".cr3" == ext
+            || ".arw" == ext || ".raf" == ext
+            || ".orf" == ext
         ) {
-            drawableId = R.drawable.browser_icon_txt
-        }*/ else if (".pptx".equals(ext)) {
+            drawableId = R.drawable.ic_book_raw
+        } else if (".jfif" == ext || ".jfif-tbnl" == ext
+            || ".tif" == ext || ".tiff" == ext
+        ) {
+            drawableId = R.drawable.ic_book_tif
+        } else if (".txt" == ext || ".log" == ext
+            || ".js" == ext || ".json" == ext
+        ) {
+            drawableId = R.drawable.ic_book_text
+        } else if (".html" == ext || ".xhtml" == ext) {
+            drawableId = R.drawable.ic_book_html
+        } else if (".pptx" == ext) {
             drawableId = R.drawable.ic_book_ppt
-        } else if (".docx".equals(ext)) {
-            drawableId = R.drawable.ic_book_word
-        } else if (".xlsx".equals(ext)) {
+        } else if (".docx" == ext) {
+            drawableId = R.drawable.ic_book_docx
+        } else if (".doc" == ext) {
+            drawableId = R.drawable.ic_book_doc
+        } else if (".xlsx" == ext) {
             drawableId = R.drawable.ic_book_excel
         }
         imageView.setImageResource(drawableId)
