@@ -7,7 +7,7 @@
     
     <string name="create_pdf">Create PDF</string>
     <string name="export_pdf">Export PDF</string>
-    <string name="settings_title">Settings</string>
+    <string name="settings_title">Reading Settings</string>
     <string name="version">Version:%s</string>
 
     <string name="create_pdf_label">Create A PDF</string>
@@ -139,7 +139,7 @@
     <string name="convert_enter_epub_filename">Enter Epub Name</string>
     <string name="convert_select_to_create_epub">Please select mobi, azw3</string>
     <string name="convert_doing">Converting...</string>
-    <string name="convert_successfully">Convert successfully %s, Saved to:%s</string>
+    <string name="convert_successfully">Convert successfully %1$s, Saved to:%2$s</string>
     <string name="convert_error">Convert failed!</string>
 
     <string name="grant_files_permission">grant file permission</string>
@@ -196,5 +196,14 @@
     <string name="show_as_dir">Show images for dir？</string>
     <string name="show_as_dir_ok">Show</string>
     <string name="show_as_dir_cancel">No</string>
-    
+
+    <string name="feature_title">Features</string>
+    <string name="feature_auto_crop">Auto Crop</string>
+    <string name="feature_multi_format">Multi-format Support</string>
+    <string name="feature_ocr">OCR Text Recognition</string>
+    <string name="feature_image_to_pdf">Image to PDF</string>
+    <string name="feature_mobi_azw3_to_pdf">Mobi/Azw3 to PDF</string>
+    <string name="feature_pdf_encrypt_decrypt">PDF Encrypt/Decrypt</string>
+    <string name="feature_webdav_backup">WebDAV Backup</string>
+    <string name="feature_tts_read">TTS Reading</string>    
 </resources>

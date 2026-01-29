@@ -5,7 +5,7 @@
 
     <string name="create_pdf">创建PDF</string>
     <string name="export_pdf">导出PDF</string>
-    <string name="settings_title">设置</string>
+    <string name="settings_title">阅读设置</string>
     <string name="version">版本号:%s</string>
 
     <string name="create_pdf_label">创建PDF</string>
@@ -137,7 +137,7 @@
     <string name="convert_enter_epub_filename">输入Epub文件名</string>
     <string name="convert_select_to_create_epub">请选择mobi,azw3来创建Epub</string>
     <string name="convert_doing">转换中…</string>
-    <string name="convert_successfully">转换成功%s本, 保存在%s</string>
+    <string name="convert_successfully">转换成功%1$s本, 保存在%2$s</string>
     <string name="convert_error">转换失败!</string>
 
     <string name="grant_files_permission">请求存储权限</string>
@@ -193,4 +193,14 @@
     <string name="show_as_dir">是否浏览该图片所在目录？</string>
     <string name="show_as_dir_ok">浏览</string>
     <string name="show_as_dir_cancel">否</string>
+
+    <string name="feature_title">功能特点</string>
+    <string name="feature_auto_crop">自动切边</string>
+    <string name="feature_multi_format">多格式支持</string>
+    <string name="feature_ocr">ocr文字识别</string>
+    <string name="feature_image_to_pdf">图片转pdf</string>
+    <string name="feature_mobi_azw3_to_pdf">mobi/azw3转pdf</string>
+    <string name="feature_pdf_encrypt_decrypt">pdf加密/解密</string>
+    <string name="feature_webdav_backup">webdav备份</string>
+    <string name="feature_tts_read">tts朗读</string>
 </resources>
