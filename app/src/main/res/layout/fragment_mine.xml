@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/version"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Version: 7.8.0"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:layout_marginBottom="32dp" />
+
+        <Button
+            android:id="@+id/btn_create_pdf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/create_pdf"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btn_export_pdf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/export_pdf"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btn_encrypt_decrypt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/encrypt_decrypt_title"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btn_split_pdf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/split_title"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btn_merge_pdf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/merge_title"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btn_convert_epub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/convert_title"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btn_webdav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/webdav_title"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btn_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_title"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btn_about"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="About"
+            android:layout_marginBottom="8dp" />
+
+    </LinearLayout>
+</ScrollView>

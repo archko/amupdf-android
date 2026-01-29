@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/transparent"
-            app:navigationIcon="@drawable/ic_back_black"
+            app:navigationIcon="@drawable/ic_back"
             app:title="@string/edit_title" />
 
         <androidx.appcompat.widget.AppCompatImageView

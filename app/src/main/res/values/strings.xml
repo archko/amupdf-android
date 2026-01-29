@@ -4,6 +4,10 @@
 
     <string name="outline_title">Table of Contents</string>
     <string name="auto_crop">auto crop bound</string>
+    
+    <string name="create_pdf">Create PDF</string>
+    <string name="export_pdf">Export PDF</string>
+    <string name="settings_title">Settings</string>
 
     <string name="create_pdf_label">Create A PDF</string>
     <string name="menu_create">Create A PDF</string>
@@ -105,6 +109,37 @@
     <string name="encrypt_decrypt_decrypt_success">Decrypt successfully\n%s</string>
     <string name="encrypt_decrypt_decrypt_failed">Decrypt failed</string>
     <string name="waiting">Waiting...</string>
+
+    <string name="split_title">Split Pdf</string>
+    <string name="split_pdf_to_split">Please select a PDF file to split</string>
+    <string name="split_rule">Split Rule</string>
+    <string name="split_rule_desc">eg.1-10,11-20, split 2 pdf, page 1 to page 10, and page 11 to 20</string>
+    <string name="split_out_setting">Out Setting</string>
+    <string name="split_out_name">PDF Name</string>
+    <string name="split_doing">Spliting...</string>
+    <string name="split_start">Start Spliting</string>
+    <string name="split_input_rule">Input Split Rule</string>
+    <string name="split_out_name_tip">Input Pdf Name</string>
+    <string name="split_success">Split Successfully！Save to: %s</string>
+    <string name="split_error">Split Error，Please check input rule.</string>
+
+    <string name="merge_title">Merge Pdf</string>
+    <string name="merge_btn">Merge Pdf</string>
+    <string name="merge_pdf_to_split">Please select a PDF file to Merge</string>
+    <string name="merge_success">Merge Successfully！Save to: %s</string>
+    <string name="merge_error">Merge Error!</string>
+    <string name="merge_select_pdf">Select Pdf</string>
+
+    <string name="convert_title">Convert to Epub</string>
+    <string name="convert_tip">mobi, azw3 convert to epub</string>
+    <string name="convert_btn">Convert</string>
+    <string name="convert_to_filename">Epub name</string>
+    <string name="convert_select_file">Select File</string>
+    <string name="convert_enter_epub_filename">Enter Epub Name</string>
+    <string name="convert_select_to_create_epub">Please select mobi, azw3</string>
+    <string name="convert_doing">Converting...</string>
+    <string name="convert_successfully">Convert successfully %s, Saved to:%s</string>
+    <string name="convert_error">Convert failed!</string>
 
     <string name="grant_files_permission">grant file permission</string>
     <string name="grant_all_files_permission">grant all files permission</string>
