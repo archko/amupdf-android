@@ -18,23 +18,26 @@
         app:title="@string/create_title" />
 
     <RadioGroup
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:orientation="horizontal">
+        android:layout_margin="8dp"
+        android:background="@drawable/bg_white_8_shape"
+        android:orientation="horizontal"
+        android:padding="8dp">
 
         <RadioButton
             android:id="@+id/btnImage"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:checked="true"
             android:text="@string/create_use_image" />
 
         <RadioButton
             android:id="@+id/btnTxt"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_weight="1"
             android:text="@string/create_use_txt" />
     </RadioGroup>
 
@@ -76,35 +79,44 @@
                 android:text="@string/create_btn_text" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <TextView
-            android:id="@+id/txt_path"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            tools:text="/storage/0/a.txt" />
+            android:background="@drawable/bg_white_8_shape"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/txt_path"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                tools:text="/storage/0/a.txt" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:text="@string/create_text_path_tip" />
+
+            <EditText
+                android:id="@+id/pdfName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:hint="@string/create_text_name"
+                android:inputType="text"
+                android:text="new.pdf" />
+        </LinearLayout>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            android:text="@string/create_text_path_tip" />
-
-        <EditText
-            android:id="@+id/pdfName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:autofillHints=""
-            android:hint="@string/create_text_name"
-            android:inputType="text"
-            android:text="new.pdf" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginBottom="8dp"
             android:text="Preview:"
             android:textStyle="bold" />
 
@@ -115,6 +127,7 @@
             android:layout_height="wrap_content">
 
             <LinearLayout
+                android:background="@drawable/bg_white_8_shape"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -178,12 +191,8 @@
                     android:id="@+id/txtPreview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/white"
                     android:lineSpacingMultiplier="1.2"
-                    android:paddingLeft="20dp"
-                    android:paddingTop="20dp"
-                    android:paddingRight="20dp"
-                    android:paddingBottom="20dp"
+                    android:padding="16dp"
                     android:text="The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.over the lazy dog.\n有一只狗跑的很快.有一只狗跑的很快.有一只狗跑的很快.有一只狗跑的很快."
                     android:textColor="@android:color/black"
                     android:textSize="16sp" />
@@ -206,27 +215,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="10dp">
-
-        <!--<Button
-                android:id="@+id/btnSelect"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginRight="4dp"
-                android:text="@string/create_btn_old_pdf" />
-
-        <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/create_old_pdf_tip" />
-
-        <TextView
-                android:id="@+id/oldPdfPath"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:text="" />-->
 
         <EditText
             android:id="@+id/pdfPath"

@@ -117,6 +117,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
+                    android:padding="8dp"
+                    android:background="@drawable/bg_white_8_shape"
                     android:text="@string/encrypt_decrypt_tips"
                     android:textSize="16sp" />
 
@@ -125,6 +127,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
+                    android:padding="8dp"
+                    android:background="@drawable/bg_white_8_shape"
                     android:text=""
                     android:textSize="16sp" />
 
