@@ -22,7 +22,7 @@
             android:background="@color/transparent"
             android:minHeight="44dp"
             app:tabMode="fixed" />
-            
+
     </LinearLayout>
 
     <androidx.viewpager2.widget.ViewPager2

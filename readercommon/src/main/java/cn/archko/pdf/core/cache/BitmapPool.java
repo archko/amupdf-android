@@ -8,10 +8,10 @@ import androidx.core.util.Pools;
 /**
  * Created by archko on 16/12/24.
  */
-
 public class BitmapPool {
 
-    private FixedSimplePool<Bitmap> simplePool;
+    private final FixedSimplePool<Bitmap> simplePool;
+    private final Object mLock = new Object();
 
     public static BitmapPool getInstance() {
         return BitmapPool.Factory.instance;
@@ -27,77 +27,95 @@ public class BitmapPool {
     }
 
     public Bitmap acquire(int width, int height) {
-        Bitmap bitmap = simplePool.acquire();
-        if (null != bitmap && bitmap.isRecycled()) {
-            bitmap = simplePool.acquire();
-        }
-        if (null == bitmap) {
-            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        } else {
-            if (bitmap.getHeight() == height && bitmap.getWidth() == width) {
-                //Log.d("TAG", String.format("use cache:%s-%s-%s%n", width, height, simplePool.mPoolSize));
-                bitmap.eraseColor(0);
-            } else {
-                bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            }
-        }
-        return bitmap;
+        return acquire(width, height, Bitmap.Config.ARGB_8888);
     }
 
     public Bitmap acquire(int width, int height, Bitmap.Config config) {
-        Bitmap bitmap = simplePool.acquire();
-        if (null != bitmap && bitmap.isRecycled()) {
-            bitmap = simplePool.acquire();
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException("width and height must be > 0");
         }
-        if (null == bitmap) {
-            bitmap = Bitmap.createBitmap(width, height, config);
-        } else {
-            if (bitmap.getConfig() == config) {
-                if (bitmap.getHeight() == height && bitmap.getWidth() == width) {
-                    //Log.d("TAG", String.format("use cache:%s-%s-%s%n", width, height, simplePool.mPoolSize));
+        final Bitmap.Config finalConfig = (config == null) ? Bitmap.Config.ARGB_8888 : config;
+        Bitmap bitmap = null;
+
+        synchronized (mLock) {
+            do {
+                bitmap = simplePool.acquire();
+            } while (bitmap != null && (bitmap.isRecycled() || bitmap.getConfig() != finalConfig));
+        }
+
+        if (bitmap != null) {
+            if (bitmap.getWidth() == width && bitmap.getHeight() == height) {
+                try {
+                    // 擦除颜色（0表示透明），复用前清空画布
                     bitmap.eraseColor(0);
-                } else {
-                    bitmap = Bitmap.createBitmap(width, height, config);
+                } catch (Exception e) {
+                    // 极端情况擦除失败，放弃复用新建
+                    bitmap = createBitmapSafe(width, height, finalConfig);
                 }
             } else {
-                bitmap = Bitmap.createBitmap(width, height, config);
+                // 宽高不匹配，新建
+                bitmap = createBitmapSafe(width, height, finalConfig);
             }
+        } else {
+            // 池内无可用Bitmap，新建
+            bitmap = createBitmapSafe(width, height, finalConfig);
         }
+
         return bitmap;
     }
 
     public void release(Bitmap bitmap) {
-        if (null == bitmap || bitmap.isRecycled()) {
+        if (bitmap == null || bitmap.isRecycled() || !bitmap.isMutable()) {
             return;
         }
-        boolean isRelease = simplePool.release(bitmap);
-        if (!isRelease) {
-            //System.out.println("recycle bitmap:" + bitmap);
-            bitmap.recycle();
+
+        synchronized (mLock) {
+            boolean isRelease = simplePool.release(bitmap);
+            if (!isRelease) {
+                //System.out.println("recycle bitmap:" + bitmap);
+                if (!bitmap.isRecycled()) {
+                    bitmap.recycle();
+                }
+            }
         }
     }
 
-    public synchronized void clear() {
-        if (null != simplePool) {
+    public void clear() {
+        synchronized (mLock) {
+            if (simplePool == null) {
+                return;
+            }
             Bitmap bitmap;
             while ((bitmap = simplePool.acquire()) != null) {
-                bitmap.recycle();
+                try {
+                    if (!bitmap.isRecycled()) {
+                        bitmap.recycle();
+                    }
+                } catch (Exception e) {
+                    // 忽略回收异常，保证清空流程完成
+                }
             }
         }
-        //simplePool = null;
+    }
+
+    private Bitmap createBitmapSafe(int width, int height, @NonNull Bitmap.Config config) {
+        try {
+            return Bitmap.createBitmap(width, height, config);
+        } catch (OutOfMemoryError | IllegalArgumentException e) {
+            // 内存不足/参数错误时，尝试降级为RGB_565（更省内存）
+            try {
+                return Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+            } catch (Exception ex) {
+                // 最终兜底，抛出明确异常
+                throw new RuntimeException("create bitmap failed, width:" + width + ", height:" + height, ex);
+            }
+        }
     }
 
     public static class FixedSimplePool<T> implements Pools.Pool<T> {
         private final Object[] mPool;
-
         private int mPoolSize;
 
-        /**
-         * Creates a new instance.
-         *
-         * @param maxPoolSize The max pool size.
-         * @throws IllegalArgumentException If the max pool size is less than zero.
-         */
         public FixedSimplePool(int maxPoolSize) {
             if (maxPoolSize <= 0) {
                 throw new IllegalArgumentException("The max pool size must be > 0");
@@ -107,7 +125,7 @@ public class BitmapPool {
 
         @Override
         @SuppressWarnings("unchecked")
-    public synchronized T acquire() {
+        public synchronized T acquire() {
             if (mPoolSize > 0) {
                 final int lastPooledIndex = mPoolSize - 1;
                 T instance = (T) mPool[lastPooledIndex];
@@ -119,7 +137,7 @@ public class BitmapPool {
         }
 
         @Override
-    public synchronized boolean release(@NonNull T instance) {
+        public synchronized boolean release(@NonNull T instance) {
             if (isInPool(instance)) {
                 return true;
             }
@@ -131,7 +149,7 @@ public class BitmapPool {
             return false;
         }
 
-    private synchronized boolean isInPool(@NonNull T instance) {
+        private synchronized boolean isInPool(@NonNull T instance) {
             for (int i = 0; i < mPoolSize; i++) {
                 if (mPool[i] == instance) {
                     return true;
