@@ -112,6 +112,7 @@
     <string name="split_title">拆分Pdf</string>
     <string name="split_pdf_to_split">请选择要拆分的PDF文件</string>
     <string name="split_rule">拆分规则</string>
+    <string name="split_pdf_info">文件信息</string>
     <string name="split_rule_desc">如 1–10,11–20,将会拆分1到10页与11到20页两个文件</string>
     <string name="split_out_setting">输出设置</string>
     <string name="split_out_name">拆分PDF文件名</string>

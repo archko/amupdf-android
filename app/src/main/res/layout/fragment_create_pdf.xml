@@ -5,10 +5,7 @@
     android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
-    android:paddingBottom="10dp">
+    android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -18,9 +15,12 @@
         app:title="@string/create_title" />
 
     <RadioGroup
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/bg_white_8_shape"
         android:orientation="horizontal"
         android:padding="8dp">
@@ -47,6 +47,8 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="10dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:visibility="gone"
         tools:visibility="visible">
 

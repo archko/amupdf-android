@@ -42,7 +42,7 @@ class MineFragment : Fragment() {
         }
 
         binding.btnSplitPdf.setOnClickListener {
-            // TODO: implement split PDF
+            HomeActivity.splitPdf(requireActivity())
         }
 
         binding.btnMergePdf.setOnClickListener {

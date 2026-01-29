@@ -42,6 +42,7 @@ import cn.archko.pdf.fragments.HistoryFragment
 import cn.archko.pdf.fragments.PdfCreationFragment
 import cn.archko.pdf.fragments.PdfOperationFragment
 import cn.archko.pdf.fragments.MineFragment
+import cn.archko.pdf.fragments.SplitPdfFragment
 import cn.archko.pdf.imagedroid.AlbumViewerActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -396,6 +397,10 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
 
         fun encryptOrDecrypt(context: FragmentActivity) {
             EncryptOrDecryptFragment.showCreateDialog(context, null)
+        }
+
+        fun splitPdf(context: FragmentActivity) {
+            SplitPdfFragment.showCreateDialog(context, null)
         }
     }
 }

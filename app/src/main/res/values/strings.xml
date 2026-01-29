@@ -114,6 +114,7 @@
     <string name="split_title">Split Pdf</string>
     <string name="split_pdf_to_split">Please select a PDF file to split</string>
     <string name="split_rule">Split Rule</string>
+    <string name="split_pdf_info">File Info</string>
     <string name="split_rule_desc">eg.1-10,11-20, split 2 pdf, page 1 to page 10, and page 11 to 20</string>
     <string name="split_out_setting">Out Setting</string>
     <string name="split_out_name">PDF Name</string>
