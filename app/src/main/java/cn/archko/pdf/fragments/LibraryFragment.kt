@@ -365,13 +365,13 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
         var mName: TextView? = null
         var mIcon: ImageView? = null
 
-        var mProgressBar: ProgressBar? = null
+        var mProgressText: TextView? = null
 
         init {
             mIcon = itemView.findViewById(R.id.icon)
             mName = itemView.findViewById(R.id.name)
             //mSize = itemView.findViewById(R.id.size)
-            mProgressBar = itemView.findViewById(R.id.progressbar)
+            mProgressText = itemView.findViewById(R.id.progressText)
         }
 
         override fun onBind(entry: FileBean, position: Int) {
@@ -381,15 +381,14 @@ class LibraryFragment : RefreshableFragment(), PopupMenu.OnMenuItemClickListener
             val bookProgress = entry.bookProgress
             if (null != bookProgress) {
                 if (bookProgress.page > 0) {
-                    mProgressBar!!.visibility = View.VISIBLE
-                    mProgressBar!!.max = bookProgress.pageCount
-                    mProgressBar!!.progress = bookProgress.page
+                    mProgressText!!.visibility = View.VISIBLE
+                    mProgressText!!.text = "${bookProgress.page}/${bookProgress.pageCount}"
                 } else {
-                    mProgressBar!!.visibility = View.INVISIBLE
+                    mProgressText!!.visibility = View.INVISIBLE
                 }
                 //mSize!!.text = Utils.getFileSize(bookProgress.size)
             } else {
-                mProgressBar!!.visibility = View.INVISIBLE
+                mProgressText!!.visibility = View.INVISIBLE
                 //mSize!!.text = null
             }
 

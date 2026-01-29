@@ -26,7 +26,7 @@
         android:max="100"
         android:progressDrawable="@drawable/progressbar_horizontal"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/name"
         app:layout_constraintLeft_toRightOf="@id/icon"
         app:layout_constraintRight_toRightOf="parent"
         tools:progress="10"
