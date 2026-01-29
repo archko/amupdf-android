@@ -86,7 +86,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Save Button -->
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_ok"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

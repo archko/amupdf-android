@@ -81,13 +81,13 @@
                 android:layout_marginEnd="16dp"
                 android:orientation="horizontal">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnExtractImage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/edit_extract_btn_image" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnExtractHtml"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

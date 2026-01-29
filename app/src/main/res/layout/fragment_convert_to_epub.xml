@@ -40,14 +40,14 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddMobi"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text="@string/create_epub_add_mobi" />
 
-            <!--<Button
+            <!--<com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddAzw"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
                 android:layout_marginStart="4dp"
                 android:text="@string/create_epub_add_azw" />-->
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnConvert"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

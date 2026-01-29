@@ -9,7 +9,7 @@
     android:paddingLeft="8dp"
     android:paddingRight="8dp">
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/label_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -20,7 +20,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/label_filename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,7 +30,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/location" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/label_filesize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/fileName" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/label_page_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -50,7 +50,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/label_filesize" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/label_read_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/label_page_count" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/label_last_read"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
         app:barrierDirection="end"
         app:constraint_referenced_ids="label_location,label_filename, label_filesize, label_read_count" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -89,7 +89,7 @@
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/fileName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -99,7 +99,7 @@
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/location" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/fileSize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -114,13 +114,13 @@
         android:orientation="horizontal"
         android:padding="2dp">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/label_lastmodified"
             android:textSize="14sp" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/lastModified"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -129,7 +129,7 @@
     </LinearLayout>-->
 
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/pageCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -139,7 +139,7 @@
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/fileSize" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/readCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -158,7 +158,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"></androidx.constraintlayout.widget.Group>
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/lastRead"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -171,20 +171,20 @@
 
     <ProgressBar
         android:id="@+id/progressbar"
-            android:progressDrawable="@drawable/progressbar_horizontal"
-            android:indeterminateOnly="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="4dp"
         android:layout_marginTop="4dp"
         android:layout_marginRight="4dp"
+        android:indeterminateOnly="false"
         android:maxHeight="10dp"
         android:minHeight="10dp"
+        android:progressDrawable="@drawable/progressbar_horizontal"
         android:textSize="14sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/lastRead" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_cancel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -195,7 +195,7 @@
         app:layout_constraintRight_toLeftOf="@id/btn_ok"
         app:layout_constraintTop_toBottomOf="@id/progressbar" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_ok"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

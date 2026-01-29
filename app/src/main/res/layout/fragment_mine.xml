@@ -27,63 +27,63 @@
             android:gravity="center"
             android:layout_marginBottom="32dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_create_pdf"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/create_pdf"
             android:layout_marginBottom="8dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_export_pdf"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/export_pdf"
             android:layout_marginBottom="8dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_encrypt_decrypt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/encrypt_decrypt_title"
             android:layout_marginBottom="8dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_split_pdf"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/split_title"
             android:layout_marginBottom="8dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_merge_pdf"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/merge_title"
             android:layout_marginBottom="8dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_convert_epub"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/convert_title"
             android:layout_marginBottom="8dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_webdav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/webdav_title"
             android:layout_marginBottom="8dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_settings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/settings_title"
             android:layout_marginBottom="8dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_about"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
