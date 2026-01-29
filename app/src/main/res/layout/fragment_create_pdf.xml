@@ -194,7 +194,6 @@
                     android:lineSpacingMultiplier="1.2"
                     android:padding="16dp"
                     android:text="The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.over the lazy dog.\n有一只狗跑的很快.有一只狗跑的很快.有一只狗跑的很快.有一只狗跑的很快."
-                    android:textColor="@android:color/black"
                     android:textSize="16sp" />
 
             </LinearLayout>

@@ -8,6 +8,7 @@
     <string name="create_pdf">Create PDF</string>
     <string name="export_pdf">Export PDF</string>
     <string name="settings_title">Settings</string>
+    <string name="version">Version:%s</string>
 
     <string name="create_pdf_label">Create A PDF</string>
     <string name="menu_create">Create A PDF</string>

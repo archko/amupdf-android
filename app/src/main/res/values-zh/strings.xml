@@ -6,6 +6,7 @@
     <string name="create_pdf">创建PDF</string>
     <string name="export_pdf">导出PDF</string>
     <string name="settings_title">设置</string>
+    <string name="version">版本号:%s</string>
 
     <string name="create_pdf_label">创建PDF</string>
     <string name="menu_create">创建PDF</string>
@@ -106,15 +107,15 @@
     <string name="encrypt_decrypt_encrypt_failed">加密失败</string>
     <string name="encrypt_decrypt_decrypt_success">解密成功\n%s</string>
     <string name="encrypt_decrypt_decrypt_failed">解密失败</string>
-    <string name="waiting">等待中...</string>
+    <string name="waiting">等待中…</string>
 
     <string name="split_title">拆分Pdf</string>
     <string name="split_pdf_to_split">请选择要拆分的PDF文件</string>
     <string name="split_rule">拆分规则</string>
-    <string name="split_rule_desc">如 1-10,11-20,将会拆分1到10页与11到20页两个文件</string>
+    <string name="split_rule_desc">如 1–10,11–20,将会拆分1到10页与11到20页两个文件</string>
     <string name="split_out_setting">输出设置</string>
     <string name="split_out_name">拆分PDF文件名</string>
-    <string name="split_doing">拆分中...</string>
+    <string name="split_doing">拆分中…</string>
     <string name="split_start">开始拆分</string>
     <string name="split_input_rule">请输入拆分范围</string>
     <string name="split_out_name_tip">请输入输出文件名</string>
@@ -135,7 +136,7 @@
     <string name="convert_select_file">选择文件</string>
     <string name="convert_enter_epub_filename">输入Epub文件名</string>
     <string name="convert_select_to_create_epub">请选择mobi,azw3来创建Epub</string>
-    <string name="convert_doing">转换中...</string>
+    <string name="convert_doing">转换中…</string>
     <string name="convert_successfully">转换成功%s本, 保存在%s</string>
     <string name="convert_error">转换失败!</string>
 

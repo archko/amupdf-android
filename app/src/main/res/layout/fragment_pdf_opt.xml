@@ -65,7 +65,7 @@
                 android:padding="8dp"
                 android:background="@drawable/bg_white_8_shape"
                 android:text="@string/edit_save_tip"
-                android:textColor="@color/red"
+                android:textColor="@color/md_theme_error"
                 android:textSize="15sp" />
 
             <include

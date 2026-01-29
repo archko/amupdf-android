@@ -8,26 +8,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import cn.archko.mupdf.R
+import cn.archko.mupdf.databinding.FragmentMineBinding
 import cn.archko.pdf.activities.AboutActivity
 import cn.archko.pdf.activities.HomeActivity
 import cn.archko.pdf.activities.PdfOptionsActivity
-import cn.archko.mupdf.R
-import cn.archko.mupdf.databinding.FragmentMineBinding
 
 /**
  * @author archko
  */
 class MineFragment : Fragment() {
 
-    private lateinit var _binding: FragmentMineBinding
-    private val binding get() = _binding!!
+    private lateinit var binding: FragmentMineBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentMineBinding.inflate(inflater, container, false)
+    ): View {
+        binding = FragmentMineBinding.inflate(inflater, container, false)
         val view = binding.root
 
         binding.btnCreatePdf.setOnClickListener {
@@ -74,16 +73,12 @@ class MineFragment : Fragment() {
             e.printStackTrace()
         }
         val versionName = packageInfo?.versionName ?: ""
-        binding.version.text = "Version: $versionName"
+        binding.version.text = String.format(getString(R.string.version), versionName)
 
         return view
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-    }
-
     companion object {
-        const val TAG = "SettingsFragment"
+        const val TAG = "MineFragment"
     }
 }

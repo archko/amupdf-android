@@ -11,10 +11,10 @@
         android:id="@+id/img_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
         android:src="@drawable/loading" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/txt_more"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -22,7 +22,6 @@
         android:gravity="center"
         android:singleLine="true"
         android:text="加载更多记录"
-        android:textColor="#9FA4B0"
         android:textSize="15sp" />
 
 </LinearLayout>
