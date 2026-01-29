@@ -209,6 +209,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
         titles[0] = getString(cn.archko.pdf.R.string.tab_history)
         titles[1] = getString(cn.archko.pdf.R.string.tab_browser)
         titles[2] = getString(cn.archko.pdf.R.string.tab_favorite)
+        titles[3] = getString(cn.archko.pdf.R.string.tab_mine)
 
         var title = titles[0]
         var bundle = Bundle()
@@ -222,9 +223,9 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
         bundle = Bundle()
         mTabs.add(SamplePagerItem(FavoriteFragment::class.java, bundle, title!!))
 
-        title = "Mine"
+        title = titles[3]
         bundle = Bundle()
-        mTabs.add(SamplePagerItem(MineFragment::class.java, bundle, title))
+        mTabs.add(SamplePagerItem(MineFragment::class.java, bundle, title!!))
     }
 
     //========================================
