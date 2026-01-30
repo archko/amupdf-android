@@ -49,8 +49,8 @@ sardine = "0.9"
 k2pdfopt = "0.2.0"
 juniversalchardet = "2.5.0"
 
-versionCode = "480"
-versionName = "7.8.0"
+versionCode = "481"
+versionName = "7.8.1"
 
 [libraries]
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
