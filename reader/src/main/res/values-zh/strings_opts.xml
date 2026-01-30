@@ -32,7 +32,7 @@
     <string name="menu_exit">退出</string>
     <string name="menu_font">字体</string>
     <string name="menu_settings">设置</string>
-    
+
     <string name="menu_opt_album">查看相册</string>
     <string name="menu_opt_delete_page">删除页面</string>
     <string name="menu_opt_insert_image">插入图片</string>

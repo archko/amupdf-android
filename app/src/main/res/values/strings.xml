@@ -6,7 +6,7 @@
     <string name="auto_crop">auto crop bound</string>
     
     <string name="create_pdf">Create PDF</string>
-    <string name="export_pdf">Export PDF</string>
+    <string name="export_image">Export Images</string>
     <string name="settings_title">Reading Settings</string>
     <string name="version">Version:%s</string>
 

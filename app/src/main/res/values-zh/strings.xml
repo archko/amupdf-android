@@ -4,7 +4,7 @@
     <string name="auto_crop">自动切边</string>
 
     <string name="create_pdf">创建PDF</string>
-    <string name="export_pdf">导出PDF</string>
+    <string name="export_image">导出图片</string>
     <string name="settings_title">阅读设置</string>
     <string name="version">版本号:%s</string>
 
