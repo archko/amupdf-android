@@ -99,15 +99,6 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     }
 
     open fun onOptionSelected(menuItem: MenuItem): Boolean {
-        when (menuItem.itemId) {
-            R.id.action_set_as_home -> {
-                setAsHome()
-                return true
-            }
-            //R.id.action_extract -> extractImage(requireActivity())
-            //R.id.action_create -> createPdf(requireActivity())
-            //R.id.action_convert_epub -> convertToEpub(requireActivity())
-        }
         return false
     }
 
@@ -117,9 +108,9 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         }
     }
 
-    private fun setAsHome() {
+    private fun setAsHome(absolutePath: String?) {
         activity?.getSharedPreferences(PREF_TAG, 0)?.edit {
-            this.putString(PREF_HOME, mCurrentPath)
+            this.putString(PREF_HOME, absolutePath)
         }
     }
 
@@ -490,7 +481,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         } else if (item.itemId == PDFViewerHelper.albumMenuItem) {
             PDFViewerHelper.openAlbum(entry.file!!, requireActivity())
         } else if (item.itemId == PDFViewerHelper.setHomeMenuItem) {
-            setAsHome()
+            setAsHome(entry.file?.absolutePath)
         } else {
             val clickedFile: File = entry.file!!
 
