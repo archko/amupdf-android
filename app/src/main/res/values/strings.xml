@@ -179,6 +179,7 @@
     <string name="menu_add_to_fav">Add To Favorites</string>
     <string name="menu_remove_from_fav">Remove from Favorites</string>
     <string name="menu_album">View as Album</string>
+    <string name="menu_set_home">Set as Home</string>
 
     <string name="dialog_title_backup">Select Backup</string>
     <string name="dialog_sub_title_backup">Select Backup file to restore</string>

@@ -1,19 +1,17 @@
 package cn.archko.pdf.common
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.view.Menu
-import android.view.MenuItem
 import androidx.core.content.FileProvider
 import cn.archko.pdf.activities.AMuPDFRecyclerViewActivity
 import cn.archko.pdf.core.common.IntentFile
-import cn.archko.pdf.imagedroid.ImageViewerActivity
 import cn.archko.pdf.imagedroid.AlbumViewerActivity
+import cn.archko.pdf.imagedroid.ImageViewerActivity
 import java.io.File
-import java.util.*
+import java.util.Locale
 
 /**
  * @author: archko 2020/1/4 :2:06 下午
@@ -24,44 +22,18 @@ class PDFViewerHelper {
 
         private const val FILE_PROVIDER = "cn.archko.mupdf.fileProvider"
 
-        const val deleteContextMenuItem = Menu.FIRST + 100
-        const val removeContextMenuItem = Menu.FIRST + 101
-        const val removeAndClearContextMenuItem = Menu.FIRST + 102
+        const val deleteMenuItem = Menu.FIRST + 100
+        const val removeMenuItem = Menu.FIRST + 101
+        const val removeAndClearMenuItem = Menu.FIRST + 102
 
-        const val mupdfNoCropContextMenuItem = Menu.FIRST + 110
+        const val otherMenuItem = Menu.FIRST + 103
+        const val infoMenuItem = Menu.FIRST + 104
+        const val addToFavoriteMenuItem = Menu.FIRST + 105
+        const val removeFromFavoriteMenuItem = Menu.FIRST + 106
 
-        const val otherContextMenuItem = Menu.FIRST + 113
-        const val infoContextMenuItem = Menu.FIRST + 114
-        const val addToFavoriteContextMenuItem = Menu.FIRST + 116
-        const val removeFromFavoriteContextMenuItem = Menu.FIRST + 117
-
-        const val editContextMenuItem = Menu.FIRST + 119
-        const val albumContextMenuItem = Menu.FIRST + 120
-
-        /**
-         * 菜单项点击的
-         */
-        fun openViewerWithMenu(clickedFile: File, item: MenuItem, activity: Activity) {
-            val uri = Uri.fromFile(clickedFile)
-            val intent = Intent()
-            intent.action = Intent.ACTION_VIEW
-            intent.data = uri
-
-            when (item.itemId) {
-                mupdfNoCropContextMenuItem -> {
-                    //val map = mapOf("type" to "AMuPDF", "name" to clickedFile.name)
-                    //MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
-
-                    openAMupdfNoCrop(clickedFile, activity)
-                }
-
-                otherContextMenuItem -> {
-                    //val map = mapOf("type" to "other", "name" to clickedFile.name)
-                    //MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, map)
-                    openWithOther(clickedFile, activity)
-                }
-            }
-        }
+        const val editMenuItem = Menu.FIRST + 107
+        const val albumMenuItem = Menu.FIRST + 108
+        const val setHomeMenuItem = Menu.FIRST + 109
 
         /**
          * 列表项点击直接调用的,所以要判断类型
@@ -85,23 +57,6 @@ class PDFViewerHelper {
             activity.startActivity(intent)
         }
 
-        fun openAMupdfNoCrop(clickedFile: File, activity: Context) {
-            val fname = clickedFile.name.lowercase(Locale.ROOT)
-            if (IntentFile.isImage(fname) || IntentFile.isTiffImage(fname)) {
-                openImage(clickedFile, activity)
-                return
-            }
-
-            val uri = Uri.fromFile(clickedFile)
-            val intent = Intent()
-            intent.action = Intent.ACTION_VIEW
-            intent.data = uri
-            intent.putExtra("forceCropParam", 0)
-
-            intent.setClass(activity, AMuPDFRecyclerViewActivity::class.java)
-            activity.startActivity(intent)
-        }
-
         fun openWithOther(clickedFile: File, activity: Context) {
             val uri = Uri.fromFile(clickedFile)
             val intent = Intent()
@@ -109,19 +64,19 @@ class PDFViewerHelper {
             intent.data = uri
 
             var mimeType = "application/pdf"
-            val name = clickedFile.absolutePath;
+            val name = clickedFile.absolutePath
             if (name.endsWith("pdf", true)) {
-                mimeType = "application/pdf";
+                mimeType = "application/pdf"
             } else if (name.endsWith("epub", true)) {
-                mimeType = "application/epub+zip";
+                mimeType = "application/epub+zip"
             } else if (name.endsWith("mobi", true)) {
-                mimeType = "application/mobi+zip";
+                mimeType = "application/mobi+zip"
             } else if (name.endsWith("cbz", true)) {
-                mimeType = "application/x-cbz";
+                mimeType = "application/x-cbz"
             } else if (name.endsWith("fb2", true)) {
-                mimeType = "application/fb2";
+                mimeType = "application/fb2"
             } else if (name.endsWith("txt", true)) {
-                mimeType = "text/plain";
+                mimeType = "text/plain"
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 intent.setDataAndType(
@@ -130,10 +85,10 @@ class PDFViewerHelper {
                         FILE_PROVIDER,
                         clickedFile
                     ), mimeType
-                );
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                intent.addCategory(Intent.CATEGORY_DEFAULT);
+                )
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                intent.addCategory(Intent.CATEGORY_DEFAULT)
             } else {
                 intent.setDataAndType(uri, mimeType)
             }

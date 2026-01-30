@@ -176,6 +176,7 @@
     <string name="menu_add_to_fav">添加到收藏夹</string>
     <string name="menu_remove_from_fav">取消收藏</string>
     <string name="menu_album">查看相册</string>
+    <string name="menu_set_home">设为主目录</string>
 
     <string name="dialog_title_backup">选择备份</string>
     <string name="dialog_sub_title_backup">选择备份文件恢复</string>
