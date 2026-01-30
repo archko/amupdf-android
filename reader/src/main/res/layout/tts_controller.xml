@@ -10,7 +10,7 @@
         android:layout_height="44dp"
         android:layout_marginStart="8dp"
         android:background="@drawable/button"
-        android:src="@drawable/ic_close_black" />
+        android:src="@drawable/ic_close" />
 
     <ImageView
         android:id="@+id/ttsSleep"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:fitsSystemWindows="true"
+    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/transparent"
-            app:navigationIcon="@drawable/ic_back_black"
+            app:navigationIcon="@drawable/ic_back"
             app:title="@string/edit_title" />
 
         <androidx.appcompat.widget.AppCompatImageView

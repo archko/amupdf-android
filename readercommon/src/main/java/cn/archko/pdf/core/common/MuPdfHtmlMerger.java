@@ -456,4 +456,38 @@ public class MuPdfHtmlMerger {
                 : style + ";font-family:" + font;
     }
 
+    /**
+     * 将合并后的 HTML 转换为适合朗读的纯文本
+     * 移除所有标签和图片，仅保留段落间的逻辑换行
+     */
+    public static String getPlainTextForRead(String mergedHtml) {
+        if (mergedHtml == null || mergedHtml.isEmpty()) return "";
+
+        // 使用 Jsoup 解析合并后的 HTML
+        Document doc = Jsoup.parse(mergedHtml);
+
+        // 1. 移除所有图片标签，避免朗读干扰
+        doc.select("img").remove();
+
+        // 2. 移除所有脚本和样式块（如果有的话）
+        doc.select("script, style").remove();
+
+        StringBuilder sb = new StringBuilder();
+
+        // 3. 遍历所有的段落标签 <p>
+        // 在合并后的 HTML 中，一个 <p> 就是一个完整的语义段落
+        Elements ps = doc.select("p");
+        for (Element p : ps) {
+            // 获取当前段落的纯文本（Jsoup 会自动过滤掉内部的 span 等标签）
+            String text = p.text().trim();
+
+            if (!text.isEmpty()) {
+                sb.append(text);
+                // 每个段落后加一个换行符，这样 TTS 朗读时会有自然的停顿
+                sb.append("\n");
+            }
+        }
+
+        return sb.toString().trim();
+    }
 }

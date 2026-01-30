@@ -32,7 +32,7 @@
     <string name="menu_exit">Exit</string>
     <string name="menu_font">Font</string>
     <string name="menu_settings">Settings</string>
-    
+
     <string name="menu_opt_album">View as Album</string>
     <string name="menu_opt_delete_page">Delete Page</string>
     <string name="menu_opt_insert_image">Insert Image</string>
@@ -180,6 +180,7 @@
     <string name="no_bookmark">No bookmark,add one?</string>
 
     <string name="tts_failed">Init tts engine failed.</string>
+    <string name="tts_title">TTS pages</string>
 
     <string name="opts_decode_block_title">Bitmap size</string>
     <string name="opts_default_decode_block" translatable="false">2</string>

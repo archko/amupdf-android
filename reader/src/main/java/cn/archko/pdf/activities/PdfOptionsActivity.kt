@@ -178,12 +178,14 @@ class PdfOptionsActivity : FragmentActivity() {
         )
         prefsList.add(prefs)
 
-        /*prefs = new Prefs(TYPE_LIST, getString(R.string.opts_list_style), getString(R.string.opts_list_style),
-                PdfOptionKeys.PREF_STYLE,
-                getResources().getStringArray(R.array.opts_list_styles),
-                getResources().getStringArray(R.array.opts_list_style_labels),
-                PdfOptionRepository.INSTANCE.getStyle());
-        prefsList.add(prefs);*/
+        prefs = Prefs(
+            TYPE_LIST, getString(R.string.opts_list_style), getString(R.string.opts_list_style),
+            PdfOptionKeys.PREF_STYLE,
+            resources.getStringArray(R.array.opts_list_styles),
+            resources.getStringArray(R.array.opts_list_style_labels),
+            PdfOptionRepository.getStyle());
+        prefsList.add(prefs)
+
         prefs = Prefs(
             TYPE_LIST, getString(R.string.opts_color_mode), getString(R.string.opts_color_mode),
             PdfOptionKeys.PREF_COLORMODE,
@@ -193,7 +195,7 @@ class PdfOptionsActivity : FragmentActivity() {
         )
         prefsList.add(prefs)
 
-        prefs = Prefs(
+        /*prefs = Prefs(
             TYPE_LIST,
             getString(R.string.opts_decode_block_title),
             getString(R.string.opts_decode_block_title),
@@ -202,7 +204,7 @@ class PdfOptionsActivity : FragmentActivity() {
             resources.getStringArray(R.array.opts_decode_block_label),
             getDecodeBlock()
         )
-        ///prefsList.add(prefs)
+        prefsList.add(prefs)*/
     }
 
     private class Prefs {

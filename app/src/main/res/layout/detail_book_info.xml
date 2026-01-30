@@ -1,72 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="20dp"
     android:layout_marginRight="20dp"
     android:orientation="vertical"
-    android:paddingLeft="8dp"
-    android:paddingRight="8dp">
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp">
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/label_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:padding="2dp"
+        android:padding="4dp"
         android:text="@string/label_location"
-        android:textSize="14sp"
+        android:textSize="15sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/label_filename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="2dp"
+        android:padding="4dp"
         android:text="@string/label_filename"
-        android:textSize="14sp"
+        android:textSize="15sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/location" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/label_filesize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="2dp"
+        android:padding="4dp"
         android:text="@string/label_filesize"
-        android:textSize="14sp"
+        android:textSize="15sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/fileName" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/label_page_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="2dp"
+        android:padding="4dp"
         android:text="@string/label_pagecount"
-        android:textSize="14sp"
+        android:textSize="15sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/label_filesize" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/label_read_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="2dp"
+        android:padding="4dp"
         android:text="@string/label_read_count"
-        android:textSize="14sp"
+        android:textSize="15sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/label_page_count" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/label_last_read"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="2dp"
+        android:padding="4dp"
         android:text="@string/label_read"
-        android:textSize="14sp"
+        android:textSize="15sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/label_read_count" />
 
@@ -77,75 +78,54 @@
         app:barrierDirection="end"
         app:constraint_referenced_ids="label_location,label_filename, label_filesize, label_read_count" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginRight="8dp"
-        android:padding="2dp"
-        android:text="location"
-        android:textSize="14sp"
+        android:layout_marginEnd="8dp"
+        android:padding="4dp"
+        tools:text="location"
+        android:textSize="15sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/fileName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="2dp"
-        android:text="fileName"
-        android:textSize="14sp"
+        android:padding="4dp"
+        tools:text="fileName"
+        android:textSize="15sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/location" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/fileSize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="2dp"
-        android:text="fileSize"
+        android:padding="4dp"
+        tools:text="fileSize"
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/fileName" />
 
-    <!--<LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="2dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/label_lastmodified"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/lastModified"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="lastModified"
-            android:textSize="14sp" />
-    </LinearLayout>-->
-
-
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/pageCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="2dp"
-        android:text="1"
-        android:textSize="14sp"
+        android:padding="4dp"
+        tools:text="1"
+        android:textSize="15sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/fileSize" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/readCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="2dp"
-        android:text="1"
-        android:textSize="14sp"
+        android:padding="4dp"
+        tools:text="1"
+        android:textSize="15sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/pageCount" />
 
@@ -154,37 +134,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="2dp"
+        android:padding="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"></androidx.constraintlayout.widget.Group>
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/lastRead"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/label_last_read"
-        android:padding="2dp"
+        android:layout_toEndOf="@id/label_last_read"
+        android:padding="4dp"
         android:text=""
-        android:textSize="14sp"
+        android:textSize="15sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/readCount" />
 
     <ProgressBar
         android:id="@+id/progressbar"
-            android:progressDrawable="@drawable/progressbar_horizontal"
-            android:indeterminateOnly="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="4dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginRight="4dp"
-        android:maxHeight="10dp"
-        android:minHeight="10dp"
-        android:textSize="14sp"
+        android:layout_margin="8dp"
+        android:indeterminateOnly="false"
+        android:maxHeight="8dp"
+        android:minHeight="8dp"
+        android:progressDrawable="@drawable/progressbar_horizontal"
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/lastRead" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_cancel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -195,7 +172,7 @@
         app:layout_constraintRight_toLeftOf="@id/btn_ok"
         app:layout_constraintTop_toBottomOf="@id/progressbar" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_ok"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -208,10 +185,11 @@
 
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="135dp"
-        android:layout_height="188dp"
-        android:paddingBottom="8dp"
-        android:src="@mipmap/logo"
+        android:layout_width="180dp"
+        android:layout_height="240dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:src="@drawable/ic_book_pdf"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_cancel" />

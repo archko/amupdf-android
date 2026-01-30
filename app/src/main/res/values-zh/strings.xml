@@ -3,6 +3,11 @@
     <string name="outline_title">目录</string>
     <string name="auto_crop">自动切边</string>
 
+    <string name="create_pdf">创建PDF</string>
+    <string name="export_image">导出图片</string>
+    <string name="settings_title">阅读设置</string>
+    <string name="version">版本号:%s</string>
+
     <string name="create_pdf_label">创建PDF</string>
     <string name="menu_create">创建PDF</string>
     <string name="menu_convert_epub">转为Epub</string>
@@ -74,7 +79,7 @@
     <string name="edit_from_page">从%s页</string>
     <string name="edit_to_page">到%s页</string>
 
-    <string name="webdav_title">Webdav config</string>
+    <string name="webdav_title">Webdav 配置</string>
 
     <string name="encrypt_decrypt_title">加密/解密</string>
     <string name="encrypt_decrypt_tips">Pdf信息</string>
@@ -102,7 +107,42 @@
     <string name="encrypt_decrypt_encrypt_failed">加密失败</string>
     <string name="encrypt_decrypt_decrypt_success">解密成功\n%s</string>
     <string name="encrypt_decrypt_decrypt_failed">解密失败</string>
-    <string name="waiting">等待中...</string>
+    <string name="waiting">等待中…</string>
+
+    <string name="split_title">拆分Pdf</string>
+    <string name="split_pdf_to_split">请选择要拆分的PDF文件</string>
+    <string name="split_rule">拆分规则</string>
+    <string name="split_pdf_info">文件信息</string>
+    <string name="split_rule_desc">如 1–10,11–20,将会拆分1到10页与11到20页两个文件</string>
+    <string name="split_out_setting">输出设置</string>
+    <string name="split_out_name">拆分PDF文件名</string>
+    <string name="split_doing">拆分中…</string>
+    <string name="split_start">开始拆分</string>
+    <string name="split_input_rule">请输入拆分范围</string>
+    <string name="split_out_name_tip">请输入输出文件名</string>
+    <string name="split_success">拆分成功！文件保存在: %s</string>
+    <string name="split_error">拆分失败，请检查输入范围是否正确</string>
+
+    <string name="merge_title">合并Pdf</string>
+    <string name="merge_btn">合并Pdf</string>
+    <string name="merge_pdf_to_split">请选择多于1个PDF文件合并</string>
+    <string name="merge_success">合并成功！文件保存在: %s</string>
+    <string name="merge_error">合并失败!</string>
+    <string name="merge_select_pdf">选择Pdf</string>
+    <string name="merge_selected_count">已选择 %1$s 个文件</string>
+    <string name="merge_doing">合并中...</string>
+    <string name="merge_out_name">输出文件名</string>
+
+    <string name="convert_title">转换为Epub</string>
+    <string name="convert_tip">支持mobi, azw3转换为epub</string>
+    <string name="convert_btn">转换</string>
+    <string name="convert_to_filename">Epub文件名</string>
+    <string name="convert_select_file">选择文件</string>
+    <string name="convert_enter_epub_filename">输入Epub文件名</string>
+    <string name="convert_select_to_create_epub">请选择mobi,azw3来创建Epub</string>
+    <string name="convert_doing">转换中…</string>
+    <string name="convert_successfully">转换成功%1$s本, 保存在%2$s</string>
+    <string name="convert_error">转换失败!</string>
 
     <string name="grant_files_permission">请求存储权限</string>
     <string name="grant_all_files_permission">请求所有文件管理权限</string>
@@ -136,6 +176,7 @@
     <string name="menu_add_to_fav">添加到收藏夹</string>
     <string name="menu_remove_from_fav">取消收藏</string>
     <string name="menu_album">查看相册</string>
+    <string name="menu_set_home">设为主目录</string>
 
     <string name="dialog_title_backup">选择备份</string>
     <string name="dialog_sub_title_backup">选择备份文件恢复</string>
@@ -157,4 +198,14 @@
     <string name="show_as_dir">是否浏览该图片所在目录？</string>
     <string name="show_as_dir_ok">浏览</string>
     <string name="show_as_dir_cancel">否</string>
+
+    <string name="feature_title">功能特点</string>
+    <string name="feature_auto_crop">自动切边</string>
+    <string name="feature_multi_format">多格式支持</string>
+    <string name="feature_ocr">ocr文字识别</string>
+    <string name="feature_image_to_pdf">图片转pdf</string>
+    <string name="feature_mobi_azw3_to_pdf">mobi/azw3转pdf</string>
+    <string name="feature_pdf_encrypt_decrypt">pdf加密/解密</string>
+    <string name="feature_webdav_backup">webdav备份</string>
+    <string name="feature_tts_read">tts朗读</string>
 </resources>

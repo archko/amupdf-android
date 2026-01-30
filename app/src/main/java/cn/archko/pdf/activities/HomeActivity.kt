@@ -39,9 +39,11 @@ import cn.archko.pdf.fragments.ConvertToEpubFragment
 import cn.archko.pdf.fragments.EncryptOrDecryptFragment
 import cn.archko.pdf.fragments.FavoriteFragment
 import cn.archko.pdf.fragments.HistoryFragment
-import cn.archko.pdf.fragments.LibraryFragment
 import cn.archko.pdf.fragments.PdfCreationFragment
 import cn.archko.pdf.fragments.PdfOperationFragment
+import cn.archko.pdf.fragments.MineFragment
+import cn.archko.pdf.fragments.SplitPdfFragment
+import cn.archko.pdf.fragments.MergePdfFragment
 import cn.archko.pdf.imagedroid.AlbumViewerActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -52,15 +54,11 @@ import java.lang.ref.WeakReference
 /**
  * @author archko
  */
-open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
-    PopupMenu.OnMenuItemClickListener {
+open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
 
     private var mViewPager: ViewPager2? = null
     private var mPagerAdapter: TabsAdapter? = null
 
-    //private lateinit var searchBtn: ImageButton
-    private var settingBtn: ImageButton? = null
-    private var menuBtn: ImageButton? = null
     private val titles = arrayOfNulls<String>(4)
 
     private lateinit var tabLayout: TabLayout
@@ -83,11 +81,6 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
 
         setContentView(R.layout.tabs_home)
 
-        settingBtn = findViewById(R.id.setting)
-        menuBtn = findViewById(R.id.menu)
-        settingBtn!!.setOnClickListener { PdfOptionsActivity.start(this@HomeActivity) }
-        menuBtn!!.setOnClickListener { prepareMenu(menuBtn!!) }
-
         checkForExternalPermission()
 
         // 设置为U-APP场景
@@ -99,7 +92,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
         collectFlowBus<GlobalEvent>(isSticky = true) {
             if (TextUtils.equals(it.name, Event.ACTION_ISFIRST) && it.obj as Boolean) {
                 Logcat.d(TAG, "ACTION_ISFIRST:${it.name}")
-                mViewPager?.currentItem = 1
+                //mViewPager?.currentItem = 1
             }
         }
 
@@ -190,63 +183,6 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
         //MobclickAgent.onPause(mContext); // BaseActivity中已经统一调用，此处无需再调用
     }
 
-    private fun prepareMenu(anchorView: View) {
-        val popupMenu = PopupMenu(this, anchorView)
-
-        onPrepareCustomMenu(popupMenu)
-        popupMenu.setOnMenuItemClickListener(this)
-        popupMenu.show()
-    }
-
-    private fun onPrepareCustomMenu(menuBuilder: PopupMenu) {
-        val index = mViewPager?.currentItem
-        if (index == 1) {
-            menuBuilder.inflate(R.menu.menu_history)
-        } else {
-            menuBuilder.inflate(R.menu.menu_library)
-        }
-    }
-
-    override fun onMenuItemClick(item: MenuItem): Boolean {
-        if (item.itemId == R.id.action_about) {
-            startActivity(
-                Intent(
-                    this@HomeActivity,
-                    AboutActivity::class.java
-                )
-            )
-            return true
-        } else {
-            var result = false
-            val fragment: Fragment? = mViewPager?.let { mPagerAdapter?.getItemFragment(it.currentItem) }
-            Logcat.d("menu:" + item.itemId + " fragment:" + fragment + " index:" + mViewPager?.currentItem)
-            if (fragment is HistoryFragment) {
-                result = fragment.onOptionSelected(item)
-            } else if (fragment is BrowserFragment) {
-                result = fragment.onOptionSelected(item)
-            } else if (fragment is FavoriteFragment) {
-                result = fragment.onOptionSelected(item)
-            } else if (fragment is LibraryFragment) {
-                result = fragment.onOptionSelected(item)
-            }
-            if (!result) {
-                if (item.itemId == R.id.action_extract) {
-                    extractImage(this)
-                }
-                if (item.itemId == R.id.action_create) {
-                    createPdf(this)
-                }
-                if (item.itemId == R.id.action_convert_epub) {
-                    convertToEpub(this)
-                }
-                if (item.itemId == R.id.action_encrypt_decrypt) {
-                    encryptOrDecrypt(this)
-                }
-            }
-            return true
-        }
-    }
-
     private fun loadView() {
         tabLayout = findViewById(R.id.tabs)
         mViewPager = findViewById(R.id.pager)
@@ -254,7 +190,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
         addTab()
         mPagerAdapter = TabsAdapter(this)
         mViewPager?.adapter = mPagerAdapter
-        mViewPager?.setCurrentItem(1, false)
+        //mViewPager?.setCurrentItem(1, false)
 
         TabLayoutMediator(tabLayout, mViewPager!!) { tab, position ->
             tab.text = mTabs[position].title
@@ -271,26 +207,26 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
     }
 
     private fun addTab() {
-        titles[0] = getString(cn.archko.pdf.R.string.tab_library)
-        titles[1] = getString(cn.archko.pdf.R.string.tab_history)
-        titles[2] = getString(cn.archko.pdf.R.string.tab_browser)
-        titles[3] = getString(cn.archko.pdf.R.string.tab_favorite)
+        titles[0] = getString(cn.archko.pdf.R.string.tab_history)
+        titles[1] = getString(cn.archko.pdf.R.string.tab_browser)
+        titles[2] = getString(cn.archko.pdf.R.string.tab_favorite)
+        titles[3] = getString(cn.archko.pdf.R.string.tab_mine)
 
         var title = titles[0]
         var bundle = Bundle()
-        mTabs.add(SamplePagerItem(LibraryFragment::class.java, bundle, title!!))
+        mTabs.add(SamplePagerItem(HistoryFragment::class.java, bundle, title!!))
 
         title = titles[1]
         bundle = Bundle()
-        mTabs.add(SamplePagerItem(HistoryFragment::class.java, bundle, title!!))
+        mTabs.add(SamplePagerItem(BrowserFragment::class.java, bundle, title!!))
 
         title = titles[2]
         bundle = Bundle()
-        mTabs.add(SamplePagerItem(BrowserFragment::class.java, bundle, title!!))
+        mTabs.add(SamplePagerItem(FavoriteFragment::class.java, bundle, title!!))
 
         title = titles[3]
         bundle = Bundle()
-        mTabs.add(SamplePagerItem(FavoriteFragment::class.java, bundle, title!!))
+        mTabs.add(SamplePagerItem(MineFragment::class.java, bundle, title!!))
     }
 
     //========================================
@@ -463,6 +399,14 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted,
 
         fun encryptOrDecrypt(context: FragmentActivity) {
             EncryptOrDecryptFragment.showCreateDialog(context, null)
+        }
+
+        fun splitPdf(context: FragmentActivity) {
+            SplitPdfFragment.showCreateDialog(context, null)
+        }
+
+        fun mergePdf(context: FragmentActivity) {
+            MergePdfFragment.showCreateDialog(context, null)
         }
     }
 }

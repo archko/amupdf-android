@@ -2,7 +2,6 @@ package cn.archko.pdf.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +14,7 @@ import cn.archko.pdf.R
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.core.widgets.ColorItemDecoration
 import cn.archko.pdf.databinding.DialogTtsTextBinding
 
 /**
@@ -69,10 +69,15 @@ class TtsTextFragment : DialogFragment(R.layout.dialog_tts_text) {
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
         binding.recyclerView.adapter = textAdapter
         binding.recyclerView.setHasFixedSize(true)
+        binding.recyclerView.addItemDecoration(ColorItemDecoration(requireContext()))
 
         // Auto scroll to current page
         if (currentPage > 0 && textAdapter.itemCount > 0) {
-            val index = textAdapter.keys.indexOfFirst { Utils.parseInt(it.page?.split("-")?.firstOrNull() ?: "") == currentPage }
+            val index = textAdapter.keys.indexOfFirst {
+                Utils.parseInt(
+                    it.page?.split("-")?.firstOrNull() ?: ""
+                ) == currentPage
+            }
             if (index >= 0) {
                 binding.recyclerView.scrollToPosition(index)
             }

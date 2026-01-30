@@ -2,11 +2,8 @@ package cn.archko.pdf.decode
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.RectF
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
 import android.util.Size
@@ -15,10 +12,8 @@ import cn.archko.pdf.core.App
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.common.IntentFile
-import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.utils.BitmapUtils
 import cn.archko.pdf.core.utils.FileUtils
-import cn.archko.pdf.widgets.CoverDrawable
 import coil3.BitmapImage
 import coil3.ImageLoader
 import coil3.asImage

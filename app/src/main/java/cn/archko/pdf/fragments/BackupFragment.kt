@@ -61,8 +61,7 @@ open class BackupFragment : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(cn.archko.pdf.R.layout.item_font, container, false)
-        view.findViewById<View>(R.id.layout_search).visibility = View.GONE
+        val view = inflater.inflate(R.layout.fragment_backup, container, false)
         val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
         toolbar.setNavigationOnClickListener({ dismiss() })
 

@@ -2,39 +2,42 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-        android:fitsSystemWindows="true"
+    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
-    android:paddingBottom="10dp">
+    android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:navigationIcon="@drawable/ic_back_black"
+        app:navigationIcon="@drawable/ic_back"
         app:title="@string/create_title" />
 
     <RadioGroup
-        android:layout_width="wrap_content"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:orientation="horizontal">
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/bg_white_8_shape"
+        android:orientation="horizontal"
+        android:padding="8dp">
 
-        <RadioButton
+        <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/btnImage"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:checked="true"
             android:text="@string/create_use_image" />
 
-        <RadioButton
+        <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/btnTxt"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_weight="1"
             android:text="@string/create_use_txt" />
     </RadioGroup>
 
@@ -44,6 +47,8 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="10dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:visibility="gone"
         tools:visibility="visible">
 
@@ -60,51 +65,60 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddTxt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
                 android:text="@string/create_btn_select_text" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCreateFromTxt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginBottom="4dp"
                 android:text="@string/create_btn_text" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <TextView
-            android:id="@+id/txt_path"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            tools:text="/storage/0/a.txt" />
+            android:background="@drawable/bg_white_8_shape"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/txt_path"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                tools:text="/storage/0/a.txt" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:text="@string/create_text_path_tip" />
+
+            <EditText
+                android:id="@+id/pdfName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:hint="@string/create_text_name"
+                android:inputType="text"
+                android:text="new.pdf" />
+        </LinearLayout>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            android:text="@string/create_text_path_tip" />
-
-        <EditText
-            android:id="@+id/pdfName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:autofillHints=""
-            android:hint="@string/create_text_name"
-            android:inputType="text"
-            android:text="new.pdf" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"
             android:text="Preview:"
             android:textStyle="bold" />
 
@@ -115,6 +129,7 @@
             android:layout_height="wrap_content">
 
             <LinearLayout
+                android:background="@drawable/bg_white_8_shape"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -178,14 +193,9 @@
                     android:id="@+id/txtPreview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/white"
                     android:lineSpacingMultiplier="1.2"
-                    android:paddingLeft="20dp"
-                    android:paddingTop="20dp"
-                    android:paddingRight="20dp"
-                    android:paddingBottom="20dp"
+                    android:padding="16dp"
                     android:text="The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.over the lazy dog.\n有一只狗跑的很快.有一只狗跑的很快.有一只狗跑的很快.有一只狗跑的很快."
-                    android:textColor="@android:color/black"
                     android:textSize="16sp" />
 
             </LinearLayout>
@@ -207,27 +217,6 @@
         android:orientation="vertical"
         android:padding="10dp">
 
-        <!--<Button
-                android:id="@+id/btnSelect"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginRight="4dp"
-                android:text="@string/create_btn_old_pdf" />
-
-        <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/create_old_pdf_tip" />
-
-        <TextView
-                android:id="@+id/oldPdfPath"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:text="" />-->
-
         <EditText
             android:id="@+id/pdfPath"
             android:layout_width="match_parent"
@@ -242,7 +231,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddImage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -250,7 +239,7 @@
                 android:layout_marginStart="4dp"
                 android:text="@string/create_image_btn_add_image" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCreateFromImage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

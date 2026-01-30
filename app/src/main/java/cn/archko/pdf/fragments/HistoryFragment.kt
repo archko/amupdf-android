@@ -5,9 +5,14 @@ import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.PopupMenu
+import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.lifecycleScope
@@ -31,6 +36,7 @@ import cn.archko.pdf.core.entity.FileBean
 import cn.archko.pdf.core.entity.ResponseHandler
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.LengthUtils
+import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.core.widgets.ColorItemDecoration
 import cn.archko.pdf.viewmodel.HistoryViewModel
 import cn.archko.pdf.viewmodel.HistoryViewModel.Companion.STYLE_GRID
@@ -164,18 +170,22 @@ class HistoryFragment : BrowserFragment() {
                 backup()
                 return true
             }
+
             R.id.action_config_webdav -> {
                 configWebdav()
                 return true
             }
+
             R.id.action_backup_webdav -> {
                 backupToWebdav()
                 return true
             }
+
             R.id.action_restore_webdav -> {
                 restoreFromWebdav()
                 return true
             }
+
             R.id.action_restore -> {
                 restore()
                 return true
@@ -207,6 +217,10 @@ class HistoryFragment : BrowserFragment() {
     }
 
     private fun backupToWebdav() {
+        if (!backupViewModel.checkAndLoadUser()) {
+            WebdavConfigFragment.showCreateDialog(requireActivity())
+            return
+        }
         progressDialog.show()
         lifecycleScope.launch {
             backupViewModel.backupToWebdav().flowOn(Dispatchers.IO).collectLatest {
@@ -221,6 +235,10 @@ class HistoryFragment : BrowserFragment() {
     }
 
     private fun restoreFromWebdav() {
+        if (!backupViewModel.checkAndLoadUser()) {
+            WebdavConfigFragment.showCreateDialog(requireActivity())
+            return
+        }
         WebdavFragment.showWebdavDialog(activity, object :
             DataListener {
             override fun onSuccess(vararg args: Any?) {
@@ -250,6 +268,8 @@ class HistoryFragment : BrowserFragment() {
         })
     }
 
+    private lateinit var fab: ImageView
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -263,8 +283,82 @@ class HistoryFragment : BrowserFragment() {
 
         addDecoration()
 
+        fab = ImageButton(requireActivity())
+        fab.setImageResource(cn.archko.pdf.R.drawable.ic_menu)
+        fab.setBackgroundResource(cn.archko.pdf.R.drawable.button)
+        fab.setOnClickListener { showPopupMenu(it) }
+
+        if (view != null && view is ViewGroup) {
+            val params = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            fab.layoutParams = params
+
+            view.addView(fab)
+
+            if (fab.layoutParams is RelativeLayout.LayoutParams) {
+                val marginParams = fab.layoutParams as RelativeLayout.LayoutParams
+                marginParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+                marginParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+                marginParams.bottomMargin = Utils.dipToPixel(20f)
+                marginParams.rightMargin = Utils.dipToPixel(20f)
+                fab.layoutParams = marginParams
+            }
+        }
+
         addObserver()
         return view
+    }
+
+    private fun showPopupMenu(view: View) {
+        val popupMenu = PopupMenu(activity, view)
+
+        onPrepareCustomMenu(popupMenu)
+        popupMenu.setOnMenuItemClickListener(menuClick)
+        popupMenu.show()
+    }
+
+    private var menuClick = object : PopupMenu.OnMenuItemClickListener {
+        override fun onMenuItemClick(item: MenuItem): Boolean {
+            if (item.itemId == backupWebdavMenuItem) {
+                backupToWebdav()
+            } else if (item.itemId == restoreWebdavMenuItem) {
+                restoreFromWebdav()
+            } else if (item.itemId == backupMenuItem) {
+                backup()
+            } else if (item.itemId == restoreMenuItem) {
+                restore()
+            }
+            return false
+        }
+    }
+
+    private fun onPrepareCustomMenu(menuBuilder: PopupMenu) {
+        menuBuilder.menu.add(
+            0,
+            backupWebdavMenuItem,
+            0,
+            getString(cn.archko.pdf.R.string.menu_backup_webdav)
+        )
+        menuBuilder.menu.add(
+            0,
+            restoreWebdavMenuItem,
+            0,
+            getString(cn.archko.pdf.R.string.menu_restore_webdav)
+        )
+        menuBuilder.menu.add(
+            0,
+            backupMenuItem,
+            0,
+            getString(cn.archko.pdf.R.string.menu_backup)
+        )
+        menuBuilder.menu.add(
+            0,
+            restoreMenuItem,
+            0,
+            getString(cn.archko.pdf.R.string.menu_restore)
+        )
     }
 
     private fun applyStyle() {
@@ -478,5 +572,10 @@ class HistoryFragment : BrowserFragment() {
         const val TAG = "HistoryFragment"
         const val PREF_BROWSER = "pref_browser"
         const val PREF_BROWSER_KEY_FIRST = "pref_browser_key_first"
+
+        const val backupWebdavMenuItem = Menu.FIRST + 110
+        const val restoreWebdavMenuItem = Menu.FIRST + 111
+        const val backupMenuItem = Menu.FIRST + 112
+        const val restoreMenuItem = Menu.FIRST + 113
     }
 }

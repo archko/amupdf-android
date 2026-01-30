@@ -2,22 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-        android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
-    android:paddingBottom="10dp">
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:navigationIcon="@drawable/ic_back_black"
+        app:navigationIcon="@drawable/ic_back"
         app:title="@string/create_epub_title" />
 
     <LinearLayout
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -25,24 +24,29 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/bg_white_8_shape"
             android:text="@string/create_epub_tips"
             android:textSize="16sp" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_margin="8dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddMobi"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:layout_marginStart="4dp"
                 android:text="@string/create_epub_add_mobi" />
 
-            <!--<Button
+            <!--<com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddAzw"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -50,12 +54,12 @@
                 android:layout_marginStart="4dp"
                 android:text="@string/create_epub_add_azw" />-->
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnConvert"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:layout_marginStart="4dp"
+                android:layout_marginStart="8dp"
                 android:text="@string/create_epub_convert" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -66,7 +70,7 @@
             android:layout_marginTop="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="5"
-            tools:listitem="@layout/item_opt_pdf" />
+            tools:listitem="@layout/item_convert_epub" />
 
     </LinearLayout>
 </LinearLayout>

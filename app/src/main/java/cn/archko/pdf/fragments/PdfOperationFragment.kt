@@ -81,7 +81,7 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
                 )
                 if (type == TYPE_EXTRACT_IMAGES) {
                     txtPath = path
-                    binding.pdfPath.text = path
+                    binding.pdfPath.text = path ?: "未选择文件"
                     loadPdf(path)
                 } else {
                     //adapter.data.add(adapter.itemCount, path)
@@ -267,12 +267,7 @@ class PdfOperationFragment : DialogFragment(R.layout.fragment_pdf_opt) {
         super.onViewCreated(view, savedInstanceState)
         binding.toolbar.setNavigationOnClickListener { dismiss() }
 
-        binding.btnExtract.setOnClickListener {
-            type = TYPE_EXTRACT_IMAGES
-            updateUi()
-        }
-
-        binding.btnAddPdf.setOnClickListener { selectPdf() }
+        binding.btnSelectPdf.setOnClickListener { selectPdf() }
         binding.btnExtractImage.setOnClickListener { extractImages() }
         binding.btnExtractHtml.setOnClickListener { extractHtml() }
         /*adapter = object : BaseRecyclerAdapter<String>(activity) {

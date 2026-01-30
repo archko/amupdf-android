@@ -76,15 +76,14 @@ open class WebdavFragment : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(cn.archko.pdf.R.layout.item_font, container, false)
-        view.findViewById<View>(cn.archko.pdf.R.id.layout_search).visibility = View.GONE
+        val view = inflater.inflate(R.layout.fragment_backup, container, false)
         val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
         toolbar.setNavigationOnClickListener { dismiss() }
 
         toolbar?.setTitle(R.string.dialog_title_backup)
         toolbar?.setSubtitle(R.string.dialog_sub_title_backup)
 
-        recyclerView = view.findViewById(cn.archko.pdf.R.id.files)
+        recyclerView = view.findViewById(R.id.files)
         recyclerView.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
 

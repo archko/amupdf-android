@@ -33,6 +33,7 @@ import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.widgets.ColorItemDecoration
 import cn.archko.pdf.viewmodel.BookViewModel
 import java.io.File
+import androidx.core.content.edit
 
 /**
  * @description:file browser
@@ -98,15 +99,6 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     }
 
     open fun onOptionSelected(menuItem: MenuItem): Boolean {
-        when (menuItem.itemId) {
-            R.id.action_set_as_home -> {
-                setAsHome()
-                return true
-            }
-            //R.id.action_extract -> extractImage(requireActivity())
-            //R.id.action_create -> createPdf(requireActivity())
-            //R.id.action_convert_epub -> convertToEpub(requireActivity())
-        }
         return false
     }
 
@@ -116,10 +108,10 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         }
     }
 
-    private fun setAsHome() {
-        val edit = activity?.getSharedPreferences(PREF_TAG, 0)?.edit()
-        edit?.putString(PREF_HOME, mCurrentPath)
-        edit?.apply()
+    private fun setAsHome(absolutePath: String?) {
+        activity?.getSharedPreferences(PREF_TAG, 0)?.edit {
+            this.putString(PREF_HOME, absolutePath)
+        }
     }
 
     open fun onBackPressed(): Boolean {
@@ -267,11 +259,6 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         var path: String? = activity?.getSharedPreferences(PREF_TAG, 0)!!
             .getString(PREF_HOME, null)
         if (null == path) {
-            //Toast.makeText(
-            //    activity,
-            //    resources.getString(R.string.toast_set_as_home),
-            //    Toast.LENGTH_SHORT
-            //).show()
             path = defaultHome
         }
         if (path!!.length > 1 && path.endsWith("/")) {
@@ -367,7 +354,6 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
      * @param menuBuilder
      */
     private fun onCreateCustomMenu(menuBuilder: PopupMenu) {
-        /*menuBuilder.add(0, 1, 0, "title1");*/
         menuBuilder.menu.clear()
     }
 
@@ -377,36 +363,31 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
      * @param menuBuilder
      */
     private fun onPrepareCustomMenu(menuBuilder: PopupMenu, entry: FileBean) {
-        /*menuBuilder.add(0, 1, 0, "title1");*/
-        if (entry.type == FileBean.HOME) {
-            //menuBuilder.getMenu().add(R.string.set_as_home);
-            return
-        }
         if (entry.isDirectory) {
             menuBuilder.menu.add(
                 0,
-                PDFViewerHelper.albumContextMenuItem,
+                PDFViewerHelper.albumMenuItem,
                 0,
                 getString(R.string.menu_album)
+            )
+            menuBuilder.menu.add(
+                0,
+                PDFViewerHelper.setHomeMenuItem,
+                0,
+                getString(R.string.menu_set_home)
             )
             return
         }
 
-        /*menuBuilder.menu.add(
-            0,
-            PDFViewerHelper.mupdfNoCropContextMenuItem,
-            0,
-            getString(R.string.menu_mupdf)
-        )*/
         menuBuilder.menu.add(
             0,
-            PDFViewerHelper.infoContextMenuItem,
+            PDFViewerHelper.infoMenuItem,
             0,
             getString(R.string.menu_info)
         )
         menuBuilder.menu.add(
             0,
-            PDFViewerHelper.otherContextMenuItem,
+            PDFViewerHelper.otherMenuItem,
             0,
             getString(R.string.menu_other)
         )
@@ -417,7 +398,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         ) {
             menuBuilder.menu.add(
                 0,
-                PDFViewerHelper.editContextMenuItem,
+                PDFViewerHelper.editMenuItem,
                 0,
                 getString(R.string.menu_edit)
             )
@@ -426,13 +407,13 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         if (entry.type == FileBean.RECENT) {
             menuBuilder.menu.add(
                 0,
-                PDFViewerHelper.removeContextMenuItem,
+                PDFViewerHelper.removeMenuItem,
                 0,
                 getString(R.string.menu_remove_from_recent)
             )
             menuBuilder.menu.add(
                 0,
-                PDFViewerHelper.removeAndClearContextMenuItem,
+                PDFViewerHelper.removeAndClearMenuItem,
                 0,
                 getString(R.string.menu_remove_and_clear)
             )
@@ -440,7 +421,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             if (entry.bookProgress?.isFavorited == 0) {
                 menuBuilder.menu.add(
                     0,
-                    PDFViewerHelper.deleteContextMenuItem,
+                    PDFViewerHelper.deleteMenuItem,
                     0,
                     getString(R.string.menu_delete)
                 )
@@ -460,14 +441,14 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
         if (entry.bookProgress!!.isFavorited == 0) {
             menuBuilder.menu.add(
                 0,
-                PDFViewerHelper.addToFavoriteContextMenuItem,
+                PDFViewerHelper.addToFavoriteMenuItem,
                 0,
                 getString(R.string.menu_add_to_fav)
             )
         } else {
             menuBuilder.menu.add(
                 0,
-                PDFViewerHelper.removeFromFavoriteContextMenuItem,
+                PDFViewerHelper.removeFromFavoriteMenuItem,
                 0,
                 getString(R.string.menu_remove_from_fav)
             )
@@ -479,7 +460,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
             return true
         }
         val entry = selectedBean!!
-        if (item.itemId == PDFViewerHelper.deleteContextMenuItem) {
+        if (item.itemId == PDFViewerHelper.deleteMenuItem) {
             Logcat.d(TAG, "delete:$entry")
             //MobclickAgent.onEvent(activity, AnalysticsHelper.A_MENU, "delete")
             if (entry.type == FileBean.NORMAL && !entry.isDirectory) {
@@ -491,19 +472,21 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
                 bookAdapter?.submitList(list)
             }
             return true
-        } else if (item.itemId == PDFViewerHelper.removeContextMenuItem) {
+        } else if (item.itemId == PDFViewerHelper.removeMenuItem) {
             remove(entry)
-        } else if (item.itemId == PDFViewerHelper.removeAndClearContextMenuItem) {
+        } else if (item.itemId == PDFViewerHelper.removeAndClearMenuItem) {
             removeAndClear(entry)
-        } else if (item.itemId == PDFViewerHelper.editContextMenuItem) {
+        } else if (item.itemId == PDFViewerHelper.editMenuItem) {
             editPdf(entry.file?.absolutePath)
-        } else if (item.itemId == PDFViewerHelper.albumContextMenuItem) {
+        } else if (item.itemId == PDFViewerHelper.albumMenuItem) {
             PDFViewerHelper.openAlbum(entry.file!!, requireActivity())
+        } else if (item.itemId == PDFViewerHelper.setHomeMenuItem) {
+            setAsHome(entry.file?.absolutePath)
         } else {
             val clickedFile: File = entry.file!!
 
             if (clickedFile.exists()) {
-                if (item.itemId == PDFViewerHelper.infoContextMenuItem) {
+                if (item.itemId == PDFViewerHelper.infoMenuItem) {
                     //val map = HashMap<String, String>()
                     //map.put("type", "info")
                     //map.put("name", clickedFile.name)
@@ -512,7 +495,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
                     showFileInfoDiaLog(entry)
                     return true
                 }
-                if (item.itemId == PDFViewerHelper.addToFavoriteContextMenuItem) {
+                if (item.itemId == PDFViewerHelper.addToFavoriteMenuItem) {
                     //val map = HashMap<String, String>()
                     //map.put("type", "addToFavorite")
                     //map.put("name", clickedFile.name)
@@ -521,7 +504,7 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
                     bookViewModel.favorite(entry, 1)
                     return true
                 }
-                if (item.itemId == PDFViewerHelper.removeFromFavoriteContextMenuItem) {
+                if (item.itemId == PDFViewerHelper.removeFromFavoriteMenuItem) {
                     //val map = HashMap<String, String>()
                     //map.put("type", "removeFromFavorite")
                     //map.put("name", clickedFile.name)
@@ -530,9 +513,11 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
                     bookViewModel.favorite(entry, 0)
                     return true
                 }
-
-                currentBean = entry
-                PDFViewerHelper.openViewerWithMenu(clickedFile, item, requireActivity())
+                if (item.itemId == PDFViewerHelper.otherMenuItem) {
+                    currentBean = entry
+                    PDFViewerHelper.openWithOther(clickedFile, requireActivity())
+                    return true
+                }
             }
         }
         return false
