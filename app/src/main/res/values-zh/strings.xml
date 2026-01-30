@@ -125,10 +125,13 @@
 
     <string name="merge_title">合并Pdf</string>
     <string name="merge_btn">合并Pdf</string>
-    <string name="merge_pdf_to_split">请选择要要合并的PDF文件</string>
+    <string name="merge_pdf_to_split">请选择多于1个PDF文件合并</string>
     <string name="merge_success">合并成功！文件保存在: %s</string>
     <string name="merge_error">合并失败!</string>
     <string name="merge_select_pdf">选择Pdf</string>
+    <string name="merge_selected_count">已选择 %1$s 个文件</string>
+    <string name="merge_doing">合并中...</string>
+    <string name="merge_out_name">输出文件名</string>
 
     <string name="convert_title">转换为Epub</string>
     <string name="convert_tip">支持mobi, azw3转换为epub</string>

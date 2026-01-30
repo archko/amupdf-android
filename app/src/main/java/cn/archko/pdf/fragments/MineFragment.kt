@@ -46,7 +46,7 @@ class MineFragment : Fragment() {
         }
 
         binding.btnMergePdf.setOnClickListener {
-            // TODO: implement merge PDF
+            HomeActivity.mergePdf(requireActivity())
         }
 
         binding.btnConvertEpub.setOnClickListener {

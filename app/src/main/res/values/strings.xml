@@ -127,10 +127,13 @@
 
     <string name="merge_title">Merge Pdf</string>
     <string name="merge_btn">Merge Pdf</string>
-    <string name="merge_pdf_to_split">Please select a PDF file to Merge</string>
+    <string name="merge_pdf_to_split">Please select more than 1 PDF file to Merge</string>
     <string name="merge_success">Merge Successfully！Save to: %s</string>
     <string name="merge_error">Merge Error!</string>
     <string name="merge_select_pdf">Select Pdf</string>
+    <string name="merge_selected_count">Selected %1$s files</string>
+    <string name="merge_doing">Merging...</string>
+    <string name="merge_out_name">Merged.pdf</string>
 
     <string name="convert_title">Convert to Epub</string>
     <string name="convert_tip">mobi, azw3 convert to epub</string>
