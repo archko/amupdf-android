@@ -66,12 +66,12 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="8dp">
+                        android:padding="4dp">
 
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="4dp"
                             android:src="@drawable/ic_feature_crop" />
 
                         <TextView
@@ -88,12 +88,12 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="8dp">
+                        android:padding="4dp">
 
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="4dp"
                             android:src="@drawable/ic_feature_formats" />
 
                         <TextView
@@ -119,12 +119,12 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="8dp">
+                        android:padding="4dp">
 
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="4dp"
                             android:src="@drawable/ic_feature_ocr" />
 
                         <TextView
@@ -141,12 +141,12 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="8dp">
+                        android:padding="4dp">
 
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="4dp"
                             android:src="@drawable/ic_feature_to_pdf" />
 
                         <TextView
@@ -172,12 +172,12 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="8dp">
+                        android:padding="4dp">
 
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="4dp"
                             android:src="@drawable/ic_feature_convert" />
 
                         <TextView
@@ -194,12 +194,12 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="8dp">
+                        android:padding="4dp">
 
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="4dp"
                             android:src="@drawable/ic_feature_encrypt" />
 
                         <TextView
@@ -224,12 +224,12 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="8dp">
+                        android:padding="4dp">
 
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="4dp"
                             android:src="@drawable/ic_feature_webdav" />
 
                         <TextView
@@ -246,12 +246,12 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="8dp">
+                        android:padding="4dp">
 
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="4dp"
                             android:src="@drawable/ic_feature_tts" />
 
                         <TextView
@@ -278,7 +278,7 @@
                 android:id="@+id/btn_create_pdf"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="4dp"
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
@@ -310,7 +310,7 @@
                 android:id="@+id/btn_export_pdf"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="4dp"
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
@@ -351,7 +351,7 @@
                 android:id="@+id/btn_encrypt_decrypt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="4dp"
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
@@ -383,7 +383,7 @@
                 android:id="@+id/btn_split_pdf"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="4dp"
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
@@ -424,7 +424,7 @@
                 android:id="@+id/btn_merge_pdf"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="4dp"
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
@@ -456,7 +456,7 @@
                 android:id="@+id/btn_convert_epub"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="4dp"
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
@@ -497,7 +497,7 @@
                 android:id="@+id/btn_webdav"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="4dp"
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
@@ -529,7 +529,7 @@
                 android:id="@+id/btn_settings"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="4dp"
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
