@@ -154,6 +154,7 @@
     <string name="no_bookmark">没有书签,先添加一个吧</string>
 
     <string name="tts_failed">初始化语音引擎失败</string>
+    <string name="tts_title">朗读页面列表</string>
 
     <string name="opts_decode_block_title">位图尺寸</string>
 </resources>

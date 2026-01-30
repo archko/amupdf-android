@@ -180,6 +180,7 @@
     <string name="no_bookmark">No bookmark,add one?</string>
 
     <string name="tts_failed">Init tts engine failed.</string>
+    <string name="tts_title">TTS pages</string>
 
     <string name="opts_decode_block_title">Bitmap size</string>
     <string name="opts_default_decode_block" translatable="false">2</string>

@@ -83,7 +83,7 @@ open class WebdavFragment : DialogFragment() {
         toolbar?.setTitle(R.string.dialog_title_backup)
         toolbar?.setSubtitle(R.string.dialog_sub_title_backup)
 
-        recyclerView = view.findViewById(cn.archko.pdf.R.id.files)
+        recyclerView = view.findViewById(R.id.files)
         recyclerView.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
 

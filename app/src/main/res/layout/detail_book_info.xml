@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="20dp"
@@ -82,9 +83,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
         android:padding="4dp"
-        android:text="location"
+        tools:text="location"
         android:textSize="15sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toTopOf="parent" />
@@ -94,7 +95,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="4dp"
-        android:text="fileName"
+        tools:text="fileName"
         android:textSize="15sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/location" />
@@ -104,37 +105,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="4dp"
-        android:text="fileSize"
+        tools:text="fileSize"
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/fileName" />
-
-    <!--<LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="4dp">
-
-        <com.google.android.material.textview.MaterialTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/label_lastmodified"
-            android:textSize="15sp" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/lastModified"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="lastModified"
-            android:textSize="15sp" />
-    </LinearLayout>-->
-
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/pageCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="4dp"
-        android:text="1"
+        tools:text="1"
         android:textSize="15sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/fileSize" />
@@ -144,7 +124,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="4dp"
-        android:text="1"
+        tools:text="1"
         android:textSize="15sp"
         app:layout_constraintLeft_toRightOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/pageCount" />
@@ -162,7 +142,7 @@
         android:id="@+id/lastRead"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/label_last_read"
+        android:layout_toEndOf="@id/label_last_read"
         android:padding="4dp"
         android:text=""
         android:textSize="15sp"
@@ -209,7 +189,7 @@
         android:layout_height="240dp"
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
-        android:src="@mipmap/logo"
+        android:src="@drawable/ic_book_pdf"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_cancel" />

@@ -37,7 +37,6 @@ open class FontsFragment : DialogFragment() {
     var mDataListener: DataListener? = null
     private lateinit var fontsViewModel: FontsViewModel
 
-    private var layoutSearch: View? = null
     private var toolbar: MaterialToolbar? = null
     private var recyclerView: RecyclerView? = null
     private var type: String = type_reflow
@@ -72,12 +71,10 @@ open class FontsFragment : DialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_font, container, false)
-        layoutSearch = view.findViewById(R.id.layoutSearch)
         recyclerView = view.findViewById(R.id.recyclerView)
 
         dialog?.setTitle("Fonts")
 
-        layoutSearch?.visibility = View.GONE
         toolbar?.setNavigationOnClickListener { dismiss() }
 
         toolbar?.setTitle(R.string.dialog_title_font)
