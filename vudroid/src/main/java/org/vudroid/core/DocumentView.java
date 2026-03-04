@@ -1,9 +1,12 @@
 package org.vudroid.core;
 
 import android.content.Context;
-import android.graphics.*;
-import android.os.Handler;
-import android.os.Looper;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.GestureDetector;
@@ -36,9 +39,6 @@ public class DocumentView extends View implements ZoomListener {
     DecodeService decodeService;
     private final SparseArray<Page> pages = new SparseArray<>();
     private final List<Page> lastPages = new ArrayList<>();
-    private final Handler updateHandler = new Handler(Looper.getMainLooper());
-    private final Runnable updateRunnable = this::updatePageVisibilityImpl;
-    private long lastRenderTime = 0L;
     private boolean isInitialized = false;
     private int pageToGoTo = -1;
     private int xToScroll;
@@ -216,18 +216,6 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void updatePageVisibility() {
-        final long now = System.currentTimeMillis();
-        final long elapsed = now - lastRenderTime;
-        updateHandler.removeCallbacks(updateRunnable);
-        if (elapsed < 16) {
-            updateHandler.postDelayed(updateRunnable, 16 - elapsed);
-        } else {
-            updatePageVisibilityImpl();
-        }
-    }
-
-    private void updatePageVisibilityImpl() {
-        lastRenderTime = System.currentTimeMillis();
         List<Page> visibleList = new ArrayList<>();
 
         int currentPage = binarySearchCurrentPage();
