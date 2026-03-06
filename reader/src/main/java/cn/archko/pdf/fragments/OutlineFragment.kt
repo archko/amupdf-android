@@ -57,7 +57,7 @@ open class OutlineFragment : DialogFragment() {
             lp.dimAmount = 0f
             lp.height =
                 ((Utils.getScreenHeightPixelWithOrientation(requireActivity()) * 0.9f).toInt())
-            lp.width = (Utils.getScreenWidthPixelWithOrientation(requireActivity()) * 0.8f).toInt()
+            lp.width = (Utils.getScreenWidthPixelWithOrientation(requireActivity()) * 0.9f).toInt()
             window!!.attributes = lp
             setCanceledOnTouchOutside(true)
             setCancelable(true)
@@ -167,7 +167,8 @@ open class OutlineFragment : DialogFragment() {
             } else {
                 root.setBackgroundColor(Color.TRANSPARENT)
             }
-            title?.text = data.title
+            val indent = "   ".repeat(data.level)
+            title?.text = indent + data.title
             page?.text = (data.targetPage.plus(1)).toString()
             itemView.setOnClickListener { onListItemClick(data) }
         }

@@ -30,12 +30,12 @@ umengAsms = "1.8.0"
 colorPickerDialog = "0.2.2"
 flinger = "1.1.1"
 paging = "3.3.2"
-tiff-android = "1.1.4"
+tiff-android = "1.1.5"
 penfeizhou = "3.0.5"
 android-gif-drawable = "1.2.29"
 
 # @keep
-targetSdk = "35"
+targetSdk = "36"
 version-catalog-update = "0.8.0"
 material = "1.13.0"
 material3 = "1.1.2"
@@ -49,8 +49,8 @@ sardine = "0.9"
 k2pdfopt = "0.2.0"
 juniversalchardet = "2.5.0"
 
-versionCode = "481"
-versionName = "7.8.1"
+versionCode = "482"
+versionName = "7.8.2"
 
 [libraries]
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }

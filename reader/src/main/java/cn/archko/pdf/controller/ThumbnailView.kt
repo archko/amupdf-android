@@ -10,6 +10,7 @@ import android.graphics.RectF
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView;
 import android.widget.Toast
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.GridLayoutManager
@@ -129,8 +130,9 @@ class ThumbnailView(
             val view = AImageView(context)
                 .apply {
                     layoutParams =
-                        ViewGroup.LayoutParams(width, width)
+                        ViewGroup.LayoutParams(width, (width * 1.2).toInt())
                     adjustViewBounds = true
+                    scaleType = ImageView.ScaleType.CENTER_CROP
                 }
 
             return PdfHolder(view)
@@ -178,22 +180,6 @@ class ThumbnailView(
 
             private var index = -1
             private fun updateImage(bmp: Bitmap?) {
-                if (null != bmp) {
-                    var width: Int = viewWidth()
-                    if (width == 0) {
-                        width = thumbnail_width
-                    }
-                    val height: Int = (1f * width * bmp.height / bmp.width).toInt()
-                    var lp = view.layoutParams
-                    if (null == lp) {
-                        lp = ViewGroup.LayoutParams(width, height)
-                        view.layoutParams = lp
-                    } else {
-                        lp.width = width
-                        lp.height = height
-                        view.layoutParams = lp
-                    }
-                }
                 view.setImageBitmap(bmp)
             }
 
@@ -254,6 +240,5 @@ class ThumbnailView(
     companion object {
 
         const val TAG = "ThumbnailView"
-        private const val thumbnail_width = 256
     }
 }
