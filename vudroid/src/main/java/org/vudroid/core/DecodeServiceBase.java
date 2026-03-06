@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import cn.archko.pdf.core.cache.BitmapCache;
 import cn.archko.pdf.core.cache.BitmapPool;
+import cn.archko.pdf.core.cache.FetcherCache;
 import cn.archko.pdf.core.common.APageSizeLoader;
 import cn.archko.pdf.core.common.IntentFile;
 import cn.archko.pdf.core.entity.APage;
@@ -217,28 +218,29 @@ public class DecodeServiceBase implements DecodeService {
         this.containerView = containerView;
     }
 
-    public CodecDocument set(String path, boolean cachePage, CodecDocument document) {
-        this.path = path;
-        this.cachePage = cachePage;
-        this.document = document;
-
-        int count = document.getPageCount();
-        pageSizeBean = new APageSizeLoader.PageSizeBean();
-        pageSizeBean.setList(aPageList);
+    private void cacheCoverIfNeeded() {
         try {
-            for (int i = 0; i < count; i++) {
-                CodecPage codecPage = document.getPage(i);
-                APage aPage = new APage(i, codecPage.getWidth(), codecPage.getHeight(), 1f);
-                aPageList.add(aPage);
-                codecPage.recycle();
+            if (null != BitmapCache.getInstance().getBitmap(path)) {
+                return;
             }
+
+            DecodeCallback callback = new DecodeCallback() {
+                @Override
+                public void decodeComplete(Bitmap bitmap, boolean isThumb, Object args) {
+                    FetcherCache.Companion.cacheBitmap(path, bitmap);
+                }
+
+                @Override
+                public boolean shouldRender(int pageNumber, boolean isFullPage) {
+                    return true;
+                }
+            };
+            DecodeTask task = new DecodeTask(null, false, 0, callback, 1f, path, new RectF(0, 0, 1f, 1f), 270, 40);
+            CodecPage vuPage = getPage(0);
+            decodeThumb(task, vuPage);
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-            path = null;
-            aPageList.clear();
-            cachePage = false;
+            System.out.println("缓存封面失败: ${e.message}");
         }
-        return document;
     }
 
     public CodecDocument open(String path, boolean cachePage, boolean crop) {
@@ -252,6 +254,7 @@ public class DecodeServiceBase implements DecodeService {
             return null;
         }
         int count = document.getPageCount();
+        cacheCoverIfNeeded();
         APageSizeLoader.PageSizeBean psb = APageSizeLoader.INSTANCE.loadPageSizeFromFile(count, path);
         if (null != psb) {
             pageSizeBean = psb;

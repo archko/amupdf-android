@@ -2,23 +2,15 @@ package cn.archko.pdf.decode
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.LinearGradient
-import android.graphics.Paint
-import android.graphics.Shader
-import android.graphics.Typeface
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
 import android.util.Size
-import cn.archko.pdf.R
 import cn.archko.pdf.core.App
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.BitmapPool
-import cn.archko.pdf.core.common.IntentFile
-import cn.archko.pdf.core.utils.BitmapUtils
+import cn.archko.pdf.core.cache.FetcherCache
 import cn.archko.pdf.core.utils.FileUtils
 import coil3.BitmapImage
 import coil3.ImageLoader
@@ -36,7 +28,6 @@ import com.artifex.mupdf.fitz.android.AndroidDrawDevice
 import org.vudroid.djvudroid.codec.DjvuContext
 import org.vudroid.djvudroid.codec.DjvuPage
 import java.io.File
-import java.nio.ByteBuffer
 
 /**
  * @author: archko 2024/8/133 :08:02
@@ -45,98 +36,6 @@ class PdfFetcher(
     private val data: PdfFetcherData,
     private val options: Options
 ) : Fetcher {
-
-    public companion object {
-
-        private var cachedBitmap: Bitmap? = null
-
-        public fun createWhiteBitmap(width: Int, height: Int): Bitmap {
-            if (cachedBitmap == null) {
-                cachedBitmap = createDefaultBookBitmap(width, height)
-            }
-
-            return cachedBitmap!!
-        }
-
-        public fun createDefaultBookBitmap(width: Int, height: Int): Bitmap {
-            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888) // 使用 ARGB_8888 保证渐变平滑
-            val canvas = Canvas(bitmap)
-
-            // 1. 绘制背景渐变 (浅灰到白色，模拟自然光)
-            val bgPaint = Paint().apply {
-                shader = LinearGradient(
-                    0f, 0f, width.toFloat(), height.toFloat(),
-                    intArrayOf(0xFFF5F5F5.toInt(), 0xFFFFFFFF.toInt()),
-                    null, Shader.TileMode.CLAMP
-                )
-            }
-            canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
-
-            // 2. 绘制书脊阴影折痕 (左侧边缘)
-            val spinePaint = Paint().apply {
-                color = Color.parseColor("#E0E0E0")
-                strokeWidth = (width / 50).toFloat()
-            }
-            canvas.drawLine(spinePaint.strokeWidth, 0f, spinePaint.strokeWidth, height.toFloat(), spinePaint)
-
-            // 3. 准备字母 "B" 的画笔 (带特效)
-            val textPaint = Paint().apply {
-                isAntiAlias = true
-                textAlign = Paint.Align.CENTER
-                typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD_ITALIC) // 使用衬线体更有书卷气
-                textSize = (width / 2).toFloat()
-
-                // 特效 A: 文字渐变色 (深灰到中灰)
-                shader = LinearGradient(
-                    0f, height/3f, 0f, height/1.5f,
-                    intArrayOf(0xFF424242.toInt(), 0xFF9E9E9E.toInt()),
-                    null, Shader.TileMode.CLAMP
-                )
-
-                // 特效 B: 添加淡淡的投影
-                setShadowLayer(10f, 6f, 6f, Color.argb(70, 0, 0, 0))
-            }
-
-            // 4. 绘制文字
-            val fontMetrics = textPaint.fontMetrics
-            val x = (width / 2f)
-            val y = (height / 2f) - (fontMetrics.ascent + fontMetrics.descent) / 2f
-            canvas.drawText("B", x, y, textPaint)
-
-            // 5. 可选：在下方画几条虚构的“作者名”横线，增加真实感
-            val linePaint = Paint().apply {
-                color = Color.parseColor("#EEEEEE")
-                strokeWidth = 6f
-            }
-            val lineY = y + (height / 8f)
-            canvas.drawLine(width/3f, lineY, width * 2/3f, lineY, linePaint)
-
-            return bitmap
-        }
-    }
-
-    private fun cacheBitmap(bitmap: Bitmap?) {
-        if (null == bitmap) {
-            return
-        }
-        BitmapCache.getInstance().addBitmap(data.path, bitmap)
-        val dir = FileUtils.getExternalCacheDir(App.instance)
-        val cacheDir = File(dir, "image")
-        if (!cacheDir.exists()) {
-            cacheDir.mkdirs()
-        }
-        val path = "${cacheDir.absolutePath}/${data.path.hashCode()}"
-        val bmp = Bitmap.createBitmap(
-            bitmap.width,
-            bitmap.height,
-            bitmap.config!!
-        )
-        val buffer = ByteBuffer.allocate(bitmap.getByteCount())
-        bitmap.copyPixelsToBuffer(buffer)
-        buffer.position(0)
-        bmp.copyPixelsFromBuffer(buffer);
-        BitmapUtils.saveBitmapToFile(bmp, File(path))
-    }
 
     private fun loadBitmapFromCache(): Bitmap? {
         var bmp = BitmapCache.getInstance().getBitmap(data.path)
@@ -160,14 +59,8 @@ class PdfFetcher(
             } else {
                 decodeMuPdf()
             }*/
-            bitmap = createWhiteBitmap(data.width, data.height)
+            bitmap = FetcherCache.createWhiteBitmap(data.width, data.height)
         }
-
-        /*if (bitmap == null) {
-            bitmap = BitmapFactory.decodeResource(App.instance!!.resources, R.drawable.ic_book_text)
-        } else {
-            cacheBitmap(bitmap)
-        }*/
 
         //val drawable = CoverDrawable(bitmap)
         val imageBitmap: BitmapImage = bitmap.asImage()
