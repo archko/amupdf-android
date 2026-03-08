@@ -28,13 +28,13 @@ import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.FileUtils
+import cn.archko.pdf.dialogs.ColorPickerDialog
 import cn.archko.pdf.core.utils.Utils
 import coil3.load
 import com.google.android.material.slider.Slider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
 import java.io.File
 import java.util.Collections
 

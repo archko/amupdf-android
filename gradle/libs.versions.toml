@@ -27,7 +27,6 @@ room = "2.8.0"
 constraintLayout = "2.2.1"
 umengCommon = "9.6.5"
 umengAsms = "1.8.0"
-colorPickerDialog = "0.2.2"
 flinger = "1.1.1"
 paging = "3.3.2"
 tiff-android = "1.1.5"
@@ -89,7 +88,6 @@ room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", vers
 
 umeng-asms = { module = "com.umeng.umsdk:asms", version.ref = "umengAsms" }
 umeng-common = { module = "com.umeng.umsdk:common", version.ref = "umengCommon" }
-colorPickerDialog = { module = "me.jfenn.ColorPickerDialog:base", version.ref = "colorPickerDialog" }
 
 multidex = { group = "androidx.multidex", name = "multidex", version.ref = "multidex" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }

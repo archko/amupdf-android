@@ -66,12 +66,12 @@ public class PdfPageController extends DefaultPageController {
         boolean crop;
         if (reflow == BookProgress.REFLOW_TXT) {
             crop = false;
-            reflowButton.setColorFilter(Color.argb(0xFF, 172, 114, 37));
+            reflowButton.setColorFilter(Color.argb(0xFF, 0, 255, 0));
             imageButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
         } else if (reflow == BookProgress.REFLOW_SCAN) {
             crop = false;
             reflowButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
-            imageButton.setColorFilter(Color.argb(0xFF, 172, 114, 37));
+            imageButton.setColorFilter(Color.argb(0xFF, 0, 255, 0));
         } else {
             reflowButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
             imageButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));

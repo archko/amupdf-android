@@ -22,15 +22,15 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="42dp"
             android:orientation="horizontal"
             android:paddingStart="4dp"
             android:paddingEnd="4dp">
 
             <ImageButton
                 android:id="@+id/back_button"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:background="@drawable/button"
                 android:contentDescription="back"
                 android:scaleType="center"
@@ -40,7 +40,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_gravity="right"
-                android:layout_height="40dp"
+                android:layout_height="42dp"
                 android:scrollbars="none">
 
                 <LinearLayout
@@ -50,8 +50,8 @@
 
                     <ImageButton
                         android:id="@+id/ttsButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/menu_tts"
                         android:src="@drawable/ic_tts"
@@ -60,8 +60,8 @@
 
                     <ImageButton
                         android:id="@+id/selectButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="select"
                         android:src="@drawable/ic_select"
@@ -70,8 +70,8 @@
 
                     <ImageButton
                         android:id="@+id/penButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="pen"
                         android:src="@drawable/ic_draw_pen"
@@ -80,8 +80,8 @@
 
                     <ImageButton
                         android:id="@+id/autoCropButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/auto_crop"
                         android:src="@drawable/ic_crop"
@@ -90,16 +90,16 @@
 
                     <ImageButton
                         android:id="@+id/outlineButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/outline_title"
                         android:src="@drawable/ic_toc" />
 
                     <ImageButton
                         android:id="@+id/reflowButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/toggle_reflow_mode"
                         android:src="@drawable/ic_reflow"
@@ -108,8 +108,8 @@
 
                     <ImageButton
                         android:id="@+id/imageButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/toggle_reflow_image"
                         android:src="@drawable/ic_image_text"
@@ -118,16 +118,16 @@
 
                     <ImageButton
                         android:id="@+id/ocrButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/menu_ocr"
                         android:src="@drawable/ic_ocr" />
 
                     <ImageButton
                         android:id="@+id/aiButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="ai"
                         android:src="@drawable/ic_ai"
@@ -136,8 +136,8 @@
 
                     <ImageButton
                         android:id="@+id/bookmarkButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="ai"
                         android:src="@drawable/ic_bookmark"
@@ -146,24 +146,24 @@
 
                     <ImageButton
                         android:id="@+id/oriButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/opts_orientation"
                         android:src="@drawable/ic_vertical" />
 
                     <ImageButton
                         android:id="@+id/searchButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/menu_search"
                         android:src="@drawable/ic_search" />
 
                     <ImageButton
                         android:id="@+id/previewButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/menu_thumb"
                         android:src="@drawable/ic_pdf_preview"
@@ -172,8 +172,8 @@
 
                     <ImageButton
                         android:id="@+id/fontButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/menu_search"
                         android:src="@drawable/ic_font"
@@ -217,7 +217,7 @@
         <LinearLayout
             android:id="@+id/layout_search"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="42dp"
             android:orientation="horizontal"
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
@@ -226,8 +226,8 @@
 
             <ImageButton
                 android:id="@+id/closeButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:background="@drawable/button"
                 android:contentDescription="@string/menu_clear_search"
                 android:src="@drawable/ic_close"
@@ -236,16 +236,16 @@
 
             <!--<ImageButton
                 android:id="@+id/showSearchButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:background="@drawable/button"
                 android:contentDescription="@string/menu_open_search"
                 android:src="@drawable/ic_search" />-->
 
             <ImageButton
                 android:id="@+id/prevButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:background="@drawable/button"
                 android:contentDescription=""
                 android:src="@drawable/ic_arrow_left"
@@ -254,8 +254,8 @@
 
             <ImageButton
                 android:id="@+id/nextButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:background="@drawable/button"
                 android:contentDescription=""
                 android:src="@drawable/ic_arrow_right"

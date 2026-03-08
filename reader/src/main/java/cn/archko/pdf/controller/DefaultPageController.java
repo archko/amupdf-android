@@ -1,5 +1,6 @@
 package cn.archko.pdf.controller;
 
+import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -46,8 +47,8 @@ public abstract class DefaultPageController implements IPageController, View.OnC
     protected ImageButton closeBtn;
     protected ImageButton mBackButton;
     protected int ori = LinearLayout.VERTICAL;
-    protected int selection = false;
-    protected int draw = false;
+    protected boolean selection = false;
+    protected boolean draw = false;
     protected int count = 1;
     protected PageControllerListener controllerListener;
     protected DocViewModel docViewModel;
@@ -171,7 +172,7 @@ public abstract class DefaultPageController implements IPageController, View.OnC
 
     public void updateSelection() {
         if (selection) {
-            selectButton.setColorFilter(Color.argb(0xFF, 172, 114, 37));
+            selectButton.setColorFilter(Color.argb(0xFF, 0, 255, 0));
         } else {
             selectButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
         }
@@ -179,7 +180,7 @@ public abstract class DefaultPageController implements IPageController, View.OnC
 
     public void updateOraw() {
         if (draw) {
-            penButton.setColorFilter(Color.argb(0xFF, 172, 114, 37));
+            penButton.setColorFilter(Color.argb(0xFF, 0, 255, 0));
         } else {
             penButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
         }
@@ -233,18 +234,18 @@ public abstract class DefaultPageController implements IPageController, View.OnC
             controllerListener.next("");
         } else if (R.id.prevButton == id) {
             controllerListener.prev("");
-        } else if (R.id.penButton == id) {
-            selection = ! selection;
-            updateOraw();
-            controllerListener.setSelection(selection);
         } else if (R.id.selectButton == id) {
-            draw = ! draw;
+            selection = !selection;
             updateSelection();
+            controllerListener.setSelection(selection);
+        } else if (R.id.penButton == id) {
+            draw = !draw;
+            updateOraw();
             controllerListener.setDraw(draw);
         } else if (R.id.aiButton == id) {
-            controlListener.ai();
+            controllerListener.ai();
         } else if (R.id.bookmarkButton == id) {
-            controlListener.bookmark();
+            controllerListener.bookmark();
         }
     }
 

@@ -10,12 +10,12 @@ import androidx.fragment.app.FragmentActivity
 import cn.archko.pdf.R
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.core.listeners.DataListener
+import cn.archko.pdf.dialogs.ColorPickerDialog
 import cn.archko.pdf.entity.FontBean
 import cn.archko.pdf.fragments.FontsFragment
 import cn.archko.pdf.fragments.FontsFragment.Companion.type_reflow
 import cn.archko.pdf.viewmodel.DocViewModel
 import kotlinx.coroutines.CoroutineScope
-import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog
 
 /**
  * 文本相关的,一是普通文本,二是文本重排的
