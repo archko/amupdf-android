@@ -250,6 +250,14 @@ open class ANormalViewController(
         return mPageSizes?.size ?: 0
     }
 
+    override fun setSelection(selection: Boolean) {
+        documentView.setSelection(selection)
+    }
+
+    override fun setDraw(draw: Boolean) {
+        documentView.setDraw(draw)
+    }
+
     override fun setOrientation(ori: Int) {
         scrollOrientation = ori
         documentView.oriention = ori

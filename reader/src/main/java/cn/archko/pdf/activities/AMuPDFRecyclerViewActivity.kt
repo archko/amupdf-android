@@ -649,6 +649,22 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             }
         }
 
+        override fun setSelection(selection :Boolean) {
+            viewController?.setSelection(selection)
+        }
+
+        override fun setDraw(draw :Boolean) {
+            viewController?.setDraw(draw)
+        }
+
+        override fun ai() {
+            this@AMuPDFRecyclerViewActivity.ai()
+        }
+
+        override fun bookmark() {
+            this@AMuPDFRecyclerViewActivity.bookmark()
+        }
+
         override fun ocr() {
             this@AMuPDFRecyclerViewActivity.ocr()
         }
@@ -814,6 +830,14 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             applyViewMode(getCurrentPos())
             setReflowButton(docViewModel.getReflow())
         }
+    }
+
+    private fun ai() {
+
+    }
+
+    private fun bookmark() {
+
     }
 
     private fun getCurrentPos(): Int {

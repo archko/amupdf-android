@@ -24,13 +24,17 @@ public abstract class DefaultPageController implements IPageController, View.OnC
     protected SeekBar mPageSlider;
     protected TextView mPageNumber;
 
+    protected ImageButton ttsButton;
+    protected ImageButton selectButton;
+    protected ImageButton penButton;
+    protected ImageButton autoCropButton;
+    protected ImageButton outlineButton;
     protected ImageButton reflowButton;
     protected ImageButton imageButton;
-    protected ImageButton outlineButton;
-    protected ImageButton autoCropButton;
     protected ImageButton oriButton;
-    protected ImageButton ttsButton;
     protected ImageButton ocrButton;
+    protected ImageButton aiButton;
+    protected ImageButton bookmarkButton;
     protected ImageButton previewButton;
     //protected TextView pathView;
     protected TextView titleView;
@@ -42,6 +46,8 @@ public abstract class DefaultPageController implements IPageController, View.OnC
     protected ImageButton closeBtn;
     protected ImageButton mBackButton;
     protected int ori = LinearLayout.VERTICAL;
+    protected int selection = false;
+    protected int draw = false;
     protected int count = 1;
     protected PageControllerListener controllerListener;
     protected DocViewModel docViewModel;
@@ -56,13 +62,17 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         mPageSlider = view.findViewById(R.id.seek_bar);
         mPageNumber = view.findViewById(R.id.page_num);
 
+        ttsButton = view.findViewById(R.id.ttsButton);
+        selectButton = view.findViewById(R.id.selectButton);
+        penButton = view.findViewById(R.id.penButton);
+        autoCropButton = view.findViewById(R.id.autoCropButton);
+        outlineButton = view.findViewById(R.id.outlineButton);
         reflowButton = view.findViewById(R.id.reflowButton);
         imageButton = view.findViewById(R.id.imageButton);
-        outlineButton = view.findViewById(R.id.outlineButton);
-        autoCropButton = view.findViewById(R.id.autoCropButton);
         oriButton = view.findViewById(R.id.oriButton);
-        ttsButton = view.findViewById(R.id.ttsButton);
         ocrButton = view.findViewById(R.id.ocrButton);
+        aiButton = view.findViewById(R.id.aiButton);
+        bookmarkButton = view.findViewById(R.id.bookmarkButton);
         previewButton = view.findViewById(R.id.previewButton);
         //pathView = view.findViewById(R.id.path);
         titleView = view.findViewById(R.id.title);
@@ -74,14 +84,18 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         closeBtn = view.findViewById(R.id.closeButton);
         mBackButton = view.findViewById(R.id.back_button);
 
-        imageButton.setOnClickListener(this);
+        ttsButton.setOnClickListener(this);
+        selectButton.setOnClickListener(this);
+        penButton.setOnClickListener(this);
+        autoCropButton.setOnClickListener(this);
         outlineButton.setOnClickListener(this);
         reflowButton.setOnClickListener(this);
-        autoCropButton.setOnClickListener(this);
+        imageButton.setOnClickListener(this);
         oriButton.setOnClickListener(this);
-        ttsButton.setOnClickListener(this);
         mBackButton.setOnClickListener(this);
         ocrButton.setOnClickListener(this);
+        aiButton.setOnClickListener(this);
+        bookmarkButton.setOnClickListener(this);
         previewButton.setOnClickListener(this);
         nextBtn.setOnClickListener(this);
         prevBtn.setOnClickListener(this);
@@ -147,6 +161,30 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         }
     }
 
+    public void setSelection(boolean selection) {
+        this.selection = selection;
+    }
+
+    public void setOraw(boolean draw) {
+        this.draw = draw;
+    }
+
+    public void updateSelection() {
+        if (selection) {
+            selectButton.setColorFilter(Color.argb(0xFF, 172, 114, 37));
+        } else {
+            selectButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
+        }
+    }
+
+    public void updateOraw() {
+        if (draw) {
+            penButton.setColorFilter(Color.argb(0xFF, 172, 114, 37));
+        } else {
+            penButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
+        }
+    }
+
     public void show() {
         topLayout.setVisibility(View.VISIBLE);
         bottomLayout.setVisibility(View.VISIBLE);
@@ -195,6 +233,18 @@ public abstract class DefaultPageController implements IPageController, View.OnC
             controllerListener.next("");
         } else if (R.id.prevButton == id) {
             controllerListener.prev("");
+        } else if (R.id.penButton == id) {
+            selection = ! selection;
+            updateOraw();
+            controllerListener.setSelection(selection);
+        } else if (R.id.selectButton == id) {
+            draw = ! draw;
+            updateSelection();
+            controllerListener.setDraw(draw);
+        } else if (R.id.aiButton == id) {
+            controlListener.ai();
+        } else if (R.id.bookmarkButton == id) {
+            controlListener.bookmark();
         }
     }
 

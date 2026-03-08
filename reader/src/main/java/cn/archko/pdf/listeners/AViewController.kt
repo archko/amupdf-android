@@ -20,6 +20,8 @@ interface AViewController {
     fun getCurrentPos(): Int
     fun getCurrentBitmap(): Bitmap?
     fun getCount(): Int
+    fun setSelection(selection: Boolean)
+    fun setDraw(draw: Boolean)
     fun setOrientation(ori: Int)
     fun setCrop(crop: Boolean)
     fun getCrop(): Boolean

@@ -408,6 +408,14 @@ class AScanReflowViewController(
 
     override fun setOrientation(ori: Int) {
     }
+    
+    override fun setSelection(selection: Boolean) {
+
+    }
+
+    override fun setDraw(draw: Boolean) {
+
+    }
 
     override fun setCrop(crop: Boolean) {
     }

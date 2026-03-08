@@ -52,6 +52,8 @@ public class DocumentView extends View implements ZoomListener {
     public static final int VERTICAL = LinearLayout.VERTICAL;
     private int oriention = VERTICAL;
     private ColorFilter filter;
+    private boolean selection;
+    private boolean draw;
 
     private final GestureDetector mGestureDetector;
     boolean crop = false;
@@ -747,6 +749,14 @@ public class DocumentView extends View implements ZoomListener {
         } else {
             filter = new ColorMatrixColorFilter(new ColorMatrix(colorMatrix));
         }
+    }
+
+    public void setSelection(boolean selection) {
+        this.selection = selection;
+    }
+
+    public void setDraw(boolean draw) {
+        this.draw = draw;
     }
 
     protected List<SearchResult> searchResults = new ArrayList<>();

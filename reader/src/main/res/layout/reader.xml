@@ -59,6 +59,26 @@
                         tools:visibility="visible" />
 
                     <ImageButton
+                        android:id="@+id/selectButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="select"
+                        android:src="@drawable/ic_select"
+                        android:visibility="visible"
+                        tools:visibility="visible" />
+
+                    <ImageButton
+                        android:id="@+id/penButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="pen"
+                        android:src="@drawable/ic_draw_pen"
+                        android:visibility="visible"
+                        tools:visibility="visible" />
+
+                    <ImageButton
                         android:id="@+id/autoCropButton"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
@@ -67,6 +87,14 @@
                         android:src="@drawable/ic_crop"
                         android:visibility="visible"
                         tools:visibility="visible" />
+
+                    <ImageButton
+                        android:id="@+id/outlineButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="@string/outline_title"
+                        android:src="@drawable/ic_toc" />
 
                     <ImageButton
                         android:id="@+id/reflowButton"
@@ -89,20 +117,32 @@
                         tools:visibility="visible" />
 
                     <ImageButton
-                        android:id="@+id/outlineButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/button"
-                        android:contentDescription="@string/outline_title"
-                        android:src="@drawable/ic_toc" />
-
-                    <ImageButton
                         android:id="@+id/ocrButton"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/menu_ocr"
                         android:src="@drawable/ic_ocr" />
+
+                    <ImageButton
+                        android:id="@+id/aiButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="ai"
+                        android:src="@drawable/ic_ai"
+                        android:visibility="visible"
+                        tools:visibility="visible" />
+
+                    <ImageButton
+                        android:id="@+id/bookmarkButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="ai"
+                        android:src="@drawable/ic_bookmark"
+                        android:visibility="visible"
+                        tools:visibility="visible" />
 
                     <ImageButton
                         android:id="@+id/oriButton"
@@ -113,6 +153,14 @@
                         android:src="@drawable/ic_vertical" />
 
                     <ImageButton
+                        android:id="@+id/searchButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="@string/menu_search"
+                        android:src="@drawable/ic_search" />
+
+                    <ImageButton
                         android:id="@+id/previewButton"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
@@ -121,14 +169,6 @@
                         android:src="@drawable/ic_pdf_preview"
                         android:visibility="gone"
                         tools:visibility="visible" />
-
-                    <ImageButton
-                        android:id="@+id/searchButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/button"
-                        android:contentDescription="@string/menu_search"
-                        android:src="@drawable/ic_search" />
 
                     <ImageButton
                         android:id="@+id/fontButton"

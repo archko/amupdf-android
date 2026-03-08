@@ -17,13 +17,17 @@ public class PdfPageController extends DefaultPageController {
     public PdfPageController(View view, DocViewModel docViewModel, PageControllerListener controlerListener) {
         super(view, docViewModel, controlerListener);
 
+        ttsButton.setVisibility(View.VISIBLE);
+        selectButton.setVisibility(View.VISIBLE);
+        penButton.setVisibility(View.VISIBLE);
         reflowButton.setVisibility(View.VISIBLE);
         imageButton.setVisibility(View.VISIBLE);
         autoCropButton.setVisibility(View.VISIBLE);
         outlineButton.setVisibility(View.VISIBLE);
         oriButton.setVisibility(View.VISIBLE);
-        ttsButton.setVisibility(View.VISIBLE);
         ocrButton.setVisibility(View.VISIBLE);
+        aiButton.setVisibility(View.VISIBLE);
+        bookmarkButton.setVisibility(View.VISIBLE);
         previewButton.setVisibility(View.VISIBLE);
     }
 
@@ -33,19 +37,27 @@ public class PdfPageController extends DefaultPageController {
         showReflow(docViewModel.getReflow());
         showReflowImage(docViewModel.getReflow());
 
+        ttsButton.setVisibility(View.VISIBLE);
         reflowButton.setVisibility(View.VISIBLE);
         imageButton.setVisibility(View.VISIBLE);
         autoCropButton.setVisibility(View.VISIBLE);
         outlineButton.setVisibility(View.VISIBLE);
-        ttsButton.setVisibility(View.VISIBLE);
         ocrButton.setVisibility(View.VISIBLE);
 
         if (viewMode == ViewMode.REFLOW_SCAN) {
+            selectButton.setVisibility(View.GONE);
+            penButton.setVisibility(View.GONE);
             oriButton.setVisibility(View.GONE);
             searchButton.setVisibility(View.GONE);
+            aiButton.setVisibility(View.GONE);
+            bookmarkButton.setVisibility(View.GONE);
         } else {
+            selectButton.setVisibility(View.VISIBLE);
+            penButton.setVisibility(View.VISIBLE);
             oriButton.setVisibility(View.VISIBLE);
             previewButton.setVisibility(View.VISIBLE);
+            aiButton.setVisibility(View.VISIBLE);
+            bookmarkButton.setVisibility(View.VISIBLE);
         }
     }
 
