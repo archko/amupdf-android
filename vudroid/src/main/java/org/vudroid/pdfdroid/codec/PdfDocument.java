@@ -125,13 +125,17 @@ public class PdfDocument implements CodecDocument {
     }
 
     public static void downOutline(Document core, Outline[] outlines, List<OutlineLink> links) {
+        downOutline(core, outlines, links, 0);
+    }
+    
+    private static void downOutline(Document core, Outline[] outlines, List<OutlineLink> links, int level) {
         if (null != outlines) {
             for (Outline outline : outlines) {
                 int page = core.pageNumberFromLocation(core.resolveLink(outline));
-                OutlineLink link = new OutlineLink(outline.title, page, 0);
+                OutlineLink link = new OutlineLink(outline.title, page, level);
                 if (outline.down != null) {
                     Outline[] child = outline.down;
-                    downOutline(core, child, links);
+                    downOutline(core, child, links, level + 1);
                 }
                 links.add(link);
             }

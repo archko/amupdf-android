@@ -41,10 +41,6 @@ open class OutlineFragment : DialogFragment() {
             if (it.getSerializable("OUTLINE") != null) {
                 outlineItems = it.getSerializable("OUTLINE") as ArrayList<OutlineLink>
             }
-
-            //if (it.getSerializable("out") != null) {
-            //    outlineItems = it.getSerializable("out") as ArrayList<OutlineItem>
-            //}
         }
     }
 
@@ -66,19 +62,6 @@ open class OutlineFragment : DialogFragment() {
         val view = inflater.inflate(R.layout.fragment_outline, container, false)
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView?.itemAnimator = null
-
-        //if (null != outlineItems) {
-        //    val treeAdapter = TreeAdapter(activity, outlineItems)
-        //    treeAdapter.setListener(object : OnItemClickListener<Any?> {
-        //        override fun onItemClick(view: View, data: Any?, position: Int) {
-        //            val ac = activity as OutlineListener
-        //            ac.onSelectedOutline((data as OutlineItem).page)
-        //        }
-        //        override fun onItemClick2(view: View, data: Any?, position: Int) {}
-        //    })
-        //    recyclerView.adapter = treeAdapter
-        //    return view
-        //}
 
         if (outlineItems == null) {
             nodataView?.visibility = View.VISIBLE

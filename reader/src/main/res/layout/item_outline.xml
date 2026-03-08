@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical"
     android:background="@drawable/bg_list_item"
-    android:minHeight="38dp"
+    android:minHeight="40dp"
     android:paddingTop="4dp"
     android:paddingBottom="4dp">
 
@@ -16,6 +16,9 @@
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/page"
         android:paddingLeft="8dp"
+        android:paddingRight="4dp"
+        android:ellipsize="end"
+        android:singleLine="true"
         android:textColor="@color/white"
         android:textSize="16sp" />
 
