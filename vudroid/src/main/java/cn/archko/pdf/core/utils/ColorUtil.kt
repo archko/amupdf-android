@@ -55,13 +55,8 @@ object ColorUtil {
             0.00f, 0.00f, 0.00f, 1.0f, 0.0f
         ),
 
-        //"CM_WHITE_ON_BLUE"
-        /*7 to floatArrayOf(
-            -0.94f, -0.02f, -0.02f, 0.0f, 255.0f,
-            -0.02f, -0.86f, -0.02f, 0.0f, 255.0f,
-            -0.02f, -0.02f, -0.74f, 0.0f, 255.0f,
-            0.00f, 0.00f, 0.00f, 1.0f, 0.0f
-        )*/
+        //"CM_CUSTOM_MATRIX" - 自定义矩阵（占位符，实际由用户选择）
+        7 to null
     )
 
     @JvmStatic

@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
@@ -45,6 +46,8 @@ import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.Logcat.d
 import cn.archko.pdf.core.common.ScanEvent
+import android.graphics.Color
+import cn.archko.pdf.core.utils.ColorUtil
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.core.widgets.ColorItemDecoration
 import cn.archko.pdf.entity.padding
@@ -273,7 +276,13 @@ class PdfOptionsActivity : FragmentActivity() {
         override fun onBind(data: Prefs, position: Int) {
             super.onBind(data, position)
             summary.text = data.labels?.get(data.index) ?: ""
-            itemView.setOnClickListener { v: View? -> showListDialog(data, summary) }
+            itemView.setOnClickListener { v: View? -> 
+                if (TextUtils.equals(data.key, PdfOptionKeys.PREF_COLORMODE)) {
+                    showColorModeDialog(data, summary)
+                } else {
+                    showListDialog(data, summary)
+                }
+            }
         }
 
         fun showListDialog(data: Prefs, summary: TextView) {
@@ -291,6 +300,30 @@ class PdfOptionsActivity : FragmentActivity() {
             builder.create().show()
         }
 
+        fun showColorModeDialog(data: Prefs, summary: TextView) {
+            val dialogView = layoutInflater.inflate(R.layout.dialog_color_mode, null)
+            val recyclerView = dialogView.findViewById<RecyclerView>(R.id.color_mode_list)
+            val titleView = dialogView.findViewById<TextView>(R.id.dialog_title)
+            titleView.text = data.title
+            
+            recyclerView.layoutManager = LinearLayoutManager(this@PdfOptionsActivity)
+            recyclerView.addItemDecoration(ColorItemDecoration(this@PdfOptionsActivity))
+            
+            val adapter = ColorModeAdapter(data.labels ?: emptyArray(), data.index) { selectedIndex ->
+                summary.text = data.labels?.get(selectedIndex) ?: ""
+                data.index = selectedIndex
+                setCheckListVal(data.key, data.vals?.get(selectedIndex) ?: false)
+            }
+            recyclerView.adapter = adapter
+            
+            val dialog = AlertDialog.Builder(this@PdfOptionsActivity)
+                .setView(dialogView)
+                .create()
+            
+            adapter.setDialog(dialog)
+            dialog.show()
+        }
+
         fun setCheckListVal(key: String?, value: Any) {
             if (TextUtils.equals(key, PdfOptionKeys.PREF_ORIENTATION)) {
                 setOrientation(value.toString().toInt())
@@ -301,6 +334,99 @@ class PdfOptionsActivity : FragmentActivity() {
             } else if (TextUtils.equals(key, PdfOptionKeys.PREF_DECODE_BLOCK)) {
                 setDecodeBlock(value.toString().toInt())
             }
+        }
+    }
+
+    private inner class ColorModeAdapter(
+        private val labels: Array<String>,
+        private var selectedIndex: Int,
+        private val onItemSelected: (Int) -> Unit
+    ) : RecyclerView.Adapter<ColorModeAdapter.ViewHolder>() {
+
+        private var dialog: AlertDialog? = null
+
+        fun setDialog(dialog: AlertDialog) {
+            this.dialog = dialog
+        }
+
+        inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val labelView: TextView = itemView.findViewById(R.id.color_mode_label)
+            val previewView: View = itemView.findViewById(R.id.color_preview)
+
+            init {
+                itemView.setOnClickListener {
+                    val position = adapterPosition
+                    if (position != RecyclerView.NO_POSITION) {
+                        if (position == labels.size - 1) {
+                            android.widget.Toast.makeText(
+                                itemView.context,
+                                "自定义矩阵功能开发中...",
+                                android.widget.Toast.LENGTH_SHORT
+                            ).show()
+                            return@setOnClickListener
+                        }
+                        
+                        selectedIndex = position
+                        notifyDataSetChanged()
+                        onItemSelected(position)
+                        dialog?.dismiss()
+                    }
+                }
+            }
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = layoutInflater.inflate(R.layout.item_color_mode, parent, false)
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            holder.labelView.text = labels[position]
+            
+            val previewColor = getPreviewColorForMode(position)
+            holder.previewView.setBackgroundColor(previewColor)
+            
+            holder.itemView.isSelected = position == selectedIndex
+        }
+
+        override fun getItemCount(): Int = labels.size
+
+        private fun getPreviewColorForMode(mode: Int): Int {
+            val matrix = ColorUtil.getColorMode(mode)
+            
+            // 基础颜色：白色 (0xFFFFFFFF)
+            val baseColor = 0xFFFFFFFF.toInt()
+            
+            // 如果没有矩阵（如正常模式或自定义矩阵），返回基础颜色
+            if (matrix == null) {
+                return when (mode) {
+                    0 -> baseColor // Normal - 白色
+                    8 -> 0xFF800080.toInt() // Custom Matrix - 紫色（占位符）
+                    else -> baseColor
+                }
+            }
+            
+            return applyColorMatrix(baseColor, matrix)
+        }
+        
+        private fun applyColorMatrix(color: Int, matrix: FloatArray): Int {
+            val r = Color.red(color).toFloat()
+            val g = Color.green(color).toFloat()
+            val b = Color.blue(color).toFloat()
+            val a = Color.alpha(color).toFloat()
+            
+            // 矩阵是 5x4 布局，每行5个元素，共4行
+            // 转换公式：R' = R*m[0] + G*m[1] + B*m[2] + A*m[3] + m[4]
+            //           G' = R*m[5] + G*m[6] + B*m[7] + A*m[8] + m[9]
+            //           B' = R*m[10] + G*m[11] + B*m[12] + A*m[13] + m[14]
+            //           A' = R*m[15] + G*m[16] + B*m[17] + A*m[18] + m[19]
+            
+            val newR = (r * matrix[0] + g * matrix[1] + b * matrix[2] + a * matrix[3] + matrix[4]).coerceIn(0f, 255f)
+            val newG = (r * matrix[5] + g * matrix[6] + b * matrix[7] + a * matrix[8] + matrix[9]).coerceIn(0f, 255f)
+            val newB = (r * matrix[10] + g * matrix[11] + b * matrix[12] + a * matrix[13] + matrix[14]).coerceIn(0f, 255f)
+            val newA = (r * matrix[15] + g * matrix[16] + b * matrix[17] + a * matrix[18] + matrix[19]).coerceIn(0f, 255f)
+            
+            return Color.argb(newA.toInt(), newR.toInt(), newG.toInt(), newB.toInt())
         }
     }
 

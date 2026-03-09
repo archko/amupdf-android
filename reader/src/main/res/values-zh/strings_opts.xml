@@ -66,15 +66,6 @@
         <item>感应横屏</item>
     </string-array>
 
-    <string-array name="opts_color_modes">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-    </string-array>
     <string-array name="opts_color_mode_labels">
         <item>原色</item>
         <item>反色</item>
@@ -83,6 +74,7 @@
         <item>浅灰底灰度</item>
         <item>灰底灰度</item>
         <item>深灰底灰度</item>
+        <item>自定义</item>
     </string-array>
 
     <string name="opts_list_style">列表风格</string>

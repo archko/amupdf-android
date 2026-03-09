@@ -24,7 +24,7 @@
     <color name="tab_divider_color">#dddddd</color>
 
     <color name="button_normal">#00000000</color>
-    <color name="button_pressed">#FF2572AC</color>
+    <color name="button_pressed">#cc2572AC</color>
 
     <color name="progress_bg_color">@color/md_theme_secondaryContainer</color>
     <color name="progress_color">@color/md_theme_secondary</color>
