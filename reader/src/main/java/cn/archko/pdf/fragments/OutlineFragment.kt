@@ -21,7 +21,7 @@ import org.vudroid.core.codec.OutlineLink
 /**
  * @author: archko 2019/7/11 :17:55
  */
-open class OutlineFragment : DialogFragment() {
+open class OutlineFragment : BaseFragment() {
 
     private lateinit var adapter: ARecyclerView.Adapter<ViewHolder>
     var outlineItems: ArrayList<OutlineLink>? = null
@@ -30,6 +30,26 @@ open class OutlineFragment : DialogFragment() {
     private var nodataView: View? = null
     private var pendingPos = -1
     private var found = -1
+
+    companion object {
+        private const val ARG_OUTLINE = "outline"
+        private const val ARG_CURRENT_PAGE = "current_page"
+        private const val ARG_PATH = "path"
+
+        fun newInstance(
+            outlineItems: ArrayList<OutlineLink>?, 
+            currentPage: Int,
+            path: String
+        ): OutlineFragment {
+            return OutlineFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable(ARG_OUTLINE, outlineItems)
+                    putInt(ARG_CURRENT_PAGE, currentPage)
+                    putString(ARG_PATH, path)
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -169,29 +189,5 @@ open class OutlineFragment : DialogFragment() {
             page?.text = (data.targetPage.plus(1)).toString()
             itemView.setOnClickListener { onListItemClick(data) }
         }
-    }
-
-    fun showDialog(
-        activity: FragmentActivity?,
-        currentPage: Int,
-        outlineItems: ArrayList<OutlineLink>?
-    ) {
-        val ft = activity?.supportFragmentManager?.beginTransaction()
-        val prev = activity?.supportFragmentManager?.findFragmentByTag("create_dialog")
-        if (prev != null) {
-            ft?.remove(prev)
-        }
-        ft?.addToBackStack(null)
-
-        // 设置参数
-        val args = Bundle().apply {
-            putInt("POSITION", currentPage)
-            if (outlineItems != null) {
-                putSerializable("OUTLINE", outlineItems)
-            }
-        }
-        arguments = args
-        
-        show(ft!!, "create_dialog")
     }
 }

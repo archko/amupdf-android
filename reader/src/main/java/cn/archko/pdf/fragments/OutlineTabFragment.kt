@@ -49,20 +49,6 @@ class OutlineTabFragment : DialogFragment() {
         private const val ARG_OUTLINE = "outline"
         private const val ARG_CURRENT_PAGE = "current_page"
         private const val ARG_PATH = "path"
-
-        fun newInstance(
-            outlineItems: ArrayList<OutlineLink>?, 
-            currentPage: Int,
-            path: String
-        ): OutlineTabFragment {
-            return OutlineTabFragment().apply {
-                arguments = Bundle().apply {
-                    putSerializable(ARG_OUTLINE, outlineItems)
-                    putInt(ARG_CURRENT_PAGE, currentPage)
-                    putString(ARG_PATH, path)
-                }
-            }
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
