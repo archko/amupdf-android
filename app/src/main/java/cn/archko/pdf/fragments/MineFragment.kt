@@ -57,6 +57,10 @@ class MineFragment : Fragment() {
             WebdavConfigFragment.showCreateDialog(requireActivity())
         }
 
+        binding.btnAiSetting.setOnClickListener {
+            showAISettingDialog()
+        }
+
         binding.btnSettings.setOnClickListener {
             PdfOptionsActivity.start(requireActivity())
         }
@@ -76,6 +80,10 @@ class MineFragment : Fragment() {
         binding.version.text = String.format(getString(R.string.version), versionName)
 
         return view
+    }
+
+    private fun showAISettingDialog() {
+        AISettingDialogFragment.show(requireActivity())
     }
 
     companion object {

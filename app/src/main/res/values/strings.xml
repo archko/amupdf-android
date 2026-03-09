@@ -223,4 +223,8 @@
     <string name="label_bookmark_count">Bookmark Count:</string>
     <string name="label_first_read_at">First Read At:</string>
     <string name="label_last_read_at">Last Read At:</string>
+
+    <!-- AI 设置 -->
+    <string name="ai_setting_title">AI Settings</string>
+    <string name="ai_setting_button">AI Settings</string>
 </resources>
