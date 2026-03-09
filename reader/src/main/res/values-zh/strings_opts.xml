@@ -160,4 +160,15 @@
     <string name="blue_label">蓝色 (B):</string>
     <string name="cancel_button">取消</string>
     <string name="ok_button">确定</string>
+    
+    <!-- Draw Config Dialog Strings -->
+    <string name="draw_config_title">绘图设置</string>
+    <string name="color_preview_label">颜色预览:</string>
+    <string name="select_color_label">选择颜色:</string>
+    <string name="stroke_width_label">线宽:</string>
+    <string name="draw_type_label">绘制类型:</string>
+    <string name="line_type">直线</string>
+    <string name="curve_type">曲线</string>
+    <string name="confirm_button">确定</string>
+
 </resources>
