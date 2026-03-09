@@ -1,8 +1,5 @@
 package cn.archko.pdf.core.utils
 
-import android.graphics.Color
-import androidx.annotation.ColorInt
-
 /**
  * copy from orion-viewer
  */
@@ -70,7 +67,7 @@ object ColorUtil {
     @JvmStatic
     fun getColorMode(type: Int): FloatArray? = COLOR_MATRICES[type]
 
-    @ColorInt
+    /*@ColorInt
     @JvmStatic
     fun transformColor(color: Int, transformation: FloatArray): Int {
         val r = Color.red(color)
@@ -89,5 +86,5 @@ object ColorUtil {
                     ).toInt()
         }
         return Color.argb(array[3], array[0], array[1], array[2])
-    }
+    }*/
 }

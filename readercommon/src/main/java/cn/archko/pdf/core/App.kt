@@ -60,7 +60,7 @@ open class App : Application() {
     }
 
     companion object {
-        public var instance: App? = null
+        var instance: App? = null
             private set
     }
 }

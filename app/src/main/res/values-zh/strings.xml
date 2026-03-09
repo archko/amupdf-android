@@ -208,15 +208,4 @@
     <string name="feature_pdf_encrypt_decrypt">pdf加密/解密</string>
     <string name="feature_webdav_backup">webdav备份</string>
     <string name="feature_tts_read">tts朗读</string>
-    
-    <!-- Color Picker Dialog Strings -->
-    <string name="color_picker_title">选择颜色</string>
-    <string name="color_value_label">颜色值:</string>
-    <string name="apply_button">应用</string>
-    <string name="alpha_label">透明度 (A):</string>
-    <string name="red_label">红色 (R):</string>
-    <string name="green_label">绿色 (G):</string>
-    <string name="blue_label">蓝色 (B):</string>
-    <string name="cancel_button">取消</string>
-    <string name="ok_button">确定</string>
 </resources>

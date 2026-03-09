@@ -217,6 +217,7 @@ class ColorPickerDialog : DialogFragment() {
                         else -> throw IllegalArgumentException("Invalid color format")
                     }
                 }
+
                 colorStr.startsWith("0x") -> {
                     val hexStr = colorStr.substring(2)
                     when (hexStr.length) {
@@ -225,6 +226,7 @@ class ColorPickerDialog : DialogFragment() {
                         else -> throw IllegalArgumentException("Invalid color format")
                     }
                 }
+
                 else -> {
                     colorStr.toInt()
                 }

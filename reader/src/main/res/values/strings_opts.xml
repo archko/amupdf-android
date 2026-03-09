@@ -197,5 +197,16 @@
         <item>2</item>
         <item>3</item>
     </string-array>
+    
+    <!-- Color Picker Dialog Strings -->
+    <string name="color_picker_title">Select Color</string>
+    <string name="color_value_label">Color Value:</string>
+    <string name="apply_button">Apply</string>
+    <string name="alpha_label">Alpha (A):</string>
+    <string name="red_label">Red (R):</string>
+    <string name="green_label">Green (G):</string>
+    <string name="blue_label">Blue (B):</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="ok_button">OK</string>
 
 </resources>
