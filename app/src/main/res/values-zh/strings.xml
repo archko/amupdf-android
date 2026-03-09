@@ -208,4 +208,16 @@
     <string name="feature_pdf_encrypt_decrypt">pdf加密/解密</string>
     <string name="feature_webdav_backup">webdav备份</string>
     <string name="feature_tts_read">tts朗读</string>
+
+    <!-- 阅读统计相关字符串 -->
+    <string name="label_reading_stats">阅读统计</string>
+    <string name="label_total_reading_time">总阅读时间：</string>
+    <string name="label_session_count">阅读会话次数：</string>
+    <string name="label_average_session_time">平均会话时间：</string>
+    <string name="label_completed_pages">已完成页数：</string>
+    <string name="label_consecutive_days">连续阅读天数：</string>
+    <string name="label_annotation_count">批注数量：</string>
+    <string name="label_bookmark_count">书签数量：</string>
+    <string name="label_first_read_at">首次阅读时间：</string>
+    <string name="label_last_read_at">最后阅读时间：</string>
 </resources>

@@ -8,7 +8,6 @@ import cn.archko.pdf.core.common.Graph
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.BookProgress
-import cn.archko.pdf.core.entity.Bookmark
 import cn.archko.pdf.core.utils.FileUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
@@ -19,24 +18,9 @@ import java.io.File
 
 class DocViewModel : ViewModel() {
 
-    var bookmarks: List<Bookmark>? = null
-
     //every book should have a progress,event if not store in db.
     var bookProgress: BookProgress? = null
         private set
-
-    private fun loadBookmarks(): List<Bookmark>? {
-        try {
-            val progressDao = Graph.database.progressDao()
-            if (null != bookProgress && !TextUtils.isEmpty(bookProgress!!.path)) {
-                return progressDao.getBookmark(bookProgress!!.path!!)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Logcat.i(Logcat.TAG, "deleteBookmark failed:$e")
-        }
-        return null
-    }
 
     private fun loadProgressAndBookmark(absolutePath: String, autoCrop: Int) {
         var crop = autoCrop
@@ -56,18 +40,6 @@ class DocViewModel : ViewModel() {
         }
         bookProgress!!.readTimes += 1
         bookProgress!!.inRecent = BookProgress.IN_RECENT
-
-        bookmarks = loadBookmarks()
-        Logcat.i(
-            Logcat.TAG,
-            String.format(
-                "loadProgressAndBookmark autoCrop:%s, path:%s, progress:%s,bookmark:%s",
-                crop,
-                absolutePath,
-                bookProgress,
-                bookmarks
-            )
-        )
     }
 
     fun getCurrentPage(): Int {
@@ -152,30 +124,6 @@ class DocViewModel : ViewModel() {
         }
         return bookProgress
     }
-
-    suspend fun deleteBookmark(bookmark: Bookmark?) = flow {
-        if (null != bookmark && bookProgress != null) {
-            val progressDao = Graph.database.progressDao()
-            progressDao.deleteBookmark(bookmark._id)
-            bookmarks = bookmarks?.minus(bookmark)
-        }
-        emit(bookmarks)
-    }.flowOn(Dispatchers.IO)
-
-    suspend fun addBookmark(page: Int) = flow {
-        val bookProgress = bookProgress
-        bookProgress?.let {
-            val bookmark = Bookmark()
-            bookmark.page = page
-            bookmark.progressId = bookProgress._id
-            bookmark.path = bookProgress.path
-            bookmark.createAt = System.currentTimeMillis()
-
-            Graph.database.progressDao().addBookmark(bookmark)
-            bookmarks = loadBookmarks()
-        }
-        emit(bookmarks)
-    }.flowOn(Dispatchers.IO)
 
     fun storeCrop(crop: Boolean) {
         if (crop) {

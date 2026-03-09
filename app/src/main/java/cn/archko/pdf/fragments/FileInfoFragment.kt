@@ -22,7 +22,12 @@ import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.utils.FetcherUtils
 import com.artifex.mupdf.fitz.Document
+import java.io.File
 import java.math.BigDecimal
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import androidx.lifecycle.lifecycleScope
 
 /**
  * @author: archko 2016/1/16 :14:34
@@ -44,6 +49,19 @@ class FileInfoFragment : DialogFragment() {
     private lateinit var mIcon: ImageView
     var bookProgress: BookProgress? = null
     private var mDataListener: DataListener? = null
+    
+    // 阅读统计视图
+    private lateinit var mDividerStats: View
+    private lateinit var mLabelStatsTitle: TextView
+    private lateinit var mTotalReadingTime: TextView
+    private lateinit var mSessionCount: TextView
+    private lateinit var mAverageSessionTime: TextView
+    private lateinit var mCompletedPages: TextView
+    private lateinit var mConsecutiveDays: TextView
+    private lateinit var mAnnotationCount: TextView
+    private lateinit var mBookmarkCount: TextView
+    private lateinit var mFirstReadAt: TextView
+    private lateinit var mLastReadAt: TextView
 
     fun setListener(dataListener: DataListener?) {
         mDataListener = dataListener
@@ -89,6 +107,20 @@ class FileInfoFragment : DialogFragment() {
         //mLastModified = view.findViewById<TextView>(R.id.lastModified)
         mPageCount = view.findViewById(R.id.pageCount)
         mIcon = view.findViewById(R.id.icon)
+        
+        // 初始化阅读统计视图
+        mDividerStats = view.findViewById(R.id.divider_stats)
+        mLabelStatsTitle = view.findViewById(R.id.label_stats_title)
+        mTotalReadingTime = view.findViewById(R.id.totalReadingTime)
+        mSessionCount = view.findViewById(R.id.sessionCount)
+        mAverageSessionTime = view.findViewById(R.id.averageSessionTime)
+        mCompletedPages = view.findViewById(R.id.completedPages)
+        mConsecutiveDays = view.findViewById(R.id.consecutiveDays)
+        mAnnotationCount = view.findViewById(R.id.annotationCount)
+        mBookmarkCount = view.findViewById(R.id.bookmarkCount)
+        mFirstReadAt = view.findViewById(R.id.firstReadAt)
+        mLastReadAt = view.findViewById(R.id.lastReadAt)
+        
         var button = view.findViewById<Button>(R.id.btn_cancel)
         button.setOnClickListener { this@FileInfoFragment.dismiss() }
         button = view.findViewById(R.id.btn_ok)
@@ -169,12 +201,107 @@ class FileInfoFragment : DialogFragment() {
 
             mReadCount.text = progress.readTimes.toString()
             updatePageCount()
+            
+            // 加载阅读统计数据
+            loadReadingStats()
         } else {
             //mLastReadLayout.visibility = View.GONE
             if (bookProgress?.pageCount == 0) {
                 loadBook()
             }
         }
+    }
+    
+    private fun loadReadingStats() {
+        mEntry?.file?.path?.let { path ->
+            lifecycleScope.launch {
+                try {
+                    val fileName = getFileName(path)
+                    val stats = Graph.database?.readingStatsDao()?.getStatsByPath(fileName)
+                    
+                    withContext(Dispatchers.Main) {
+                        if (stats != null) {
+                            showReadingStats(stats)
+                        } else {
+                            hideReadingStats()
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    withContext(Dispatchers.Main) {
+                        hideReadingStats()
+                    }
+                }
+            }
+        } ?: run {
+            hideReadingStats()
+        }
+    }
+    
+    private fun getFileName(path: String): String {
+        return File(path).name
+    }
+    
+    private fun showReadingStats(stats: cn.archko.pdf.core.entity.ReadingStats) {
+        mTotalReadingTime.text = formatDuration(stats.totalReadingTime)
+        mSessionCount.text = stats.sessionCount.toString()
+        mAverageSessionTime.text = formatDuration(stats.averageSessionTime)
+        mCompletedPages.text = "${stats.completedPages}/${stats.totalPages}"
+        mConsecutiveDays.text = "${stats.consecutiveDays}天"
+        mAnnotationCount.text = stats.annotationCount.toString()
+        mBookmarkCount.text = stats.bookmarkCount.toString()
+        
+        mFirstReadAt.text = if (stats.firstReadAt > 0) {
+            DateUtils.formatTime(stats.firstReadAt, DateUtils.TIME_FORMAT_TWO)
+        } else {
+            ""
+        }
+        
+        mLastReadAt.text = if (stats.lastReadAt > 0) {
+            DateUtils.formatTime(stats.lastReadAt, DateUtils.TIME_FORMAT_TWO)
+        } else {
+            ""
+        }
+        
+        showReadingStatsViews()
+    }
+    
+    private fun formatDuration(seconds: Long): String {
+        val hours = seconds / 3600
+        val minutes = (seconds % 3600) / 60
+        return if (hours > 0) {
+            "${hours}小时${minutes}分钟"
+        } else {
+            "${minutes}分钟"
+        }
+    }
+    
+    private fun showReadingStatsViews() {
+        mDividerStats.visibility = View.VISIBLE
+        mLabelStatsTitle.visibility = View.VISIBLE
+        mTotalReadingTime.visibility = View.VISIBLE
+        mSessionCount.visibility = View.VISIBLE
+        mAverageSessionTime.visibility = View.VISIBLE
+        mCompletedPages.visibility = View.VISIBLE
+        mConsecutiveDays.visibility = View.VISIBLE
+        mAnnotationCount.visibility = View.VISIBLE
+        mBookmarkCount.visibility = View.VISIBLE
+        mFirstReadAt.visibility = View.VISIBLE
+        mLastReadAt.visibility = View.VISIBLE
+    }
+    
+    private fun hideReadingStats() {
+        mDividerStats.visibility = View.GONE
+        mLabelStatsTitle.visibility = View.GONE
+        mTotalReadingTime.visibility = View.GONE
+        mSessionCount.visibility = View.GONE
+        mAverageSessionTime.visibility = View.GONE
+        mCompletedPages.visibility = View.GONE
+        mConsecutiveDays.visibility = View.GONE
+        mAnnotationCount.visibility = View.GONE
+        mBookmarkCount.visibility = View.GONE
+        mFirstReadAt.visibility = View.GONE
+        mLastReadAt.visibility = View.GONE
     }
 
     companion object {

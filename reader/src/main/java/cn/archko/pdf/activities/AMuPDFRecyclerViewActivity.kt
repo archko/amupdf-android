@@ -44,7 +44,6 @@ import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.common.SensorHelper
 import cn.archko.pdf.core.common.StatusBarHelper
 import cn.archko.pdf.core.entity.BookProgress
-import cn.archko.pdf.core.entity.Bookmark
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
@@ -58,6 +57,7 @@ import cn.archko.pdf.tts.TtsForegroundService
 import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.IBinder
+import cn.archko.pdf.viewmodel.BookmarkViewModel
 import cn.archko.pdf.viewmodel.DocViewModel
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
@@ -86,6 +86,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private var documentLayout: FrameLayout? = null
     private var viewController: AViewController? = null
     private val docViewModel: DocViewModel = DocViewModel()
+    private val bookmarkViewModel: BookmarkViewModel = BookmarkViewModel()
 
     private var pageController: IPageController? = null
     private var outlineLinks = mutableListOf<OutlineLink>()
@@ -103,6 +104,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private var ttsMode = false
     private val handler = Handler(Looper.getMainLooper())
     private var pendingPos = -1
+    private var sessionStartTime: Long = 0L
 
     // TTS数据缓存
     private var cachedTtsData: List<ReflowBean>? = null
@@ -185,7 +187,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
         clean()
 
-        loadBookmark()
         initView()
 
         createControls()
@@ -231,14 +232,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         if (!TextUtils.isEmpty(oldPath) && oldPath != mPath) {
             clearTtsDataCache()
             Logcat.d(TAG, "Cleared TTS cache due to document change")
-        }
-    }
-
-    private fun loadBookmark() {
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                mPath!!.run { docViewModel.loadBookProgressByPath(this) }
-            }
         }
     }
 
@@ -493,6 +486,12 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
             isDocLoaded = true
 
+            // 开始阅读会话统计
+            sessionStartTime = System.currentTimeMillis()
+            lifecycleScope.launch {
+                bookmarkViewModel.startSession(mPath!!, count)
+            }
+
             val sp = getSharedPreferences(PREF_READER, MODE_PRIVATE)
             val isFirst = sp.getBoolean(PREF_READER_KEY_FIRST, true)
             if (isFirst) {
@@ -515,24 +514,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         if (null == outlineTabFragment) {
             outlineTabFragment = OutlineTabFragment()
         }
-    }
-
-    private fun deleteBookmark(bookmark: Bookmark) {
-        /*lifecycleScope.launch {
-            pdfViewModel.deleteBookmark(bookmark).collectLatest {
-                mMenuHelper?.updateBookmark(getCurrentPos(), it)
-                viewController?.notifyDataSetChanged()
-            }
-        }*/
-    }
-
-    private fun addBookmark(page: Int) {
-        /*lifecycleScope.launch {
-            val currentPos = getCurrentPos()
-            pdfViewModel.addBookmark(currentPos).collectLatest {
-                viewController?.notifyDataSetChanged()
-            }
-        }*/
     }
 
     /**
@@ -866,6 +847,19 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     //--------------------------------------
 
     override fun onDestroy() {
+        // 结束阅读会话统计
+        if (isDocLoaded && sessionStartTime > 0) {
+            val sessionDuration = (System.currentTimeMillis() - sessionStartTime) / 1000 // 转换为秒
+            val currentPage = getCurrentPos()
+            val bookmarkCount = bookmarkViewModel.currentPathBookmarks.value.size
+            bookmarkViewModel.endSession(
+                path = mPath!!,
+                sessionDuration = sessionDuration,
+                currentPage = currentPage,
+                bookmarkCount = bookmarkCount
+            )
+        }
+
         super.onDestroy()
 
         viewController?.onDestroy()

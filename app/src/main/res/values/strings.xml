@@ -211,4 +211,16 @@
     <string name="feature_pdf_encrypt_decrypt">PDF Encrypt/Decrypt</string>
     <string name="feature_webdav_backup">WebDAV Backup</string>
     <string name="feature_tts_read">TTS Reading</string>
+
+    <!-- 阅读统计相关字符串 -->
+    <string name="label_reading_stats">Reading Statistics</string>
+    <string name="label_total_reading_time">Total Reading Time:</string>
+    <string name="label_session_count">Session Count:</string>
+    <string name="label_average_session_time">Average Session Time:</string>
+    <string name="label_completed_pages">Completed Pages:</string>
+    <string name="label_consecutive_days">Consecutive Days:</string>
+    <string name="label_annotation_count">Annotation Count:</string>
+    <string name="label_bookmark_count">Bookmark Count:</string>
+    <string name="label_first_read_at">First Read At:</string>
+    <string name="label_last_read_at">Last Read At:</string>
 </resources>

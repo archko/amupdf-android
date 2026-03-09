@@ -209,7 +209,6 @@ public class BookmarkViewModel : ViewModel() {
         path: String,
         sessionDuration: Long,  // 本次阅读时长（秒）
         currentPage: Int,
-        annotationCount: Int,
         bookmarkCount: Int
     ) {
         viewModelScope.launch {
@@ -242,7 +241,6 @@ public class BookmarkViewModel : ViewModel() {
                 }
 
                 // 更新计数
-                this.annotationCount = annotationCount
                 this.bookmarkCount = bookmarkCount
             }
 
