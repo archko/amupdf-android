@@ -40,8 +40,6 @@ class FileInfoFragment : DialogFragment() {
     private lateinit var mFileName: TextView
     private lateinit var mFileSize: TextView
 
-    //lateinit var mLastModified: TextView
-    private lateinit var mLastReadLayout: View
     private lateinit var mLastRead: TextView
     private lateinit var mReadCount: TextView
     private lateinit var mPageCount: TextView
@@ -100,11 +98,9 @@ class FileInfoFragment : DialogFragment() {
         mLocation = view.findViewById(R.id.location)
         mFileName = view.findViewById(R.id.fileName)
         mFileSize = view.findViewById(R.id.fileSize)
-        mLastReadLayout = view.findViewById(R.id.lay_last_read)
         mLastRead = view.findViewById(R.id.lastRead)
         mReadCount = view.findViewById(R.id.readCount)
         mProgressBar = view.findViewById(R.id.progressbar)
-        //mLastModified = view.findViewById<TextView>(R.id.lastModified)
         mPageCount = view.findViewById(R.id.pageCount)
         mIcon = view.findViewById(R.id.icon)
         
@@ -189,8 +185,6 @@ class FileInfoFragment : DialogFragment() {
 
     private fun showProgress(progress: BookProgress) {
         if (null != bookProgress && bookProgress!!.pageCount > 0) {
-            mLastReadLayout.visibility = View.VISIBLE
-
             var text = DateUtils.formatTime(progress.firstTimestampe, DateUtils.TIME_FORMAT_TWO)
             val percent = progress.page * 100f / progress.pageCount
             val b = BigDecimal(percent.toDouble())
@@ -205,7 +199,6 @@ class FileInfoFragment : DialogFragment() {
             // 加载阅读统计数据
             loadReadingStats()
         } else {
-            //mLastReadLayout.visibility = View.GONE
             if (bookProgress?.pageCount == 0) {
                 loadBook()
             }
