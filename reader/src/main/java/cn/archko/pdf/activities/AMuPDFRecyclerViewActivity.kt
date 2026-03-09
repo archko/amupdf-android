@@ -7,7 +7,6 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.speech.tts.TextToSpeech
 import android.text.TextUtils
 import android.util.SparseArray
 import android.view.MotionEvent
@@ -23,7 +22,6 @@ import androidx.core.util.forEach
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
-import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.controller.AEpubViewController
 import cn.archko.pdf.controller.ANormalViewController
 import cn.archko.pdf.controller.AScanReflowViewController
@@ -69,6 +67,7 @@ import org.vudroid.core.codec.OutlineLink
 import vn.chungha.flowbus.busEvent
 import androidx.core.view.isVisible
 import androidx.core.content.edit
+import cn.archko.pdf.core.common.PdfOptionRepository
 
 /**
  * @author: archko 2019/8/25 :12:43

@@ -15,10 +15,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.common.FontHelper
-import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.common.StyleHelper
 import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.core.adapters.BaseViewHolder
+import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.entity.FontBean

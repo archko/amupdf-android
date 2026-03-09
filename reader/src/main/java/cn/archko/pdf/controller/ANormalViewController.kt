@@ -11,7 +11,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
-import cn.archko.pdf.common.PdfOptionRepository
+import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.AppExecutors.Companion.instance
 import cn.archko.pdf.core.common.Logcat
@@ -27,7 +27,6 @@ import cn.archko.pdf.fragments.SearchFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
-import cn.archko.pdf.viewmodel.PDFViewModel
 import kotlinx.coroutines.CoroutineScope
 import org.vudroid.core.DecodeService
 import org.vudroid.core.DecodeServiceBase

@@ -23,12 +23,12 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.R
-import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.ReflowViewCache
 import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.AppExecutors.Companion.instance
 import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.utils.ColorUtil.getColorMode
@@ -408,7 +408,7 @@ class AScanReflowViewController(
 
     override fun setOrientation(ori: Int) {
     }
-    
+
     override fun setSelection(selection: Boolean) {
 
     }

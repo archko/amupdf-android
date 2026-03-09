@@ -3,6 +3,7 @@ package cn.archko.pdf.common
 import android.graphics.Typeface
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
+import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.entity.FontBean
 import kotlinx.coroutines.Dispatchers

@@ -1,5 +1,7 @@
 package cn.archko.pdf.core.utils
 
+import cn.archko.pdf.core.common.PdfOptionRepository
+
 /**
  * copy from orion-viewer
  */
@@ -60,7 +62,14 @@ object ColorUtil {
     )
 
     @JvmStatic
-    fun getColorMode(type: Int): FloatArray? = COLOR_MATRICES[type]
+    fun getColorMode(type: Int): FloatArray? {
+        return if (type == 7) {
+            // 自定义矩阵，从PdfOptionRepository获取
+            PdfOptionRepository.getCustomColorMatrix() ?: COLOR_MATRICES[type]
+        } else {
+            COLOR_MATRICES[type]
+        }
+    }
 
     /*@ColorInt
     @JvmStatic

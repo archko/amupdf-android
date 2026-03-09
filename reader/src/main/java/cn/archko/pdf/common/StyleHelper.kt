@@ -1,6 +1,7 @@
 package cn.archko.pdf.common
 
 import androidx.activity.ComponentActivity
+import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.entity.StyleBean
 
 /**

@@ -4,7 +4,7 @@ import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import cn.archko.pdf.common.PdfOptionRepository
+import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.common.AppExecutors
 import cn.archko.pdf.core.common.Graph
 import cn.archko.pdf.core.common.IntentFile

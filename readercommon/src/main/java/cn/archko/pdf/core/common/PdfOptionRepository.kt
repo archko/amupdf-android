@@ -1,9 +1,10 @@
-package cn.archko.pdf.common
+package cn.archko.pdf.core.common
 
 import android.graphics.Color
 import cn.archko.pdf.core.utils.Utils
-import cn.archko.pdf.entity.padding
 import com.tencent.mmkv.MMKV
+
+const val opt_padding = 12f
 
 /**
  * @author: archko 2021/10/4 :08:37
@@ -113,7 +114,7 @@ object PdfOptionRepository {
     }
 
     fun getLeftPadding(): Int {
-        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_LEFT_PADDING, Utils.dipToPixel(padding))
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_LEFT_PADDING, Utils.dipToPixel(opt_padding))
     }
 
     fun setTopPadding(topPadding: Int) {
@@ -121,7 +122,7 @@ object PdfOptionRepository {
     }
 
     fun getTopPadding(): Int {
-        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_RIGHT_PADDING, Utils.dipToPixel(padding))
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_RIGHT_PADDING, Utils.dipToPixel(opt_padding))
     }
 
     fun setRightPadding(rightPadding: Int) {
@@ -129,7 +130,7 @@ object PdfOptionRepository {
     }
 
     fun getRightPadding(): Int {
-        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_TOP_PADDING, Utils.dipToPixel(padding))
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_TOP_PADDING, Utils.dipToPixel(opt_padding))
     }
 
     fun setBottomPadding(bottomPadding: Int) {
@@ -137,7 +138,7 @@ object PdfOptionRepository {
     }
 
     fun getBottomPadding(): Int {
-        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_BOTTOM_PADDING, Utils.dipToPixel(padding))
+        return mmkv.decodeInt(PdfOptionKeys.STYLE_KEY_BOTTOM_PADDING, Utils.dipToPixel(opt_padding))
     }
 
     fun setDirsFirst(enable: Boolean): Boolean {
@@ -204,6 +205,24 @@ object PdfOptionRepository {
         return mmkv.decodeInt(PdfOptionKeys.PREF_DECODE_BLOCK, 2)
     }
 
+    fun setCustomColorMatrix(matrix: FloatArray) {
+        val matrixString = matrix.joinToString(",")
+        mmkv.encode(PdfOptionKeys.PREF_CUSTOM_MATRIX, matrixString)
+    }
+
+    fun getCustomColorMatrix(): FloatArray? {
+        val matrixString = mmkv.decodeString(PdfOptionKeys.PREF_CUSTOM_MATRIX)
+        return if (matrixString.isNullOrEmpty()) {
+            null
+        } else {
+            try {
+                matrixString.split(",").map { it.toFloat() }.toFloatArray()
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
+
     @JvmField
     val FONT_DIR = "fonts/"
 
@@ -247,10 +266,10 @@ data class PdfOption(
     var bgColor: Int = Color.WHITE,
     var fgColor: Int = Color.BLACK,
     var lineSpacingMult: Float = 1.48f,
-    var leftPadding: Int = Utils.dipToPixel(padding),
-    var topPadding: Int = Utils.dipToPixel(padding),
-    var rightPadding: Int = Utils.dipToPixel(padding),
-    var bottomPadding: Int = Utils.dipToPixel(padding),
+    var leftPadding: Int = Utils.dipToPixel(opt_padding),
+    var topPadding: Int = Utils.dipToPixel(opt_padding),
+    var rightPadding: Int = Utils.dipToPixel(opt_padding),
+    var bottomPadding: Int = Utils.dipToPixel(opt_padding),
 )
 
 object PdfOptionKeys {
@@ -268,6 +287,7 @@ object PdfOptionKeys {
     const val PREF_KEEP_ON = ("keepOn")
     const val PREF_DIRS_FIRST = ("dirsFirst")
     const val PREF_COLORMODE = ("colorMode")
+    const val PREF_CUSTOM_MATRIX = ("customColorMatrix")
     const val PREF_STYLE = ("style")
     const val PREF_LIBRARY_STYLE = ("libraryStyle")
     const val PREF_AUTO_SCAN = ("autoScan")

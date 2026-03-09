@@ -3,7 +3,7 @@ package cn.archko.pdf.viewmodel
 import android.text.TextUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cn.archko.pdf.common.PdfOptionRepository
+import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.common.Graph
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat

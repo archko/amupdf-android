@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:padding="2dp"
-            android:text="Text Color \n背景色"
+            android:text="Text Color 背景色"
             android:textColor="#000000"
             android:textSize="15sp"/>
 

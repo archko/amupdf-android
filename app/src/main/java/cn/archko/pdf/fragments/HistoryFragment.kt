@@ -24,7 +24,7 @@ import cn.archko.mupdf.R
 import cn.archko.pdf.adapters.BaseBookAdapter
 import cn.archko.pdf.adapters.BookAdapter
 import cn.archko.pdf.adapters.GridBookAdapter
-import cn.archko.pdf.common.PdfOptionRepository
+import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.App
 import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.Event.Companion.ACTION_FAVORITED

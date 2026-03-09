@@ -22,7 +22,7 @@ import cn.archko.mupdf.R
 import cn.archko.pdf.activities.EditActivity
 import cn.archko.pdf.adapters.BaseBookAdapter
 import cn.archko.pdf.common.PDFViewerHelper
-import cn.archko.pdf.common.PdfOptionRepository
+import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.entity.BookProgress

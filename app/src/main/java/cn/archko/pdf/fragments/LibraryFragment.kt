@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.ListLibraryBinding
 import cn.archko.pdf.adapters.AdapterUtils
-import cn.archko.pdf.common.PdfOptionRepository
+import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.common.Event.Companion.ACTION_DONOT_SCAN
