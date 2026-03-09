@@ -49,6 +49,7 @@ import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.fragments.OutlineFragment
+import cn.archko.pdf.fragments.OutlineTabFragment
 import cn.archko.pdf.fragments.SleepTimerDialog
 import cn.archko.pdf.fragments.TtsTextFragment
 import cn.archko.pdf.listeners.AViewController
@@ -88,7 +89,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     private var pageController: IPageController? = null
     private var outlineLinks = mutableListOf<OutlineLink>()
-    private var outlineFragment: OutlineFragment? = null
+    private var outlineTabFragment: OutlineTabFragment? = null
     private lateinit var mReflowLayout: RelativeLayout
     private lateinit var mContentView: View
     private lateinit var ttsLayout: View
@@ -511,15 +512,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun setupOutline(currentPos: Int?) {
-        if (null == outlineFragment) {
-            outlineFragment = OutlineFragment()
-            val bundle = Bundle()
-            if (outlineLinks.size > 0) {
-                outlineFragment!!.outlineItems = ArrayList(outlineLinks)
-                bundle.putSerializable("out", outlineFragment!!.outlineItems)
-            }
-            bundle.putSerializable("POSITION", currentPos)
-            outlineFragment?.arguments = bundle
+        if (null == outlineTabFragment) {
+            outlineTabFragment = OutlineTabFragment()
         }
     }
 
@@ -808,8 +802,15 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     private fun showOutline() {
         if (outlineLinks.size > 0) {
-            outlineFragment?.updateSelection(getCurrentPos())
-            outlineFragment?.showDialog(this)
+            outlineTabFragment?.showDialog(
+                this,
+                getCurrentPos(),
+                ArrayList(outlineLinks),
+                mPath ?: "",
+                null,
+                null,
+                null
+            )
         } else {
             Toast.makeText(this, "no outline", Toast.LENGTH_SHORT).show()
         }

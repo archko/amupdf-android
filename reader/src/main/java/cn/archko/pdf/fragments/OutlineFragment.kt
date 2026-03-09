@@ -25,7 +25,7 @@ open class OutlineFragment : DialogFragment() {
 
     private lateinit var adapter: ARecyclerView.Adapter<ViewHolder>
     var outlineItems: ArrayList<OutlineLink>? = null
-    private var currentPage: Int = 0
+    var currentPage: Int = 0
     private var recyclerView: ARecyclerView? = null
     private var nodataView: View? = null
     private var pendingPos = -1
@@ -59,30 +59,44 @@ open class OutlineFragment : DialogFragment() {
             setCancelable(true)
         }
 
+        // 使用原有的布局文件，只显示大纲列表
         val view = inflater.inflate(R.layout.fragment_outline, container, false)
+        
         recyclerView = view.findViewById(R.id.recyclerView)
-        recyclerView?.itemAnimator = null
+        nodataView = view.findViewById(R.id.nodataView)
+        
+        // 初始化RecyclerView
+        recyclerView?.layoutManager = LinearLayoutManager(requireContext())
+        
+        // 初始化Adapter
+        adapter = object : ARecyclerView.Adapter<ViewHolder>() {
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+                val itemView = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_outline, parent, false)
+                return ViewHolder(itemView)
+            }
 
-        if (outlineItems == null) {
-            nodataView?.visibility = View.VISIBLE
-        } else {
-            adapter = object : ARecyclerView.Adapter<ViewHolder>() {
-
-                override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-                    val root = inflater.inflate(R.layout.item_outline, parent, false)
-                    return ViewHolder(root)
-                }
-
-                override fun getItemCount(): Int {
-                    return outlineItems!!.size
-                }
-
-                override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-                    holder.onBind(outlineItems!![position], position)
+            override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+                val item = outlineItems?.get(position)
+                if (item != null) {
+                    holder.onBind(item, position)
                 }
             }
-            recyclerView?.adapter = adapter
+
+            override fun getItemCount(): Int = outlineItems?.size ?: 0
         }
+        
+        recyclerView?.adapter = adapter
+        
+        // 显示/隐藏无数据视图
+        if (outlineItems.isNullOrEmpty()) {
+            recyclerView?.visibility = View.GONE
+            nodataView?.visibility = View.VISIBLE
+        } else {
+            recyclerView?.visibility = View.VISIBLE
+            nodataView?.visibility = View.GONE
+        }
+        
         return view
     }
 
@@ -157,7 +171,11 @@ open class OutlineFragment : DialogFragment() {
         }
     }
 
-    fun showDialog(activity: FragmentActivity?) {
+    fun showDialog(
+        activity: FragmentActivity?,
+        currentPage: Int,
+        outlineItems: ArrayList<OutlineLink>?
+    ) {
         val ft = activity?.supportFragmentManager?.beginTransaction()
         val prev = activity?.supportFragmentManager?.findFragmentByTag("create_dialog")
         if (prev != null) {
@@ -165,6 +183,15 @@ open class OutlineFragment : DialogFragment() {
         }
         ft?.addToBackStack(null)
 
+        // 设置参数
+        val args = Bundle().apply {
+            putInt("POSITION", currentPage)
+            if (outlineItems != null) {
+                putSerializable("OUTLINE", outlineItems)
+            }
+        }
+        arguments = args
+        
         show(ft!!, "create_dialog")
     }
 }
