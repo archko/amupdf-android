@@ -32,8 +32,8 @@ open class OutlineFragment : BaseFragment() {
     private var found = -1
 
     companion object {
-        private const val ARG_OUTLINE = "outline"
-        private const val ARG_CURRENT_PAGE = "current_page"
+        private const val ARG_OUTLINE = "OUTLINE"
+        private const val ARG_CURRENT_PAGE = "POSITION"
         private const val ARG_PATH = "path"
 
         fun newInstance(

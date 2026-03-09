@@ -17,10 +17,10 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 /**
- * 批注Tab Fragment
+ * 批注Fragment
  * @author: archko 2026/3/9
  */
-class AnnotationTabFragment : Fragment() {
+class AnnotationFragment : Fragment() {
 
     private var annotationManager: AnnotationManager? = null
     private lateinit var recyclerView: RecyclerView
@@ -33,8 +33,8 @@ class AnnotationTabFragment : Fragment() {
     companion object {
         private const val ARG_ANNOTATION_MANAGER = "annotation_manager"
 
-        fun newInstance(annotationManager: AnnotationManager?): AnnotationTabFragment {
-            return AnnotationTabFragment().apply {
+        fun newInstance(annotationManager: AnnotationManager?): AnnotationFragment {
+            return AnnotationFragment().apply {
                 arguments = Bundle().apply {
                     // 由于AnnotationManager不是Parcelable，我们通过父Fragment传递
                 }
@@ -57,7 +57,7 @@ class AnnotationTabFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_annotation_tab, container, false)
+        val view = inflater.inflate(R.layout.fragment_annotation, container, false)
         
         recyclerView = view.findViewById(R.id.recycler_view)
         emptyView = view.findViewById(R.id.tv_empty)

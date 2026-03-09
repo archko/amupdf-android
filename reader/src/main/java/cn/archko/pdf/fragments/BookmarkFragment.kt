@@ -23,7 +23,7 @@ import java.util.Locale
  * 书签Tab Fragment
  * @author: archko 2026/3/9
  */
-class BookmarkTabFragment : Fragment() {
+class BookmarkFragment : Fragment() {
 
     private var bookmarkViewModel: BookmarkViewModel? = null
     private lateinit var recyclerView: RecyclerView
@@ -37,8 +37,8 @@ class BookmarkTabFragment : Fragment() {
     companion object {
         private const val ARG_BOOKMARK_VIEW_MODEL = "bookmark_view_model"
 
-        fun newInstance(bookmarkViewModel: BookmarkViewModel?): BookmarkTabFragment {
-            return BookmarkTabFragment().apply {
+        fun newInstance(bookmarkViewModel: BookmarkViewModel?): BookmarkFragment {
+            return BookmarkFragment().apply {
                 arguments = Bundle().apply {
                     // 由于BookmarkViewModel不是Parcelable，我们通过父Fragment传递
                 }

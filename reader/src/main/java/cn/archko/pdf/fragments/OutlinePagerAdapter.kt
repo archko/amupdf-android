@@ -16,6 +16,7 @@ class OutlinePagerAdapter(
 
     companion object {
         const val TAB_COUNT = 3
+        
         const val TAB_OUTLINE = 0
         const val TAB_ANNOTATION = 1
         const val TAB_BOOKMARK = 2
@@ -26,7 +27,6 @@ class OutlinePagerAdapter(
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             TAB_OUTLINE -> {
-                // 大纲tab - 使用只显示大纲的OutlineFragment
                 val outlineFragment = OutlineFragment()
                 val args = Bundle().apply {
                     putInt("POSITION", outlineTabFragment.currentPage)
@@ -38,11 +38,9 @@ class OutlinePagerAdapter(
                 outlineFragment
             }
             TAB_ANNOTATION -> {
-                // 批注tab
-                AnnotationTabFragment.newInstance(outlineTabFragment.annotationManager)
+                AnnotationFragment.newInstance(outlineTabFragment.annotationManager)
             }
             TAB_BOOKMARK -> {
-                // 书签tab
                 BookmarkTabFragment.newInstance(outlineTabFragment.bookmarkViewModel)
             }
             else -> throw IllegalArgumentException("Invalid tab position: $position")
