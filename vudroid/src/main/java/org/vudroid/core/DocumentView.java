@@ -5,6 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.Log;
@@ -55,6 +57,20 @@ public class DocumentView extends View implements ZoomListener {
     private boolean selection;
     private boolean draw;
 
+    // 选择模式相关状态
+    private boolean isSelecting = false;
+    private Page selectedPage = null;
+    private float selectionStartX, selectionStartY;
+    private float selectionEndX, selectionEndY;
+    private float pageSelectionStartX, pageSelectionStartY;
+    private float pageSelectionEndX, pageSelectionEndY;
+
+    // 绘制模式相关状态
+    private boolean isDrawing = false;
+    private Page drawingPage = null;
+    private List<android.graphics.PointF> drawingPoints = new ArrayList<>();
+    private android.graphics.Paint drawingPaint;
+
     private final GestureDetector mGestureDetector;
     boolean crop = false;
     private DocViewListener docViewListener;
@@ -90,6 +106,54 @@ public class DocumentView extends View implements ZoomListener {
             isInitialized = false;
             pageToGoTo = getCurrentPage();
             init();
+        }
+    }
+
+    public void setSelection(boolean selection) {
+        if (this.selection != selection) {
+            this.selection = selection;
+            this.draw = false; // 只能有一个模式激活
+            resetGestureState();
+            invalidate();
+            Log.d(TAG, "设置选择模式: " + selection);
+        }
+    }
+
+    public void setDraw(boolean draw) {
+        if (this.draw != draw) {
+            this.draw = draw;
+            this.selection = false; // 只能有一个模式激活
+            resetGestureState();
+            initDrawingPaint();
+            invalidate();
+            Log.d(TAG, "设置绘制模式: " + draw);
+        }
+    }
+
+    private void resetGestureState() {
+        if (pages != null) {
+            for (int i = 0; i < pages.size(); i++) {
+                Page page = pages.valueAt(i);
+                if (page != null) {
+                    page.clearTextSelection();
+                }
+            }
+        }
+
+        isSelecting = false;
+        isDrawing = false;
+        selectedPage = null;
+        drawingPage = null;
+        drawingPoints.clear();
+    }
+
+    private void initDrawingPaint() {
+        if (drawingPaint == null) {
+            drawingPaint = new android.graphics.Paint();
+            drawingPaint.setColor(android.graphics.Color.RED);
+            drawingPaint.setStrokeWidth(4f);
+            drawingPaint.setStyle(android.graphics.Paint.Style.STROKE);
+            drawingPaint.setAntiAlias(true);
         }
     }
 
@@ -446,10 +510,22 @@ public class DocumentView extends View implements ZoomListener {
     public boolean onTouchEvent(MotionEvent ev) {
         super.onTouchEvent(ev);
 
-        if(!isInitialized) {
+        if (!isInitialized) {
             return true;
         }
 
+        // 根据当前模式处理触摸事件
+        if (selection) {
+            return handleSelectionTouch(ev);
+        } else if (draw) {
+            return handleDrawTouch(ev);
+        } else {
+            // 普通视图模式
+            return handleViewModeTouch(ev);
+        }
+    }
+
+    private boolean handleViewModeTouch(MotionEvent ev) {
         if (multiTouchZoom != null) {
             if (multiTouchZoom.onTouchEvent(ev)) {
                 return true;
@@ -464,6 +540,40 @@ public class DocumentView extends View implements ZoomListener {
             return true;
         }
 
+        return true;
+    }
+
+    private boolean handleSelectionTouch(MotionEvent ev) {
+        int action = ev.getAction();
+        float x = ev.getX();
+        float y = ev.getY();
+
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                return handleSelectionDown(x, y);
+            case MotionEvent.ACTION_MOVE:
+                return handleSelectionMove(x, y);
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                return handleSelectionUp();
+        }
+        return true;
+    }
+
+    private boolean handleDrawTouch(MotionEvent ev) {
+        int action = ev.getAction();
+        float x = ev.getX();
+        float y = ev.getY();
+
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                return handleDrawDown(x, y);
+            case MotionEvent.ACTION_MOVE:
+                return handleDrawMove(x, y);
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                return handleDrawUp();
+        }
         return true;
     }
 
@@ -599,6 +709,9 @@ public class DocumentView extends View implements ZoomListener {
                 }
             }
         }
+
+        // 绘制选择区域和当前绘制的路径
+        drawSelectionAndDrawing(canvas);
     }
 
     @Override
@@ -683,19 +796,12 @@ public class DocumentView extends View implements ZoomListener {
 
     private Page tryHyperlink(MotionEvent e, Page page) {
         if (null != page) {
-            float scale = calculateScale(page);
-            int scrollX = getScrollX();
-            int scrollY = getScrollY();
-            float x = Math.abs((e.getX() + scrollX - page.bounds.left) / scale);
-            float y = Math.abs((e.getY() + scrollY - page.bounds.top) / scale);
-
-            if (crop) {
-                Rect rect = getBounds(page);
-                if (null != rect) {
-                    x += rect.left;
-                    y += rect.top;
-                }
-            }
+            // 使用Page的screenToPagePoint方法获取页面原始坐标
+            float screenX = e.getX() + getScrollX();
+            float screenY = e.getY() + getScrollY();
+            android.graphics.PointF pagePoint = page.screenToPagePoint(screenX, screenY);
+            float x = Math.abs(pagePoint.x);
+            float y = Math.abs(pagePoint.y);
 
             //Log.d(TAG, String.format("scrollX:%s, scrollY:%s, scale:%s, zoom:%s, index:%s, e.x:%s, e.y:%s, bound:%s",
             //        scrollX, scrollY, scale, zoomModel.getZoom(), page.index, e.getX(), e.getY(), page.bounds.top));
@@ -749,14 +855,6 @@ public class DocumentView extends View implements ZoomListener {
         } else {
             filter = new ColorMatrixColorFilter(new ColorMatrix(colorMatrix));
         }
-    }
-
-    public void setSelection(boolean selection) {
-        this.selection = selection;
-    }
-
-    public void setDraw(boolean draw) {
-        this.draw = draw;
     }
 
     protected List<SearchResult> searchResults = new ArrayList<>();
@@ -908,6 +1006,219 @@ public class DocumentView extends View implements ZoomListener {
     //--------------------------------
 
     private FlingRunnable mCurrentFlingRunnable;
+
+    // 选择模式处理方法
+    private boolean handleSelectionDown(float x, float y) {
+        Page page = getEventPageFromScreen(x, y);
+        if (page != null) {
+            isSelecting = true;
+            selectedPage = page;
+            selectionStartX = x;
+            selectionStartY = y;
+            selectionEndX = x;
+            selectionEndY = y;
+
+            // 使用Page的screenToPagePoint方法获取页面原始坐标
+            // 注意：需要将屏幕坐标转换为相对于文档内容的坐标
+            float screenX = x + getScrollX();
+            float screenY = y + getScrollY();
+            android.graphics.PointF pagePoint = page.screenToPagePoint(screenX, screenY);
+            pageSelectionStartX = pagePoint.x;
+            pageSelectionStartY = pagePoint.y;
+            pageSelectionEndX = pageSelectionStartX;
+            pageSelectionEndY = pageSelectionStartY;
+
+            Log.d(TAG, String.format("开始选择: 页面%d, 屏幕坐标(%.1f, %.1f), 页面原始坐标(%.1f, %.1f)",
+                    page.index, x, y, pageSelectionStartX, pageSelectionStartY));
+            invalidate();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean handleSelectionMove(float x, float y) {
+        if (isSelecting && selectedPage != null) {
+            selectionEndX = x;
+            selectionEndY = y;
+
+            // 使用Page的screenToPagePoint方法获取页面原始坐标
+            float screenX = x + getScrollX();
+            float screenY = y + getScrollY();
+            android.graphics.PointF pagePoint = selectedPage.screenToPagePoint(screenX, screenY);
+            pageSelectionEndX = pagePoint.x;
+            pageSelectionEndY = pagePoint.y;
+
+            // 通过DecodeService获取高亮区域
+            if (decodeService != null) {
+                List<RectF> selectionRects = decodeService.getTextSelectionRects(
+                        selectedPage.index,
+                        pageSelectionStartX, pageSelectionStartY,
+                        pageSelectionEndX, pageSelectionEndY
+                );
+
+                if (selectionRects != null) {
+                    // 将页面坐标的矩形转换为屏幕坐标
+                    List<RectF> screenRects = new ArrayList<>();
+                    for (RectF pageRect : selectionRects) {
+                        RectF screenRect = selectedPage.getPageRegion(selectedPage.bounds, pageRect);
+                        screenRects.add(screenRect);
+                    }
+                    selectedPage.setSelectionRects(screenRects);
+                }
+            }
+
+            Log.d(TAG, String.format("更新选择: 页面%d, 屏幕坐标(%.1f, %.1f), 页面原始坐标(%.1f, %.1f)",
+                    selectedPage.index, x, y, pageSelectionEndX, pageSelectionEndY));
+
+            invalidate();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean handleSelectionUp() {
+        if (isSelecting && selectedPage != null) {
+            // 通过DecodeService获取选中的文本
+            String selectedText = null;
+            if (decodeService != null) {
+                selectedText = decodeService.getSelectedText(
+                        selectedPage.index,
+                        pageSelectionStartX, pageSelectionStartY,
+                        pageSelectionEndX, pageSelectionEndY
+                );
+            }
+
+            Log.d(TAG, String.format("结束选择: 页面%d, 选择区域(%.1f, %.1f) -> (%.1f, %.1f), 选中文本: %s",
+                    selectedPage.index, selectionStartX, selectionStartY, selectionEndX, selectionEndY,
+                    selectedText != null ? selectedText : "null"));
+
+            // 重置选择状态
+            isSelecting = false;
+            selectedPage = null;
+            invalidate();
+            return true;
+        }
+        return false;
+    }
+
+    // 绘制模式处理方法
+    private boolean handleDrawDown(float x, float y) {
+        Page page = getEventPageFromScreen(x, y);
+        if (page != null) {
+            isDrawing = true;
+            drawingPage = page;
+            drawingPoints.clear();
+
+            // 使用Page的screenToPageRelativePoint方法获取页面相对坐标 (0-1)
+            float screenX = x + getScrollX();
+            float screenY = y + getScrollY();
+            android.graphics.PointF relativePoint = page.screenToPageRelativePoint(screenX, screenY);
+            android.graphics.PointF point = new android.graphics.PointF(relativePoint.x, relativePoint.y);
+            drawingPoints.add(point);
+
+            Log.d(TAG, String.format("开始绘制: 页面%d, 相对坐标(%.3f, %.3f)", page.index, relativePoint.x, relativePoint.y));
+
+            invalidate();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean handleDrawMove(float x, float y) {
+        if (isDrawing && drawingPage != null) {
+            // 使用Page的screenToPageRelativePoint方法获取页面相对坐标 (0-1)
+            float screenX = x + getScrollX();
+            float screenY = y + getScrollY();
+            android.graphics.PointF relativePoint = drawingPage.screenToPageRelativePoint(screenX, screenY);
+            android.graphics.PointF point = new android.graphics.PointF(relativePoint.x, relativePoint.y);
+            drawingPoints.add(point);
+
+            Log.d(TAG, String.format("继续绘制: 页面%d, 点%d, 相对坐标(%.3f, %.3f)",
+                    drawingPage.index, drawingPoints.size(), relativePoint.x, relativePoint.y));
+
+            invalidate();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean handleDrawUp() {
+        if (isDrawing && drawingPage != null && drawingPoints.size() > 1) {
+            Log.d(TAG, String.format("结束绘制: 页面%d, 共%d个点", drawingPage.index, drawingPoints.size()));
+
+            // TODO: 保存绘制路径到AnnotationManager
+            // 这里可以调用AnnotationManager保存绘制路径
+
+            // 重置绘制状态
+            isDrawing = false;
+            drawingPage = null;
+            drawingPoints.clear();
+            invalidate();
+            return true;
+        }
+        return false;
+    }
+
+    // 辅助方法：从屏幕坐标获取页面
+    private Page getEventPageFromScreen(float screenX, float screenY) {
+        MotionEvent event = MotionEvent.obtain(0, 0, MotionEvent.ACTION_DOWN, screenX, screenY, 0);
+        Page page = getEventPage(event);
+        event.recycle();
+        return page;
+    }
+
+    // 绘制选择区域和绘制路径
+    private void drawSelectionAndDrawing(Canvas canvas) {
+        // 绘制选择区域
+        if (isSelecting && selectedPage != null) {
+            drawSelectionRect(canvas);
+        }
+
+        // 绘制当前绘制的路径
+        if (isDrawing && drawingPage != null && drawingPoints.size() > 1) {
+            drawCurrentPath(canvas);
+        }
+
+        // TODO: 绘制已保存的标注
+    }
+
+    private void drawSelectionRect(Canvas canvas) {
+        Paint paint = new Paint();
+        paint.setColor(android.graphics.Color.argb(100, 0, 120, 215)); // 半透明蓝色
+        paint.setStyle(Paint.Style.FILL);
+
+        float left = Math.min(selectionStartX, selectionEndX);
+        float top = Math.min(selectionStartY, selectionEndY);
+        float right = Math.max(selectionStartX, selectionEndX);
+        float bottom = Math.max(selectionStartY, selectionEndY);
+
+        canvas.drawRect(left, top, right, bottom, paint);
+
+        // 绘制边框
+        paint.setColor(android.graphics.Color.rgb(0, 120, 215));
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(2f);
+        canvas.drawRect(left, top, right, bottom, paint);
+    }
+
+    private void drawCurrentPath(Canvas canvas) {
+        if (drawingPaint == null || drawingPoints.size() < 2) return;
+
+        Path path = new Path();
+
+        // 转换为屏幕坐标
+        float firstX = drawingPoints.get(0).x * drawingPage.bounds.width() + drawingPage.bounds.left - getScrollX();
+        float firstY = drawingPoints.get(0).y * drawingPage.bounds.height() + drawingPage.bounds.top - getScrollY();
+        path.moveTo(firstX, firstY);
+
+        for (int i = 1; i < drawingPoints.size(); i++) {
+            float x = drawingPoints.get(i).x * drawingPage.bounds.width() + drawingPage.bounds.left - getScrollX();
+            float y = drawingPoints.get(i).y * drawingPage.bounds.height() + drawingPage.bounds.top - getScrollY();
+            path.lineTo(x, y);
+        }
+
+        canvas.drawPath(path, drawingPaint);
+    }
 
     public void cancelFling() {
         if (null != mCurrentFlingRunnable) {

@@ -9,6 +9,7 @@ import com.archko.reader.image.DjvuLink;
 import com.archko.reader.image.DjvuLoader;
 import com.archko.reader.image.DjvuPageInfo;
 import com.archko.reader.image.TextSearchResult;
+import com.archko.reader.image.TextSelectionResult;
 
 import org.vudroid.core.codec.CodecPage;
 import org.vudroid.core.codec.PageTextBox;
@@ -184,5 +185,41 @@ public class DjvuPage implements CodecPage {
     @Override
     public void loadPage(int pageNumber) {
         // No-op
+    }
+
+    @Override
+    public String getSelectedText(float startX, float startY, float endX, float endY) {
+        try {
+            TextSelectionResult result = djvuLoader.selectText(
+                    pageNumber,
+                    (int) startX,
+                    (int) startY,
+                    (int) endX,
+                    (int) endY
+            );
+
+            if (result != null) {
+                return result.getText();
+            }
+        } catch (Exception e) {
+            Log.e("DjvuPage", "getSelectedText error: " + e.getMessage());
+        }
+        return "";
+    }
+
+    @Override
+    public List<RectF> getTextSelectionRects(float startX, float startY, float endX, float endY) {
+        List<RectF> rects = new ArrayList<>();
+        try {
+            // 对于DJVU，我们创建一个简单的矩形区域
+            float left = Math.min(startX, endX);
+            float top = Math.min(startY, endY);
+            float right = Math.max(startX, endX);
+            float bottom = Math.max(startY, endY);
+            rects.add(new RectF(left, top, right, bottom));
+        } catch (Exception e) {
+            Log.e("DjvuPage", "getTextSelectionRects error: " + e.getMessage());
+        }
+        return rects;
     }
 }

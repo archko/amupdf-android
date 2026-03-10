@@ -2,6 +2,7 @@ package cn.archko.pdf.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cn.archko.pdf.core.common.AKDatabase
 import cn.archko.pdf.core.entity.AIPageConversation
 import cn.archko.pdf.core.entity.AIProvider
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,27 +13,28 @@ import kotlinx.coroutines.launch
  * AI 功能 ViewModel
  * @author: archko 2026/3/1
  */
-public class AIViewModel : ViewModel() {
+class AIViewModel : ViewModel() {
 
-    public var database: AkDatabase? = null
+    var database: AKDatabase? = null
+    var aiService: AIService = AIService()
 
     private val _providers = MutableStateFlow<List<AIProvider>>(emptyList())
-    public val providers: StateFlow<List<AIProvider>> = _providers
+    val providers: StateFlow<List<AIProvider>> = _providers
 
     private val _defaultProvider = MutableStateFlow<AIProvider?>(null)
-    public val defaultProvider: StateFlow<AIProvider?> = _defaultProvider
+    val defaultProvider: StateFlow<AIProvider?> = _defaultProvider
 
     // AI页面对话相关状态
     private val _conversations = MutableStateFlow<List<AIPageConversation>>(emptyList())
-    public val conversations: StateFlow<List<AIPageConversation>> = _conversations
+    val conversations: StateFlow<List<AIPageConversation>> = _conversations
 
     private val _isLoading = MutableStateFlow(false)
-    public val isLoading: StateFlow<Boolean> = _isLoading
+    val isLoading: StateFlow<Boolean> = _isLoading
 
     /**
      * 初始化默认提供商
      */
-    public fun initializeDefaultProviders() {
+    fun initializeDefaultProviders() {
         viewModelScope.launch {
             val existing = database?.aiProviderDao()?.getAllProviders() ?: emptyList()
             if (existing.isEmpty()) {
@@ -77,7 +79,7 @@ public class AIViewModel : ViewModel() {
     /**
      * 加载所有提供商
      */
-    public fun loadProviders() {
+    fun loadProviders() {
         viewModelScope.launch {
             val providers = database?.aiProviderDao()?.getAllProviders() ?: emptyList()
             _providers.value = providers
@@ -88,7 +90,7 @@ public class AIViewModel : ViewModel() {
     /**
      * 更新提供商
      */
-    public fun updateProvider(provider: AIProvider) {
+    fun updateProvider(provider: AIProvider) {
         viewModelScope.launch {
             provider.updatedAt = System.currentTimeMillis()
             database?.aiProviderDao()?.updateProvider(provider)
@@ -99,7 +101,7 @@ public class AIViewModel : ViewModel() {
     /**
      * 设置默认提供商
      */
-    public fun setDefaultProvider(id: String) {
+    fun setDefaultProvider(id: String) {
         viewModelScope.launch {
             database?.aiProviderDao()?.clearAllDefaults()
             database?.aiProviderDao()?.setDefault(id)
@@ -110,7 +112,7 @@ public class AIViewModel : ViewModel() {
     /**
      * 获取当前可用的提供商
      */
-    public suspend fun getCurrentProvider(): AIProvider? {
+    suspend fun getCurrentProvider(): AIProvider? {
         return database?.aiProviderDao()?.getDefaultProvider()
     }
 
@@ -119,7 +121,7 @@ public class AIViewModel : ViewModel() {
     /**
      * 加载指定页面的对话历史
      */
-    public fun loadConversations(path: String, pageIndex: Int) {
+    fun loadConversations(path: String, pageIndex: Int) {
         viewModelScope.launch {
             val list = database?.aiPageConversationDao()?.getConversationsByPage(path, pageIndex)
                 ?: emptyList()
@@ -131,7 +133,7 @@ public class AIViewModel : ViewModel() {
     /**
      * 保存对话
      */
-    public fun saveConversation(
+    fun saveConversation(
         documentPath: String,
         documentName: String,
         pageIndex: Int,
@@ -159,7 +161,7 @@ public class AIViewModel : ViewModel() {
     /**
      * 删除对话
      */
-    public fun deleteConversation(conversation: AIPageConversation) {
+    fun deleteConversation(conversation: AIPageConversation) {
         viewModelScope.launch {
             database?.aiPageConversationDao()?.deleteConversation(conversation)
             println("AIViewModel.deleteConversation: $conversation")
@@ -172,14 +174,14 @@ public class AIViewModel : ViewModel() {
     /**
      * 设置加载状态
      */
-    public fun setLoading(loading: Boolean) {
+    fun setLoading(loading: Boolean) {
         _isLoading.value = loading
     }
 
     /**
      * 发送问题到 AI 并保存对话
      */
-    public fun askQuestion(
+    fun askQuestion(
         documentPath: String,
         documentName: String,
         pageIndex: Int,
@@ -242,7 +244,7 @@ public class AIViewModel : ViewModel() {
     /**
      * 获取所有文档的对话记录（按页面分组）
      */
-    public fun loadAllConversations(documentPath: String) {
+    fun loadAllConversations(documentPath: String) {
         viewModelScope.launch {
             val allConversations = database?.aiPageConversationDao()
                 ?.getConversationsByDocument(documentPath) ?: emptyList()

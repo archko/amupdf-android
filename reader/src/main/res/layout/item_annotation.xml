@@ -3,15 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/bg_list_item"
     android:orientation="vertical"
-    android:padding="12dp"
-    android:background="@drawable/bg_list_item">
+    android:padding="12dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_page"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -19,7 +19,7 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,9 +34,9 @@
             android:layout_alignParentEnd="true"
             android:layout_toStartOf="@id/tv_count"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_delete"
             android:contentDescription="删除批注"
-            android:tint="@color/white" />
+            android:src="@drawable/ic_delete"
+            app:tint="@color/white" />
 
     </RelativeLayout>
 

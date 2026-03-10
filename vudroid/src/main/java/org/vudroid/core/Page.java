@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.TextPaint;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.archko.pdf.core.cache.BitmapCache;
-import cn.archko.pdf.core.common.Logcat;
+import cn.archko.pdf.core.entity.APage;
 import cn.archko.pdf.core.link.Hyperlink;
 
 public class Page {
@@ -45,6 +46,10 @@ public class Page {
     private List<PageTextBox> searchBoxs;
     private List<RectF> searchRectFs;
 
+    // 文本选择相关 - 由DocumentView通过DecodeService处理
+    private List<RectF> selectionRects;
+    private Paint selectionPaint;
+
     Page(DocumentView documentView, int index, boolean crop, ColorFilter filter) {
         this.documentView = documentView;
         this.index = index;
@@ -52,6 +57,7 @@ public class Page {
         this.filter = filter;
         fillPaint = fillPaint();
         node = new PageTreeNode(documentView, new RectF(0, 0, 1, 1), this, ZOOM_THRESHOLD, null, filter);
+        initSelectionPaint();
     }
 
     private float aspectRatio;
@@ -109,6 +115,8 @@ public class Page {
         drawPageLinks(canvas);
         drawSearchResult(canvas);
         drawSpeaking(canvas);
+        drawTextSelection(canvas); // 添加文本选择绘制
+        drawAnnotations(canvas); // 添加标注绘制
     }
 
     protected String getKey() {
@@ -152,6 +160,18 @@ public class Page {
         fillPaint.setStyle(Paint.Style.FILL);
         fillPaint.setColorFilter(filter);
         return fillPaint;
+    }
+
+    private Paint selectionPaint() {
+        final Paint paint = new Paint();
+        paint.setColor(Color.parseColor("#6633B5E5"));
+        paint.setStyle(Paint.Style.FILL);
+        return paint;
+    }
+
+    private void initSelectionPaint() {
+        selectionPaint = selectionPaint();
+        selectionRects = new ArrayList<>();
     }
 
     private TextPaint textPaint() {
@@ -419,6 +439,112 @@ public class Page {
         m.mapRect(sourceRect);
 
         return getTargetRect(pageBounds, sourceRect);
+    }
+
+    // 绘制标注
+    private void drawAnnotations(Canvas canvas) {
+        // TODO: 从AnnotationManager获取当前页面的标注并绘制
+        // 这里先实现一个简单的示例绘制
+
+        // 示例：绘制一个红色的测试矩形
+        Paint testPaint = new Paint();
+        testPaint.setColor(Color.RED);
+        testPaint.setStyle(Paint.Style.STROKE);
+        testPaint.setStrokeWidth(4f);
+
+        float testLeft = bounds.left + bounds.width() * 0.1f;
+        float testTop = bounds.top + bounds.height() * 0.1f;
+        float testRight = bounds.left + bounds.width() * 0.3f;
+        float testBottom = bounds.top + bounds.height() * 0.3f;
+
+        canvas.drawRect(testLeft, testTop, testRight, testBottom, testPaint);
+
+        // 示例：绘制一条测试线
+        Paint linePaint = new Paint();
+        linePaint.setColor(Color.BLUE);
+        linePaint.setStyle(Paint.Style.STROKE);
+        linePaint.setStrokeWidth(3f);
+
+        float startX = bounds.left + bounds.width() * 0.4f;
+        float startY = bounds.top + bounds.height() * 0.4f;
+        float endX = bounds.left + bounds.width() * 0.8f;
+        float endY = bounds.top + bounds.height() * 0.8f;
+
+        canvas.drawLine(startX, startY, endX, endY, linePaint);
+    }
+
+    // 文本选择相关方法 - 由DocumentView通过DecodeService处理
+    public void setSelectionRects(List<RectF> rects) {
+        if (selectionRects == null) {
+            selectionRects = new ArrayList<>();
+        } else {
+            selectionRects.clear();
+        }
+
+        if (rects != null) {
+            selectionRects.addAll(rects);
+        }
+    }
+
+    public void clearTextSelection() {
+        if (selectionRects != null) {
+            selectionRects.clear();
+        }
+    }
+
+    /**
+     * 将屏幕坐标转换为页面原始坐标
+     * 参考tryHyperlink中的坐标转换逻辑
+     */
+    public PointF screenToPagePoint(float screenX, float screenY) {
+        // 获取缩放因子
+        float scale = documentView.calculateScale(this);
+
+        // 将屏幕坐标转换为相对于页面bounds的坐标，并除以缩放因子
+        float x = (screenX - bounds.left) / scale;
+        float y = (screenY - bounds.top) / scale;
+
+        // 处理切边
+        if (crop && documentView.crop) {
+            Rect rect = documentView.getBounds(this);
+            if (rect != null) {
+                x += rect.left;
+                y += rect.top;
+            }
+        }
+
+        return new PointF(x, y);
+    }
+
+    /**
+     * 将屏幕坐标转换为页面相对坐标（0-1范围）
+     * 相对于原始页面尺寸
+     */
+    public PointF screenToPageRelativePoint(float screenX, float screenY) {
+        // 首先获取页面原始坐标
+        PointF pagePoint = screenToPagePoint(screenX, screenY);
+
+        // 获取原始页面尺寸
+        APage vuPage = documentView.decodeService.getAPage(index);
+        if (vuPage == null) {
+            return new PointF(0, 0);
+        }
+
+        // 转换为相对坐标（0-1）
+        float relativeX = pagePoint.x / vuPage.getWidth(false);
+        float relativeY = pagePoint.y / vuPage.getHeight(false);
+
+        return new PointF(relativeX, relativeY);
+    }
+
+    private void drawTextSelection(Canvas canvas) {
+        if (selectionRects == null || selectionRects.isEmpty() || selectionPaint == null) {
+            return;
+        }
+
+        for (RectF rect : selectionRects) {
+            canvas.drawRect(rect, selectionPaint);
+        }
     }
 
     @Override

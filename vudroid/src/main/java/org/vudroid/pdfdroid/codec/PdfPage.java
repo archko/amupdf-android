@@ -4,11 +4,15 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.Log;
 
 import com.artifex.mupdf.fitz.Document;
 import com.artifex.mupdf.fitz.Link;
 import com.artifex.mupdf.fitz.Location;
 import com.artifex.mupdf.fitz.Page;
+import com.artifex.mupdf.fitz.Point;
+import com.artifex.mupdf.fitz.Quad;
+import com.artifex.mupdf.fitz.StructuredText;
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice;
 
 import org.vudroid.core.codec.CodecPage;
@@ -20,7 +24,6 @@ import cn.archko.pdf.core.cache.BitmapPool;
 import cn.archko.pdf.core.common.ParseTextMain;
 import cn.archko.pdf.core.entity.ReflowBean;
 import cn.archko.pdf.core.link.Hyperlink;
-
 
 public class PdfPage implements CodecPage {
 
@@ -167,6 +170,49 @@ public class PdfPage implements CodecPage {
     protected void finalize() throws Throwable {
         recycle();
         super.finalize();
+    }
+
+    @Override
+    public String getSelectedText(float startX, float startY, float endX, float endY) {
+        try {
+            if (page != null) {
+                StructuredText structuredText = page.toStructuredText();
+                if (structuredText != null) {
+                    Point start = new Point(startX, startY);
+                    Point end = new Point(endX, endY);
+                    String selectedText = structuredText.copy(start, end);
+                    return selectedText != null ? selectedText : "";
+                }
+            }
+        } catch (Exception e) {
+            Log.e("PdfPage", "getSelectedText error: " + e.getMessage());
+        }
+        return "";
+    }
+
+    @Override
+    public List<RectF> getTextSelectionRects(float startX, float startY, float endX, float endY) {
+        List<RectF> rects = new ArrayList<>();
+        try {
+            if (page != null) {
+                StructuredText structuredText = page.toStructuredText();
+                if (structuredText != null) {
+                    Point start = new Point(startX, startY);
+                    Point end = new Point(endX, endY);
+
+                    Quad[] quads = structuredText.highlight(start, end);
+                    if (quads != null) {
+                        for (Quad quad : quads) {
+                            com.artifex.mupdf.fitz.Rect rect = quad.toRect();
+                            rects.add(new RectF(rect.x0, rect.y0, rect.x1, rect.y1));
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e("PdfPage", "getTextSelectionRects error: " + e.getMessage());
+        }
+        return rects;
     }
 
     public Bitmap renderBitmap(int width, int height, RectF pageSliceBounds) {

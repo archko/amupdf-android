@@ -1,20 +1,16 @@
 package cn.archko.pdf.fragments
 
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.view.WindowManager
 import android.widget.TextView
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.R
-import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.base.BaseFragment
 import cn.archko.pdf.listeners.OutlineListener
 import org.vudroid.core.codec.OutlineLink
 
@@ -37,7 +33,7 @@ open class OutlineFragment : BaseFragment() {
         private const val ARG_PATH = "path"
 
         fun newInstance(
-            outlineItems: ArrayList<OutlineLink>?, 
+            outlineItems: ArrayList<OutlineLink>?,
             currentPage: Int,
             path: String
         ): OutlineFragment {
@@ -53,8 +49,6 @@ open class OutlineFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var themeId = R.style.AppTheme
-        setStyle(STYLE_NORMAL, themeId)
 
         arguments?.let {
             currentPage = it.getInt("POSITION", 0)
@@ -67,27 +61,15 @@ open class OutlineFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        dialog?.apply {
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            val lp: WindowManager.LayoutParams = window!!.attributes
-            lp.dimAmount = 0f
-            lp.height =
-                ((Utils.getScreenHeightPixelWithOrientation(requireActivity()) * 0.9f).toInt())
-            lp.width = (Utils.getScreenWidthPixelWithOrientation(requireActivity()) * 0.9f).toInt()
-            window!!.attributes = lp
-            setCanceledOnTouchOutside(true)
-            setCancelable(true)
-        }
-
         // 使用原有的布局文件，只显示大纲列表
         val view = inflater.inflate(R.layout.fragment_outline, container, false)
-        
+
         recyclerView = view.findViewById(R.id.recyclerView)
         nodataView = view.findViewById(R.id.nodataView)
-        
+
         // 初始化RecyclerView
         recyclerView?.layoutManager = LinearLayoutManager(requireContext())
-        
+
         // 初始化Adapter
         adapter = object : ARecyclerView.Adapter<ViewHolder>() {
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -105,9 +87,9 @@ open class OutlineFragment : BaseFragment() {
 
             override fun getItemCount(): Int = outlineItems?.size ?: 0
         }
-        
+
         recyclerView?.adapter = adapter
-        
+
         // 显示/隐藏无数据视图
         if (outlineItems.isNullOrEmpty()) {
             recyclerView?.visibility = View.GONE
@@ -116,7 +98,7 @@ open class OutlineFragment : BaseFragment() {
             recyclerView?.visibility = View.VISIBLE
             nodataView?.visibility = View.GONE
         }
-        
+
         return view
     }
 
@@ -164,7 +146,6 @@ open class OutlineFragment : BaseFragment() {
     protected fun onListItemClick(item: OutlineLink) {
         val ac = activity as OutlineListener
         ac.onSelectedOutline(item.targetPage)
-        dismiss()
     }
 
     inner class ViewHolder(private val root: View) :

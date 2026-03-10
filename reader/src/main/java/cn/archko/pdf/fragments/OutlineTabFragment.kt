@@ -16,7 +16,6 @@ import cn.archko.pdf.R
 import cn.archko.pdf.common.AnnotationManager
 import cn.archko.pdf.core.entity.ABookmark
 import cn.archko.pdf.core.utils.Utils
-import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.BookmarkViewModel
 import com.google.android.material.tabs.TabLayoutMediator
 import org.vudroid.core.codec.OutlineLink
@@ -32,14 +31,14 @@ class OutlineTabFragment : DialogFragment() {
     private lateinit var pagerAdapter: OutlinePagerAdapter
     private lateinit var btnBack: ImageButton
     private lateinit var tvTitle: TextView
-    
+
     // ViewModel和Manager
     var bookmarkViewModel: BookmarkViewModel? = null
     var annotationManager: AnnotationManager? = null
     private var currentPath: String = ""
     var outlineItems: ArrayList<OutlineLink>? = null
     var currentPage: Int = 0
-    
+
     // 回调接口
     var onAnnotationClick: ((Int) -> Unit)? = null
     var onBookmarkClick: ((ABookmark) -> Unit)? = null
@@ -61,10 +60,10 @@ class OutlineTabFragment : DialogFragment() {
             currentPath = it.getString(ARG_PATH, "")
             outlineItems = it.getSerializable(ARG_OUTLINE) as? ArrayList<OutlineLink>
         }
-        
+
         // 初始化ViewModel
         bookmarkViewModel = ViewModelProvider(requireActivity()).get(BookmarkViewModel::class.java)
-        
+
         // 初始化AnnotationManager
         if (currentPath.isNotEmpty()) {
             annotationManager = AnnotationManager(currentPath)
@@ -90,47 +89,47 @@ class OutlineTabFragment : DialogFragment() {
 
         // 使用多tab布局文件
         val view = inflater.inflate(R.layout.fragment_outline_tabs, container, false)
-        
+
         // 初始化UI组件
         btnBack = view.findViewById(R.id.btn_back)
         tvTitle = view.findViewById(R.id.tv_title)
         tabLayout = view.findViewById(R.id.tab_layout)
         viewPager = view.findViewById(R.id.view_pager)
-        
+
         // 设置返回按钮点击事件
         btnBack.setOnClickListener {
             dismiss()
         }
-        
+
         // 初始化ViewPager和Adapter
         pagerAdapter = OutlinePagerAdapter(requireActivity(), this)
         viewPager.adapter = pagerAdapter
-        
+
         // 设置TabLayout和ViewPager的联动
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = pagerAdapter.getTabTitle(position)
         }.attach()
-        
+
         // 加载书签数据
         if (currentPath.isNotEmpty()) {
             bookmarkViewModel?.loadBookmarks(currentPath)
         }
-        
+
         return view
     }
-    
+
     // 新增：批注点击回调
     fun onAnnotationClick(pageIndex: Int) {
         onAnnotationClick?.invoke(pageIndex)
         dismiss()
     }
-    
+
     // 新增：书签点击回调
     fun onBookmarkClick(bookmark: ABookmark) {
         onBookmarkClick?.invoke(bookmark)
         dismiss()
     }
-    
+
     // 新增：编辑书签回调
     fun onEditBookmark(bookmark: ABookmark) {
         onEditBookmark?.invoke(bookmark)
@@ -162,12 +161,12 @@ class OutlineTabFragment : DialogFragment() {
             }
         }
         arguments = args
-        
+
         // 设置回调
         this.onAnnotationClick = onAnnotationClick
         this.onBookmarkClick = onBookmarkClick
         this.onEditBookmark = onEditBookmark
-        
+
         show(ft!!, "outline_tabs_dialog")
     }
 }

@@ -2,10 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/menu_bg"
+    android:fitsSystemWindows="true"
     android:orientation="vertical">
 
     <androidx.recyclerview.awidget.ARecyclerView
@@ -19,7 +19,7 @@
         tools:itemCount="6"
         tools:listitem="@layout/item_outline" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/nodataView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

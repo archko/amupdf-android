@@ -16,7 +16,7 @@ class OutlinePagerAdapter(
 
     companion object {
         const val TAB_COUNT = 3
-        
+
         const val TAB_OUTLINE = 0
         const val TAB_ANNOTATION = 1
         const val TAB_BOOKMARK = 2
@@ -37,12 +37,15 @@ class OutlinePagerAdapter(
                 outlineFragment.arguments = args
                 outlineFragment
             }
+
             TAB_ANNOTATION -> {
                 AnnotationFragment.newInstance(outlineTabFragment.annotationManager)
             }
+
             TAB_BOOKMARK -> {
-                BookmarkTabFragment.newInstance(outlineTabFragment.bookmarkViewModel)
+                BookmarkFragment.newInstance(outlineTabFragment.bookmarkViewModel)
             }
+
             else -> throw IllegalArgumentException("Invalid tab position: $position")
         }
     }

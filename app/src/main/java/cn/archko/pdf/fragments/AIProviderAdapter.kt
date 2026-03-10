@@ -1,7 +1,6 @@
 package cn.archko.pdf.fragments
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -25,7 +24,8 @@ class AIProviderAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemAiProviderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            ItemAiProviderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
@@ -41,7 +41,8 @@ class AIProviderAdapter(
         }
     }
 
-    inner class ViewHolder(val binding: ItemAiProviderBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(val binding: ItemAiProviderBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(provider: AIProvider, isDefault: Boolean) {
             binding.tvProviderName.text = provider.name
             binding.tvProviderModel.text = provider.model
@@ -60,7 +61,7 @@ class AIProviderAdapter(
         }
 
         override fun areContentsTheSame(oldItem: AIProvider, newItem: AIProvider): Boolean {
-            return oldItem == newItem
+            return oldItem.equals(newItem)
         }
     }
 }

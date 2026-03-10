@@ -87,14 +87,14 @@
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:backgroundTint="@android:color/darker_gray"
-            android:text="取消" />
+            android:text="@string/cancel_button" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_save"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="保存" />
+            android:text="@string/ok_button" />
 
     </LinearLayout>
 

@@ -139,4 +139,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.github.axet/k2pdfopt
     implementation(libs.k2pdfopt)
+
+    // HTTP client for AI service
+    implementation(libs.okhttp3)
 }

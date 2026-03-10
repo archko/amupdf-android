@@ -10,7 +10,6 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.GridLayoutManager
@@ -42,12 +41,24 @@ class DrawConfigDialog : DialogFragment() {
 
     // 常用颜色列表
     private val colors = listOf(
-        Color.RED, Color.parseColor("#FFE91E63"), Color.parseColor("#FF9C27B0"), // 红、粉、紫
-        Color.parseColor("#FF673AB7"), Color.parseColor("#FF3F51B5"), Color.BLUE, // 深紫、蓝
-        Color.parseColor("#FF03A9F4"), Color.parseColor("#FF00BCD4"), Color.parseColor("#FF009688"), // 天蓝、青、绿
-        Color.parseColor("#FF4CAF50"), Color.parseColor("#FF8BC34A"), Color.parseColor("#FFCDDC39"), // 浅绿、黄
-        Color.parseColor("#FFFFEB3B"), Color.parseColor("#FFFFC107"), Color.parseColor("#FFFF9800"), // 橙
-        Color.BLACK, Color.GRAY, Color.LTGRAY          // 黑、灰
+        Color.RED,
+        Color.parseColor("#FFE91E63"),
+        Color.parseColor("#FF9C27B0"), // 红、粉、紫
+        Color.parseColor("#FF673AB7"),
+        Color.parseColor("#FF3F51B5"),
+        Color.BLUE, // 深紫、蓝
+        Color.parseColor("#FF03A9F4"),
+        Color.parseColor("#FF00BCD4"),
+        Color.parseColor("#FF009688"), // 天蓝、青、绿
+        Color.parseColor("#FF4CAF50"),
+        Color.parseColor("#FF8BC34A"),
+        Color.parseColor("#FFCDDC39"), // 浅绿、黄
+        Color.parseColor("#FFFFEB3B"),
+        Color.parseColor("#FFFFC107"),
+        Color.parseColor("#FFFF9800"), // 橙
+        Color.BLACK,
+        Color.GRAY,
+        Color.LTGRAY          // 黑、灰
     )
 
     private var selectedColor: Int = initialColor
@@ -211,9 +222,15 @@ class DrawConfigDialog : DialogFragment() {
             // 添加选中状态边框
             val isSelected = color == selectedColor
             val borderDrawable = if (isSelected) {
-                androidx.core.content.ContextCompat.getDrawable(requireContext(), R.drawable.color_item_selected_border)
+                androidx.core.content.ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.color_item_selected_border
+                )
             } else {
-                androidx.core.content.ContextCompat.getDrawable(requireContext(), R.drawable.color_item_border)
+                androidx.core.content.ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.color_item_border
+                )
             }
             holder.colorView.background = borderDrawable
 

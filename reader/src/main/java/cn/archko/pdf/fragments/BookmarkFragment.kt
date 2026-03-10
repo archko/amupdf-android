@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import cn.archko.pdf.base.BaseFragment
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
@@ -29,7 +29,7 @@ class BookmarkFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyView: View
     private lateinit var adapter: BookmarkAdapter
-    
+
     private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
     private var bookmarksJob: Job? = null
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
@@ -61,13 +61,14 @@ class BookmarkFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_bookmark_tab, container, false)
-        
+        val view = inflater.inflate(R.layout.fragment_bookmark, container, false)
+
         recyclerView = view.findViewById(R.id.recycler_view)
         emptyView = view.findViewById(R.id.tv_empty)
-        
+
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        adapter = BookmarkAdapter(requireContext(), emptyList(),
+        adapter = BookmarkAdapter(
+            requireContext(), emptyList(),
             onItemClick = { bookmark ->
                 // 点击书签项，跳转到对应页面
                 parentFragment?.let {
@@ -90,7 +91,7 @@ class BookmarkFragment : Fragment() {
             }
         )
         recyclerView.adapter = adapter
-        
+
         return view
     }
 
@@ -156,33 +157,33 @@ class BookmarkFragment : Fragment() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = items[position]
-            
+
             holder.tvPage.text = context.getString(R.string.page_label, item.pageIndex + 1)
-            
+
             if (!item.title.isNullOrBlank()) {
                 holder.tvTitle.text = item.title
                 holder.tvTitle.visibility = View.VISIBLE
             } else {
                 holder.tvTitle.visibility = View.GONE
             }
-            
+
             holder.tvTime.text = dateFormat.format(Date(item.createAt))
-            
+
             if (!item.note.isNullOrBlank()) {
                 holder.tvNote.text = item.note
                 holder.tvNote.visibility = View.VISIBLE
             } else {
                 holder.tvNote.visibility = View.GONE
             }
-            
+
             holder.itemView.setOnClickListener {
                 onItemClick(item)
             }
-            
+
             holder.btnEdit.setOnClickListener {
                 onEditClick(item)
             }
-            
+
             holder.btnDelete.setOnClickListener {
                 onDeleteClick(item)
             }

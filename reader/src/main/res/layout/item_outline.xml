@@ -8,29 +8,29 @@
     android:paddingTop="4dp"
     android:paddingBottom="4dp">
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/page"
-        android:paddingLeft="8dp"
-        android:paddingRight="4dp"
+        android:layout_toStartOf="@+id/page"
         android:ellipsize="end"
+        android:paddingStart="8dp"
+        android:paddingEnd="4dp"
         android:singleLine="true"
         android:textColor="@color/white"
         android:textSize="16sp" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/page"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/title"
         android:layout_alignBottom="@+id/title"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:paddingRight="8dp"
+        android:paddingEnd="8dp"
         android:textColor="@color/white"
         android:textSize="14sp" />
 

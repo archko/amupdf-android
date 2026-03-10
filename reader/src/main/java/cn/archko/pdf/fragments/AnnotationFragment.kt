@@ -26,7 +26,7 @@ class AnnotationFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyView: View
     private lateinit var adapter: AnnotationAdapter
-    
+
     private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
     private var annotationsJob: Job? = null
 
@@ -58,10 +58,10 @@ class AnnotationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_annotation, container, false)
-        
+
         recyclerView = view.findViewById(R.id.recycler_view)
         emptyView = view.findViewById(R.id.tv_empty)
-        
+
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         adapter = AnnotationAdapter(requireContext(), emptyList()) { pageIndex ->
             // 点击批注项，跳转到对应页面
@@ -72,7 +72,7 @@ class AnnotationFragment : Fragment() {
             }
         }
         recyclerView.adapter = adapter
-        
+
         return view
     }
 
@@ -107,12 +107,12 @@ class AnnotationFragment : Fragment() {
         } else {
             recyclerView.visibility = View.VISIBLE
             emptyView.visibility = View.GONE
-            
+
             // 转换数据为列表形式
             val annotationList = annotations.entries.map { entry ->
                 AnnotationItem(entry.key, entry.value)
             }.sortedBy { it.pageIndex }
-            
+
             adapter.updateData(annotationList)
         }
     }
@@ -144,11 +144,11 @@ class AnnotationFragment : Fragment() {
             val item = items[position]
             holder.tvPage.text = context.getString(R.string.page_label, item.pageIndex + 1)
             holder.tvCount.text = context.getString(R.string.annotations_count, item.paths.size)
-            
+
             holder.itemView.setOnClickListener {
                 onItemClick(item.pageIndex)
             }
-            
+
             holder.btnDelete.setOnClickListener {
                 // 删除该页面的所有批注
                 // 这里需要访问AnnotationManager，可以通过其他方式传递

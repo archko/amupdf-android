@@ -14,11 +14,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.DialogAiSettingBinding
+import cn.archko.pdf.core.entity.AIProvider
 import cn.archko.pdf.viewmodel.AIViewModel
-import com.archko.reader.pdf.entity.AIProvider
 import com.google.android.material.textfield.TextInputEditText
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 /**
  * AI 设置对话框
@@ -32,7 +30,8 @@ class AISettingDialogFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NO_TITLE, R.style.AppTheme)
+        var themeId = cn.archko.pdf.R.style.AppTheme
+        setStyle(STYLE_NO_TITLE, themeId)
     }
 
     override fun onCreateView(
@@ -85,7 +84,8 @@ class AISettingDialogFragment : DialogFragment() {
     }
 
     private fun showEditDialog(provider: AIProvider) {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_ai_provider_edit, null)
+        val dialogView =
+            LayoutInflater.from(requireContext()).inflate(R.layout.dialog_ai_provider_edit, null)
         val tvTitle = dialogView.findViewById<TextView>(R.id.tvDialogTitle)
         val etApiKey = dialogView.findViewById<TextInputEditText>(R.id.etApiKey)
         val etBaseUrl = dialogView.findViewById<TextInputEditText>(R.id.etBaseUrl)

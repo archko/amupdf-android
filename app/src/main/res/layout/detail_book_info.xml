@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -23,7 +22,7 @@
             tools:ignore="ContentDescription" />
 
         <!-- 书籍信息 -->
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/fileName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -32,7 +31,7 @@
             android:textStyle="bold"
             tools:text="书籍名称.pdf" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,7 +47,7 @@
             android:orientation="horizontal"
             android:weightSum="2">
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/fileSize"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -56,7 +55,7 @@
                 android:textSize="13sp"
                 tools:text="大小: 2.5 MB" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/readCount"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -66,7 +65,7 @@
         </LinearLayout>
 
         <!-- 阅读进度 -->
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/pageCount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -84,7 +83,7 @@
             android:progress="50" />
 
         <!-- 最后阅读时间 -->
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/lastRead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -101,7 +100,7 @@
             android:background="?android:attr/listDivider" />
 
         <!-- 阅读统计标题 -->
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/label_stats_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -117,14 +116,14 @@
             android:layout_marginBottom="4dp"
             android:orientation="horizontal">
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/label_total_reading_time"
                 android:textSize="13sp" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/totalReadingTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -146,13 +145,13 @@
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/label_session_count"
                     android:textSize="13sp" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/sessionCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -166,13 +165,13 @@
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/label_average_session_time"
                     android:textSize="13sp" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/averageSessionTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -195,13 +194,13 @@
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/label_completed_pages"
                     android:textSize="13sp" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/completedPages"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -215,13 +214,13 @@
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/label_consecutive_days"
                     android:textSize="13sp" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/consecutiveDays"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -244,13 +243,13 @@
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/label_annotation_count"
                     android:textSize="13sp" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/annotationCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -264,13 +263,13 @@
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/label_bookmark_count"
                     android:textSize="13sp" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/bookmarkCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -292,13 +291,13 @@
                 android:layout_marginBottom="2dp"
                 android:orientation="horizontal">
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/label_first_read_at"
                     android:textSize="13sp" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/firstReadAt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -311,13 +310,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/label_last_read_at"
                     android:textSize="13sp" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/lastReadAt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -334,7 +333,7 @@
             android:orientation="horizontal"
             android:weightSum="2">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_cancel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -342,7 +341,7 @@
                 android:layout_weight="1"
                 android:text="Cancel" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_ok"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

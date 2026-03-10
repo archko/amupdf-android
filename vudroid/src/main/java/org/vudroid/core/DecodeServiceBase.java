@@ -682,4 +682,45 @@ public class DecodeServiceBase implements DecodeService {
 
     //=========================
 
+    @Override
+    public String getSelectedText(int pageIndex, float startX, float startY, float endX, float endY) {
+        try {
+            CodecPage codecPage = getPage(pageIndex);
+            if (codecPage == null) {
+                Log.d(TAG, String.format("getSelectedText: 页面%d的CodecPage为空", pageIndex));
+                return "";
+            }
+
+            // 直接调用接口方法
+            String selectedText = codecPage.getSelectedText(startX, startY, endX, endY);
+            Log.d(TAG, String.format("getSelectedText: 页面%d, 选中文本长度: %d",
+                    pageIndex, selectedText != null ? selectedText.length() : 0));
+            return selectedText;
+        } catch (Exception e) {
+            Log.e(TAG, "getSelectedText异常: " + e.getMessage());
+            return "";
+        }
+    }
+
+    @Override
+    public List<RectF> getTextSelectionRects(int pageIndex, float startX, float startY, float endX, float endY) {
+        List<RectF> rects = new ArrayList<>();
+        try {
+            CodecPage codecPage = getPage(pageIndex);
+            if (codecPage == null) {
+                Log.d(TAG, String.format("getTextSelectionRects: 页面%d的CodecPage为空", pageIndex));
+                return rects;
+            }
+
+            // 直接调用接口方法
+            rects = codecPage.getTextSelectionRects(startX, startY, endX, endY);
+            Log.d(TAG, String.format("getTextSelectionRects: 页面%d, 找到%d个矩形区域",
+                    pageIndex, rects.size()));
+            return rects;
+        } catch (Exception e) {
+            Log.e(TAG, "getTextSelectionRects异常: " + e.getMessage());
+            return rects;
+        }
+    }
+
 }
