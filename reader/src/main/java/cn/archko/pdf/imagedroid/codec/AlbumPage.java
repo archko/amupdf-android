@@ -10,6 +10,7 @@ import org.vudroid.core.codec.CodecPage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import cn.archko.pdf.core.cache.BitmapPool;
@@ -83,6 +84,16 @@ public class AlbumPage implements CodecPage {
                 Log.d("TAG", "loadPage.error,", e);
             }
         }
+    }
+
+    @Override
+    public String getSelectedText(float startX, float startY, float endX, float endY) {
+        return "";
+    }
+
+    @Override
+    public List<RectF> getTextSelectionRects(float startX, float startY, float endX, float endY) {
+        return Collections.emptyList();
     }
 
     /**

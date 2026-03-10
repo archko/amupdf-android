@@ -23,35 +23,18 @@ import java.util.Locale
  * 书签Tab Fragment
  * @author: archko 2026/3/9
  */
-class BookmarkFragment : Fragment() {
+class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) : Fragment() {
 
-    private var bookmarkViewModel: BookmarkViewModel? = null
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyView: View
     private lateinit var adapter: BookmarkAdapter
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
     private var bookmarksJob: Job? = null
-    private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
     companion object {
-        private const val ARG_BOOKMARK_VIEW_MODEL = "bookmark_view_model"
-
-        fun newInstance(bookmarkViewModel: BookmarkViewModel?): BookmarkFragment {
-            return BookmarkFragment().apply {
-                arguments = Bundle().apply {
-                    // 由于BookmarkViewModel不是Parcelable，我们通过父Fragment传递
-                }
-            }
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        // 从父Fragment获取BookmarkViewModel
-        parentFragment?.let {
-            if (it is OutlineTabFragment) {
-                bookmarkViewModel = it.bookmarkViewModel
+        fun newInstance(bookmarkViewModel: BookmarkViewModel): BookmarkFragment {
+            return BookmarkFragment(bookmarkViewModel).apply {
             }
         }
     }
@@ -78,7 +61,6 @@ class BookmarkFragment : Fragment() {
                 }
             },
             onEditClick = { bookmark ->
-                // 编辑书签
                 parentFragment?.let {
                     if (it is OutlineTabFragment) {
                         it.onEditBookmark(bookmark)
@@ -86,8 +68,7 @@ class BookmarkFragment : Fragment() {
                 }
             },
             onDeleteClick = { bookmark ->
-                // 删除书签
-                bookmarkViewModel?.deleteBookmark(bookmark)
+                bookmarkViewModel.deleteBookmark(bookmark)
             }
         )
         recyclerView.adapter = adapter
@@ -108,7 +89,7 @@ class BookmarkFragment : Fragment() {
     private fun startObservingBookmarks() {
         bookmarksJob?.cancel()
         bookmarksJob = coroutineScope.launch {
-            bookmarkViewModel?.currentPathBookmarks?.collectLatest { bookmarks ->
+            bookmarkViewModel.currentPathBookmarks.collectLatest { bookmarks ->
                 updateBookmarks(bookmarks)
             }
         }

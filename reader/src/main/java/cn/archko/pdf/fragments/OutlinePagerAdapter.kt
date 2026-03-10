@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import cn.archko.pdf.common.AnnotationManager
+import cn.archko.pdf.viewmodel.BookmarkViewModel
+import org.vudroid.core.codec.OutlineLink
 
 /**
  * OutlineTabFragment的ViewPager适配器
@@ -11,7 +14,10 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
  */
 class OutlinePagerAdapter(
     fragmentActivity: FragmentActivity,
-    private val outlineTabFragment: OutlineTabFragment
+    var bookmarkViewModel: BookmarkViewModel,
+    var annotationManager: AnnotationManager?,
+    var outlineItems: List<OutlineLink>?,
+    val arguments: Bundle?
 ) : FragmentStateAdapter(fragmentActivity) {
 
     companion object {
@@ -27,23 +33,15 @@ class OutlinePagerAdapter(
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             TAB_OUTLINE -> {
-                val outlineFragment = OutlineFragment()
-                val args = Bundle().apply {
-                    putInt("POSITION", outlineTabFragment.currentPage)
-                    if (outlineTabFragment.outlineItems != null) {
-                        putSerializable("OUTLINE", outlineTabFragment.outlineItems)
-                    }
-                }
-                outlineFragment.arguments = args
-                outlineFragment
+                OutlineFragment.newInstance(arguments, outlineItems)
             }
 
             TAB_ANNOTATION -> {
-                AnnotationFragment.newInstance(outlineTabFragment.annotationManager)
+                AnnotationFragment.newInstance(annotationManager)
             }
 
             TAB_BOOKMARK -> {
-                BookmarkFragment.newInstance(outlineTabFragment.bookmarkViewModel)
+                BookmarkFragment.newInstance(bookmarkViewModel)
             }
 
             else -> throw IllegalArgumentException("Invalid tab position: $position")

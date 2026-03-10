@@ -213,6 +213,7 @@
     
     <!-- Outline Tab Strings -->
     <string name="document_outline">Document Outline</string>
+    <string name="outline_empty">No outline</string>
     <string name="annotation_empty">No annotations</string>
     <string name="bookmark_empty">No bookmarks</string>
     <string name="page_label">Page %d</string>

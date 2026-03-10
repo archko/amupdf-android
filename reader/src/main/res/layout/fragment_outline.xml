@@ -12,9 +12,10 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:cacheColorHint="#00000000"
+        android:clipToPadding="false"
         android:divider="@color/tab_divider_color"
         android:dividerHeight="1px"
+        android:padding="8dp"
         app:layoutManager="androidx.recyclerview.awidget.LinearLayoutManager"
         tools:itemCount="6"
         tools:listitem="@layout/item_outline" />
@@ -22,10 +23,11 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/nodataView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:gravity="center"
-        android:text="no outline"
-        android:textSize="18sp"
+        android:text="@string/outline_empty"
+        android:textColor="@color/white"
+        android:textSize="16sp"
         android:visibility="gone" />
 
 </LinearLayout>

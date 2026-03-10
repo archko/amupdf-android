@@ -41,7 +41,7 @@ class FileInfoFragment : DialogFragment() {
     private lateinit var mFileSize: TextView
 
     private lateinit var mLastRead: TextView
-    private lateinit var mReadCount: TextView
+    //private lateinit var mReadCount: TextView
     private lateinit var mPageCount: TextView
     private lateinit var mProgressBar: ProgressBar
     private lateinit var mIcon: ImageView
@@ -99,7 +99,7 @@ class FileInfoFragment : DialogFragment() {
         mFileName = view.findViewById(R.id.fileName)
         mFileSize = view.findViewById(R.id.fileSize)
         mLastRead = view.findViewById(R.id.lastRead)
-        mReadCount = view.findViewById(R.id.readCount)
+        //mReadCount = view.findViewById(R.id.readCount)
         mProgressBar = view.findViewById(R.id.progressbar)
         mPageCount = view.findViewById(R.id.pageCount)
         mIcon = view.findViewById(R.id.icon)
@@ -193,7 +193,7 @@ class FileInfoFragment : DialogFragment() {
             mProgressBar.max = progress.pageCount
             mProgressBar.progress = progress.page
 
-            mReadCount.text = progress.readTimes.toString()
+            //mReadCount.text = progress.readTimes.toString()
             updatePageCount()
 
             // 加载阅读统计数据

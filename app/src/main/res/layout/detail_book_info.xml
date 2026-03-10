@@ -55,13 +55,13 @@
                 android:textSize="13sp"
                 tools:text="大小: 2.5 MB" />
 
-            <com.google.android.material.textview.MaterialTextView
+            <!--<com.google.android.material.textview.MaterialTextView
                 android:id="@+id/readCount"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="13sp"
-                tools:text="阅读次数: 5" />
+                tools:text="阅读次数: 5" />-->
         </LinearLayout>
 
         <!-- 阅读进度 -->

@@ -11,12 +11,14 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProvider
+import androidx.viewpager2.widget.ViewPager2
 import cn.archko.pdf.R
 import cn.archko.pdf.common.AnnotationManager
 import cn.archko.pdf.core.entity.ABookmark
 import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.BookmarkViewModel
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import org.vudroid.core.codec.OutlineLink
 
@@ -26,18 +28,15 @@ import org.vudroid.core.codec.OutlineLink
  */
 class OutlineTabFragment : DialogFragment() {
 
-    private lateinit var tabLayout: com.google.android.material.tabs.TabLayout
-    private lateinit var viewPager: androidx.viewpager2.widget.ViewPager2
+    private lateinit var tabLayout: TabLayout
+    private lateinit var viewPager: ViewPager2
     private lateinit var pagerAdapter: OutlinePagerAdapter
     private lateinit var btnBack: ImageButton
     private lateinit var tvTitle: TextView
 
-    // ViewModel和Manager
-    var bookmarkViewModel: BookmarkViewModel? = null
-    var annotationManager: AnnotationManager? = null
-    private var currentPath: String = ""
-    var outlineItems: ArrayList<OutlineLink>? = null
-    var currentPage: Int = 0
+    private var bookmarkViewModel: BookmarkViewModel? = null
+    private var annotationManager: AnnotationManager? = null
+    private var outlineItems: List<OutlineLink>?=null
 
     // 回调接口
     var onAnnotationClick: ((Int) -> Unit)? = null
@@ -45,29 +44,15 @@ class OutlineTabFragment : DialogFragment() {
     var onEditBookmark: ((ABookmark) -> Unit)? = null
 
     companion object {
-        private const val ARG_OUTLINE = "outline"
-        private const val ARG_CURRENT_PAGE = "current_page"
-        private const val ARG_PATH = "path"
+        const val ARG_OUTLINE = "outline"
+        const val ARG_CURRENT_PAGE = "current_page"
+        const val ARG_PATH = "path"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var themeId = R.style.AppTheme
+        val themeId = R.style.AppTheme
         setStyle(STYLE_NORMAL, themeId)
-
-        arguments?.let {
-            currentPage = it.getInt(ARG_CURRENT_PAGE, 0)
-            currentPath = it.getString(ARG_PATH, "")
-            outlineItems = it.getSerializable(ARG_OUTLINE) as? ArrayList<OutlineLink>
-        }
-
-        // 初始化ViewModel
-        bookmarkViewModel = ViewModelProvider(requireActivity()).get(BookmarkViewModel::class.java)
-
-        // 初始化AnnotationManager
-        if (currentPath.isNotEmpty()) {
-            annotationManager = AnnotationManager(currentPath)
-        }
     }
 
     override fun onCreateView(
@@ -87,35 +72,37 @@ class OutlineTabFragment : DialogFragment() {
             setCancelable(true)
         }
 
-        // 使用多tab布局文件
         val view = inflater.inflate(R.layout.fragment_outline_tabs, container, false)
 
-        // 初始化UI组件
         btnBack = view.findViewById(R.id.btn_back)
         tvTitle = view.findViewById(R.id.tv_title)
         tabLayout = view.findViewById(R.id.tab_layout)
         viewPager = view.findViewById(R.id.view_pager)
 
-        // 设置返回按钮点击事件
         btnBack.setOnClickListener {
             dismiss()
         }
 
-        // 初始化ViewPager和Adapter
-        pagerAdapter = OutlinePagerAdapter(requireActivity(), this)
+        pagerAdapter = OutlinePagerAdapter(
+            requireActivity(),
+            bookmarkViewModel!!,
+            annotationManager,
+            outlineItems,
+            arguments
+        )
         viewPager.adapter = pagerAdapter
 
-        // 设置TabLayout和ViewPager的联动
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = pagerAdapter.getTabTitle(position)
         }.attach()
 
-        // 加载书签数据
-        if (currentPath.isNotEmpty()) {
-            bookmarkViewModel?.loadBookmarks(currentPath)
-        }
-
         return view
+    }
+
+    fun onListItemClick(targetPage: Int) {
+        val ac = activity as OutlineListener
+        ac.onSelectedOutline(targetPage)
+        dismiss()
     }
 
     // 新增：批注点击回调
@@ -133,13 +120,14 @@ class OutlineTabFragment : DialogFragment() {
     // 新增：编辑书签回调
     fun onEditBookmark(bookmark: ABookmark) {
         onEditBookmark?.invoke(bookmark)
-        // 不关闭对话框，让用户编辑
     }
 
     fun showDialog(
         activity: FragmentActivity?,
+        bookmarkViewModel: BookmarkViewModel,
+        annotationManager: AnnotationManager?,
         currentPage: Int,
-        outlineItems: ArrayList<OutlineLink>?,
+        outlineItems: List<OutlineLink>?,
         path: String,
         onAnnotationClick: ((Int) -> Unit)? = null,
         onBookmarkClick: ((ABookmark) -> Unit)? = null,
@@ -152,17 +140,15 @@ class OutlineTabFragment : DialogFragment() {
         }
         ft?.addToBackStack(null)
 
-        // 设置参数
         val args = Bundle().apply {
             putInt(ARG_CURRENT_PAGE, currentPage)
             putString(ARG_PATH, path)
-            if (outlineItems != null) {
-                putSerializable(ARG_OUTLINE, outlineItems)
-            }
         }
+        this.bookmarkViewModel = bookmarkViewModel
+        this.annotationManager = annotationManager
+        this.outlineItems = outlineItems
         arguments = args
 
-        // 设置回调
         this.onAnnotationClick = onAnnotationClick
         this.onBookmarkClick = onBookmarkClick
         this.onEditBookmark = onEditBookmark

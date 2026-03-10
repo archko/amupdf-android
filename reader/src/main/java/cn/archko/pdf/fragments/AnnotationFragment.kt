@@ -20,9 +20,8 @@ import kotlinx.coroutines.launch
  * 批注Fragment
  * @author: archko 2026/3/9
  */
-class AnnotationFragment : Fragment() {
+class AnnotationFragment(private val annotationManager: AnnotationManager?) : Fragment() {
 
-    private var annotationManager: AnnotationManager? = null
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyView: View
     private lateinit var adapter: AnnotationAdapter
@@ -31,12 +30,9 @@ class AnnotationFragment : Fragment() {
     private var annotationsJob: Job? = null
 
     companion object {
-        private const val ARG_ANNOTATION_MANAGER = "annotation_manager"
-
         fun newInstance(annotationManager: AnnotationManager?): AnnotationFragment {
-            return AnnotationFragment().apply {
+            return AnnotationFragment(annotationManager).apply {
                 arguments = Bundle().apply {
-                    // 由于AnnotationManager不是Parcelable，我们通过父Fragment传递
                 }
             }
         }
@@ -44,12 +40,6 @@ class AnnotationFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 从父Fragment获取AnnotationManager
-        parentFragment?.let {
-            if (it is OutlineTabFragment) {
-                annotationManager = it.annotationManager
-            }
-        }
     }
 
     override fun onCreateView(
@@ -64,7 +54,6 @@ class AnnotationFragment : Fragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         adapter = AnnotationAdapter(requireContext(), emptyList()) { pageIndex ->
-            // 点击批注项，跳转到对应页面
             parentFragment?.let {
                 if (it is OutlineTabFragment) {
                     it.onAnnotationClick(pageIndex)

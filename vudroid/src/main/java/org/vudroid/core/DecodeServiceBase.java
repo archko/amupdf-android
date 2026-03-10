@@ -34,6 +34,7 @@ import cn.archko.pdf.core.cache.BitmapPool;
 import cn.archko.pdf.core.cache.FetcherCache;
 import cn.archko.pdf.core.common.APageSizeLoader;
 import cn.archko.pdf.core.common.IntentFile;
+import cn.archko.pdf.core.common.Logcat;
 import cn.archko.pdf.core.entity.APage;
 import cn.archko.pdf.core.utils.SmartCropUtils;
 
@@ -235,11 +236,11 @@ public class DecodeServiceBase implements DecodeService {
                     return true;
                 }
             };
-            DecodeTask task = new DecodeTask(null, false, 0, callback, 1f, path, new RectF(0, 0, 1f, 1f), 270, 40);
+            DecodeTask task = new DecodeTask(null, false, 0, callback, 1f, path, null, 270, 40);
             CodecPage vuPage = getPage(0);
             decodeThumb(task, vuPage);
         } catch (Exception e) {
-            System.out.println("缓存封面失败: ${e.message}");
+            Logcat.longLog(TAG, String.format("缓存封面失败:%s", e.getMessage()));
         }
     }
 

@@ -11,6 +11,8 @@ import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.R
 import cn.archko.pdf.base.BaseFragment
+import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.fragments.OutlineTabFragment.Companion.ARG_CURRENT_PAGE
 import cn.archko.pdf.listeners.OutlineListener
 import org.vudroid.core.codec.OutlineLink
 
@@ -20,7 +22,7 @@ import org.vudroid.core.codec.OutlineLink
 open class OutlineFragment : BaseFragment() {
 
     private lateinit var adapter: ARecyclerView.Adapter<ViewHolder>
-    var outlineItems: ArrayList<OutlineLink>? = null
+    var outlineItems: List<OutlineLink>? = null
     var currentPage: Int = 0
     private var recyclerView: ARecyclerView? = null
     private var nodataView: View? = null
@@ -28,49 +30,30 @@ open class OutlineFragment : BaseFragment() {
     private var found = -1
 
     companion object {
-        private const val ARG_OUTLINE = "OUTLINE"
-        private const val ARG_CURRENT_PAGE = "POSITION"
-        private const val ARG_PATH = "path"
 
-        fun newInstance(
-            outlineItems: ArrayList<OutlineLink>?,
-            currentPage: Int,
-            path: String
-        ): OutlineFragment {
-            return OutlineFragment().apply {
-                arguments = Bundle().apply {
-                    putSerializable(ARG_OUTLINE, outlineItems)
-                    putInt(ARG_CURRENT_PAGE, currentPage)
-                    putString(ARG_PATH, path)
+        fun newInstance(arguments: Bundle?, outlineItems: List<OutlineLink>?): OutlineFragment {
+            val fragment = OutlineFragment()
+            arguments?.run {
+                fragment.outlineItems = outlineItems
+                fragment.currentPage = arguments.getInt(ARG_CURRENT_PAGE)
+                if (fragment.currentPage > 0) {
+                    fragment.pendingPos = fragment.currentPage
                 }
             }
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        arguments?.let {
-            currentPage = it.getInt("POSITION", 0)
-            if (it.getSerializable("OUTLINE") != null) {
-                outlineItems = it.getSerializable("OUTLINE") as ArrayList<OutlineLink>
-            }
+            return fragment
         }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        // 使用原有的布局文件，只显示大纲列表
         val view = inflater.inflate(R.layout.fragment_outline, container, false)
 
         recyclerView = view.findViewById(R.id.recyclerView)
         nodataView = view.findViewById(R.id.nodataView)
 
-        // 初始化RecyclerView
         recyclerView?.layoutManager = LinearLayoutManager(requireContext())
 
-        // 初始化Adapter
         adapter = object : ARecyclerView.Adapter<ViewHolder>() {
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
                 val itemView = LayoutInflater.from(parent.context)
@@ -90,7 +73,6 @@ open class OutlineFragment : BaseFragment() {
 
         recyclerView?.adapter = adapter
 
-        // 显示/隐藏无数据视图
         if (outlineItems.isNullOrEmpty()) {
             recyclerView?.visibility = View.GONE
             nodataView?.visibility = View.VISIBLE
@@ -130,7 +112,7 @@ open class OutlineFragment : BaseFragment() {
                 found = i
             }
         }
-        //println(String.format("found:%s, currentPage:%s", found, currentPage))
+        Logcat.d(String.format("found:%s, currentPage:%s", found, currentPage))
         if (found >= 0) {
             recyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object :
                 ViewTreeObserver.OnGlobalLayoutListener {
@@ -144,8 +126,11 @@ open class OutlineFragment : BaseFragment() {
     }
 
     protected fun onListItemClick(item: OutlineLink) {
-        val ac = activity as OutlineListener
-        ac.onSelectedOutline(item.targetPage)
+        parentFragment?.let {
+            if (it is OutlineTabFragment) {
+                it.onListItemClick(item.targetPage)
+            }
+        }
     }
 
     inner class ViewHolder(private val root: View) :
@@ -166,7 +151,7 @@ open class OutlineFragment : BaseFragment() {
                 root.setBackgroundColor(Color.TRANSPARENT)
             }
             val indent = "   ".repeat(data.level)
-            title?.text = indent + data.title
+            title?.text = String.format("%s%s", indent, data.title)
             page?.text = (data.targetPage.plus(1)).toString()
             itemView.setOnClickListener { onListItemClick(data) }
         }

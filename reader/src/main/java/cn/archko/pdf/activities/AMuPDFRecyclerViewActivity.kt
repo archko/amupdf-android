@@ -1,11 +1,14 @@
 package cn.archko.pdf.activities
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Handler
+import android.os.IBinder
 import android.os.Looper
 import android.text.TextUtils
 import android.util.SparseArray
@@ -18,10 +21,13 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.Toast
+import androidx.core.content.edit
 import androidx.core.util.forEach
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
+import cn.archko.pdf.common.AnnotationManager
 import cn.archko.pdf.controller.AEpubViewController
 import cn.archko.pdf.controller.ANormalViewController
 import cn.archko.pdf.controller.AScanReflowViewController
@@ -41,22 +47,19 @@ import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.GlobalEvent
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.common.SensorHelper
 import cn.archko.pdf.core.common.StatusBarHelper
 import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
-import cn.archko.pdf.fragments.OutlineFragment
 import cn.archko.pdf.fragments.OutlineTabFragment
 import cn.archko.pdf.fragments.SleepTimerDialog
 import cn.archko.pdf.fragments.TtsTextFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TtsForegroundService
-import android.content.ComponentName
-import android.content.ServiceConnection
-import android.os.IBinder
 import cn.archko.pdf.viewmodel.BookmarkViewModel
 import cn.archko.pdf.viewmodel.DocViewModel
 import com.tencent.mmkv.MMKV
@@ -66,9 +69,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.vudroid.core.codec.OutlineLink
 import vn.chungha.flowbus.busEvent
-import androidx.core.view.isVisible
-import androidx.core.content.edit
-import cn.archko.pdf.core.common.PdfOptionRepository
 
 /**
  * @author: archko 2019/8/25 :12:43
@@ -87,7 +87,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private var viewController: AViewController? = null
     private val docViewModel: DocViewModel = DocViewModel()
     private val bookmarkViewModel: BookmarkViewModel = BookmarkViewModel()
-
+    private var annotationManager: AnnotationManager? = null
     private var pageController: IPageController? = null
     private var outlineLinks = mutableListOf<OutlineLink>()
     private var outlineTabFragment: OutlineTabFragment? = null
@@ -491,6 +491,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             lifecycleScope.launch {
                 bookmarkViewModel.startSession(mPath!!, count)
             }
+            annotationManager = AnnotationManager(mPath!!)
 
             val sp = getSharedPreferences(PREF_READER, MODE_PRIVATE)
             val isFirst = sp.getBoolean(PREF_READER_KEY_FIRST, true)
@@ -623,11 +624,11 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             }
         }
 
-        override fun setSelection(selection :Boolean) {
+        override fun setSelection(selection: Boolean) {
             viewController?.setSelection(selection)
         }
 
-        override fun setDraw(draw :Boolean) {
+        override fun setDraw(draw: Boolean) {
             viewController?.setDraw(draw)
         }
 
@@ -782,19 +783,17 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun showOutline() {
-        if (outlineLinks.size > 0) {
-            outlineTabFragment?.showDialog(
-                this,
-                getCurrentPos(),
-                ArrayList(outlineLinks),
-                mPath ?: "",
-                null,
-                null,
-                null
-            )
-        } else {
-            Toast.makeText(this, "no outline", Toast.LENGTH_SHORT).show()
-        }
+        outlineTabFragment?.showDialog(
+            this,
+            bookmarkViewModel,
+            annotationManager,
+            getCurrentPos(),
+            outlineLinks,
+            mPath ?: "",
+            null,
+            null,
+            null
+        )
     }
 
     private fun toggleCrop() {
@@ -1152,7 +1151,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 }
             }
         }
-        val subData = if (startIndex < data.size) data.subList(startIndex, data.size) else emptyList()
+        val subData =
+            if (startIndex < data.size) data.subList(startIndex, data.size) else emptyList()
         if (subData.isNotEmpty()) {
             ttsService?.addToQueue(subData)
         }
