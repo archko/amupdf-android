@@ -3,6 +3,7 @@ package cn.archko.pdf.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.archko.pdf.core.common.AKDatabase
+import cn.archko.pdf.core.common.Graph
 import cn.archko.pdf.core.entity.AIPageConversation
 import cn.archko.pdf.core.entity.AIProvider
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
  */
 class AIViewModel : ViewModel() {
 
-    var database: AKDatabase? = null
+    private val database: AKDatabase = Graph.database
     var aiService: AIService = AIService()
 
     private val _providers = MutableStateFlow<List<AIProvider>>(emptyList())
@@ -31,12 +32,16 @@ class AIViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    init {
+        initializeDefaultProviders()
+    }
+
     /**
      * 初始化默认提供商
      */
     fun initializeDefaultProviders() {
         viewModelScope.launch {
-            val existing = database?.aiProviderDao()?.getAllProviders() ?: emptyList()
+            val existing = database.aiProviderDao().getAllProviders()
             if (existing.isEmpty()) {
                 val defaults = listOf(
                     AIProvider(
@@ -70,7 +75,7 @@ class AIViewModel : ViewModel() {
                         isDefault = false
                     )
                 )
-                database?.aiProviderDao()?.insertAllProviders(defaults)
+                database.aiProviderDao().insertAllProviders(defaults)
             }
             loadProviders()
         }
@@ -81,7 +86,7 @@ class AIViewModel : ViewModel() {
      */
     fun loadProviders() {
         viewModelScope.launch {
-            val providers = database?.aiProviderDao()?.getAllProviders() ?: emptyList()
+            val providers = database.aiProviderDao().getAllProviders()
             _providers.value = providers
             _defaultProvider.value = providers.find { it.isDefault }
         }
@@ -93,7 +98,7 @@ class AIViewModel : ViewModel() {
     fun updateProvider(provider: AIProvider) {
         viewModelScope.launch {
             provider.updatedAt = System.currentTimeMillis()
-            database?.aiProviderDao()?.updateProvider(provider)
+            database.aiProviderDao().updateProvider(provider)
             loadProviders()
         }
     }
@@ -103,8 +108,8 @@ class AIViewModel : ViewModel() {
      */
     fun setDefaultProvider(id: String) {
         viewModelScope.launch {
-            database?.aiProviderDao()?.clearAllDefaults()
-            database?.aiProviderDao()?.setDefault(id)
+            database.aiProviderDao().clearAllDefaults()
+            database.aiProviderDao().setDefault(id)
             loadProviders()
         }
     }
@@ -113,7 +118,7 @@ class AIViewModel : ViewModel() {
      * 获取当前可用的提供商
      */
     suspend fun getCurrentProvider(): AIProvider? {
-        return database?.aiProviderDao()?.getDefaultProvider()
+        return database.aiProviderDao().getDefaultProvider()
     }
 
     // ========== AI页面对话功能 ==========
@@ -123,8 +128,7 @@ class AIViewModel : ViewModel() {
      */
     fun loadConversations(path: String, pageIndex: Int) {
         viewModelScope.launch {
-            val list = database?.aiPageConversationDao()?.getConversationsByPage(path, pageIndex)
-                ?: emptyList()
+            val list = database.aiPageConversationDao().getConversationsByPage(path, pageIndex)
             _conversations.value = list
             println("AIViewModel.loadConversations: path=$path, page=$pageIndex, count=${list.size}")
         }
@@ -150,7 +154,7 @@ class AIViewModel : ViewModel() {
                 answer = answer,
                 pageContent = pageContent
             )
-            database?.aiPageConversationDao()?.insertConversation(conversation)
+            database.aiPageConversationDao().insertConversation(conversation)
             println("AIViewModel.saveConversation: $conversation")
 
             // 重新加载对话列表
@@ -163,7 +167,7 @@ class AIViewModel : ViewModel() {
      */
     fun deleteConversation(conversation: AIPageConversation) {
         viewModelScope.launch {
-            database?.aiPageConversationDao()?.deleteConversation(conversation)
+            database.aiPageConversationDao().deleteConversation(conversation)
             println("AIViewModel.deleteConversation: $conversation")
 
             // 重新加载对话列表
@@ -246,8 +250,8 @@ class AIViewModel : ViewModel() {
      */
     fun loadAllConversations(documentPath: String) {
         viewModelScope.launch {
-            val allConversations = database?.aiPageConversationDao()
-                ?.getConversationsByDocument(documentPath) ?: emptyList()
+            val allConversations = database.aiPageConversationDao()
+                .getConversationsByDocument(documentPath)
             _conversations.value = allConversations
         }
     }

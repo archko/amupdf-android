@@ -473,7 +473,6 @@ public class Page {
         canvas.drawLine(startX, startY, endX, endY, linePaint);
     }
 
-    // 文本选择相关方法 - 由DocumentView通过DecodeService处理
     public void setSelectionRects(List<RectF> rects) {
         if (selectionRects == null) {
             selectionRects = new ArrayList<>();

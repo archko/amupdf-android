@@ -210,7 +210,11 @@
     <string name="blue_label">Blue (B):</string>
     <string name="cancel_button">Cancel</string>
     <string name="ok_button">OK</string>
-    
+
+    <string name="color_filter_title">Custom background color filter</string>
+    <string name="color_filter_reset">Reset</string>
+    <string name="color_filter_filter_error">矩阵值无效</string>
+
     <!-- Outline Tab Strings -->
     <string name="document_outline">Document Outline</string>
     <string name="outline_empty">No outline</string>

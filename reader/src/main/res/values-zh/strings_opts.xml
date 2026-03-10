@@ -160,6 +160,17 @@
     <string name="blue_label">蓝色 (B):</string>
     <string name="cancel_button">取消</string>
     <string name="ok_button">确定</string>
+
+    <string name="color_filter_title">自定义颜色矩阵</string>
+    <string name="color_filter_reset">重置</string>
+    <string name="color_filter_filter_error">矩阵值无效</string>
+
+    <string name="document_outline">大纲</string>
+    <string name="outline_empty">没有大纲</string>
+    <string name="annotation_empty">没有批注</string>
+    <string name="bookmark_empty">没有书签</string>
+    <string name="page_label">%d页</string>
+    <string name="annotations_count">批注数:%d</string>
     
     <!-- Draw Config Dialog Strings -->
     <string name="draw_config_title">绘图设置</string>

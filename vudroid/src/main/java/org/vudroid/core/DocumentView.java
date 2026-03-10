@@ -2,11 +2,13 @@ package org.vudroid.core;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.Log;
@@ -68,8 +70,8 @@ public class DocumentView extends View implements ZoomListener {
     // 绘制模式相关状态
     private boolean isDrawing = false;
     private Page drawingPage = null;
-    private List<android.graphics.PointF> drawingPoints = new ArrayList<>();
-    private android.graphics.Paint drawingPaint;
+    private List<PointF> drawingPoints = new ArrayList<>();
+    private Paint drawingPaint;
 
     private final GestureDetector mGestureDetector;
     boolean crop = false;
@@ -149,10 +151,10 @@ public class DocumentView extends View implements ZoomListener {
 
     private void initDrawingPaint() {
         if (drawingPaint == null) {
-            drawingPaint = new android.graphics.Paint();
-            drawingPaint.setColor(android.graphics.Color.RED);
+            drawingPaint = new Paint();
+            drawingPaint.setColor(Color.RED);
             drawingPaint.setStrokeWidth(4f);
-            drawingPaint.setStyle(android.graphics.Paint.Style.STROKE);
+            drawingPaint.setStyle(Paint.Style.STROKE);
             drawingPaint.setAntiAlias(true);
         }
     }
@@ -799,7 +801,7 @@ public class DocumentView extends View implements ZoomListener {
             // 使用Page的screenToPagePoint方法获取页面原始坐标
             float screenX = e.getX() + getScrollX();
             float screenY = e.getY() + getScrollY();
-            android.graphics.PointF pagePoint = page.screenToPagePoint(screenX, screenY);
+            PointF pagePoint = page.screenToPagePoint(screenX, screenY);
             float x = Math.abs(pagePoint.x);
             float y = Math.abs(pagePoint.y);
 
@@ -1022,7 +1024,7 @@ public class DocumentView extends View implements ZoomListener {
             // 注意：需要将屏幕坐标转换为相对于文档内容的坐标
             float screenX = x + getScrollX();
             float screenY = y + getScrollY();
-            android.graphics.PointF pagePoint = page.screenToPagePoint(screenX, screenY);
+            PointF pagePoint = page.screenToPagePoint(screenX, screenY);
             pageSelectionStartX = pagePoint.x;
             pageSelectionStartY = pagePoint.y;
             pageSelectionEndX = pageSelectionStartX;
@@ -1041,14 +1043,12 @@ public class DocumentView extends View implements ZoomListener {
             selectionEndX = x;
             selectionEndY = y;
 
-            // 使用Page的screenToPagePoint方法获取页面原始坐标
             float screenX = x + getScrollX();
             float screenY = y + getScrollY();
-            android.graphics.PointF pagePoint = selectedPage.screenToPagePoint(screenX, screenY);
+            PointF pagePoint = selectedPage.screenToPagePoint(screenX, screenY);
             pageSelectionEndX = pagePoint.x;
             pageSelectionEndY = pagePoint.y;
 
-            // 通过DecodeService获取高亮区域
             if (decodeService != null) {
                 List<RectF> selectionRects = decodeService.getTextSelectionRects(
                         selectedPage.index,
@@ -1067,8 +1067,8 @@ public class DocumentView extends View implements ZoomListener {
                 }
             }
 
-            Log.d(TAG, String.format("更新选择: 页面%d, 屏幕坐标(%.1f, %.1f), 页面原始坐标(%.1f, %.1f)",
-                    selectedPage.index, x, y, pageSelectionEndX, pageSelectionEndY));
+            //Log.d(TAG, String.format("更新选择: 页面%d, 屏幕坐标(%.1f, %.1f), 页面原始坐标(%.1f, %.1f)",
+            //        selectedPage.index, x, y, pageSelectionEndX, pageSelectionEndY));
 
             invalidate();
             return true;
@@ -1078,7 +1078,6 @@ public class DocumentView extends View implements ZoomListener {
 
     private boolean handleSelectionUp() {
         if (isSelecting && selectedPage != null) {
-            // 通过DecodeService获取选中的文本
             String selectedText = null;
             if (decodeService != null) {
                 selectedText = decodeService.getSelectedText(
@@ -1109,11 +1108,10 @@ public class DocumentView extends View implements ZoomListener {
             drawingPage = page;
             drawingPoints.clear();
 
-            // 使用Page的screenToPageRelativePoint方法获取页面相对坐标 (0-1)
             float screenX = x + getScrollX();
             float screenY = y + getScrollY();
-            android.graphics.PointF relativePoint = page.screenToPageRelativePoint(screenX, screenY);
-            android.graphics.PointF point = new android.graphics.PointF(relativePoint.x, relativePoint.y);
+            PointF relativePoint = page.screenToPageRelativePoint(screenX, screenY);
+            PointF point = new PointF(relativePoint.x, relativePoint.y);
             drawingPoints.add(point);
 
             Log.d(TAG, String.format("开始绘制: 页面%d, 相对坐标(%.3f, %.3f)", page.index, relativePoint.x, relativePoint.y));
@@ -1129,8 +1127,8 @@ public class DocumentView extends View implements ZoomListener {
             // 使用Page的screenToPageRelativePoint方法获取页面相对坐标 (0-1)
             float screenX = x + getScrollX();
             float screenY = y + getScrollY();
-            android.graphics.PointF relativePoint = drawingPage.screenToPageRelativePoint(screenX, screenY);
-            android.graphics.PointF point = new android.graphics.PointF(relativePoint.x, relativePoint.y);
+            PointF relativePoint = drawingPage.screenToPageRelativePoint(screenX, screenY);
+            PointF point = new PointF(relativePoint.x, relativePoint.y);
             drawingPoints.add(point);
 
             Log.d(TAG, String.format("继续绘制: 页面%d, 点%d, 相对坐标(%.3f, %.3f)",
@@ -1169,7 +1167,6 @@ public class DocumentView extends View implements ZoomListener {
 
     // 绘制选择区域和绘制路径
     private void drawSelectionAndDrawing(Canvas canvas) {
-        // 绘制选择区域
         if (isSelecting && selectedPage != null) {
             drawSelectionRect(canvas);
         }
@@ -1184,7 +1181,7 @@ public class DocumentView extends View implements ZoomListener {
 
     private void drawSelectionRect(Canvas canvas) {
         Paint paint = new Paint();
-        paint.setColor(android.graphics.Color.argb(100, 0, 120, 215)); // 半透明蓝色
+        paint.setColor(Color.argb(100, 0, 120, 215)); // 半透明蓝色
         paint.setStyle(Paint.Style.FILL);
 
         float left = Math.min(selectionStartX, selectionEndX);
@@ -1195,7 +1192,7 @@ public class DocumentView extends View implements ZoomListener {
         canvas.drawRect(left, top, right, bottom, paint);
 
         // 绘制边框
-        paint.setColor(android.graphics.Color.rgb(0, 120, 215));
+        paint.setColor(Color.rgb(0, 120, 215));
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(2f);
         canvas.drawRect(left, top, right, bottom, paint);

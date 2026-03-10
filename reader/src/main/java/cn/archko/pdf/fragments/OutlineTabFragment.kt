@@ -55,6 +55,11 @@ class OutlineTabFragment : DialogFragment() {
         setStyle(STYLE_NORMAL, themeId)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        // 不保存状态，避免ViewPager2恢复Fragment时崩溃
+        // super.onSaveInstanceState(outState)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -84,7 +89,7 @@ class OutlineTabFragment : DialogFragment() {
         }
 
         pagerAdapter = OutlinePagerAdapter(
-            requireActivity(),
+            this,
             bookmarkViewModel!!,
             annotationManager,
             outlineItems,

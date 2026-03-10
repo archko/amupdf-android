@@ -13,7 +13,6 @@ import cn.archko.pdf.R
 import cn.archko.pdf.base.BaseFragment
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.fragments.OutlineTabFragment.Companion.ARG_CURRENT_PAGE
-import cn.archko.pdf.listeners.OutlineListener
 import org.vudroid.core.codec.OutlineLink
 
 /**
@@ -35,12 +34,21 @@ open class OutlineFragment : BaseFragment() {
             val fragment = OutlineFragment()
             arguments?.run {
                 fragment.outlineItems = outlineItems
+                updateArgs(fragment, arguments)
+            }
+            return fragment
+        }
+
+        fun updateArgs(
+            fragment: OutlineFragment,
+            arguments: Bundle?
+        ) {
+            arguments?.run {
                 fragment.currentPage = arguments.getInt(ARG_CURRENT_PAGE)
                 if (fragment.currentPage > 0) {
                     fragment.pendingPos = fragment.currentPage
                 }
             }
-            return fragment
         }
     }
 

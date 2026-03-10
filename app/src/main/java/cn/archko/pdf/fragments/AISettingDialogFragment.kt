@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
@@ -16,6 +15,7 @@ import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.DialogAiSettingBinding
 import cn.archko.pdf.core.entity.AIProvider
 import cn.archko.pdf.viewmodel.AIViewModel
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textfield.TextInputEditText
 
 /**
@@ -46,6 +46,8 @@ class AISettingDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(requireActivity()).get(AIViewModel::class.java)
+
+        binding.toolbar.setNavigationOnClickListener { dismiss() }
 
         adapter = AIProviderAdapter(
             onEditClick = { provider ->
@@ -86,14 +88,13 @@ class AISettingDialogFragment : DialogFragment() {
     private fun showEditDialog(provider: AIProvider) {
         val dialogView =
             LayoutInflater.from(requireContext()).inflate(R.layout.dialog_ai_provider_edit, null)
-        val tvTitle = dialogView.findViewById<TextView>(R.id.tvDialogTitle)
+        val toolbar = dialogView.findViewById<MaterialToolbar>(R.id.toolbar)
         val etApiKey = dialogView.findViewById<TextInputEditText>(R.id.etApiKey)
         val etBaseUrl = dialogView.findViewById<TextInputEditText>(R.id.etBaseUrl)
         val etModel = dialogView.findViewById<TextInputEditText>(R.id.etModel)
         val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
         val btnSave = dialogView.findViewById<Button>(R.id.btnSave)
 
-        tvTitle.text = "编辑 ${provider.name}"
         etApiKey.setText(provider.apiKey)
         etBaseUrl.setText(provider.baseUrl)
         etModel.setText(provider.model)
@@ -101,6 +102,9 @@ class AISettingDialogFragment : DialogFragment() {
         val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .create()
+
+        toolbar.setTitle(provider.name)
+        toolbar.setNavigationOnClickListener { dialog.dismiss() }
 
         btnCancel.setOnClickListener { dialog.dismiss() }
         btnSave.setOnClickListener {

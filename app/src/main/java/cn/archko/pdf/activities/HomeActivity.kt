@@ -17,10 +17,6 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
 import android.util.SparseArray
-import android.view.MenuItem
-import android.view.View
-import android.widget.ImageButton
-import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.app.ActivityCompat
@@ -39,11 +35,11 @@ import cn.archko.pdf.fragments.ConvertToEpubFragment
 import cn.archko.pdf.fragments.EncryptOrDecryptFragment
 import cn.archko.pdf.fragments.FavoriteFragment
 import cn.archko.pdf.fragments.HistoryFragment
+import cn.archko.pdf.fragments.MergePdfFragment
+import cn.archko.pdf.fragments.MineFragment
 import cn.archko.pdf.fragments.PdfCreationFragment
 import cn.archko.pdf.fragments.PdfOperationFragment
-import cn.archko.pdf.fragments.MineFragment
 import cn.archko.pdf.fragments.SplitPdfFragment
-import cn.archko.pdf.fragments.MergePdfFragment
 import cn.archko.pdf.imagedroid.AlbumViewerActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -344,6 +340,10 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
 
         init {
             mContext = activity
+        }
+
+        override fun getItemId(position: Int): Long {
+            return position.toLong()
         }
 
         override fun getItemCount(): Int {

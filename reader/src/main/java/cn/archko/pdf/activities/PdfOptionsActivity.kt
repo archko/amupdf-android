@@ -18,6 +18,7 @@ import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -534,12 +535,6 @@ class PdfOptionsActivity : FragmentActivity() {
 
                     PdfOptionRepository.setCustomColorMatrix(matrix)
 
-                    android.widget.Toast.makeText(
-                        context,
-                        "自定义矩阵已保存",
-                        android.widget.Toast.LENGTH_SHORT
-                    ).show()
-
                     // 更新预览颜色
                     selectedIndex = labels.size - 1
                     notifyDataSetChanged()
@@ -548,10 +543,10 @@ class PdfOptionsActivity : FragmentActivity() {
                     dialog.dismiss()
                     this@ColorModeAdapter.dialog?.dismiss()
                 } catch (e: Exception) {
-                    android.widget.Toast.makeText(
+                    Toast.makeText(
                         context,
-                        "矩阵值无效",
-                        android.widget.Toast.LENGTH_SHORT
+                        R.string.color_filter_filter_error,
+                        Toast.LENGTH_SHORT
                     ).show()
                 }
             }
@@ -581,6 +576,7 @@ class PdfOptionsActivity : FragmentActivity() {
                             baseColor
                         }
                     }
+
                     else -> baseColor
                 }
             }
