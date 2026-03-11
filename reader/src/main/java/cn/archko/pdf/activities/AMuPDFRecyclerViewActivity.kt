@@ -800,7 +800,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             outlineLinks,
             mPath ?: "",
             onItemClick = { page ->
-                updateProgress(page)
+                onSelectedOutline(page)
             },
         )
     }
