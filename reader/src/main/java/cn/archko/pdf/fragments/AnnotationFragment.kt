@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.common.AnnotationManager
+import cn.archko.pdf.core.widgets.ColorItemDecoration
 import cn.archko.pdf.entity.AnnotationPath
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -53,6 +54,7 @@ class AnnotationFragment(private val annotationManager: AnnotationManager?) : Fr
         emptyView = view.findViewById(R.id.tv_empty)
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.addItemDecoration(ColorItemDecoration(requireContext()))
         adapter = AnnotationAdapter(requireContext(), emptyList()) { pageIndex ->
             parentFragment?.let {
                 if (it is OutlineTabFragment) {

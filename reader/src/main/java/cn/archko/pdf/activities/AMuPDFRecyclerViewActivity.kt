@@ -799,9 +799,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             getCurrentPos(),
             outlineLinks,
             mPath ?: "",
-            null,
-            null,
-            null
+            onItemClick = { page ->
+                updateProgress(page)
+            },
         )
     }
 

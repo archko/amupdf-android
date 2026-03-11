@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.widget.ViewPager2
@@ -28,16 +27,13 @@ class OutlineTabFragment : DialogFragment() {
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager2
     private lateinit var pagerAdapter: OutlinePagerAdapter
-    private lateinit var tvTitle: TextView
 
     private var bookmarkViewModel: BookmarkViewModel? = null
     private var annotationManager: AnnotationManager? = null
     private var outlineItems: List<OutlineLink>? = null
 
     // 回调接口
-    var onAnnotationClick: ((Int) -> Unit)? = null
-    var onBookmarkClick: ((ABookmark) -> Unit)? = null
-    var onEditBookmark: ((ABookmark) -> Unit)? = null
+    var onItemClick: ((Int) -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,7 +60,6 @@ class OutlineTabFragment : DialogFragment() {
         val view = inflater.inflate(R.layout.fragment_outline_tabs, container, false)
 
         val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
-        tvTitle = view.findViewById(R.id.tv_title)
         tabLayout = view.findViewById(R.id.tab_layout)
         viewPager = view.findViewById(R.id.view_pager)
 
@@ -93,19 +88,14 @@ class OutlineTabFragment : DialogFragment() {
 
     // 新增：批注点击回调
     fun onAnnotationClick(pageIndex: Int) {
-        onAnnotationClick?.invoke(pageIndex)
+        onItemClick?.invoke(pageIndex)
         dismiss()
     }
 
     // 新增：书签点击回调
     fun onBookmarkClick(bookmark: ABookmark) {
-        onBookmarkClick?.invoke(bookmark)
+        onItemClick?.invoke(bookmark.pageIndex)
         dismiss()
-    }
-
-    // 新增：编辑书签回调
-    fun onEditBookmark(bookmark: ABookmark) {
-        onEditBookmark?.invoke(bookmark)
     }
 
     companion object {
@@ -133,9 +123,7 @@ class OutlineTabFragment : DialogFragment() {
             currentPage: Int,
             outlineItems: List<OutlineLink>?,
             path: String,
-            onAnnotationClick: ((Int) -> Unit)? = null,
-            onBookmarkClick: ((ABookmark) -> Unit)? = null,
-            onEditBookmark: ((ABookmark) -> Unit)? = null
+            onItemClick: ((Int) -> Unit)? = null,
         ) {
             val fragmentManager = activity.supportFragmentManager
 
@@ -154,9 +142,7 @@ class OutlineTabFragment : DialogFragment() {
             newDialog.outlineItems = outlineItems
             newDialog.arguments = args
 
-            newDialog.onAnnotationClick = onAnnotationClick
-            newDialog.onBookmarkClick = onBookmarkClick
-            newDialog.onEditBookmark = onEditBookmark
+            newDialog.onItemClick = onItemClick
 
             newDialog.show(fragmentManager, TAG)
         }

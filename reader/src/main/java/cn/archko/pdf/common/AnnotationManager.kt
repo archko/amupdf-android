@@ -1,11 +1,11 @@
 package cn.archko.pdf.common
 
+import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.entity.AnnotationPath
-import cn.archko.pdf.entity.DrawType
-import cn.archko.pdf.entity.PathConfig
-import cn.archko.pdf.entity.Offset
 import cn.archko.pdf.entity.Color
-import cn.archko.pdf.core.utils.FileUtils;
+import cn.archko.pdf.entity.DrawType
+import cn.archko.pdf.entity.Offset
+import cn.archko.pdf.entity.PathConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 
@@ -137,17 +136,17 @@ public class AnnotationManager(public val path: String) {
             val root = JSONObject()
             root.put("fileName", fileName)
             root.put("size", size)
-            
+
             val annoArray = JSONArray()
             annotations.forEach { (pageIndex, paths) ->
                 if (paths.isNotEmpty()) {
                     val pageObj = JSONObject()
                     pageObj.put("page", pageIndex)
-                    
+
                     val pathsArray = JSONArray()
                     paths.forEach { path ->
                         val pathObj = JSONObject()
-                        
+
                         val pointsArray = JSONArray()
                         path.points.forEach { offset ->
                             val pointObj = JSONObject()
@@ -156,13 +155,13 @@ public class AnnotationManager(public val path: String) {
                             pointsArray.put(pointObj)
                         }
                         pathObj.put("points", pointsArray)
-                        
+
                         val configObj = JSONObject()
                         configObj.put("c", path.config.color.value.toString(16))
                         configObj.put("s", path.config.strokeWidth)
                         configObj.put("d", path.config.drawType.name)
                         pathObj.put("config", configObj)
-                        
+
                         pathsArray.put(pathObj)
                     }
                     pageObj.put("paths", pathsArray)
@@ -170,7 +169,7 @@ public class AnnotationManager(public val path: String) {
                 }
             }
             root.put("anno", annoArray)
-            
+
             root.toString()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -233,14 +232,14 @@ public class AnnotationManager(public val path: String) {
                     val pageObj = annoArray.optJSONObject(i) ?: continue
                     val pageIndex = pageObj.optInt("page", -1)
                     if (pageIndex == -1) continue
-                    
+
                     val pathsArray = pageObj.optJSONArray("paths")
                     if (pathsArray != null) {
                         for (j in 0 until pathsArray.length()) {
                             val pathObj = pathsArray.optJSONObject(j) ?: continue
                             val pointsArray = pathObj.optJSONArray("points")
                             val configObj = pathObj.optJSONObject("config")
-                            
+
                             if (pointsArray != null && configObj != null) {
                                 val points = mutableListOf<Offset>()
                                 for (k in 0 until pointsArray.length()) {
@@ -249,7 +248,7 @@ public class AnnotationManager(public val path: String) {
                                     val y = pointObj.optDouble("y").toFloat()
                                     points.add(Offset(x, y))
                                 }
-                                
+
                                 val colorStr = configObj.optString("c")
                                 val colorValue = colorStr.toULongOrNull(16)
                                 val color = colorValue?.let { Color(it.toLong()) } ?: Color.Red
@@ -260,13 +259,13 @@ public class AnnotationManager(public val path: String) {
                                 } catch (e: IllegalArgumentException) {
                                     DrawType.CURVE
                                 }
-                                
+
                                 val config = PathConfig(
                                     color = color,
                                     strokeWidth = strokeWidth,
                                     drawType = drawType
                                 )
-                                
+
                                 val annotationPath = AnnotationPath(points, config)
                                 annotations.getOrPut(pageIndex) { mutableListOf() }
                                     .add(annotationPath)
@@ -283,7 +282,8 @@ public class AnnotationManager(public val path: String) {
     private fun getAnnotationCacheFile(): File {
         val file = File(path)
         val fileName = file.nameWithoutExtension
-        return File(FileUtils.getStorageDir("anno"), "$fileName.json")
+        val dir = FileUtils.getStorageDir("amupdf")
+        return File(dir, "anno/$fileName.json")
     }
 
     private fun updateAnnotationsFlow() {

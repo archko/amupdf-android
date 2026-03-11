@@ -4,40 +4,39 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_list_item"
-    android:orientation="vertical"
-    android:padding="12dp">
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tv_page"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tv_page"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tv_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:textColor="@color/white"
-            android:textSize="14sp" />
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tv_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:textColor="@color/white"
+        android:textSize="14sp" />
 
-        <ImageButton
-            android:id="@+id/btn_delete"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignParentEnd="true"
-            android:layout_toStartOf="@id/tv_count"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="删除批注"
-            android:src="@drawable/ic_delete"
-            app:tint="@color/white" />
-
-    </RelativeLayout>
+    <ImageButton
+        android:id="@+id/btn_delete"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription=""
+        android:src="@drawable/ic_delete"
+        app:tint="@color/white" />
 
 </LinearLayout>
