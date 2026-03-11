@@ -57,7 +57,8 @@ class OutlinePagerAdapter(
             }
 
             TAB_BOOKMARK -> {
-                BookmarkFragment.newInstance(bookmarkViewModel)
+                val path = arguments?.getString(OutlineTabFragment.ARG_PATH) ?: ""
+                BookmarkFragment.newInstance(bookmarkViewModel, path)
             }
 
             else -> throw IllegalArgumentException("Invalid tab position: $position")

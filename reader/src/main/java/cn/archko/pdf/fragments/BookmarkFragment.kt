@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.core.entity.ABookmark
+import cn.archko.pdf.core.widgets.ColorItemDecoration
 import cn.archko.pdf.viewmodel.BookmarkViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,10 +32,13 @@ class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) : Fragm
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
     private var bookmarksJob: Job? = null
+    private var path: String? = null
 
     companion object {
-        fun newInstance(bookmarkViewModel: BookmarkViewModel): BookmarkFragment {
+
+        fun newInstance(bookmarkViewModel: BookmarkViewModel, path: String): BookmarkFragment {
             return BookmarkFragment(bookmarkViewModel).apply {
+                this.path = path
             }
         }
     }
@@ -50,6 +54,9 @@ class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) : Fragm
         emptyView = view.findViewById(R.id.tv_empty)
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        val itemDecoration = ColorItemDecoration(requireContext())
+        itemDecoration.setColor(resources.getColor(cn.archko.pdf.common.R.color.extract_dialog_bg))
+        recyclerView.addItemDecoration(itemDecoration)
         adapter = BookmarkAdapter(
             requireContext(), emptyList(),
             onItemClick = { bookmark ->
@@ -60,6 +67,7 @@ class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) : Fragm
                 }
             },
             onEditClick = { bookmark ->
+                showEditDialog(bookmark)
             },
             onDeleteClick = { bookmark ->
                 bookmarkViewModel.deleteBookmark(bookmark)
@@ -68,6 +76,16 @@ class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) : Fragm
         recyclerView.adapter = adapter
 
         return view
+    }
+
+    private fun showEditDialog(bookmark: ABookmark) {
+        val dialog = BookmarkEditDialog.showDialog(
+            pageIndex = bookmark.pageIndex,
+            path = bookmark.path,
+            bookmarkViewModel = bookmarkViewModel,
+            existingBookmark = bookmark
+        )
+        dialog.show(childFragmentManager, "BookmarkEditDialog")
     }
 
     override fun onResume() {
@@ -116,7 +134,6 @@ class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) : Fragm
         private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
         class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val tvPage: android.widget.TextView = view.findViewById(R.id.tv_page)
             val tvTitle: android.widget.TextView = view.findViewById(R.id.tv_title)
             val tvTime: android.widget.TextView = view.findViewById(R.id.tv_time)
             val tvNote: android.widget.TextView = view.findViewById(R.id.tv_note)
@@ -133,23 +150,14 @@ class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) : Fragm
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = items[position]
 
-            holder.tvPage.text = context.getString(R.string.page_label, item.pageIndex + 1)
-
-            if (!item.title.isNullOrBlank()) {
-                holder.tvTitle.text = item.title
-                holder.tvTitle.visibility = View.VISIBLE
-            } else {
-                holder.tvTitle.visibility = View.GONE
-            }
+            holder.tvTitle.text = String.format(
+                "%s - %s",
+                context.getString(R.string.page_label, item.pageIndex + 1),
+                item.title
+            )
 
             holder.tvTime.text = dateFormat.format(Date(item.createAt))
-
-            if (!item.note.isNullOrBlank()) {
-                holder.tvNote.text = item.note
-                holder.tvNote.visibility = View.VISIBLE
-            } else {
-                holder.tvNote.visibility = View.GONE
-            }
+            holder.tvNote.text = item.note
 
             holder.itemView.setOnClickListener {
                 onItemClick(item)

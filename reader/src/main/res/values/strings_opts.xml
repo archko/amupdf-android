@@ -233,4 +233,7 @@
     <string name="curve_type">Curve</string>
     <string name="confirm_button">OK</string>
 
+    <!-- Bookmark -->
+    <string name="bookmark_dialog_title">Bookmark Settings</string>
+
 </resources>

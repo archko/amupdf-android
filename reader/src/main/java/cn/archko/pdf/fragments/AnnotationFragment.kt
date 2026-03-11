@@ -57,7 +57,9 @@ class AnnotationFragment(private val annotationManager: AnnotationManager?) : Fr
         emptyView = view.findViewById(R.id.tv_empty)
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.addItemDecoration(ColorItemDecoration(requireContext()))
+        val itemDecoration = ColorItemDecoration(requireContext())
+        itemDecoration.setColor(resources.getColor(cn.archko.pdf.common.R.color.extract_dialog_bg))
+        recyclerView.addItemDecoration(itemDecoration)
         adapter = AnnotationAdapter(requireContext(), emptyList()) { pageIndex ->
             parentFragment?.let {
                 if (it is OutlineTabFragment) {

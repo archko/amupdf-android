@@ -54,6 +54,7 @@ import cn.archko.pdf.core.entity.BookProgress
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.fragments.BookmarkEditDialog
 import cn.archko.pdf.fragments.OutlineTabFragment
 import cn.archko.pdf.fragments.SleepTimerDialog
 import cn.archko.pdf.fragments.TtsTextFragment
@@ -239,7 +240,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private fun loadBook() {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                mPath!!.run { docViewModel.loadBookProgressByPath(this) }
+                mPath!!.run {
+                    docViewModel.loadBookProgressByPath(this)
+                    bookmarkViewModel.loadBookmarks(this)
+                }
             }
         }
     }
@@ -646,7 +650,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
 
         override fun bookmark() {
-            this@AMuPDFRecyclerViewActivity.bookmark()
+            this@AMuPDFRecyclerViewActivity.editBookmark()
         }
 
         override fun ocr() {
@@ -825,8 +829,21 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     }
 
-    private fun bookmark() {
+    private fun editBookmark() {
+        lifecycleScope.launch {
+            val pageIndex = getCurrentPos()
+            val existingBookmark = withContext(Dispatchers.IO) {
+                bookmarkViewModel.getBookmarkAtPage(mPath ?: "", pageIndex)
+            }
 
+            val dialog = BookmarkEditDialog.showDialog(
+                pageIndex = pageIndex,
+                path = mPath ?: "",
+                bookmarkViewModel = bookmarkViewModel,
+                existingBookmark = existingBookmark
+            )
+            dialog.show(supportFragmentManager, "BookmarkEditDialog")
+        }
     }
 
     private fun getCurrentPos(): Int {

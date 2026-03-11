@@ -182,4 +182,7 @@
     <string name="curve_type">曲线</string>
     <string name="confirm_button">确定</string>
 
+    <!-- Bookmark -->
+    <string name="bookmark_dialog_title">书签</string>
+
 </resources>
