@@ -178,7 +178,7 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         }
     }
 
-    public void updateOraw() {
+    public void updateDraw() {
         if (draw) {
             penButton.setColorFilter(Color.argb(0xFF, 0, 255, 0));
         } else {
@@ -237,10 +237,18 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         } else if (R.id.selectButton == id) {
             selection = !selection;
             updateSelection();
+            if (selection){
+                draw=false;
+                updateDraw();;
+            }
             controllerListener.setSelection(selection);
         } else if (R.id.penButton == id) {
             draw = !draw;
-            updateOraw();
+            updateDraw();
+            if (draw) {
+                selection = false;
+                updateSelection();
+            }
             controllerListener.setDraw(draw);
         } else if (R.id.aiButton == id) {
             controllerListener.ai();

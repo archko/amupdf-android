@@ -114,7 +114,7 @@ public class DocumentView extends View implements ZoomListener {
     public void setSelection(boolean selection) {
         if (this.selection != selection) {
             this.selection = selection;
-            this.draw = false; // 只能有一个模式激活
+            this.draw = false;
             resetGestureState();
             invalidate();
             Log.d(TAG, "设置选择模式: " + selection);
@@ -124,7 +124,7 @@ public class DocumentView extends View implements ZoomListener {
     public void setDraw(boolean draw) {
         if (this.draw != draw) {
             this.draw = draw;
-            this.selection = false; // 只能有一个模式激活
+            this.selection = false;
             resetGestureState();
             initDrawingPaint();
             invalidate();
