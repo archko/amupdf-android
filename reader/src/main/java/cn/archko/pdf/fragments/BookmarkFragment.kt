@@ -53,7 +53,6 @@ class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) : Fragm
         adapter = BookmarkAdapter(
             requireContext(), emptyList(),
             onItemClick = { bookmark ->
-                // 点击书签项，跳转到对应页面
                 parentFragment?.let {
                     if (it is OutlineTabFragment) {
                         it.onBookmarkClick(bookmark)
@@ -61,11 +60,6 @@ class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) : Fragm
                 }
             },
             onEditClick = { bookmark ->
-                parentFragment?.let {
-                    if (it is OutlineTabFragment) {
-                        it.onEditBookmark(bookmark)
-                    }
-                }
             },
             onDeleteClick = { bookmark ->
                 bookmarkViewModel.deleteBookmark(bookmark)

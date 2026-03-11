@@ -1,9 +1,12 @@
 package cn.archko.pdf.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -113,16 +116,16 @@ class AnnotationFragment(private val annotationManager: AnnotationManager?) : Fr
         val paths: List<AnnotationPath>
     )
 
-    class AnnotationAdapter(
-        private val context: android.content.Context,
+    inner class AnnotationAdapter(
+        private val context: Context,
         private var items: List<AnnotationItem>,
         private val onItemClick: (Int) -> Unit
     ) : RecyclerView.Adapter<AnnotationAdapter.ViewHolder>() {
 
-        class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val tvPage: android.widget.TextView = view.findViewById(R.id.tv_page)
-            val tvCount: android.widget.TextView = view.findViewById(R.id.tv_count)
-            val btnDelete: android.widget.ImageButton = view.findViewById(R.id.btn_delete)
+        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val tvPage: TextView = view.findViewById(R.id.tv_page)
+            val tvCount: TextView = view.findViewById(R.id.tv_count)
+            val btnDelete: ImageButton = view.findViewById(R.id.btn_delete)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -141,8 +144,7 @@ class AnnotationFragment(private val annotationManager: AnnotationManager?) : Fr
             }
 
             holder.btnDelete.setOnClickListener {
-                // 删除该页面的所有批注
-                // 这里需要访问AnnotationManager，可以通过其他方式传递
+                annotationManager?.deletePaths(position)
             }
         }
 
