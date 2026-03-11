@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -23,6 +24,7 @@ import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.utils.FetcherUtils
 import com.artifex.mupdf.fitz.Document
+import com.google.android.material.appbar.MaterialToolbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -41,8 +43,9 @@ class FileInfoFragment : DialogFragment() {
     private lateinit var mFileSize: TextView
 
     private lateinit var mLastRead: TextView
+
     //private lateinit var mReadCount: TextView
-    private lateinit var mPageCount: TextView
+    //private lateinit var mPageCount: TextView
     private lateinit var mProgressBar: ProgressBar
     private lateinit var mIcon: ImageView
     var bookProgress: BookProgress? = null
@@ -67,7 +70,7 @@ class FileInfoFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val themeId = android.R.style.Theme_Material_Light_Dialog
+        val themeId = cn.archko.pdf.R.style.AppTheme
         setStyle(STYLE_NORMAL, themeId)
     }
 
@@ -94,14 +97,28 @@ class FileInfoFragment : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        dialog?.apply {
+            val lp: WindowManager.LayoutParams = window!!.attributes
+            lp.dimAmount = 0f
+            setCanceledOnTouchOutside(true)
+            setCancelable(true)
+            // 设置宽度为屏幕宽度的 85%
+            val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
+            window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+        }
+
         val view = inflater.inflate(R.layout.detail_book_info, container, false)
+
+        val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
+        toolbar.setNavigationOnClickListener({ dismiss() })
+
         mLocation = view.findViewById(R.id.location)
         mFileName = view.findViewById(R.id.fileName)
         mFileSize = view.findViewById(R.id.fileSize)
         mLastRead = view.findViewById(R.id.lastRead)
         //mReadCount = view.findViewById(R.id.readCount)
         mProgressBar = view.findViewById(R.id.progressbar)
-        mPageCount = view.findViewById(R.id.pageCount)
+        //mPageCount = view.findViewById(R.id.pageCount)
         mIcon = view.findViewById(R.id.icon)
 
         // 初始化阅读统计视图
@@ -170,7 +187,7 @@ class FileInfoFragment : DialogFragment() {
     }
 
     private fun updatePageCount() {
-        mPageCount.text = String.format("%s/%s", bookProgress!!.page, bookProgress!!.pageCount)
+        //mPageCount.text = String.format("%s/%s", bookProgress!!.page, bookProgress!!.pageCount)
     }
 
     private fun loadBook() {
@@ -302,24 +319,29 @@ class FileInfoFragment : DialogFragment() {
         const val TAG = "FileInfoFragment"
         const val FILE_LIST_ENTRY = "FILE_LIST_ENTRY"
 
+        fun newInstance(entry: FileBean): FileInfoFragment {
+            val fragment = FileInfoFragment()
+            val args = Bundle()
+            args.putSerializable(FILE_LIST_ENTRY, entry)
+            fragment.arguments = args
+            return fragment
+        }
+
         fun showInfoDialog(
-            activity: FragmentActivity?,
+            activity: FragmentActivity,
             entry: FileBean,
             dataListener: DataListener?
         ) {
-            val ft = activity?.supportFragmentManager?.beginTransaction()
-            val prev = activity?.supportFragmentManager?.findFragmentByTag("diaLog")
-            if (prev != null) {
-                ft?.remove(prev)
-            }
-            ft?.addToBackStack(null)
+            val fragmentManager = activity.supportFragmentManager
 
-            val fileInfoFragment = FileInfoFragment()
-            val bundle = Bundle()
-            bundle.putSerializable(FILE_LIST_ENTRY, entry)
-            fileInfoFragment.arguments = bundle
-            fileInfoFragment.setListener(dataListener)
-            fileInfoFragment.show(ft!!, "diaLog")
+            val existing = fragmentManager.findFragmentByTag("diaLog")
+            if (existing is FileInfoFragment && existing.isVisible) {
+                return
+            }
+
+            val newDialog = newInstance(entry)
+            newDialog.setListener(dataListener)
+            newDialog.show(fragmentManager, "diaLog")
         }
     }
 }

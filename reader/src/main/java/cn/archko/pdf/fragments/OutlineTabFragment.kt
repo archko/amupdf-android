@@ -1,13 +1,10 @@
 package cn.archko.pdf.fragments
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
@@ -15,9 +12,9 @@ import androidx.viewpager2.widget.ViewPager2
 import cn.archko.pdf.R
 import cn.archko.pdf.common.AnnotationManager
 import cn.archko.pdf.core.entity.ABookmark
-import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.BookmarkViewModel
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import org.vudroid.core.codec.OutlineLink
@@ -31,33 +28,21 @@ class OutlineTabFragment : DialogFragment() {
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager2
     private lateinit var pagerAdapter: OutlinePagerAdapter
-    private lateinit var btnBack: ImageButton
     private lateinit var tvTitle: TextView
 
     private var bookmarkViewModel: BookmarkViewModel? = null
     private var annotationManager: AnnotationManager? = null
-    private var outlineItems: List<OutlineLink>?=null
+    private var outlineItems: List<OutlineLink>? = null
 
     // 回调接口
     var onAnnotationClick: ((Int) -> Unit)? = null
     var onBookmarkClick: ((ABookmark) -> Unit)? = null
     var onEditBookmark: ((ABookmark) -> Unit)? = null
 
-    companion object {
-        const val ARG_OUTLINE = "outline"
-        const val ARG_CURRENT_PAGE = "current_page"
-        const val ARG_PATH = "path"
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val themeId = R.style.AppTheme
         setStyle(STYLE_NORMAL, themeId)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        // 不保存状态，避免ViewPager2恢复Fragment时崩溃
-        // super.onSaveInstanceState(outState)
     }
 
     override fun onCreateView(
@@ -66,27 +51,24 @@ class OutlineTabFragment : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         dialog?.apply {
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             val lp: WindowManager.LayoutParams = window!!.attributes
             lp.dimAmount = 0f
-            lp.height =
-                ((Utils.getScreenHeightPixelWithOrientation(requireActivity()) * 0.9f).toInt())
-            lp.width = (Utils.getScreenWidthPixelWithOrientation(requireActivity()) * 0.9f).toInt()
-            window!!.attributes = lp
             setCanceledOnTouchOutside(true)
             setCancelable(true)
+            // 设置宽度为屏幕宽度的 85%
+            val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
+            val height = (resources.displayMetrics.heightPixels * 0.85).toInt()
+            window?.setLayout(width, height)
         }
 
         val view = inflater.inflate(R.layout.fragment_outline_tabs, container, false)
 
-        btnBack = view.findViewById(R.id.btn_back)
+        val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
         tvTitle = view.findViewById(R.id.tv_title)
         tabLayout = view.findViewById(R.id.tab_layout)
         viewPager = view.findViewById(R.id.view_pager)
 
-        btnBack.setOnClickListener {
-            dismiss()
-        }
+        toolbar.setNavigationOnClickListener({ dismiss() })
 
         pagerAdapter = OutlinePagerAdapter(
             this,
@@ -105,8 +87,7 @@ class OutlineTabFragment : DialogFragment() {
     }
 
     fun onListItemClick(targetPage: Int) {
-        val ac = activity as OutlineListener
-        ac.onSelectedOutline(targetPage)
+        (activity as? OutlineListener)?.onSelectedOutline(targetPage)
         dismiss()
     }
 
@@ -127,37 +108,57 @@ class OutlineTabFragment : DialogFragment() {
         onEditBookmark?.invoke(bookmark)
     }
 
-    fun showDialog(
-        activity: FragmentActivity?,
-        bookmarkViewModel: BookmarkViewModel,
-        annotationManager: AnnotationManager?,
-        currentPage: Int,
-        outlineItems: List<OutlineLink>?,
-        path: String,
-        onAnnotationClick: ((Int) -> Unit)? = null,
-        onBookmarkClick: ((ABookmark) -> Unit)? = null,
-        onEditBookmark: ((ABookmark) -> Unit)? = null
-    ) {
-        val ft = activity?.supportFragmentManager?.beginTransaction()
-        val prev = activity?.supportFragmentManager?.findFragmentByTag("outline_tabs_dialog")
-        if (prev != null) {
-            ft?.remove(prev)
+    companion object {
+        const val TAG = "outline_tabs_dialog"
+        const val ARG_OUTLINE = "outline"
+        const val ARG_CURRENT_PAGE = "current_page"
+        const val ARG_PATH = "path"
+
+        /**
+         * 3. 标准工厂方法：每次显示都调用这个，返回全新实例
+         */
+        fun newInstance(currentPage: Int, path: String): OutlineTabFragment {
+            val fragment = OutlineTabFragment()
+            val args = Bundle()
+            args.putInt(ARG_CURRENT_PAGE, currentPage)
+            args.putString(ARG_PATH, path)
+            fragment.arguments = args
+            return fragment
         }
-        ft?.addToBackStack(null)
 
-        val args = Bundle().apply {
-            putInt(ARG_CURRENT_PAGE, currentPage)
-            putString(ARG_PATH, path)
+        fun showDialog(
+            activity: FragmentActivity,
+            bookmarkViewModel: BookmarkViewModel,
+            annotationManager: AnnotationManager?,
+            currentPage: Int,
+            outlineItems: List<OutlineLink>?,
+            path: String,
+            onAnnotationClick: ((Int) -> Unit)? = null,
+            onBookmarkClick: ((ABookmark) -> Unit)? = null,
+            onEditBookmark: ((ABookmark) -> Unit)? = null
+        ) {
+            val fragmentManager = activity.supportFragmentManager
+
+            val existing = fragmentManager.findFragmentByTag(TAG)
+            if (existing is OutlineTabFragment && existing.isVisible) {
+                return
+            }
+
+            val newDialog = newInstance(currentPage, path)
+            val args = Bundle().apply {
+                putInt(ARG_CURRENT_PAGE, currentPage)
+                putString(ARG_PATH, path)
+            }
+            newDialog.bookmarkViewModel = bookmarkViewModel
+            newDialog.annotationManager = annotationManager
+            newDialog.outlineItems = outlineItems
+            newDialog.arguments = args
+
+            newDialog.onAnnotationClick = onAnnotationClick
+            newDialog.onBookmarkClick = onBookmarkClick
+            newDialog.onEditBookmark = onEditBookmark
+
+            newDialog.show(fragmentManager, TAG)
         }
-        this.bookmarkViewModel = bookmarkViewModel
-        this.annotationManager = annotationManager
-        this.outlineItems = outlineItems
-        arguments = args
-
-        this.onAnnotationClick = onAnnotationClick
-        this.onBookmarkClick = onBookmarkClick
-        this.onEditBookmark = onEditBookmark
-
-        show(ft!!, "outline_tabs_dialog")
     }
 }

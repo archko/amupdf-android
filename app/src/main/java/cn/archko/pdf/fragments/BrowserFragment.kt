@@ -530,11 +530,12 @@ open class BrowserFragment : RefreshableFragment(), SwipeRefreshLayout.OnRefresh
     }
 
     private fun showFileInfoDiaLog(entry: FileBean) {
-        FileInfoFragment.showInfoDialog(activity, entry, object :
+        FileInfoFragment.showInfoDialog(requireActivity(), entry, object :
             DataListener {
             override fun onSuccess(vararg args: Any?) {
                 val fileEntry = args[0] as FileBean
-                recyclerView.let { prepareMenu(it, fileEntry) }
+                //prepareMenu(recyclerView, fileEntry)
+                PDFViewerHelper.openAMupdf(fileEntry.file!!, requireActivity())
             }
 
             override fun onFailed(vararg args: Any?) {

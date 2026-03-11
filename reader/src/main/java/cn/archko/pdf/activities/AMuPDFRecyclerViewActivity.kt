@@ -783,7 +783,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun showOutline() {
-        outlineTabFragment?.showDialog(
+        OutlineTabFragment.showDialog(
             this,
             bookmarkViewModel,
             annotationManager,
