@@ -237,9 +237,9 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         } else if (R.id.selectButton == id) {
             selection = !selection;
             updateSelection();
-            if (selection){
-                draw=false;
-                updateDraw();;
+            if (selection) {
+                draw = false;
+                updateDraw();
             }
             controllerListener.setSelection(selection);
         } else if (R.id.penButton == id) {
