@@ -187,6 +187,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
         clean()
 
+        loadBook()
         initView()
 
         createControls()
@@ -232,6 +233,14 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         if (!TextUtils.isEmpty(oldPath) && oldPath != mPath) {
             clearTtsDataCache()
             Logcat.d(TAG, "Cleared TTS cache due to document change")
+        }
+    }
+
+    private fun loadBook() {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                mPath!!.run { docViewModel.loadBookProgressByPath(this) }
+            }
         }
     }
 
