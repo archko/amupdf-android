@@ -71,4 +71,41 @@ public class AIProvider {
         this.createdAt = System.currentTimeMillis()
         this.updatedAt = System.currentTimeMillis()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as AIProvider
+
+        if (maxTokens != other.maxTokens) return false
+        if (temperature != other.temperature) return false
+        if (enabled != other.enabled) return false
+        if (isDefault != other.isDefault) return false
+        if (createdAt != other.createdAt) return false
+        if (updatedAt != other.updatedAt) return false
+        if (id != other.id) return false
+        if (name != other.name) return false
+        if (apiKey != other.apiKey) return false
+        if (baseUrl != other.baseUrl) return false
+        if (model != other.model) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = maxTokens
+        result = 31 * result + temperature.hashCode()
+        result = 31 * result + enabled.hashCode()
+        result = 31 * result + isDefault.hashCode()
+        result = 31 * result + createdAt.hashCode()
+        result = 31 * result + updatedAt.hashCode()
+        result = 31 * result + id.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + apiKey.hashCode()
+        result = 31 * result + baseUrl.hashCode()
+        result = 31 * result + model.hashCode()
+        return result
+    }
+
 }

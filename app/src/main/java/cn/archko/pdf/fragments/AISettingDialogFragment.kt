@@ -8,8 +8,10 @@ import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.DialogAiSettingBinding
@@ -17,6 +19,7 @@ import cn.archko.pdf.core.entity.AIProvider
 import cn.archko.pdf.viewmodel.AIViewModel
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.launch
 
 /**
  * AI 设置对话框
@@ -30,7 +33,7 @@ class AISettingDialogFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var themeId = cn.archko.pdf.R.style.AppTheme
+        val themeId = cn.archko.pdf.R.style.AppTheme
         setStyle(STYLE_NO_TITLE, themeId)
     }
 
@@ -73,14 +76,16 @@ class AISettingDialogFragment : DialogFragment() {
     }
 
     private fun observeViewModel() {
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.providers.collect { providers ->
-                adapter.submitList(providers)
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.providers.collect { providers ->
+                    adapter.submitList(providers)
+                }
             }
-        }
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.defaultProvider.collect { defaultProvider ->
-                adapter.setDefaultProviderId(defaultProvider?.id)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.defaultProvider.collect { defaultProvider ->
+                    adapter.setDefaultProviderId(defaultProvider?.id)
+                }
             }
         }
     }

@@ -48,9 +48,10 @@ class AIProviderAdapter(
             binding.tvProviderModel.text = provider.model
             binding.radioDefault.isChecked = isDefault
             if (provider.apiKey.isNotEmpty()) {
-                binding.tvApiKeyHint.text = "API Key: ${provider.apiKey.take(8)}..."
+                binding.tvApiKeyHint.text =
+                    String.format("API Key: %s", "${provider.apiKey.take(8)}...")
             } else {
-                binding.tvApiKeyHint.text = "API Key: 未设置"
+                binding.tvApiKeyHint.text = "NO API Key"
             }
         }
     }
@@ -61,7 +62,7 @@ class AIProviderAdapter(
         }
 
         override fun areContentsTheSame(oldItem: AIProvider, newItem: AIProvider): Boolean {
-            return oldItem.equals(newItem)
+            return oldItem == newItem
         }
     }
 }
