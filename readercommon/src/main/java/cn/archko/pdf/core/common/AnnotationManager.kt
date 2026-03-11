@@ -1,11 +1,11 @@
-package cn.archko.pdf.common
+package cn.archko.pdf.core.common
 
+import cn.archko.pdf.core.entity.AnnotationPath
+import cn.archko.pdf.core.entity.DrawType
+import cn.archko.pdf.core.entity.Offset
+import cn.archko.pdf.core.entity.PathConfig
 import cn.archko.pdf.core.utils.FileUtils
-import cn.archko.pdf.entity.AnnotationPath
-import cn.archko.pdf.entity.Color
-import cn.archko.pdf.entity.DrawType
-import cn.archko.pdf.entity.Offset
-import cn.archko.pdf.entity.PathConfig
+import android.graphics.Color
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,16 +19,16 @@ import java.io.File
 /**
  * @author: archko 2026/2/3 :08:47
  */
-public class AnnotationManager(public val path: String) {
-    public val decodeScope: CoroutineScope =
+class AnnotationManager(val path: String?) {
+    val decodeScope: CoroutineScope =
         CoroutineScope(Dispatchers.Default.limitedParallelism(1))
 
     // 使用普通MutableMap，在View系统中使用
-    public val annotations: MutableMap<Int, MutableList<AnnotationPath>> =
+    val annotations: MutableMap<Int, MutableList<AnnotationPath>> =
         mutableMapOf()
 
     private val _annotationsFlow = MutableStateFlow<Map<Int, List<AnnotationPath>>>(emptyMap())
-    public val annotationsFlow: StateFlow<Map<Int, List<AnnotationPath>>> =
+    val annotationsFlow: StateFlow<Map<Int, List<AnnotationPath>>> =
         _annotationsFlow.asStateFlow()
 
     // 撤销/重做栈：记录的是"操作指令"
@@ -38,8 +38,8 @@ public class AnnotationManager(public val path: String) {
     // 用于 UI 判断按钮是否可用 - 使用StateFlow来管理状态
     private val _canUndo = MutableStateFlow(false)
     private val _canRedo = MutableStateFlow(false)
-    public val canUndo: StateFlow<Boolean> = _canUndo.asStateFlow()
-    public val canRedo: StateFlow<Boolean> = _canRedo.asStateFlow()
+    val canUndo: StateFlow<Boolean> = _canUndo.asStateFlow()
+    val canRedo: StateFlow<Boolean> = _canRedo.asStateFlow()
 
     init {
         decodeScope.launch {
@@ -48,12 +48,12 @@ public class AnnotationManager(public val path: String) {
         }
     }
 
-    public sealed class UndoAction {
-        public data class Add(val pageIndex: Int, val path: AnnotationPath) : UndoAction()
+    sealed class UndoAction {
+        data class Add(val pageIndex: Int, val path: AnnotationPath) : UndoAction()
         // 未来可以扩展 Delete, Clear 等
     }
 
-    public fun addPath(pageIndex: Int, path: AnnotationPath) {
+    fun addPath(pageIndex: Int, path: AnnotationPath) {
         val list = annotations.getOrPut(pageIndex) { mutableListOf() }
         list.add(path)
         undoStack.add(UndoAction.Add(pageIndex, path))
@@ -66,7 +66,7 @@ public class AnnotationManager(public val path: String) {
         }
     }
 
-    public fun undo() {
+    fun undo() {
         if (undoStack.isEmpty()) return
         when (val action = undoStack.removeAt(undoStack.size - 1)) {
             is UndoAction.Add -> {
@@ -94,7 +94,7 @@ public class AnnotationManager(public val path: String) {
         }
     }
 
-    public fun deletePaths(pageIndex: Int) {
+    fun deletePaths(pageIndex: Int) {
         annotations.remove(pageIndex)
         undoStack.clear()
         redoStack.clear()
@@ -106,7 +106,7 @@ public class AnnotationManager(public val path: String) {
         }
     }
 
-    public fun redo() {
+    fun redo() {
         if (redoStack.isEmpty()) return
         when (val action = redoStack.removeAt(redoStack.size - 1)) {
             is UndoAction.Add -> {
@@ -128,7 +128,7 @@ public class AnnotationManager(public val path: String) {
         }
     }
 
-    public fun toJson(): String {
+    fun toJson(): String {
         val file = File(path)
         val size = file.length()
         val fileName = file.name
@@ -157,7 +157,7 @@ public class AnnotationManager(public val path: String) {
                         pathObj.put("points", pointsArray)
 
                         val configObj = JSONObject()
-                        configObj.put("c", path.config.color.value.toString(16))
+                        configObj.put("c", Integer.toHexString(path.config.color))
                         configObj.put("s", path.config.strokeWidth)
                         configObj.put("d", path.config.drawType.name)
                         pathObj.put("config", configObj)
@@ -177,7 +177,7 @@ public class AnnotationManager(public val path: String) {
         }
     }
 
-    public fun saveToFile() {
+    fun saveToFile() {
         try {
             val saveFile = getAnnotationCacheFile()
             val content = toJson()
@@ -188,7 +188,7 @@ public class AnnotationManager(public val path: String) {
         }
     }
 
-    public fun loadFromFile(): Boolean {
+    fun loadFromFile(): Boolean {
         return try {
             val saveFile = getAnnotationCacheFile()
             if (!saveFile.exists()) {
@@ -250,8 +250,11 @@ public class AnnotationManager(public val path: String) {
                                 }
 
                                 val colorStr = configObj.optString("c")
-                                val colorValue = colorStr.toULongOrNull(16)
-                                val color = colorValue?.let { Color(it.toLong()) } ?: Color.Red
+                                val color = try {
+                                    colorStr.toLongOrNull(16)?.toInt() ?: Color.RED
+                                } catch (e: Exception) {
+                                    Color.RED
+                                }
                                 val strokeWidth = configObj.optDouble("s").toFloat()
                                 val drawTypeStr = configObj.optString("d", "CURVE")
                                 val drawType = try {

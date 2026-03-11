@@ -27,7 +27,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
-import cn.archko.pdf.common.AnnotationManager
+import cn.archko.pdf.core.common.AnnotationManager
 import cn.archko.pdf.controller.AEpubViewController
 import cn.archko.pdf.controller.ANormalViewController
 import cn.archko.pdf.controller.AScanReflowViewController
@@ -238,6 +238,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun loadBook() {
+        annotationManager = AnnotationManager(mPath)
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 mPath!!.run {
@@ -431,6 +432,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             mReflowLayout,
             docViewModel,
             mPath!!,
+            annotationManager,
             pageController!!,
             controllerListener
         )
@@ -504,7 +506,6 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             lifecycleScope.launch {
                 bookmarkViewModel.startSession(mPath!!, count)
             }
-            annotationManager = AnnotationManager(mPath!!)
 
             val sp = getSharedPreferences(PREF_READER, MODE_PRIVATE)
             val isFirst = sp.getBoolean(PREF_READER_KEY_FIRST, true)
@@ -1014,6 +1015,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             controllerLayout: RelativeLayout,
             docViewModel: DocViewModel,
             path: String,
+            annotationManager: AnnotationManager?,
             pageSeekBarControls: IPageController,
             controllerListener: ControllerListener?,
         ): AViewController {
@@ -1028,6 +1030,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 controllerLayout,
                 docViewModel,
                 path,
+                annotationManager,
                 pageSeekBarControls,
                 controllerListener,
             )
@@ -1043,6 +1046,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             controllerLayout: RelativeLayout,
             docViewModel: DocViewModel,
             path: String,
+            annotationManager: AnnotationManager?,
             pageController: IPageController,
             controllerListener: ControllerListener?,
         ): AViewController {
@@ -1054,6 +1058,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                         controllerLayout,
                         docViewModel,
                         path,
+                        annotationManager,
                         pageController,
                         controllerListener,
                     )
@@ -1064,6 +1069,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     controllerLayout,
                     docViewModel,
                     path,
+                    annotationManager,
                     pageController,
                     controllerListener,
                 )
@@ -1105,6 +1111,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                         controllerLayout,
                         docViewModel,
                         path,
+                        annotationManager,
                         pageController,
                         controllerListener,
                     )
@@ -1115,6 +1122,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     controllerLayout,
                     docViewModel,
                     path,
+                    annotationManager,
                     pageController,
                     controllerListener,
                 )
@@ -1126,7 +1134,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private fun bindTtsService() {
         if (!isTtsServiceBound) {
             val intent = Intent(this, TtsForegroundService::class.java)
-            bindService(intent, ttsServiceConnection, Context.BIND_AUTO_CREATE)
+            bindService(intent, ttsServiceConnection, BIND_AUTO_CREATE)
             Logcat.d(TAG, "Binding TTS service")
         }
     }

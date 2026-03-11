@@ -11,9 +11,9 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
-import cn.archko.pdf.common.AnnotationManager
+import cn.archko.pdf.core.common.AnnotationManager
 import cn.archko.pdf.core.widgets.ColorItemDecoration
-import cn.archko.pdf.entity.AnnotationPath
+import cn.archko.pdf.core.entity.AnnotationPath
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

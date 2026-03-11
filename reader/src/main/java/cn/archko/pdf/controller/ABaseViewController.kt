@@ -139,7 +139,7 @@ abstract class ABaseViewController(
     override fun setOrientation(ori: Int) {
         (mRecyclerView.layoutManager as LinearLayoutManager).orientation = ori
     }
-    
+
     override fun setSelection(selection: Boolean) {
 
     }

@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -20,7 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.archko.pdf.core.cache.BitmapCache;
+import cn.archko.pdf.core.common.AnnotationManager;
 import cn.archko.pdf.core.entity.APage;
+import cn.archko.pdf.core.entity.AnnotationPath;
+import cn.archko.pdf.core.entity.DrawType;
+import cn.archko.pdf.core.entity.Offset;
+import cn.archko.pdf.core.entity.PathConfig;
 import cn.archko.pdf.core.link.Hyperlink;
 
 public class Page {
@@ -443,34 +449,112 @@ public class Page {
 
     // 绘制标注
     private void drawAnnotations(Canvas canvas) {
-        // TODO: 从AnnotationManager获取当前页面的标注并绘制
-        // 这里先实现一个简单的示例绘制
+        AnnotationManager annotationManager = documentView.annotationManager;
+        if (annotationManager == null) {
+            return;
+        }
 
-        // 示例：绘制一个红色的测试矩形
-        Paint testPaint = new Paint();
-        testPaint.setColor(Color.RED);
-        testPaint.setStyle(Paint.Style.STROKE);
-        testPaint.setStrokeWidth(4f);
+        // 获取当前页面的标注列表
+        List<AnnotationPath> paths = annotationManager.getAnnotations().get(index);
+        if (paths == null || paths.isEmpty()) {
+            return;
+        }
 
-        float testLeft = bounds.left + bounds.width() * 0.1f;
-        float testTop = bounds.top + bounds.height() * 0.1f;
-        float testRight = bounds.left + bounds.width() * 0.3f;
-        float testBottom = bounds.top + bounds.height() * 0.3f;
+        // 绘制每个标注路径
+        for (AnnotationPath annotationPath : paths) {
+            drawSingleAnnotationPath(canvas, annotationPath);
+        }
+    }
 
-        canvas.drawRect(testLeft, testTop, testRight, testBottom, testPaint);
+    /**
+     * 绘制单个标注路径
+     */
+    private void drawSingleAnnotationPath(Canvas canvas, AnnotationPath annotationPath) {
+        List<Offset> points = annotationPath.getPoints();
+        if (points == null || points.size() < 2) {
+            return;
+        }
 
-        // 示例：绘制一条测试线
-        Paint linePaint = new Paint();
-        linePaint.setColor(Color.BLUE);
-        linePaint.setStyle(Paint.Style.STROKE);
-        linePaint.setStrokeWidth(3f);
+        // 获取路径配置
+        PathConfig config = annotationPath.getConfig();
+        if (config == null) {
+            return;
+        }
 
-        float startX = bounds.left + bounds.width() * 0.4f;
-        float startY = bounds.top + bounds.height() * 0.4f;
-        float endX = bounds.left + bounds.width() * 0.8f;
-        float endY = bounds.top + bounds.height() * 0.8f;
+        // 创建画笔
+        Paint paint = new Paint();
+        int color = config.getColor();
+        paint.setColor(color);
+        paint.setStrokeWidth(config.getStrokeWidth());
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setAntiAlias(true);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setStrokeJoin(Paint.Join.ROUND);
 
-        canvas.drawLine(startX, startY, endX, endY, linePaint);
+        // 获取缩放因子
+        float scale = documentView.calculateScale(this);
+
+        // 根据绘制类型选择绘制方式
+        DrawType drawType = config.getDrawType();
+        if (drawType == DrawType.LINE && points.size() == 2) {
+            // 直线绘制
+            Offset startPoint = points.get(0);
+            Offset endPoint = points.get(1);
+
+            PointF startScreen = convertRelativeToScreen(startPoint.getX(), startPoint.getY(), scale);
+            PointF endScreen = convertRelativeToScreen(endPoint.getX(), endPoint.getY(), scale);
+
+            canvas.drawLine(startScreen.x, startScreen.y, endScreen.x, endScreen.y, paint);
+        } else {
+            // 曲线绘制（默认）
+            Path path = new Path();
+
+            PointF firstScreen = convertRelativeToScreen(points.get(0).getX(), points.get(0).getY(), scale);
+            path.moveTo(firstScreen.x, firstScreen.y);
+
+            for (int i = 1; i < points.size(); i++) {
+                PointF screen = convertRelativeToScreen(points.get(i).getX(), points.get(i).getY(), scale);
+                path.lineTo(screen.x, screen.y);
+            }
+
+            canvas.drawPath(path, paint);
+        }
+    }
+
+    /**
+     * 将页面相对坐标(0-1)转换为绘制坐标
+     * 在 Page.draw() 中调用，返回相对于 pageBounds 的坐标（不包含滚动偏移）
+     */
+    private PointF convertRelativeToScreen(float relativeX, float relativeY, float scale) {
+        // 获取原始页面尺寸
+        APage vuPage = documentView.decodeService.getAPage(index);
+        if (vuPage == null) {
+            return new PointF(0, 0);
+        }
+
+        // 将相对坐标转换为页面原始坐标
+        float pageX = relativeX * vuPage.getWidth(false);
+        float pageY = relativeY * vuPage.getHeight(false);
+
+        // 处理切边
+        if (crop && documentView.crop) {
+            Rect rect = documentView.getBounds(this);
+            if (rect != null) {
+                pageX -= rect.left;
+                pageY -= rect.top;
+            }
+        }
+
+        // 应用缩放
+        float scaledX = pageX * scale;
+        float scaledY = pageY * scale;
+
+        // 转换为相对于 pageBounds 的坐标
+        // 在 Page.draw() 中，canvas 已经自动处理了滚动，所以不需要减去 getScrollX/Y
+        float resultX = scaledX + bounds.left;
+        float resultY = scaledY + bounds.top;
+
+        return new PointF(resultX, resultY);
     }
 
     public void setSelectionRects(List<RectF> rects) {

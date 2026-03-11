@@ -11,10 +11,11 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
-import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.common.APageSizeLoader
+import cn.archko.pdf.core.common.AnnotationManager
 import cn.archko.pdf.core.common.AppExecutors.Companion.instance
 import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.common.TtsHelper
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.BookProgress
@@ -48,6 +49,7 @@ open class ANormalViewController(
     protected val mControllerLayout: RelativeLayout,
     private var docViewModel: DocViewModel,
     private var mPath: String,
+    var annotationManager: AnnotationManager? = null,
     protected var pageController: IPageController?,
     protected var controllerListener: ControllerListener?,
 ) :
@@ -149,6 +151,8 @@ open class ANormalViewController(
         recyclerView?.visibility = View.GONE
 
         setFilter(PdfOptionRepository.getColorMode())
+
+        documentView.setAnnotationManager(annotationManager)
     }
 
     fun loadDocument() {

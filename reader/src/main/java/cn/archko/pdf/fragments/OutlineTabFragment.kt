@@ -9,7 +9,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.widget.ViewPager2
 import cn.archko.pdf.R
-import cn.archko.pdf.common.AnnotationManager
+import cn.archko.pdf.core.common.AnnotationManager
 import cn.archko.pdf.core.entity.ABookmark
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.BookmarkViewModel

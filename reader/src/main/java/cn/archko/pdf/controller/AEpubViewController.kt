@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import androidx.fragment.app.FragmentActivity
 import cn.archko.pdf.R
+import cn.archko.pdf.core.common.AnnotationManager
 import cn.archko.pdf.core.App.Companion.instance
 import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.Logcat
@@ -29,6 +30,7 @@ class AEpubViewController(
     mControllerLayout: RelativeLayout,
     docViewModel: DocViewModel,
     var mPath: String,
+    annotationManager: AnnotationManager? = null,
     pageController: IPageController?,
     controllerListener: ControllerListener?,
 ) : ANormalViewController(
@@ -37,6 +39,7 @@ class AEpubViewController(
     mControllerLayout,
     docViewModel,
     mPath,
+    annotationManager,
     pageController,
     controllerListener
 ),

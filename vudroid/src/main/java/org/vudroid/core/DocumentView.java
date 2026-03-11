@@ -31,7 +31,12 @@ import java.util.List;
 
 import androidx.annotation.Nullable;
 import cn.archko.pdf.core.cache.BitmapCache;
+import cn.archko.pdf.core.common.AnnotationManager;
 import cn.archko.pdf.core.entity.APage;
+import cn.archko.pdf.core.entity.AnnotationPath;
+import cn.archko.pdf.core.entity.DrawType;
+import cn.archko.pdf.core.entity.Offset;
+import cn.archko.pdf.core.entity.PathConfig;
 import cn.archko.pdf.core.link.Hyperlink;
 import cn.archko.pdf.core.utils.ColorUtil;
 
@@ -56,6 +61,8 @@ public class DocumentView extends View implements ZoomListener {
     public static final int VERTICAL = LinearLayout.VERTICAL;
     private int oriention = VERTICAL;
     private ColorFilter filter;
+
+    AnnotationManager annotationManager = null;
     private boolean selection;
     private boolean draw;
 
@@ -72,6 +79,9 @@ public class DocumentView extends View implements ZoomListener {
     private Page drawingPage = null;
     private final List<PointF> drawingPoints = new ArrayList<>();
     private Paint drawingPaint;
+    private int drawColor = Color.RED;
+    private float drawStrokeWidth = 4f;
+    private DrawType drawType = DrawType.LINE;
 
     private final GestureDetector mGestureDetector;
     boolean crop = false;
@@ -136,6 +146,18 @@ public class DocumentView extends View implements ZoomListener {
         }
     }
 
+    public void setDrawConfig(int color, float strokeWidth, DrawType drawType) {
+        this.drawColor = color;
+        this.drawStrokeWidth = strokeWidth;
+        this.drawType = drawType;
+        initDrawingPaint();
+        Log.d(TAG, String.format("设置绘制配置: color=%d, strokeWidth=%.1f, drawType=%s", color, strokeWidth, drawType));
+    }
+
+    public void setAnnotationManager(AnnotationManager annotationManager) {
+        this.annotationManager = annotationManager;
+    }
+
     private void resetGestureState() {
         if (pages != null) {
             for (int i = 0; i < pages.size(); i++) {
@@ -154,13 +176,11 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void initDrawingPaint() {
-        if (drawingPaint == null) {
-            drawingPaint = new Paint();
-            drawingPaint.setColor(Color.RED);
-            drawingPaint.setStrokeWidth(4f);
-            drawingPaint.setStyle(Paint.Style.STROKE);
-            drawingPaint.setAntiAlias(true);
-        }
+        drawingPaint = new Paint();
+        drawingPaint.setColor(drawColor);
+        drawingPaint.setStrokeWidth(drawStrokeWidth);
+        drawingPaint.setStyle(Paint.Style.STROKE);
+        drawingPaint.setAntiAlias(true);
     }
 
     public DocumentView(Context context, final ZoomModel zoomModel,
@@ -1115,9 +1135,10 @@ public class DocumentView extends View implements ZoomListener {
             float screenY = y + getScrollY();
             PointF relativePoint = page.screenToPageRelativePoint(screenX, screenY);
             PointF point = new PointF(relativePoint.x, relativePoint.y);
-            drawingPoints.add(point);
+            drawingPoints.add(point);  // 起点
 
-            Log.d(TAG, String.format("开始绘制: 页面%d, 相对坐标(%.3f, %.3f)", page.index, relativePoint.x, relativePoint.y));
+            Log.d(TAG, String.format("开始绘制: 页面%d, 模式%s, 相对坐标(%.3f, %.3f)",
+                    page.index, drawType, relativePoint.x, relativePoint.y));
 
             invalidate();
             return true;
@@ -1127,15 +1148,25 @@ public class DocumentView extends View implements ZoomListener {
 
     private boolean handleDrawMove(float x, float y) {
         if (isDrawing && drawingPage != null) {
-            // 使用Page的screenToPageRelativePoint方法获取页面相对坐标 (0-1)
             float screenX = x + getScrollX();
             float screenY = y + getScrollY();
             PointF relativePoint = drawingPage.screenToPageRelativePoint(screenX, screenY);
-            PointF point = new PointF(relativePoint.x, relativePoint.y);
-            drawingPoints.add(point);
 
-            Log.d(TAG, String.format("继续绘制: 页面%d, 点%d, 相对坐标(%.3f, %.3f)",
-                    drawingPage.index, drawingPoints.size(), relativePoint.x, relativePoint.y));
+            if (drawType == DrawType.LINE) {
+                // LINE模式: 只保留起点和当前终点
+                if (drawingPoints.size() > 1) {
+                    drawingPoints.set(1, new PointF(relativePoint.x, relativePoint.y));
+                } else {
+                    drawingPoints.add(new PointF(relativePoint.x, relativePoint.y));
+                }
+            } else {
+                // CURVE模式: 记录所有点
+                PointF point = new PointF(relativePoint.x, relativePoint.y);
+                drawingPoints.add(point);
+            }
+
+            Log.d(TAG, String.format("继续绘制: 页面%d, 模式%s, 点%d, 相对坐标(%.3f, %.3f)",
+                    drawingPage.index, drawType, drawingPoints.size(), relativePoint.x, relativePoint.y));
 
             invalidate();
             return true;
@@ -1145,10 +1176,64 @@ public class DocumentView extends View implements ZoomListener {
 
     private boolean handleDrawUp() {
         if (isDrawing && drawingPage != null && drawingPoints.size() > 1) {
-            Log.d(TAG, String.format("结束绘制: 页面%d, 共%d个点", drawingPage.index, drawingPoints.size()));
+            Log.d(TAG, String.format("结束绘制: 页面%d, 共%d个点, 模式%s",
+                    drawingPage.index, drawingPoints.size(), drawType));
 
-            // TODO: 保存绘制路径到AnnotationManager
-            // 这里可以调用AnnotationManager保存绘制路径
+            if (annotationManager != null) {
+                try {
+                    List<Offset> offsetList = new ArrayList<>();
+
+                    if (drawType == DrawType.LINE) {
+                        // LINE模式: 计算水平或垂直线的终点
+                        PointF startPoint = drawingPoints.get(0);
+                        PointF endPoint = drawingPoints.get(drawingPoints.size() - 1);
+
+                        // 判断主要方向（水平还是垂直）
+                        float dx = Math.abs(endPoint.x - startPoint.x);
+                        float dy = Math.abs(endPoint.y - startPoint.y);
+
+                        PointF finalEndPoint = new PointF(endPoint.x, endPoint.y);
+                        if (dx > dy) {
+                            // 水平线：使用起点的y坐标
+                            finalEndPoint.y = startPoint.y;
+                        } else {
+                            // 垂直线：使用起点的x坐标
+                            finalEndPoint.x = startPoint.x;
+                        }
+
+                        offsetList.add(new Offset(startPoint.x, startPoint.y));
+                        offsetList.add(new Offset(finalEndPoint.x, finalEndPoint.y));
+
+                        Log.d(TAG, String.format("LINE模式: 起点(%.3f, %.3f), 终点(%.3f, %.3f), 方向=%s",
+                                startPoint.x, startPoint.y, finalEndPoint.x, finalEndPoint.y, dx > dy ? "水平" : "垂直"));
+                    } else {
+                        // CURVE模式: 保存所有点
+                        for (PointF point : drawingPoints) {
+                            offsetList.add(new Offset(point.x, point.y));
+                        }
+                    }
+
+                    PathConfig config = new PathConfig(
+                            drawColor,
+                            drawStrokeWidth,
+                            drawType
+                    );
+
+                    AnnotationPath annotationPath = new AnnotationPath(
+                            offsetList,
+                            config
+                    );
+
+                    annotationManager.addPath(drawingPage.index, annotationPath);
+
+                    Log.d(TAG, String.format("成功保存标注到AnnotationManager: 页面%d, 点数%d", drawingPage.index, offsetList.size()));
+                } catch (Exception e) {
+                    Log.e(TAG, "保存标注失败", e);
+                    e.printStackTrace();
+                }
+            } else {
+                Log.w(TAG, "AnnotationManager未设置,无法保存标注");
+            }
 
             // 重置绘制状态
             isDrawing = false;
@@ -1168,18 +1253,15 @@ public class DocumentView extends View implements ZoomListener {
         return page;
     }
 
-    // 绘制选择区域和绘制路径
+    // 临时绘制,如果这里没有,则会导致画的过程不显示.绘制选择区域和绘制路径
     private void drawSelectionAndDrawing(Canvas canvas) {
         if (isSelecting && selectedPage != null) {
             drawSelectionRect(canvas);
         }
 
-        // 绘制当前绘制的路径
         if (isDrawing && drawingPage != null && drawingPoints.size() > 1) {
             drawCurrentPath(canvas);
         }
-
-        // TODO: 绘制已保存的标注
     }
 
     private void drawSelectionRect(Canvas canvas) {
@@ -1204,20 +1286,86 @@ public class DocumentView extends View implements ZoomListener {
     private void drawCurrentPath(Canvas canvas) {
         if (drawingPaint == null || drawingPoints.size() < 2) return;
 
-        Path path = new Path();
+        // 使用与 Page.getPageRegion 相同的坐标转换逻辑
+        float scale = calculateScale(drawingPage);
 
-        // 转换为屏幕坐标
-        float firstX = drawingPoints.get(0).x * drawingPage.bounds.width() + drawingPage.bounds.left - getScrollX();
-        float firstY = drawingPoints.get(0).y * drawingPage.bounds.height() + drawingPage.bounds.top - getScrollY();
-        path.moveTo(firstX, firstY);
+        if (drawType == DrawType.LINE && drawingPoints.size() == 2) {
+            // LINE模式: 绘制水平或垂直线
+            PointF startPoint = drawingPoints.get(0);
+            PointF endPoint = drawingPoints.get(1);
 
-        for (int i = 1; i < drawingPoints.size(); i++) {
-            float x = drawingPoints.get(i).x * drawingPage.bounds.width() + drawingPage.bounds.left - getScrollX();
-            float y = drawingPoints.get(i).y * drawingPage.bounds.height() + drawingPage.bounds.top - getScrollY();
-            path.lineTo(x, y);
+            // 计算水平或垂直线的终点（预览时也保持这个逻辑）
+            float dx = Math.abs(endPoint.x - startPoint.x);
+            float dy = Math.abs(endPoint.y - startPoint.y);
+
+            PointF finalEndPoint = new PointF(endPoint.x, endPoint.y);
+            if (dx > dy) {
+                finalEndPoint.y = startPoint.y;
+            } else {
+                finalEndPoint.x = startPoint.x;
+            }
+
+            // 将相对坐标转换为屏幕坐标（考虑缩放和滚动）
+            float startX = convertRelativeToScreen(startPoint.x, startPoint.y, scale).x;
+            float startY = convertRelativeToScreen(startPoint.x, startPoint.y, scale).y;
+            float endX = convertRelativeToScreen(finalEndPoint.x, finalEndPoint.y, scale).x;
+            float endY = convertRelativeToScreen(finalEndPoint.x, finalEndPoint.y, scale).y;
+
+            canvas.drawLine(startX, startY, endX, endY, drawingPaint);
+        } else {
+            // CURVE模式: 绘制曲线
+            Path path = new Path();
+
+            PointF firstScreen = convertRelativeToScreen(drawingPoints.get(0).x, drawingPoints.get(0).y, scale);
+            path.moveTo(firstScreen.x, firstScreen.y);
+
+            for (int i = 1; i < drawingPoints.size(); i++) {
+                PointF screen = convertRelativeToScreen(drawingPoints.get(i).x, drawingPoints.get(i).y, scale);
+                path.lineTo(screen.x, screen.y);
+            }
+
+            canvas.drawPath(path, drawingPaint);
+        }
+    }
+
+    /**
+     * 将页面相对坐标(0-1)转换为屏幕绘制坐标
+     * 与 Page.getPageRegion 使用相同的转换逻辑
+     * 在 DocumentView.onDraw 中调用时，canvas 坐标需要减去滚动偏移
+     */
+    private PointF convertRelativeToScreen(float relativeX, float relativeY, float scale) {
+        // 获取原始页面尺寸
+        APage vuPage = decodeService.getAPage(drawingPage.index);
+        if (vuPage == null) {
+            return new PointF(0, 0);
         }
 
-        canvas.drawPath(path, drawingPaint);
+        // 将相对坐标转换为页面原始坐标
+        float pageX = relativeX * vuPage.getWidth(false);
+        float pageY = relativeY * vuPage.getHeight(false);
+
+        // 处理切边
+        if (crop) {
+            Rect rect = getBounds(drawingPage);
+            if (rect != null) {
+                pageX -= rect.left;
+                pageY -= rect.top;
+            }
+        }
+
+        // 应用缩放
+        float scaledX = pageX * scale;
+        float scaledY = pageY * scale;
+
+        // 转换为文档坐标（相对于 pageBounds）
+        float docX = scaledX + drawingPage.bounds.left;
+        float docY = scaledY + drawingPage.bounds.top;
+
+        // 在 DocumentView.onDraw 中绘制时，需要转换为屏幕坐标（减去滚动偏移）
+        float screenX = docX - getScrollX();
+        float screenY = docY - getScrollY();
+
+        return new PointF(screenX, screenY);
     }
 
     public void cancelFling() {

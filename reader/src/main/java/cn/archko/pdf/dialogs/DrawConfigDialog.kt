@@ -15,7 +15,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
-import cn.archko.pdf.entity.DrawType
+import cn.archko.pdf.core.entity.DrawType
 
 /**
  * 绘图配置对话框 - 融合颜色、线宽和绘制类型选择
