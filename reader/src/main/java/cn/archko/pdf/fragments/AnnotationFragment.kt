@@ -25,7 +25,8 @@ import kotlinx.coroutines.launch
  * 批注Fragment
  * @author: archko 2026/3/9
  */
-class AnnotationFragment(private val annotationManager: AnnotationManager?) : Fragment(R.layout.fragment_annotation) {
+class AnnotationFragment(private val annotationManager: AnnotationManager?) :
+    Fragment(R.layout.fragment_annotation) {
 
     private lateinit var binding: FragmentAnnotationBinding
     private lateinit var adapter: AnnotationAdapter
@@ -139,7 +140,7 @@ class AnnotationFragment(private val annotationManager: AnnotationManager?) : Fr
             }
 
             holder.btnDelete.setOnClickListener {
-                annotationManager?.deletePaths(position)
+                annotationManager?.deletePaths(item.pageIndex)
             }
         }
 

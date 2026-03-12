@@ -9,8 +9,6 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.RadioButton
 import android.widget.RadioGroup
-import android.widget.SeekBar
-import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.GridLayoutManager
@@ -20,6 +18,7 @@ import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.entity.DrawType
 import cn.archko.pdf.widgets.DrawPreviewView
+import com.google.android.material.slider.Slider
 
 /**
  * 绘图配置对话框 - 融合颜色、线宽和绘制类型选择
@@ -32,8 +31,7 @@ class DrawConfigDialog : DialogFragment() {
     private var configChangeListener: ((Int, Float, DrawType) -> Unit)? = null
 
     private lateinit var drawPreview: DrawPreviewView
-    private lateinit var widthSeekBar: SeekBar
-    private lateinit var widthValueText: TextView
+    private lateinit var widthSeekBar: Slider
     private lateinit var drawTypeRadioGroup: RadioGroup
     private lateinit var lineRadioButton: RadioButton
     private lateinit var curveRadioButton: RadioButton
@@ -103,7 +101,6 @@ class DrawConfigDialog : DialogFragment() {
     private fun initViews(view: View) {
         drawPreview = view.findViewById(R.id.drawPreview)
         widthSeekBar = view.findViewById(R.id.widthSeekBar)
-        widthValueText = view.findViewById(R.id.widthValueText)
         drawTypeRadioGroup = view.findViewById(R.id.drawTypeRadioGroup)
         lineRadioButton = view.findViewById(R.id.lineRadioButton)
         curveRadioButton = view.findViewById(R.id.curveRadioButton)
@@ -123,22 +120,17 @@ class DrawConfigDialog : DialogFragment() {
     }
 
     private fun setupWidthSeekBar() {
-        widthSeekBar.max = 20 // 1-20px
-        widthSeekBar.progress = selectedWidth.toInt()
-        widthValueText.text = "${selectedWidth.toInt()} px"
+        widthSeekBar.valueFrom = 1f
+        widthSeekBar.valueTo = 20f
+        widthSeekBar.stepSize = 1f
+        widthSeekBar.value = selectedWidth
 
-        widthSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    selectedWidth = progress.toFloat().coerceAtLeast(1f)
-                    widthValueText.text = "${selectedWidth.toInt()} px"
-                    updatePreview()
-                }
+        widthSeekBar.addOnChangeListener { _, value, fromUser ->
+            if (fromUser) {
+                selectedWidth = value
+                updatePreview()
             }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
+        }
     }
 
     private fun setupDrawTypeSelection() {

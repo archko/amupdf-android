@@ -50,32 +50,16 @@
         android:text="@string/stroke_width_label"
         android:textSize="14sp" />
 
-    <LinearLayout
+    <com.google.android.material.slider.Slider
+        android:id="@+id/widthSeekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <SeekBar
-            android:id="@+id/widthSeekBar"
-            android:layout_width="match_parent"
-            android:layout_height="10dp"
-            android:max="20"
-            android:minHeight="10dp"
-            android:progressDrawable="@drawable/seek_line"
-            android:thumb="@drawable/seek_thumb" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/widthValueText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:minWidth="50dp"
-            android:text="4 px"
-            android:textSize="14sp" />
-
-    </LinearLayout>
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:stepSize="1"
+        android:text=""
+        app:labelBehavior="withinBounds"
+        app:tickVisible="true" />
 
     <!-- 绘制类型选择 -->
     <com.google.android.material.textview.MaterialTextView
