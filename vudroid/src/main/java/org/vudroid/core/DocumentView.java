@@ -181,6 +181,8 @@ public class DocumentView extends View implements ZoomListener {
         drawingPaint.setStrokeWidth(drawStrokeWidth);
         drawingPaint.setStyle(Paint.Style.STROKE);
         drawingPaint.setAntiAlias(true);
+        drawingPaint.setStrokeCap(Paint.Cap.ROUND);
+        drawingPaint.setStrokeJoin(Paint.Join.ROUND);
     }
 
     public DocumentView(Context context, final ZoomModel zoomModel,
@@ -1152,21 +1154,9 @@ public class DocumentView extends View implements ZoomListener {
             float screenY = y + getScrollY();
             PointF relativePoint = drawingPage.screenToPageRelativePoint(screenX, screenY);
 
-            if (drawType == DrawType.LINE) {
-                // LINE模式: 只保留起点和当前终点
-                if (drawingPoints.size() > 1) {
-                    drawingPoints.set(1, new PointF(relativePoint.x, relativePoint.y));
-                } else {
-                    drawingPoints.add(new PointF(relativePoint.x, relativePoint.y));
-                }
-            } else {
-                // CURVE模式: 记录所有点
-                PointF point = new PointF(relativePoint.x, relativePoint.y);
-                drawingPoints.add(point);
-            }
-
-            Log.d(TAG, String.format("继续绘制: 页面%d, 模式%s, 点%d, 相对坐标(%.3f, %.3f)",
-                    drawingPage.index, drawType, drawingPoints.size(), relativePoint.x, relativePoint.y));
+            // LINE和CURVE模式都记录所有点
+            PointF point = new PointF(relativePoint.x, relativePoint.y);
+            drawingPoints.add(point);
 
             invalidate();
             return true;
@@ -1289,10 +1279,10 @@ public class DocumentView extends View implements ZoomListener {
         // 使用与 Page.getPageRegion 相同的坐标转换逻辑
         float scale = calculateScale(drawingPage);
 
-        if (drawType == DrawType.LINE && drawingPoints.size() == 2) {
-            // LINE模式: 绘制水平或垂直线
+        if (drawType == DrawType.LINE) {
+            // LINE模式: 绘制水平或垂直线，只使用起点和终点
             PointF startPoint = drawingPoints.get(0);
-            PointF endPoint = drawingPoints.get(1);
+            PointF endPoint = drawingPoints.get(drawingPoints.size() - 1);
 
             // 计算水平或垂直线的终点（预览时也保持这个逻辑）
             float dx = Math.abs(endPoint.x - startPoint.x);
@@ -1300,8 +1290,10 @@ public class DocumentView extends View implements ZoomListener {
 
             PointF finalEndPoint = new PointF(endPoint.x, endPoint.y);
             if (dx > dy) {
+                // 水平线：使用起点的y坐标
                 finalEndPoint.y = startPoint.y;
             } else {
+                // 垂直线：使用起点的x坐标
                 finalEndPoint.x = startPoint.x;
             }
 
@@ -1310,9 +1302,10 @@ public class DocumentView extends View implements ZoomListener {
             float startY = convertRelativeToScreen(startPoint.x, startPoint.y, scale).y;
             float endX = convertRelativeToScreen(finalEndPoint.x, finalEndPoint.y, scale).x;
             float endY = convertRelativeToScreen(finalEndPoint.x, finalEndPoint.y, scale).y;
+            //Log.d(TAG, String.format("startX:%s, startY:%s, endX:%s, endY:%s", startX, startY, endX, endY));
 
             canvas.drawLine(startX, startY, endX, endY, drawingPaint);
-        } else {
+        } else if (drawType == DrawType.CURVE) {
             // CURVE模式: 绘制曲线
             Path path = new Path();
 
@@ -1329,9 +1322,9 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     /**
-     * 将页面相对坐标(0-1)转换为屏幕绘制坐标
+     * 将页面相对坐标(0-1)转换为绘制坐标
      * 与 Page.getPageRegion 使用相同的转换逻辑
-     * 在 DocumentView.onDraw 中调用时，canvas 坐标需要减去滚动偏移
+     * 在 DocumentView.onDraw 中调用时，返回相对于 pageBounds 的坐标（不包含滚动偏移）
      */
     private PointF convertRelativeToScreen(float relativeX, float relativeY, float scale) {
         // 获取原始页面尺寸
@@ -1357,15 +1350,12 @@ public class DocumentView extends View implements ZoomListener {
         float scaledX = pageX * scale;
         float scaledY = pageY * scale;
 
-        // 转换为文档坐标（相对于 pageBounds）
-        float docX = scaledX + drawingPage.bounds.left;
-        float docY = scaledY + drawingPage.bounds.top;
+        // 转换为相对于 pageBounds 的坐标
+        // 在 DocumentView.onDraw 中，canvas 已经自动处理了滚动，所以不需要减去 getScrollX/Y
+        float resultX = scaledX + drawingPage.bounds.left;
+        float resultY = scaledY + drawingPage.bounds.top;
 
-        // 在 DocumentView.onDraw 中绘制时，需要转换为屏幕坐标（减去滚动偏移）
-        float screenX = docX - getScrollX();
-        float screenY = docY - getScrollY();
-
-        return new PointF(screenX, screenY);
+        return new PointF(resultX, resultY);
     }
 
     public void cancelFling() {
