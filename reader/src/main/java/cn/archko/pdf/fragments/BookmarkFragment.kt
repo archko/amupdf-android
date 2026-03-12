@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.core.entity.ABookmark
 import cn.archko.pdf.core.widgets.ColorItemDecoration
+import cn.archko.pdf.databinding.FragmentBookmarkBinding
 import cn.archko.pdf.viewmodel.BookmarkViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,10 +25,10 @@ import java.util.Locale
  * 书签Tab Fragment
  * @author: archko 2026/3/9
  */
-class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) : Fragment() {
+class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) :
+    Fragment(R.layout.fragment_bookmark) {
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var emptyView: View
+    private lateinit var binding: FragmentBookmarkBinding
     private lateinit var adapter: BookmarkAdapter
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
@@ -44,19 +45,18 @@ class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) : Fragm
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_bookmark, container, false)
+    ): View {
+        binding = FragmentBookmarkBinding.inflate(layoutInflater)
+        return binding.root
+    }
 
-        recyclerView = view.findViewById(R.id.recycler_view)
-        emptyView = view.findViewById(R.id.tv_empty)
-
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val itemDecoration = ColorItemDecoration(requireContext())
-        itemDecoration.setColor(resources.getColor(cn.archko.pdf.common.R.color.extract_dialog_bg))
-        recyclerView.addItemDecoration(itemDecoration)
+        binding.recyclerView.addItemDecoration(itemDecoration)
         adapter = BookmarkAdapter(
             requireContext(), emptyList(),
             onItemClick = { bookmark ->
@@ -73,9 +73,7 @@ class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) : Fragm
                 bookmarkViewModel.deleteBookmark(bookmark)
             }
         )
-        recyclerView.adapter = adapter
-
-        return view
+        binding.recyclerView.adapter = adapter
     }
 
     private fun showEditDialog(bookmark: ABookmark) {
@@ -114,11 +112,11 @@ class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) : Fragm
 
     private fun updateBookmarks(bookmarks: List<ABookmark>) {
         if (bookmarks.isEmpty()) {
-            recyclerView.visibility = View.GONE
-            emptyView.visibility = View.VISIBLE
+            binding.recyclerView.visibility = View.GONE
+            binding.tvEmpty.visibility = View.VISIBLE
         } else {
-            recyclerView.visibility = View.VISIBLE
-            emptyView.visibility = View.GONE
+            binding.recyclerView.visibility = View.VISIBLE
+            binding.tvEmpty.visibility = View.GONE
             adapter.updateData(bookmarks)
         }
     }
@@ -143,7 +141,7 @@ class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) : Fragm
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(context)
-                .inflate(R.layout.item_bookmark_tab, parent, false)
+                .inflate(R.layout.item_bookmark, parent, false)
             return ViewHolder(view)
         }
 

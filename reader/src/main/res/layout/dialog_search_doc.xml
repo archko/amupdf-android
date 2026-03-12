@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,8 +10,8 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="42dp"
-        android:background="@color/menu_bg"
+        android:layout_height="44dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="4dp"
         android:paddingEnd="4dp">
@@ -21,7 +22,8 @@
             android:layout_height="42dp"
             android:background="@drawable/button"
             android:contentDescription=""
-            android:src="@drawable/ic_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/black" />
 
         <EditText
             android:id="@+id/keyword"
@@ -30,10 +32,9 @@
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:hint="keyword"
-            android:padding="0dp"
+            android:inputType="text"
             android:lines="1"
-            android:textColor="@color/white"
-            android:textColorHint="#7fffffff" />
+            android:padding="0dp" />
 
         <ImageButton
             android:id="@+id/searchButton"
@@ -41,7 +42,8 @@
             android:layout_height="42dp"
             android:background="@drawable/button"
             android:contentDescription=""
-            android:src="@drawable/ic_search" />
+            android:src="@drawable/ic_search"
+            app:tint="@color/black" />
 
         <ImageButton
             android:id="@+id/closeButton"
@@ -51,13 +53,26 @@
             android:contentDescription=""
             android:src="@drawable/ic_close"
             android:visibility="visible"
+            app:tint="@color/black"
             tools:visibility="visible" />
 
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="4dp" />
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="4dp" />
+
+        <ProgressBar
+            android:id="@+id/progress_circular"
+            android:visibility="gone"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center" />
+    </FrameLayout>
 </LinearLayout>

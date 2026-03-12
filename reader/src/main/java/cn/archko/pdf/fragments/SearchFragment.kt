@@ -58,7 +58,7 @@ open class SearchFragment : DialogFragment(R.layout.dialog_search_doc) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var themeId = R.style.AppTheme
+        val themeId = R.style.AppTheme
         setStyle(STYLE_NO_TITLE, themeId)
     }
 
@@ -126,6 +126,7 @@ open class SearchFragment : DialogFragment(R.layout.dialog_search_doc) {
             textAdapter?.notifyDataSetChanged()
             return
         }
+        binding.progressCircular.visibility = View.VISIBLE
         keyword = text
         lifecycleScope.launch {
             flow {
@@ -143,6 +144,7 @@ open class SearchFragment : DialogFragment(R.layout.dialog_search_doc) {
             }.flowOn(Dispatchers.IO)
                 .collectLatest { res ->
                     if (res is ResponseHandler.Success) {
+                        binding.progressCircular.visibility = View.GONE
                         if (res.data != null) {
                             textAdapter?.data = (res.data!!)
                             textAdapter?.notifyDataSetChanged()
@@ -200,7 +202,7 @@ open class SearchFragment : DialogFragment(R.layout.dialog_search_doc) {
                                 context,
                                 R.color.red
                             )
-                        ) // 定义你想要的高亮颜色
+                        )
                         spannableString.setSpan(
                             foregroundColorSpan,
                             startIndex,

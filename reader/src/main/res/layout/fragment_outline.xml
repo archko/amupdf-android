@@ -4,19 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/menu_bg"
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <androidx.recyclerview.awidget.ARecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:divider="@color/tab_divider_color"
-        android:dividerHeight="1px"
-        android:padding="8dp"
-        app:layoutManager="androidx.recyclerview.awidget.LinearLayoutManager"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="6"
         tools:listitem="@layout/item_outline" />
 
@@ -26,7 +24,6 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:text="@string/outline_empty"
-        android:textColor="@color/white"
         android:textSize="16sp"
         android:visibility="gone" />
 

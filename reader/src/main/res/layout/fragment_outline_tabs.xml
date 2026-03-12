@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/menu_bg"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -11,21 +10,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="@color/white"
-        app:title="@string/document_outline"
-        app:titleTextColor="@color/white" />
+        app:title="@string/document_outline"/>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/menu_bg"
         app:tabGravity="fill"
-        app:tabIndicatorColor="@color/white"
         app:tabIndicatorHeight="2dp"
-        app:tabMode="fixed"
-        app:tabSelectedTextColor="@color/white"
-        app:tabTextColor="@color/white" />
+        app:tabMode="fixed"/>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager"

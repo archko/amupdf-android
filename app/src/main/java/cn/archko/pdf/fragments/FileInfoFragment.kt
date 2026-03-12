@@ -227,7 +227,7 @@ class FileInfoFragment : DialogFragment() {
             lifecycleScope.launch {
                 try {
                     val fileName = getFileName(path)
-                    val stats = Graph.database?.readingStatsDao()?.getStatsByPath(fileName)
+                    val stats = Graph.database.readingStatsDao().getStatsByPath(fileName)
 
                     withContext(Dispatchers.Main) {
                         if (stats != null) {
@@ -256,8 +256,8 @@ class FileInfoFragment : DialogFragment() {
         mTotalReadingTime.text = formatDuration(stats.totalReadingTime)
         mSessionCount.text = stats.sessionCount.toString()
         mAverageSessionTime.text = formatDuration(stats.averageSessionTime)
-        mCompletedPages.text = "${stats.completedPages}/${stats.totalPages}"
-        mConsecutiveDays.text = "${stats.consecutiveDays}天"
+        mCompletedPages.text = String.format("%s/%s", stats.completedPages, stats.totalPages)
+        mConsecutiveDays.text = String.format("%s天", stats.consecutiveDays)
         mAnnotationCount.text = stats.annotationCount.toString()
         mBookmarkCount.text = stats.bookmarkCount.toString()
 

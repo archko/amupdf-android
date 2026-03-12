@@ -12,8 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
 import cn.archko.pdf.core.common.AnnotationManager
-import cn.archko.pdf.core.widgets.ColorItemDecoration
 import cn.archko.pdf.core.entity.AnnotationPath
+import cn.archko.pdf.core.widgets.ColorItemDecoration
+import cn.archko.pdf.databinding.FragmentAnnotationBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -24,10 +25,9 @@ import kotlinx.coroutines.launch
  * 批注Fragment
  * @author: archko 2026/3/9
  */
-class AnnotationFragment(private val annotationManager: AnnotationManager?) : Fragment() {
+class AnnotationFragment(private val annotationManager: AnnotationManager?) : Fragment(R.layout.fragment_annotation) {
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var emptyView: View
+    private lateinit var binding: FragmentAnnotationBinding
     private lateinit var adapter: AnnotationAdapter
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
@@ -42,24 +42,19 @@ class AnnotationFragment(private val annotationManager: AnnotationManager?) : Fr
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentAnnotationBinding.inflate(layoutInflater)
+        return binding.root
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_annotation, container, false)
-
-        recyclerView = view.findViewById(R.id.recycler_view)
-        emptyView = view.findViewById(R.id.tv_empty)
-
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val itemDecoration = ColorItemDecoration(requireContext())
-        itemDecoration.setColor(resources.getColor(cn.archko.pdf.common.R.color.extract_dialog_bg))
-        recyclerView.addItemDecoration(itemDecoration)
+        binding.recyclerView.addItemDecoration(itemDecoration)
         adapter = AnnotationAdapter(requireContext(), emptyList()) { pageIndex ->
             parentFragment?.let {
                 if (it is OutlineTabFragment) {
@@ -67,9 +62,7 @@ class AnnotationFragment(private val annotationManager: AnnotationManager?) : Fr
                 }
             }
         }
-        recyclerView.adapter = adapter
-
-        return view
+        binding.recyclerView.adapter = adapter
     }
 
     override fun onResume() {
@@ -98,11 +91,11 @@ class AnnotationFragment(private val annotationManager: AnnotationManager?) : Fr
 
     private fun updateAnnotations(annotations: Map<Int, List<AnnotationPath>>) {
         if (annotations.isEmpty()) {
-            recyclerView.visibility = View.GONE
-            emptyView.visibility = View.VISIBLE
+            binding.recyclerView.visibility = View.GONE
+            binding.tvEmpty.visibility = View.VISIBLE
         } else {
-            recyclerView.visibility = View.VISIBLE
-            emptyView.visibility = View.GONE
+            binding.recyclerView.visibility = View.VISIBLE
+            binding.tvEmpty.visibility = View.GONE
 
             // 转换数据为列表形式
             val annotationList = annotations.entries.map { entry ->

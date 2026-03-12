@@ -7,24 +7,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.TextView
-import androidx.recyclerview.awidget.ARecyclerView
-import androidx.recyclerview.awidget.LinearLayoutManager
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
-import cn.archko.pdf.base.BaseFragment
+import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.widgets.ColorItemDecoration
+import cn.archko.pdf.databinding.FragmentOutlineBinding
 import cn.archko.pdf.fragments.OutlineTabFragment.Companion.ARG_CURRENT_PAGE
 import org.vudroid.core.codec.OutlineLink
 
 /**
  * @author: archko 2019/7/11 :17:55
  */
-open class OutlineFragment : BaseFragment() {
+open class OutlineFragment : Fragment(R.layout.fragment_outline) {
 
-    private lateinit var adapter: ARecyclerView.Adapter<ViewHolder>
+    private lateinit var binding: FragmentOutlineBinding
+    private lateinit var adapter: RecyclerView.Adapter<ViewHolder>
     var outlineItems: List<OutlineLink>? = null
     var currentPage: Int = 0
-    private var recyclerView: ARecyclerView? = null
-    private var nodataView: View? = null
     private var pendingPos = -1
     private var found = -1
 
@@ -53,16 +55,20 @@ open class OutlineFragment : BaseFragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_outline, container, false)
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentOutlineBinding.inflate(layoutInflater)
+        return binding.root
+    }
 
-        recyclerView = view.findViewById(R.id.recyclerView)
-        nodataView = view.findViewById(R.id.nodataView)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        val itemDecoration = ColorItemDecoration(requireContext())
+        binding.recyclerView.addItemDecoration(itemDecoration)
 
-        recyclerView?.layoutManager = LinearLayoutManager(requireContext())
-
-        adapter = object : ARecyclerView.Adapter<ViewHolder>() {
+        adapter = object : RecyclerView.Adapter<ViewHolder>() {
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
                 val itemView = LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_outline, parent, false)
@@ -79,17 +85,15 @@ open class OutlineFragment : BaseFragment() {
             override fun getItemCount(): Int = outlineItems?.size ?: 0
         }
 
-        recyclerView?.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
         if (outlineItems.isNullOrEmpty()) {
-            recyclerView?.visibility = View.GONE
-            nodataView?.visibility = View.VISIBLE
+            binding.recyclerView.visibility = View.GONE
+            binding.nodataView.visibility = View.VISIBLE
         } else {
-            recyclerView?.visibility = View.VISIBLE
-            nodataView?.visibility = View.GONE
+            binding.recyclerView.visibility = View.VISIBLE
+            binding.nodataView.visibility = View.GONE
         }
-
-        return view
     }
 
     override fun onResume() {
@@ -122,11 +126,11 @@ open class OutlineFragment : BaseFragment() {
         }
         Logcat.d(String.format("found:%s, currentPage:%s", found, currentPage))
         if (found >= 0) {
-            recyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object :
+            binding.recyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object :
                 ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    recyclerView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
-                    (recyclerView?.layoutManager as LinearLayoutManager)
+                    binding.recyclerView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+                    (binding.recyclerView.layoutManager as LinearLayoutManager)
                         .scrollToPositionWithOffset(found, -10)
                 }
             })
@@ -142,7 +146,7 @@ open class OutlineFragment : BaseFragment() {
     }
 
     inner class ViewHolder(private val root: View) :
-        ARecyclerView.ViewHolder(root) {
+        BaseViewHolder<OutlineLink>(root) {
 
         var title: TextView? = null
         var page: TextView? = null
@@ -152,7 +156,7 @@ open class OutlineFragment : BaseFragment() {
             page = root.findViewById(R.id.page)
         }
 
-        fun onBind(data: OutlineLink, position: Int) {
+        override fun onBind(data: OutlineLink, position: Int) {
             if (position == found) {
                 root.setBackgroundColor(root.context.resources.getColor(R.color.toc_color_bg))
             } else {

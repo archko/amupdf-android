@@ -1,45 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_vertical"
-    android:background="@drawable/bg_list_item"
-    android:minHeight="36dp"
-    android:paddingLeft="8dp"
-    android:paddingTop="4dp"
-    android:paddingRight="8dp"
-    android:paddingBottom="4dp">
+    android:orientation="horizontal"
+    android:padding="8dp">
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/title"
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textSize="16sp"
+            tools:text="title" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textSize="14sp"
+            tools:text="note" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            tools:text="time" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:paddingStart="8dp"
-        android:text="@string/bookmark_page"
-        android:textColor="@color/white"
-        android:textSize="15sp" />
+        android:layout_gravity="end|center_vertical"
+        android:orientation="horizontal">
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/page"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toEndOf="@id/title"
-        android:paddingStart="8dp"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        tools:ignore="RelativeOverlap"
-        tools:text="33" />
+        <ImageButton
+            android:id="@+id/btn_edit"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/button"
+            android:contentDescription="编辑书签"
+            android:src="@drawable/ic_edit" />
 
-    <ImageView
-        android:id="@+id/delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="4dp"
-        android:padding="4dp"
-        android:src="@drawable/ic_delete" />
+        <ImageButton
+            android:id="@+id/btn_delete"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/button"
+            android:contentDescription="删除书签"
+            android:src="@drawable/ic_delete" />
 
-</RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>
