@@ -27,7 +27,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
-import cn.archko.pdf.core.common.AnnotationManager
 import cn.archko.pdf.controller.AEpubViewController
 import cn.archko.pdf.controller.ANormalViewController
 import cn.archko.pdf.controller.AScanReflowViewController
@@ -43,6 +42,7 @@ import cn.archko.pdf.controller.TtsDataCallback
 import cn.archko.pdf.controller.ViewMode
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.BitmapPool
+import cn.archko.pdf.core.common.AnnotationManager
 import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.GlobalEvent
 import cn.archko.pdf.core.common.IntentFile
@@ -51,9 +51,11 @@ import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.common.SensorHelper
 import cn.archko.pdf.core.common.StatusBarHelper
 import cn.archko.pdf.core.entity.BookProgress
+import cn.archko.pdf.core.entity.PathConfig
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.dialogs.DrawConfigDialog
 import cn.archko.pdf.fragments.BookmarkEditDialog
 import cn.archko.pdf.fragments.OutlineTabFragment
 import cn.archko.pdf.fragments.SleepTimerDialog
@@ -90,6 +92,8 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private val bookmarkViewModel: BookmarkViewModel = BookmarkViewModel()
     private var annotationManager: AnnotationManager? = null
     private var pageController: IPageController? = null
+
+    private var pathConfig: PathConfig = PathConfig()
     private var outlineLinks = mutableListOf<OutlineLink>()
     private var outlineTabFragment: OutlineTabFragment? = null
     private lateinit var mReflowLayout: RelativeLayout
@@ -644,6 +648,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
         override fun setDraw(draw: Boolean) {
             viewController?.setDraw(draw)
+            if (draw) {
+                updateUndoRedoButtons()
+            }
         }
 
         override fun ai() {
@@ -680,6 +687,20 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
         override fun selectFont() {
             viewController?.selectFont()
+        }
+
+        override fun showDrawConfig() {
+            showDrawConfigDialog()
+        }
+
+        override fun undoDraw() {
+            annotationManager?.undo()
+            updateUndoRedoButtons()
+        }
+
+        override fun redoDraw() {
+            annotationManager?.redo()
+            updateUndoRedoButtons()
         }
     }
 
@@ -844,6 +865,29 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 existingBookmark = existingBookmark
             )
             dialog.show(supportFragmentManager, "BookmarkEditDialog")
+        }
+    }
+
+    private fun showDrawConfigDialog() {
+        val dialog = DrawConfigDialog().withConfig(
+            pathConfig.color,
+            pathConfig.strokeWidth,
+            pathConfig.drawType
+        ).withListener { color, width, drawType ->
+            pathConfig.color = color
+            pathConfig.strokeWidth = width
+            pathConfig.drawType = drawType
+            viewController?.setDrawConfig(pathConfig)
+        }
+        dialog.show(supportFragmentManager, "DrawConfigDialog")
+    }
+
+    private fun updateUndoRedoButtons() {
+        if (annotationManager != null && pageController != null) {
+            pageController!!.updateUndoRedoButtons(
+                annotationManager!!.canUndo.value,
+                annotationManager!!.canRedo.value
+            )
         }
     }
 

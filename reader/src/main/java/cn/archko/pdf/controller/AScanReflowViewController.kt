@@ -31,6 +31,7 @@ import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.BookProgress
+import cn.archko.pdf.core.entity.PathConfig
 import cn.archko.pdf.core.utils.ColorUtil.getColorMode
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
@@ -410,11 +411,12 @@ class AScanReflowViewController(
     }
 
     override fun setSelection(selection: Boolean) {
-
     }
 
     override fun setDraw(draw: Boolean) {
+    }
 
+    override fun setDrawConfig(pathConfig: PathConfig) {
     }
 
     override fun setCrop(crop: Boolean) {

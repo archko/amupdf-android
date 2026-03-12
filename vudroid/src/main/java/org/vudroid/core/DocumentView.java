@@ -79,9 +79,7 @@ public class DocumentView extends View implements ZoomListener {
     private Page drawingPage = null;
     private final List<PointF> drawingPoints = new ArrayList<>();
     private Paint drawingPaint;
-    private int drawColor = Color.RED;
-    private float drawStrokeWidth = 4f;
-    private DrawType drawType = DrawType.LINE;
+    private PathConfig pathConfig = new PathConfig();
 
     private final GestureDetector mGestureDetector;
     boolean crop = false;
@@ -146,12 +144,10 @@ public class DocumentView extends View implements ZoomListener {
         }
     }
 
-    public void setDrawConfig(int color, float strokeWidth, DrawType drawType) {
-        this.drawColor = color;
-        this.drawStrokeWidth = strokeWidth;
-        this.drawType = drawType;
+    public void setDrawConfig(PathConfig pathConfig) {
+        this.pathConfig = pathConfig;
         initDrawingPaint();
-        Log.d(TAG, String.format("设置绘制配置: color=%d, strokeWidth=%.1f, drawType=%s", color, strokeWidth, drawType));
+        Log.d(TAG, String.format("设置绘制配置: cofig:%s", pathConfig));
     }
 
     public void setAnnotationManager(AnnotationManager annotationManager) {
@@ -177,8 +173,8 @@ public class DocumentView extends View implements ZoomListener {
 
     private void initDrawingPaint() {
         drawingPaint = new Paint();
-        drawingPaint.setColor(drawColor);
-        drawingPaint.setStrokeWidth(drawStrokeWidth);
+        drawingPaint.setColor(pathConfig.getColor());
+        drawingPaint.setStrokeWidth(pathConfig.getStrokeWidth());
         drawingPaint.setStyle(Paint.Style.STROKE);
         drawingPaint.setAntiAlias(true);
         drawingPaint.setStrokeCap(Paint.Cap.ROUND);
@@ -1140,7 +1136,7 @@ public class DocumentView extends View implements ZoomListener {
             drawingPoints.add(point);  // 起点
 
             Log.d(TAG, String.format("开始绘制: 页面%d, 模式%s, 相对坐标(%.3f, %.3f)",
-                    page.index, drawType, relativePoint.x, relativePoint.y));
+                    page.index, pathConfig.getDrawType(), relativePoint.x, relativePoint.y));
 
             invalidate();
             return true;
@@ -1167,13 +1163,13 @@ public class DocumentView extends View implements ZoomListener {
     private boolean handleDrawUp() {
         if (isDrawing && drawingPage != null && drawingPoints.size() > 1) {
             Log.d(TAG, String.format("结束绘制: 页面%d, 共%d个点, 模式%s",
-                    drawingPage.index, drawingPoints.size(), drawType));
+                    drawingPage.index, drawingPoints.size(), pathConfig.getDrawType()));
 
             if (annotationManager != null) {
                 try {
                     List<Offset> offsetList = new ArrayList<>();
 
-                    if (drawType == DrawType.LINE) {
+                    if (pathConfig.getDrawType() == DrawType.LINE) {
                         // LINE模式: 计算水平或垂直线的终点
                         PointF startPoint = drawingPoints.get(0);
                         PointF endPoint = drawingPoints.get(drawingPoints.size() - 1);
@@ -1203,15 +1199,9 @@ public class DocumentView extends View implements ZoomListener {
                         }
                     }
 
-                    PathConfig config = new PathConfig(
-                            drawColor,
-                            drawStrokeWidth,
-                            drawType
-                    );
-
                     AnnotationPath annotationPath = new AnnotationPath(
                             offsetList,
-                            config
+                            pathConfig
                     );
 
                     annotationManager.addPath(drawingPage.index, annotationPath);
@@ -1279,7 +1269,7 @@ public class DocumentView extends View implements ZoomListener {
         // 使用与 Page.getPageRegion 相同的坐标转换逻辑
         float scale = calculateScale(drawingPage);
 
-        if (drawType == DrawType.LINE) {
+        if (pathConfig.getDrawType() == DrawType.LINE) {
             // LINE模式: 绘制水平或垂直线，只使用起点和终点
             PointF startPoint = drawingPoints.get(0);
             PointF endPoint = drawingPoints.get(drawingPoints.size() - 1);
@@ -1305,7 +1295,7 @@ public class DocumentView extends View implements ZoomListener {
             //Log.d(TAG, String.format("startX:%s, startY:%s, endX:%s, endY:%s", startX, startY, endX, endY));
 
             canvas.drawLine(startX, startY, endX, endY, drawingPaint);
-        } else if (drawType == DrawType.CURVE) {
+        } else if (pathConfig.getDrawType() == DrawType.CURVE) {
             // CURVE模式: 绘制曲线
             Path path = new Path();
 

@@ -13,16 +13,16 @@ data class AnnotationPath(
 )
 
 data class PathConfig(
-    val color: Int = Color.RED,
-    val strokeWidth: Float = 4f,
-    val drawType: DrawType = DrawType.LINE
+    var color: Int = Color.RED,
+    var strokeWidth: Float = 4f,
+    var drawType: DrawType = DrawType.LINE
 ) {
     override fun toString(): String {
         return "PathConfig(color=#${Integer.toHexString(color)}, strokeWidth=$strokeWidth, drawType=$drawType)"
     }
 }
 
-enum class DrawType { CURVE, LINE }
+enum class DrawType { CURVE, LINE, CIRCLE }
 
 data class Offset(
     val x: Float,

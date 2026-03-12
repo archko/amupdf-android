@@ -19,6 +19,7 @@ import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.common.TtsHelper
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.BookProgress
+import cn.archko.pdf.core.entity.PathConfig
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.entity.TtsBean
 import cn.archko.pdf.core.listeners.ClickListener
@@ -259,6 +260,10 @@ open class ANormalViewController(
 
     override fun setDraw(draw: Boolean) {
         documentView.setDraw(draw)
+    }
+
+    override fun setDrawConfig(pathConfig: PathConfig) {
+        documentView.setDrawConfig(pathConfig)
     }
 
     override fun setOrientation(ori: Int) {

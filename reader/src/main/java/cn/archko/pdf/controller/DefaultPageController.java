@@ -8,8 +8,11 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import cn.archko.pdf.R;
+import cn.archko.pdf.core.entity.DrawType;
+import cn.archko.pdf.core.entity.PathConfig;
 import cn.archko.pdf.core.utils.FileUtils;
 import cn.archko.pdf.viewmodel.DocViewModel;
+import cn.archko.pdf.widgets.DrawPreviewView;
 
 /**
  * 公用的顶部栏,有公共的按钮与对应的处理事件
@@ -53,6 +56,14 @@ public abstract class DefaultPageController implements IPageController, View.OnC
     protected PageControllerListener controllerListener;
     protected DocViewModel docViewModel;
 
+    // 绘制工具栏相关
+    protected View layoutDraw;
+    protected DrawPreviewView drawWidthButton;
+    protected DrawPreviewView drawTypeButton;
+    protected DrawPreviewView drawColorButton;
+    protected ImageButton drawUndoButton;
+    protected ImageButton drawRedoButton;
+
     public DefaultPageController(View view, DocViewModel docViewModel, PageControllerListener controlListener) {
         this.controllerListener = controlListener;
         this.docViewModel = docViewModel;
@@ -79,11 +90,21 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         titleView = view.findViewById(R.id.title);
         layoutTitle = view.findViewById(R.id.layout_path);
         layoutSearch = view.findViewById(R.id.layout_search);
+        layoutDraw = view.findViewById(R.id.layout_draw);
         searchButton = view.findViewById(R.id.searchButton);
         nextBtn = view.findViewById(R.id.nextButton);
         prevBtn = view.findViewById(R.id.prevButton);
         closeBtn = view.findViewById(R.id.closeButton);
         mBackButton = view.findViewById(R.id.back_button);
+        drawWidthButton = view.findViewById(R.id.drawWidthButton);
+        drawTypeButton = view.findViewById(R.id.drawTypeButton);
+        drawColorButton = view.findViewById(R.id.drawColorButton);
+        drawUndoButton = view.findViewById(R.id.drawUndoButton);
+        drawRedoButton = view.findViewById(R.id.drawRedoButton);
+
+        drawWidthButton.setDrawType(DrawType.LINE);
+        drawTypeButton.setDrawType(DrawType.CURVE);
+        drawColorButton.setDrawType(DrawType.CIRCLE);
 
         ttsButton.setOnClickListener(this);
         selectButton.setOnClickListener(this);
@@ -102,6 +123,11 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         prevBtn.setOnClickListener(this);
         closeBtn.setOnClickListener(this);
         searchButton.setOnClickListener(this);
+        drawWidthButton.setOnClickListener(this);
+        drawTypeButton.setOnClickListener(this);
+        drawColorButton.setOnClickListener(this);
+        drawUndoButton.setOnClickListener(this);
+        drawRedoButton.setOnClickListener(this);
 
         mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -162,14 +188,6 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         }
     }
 
-    public void setSelection(boolean selection) {
-        this.selection = selection;
-    }
-
-    public void setOraw(boolean draw) {
-        this.draw = draw;
-    }
-
     public void updateSelection() {
         if (selection) {
             selectButton.setColorFilter(Color.argb(0xFF, 0, 255, 0));
@@ -181,8 +199,25 @@ public abstract class DefaultPageController implements IPageController, View.OnC
     public void updateDraw() {
         if (draw) {
             penButton.setColorFilter(Color.argb(0xFF, 0, 255, 0));
+            layoutDraw.setVisibility(View.VISIBLE);
         } else {
             penButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
+            layoutDraw.setVisibility(View.GONE);
+        }
+    }
+
+    public void updateUndoRedoButtons(boolean canUndo, boolean canRedo) {
+        if (drawUndoButton != null) {
+            drawUndoButton.setColorFilter(
+                    canUndo ? Color.argb(0xFF, 255, 255, 255)
+                            : Color.argb(0xFF, 128, 128, 128)
+            );
+        }
+        if (drawRedoButton != null) {
+            drawRedoButton.setColorFilter(
+                    canRedo ? Color.argb(0xFF, 255, 255, 255)
+                            : Color.argb(0xFF, 128, 128, 128)
+            );
         }
     }
 
@@ -254,6 +289,16 @@ public abstract class DefaultPageController implements IPageController, View.OnC
             controllerListener.ai();
         } else if (R.id.bookmarkButton == id) {
             controllerListener.bookmark();
+        } else if (R.id.drawWidthButton == id) {
+            controllerListener.showDrawConfig();
+        } else if (R.id.drawTypeButton == id) {
+            controllerListener.showDrawConfig();
+        } else if (R.id.drawColorButton == id) {
+            controllerListener.showDrawConfig();
+        } else if (R.id.drawUndoButton == id) {
+            controllerListener.undoDraw();
+        } else if (R.id.drawRedoButton == id) {
+            controllerListener.redoDraw();
         }
     }
 

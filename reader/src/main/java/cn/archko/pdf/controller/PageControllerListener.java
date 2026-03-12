@@ -42,4 +42,10 @@ public interface PageControllerListener {
     void preview();
 
     void selectFont();
+
+    void showDrawConfig();
+
+    void undoDraw();
+
+    void redoDraw();
 }

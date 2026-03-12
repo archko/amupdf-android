@@ -191,7 +191,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="8dp"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/path"
@@ -213,6 +213,59 @@
                 android:text=""
                 android:textColor="@android:color/white"
                 android:textSize="15sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_draw"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <cn.archko.pdf.widgets.DrawPreviewView
+                android:id="@+id/drawWidthButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="4dp" />
+
+            <cn.archko.pdf.widgets.DrawPreviewView
+                android:id="@+id/drawTypeButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="4dp" />
+
+
+            <cn.archko.pdf.widgets.DrawPreviewView
+                android:id="@+id/drawColorButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="4dp" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="#80FFFFFF" />
+
+            <ImageButton
+                android:id="@+id/drawUndoButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/button"
+                android:contentDescription="undo"
+                android:src="@drawable/ic_undo"
+                app:tint="#80FFFFFF" />
+
+            <ImageButton
+                android:id="@+id/drawRedoButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/button"
+                android:contentDescription="redo"
+                android:src="@drawable/ic_redo"
+                app:tint="#80FFFFFF" />
 
         </LinearLayout>
 

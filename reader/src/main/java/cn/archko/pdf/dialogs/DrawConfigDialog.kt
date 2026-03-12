@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.RadioButton
 import android.widget.RadioGroup
@@ -15,7 +16,10 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
+import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
+import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.entity.DrawType
+import cn.archko.pdf.widgets.DrawPreviewView
 
 /**
  * 绘图配置对话框 - 融合颜色、线宽和绘制类型选择
@@ -27,11 +31,9 @@ class DrawConfigDialog : DialogFragment() {
     private var initialDrawType: DrawType = DrawType.LINE
     private var configChangeListener: ((Int, Float, DrawType) -> Unit)? = null
 
-    private lateinit var colorPreview: View
+    private lateinit var drawPreview: DrawPreviewView
     private lateinit var widthSeekBar: SeekBar
     private lateinit var widthValueText: TextView
-    private lateinit var linePreview: View
-    private lateinit var curvePreview: View
     private lateinit var drawTypeRadioGroup: RadioGroup
     private lateinit var lineRadioButton: RadioButton
     private lateinit var curveRadioButton: RadioButton
@@ -67,8 +69,7 @@ class DrawConfigDialog : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val themeId = android.R.style.Theme_Material_Dialog
-        setStyle(STYLE_NO_FRAME, themeId)
+        setStyle(STYLE_NO_FRAME, R.style.AppTheme)
     }
 
     override fun onCreateView(
@@ -76,6 +77,15 @@ class DrawConfigDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        dialog?.apply {
+            val lp: WindowManager.LayoutParams = window!!.attributes
+            lp.dimAmount = 0f
+            setCanceledOnTouchOutside(true)
+            setCancelable(true)
+            val width = (resources.displayMetrics.widthPixels * 0.75).toInt()
+            val height = (resources.displayMetrics.heightPixels * 0.75).toInt()
+            window?.setLayout(width, height)
+        }
         return inflater.inflate(R.layout.dialog_draw_config, container, false)
     }
 
@@ -91,11 +101,9 @@ class DrawConfigDialog : DialogFragment() {
     }
 
     private fun initViews(view: View) {
-        colorPreview = view.findViewById(R.id.colorPreview)
+        drawPreview = view.findViewById(R.id.drawPreview)
         widthSeekBar = view.findViewById(R.id.widthSeekBar)
         widthValueText = view.findViewById(R.id.widthValueText)
-        linePreview = view.findViewById(R.id.linePreview)
-        curvePreview = view.findViewById(R.id.curvePreview)
         drawTypeRadioGroup = view.findViewById(R.id.drawTypeRadioGroup)
         lineRadioButton = view.findViewById(R.id.lineRadioButton)
         curveRadioButton = view.findViewById(R.id.curveRadioButton)
@@ -106,10 +114,12 @@ class DrawConfigDialog : DialogFragment() {
 
     private fun setupColorGrid() {
         colorsRecyclerView.layoutManager = GridLayoutManager(requireContext(), 5)
-        colorsRecyclerView.adapter = ColorAdapter(colors) { color ->
+        val adapter = ColorAdapter() { color ->
             selectedColor = color
             updatePreview()
         }
+        adapter.data = colors
+        colorsRecyclerView.adapter = adapter
     }
 
     private fun setupWidthSeekBar() {
@@ -132,10 +142,10 @@ class DrawConfigDialog : DialogFragment() {
     }
 
     private fun setupDrawTypeSelection() {
-        // 设置初始选择
         when (selectedDrawType) {
             DrawType.LINE -> lineRadioButton.isChecked = true
             DrawType.CURVE -> curveRadioButton.isChecked = true
+            else -> {}
         }
 
         drawTypeRadioGroup.setOnCheckedChangeListener { _, checkedId ->
@@ -144,19 +154,6 @@ class DrawConfigDialog : DialogFragment() {
                 R.id.curveRadioButton -> DrawType.CURVE
                 else -> DrawType.LINE
             }
-            updatePreview()
-        }
-
-        // 为预览区域添加点击事件
-        linePreview.setOnClickListener {
-            lineRadioButton.isChecked = true
-            selectedDrawType = DrawType.LINE
-            updatePreview()
-        }
-
-        curvePreview.setOnClickListener {
-            curveRadioButton.isChecked = true
-            selectedDrawType = DrawType.CURVE
             updatePreview()
         }
     }
@@ -173,12 +170,10 @@ class DrawConfigDialog : DialogFragment() {
     }
 
     private fun updatePreview() {
-        // 更新颜色预览
-        colorPreview.setBackgroundColor(selectedColor)
-
-        // 更新线宽和绘制类型预览
-        // 这里可以在预览区域绘制线条，但需要自定义View
-        // 暂时只更新颜色预览
+        // 更新绘图预览
+        drawPreview.lineColor = selectedColor
+        drawPreview.lineWidth = selectedWidth
+        drawPreview.drawType = selectedDrawType
     }
 
     fun withConfig(color: Int, width: Float, drawType: DrawType): DrawConfigDialog {
@@ -201,47 +196,42 @@ class DrawConfigDialog : DialogFragment() {
     }
 
     private inner class ColorAdapter(
-        private val colorList: List<Int>,
         private val onColorSelected: (Int) -> Unit
-    ) : RecyclerView.Adapter<ColorAdapter.ColorViewHolder>() {
+    ) : BaseRecyclerAdapter<Int>(context) {
 
-        inner class ColorViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val colorView: View = itemView.findViewById(R.id.colorItemView)
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ColorViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_color_grid, parent, false)
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+        ): BaseViewHolder<Int> {
+            val view = mInflater.inflate(R.layout.item_color_grid, parent, false)
             return ColorViewHolder(view)
         }
 
-        override fun onBindViewHolder(holder: ColorViewHolder, position: Int) {
-            val color = colorList[position]
-            holder.colorView.setBackgroundColor(color)
+        inner class ColorViewHolder(itemView: View) : BaseViewHolder<Int>(itemView) {
+            val colorView: View = itemView.findViewById(R.id.colorItemView)
+            val colorBackground: View = itemView.findViewById(R.id.colorBackground)
 
-            // 添加选中状态边框
-            val isSelected = color == selectedColor
-            val borderDrawable = if (isSelected) {
-                androidx.core.content.ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.color_item_selected_border
-                )
-            } else {
-                androidx.core.content.ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.color_item_border
-                )
-            }
-            holder.colorView.background = borderDrawable
+            override fun onBind(color: Int, position: Int) {
+                colorView.setBackgroundColor(color)
 
-            holder.colorView.setOnClickListener {
-                selectedColor = color
-                notifyDataSetChanged()
-                onColorSelected(color)
-                updatePreview()
+                val isSelected = color == selectedColor
+                val borderDrawable = if (isSelected) {
+                    androidx.core.content.ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.color_item_selected_border
+                    )
+                } else {
+                    null
+                }
+                colorBackground.background = borderDrawable
+
+                colorBackground.setOnClickListener {
+                    selectedColor = color
+                    notifyDataSetChanged()
+                    onColorSelected(color)
+                    updatePreview()
+                }
             }
         }
-
-        override fun getItemCount(): Int = colorList.size
     }
 }

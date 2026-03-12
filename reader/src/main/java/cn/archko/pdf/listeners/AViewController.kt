@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.view.MotionEvent
 import android.view.View
 import cn.archko.pdf.controller.TtsDataCallback
+import cn.archko.pdf.core.entity.PathConfig
 
 /**
  * @author: archko 2020/5/15 :12:43
@@ -49,4 +50,5 @@ interface AViewController {
     fun setSpeakingPage(page: Int)
     fun toggleThumbnail()
     fun selectFont()
+    fun setDrawConfig(pathConfig: PathConfig)
 }
