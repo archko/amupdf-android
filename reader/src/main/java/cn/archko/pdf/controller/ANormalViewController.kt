@@ -266,6 +266,10 @@ open class ANormalViewController(
         documentView.setDrawConfig(pathConfig)
     }
 
+    override fun setInvalidate() {
+        documentView.postInvalidate()
+    }
+
     override fun setOrientation(ori: Int) {
         scrollOrientation = ori
         documentView.oriention = ori

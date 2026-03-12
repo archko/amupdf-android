@@ -147,6 +147,8 @@ abstract class ABaseViewController(
 
     override fun setDrawConfig(pathConfig: PathConfig) {}
 
+    override fun setInvalidate() {}
+
     override fun setCrop(crop: Boolean) {
     }
 

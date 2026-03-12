@@ -416,6 +416,9 @@ class AScanReflowViewController(
     override fun setDraw(draw: Boolean) {
     }
 
+    override fun setInvalidate() {
+    }
+
     override fun setDrawConfig(pathConfig: PathConfig) {
     }
 

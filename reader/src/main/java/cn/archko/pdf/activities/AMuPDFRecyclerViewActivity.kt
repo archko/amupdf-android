@@ -68,6 +68,8 @@ import cn.archko.pdf.viewmodel.DocViewModel
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.vudroid.core.codec.OutlineLink
@@ -110,6 +112,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private val handler = Handler(Looper.getMainLooper())
     private var pendingPos = -1
     private var sessionStartTime: Long = 0L
+
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
+    private var annotationsJob: Job? = null
 
     // TTS数据缓存
     private var cachedTtsData: List<ReflowBean>? = null
@@ -695,11 +700,13 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
         override fun undoDraw() {
             annotationManager?.undo()
+            viewController?.setInvalidate()
             updateUndoRedoButtons()
         }
 
         override fun redoDraw() {
             annotationManager?.redo()
+            viewController?.setInvalidate()
             updateUndoRedoButtons()
         }
     }
@@ -916,6 +923,23 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     //--------------------------------------
 
+    private fun startObservingAnnotations() {
+        annotationsJob?.cancel()
+        annotationsJob = coroutineScope.launch {
+            annotationManager?.canUndo?.collectLatest { canUndo ->
+                pageController?.updateUndoRedoButtons(canUndo, annotationManager!!.canRedo.value)
+            }
+            annotationManager?.canRedo?.collectLatest { canRedo ->
+                pageController?.updateUndoRedoButtons(annotationManager!!.canRedo.value, canRedo)
+            }
+        }
+    }
+
+    private fun stopObservingAnnotations() {
+        annotationsJob?.cancel()
+        annotationsJob = null
+    }
+
     override fun onDestroy() {
         // 结束阅读会话统计
         if (isDocLoaded && sessionStartTime > 0) {
@@ -981,6 +1005,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             locatePageForTTS()
             resetSpeakingPage(pendingPos)
         }
+        startObservingAnnotations()
     }
 
     private fun locatePageForTTS() {
@@ -1003,6 +1028,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
         sensorHelper?.onPause()
         viewController?.onPause()
+        stopObservingAnnotations()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -23,6 +23,7 @@ interface AViewController {
     fun getCount(): Int
     fun setSelection(selection: Boolean)
     fun setDraw(draw: Boolean)
+    fun setInvalidate()
     fun setOrientation(ori: Int)
     fun setCrop(crop: Boolean)
     fun getCrop(): Boolean
