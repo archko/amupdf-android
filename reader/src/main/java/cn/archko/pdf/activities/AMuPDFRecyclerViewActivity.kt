@@ -65,6 +65,7 @@ import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TtsForegroundService
 import cn.archko.pdf.viewmodel.BookmarkViewModel
 import cn.archko.pdf.viewmodel.DocViewModel
+import cn.archko.pdf.viewmodel.AIViewModel
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -92,6 +93,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private var viewController: AViewController? = null
     private val docViewModel: DocViewModel = DocViewModel()
     private val bookmarkViewModel: BookmarkViewModel = BookmarkViewModel()
+    private val aiViewModel: AIViewModel = AIViewModel()
     private var annotationManager: AnnotationManager? = null
     private var pageController: IPageController? = null
 
@@ -253,6 +255,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 mPath!!.run {
                     docViewModel.loadBookProgressByPath(this)
                     bookmarkViewModel.loadBookmarks(this)
+                    aiViewModel.loadAllConversations(this)
                 }
             }
         }
@@ -832,6 +835,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             getCurrentPos(),
             outlineLinks,
             mPath ?: "",
+            aiViewModel = aiViewModel,
             onItemClick = { page ->
                 onSelectedOutline(page)
             },

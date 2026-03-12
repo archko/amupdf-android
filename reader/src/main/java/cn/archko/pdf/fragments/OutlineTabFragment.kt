@@ -13,6 +13,7 @@ import cn.archko.pdf.core.common.AnnotationManager
 import cn.archko.pdf.core.entity.ABookmark
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.BookmarkViewModel
+import cn.archko.pdf.viewmodel.AIViewModel
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -31,6 +32,7 @@ class OutlineTabFragment : DialogFragment() {
     private var bookmarkViewModel: BookmarkViewModel? = null
     private var annotationManager: AnnotationManager? = null
     private var outlineItems: List<OutlineLink>? = null
+    private var aiViewModel: AIViewModel? = null
 
     // 回调接口
     var onItemClick: ((Int) -> Unit)? = null
@@ -70,7 +72,8 @@ class OutlineTabFragment : DialogFragment() {
             bookmarkViewModel!!,
             annotationManager,
             outlineItems,
-            arguments
+            arguments,
+            aiViewModel
         )
         viewPager.adapter = pagerAdapter
 
@@ -123,6 +126,7 @@ class OutlineTabFragment : DialogFragment() {
             currentPage: Int,
             outlineItems: List<OutlineLink>?,
             path: String,
+            aiViewModel: AIViewModel? = null,
             onItemClick: ((Int) -> Unit)? = null,
         ) {
             val fragmentManager = activity.supportFragmentManager
@@ -140,6 +144,7 @@ class OutlineTabFragment : DialogFragment() {
             newDialog.bookmarkViewModel = bookmarkViewModel
             newDialog.annotationManager = annotationManager
             newDialog.outlineItems = outlineItems
+            newDialog.aiViewModel = aiViewModel
             newDialog.arguments = args
 
             newDialog.onItemClick = onItemClick

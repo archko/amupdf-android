@@ -50,7 +50,7 @@ class AIViewModel : ViewModel() {
                         apiKey = "",
                         baseUrl = "https://api.deepseek.com",
                         model = "deepseek-chat",
-                        maxTokens = 2000,
+                        maxTokens = 4000,
                         temperature = 0.7f,
                         isDefault = true
                     ),
@@ -60,7 +60,7 @@ class AIViewModel : ViewModel() {
                         apiKey = "",
                         baseUrl = "https://dashscope.aliyuncs.com",
                         model = "qwen-turbo",
-                        maxTokens = 2000,
+                        maxTokens = 4000,
                         temperature = 0.7f,
                         isDefault = false
                     ),
@@ -70,7 +70,7 @@ class AIViewModel : ViewModel() {
                         apiKey = "",
                         baseUrl = "https://open.bigmodel.cn",
                         model = "glm-4-flash",
-                        maxTokens = 2000,
+                        maxTokens = 4000,
                         temperature = 0.7f,
                         isDefault = false
                     )

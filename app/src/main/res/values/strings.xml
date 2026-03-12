@@ -227,4 +227,11 @@
     <!-- AI 设置 -->
     <string name="ai_setting_title">AI Settings</string>
     <string name="ai_setting_button">AI Settings</string>
+    
+    <!-- AI 对话相关 -->
+    <string name="ai_chat_empty">No AI conversations yet</string>
+    <string name="ai_conversations_count">%d conversations</string>
+    <string name="ai_tab">AI Chat</string>
+    <string name="page_label">Page %d</string>
+    <string name="annotations_count">%d annotations</string>
 </resources>

@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import cn.archko.pdf.core.common.AnnotationManager
 import cn.archko.pdf.viewmodel.BookmarkViewModel
+import cn.archko.pdf.viewmodel.AIViewModel
 import org.vudroid.core.codec.OutlineLink
 import java.lang.ref.WeakReference
 
@@ -18,15 +19,17 @@ class OutlinePagerAdapter(
     var bookmarkViewModel: BookmarkViewModel,
     var annotationManager: AnnotationManager?,
     var outlineItems: List<OutlineLink>?,
-    val arguments: Bundle?
+    val arguments: Bundle?,
+    var aiViewModel: AIViewModel? = null
 ) : FragmentStateAdapter(fragment) {
 
     companion object {
-        const val TAB_COUNT = 3
+        const val TAB_COUNT = 4
 
         const val TAB_OUTLINE = 0
         const val TAB_ANNOTATION = 1
         const val TAB_BOOKMARK = 2
+        const val TAB_AI = 3
     }
 
     override fun getItemCount(): Int = TAB_COUNT
@@ -61,6 +64,11 @@ class OutlinePagerAdapter(
                 BookmarkFragment.newInstance(bookmarkViewModel, path)
             }
 
+            TAB_AI -> {
+                val path = arguments?.getString(OutlineTabFragment.ARG_PATH) ?: ""
+                AIFragment.newInstance(aiViewModel, path)
+            }
+
             else -> throw IllegalArgumentException("Invalid tab position: $position")
         }
         mFragmentArray.put(position, WeakReference(fragment))
@@ -72,6 +80,7 @@ class OutlinePagerAdapter(
             TAB_OUTLINE -> "大纲"
             TAB_ANNOTATION -> "批注"
             TAB_BOOKMARK -> "书签"
+            TAB_AI -> "AI"
             else -> ""
         }
     }
