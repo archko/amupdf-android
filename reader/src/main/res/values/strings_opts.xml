@@ -254,4 +254,8 @@
     <string name="completion_tokens">Completion: %d</string>
     <string name="total_tokens">Total: %d</string>
 
+    <string name="copy">Copy</string>
+    <string name="selected_text">Selected text</string>
+    <string name="copy_to_clipboard">Copy to clipboard</string>
+
 </resources>

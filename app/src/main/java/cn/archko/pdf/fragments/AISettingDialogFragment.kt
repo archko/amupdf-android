@@ -179,7 +179,7 @@ class AISettingDialogFragment : DialogFragment() {
         override fun onBind(provider: AIProvider, position: Int) {
             binding.tvProviderName.text = provider.name
             binding.tvProviderModel.text = provider.model
-            binding.radioDefault.isChecked = provider.id == defaultProviderId
+            binding.radioDefault.isChecked = provider.isDefault
             if (provider.apiKey.isNotEmpty()) {
                 binding.tvApiKeyHint.text =
                     String.format("API Key: %s", "${provider.apiKey.take(8)}...")

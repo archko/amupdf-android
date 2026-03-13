@@ -84,6 +84,10 @@ open class ANormalViewController(
         override fun setCurrentPage(page: Int) {
             updateProgress(page)
         }
+
+        override fun selectedText(text: String) {
+            controllerListener?.selectedText(text)
+        }
     }
     val clickListener = object : ClickListener<View> {
         override fun click(t: View?, pos: Int) {

@@ -14,4 +14,6 @@ interface ControllerListener {
     fun doLoadedDoc(count: Int, pos: Int, outlineLinks: List<OutlineLink>?)
 
     fun reloadDoc()
+
+    fun selectedText(text: String)
 }

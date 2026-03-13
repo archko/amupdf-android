@@ -1106,6 +1106,7 @@ public class DocumentView extends View implements ZoomListener {
                         pageSelectionStartX, pageSelectionStartY,
                         pageSelectionEndX, pageSelectionEndY
                 );
+                docViewListener.selectedText(selectedText);
             }
 
             Log.d(TAG, String.format("结束选择: 页面%d, 选择区域(%.1f, %.1f) -> (%.1f, %.1f), 选中文本: %s",

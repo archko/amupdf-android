@@ -44,8 +44,7 @@ class ColorPickerDialog : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val themeId = android.R.style.Theme_Material_Dialog
-        setStyle(STYLE_NO_FRAME, themeId)
+        setStyle(STYLE_NO_FRAME, R.style.AppTheme)
     }
 
     override fun onCreateView(
@@ -61,8 +60,8 @@ class ColorPickerDialog : DialogFragment() {
             lp.flags = lp.flags or WindowManager.LayoutParams.FLAG_DIM_BEHIND
             setCanceledOnTouchOutside(true)
             setCancelable(true)
-            val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
-            val height = (resources.displayMetrics.heightPixels * 0.85).toInt()
+            val width = (resources.displayMetrics.widthPixels * 0.8).toInt()
+            val height = (resources.displayMetrics.heightPixels * 0.8).toInt()
             window?.setLayout(width, height)
         }
 

@@ -57,6 +57,7 @@ import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.dialogs.AIPageDialog
 import cn.archko.pdf.dialogs.DrawConfigDialog
+import cn.archko.pdf.dialogs.SelectionDialog
 import cn.archko.pdf.fragments.BookmarkEditDialog
 import cn.archko.pdf.fragments.OutlineTabFragment
 import cn.archko.pdf.fragments.SleepTimerDialog
@@ -402,6 +403,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
             override fun reloadDoc() {
                 applyViewMode(getCurrentPos())
+            }
+
+            override fun selectedText(text: String) {
+                showSelectedTextDialog(text)
             }
         }
     }
@@ -876,6 +881,11 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             val dialog = AIPageDialog.newInstance(mPath!!, pageIndex, content, aiViewModel)
             dialog.show(supportFragmentManager, "aiDialog")
         }
+    }
+
+    private fun showSelectedTextDialog(text: String) {
+        val dialog = SelectionDialog.newInstance(text)
+        dialog.show(supportFragmentManager, "selectionDialog")
     }
 
     private fun editBookmark() {
