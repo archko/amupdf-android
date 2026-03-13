@@ -84,8 +84,7 @@ class DrawConfigDialog : DialogFragment() {
             setCanceledOnTouchOutside(true)
             setCancelable(true)
             val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
-            val height = (resources.displayMetrics.heightPixels * 0.85).toInt()
-            window?.setLayout(width, height)
+            window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
         return inflater.inflate(R.layout.dialog_draw_config, container, false)
     }
