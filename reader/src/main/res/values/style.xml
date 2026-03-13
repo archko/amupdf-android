@@ -3,7 +3,6 @@
 
     <style name="AppDialogTheme" parent="Theme.Material3.Light.Dialog">
         <item name="android:windowBackground">@drawable/dialog_background</item>
-        <item name="android:windowCornerRadius">16dp</item>
         <item name="android:windowElevation">8dp</item>
         
         <!-- 关键点2：关闭默认的浮动窗口行为，让它像一个普通 View 一样听话 -->
