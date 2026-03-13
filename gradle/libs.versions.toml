@@ -48,7 +48,7 @@ sardine = "0.9"
 k2pdfopt = "0.2.0"
 juniversalchardet = "2.5.0"
 
-versionCode = "483"
+versionCode = "484"
 versionName = "7.8.3"
 
 [libraries]

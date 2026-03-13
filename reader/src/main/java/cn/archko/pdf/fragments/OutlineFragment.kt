@@ -79,6 +79,7 @@ open class OutlineFragment : Fragment(R.layout.fragment_outline) {
         }
 
         binding.recyclerView.adapter = adapter
+        adapter.data = outlineItems
 
         if (outlineItems.isNullOrEmpty()) {
             binding.recyclerView.visibility = View.GONE
