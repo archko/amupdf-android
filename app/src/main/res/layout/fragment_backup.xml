@@ -13,8 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:navigationIcon="@drawable/ic_back"
-        app:popupTheme="@style/ThemeOverlay.MaterialComponents.ActionBar"
-        app:title="@string/menu_search" />
+        app:title="@string/dialog_title_backup" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/files"

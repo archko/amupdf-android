@@ -42,8 +42,8 @@ open class BackupFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val themeId = android.R.style.Theme_Material_Dialog
-        setStyle(STYLE_NO_FRAME, themeId)
+        val themeId = cn.archko.pdf.R.style.AppTheme
+        setStyle(STYLE_NORMAL, themeId)
         backupViewModel = BackupViewModel()
     }
 

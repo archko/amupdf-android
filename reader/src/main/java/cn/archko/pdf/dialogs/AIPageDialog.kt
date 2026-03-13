@@ -59,7 +59,7 @@ class AIPageDialog : DialogFragment(R.layout.dialog_ai_page) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NO_FRAME, R.style.AppTheme)
+        setStyle(STYLE_NORMAL, R.style.AppTheme)
     }
 
     override fun onCreateView(
