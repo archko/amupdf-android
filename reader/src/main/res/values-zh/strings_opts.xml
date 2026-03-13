@@ -185,4 +185,22 @@
     <!-- Bookmark -->
     <string name="bookmark_dialog_title">书签</string>
 
+    <!-- AI 对话相关 -->
+    <string name="ai_chat_empty">没有 AI 会话 yet</string>
+    <string name="ai_conversations_count">会话数%d</string>
+    <string name="ai_tab">AI Chat</string>
+
+    <!-- AI 页面对话框相关 -->
+    <string name="ai_assistant_page">AI 助手 - 页 %d</string>
+    <string name="ask_based_on_content">基于当前页面问答…</string>
+    <string name="conversation_history">会话历史</string>
+    <string name="no_conversation_records">没有会话</string>
+    <string name="page_content">页面内容</string>
+    <string name="unable_to_get_page_text">无法获取页面文本</string>
+    <string name="send">发送</string>
+    <string name="close">关闭</string>
+    <string name="prompt_tokens">消耗: %d</string>
+    <string name="completion_tokens">完成: %d</string>
+    <string name="total_tokens">总: %d</string>
+
 </resources>

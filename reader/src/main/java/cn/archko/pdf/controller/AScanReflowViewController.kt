@@ -379,6 +379,10 @@ class AScanReflowViewController(
         return bitmap
     }
 
+    override fun getCurrentContent(start: Int, end: Int): List<String>? {
+        return null
+    }
+
     override fun getCurrentPos(): Int {
         if (null == mRecyclerView.layoutManager) {
             return 0

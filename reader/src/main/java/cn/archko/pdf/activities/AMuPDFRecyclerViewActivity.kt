@@ -55,6 +55,7 @@ import cn.archko.pdf.core.entity.PathConfig
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.dialogs.AIPageDialog
 import cn.archko.pdf.dialogs.DrawConfigDialog
 import cn.archko.pdf.fragments.BookmarkEditDialog
 import cn.archko.pdf.fragments.OutlineTabFragment
@@ -63,9 +64,9 @@ import cn.archko.pdf.fragments.TtsTextFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TtsForegroundService
+import cn.archko.pdf.viewmodel.AIViewModel
 import cn.archko.pdf.viewmodel.BookmarkViewModel
 import cn.archko.pdf.viewmodel.DocViewModel
-import cn.archko.pdf.viewmodel.AIViewModel
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -859,7 +860,22 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun ai() {
+        lifecycleScope.launch {
+            val pageIndex = getCurrentPos()
+            val content = withContext(Dispatchers.IO) {
+                val list = viewController?.getCurrentContent(pageIndex, pageIndex)
+                val sb = StringBuilder()
+                if (list != null) {
+                    for (str in list) {
+                        sb.append(str)
+                    }
+                }
+                sb.toString()
+            }
 
+            val dialog = AIPageDialog.newInstance(mPath!!, pageIndex, content, aiViewModel)
+            dialog.show(supportFragmentManager, "aiDialog")
+        }
     }
 
     private fun editBookmark() {

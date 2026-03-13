@@ -7,26 +7,21 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- 标题栏 - 使用 MaterialToolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:navigationIcon="@drawable/ic_close"
-        app:title="@string/ai_page_dialog_title"
-        app:titleTextColor="@color/colorPrimary"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"
+        app:navigationIcon="@drawable/ic_back" />
 
-    <!-- Token 使用信息 -->
     <LinearLayout
         android:id="@+id/llTokenUsage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone"
         android:layout_marginBottom="8dp"
-        android:background="@color/colorSurfaceVariant"
-        android:padding="8dp">
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -39,7 +34,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="12sp"
-                android:textColor="@color/colorOnSurfaceVariant"
                 tools:text="Prompt: 100" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -48,7 +42,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="12sp"
-                android:textColor="@color/colorOnSurfaceVariant"
                 tools:text="Completion: 200" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -57,27 +50,23 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="12sp"
-                android:textColor="@color/colorOnSurfaceVariant"
                 tools:text="Total: 300" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- 页面内容区域 -->
     <com.google.android.material.textview.MaterialTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
         android:text="@string/page_content"
         android:textSize="14sp"
-        android:textStyle="bold"
-        android:textColor="@color/colorOnSurfaceVariant"
-        android:layout_marginBottom="4dp" />
+        android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.5"
         android:orientation="vertical"
-        android:background="@color/colorSurfaceVariant"
         android:padding="8dp">
 
         <ScrollView
@@ -89,9 +78,8 @@
                 android:id="@+id/tvPageContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textColor="@color/colorOnSurfaceVariant"
                 android:lineSpacingExtra="4dp"
+                android:textSize="12sp"
                 tools:text="这里是页面内容文本..." />
         </ScrollView>
     </LinearLayout>
@@ -99,26 +87,22 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorSurfaceVariant"
         android:layout_marginVertical="8dp" />
 
-    <!-- 对话历史区域 -->
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tvConversationHistory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
         android:text="@string/conversation_history"
         android:textSize="14sp"
-        android:textStyle="bold"
-        android:textColor="@color/colorOnSurfaceVariant"
-        android:layout_marginBottom="4dp" />
+        android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.5"
         android:orientation="vertical"
-        android:background="@color/colorSurfaceVariant"
         android:padding="8dp">
 
         <androidx.recyclerview.widget.RecyclerView
@@ -130,15 +114,13 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorSurfaceVariant"
         android:layout_marginVertical="8dp" />
 
-    <!-- 输入区域 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etQuestion"
@@ -149,8 +131,7 @@
             android:inputType="textMultiLine"
             android:maxLines="3"
             android:minLines="1"
-            android:padding="12dp"
-            android:background="@drawable/edit_text_background" />
+            android:padding="12dp" />
 
         <ProgressBar
             android:id="@+id/pbLoading"
@@ -164,8 +145,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="@string/send"
-            android:enabled="false" />
+            android:enabled="false"
+            android:text="@string/send" />
     </LinearLayout>
 
 </LinearLayout>

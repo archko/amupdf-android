@@ -36,6 +36,7 @@ import cn.archko.pdf.core.common.APageSizeLoader;
 import cn.archko.pdf.core.common.IntentFile;
 import cn.archko.pdf.core.common.Logcat;
 import cn.archko.pdf.core.entity.APage;
+import cn.archko.pdf.core.entity.ReflowBean;
 import cn.archko.pdf.core.utils.SmartCropUtils;
 
 public class DecodeServiceBase implements DecodeService {
@@ -700,6 +701,33 @@ public class DecodeServiceBase implements DecodeService {
         } catch (Exception e) {
             Log.e(TAG, "getSelectedText异常: " + e.getMessage());
             return "";
+        }
+    }
+
+    @Override
+    public List<String> getSelectedText(int startIndex, int endIndex) {
+        List<String> list = new ArrayList<>();
+        try {
+            for (int i = startIndex; i <= endIndex; i++) {
+                CodecPage codecPage = getPage(startIndex);
+                if (codecPage == null) {
+                    Log.d(TAG, String.format("getSelectedText: 页面%d的CodecPage为空", startIndex));
+                    return list;
+                }
+
+                List<ReflowBean> reflowBeans = codecPage.getReflowBean();
+                Log.d(TAG, String.format("page: 页面%d, 文本长度: %d",
+                        startIndex, reflowBeans != null ? reflowBeans.size() : 0));
+                StringBuilder sb = new StringBuilder();
+                for (ReflowBean bean : reflowBeans) {
+                    sb.append(bean.getData());
+                }
+                list.add(sb.toString());
+            }
+            return list;
+        } catch (Exception e) {
+            Log.e(TAG, "getSelectedText异常: " + e.getMessage());
+            return list;
         }
     }
 

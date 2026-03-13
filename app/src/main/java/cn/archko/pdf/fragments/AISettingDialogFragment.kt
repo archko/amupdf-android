@@ -12,9 +12,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.archko.mupdf.R
 import cn.archko.mupdf.databinding.DialogAiSettingBinding
+import cn.archko.mupdf.databinding.ItemAiProviderBinding
+import cn.archko.pdf.core.adapters.BaseRecyclerListAdapter
+import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.entity.AIProvider
 import cn.archko.pdf.viewmodel.AIViewModel
 import com.google.android.material.appbar.MaterialToolbar
@@ -30,6 +34,7 @@ class AISettingDialogFragment : DialogFragment() {
     private lateinit var binding: DialogAiSettingBinding
     private lateinit var viewModel: AIViewModel
     private lateinit var adapter: AIProviderAdapter
+    private var defaultProviderId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,14 +57,7 @@ class AISettingDialogFragment : DialogFragment() {
 
         binding.toolbar.setNavigationOnClickListener { dismiss() }
 
-        adapter = AIProviderAdapter(
-            onEditClick = { provider ->
-                showEditDialog(provider)
-            },
-            onSetDefault = { provider ->
-                viewModel.setDefaultProvider(provider.id)
-            }
-        )
+        adapter = AIProviderAdapter()
         binding.rvAiProviders.layoutManager = LinearLayoutManager(requireContext())
         binding.rvAiProviders.adapter = adapter
 
@@ -84,7 +82,7 @@ class AISettingDialogFragment : DialogFragment() {
             }
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.defaultProvider.collect { defaultProvider ->
-                    adapter.setDefaultProviderId(defaultProvider?.id)
+                    defaultProviderId = defaultProvider?.id
                 }
             }
         }
@@ -135,6 +133,50 @@ class AISettingDialogFragment : DialogFragment() {
         }
 
         dialog.show()
+    }
+
+    inner class AIProviderAdapter : BaseRecyclerListAdapter<AIProvider>(
+        context,
+        object : DiffUtil.ItemCallback<AIProvider>() {
+            override fun areItemsTheSame(oldItem: AIProvider, newItem: AIProvider): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(oldItem: AIProvider, newItem: AIProvider): Boolean {
+                return oldItem == newItem
+            }
+        }) {
+
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+        ): BaseViewHolder<AIProvider> {
+            val binding = ItemAiProviderBinding.inflate(layoutInflater, parent, false)
+            return ViewHolder(binding)
+        }
+    }
+
+    inner class ViewHolder(
+        private val binding: ItemAiProviderBinding
+    ) : BaseViewHolder<AIProvider>(binding.root) {
+        override fun onBind(provider: AIProvider, position: Int) {
+            binding.tvProviderName.text = provider.name
+            binding.tvProviderModel.text = provider.model
+            binding.radioDefault.isChecked = provider.id == defaultProviderId
+            if (provider.apiKey.isNotEmpty()) {
+                binding.tvApiKeyHint.text =
+                    String.format("API Key: %s", "${provider.apiKey.take(8)}...")
+            } else {
+                binding.tvApiKeyHint.text = "NO API Key"
+            }
+
+            binding.radioDefault.setOnClickListener {
+                viewModel.setDefaultProvider(provider.id)
+            }
+            binding.btnEdit.setOnClickListener {
+                showEditDialog(provider)
+            }
+        }
     }
 
     companion object {

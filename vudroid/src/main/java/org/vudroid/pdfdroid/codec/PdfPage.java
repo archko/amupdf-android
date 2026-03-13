@@ -143,7 +143,7 @@ public class PdfPage implements CodecPage {
     }
 
     public List<ReflowBean> getReflowBean() {
-        byte[] result = ((Page) page).textAsText("preserve-whitespace,inhibit-spaces");
+        byte[] result = page.textAsText("preserve-whitespace,inhibit-spaces");
         if (null != result) {
             List<ReflowBean> reflowBeans = ParseTextMain.INSTANCE.parseAsTextList(result, (int) pageHandle);
             return reflowBeans;

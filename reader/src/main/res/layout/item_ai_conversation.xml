@@ -1,57 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
     android:orientation="vertical"
-    android:background="@color/colorSurface"
-    android:padding="12dp"
-    android:layout_marginBottom="8dp">
+    android:padding="12dp">
 
-    <!-- 问题部分 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_marginBottom="4dp"
         android:gravity="center_vertical"
-        android:layout_marginBottom="4dp">
+        android:orientation="horizontal">
 
         <ImageView
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_ai"
-            android:tint="@color/colorPrimary"
-            android:contentDescription="@null" />
+            android:contentDescription="@null"
+            android:src="@drawable/ic_ai" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tvQuestion"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textSize="14sp"
-            android:textColor="@color/colorOnSurface"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- 回答部分 -->
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tvAnswer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="13sp"
-        android:textColor="@color/colorOnSurfaceVariant"
         android:lineSpacingExtra="4dp"
-        android:paddingStart="24dp" />
+        android:paddingStart="24dp"
+        android:textSize="13sp" />
 
-    <!-- 时间信息 -->
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tvTime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="11sp"
-        android:textColor="@color/colorOnSurfaceVariant"
         android:gravity="end"
-        android:paddingTop="4dp" />
+        android:paddingTop="4dp"
+        android:textSize="11sp" />
 
 </LinearLayout>

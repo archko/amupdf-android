@@ -10,7 +10,25 @@ import kotlin.math.sqrt
 data class AnnotationPath(
     val points: List<Offset>,
     val config: PathConfig,
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as AnnotationPath
+
+        if (points != other.points) return false
+        if (config != other.config) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = points.hashCode()
+        result = 31 * result + config.hashCode()
+        return result
+    }
+}
 
 data class PathConfig(
     var color: Int = Color.RED,

@@ -236,4 +236,22 @@
     <!-- Bookmark -->
     <string name="bookmark_dialog_title">Bookmark Settings</string>
 
+    <!-- AI 对话相关 -->
+    <string name="ai_chat_empty">No AI conversations yet</string>
+    <string name="ai_conversations_count">%d conversations</string>
+    <string name="ai_tab">AI Chat</string>
+
+    <!-- AI 页面对话框相关 -->
+    <string name="ai_assistant_page">AI Assistant - Page %d</string>
+    <string name="ask_based_on_content">Ask based on page content…</string>
+    <string name="conversation_history">Conversation History</string>
+    <string name="no_conversation_records">No conversation records</string>
+    <string name="page_content">Page Content</string>
+    <string name="unable_to_get_page_text">Unable to get page text</string>
+    <string name="send">Send</string>
+    <string name="close">Close</string>
+    <string name="prompt_tokens">Prompt: %d</string>
+    <string name="completion_tokens">Completion: %d</string>
+    <string name="total_tokens">Total: %d</string>
+
 </resources>

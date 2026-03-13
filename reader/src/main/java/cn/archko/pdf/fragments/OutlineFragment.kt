@@ -9,8 +9,8 @@ import android.view.ViewTreeObserver
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
+import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
 import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.common.Logcat
 import cn.archko.pdf.core.widgets.ColorItemDecoration
@@ -24,7 +24,7 @@ import org.vudroid.core.codec.OutlineLink
 open class OutlineFragment : Fragment(R.layout.fragment_outline) {
 
     private lateinit var binding: FragmentOutlineBinding
-    private lateinit var adapter: RecyclerView.Adapter<ViewHolder>
+    private lateinit var adapter: BaseRecyclerAdapter<OutlineLink>
     var outlineItems: List<OutlineLink>? = null
     var currentPage: Int = 0
     private var pendingPos = -1
@@ -68,21 +68,14 @@ open class OutlineFragment : Fragment(R.layout.fragment_outline) {
         val itemDecoration = ColorItemDecoration(requireContext())
         binding.recyclerView.addItemDecoration(itemDecoration)
 
-        adapter = object : RecyclerView.Adapter<ViewHolder>() {
-            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-                val itemView = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_outline, parent, false)
-                return ViewHolder(itemView)
+        adapter = object : BaseRecyclerAdapter<OutlineLink>(requireContext()) {
+            override fun onCreateViewHolder(
+                parent: ViewGroup,
+                viewType: Int
+            ): BaseViewHolder<OutlineLink> {
+                val root = inflater.inflate(R.layout.item_outline, parent, false)
+                return ViewHolder(root)
             }
-
-            override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-                val item = outlineItems?.get(position)
-                if (item != null) {
-                    holder.onBind(item, position)
-                }
-            }
-
-            override fun getItemCount(): Int = outlineItems?.size ?: 0
         }
 
         binding.recyclerView.adapter = adapter

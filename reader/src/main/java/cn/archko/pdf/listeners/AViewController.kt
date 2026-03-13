@@ -20,6 +20,7 @@ interface AViewController {
 
     fun getCurrentPos(): Int
     fun getCurrentBitmap(): Bitmap?
+    fun getCurrentContent(start: Int, end: Int): List<String>?
     fun getCount(): Int
     fun setSelection(selection: Boolean)
     fun setDraw(draw: Boolean)

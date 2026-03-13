@@ -5,16 +5,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
+import cn.archko.pdf.core.adapters.BaseRecyclerListAdapter
+import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.common.AnnotationManager
 import cn.archko.pdf.core.entity.AnnotationPath
 import cn.archko.pdf.core.widgets.ColorItemDecoration
 import cn.archko.pdf.databinding.FragmentAnnotationBinding
+import cn.archko.pdf.databinding.ItemAnnotationBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -56,14 +57,16 @@ class AnnotationFragment(private val annotationManager: AnnotationManager?) :
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val itemDecoration = ColorItemDecoration(requireContext())
         binding.recyclerView.addItemDecoration(itemDecoration)
-        adapter = AnnotationAdapter(requireContext(), emptyList()) { pageIndex ->
-            parentFragment?.let {
-                if (it is OutlineTabFragment) {
-                    it.onAnnotationClick(pageIndex)
-                }
+        adapter = AnnotationAdapter(requireContext())
+        binding.recyclerView.adapter = adapter
+    }
+
+    private fun onItemClick(pageIndex: Int) {
+        parentFragment?.let {
+            if (it is OutlineTabFragment) {
+                it.onListItemClick(pageIndex)
             }
         }
-        binding.recyclerView.adapter = adapter
     }
 
     override fun onResume() {
@@ -98,57 +101,81 @@ class AnnotationFragment(private val annotationManager: AnnotationManager?) :
             binding.recyclerView.visibility = View.VISIBLE
             binding.tvEmpty.visibility = View.GONE
 
-            // 转换数据为列表形式
             val annotationList = annotations.entries.map { entry ->
                 AnnotationItem(entry.key, entry.value)
             }.sortedBy { it.pageIndex }
 
-            adapter.updateData(annotationList)
+            adapter.submitList(annotationList)
         }
     }
 
     data class AnnotationItem(
         val pageIndex: Int,
         val paths: List<AnnotationPath>
-    )
+
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as AnnotationItem
+
+            if (pageIndex != other.pageIndex) return false
+            if (paths != other.paths) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = pageIndex
+            result = 31 * result + paths.hashCode()
+            return result
+        }
+    }
 
     inner class AnnotationAdapter(
-        private val context: Context,
-        private var items: List<AnnotationItem>,
-        private val onItemClick: (Int) -> Unit
-    ) : RecyclerView.Adapter<AnnotationAdapter.ViewHolder>() {
+        context: Context,
+    ) : BaseRecyclerListAdapter<AnnotationItem>(
+        context,
+        object : DiffUtil.ItemCallback<AnnotationItem>() {
+            override fun areItemsTheSame(
+                oldItem: AnnotationItem,
+                newItem: AnnotationItem
+            ): Boolean {
+                return oldItem.pageIndex == newItem.pageIndex
+            }
 
-        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val tvPage: TextView = view.findViewById(R.id.tv_page)
-            val tvCount: TextView = view.findViewById(R.id.tv_count)
-            val btnDelete: ImageButton = view.findViewById(R.id.btn_delete)
+            override fun areContentsTheSame(
+                oldItem: AnnotationItem,
+                newItem: AnnotationItem
+            ): Boolean {
+                return oldItem.paths == newItem.paths
+            }
+        }) {
+
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+        ): BaseViewHolder<AnnotationItem> {
+            val binding = ItemAnnotationBinding.inflate(layoutInflater, parent, false)
+            return ViewHolder(binding)
         }
+    }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(context)
-                .inflate(R.layout.item_annotation, parent, false)
-            return ViewHolder(view)
-        }
+    inner class ViewHolder(
+        private val binding: ItemAnnotationBinding
+    ) : BaseViewHolder<AnnotationItem>(binding.root) {
+        override fun onBind(item: AnnotationItem, position: Int) {
+            binding.tvPage.text = context!!.getString(R.string.page_label, item.pageIndex + 1)
+            binding.tvCount.text = context!!.getString(R.string.annotations_count, item.paths.size)
 
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val item = items[position]
-            holder.tvPage.text = context.getString(R.string.page_label, item.pageIndex + 1)
-            holder.tvCount.text = context.getString(R.string.annotations_count, item.paths.size)
-
-            holder.itemView.setOnClickListener {
+            binding.root.setOnClickListener {
                 onItemClick(item.pageIndex)
             }
 
-            holder.btnDelete.setOnClickListener {
+            binding.btnDelete.setOnClickListener {
                 annotationManager?.deletePaths(item.pageIndex)
             }
-        }
-
-        override fun getItemCount(): Int = items.size
-
-        fun updateData(newItems: List<AnnotationItem>) {
-            items = newItems
-            notifyDataSetChanged()
         }
     }
 }

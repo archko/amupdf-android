@@ -5,8 +5,8 @@ import android.util.SparseArray
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import cn.archko.pdf.core.common.AnnotationManager
-import cn.archko.pdf.viewmodel.BookmarkViewModel
 import cn.archko.pdf.viewmodel.AIViewModel
+import cn.archko.pdf.viewmodel.BookmarkViewModel
 import org.vudroid.core.codec.OutlineLink
 import java.lang.ref.WeakReference
 

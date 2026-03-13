@@ -242,6 +242,10 @@ open class ANormalViewController(
         return decodeService?.decodeThumb(getCurrentPos())
     }
 
+    override fun getCurrentContent(start: Int, end: Int): List<String>? {
+        return decodeService?.getSelectedText(start, end)
+    }
+
     override fun getCurrentPos(): Int {
         var position = documentView.getCurrentPage()
         if (position < 0) {

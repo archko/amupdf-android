@@ -1,16 +1,20 @@
 package cn.archko.pdf.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
+import cn.archko.pdf.core.adapters.BaseRecyclerListAdapter
+import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.entity.ABookmark
 import cn.archko.pdf.core.widgets.ColorItemDecoration
 import cn.archko.pdf.databinding.FragmentBookmarkBinding
+import cn.archko.pdf.databinding.ItemBookmarkBinding
 import cn.archko.pdf.viewmodel.BookmarkViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,23 +61,24 @@ class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) :
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val itemDecoration = ColorItemDecoration(requireContext())
         binding.recyclerView.addItemDecoration(itemDecoration)
-        adapter = BookmarkAdapter(
-            requireContext(), emptyList(),
-            onItemClick = { bookmark ->
-                parentFragment?.let {
-                    if (it is OutlineTabFragment) {
-                        it.onBookmarkClick(bookmark)
-                    }
-                }
-            },
-            onEditClick = { bookmark ->
-                showEditDialog(bookmark)
-            },
-            onDeleteClick = { bookmark ->
-                bookmarkViewModel.deleteBookmark(bookmark)
-            }
-        )
+        adapter = BookmarkAdapter(requireContext())
         binding.recyclerView.adapter = adapter
+    }
+
+    private fun onItemClick(bookmark: ABookmark) {
+        parentFragment?.let {
+            if (it is OutlineTabFragment) {
+                it.onBookmarkClick(bookmark)
+            }
+        }
+    }
+
+    private fun onEditClick(bookmark: ABookmark) {
+        showEditDialog(bookmark)
+    }
+
+    private fun onDeleteClick(bookmark: ABookmark) {
+        bookmarkViewModel.deleteBookmark(bookmark)
     }
 
     private fun showEditDialog(bookmark: ABookmark) {
@@ -117,64 +122,68 @@ class BookmarkFragment(private var bookmarkViewModel: BookmarkViewModel) :
         } else {
             binding.recyclerView.visibility = View.VISIBLE
             binding.tvEmpty.visibility = View.GONE
-            adapter.updateData(bookmarks)
+            adapter.submitList(bookmarks)
         }
     }
 
-    class BookmarkAdapter(
-        private val context: android.content.Context,
-        private var items: List<ABookmark>,
-        private val onItemClick: (ABookmark) -> Unit,
-        private val onEditClick: (ABookmark) -> Unit,
-        private val onDeleteClick: (ABookmark) -> Unit
-    ) : RecyclerView.Adapter<BookmarkAdapter.ViewHolder>() {
+    private inner class BookmarkAdapter(
+        context: Context,
+    ) : BaseRecyclerListAdapter<ABookmark>(
+        context,
+        object : DiffUtil.ItemCallback<ABookmark>() {
+            override fun areItemsTheSame(
+                oldItem: ABookmark,
+                newItem: ABookmark
+            ): Boolean {
+                return oldItem.id == newItem.id
+            }
 
-        private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+            override fun areContentsTheSame(
+                oldItem: ABookmark,
+                newItem: ABookmark
+            ): Boolean {
+                return oldItem.path == newItem.path &&
+                        oldItem.pageIndex == newItem.pageIndex &&
+                        oldItem.createAt == newItem.createAt
+            }
+        }) {
 
-        class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val tvTitle: android.widget.TextView = view.findViewById(R.id.tv_title)
-            val tvTime: android.widget.TextView = view.findViewById(R.id.tv_time)
-            val tvNote: android.widget.TextView = view.findViewById(R.id.tv_note)
-            val btnEdit: android.widget.ImageButton = view.findViewById(R.id.btn_edit)
-            val btnDelete: android.widget.ImageButton = view.findViewById(R.id.btn_delete)
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+        ): BaseViewHolder<ABookmark> {
+            val binding = ItemBookmarkBinding.inflate(layoutInflater, parent, false)
+            return ViewHolder(binding)
         }
+    }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(context)
-                .inflate(R.layout.item_bookmark, parent, false)
-            return ViewHolder(view)
-        }
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val item = items[position]
+    private inner class ViewHolder(
+        private val binding: ItemBookmarkBinding
+    ) : BaseViewHolder<ABookmark>(binding.root) {
 
-            holder.tvTitle.text = String.format(
+        override fun onBind(item: ABookmark, position: Int) {
+            binding.tvTitle.text = String.format(
                 "%s - %s",
-                context.getString(R.string.page_label, item.pageIndex + 1),
+                context!!.getString(R.string.page_label, item.pageIndex + 1),
                 item.title
             )
 
-            holder.tvTime.text = dateFormat.format(Date(item.createAt))
-            holder.tvNote.text = item.note
+            binding.tvTime.text = dateFormat.format(Date(item.createAt))
+            binding.tvNote.text = item.note
 
-            holder.itemView.setOnClickListener {
+            binding.root.setOnClickListener {
                 onItemClick(item)
             }
 
-            holder.btnEdit.setOnClickListener {
+            binding.btnEdit.setOnClickListener {
                 onEditClick(item)
             }
 
-            holder.btnDelete.setOnClickListener {
+            binding.btnDelete.setOnClickListener {
                 onDeleteClick(item)
             }
-        }
-
-        override fun getItemCount(): Int = items.size
-
-        fun updateData(newItems: List<ABookmark>) {
-            items = newItems
-            notifyDataSetChanged()
         }
     }
 }

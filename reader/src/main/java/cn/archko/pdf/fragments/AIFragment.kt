@@ -5,13 +5,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import cn.archko.pdf.R
+import cn.archko.pdf.core.adapters.BaseRecyclerListAdapter
+import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.entity.AIPageConversation
+import cn.archko.pdf.databinding.FragmentAiBinding
+import cn.archko.pdf.databinding.ItemAiBinding
 import cn.archko.pdf.viewmodel.AIViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -53,14 +55,16 @@ class AIFragment(private val aiViewModel: AIViewModel?, private val documentPath
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        adapter = AIAdapter(requireContext(), emptyList()) { pageIndex ->
-            parentFragment?.let {
-                if (it is OutlineTabFragment) {
-                    it.onListItemClick(pageIndex)
-                }
+        adapter = AIAdapter(requireContext())
+        binding.recyclerView.adapter = adapter
+    }
+
+    private fun onItemClick(pageIndex: Int) {
+        parentFragment?.let {
+            if (it is OutlineTabFragment) {
+                it.onListItemClick(pageIndex)
             }
         }
-        binding.recyclerView.adapter = adapter
     }
 
     override fun onResume() {
@@ -80,7 +84,7 @@ class AIFragment(private val aiViewModel: AIViewModel?, private val documentPath
                 updateConversations(conversations)
             }
         }
-        
+
         // 加载对话数据
         aiViewModel?.loadAllConversations(documentPath)
     }
@@ -98,71 +102,94 @@ class AIFragment(private val aiViewModel: AIViewModel?, private val documentPath
             binding.recyclerView.visibility = View.VISIBLE
             binding.tvEmpty.visibility = View.GONE
 
-            // 按页面分组对话
             val conversationsByPage = conversations.groupBy { it.pageIndex }
-            
-            // 转换数据为列表形式
+
             val conversationList = conversationsByPage.entries.map { entry ->
                 AIItem(entry.key, entry.value)
             }.sortedBy { it.pageIndex }
 
-            adapter.updateData(conversationList)
+            adapter.submitList(conversationList)
         }
     }
 
     data class AIItem(
         val pageIndex: Int,
         val conversations: List<AIPageConversation>
-    )
+
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as AIItem
+
+            if (pageIndex != other.pageIndex) return false
+            if (conversations != other.conversations) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = pageIndex
+            result = 31 * result + conversations.hashCode()
+            return result
+        }
+    }
 
     inner class AIAdapter(
-        private val context: Context,
-        private var items: List<AIItem>,
-        private val onItemClick: (Int) -> Unit
-    ) : RecyclerView.Adapter<AIAdapter.ViewHolder>() {
-
-        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val tvPage: TextView = view.findViewById(R.id.tv_page)
-            val tvCount: TextView = view.findViewById(R.id.tv_count)
-            val tvPreview: TextView = view.findViewById(R.id.tv_preview)
-            val btnDelete: ImageButton = view.findViewById(R.id.btn_delete)
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(context)
-                .inflate(R.layout.item_ai, parent, false)
-            return ViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val item = items[position]
-            holder.tvPage.text = context.getString(R.string.page_label, item.pageIndex + 1)
-            holder.tvCount.text = context.getString(R.string.ai_conversations_count, item.conversations.size)
-            
-            // 显示最后一条对话的问题预览
-            item.conversations.firstOrNull()?.let { lastConv ->
-                holder.tvPreview.text = lastConv.question
-                holder.tvPreview.visibility = View.VISIBLE
-            } ?: run {
-                holder.tvPreview.visibility = View.GONE
+        context: Context,
+    ) : BaseRecyclerListAdapter<AIItem>(
+        context,
+        object : DiffUtil.ItemCallback<AIItem>() {
+            override fun areItemsTheSame(
+                oldItem: AIItem,
+                newItem: AIItem
+            ): Boolean {
+                return oldItem.pageIndex == newItem.pageIndex
             }
 
-            holder.itemView.setOnClickListener {
+            override fun areContentsTheSame(
+                oldItem: AIItem,
+                newItem: AIItem
+            ): Boolean {
+                return oldItem.conversations == newItem.conversations
+            }
+        }) {
+
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+        ): BaseViewHolder<AIItem> {
+            val binding = ItemAiBinding.inflate(layoutInflater, parent, false)
+            return ViewHolder(binding)
+        }
+    }
+
+    private inner class ViewHolder(
+        private val binding: ItemAiBinding
+    ) : BaseViewHolder<AIItem>(binding.root) {
+        override fun onBind(item: AIItem, position: Int) {
+            binding.tvPage.text = context!!.getString(R.string.page_label, item.pageIndex + 1)
+            binding.tvCount.text =
+                context!!.getString(R.string.ai_conversations_count, item.conversations.size)
+
+            // 显示最后一条对话的问题预览
+            item.conversations.firstOrNull()?.let { lastConv ->
+                binding.tvPreview.text = lastConv.question
+                binding.tvPreview.visibility = View.VISIBLE
+            } ?: run {
+                binding.tvPreview.visibility = View.GONE
+            }
+
+            binding.root.setOnClickListener {
                 onItemClick(item.pageIndex)
             }
 
-            holder.btnDelete.setOnClickListener {
+            binding.btnDelete.setOnClickListener {
                 item.conversations.forEach { conversation ->
                     aiViewModel?.deleteConversation(conversation)
                 }
             }
-        }
-
-        override fun getItemCount(): Int = items.size
-
-        fun updateData(newItems: List<AIItem>) {
-            items = newItems
-            notifyDataSetChanged()
         }
     }
 }

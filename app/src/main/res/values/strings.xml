@@ -4,7 +4,7 @@
 
     <string name="outline_title">Table of Contents</string>
     <string name="auto_crop">auto crop bound</string>
-    
+
     <string name="create_pdf">Create PDF</string>
     <string name="export_image">Export Images</string>
     <string name="settings_title">Reading Settings</string>
@@ -227,24 +227,4 @@
     <!-- AI 设置 -->
     <string name="ai_setting_title">AI Settings</string>
     <string name="ai_setting_button">AI Settings</string>
-    
-    <!-- AI 对话相关 -->
-    <string name="ai_chat_empty">No AI conversations yet</string>
-    <string name="ai_conversations_count">%d conversations</string>
-    <string name="ai_tab">AI Chat</string>
-    <string name="page_label">Page %d</string>
-    <string name="annotations_count">%d annotations</string>
-    
-    <!-- AI 页面对话框相关 -->
-    <string name="ai_assistant_page">AI Assistant - Page %d</string>
-    <string name="ask_based_on_content">Ask based on page content...</string>
-    <string name="conversation_history">Conversation History</string>
-    <string name="no_conversation_records">No conversation records</string>
-    <string name="page_content">Page Content</string>
-    <string name="unable_to_get_page_text">Unable to get page text</string>
-    <string name="send">Send</string>
-    <string name="close">Close</string>
-    <string name="prompt_tokens">Prompt: %d</string>
-    <string name="completion_tokens">Completion: %d</string>
-    <string name="total_tokens">Total: %d</string>
 </resources>

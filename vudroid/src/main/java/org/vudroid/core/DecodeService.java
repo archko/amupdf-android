@@ -53,22 +53,26 @@ public interface DecodeService {
 
     /**
      * 从页面坐标获取选中的文本
+     *
      * @param pageIndex 页面索引
-     * @param startX 起始点X坐标（页面坐标）
-     * @param startY 起始点Y坐标（页面坐标）
-     * @param endX 结束点X坐标（页面坐标）
-     * @param endY 结束点Y坐标（页面坐标）
+     * @param startX    起始点X坐标（页面坐标）
+     * @param startY    起始点Y坐标（页面坐标）
+     * @param endX      结束点X坐标（页面坐标）
+     * @param endY      结束点Y坐标（页面坐标）
      * @return 选中的文本
      */
     String getSelectedText(int pageIndex, float startX, float startY, float endX, float endY);
 
+    List<String> getSelectedText(int startIndex, int endIndex);
+
     /**
      * 获取文本选择的高亮区域
+     *
      * @param pageIndex 页面索引
-     * @param startX 起始点X坐标（页面坐标）
-     * @param startY 起始点Y坐标（页面坐标）
-     * @param endX 结束点X坐标（页面坐标）
-     * @param endY 结束点Y坐标（页面坐标）
+     * @param startX    起始点X坐标（页面坐标）
+     * @param startY    起始点Y坐标（页面坐标）
+     * @param endX      结束点X坐标（页面坐标）
+     * @param endY      结束点Y坐标（页面坐标）
      * @return 高亮区域列表
      */
     List<RectF> getTextSelectionRects(int pageIndex, float startX, float startY, float endX, float endY);
