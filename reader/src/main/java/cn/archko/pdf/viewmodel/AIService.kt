@@ -1,12 +1,15 @@
 package cn.archko.pdf.viewmodel
 
 import cn.archko.pdf.core.entity.AIProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.concurrent.TimeUnit
 
 /**
  * AI 服务 - 处理与 AI 提供商的通信
@@ -14,7 +17,11 @@ import org.json.JSONObject
  */
 class AIService {
 
-    private val client = OkHttpClient()
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(360, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
+        .build()
 
     /**
      * AI 响应结果，包含回答和 token 使用信息
@@ -91,8 +98,8 @@ class AIService {
         question: String,
         pageContent: String,
         providerName: String
-    ): Result<AIResponse> {
-        return try {
+    ): Result<AIResponse> = withContext(Dispatchers.IO) {
+        try {
             // 构建请求 JSON
             val requestJson = JSONObject().apply {
                 put("model", provider.model)
@@ -126,11 +133,11 @@ class AIService {
             val response = client.newCall(request).execute()
 
             if (!response.isSuccessful) {
-                return Result.failure(Exception("$providerName API 请求失败: ${response.code} ${response.message}"))
+                return@withContext Result.failure(Exception("$providerName API 请求失败: ${response.code} ${response.message}"))
             }
 
             val responseBody = response.body?.string()
-                ?: return Result.failure(Exception("$providerName API 返回空响应体"))
+                ?: return@withContext Result.failure(Exception("$providerName API 返回空响应体"))
 
             val responseJson = JSONObject(responseBody)
 
@@ -139,7 +146,7 @@ class AIService {
             val firstChoice = choicesArray?.optJSONObject(0)
             val message = firstChoice?.optJSONObject("message")
             val answer = message?.optString("content")
-                ?: return Result.failure(Exception("$providerName AI 返回空响应"))
+                ?: return@withContext Result.failure(Exception("$providerName AI 返回空响应"))
 
             // 解析 token 使用信息
             val usage = responseJson.optJSONObject("usage")
