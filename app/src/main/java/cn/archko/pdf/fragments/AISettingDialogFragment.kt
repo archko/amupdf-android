@@ -66,6 +66,9 @@ class AISettingDialogFragment : DialogFragment() {
         }
 
         binding.btnSave.setOnClickListener {
+            defaultProviderId?.run {
+                viewModel.setDefaultProvider(this)
+            }
             dismiss()
         }
 
@@ -171,7 +174,7 @@ class AISettingDialogFragment : DialogFragment() {
             }
 
             binding.radioDefault.setOnClickListener {
-                viewModel.setDefaultProvider(provider.id)
+                defaultProviderId = provider.id
             }
             binding.btnEdit.setOnClickListener {
                 showEditDialog(provider)
