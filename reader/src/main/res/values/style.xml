@@ -2,6 +2,18 @@
 <resources>
 
     <style name="AppDialogTheme" parent="Theme.Material3.Light.Dialog">
-        <!--<item name="android:windowBackground">@drawable/bg_window_tiled</item>-->
+        <item name="android:windowBackground">@drawable/dialog_background</item>
+        <item name="android:windowCornerRadius">16dp</item>
+        <item name="android:windowElevation">8dp</item>
+        
+        <!-- 关键点2：关闭默认的浮动窗口行为，让它像一个普通 View 一样听话 -->
+        <item name="android:windowIsFloating">false</item> 
+        
+        <!-- 关键点3：去掉默认标题栏等干扰 -->
+        <item name="android:windowNoTitle">true</item>
+        
+        <!-- 保留你的 Primary 颜色等，以便内部组件（如 TabLayout）能获取到主题色 -->
+        <item name="colorPrimary">@color/md_theme_primary</item>
+        <item name="colorSurface">@color/md_theme_surface</item>
     </style>
 </resources>

@@ -98,8 +98,11 @@ class FileInfoFragment : DialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         dialog?.apply {
+            window!!.setBackgroundDrawable(androidx.core.content.ContextCompat.getDrawable(requireContext(), cn.archko.pdf.R.drawable.dialog_background))
+            window!!.decorView?.elevation = 16f // 16dp 的阴影深度，可根据需要调整
             val lp: WindowManager.LayoutParams = window!!.attributes
-            lp.dimAmount = 0f
+            lp.dimAmount = 0.5f 
+            lp.flags = lp.flags or WindowManager.LayoutParams.FLAG_DIM_BEHIND
             setCanceledOnTouchOutside(true)
             setCancelable(true)
             // 设置宽度为屏幕宽度的 85%

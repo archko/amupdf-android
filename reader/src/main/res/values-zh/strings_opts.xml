@@ -186,7 +186,7 @@
     <string name="bookmark_dialog_title">书签</string>
 
     <!-- AI 对话相关 -->
-    <string name="ai_chat_empty">没有 AI 会话 yet</string>
+    <string name="ai_chat_empty">没有 AI 会话</string>
     <string name="ai_conversations_count">会话数%d</string>
     <string name="ai_tab">AI Chat</string>
 

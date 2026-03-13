@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.SeekBar
@@ -52,6 +53,19 @@ class ColorPickerDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        dialog?.apply {
+            window!!.setBackgroundDrawable(androidx.core.content.ContextCompat.getDrawable(requireContext(), R.drawable.dialog_background))
+            window!!.decorView?.elevation = 16f // 16dp 的阴影深度，可根据需要调整
+            val lp: WindowManager.LayoutParams = window!!.attributes
+            lp.dimAmount = 0.5f 
+            lp.flags = lp.flags or WindowManager.LayoutParams.FLAG_DIM_BEHIND
+            setCanceledOnTouchOutside(true)
+            setCancelable(true)
+            val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
+            val height = (resources.displayMetrics.heightPixels * 0.85).toInt()
+            window?.setLayout(width, height)
+        }
+
         return inflater.inflate(R.layout.dialog_color_picker, container, false)
     }
 

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
@@ -61,6 +62,19 @@ open class BackupFragment : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        dialog?.apply {
+            window!!.setBackgroundDrawable(androidx.core.content.ContextCompat.getDrawable(requireContext(), cn.archko.pdf.R.drawable.dialog_background))
+            window!!.decorView?.elevation = 16f // 16dp 的阴影深度，可根据需要调整
+            val lp: WindowManager.LayoutParams = window!!.attributes
+            lp.dimAmount = 0.5f 
+            lp.flags = lp.flags or WindowManager.LayoutParams.FLAG_DIM_BEHIND
+            setCanceledOnTouchOutside(true)
+            setCancelable(true)
+            val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
+            val height = (resources.displayMetrics.heightPixels * 0.85).toInt()
+            window?.setLayout(width, height)
+        }
+
         val view = inflater.inflate(R.layout.fragment_backup, container, false)
         val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
         toolbar.setNavigationOnClickListener({ dismiss() })

@@ -49,11 +49,13 @@ class OutlineTabFragment : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         dialog?.apply {
+            window!!.setBackgroundDrawable(androidx.core.content.ContextCompat.getDrawable(requireContext(), R.drawable.dialog_background))
+            window!!.decorView?.elevation = 16f // 16dp 的阴影深度，可根据需要调整
             val lp: WindowManager.LayoutParams = window!!.attributes
-            lp.dimAmount = 0f
+            lp.dimAmount = 0.5f 
+            lp.flags = lp.flags or WindowManager.LayoutParams.FLAG_DIM_BEHIND
             setCanceledOnTouchOutside(true)
             setCancelable(true)
-            // 设置宽度为屏幕宽度的 85%
             val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
             val height = (resources.displayMetrics.heightPixels * 0.85).toInt()
             window?.setLayout(width, height)

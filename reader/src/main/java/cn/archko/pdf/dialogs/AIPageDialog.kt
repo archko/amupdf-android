@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.archko.pdf.R
+import cn.archko.pdf.core.widgets.ColorItemDecoration
 import cn.archko.pdf.core.adapters.BaseRecyclerListAdapter
 import cn.archko.pdf.core.adapters.BaseViewHolder
 import cn.archko.pdf.core.entity.AIPageConversation
@@ -58,7 +59,7 @@ class AIPageDialog : DialogFragment(R.layout.dialog_ai_page) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NO_FRAME, R.style.AppTheme)
+        setStyle(STYLE_NO_FRAME, R.style.AppDialogTheme)
     }
 
     override fun onCreateView(
@@ -66,8 +67,11 @@ class AIPageDialog : DialogFragment(R.layout.dialog_ai_page) {
         savedInstanceState: Bundle?
     ): View {
         dialog?.apply {
+            window!!.setBackgroundDrawable(androidx.core.content.ContextCompat.getDrawable(requireContext(), R.drawable.dialog_background))
+            window!!.decorView?.elevation = 16f // 16dp 的阴影深度，可根据需要调整
             val lp: WindowManager.LayoutParams = window!!.attributes
-            lp.dimAmount = 0f
+            lp.dimAmount = 0.5f 
+            lp.flags = lp.flags or WindowManager.LayoutParams.FLAG_DIM_BEHIND
             setCanceledOnTouchOutside(true)
             setCancelable(true)
             val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
@@ -91,6 +95,8 @@ class AIPageDialog : DialogFragment(R.layout.dialog_ai_page) {
     private fun initViews() {
         binding.toolbar.title = getString(R.string.ai_assistant_page).format(pageIndex + 1)
         binding.rvConversations.layoutManager = LinearLayoutManager(requireContext())
+        val itemDecoration = ColorItemDecoration(requireContext())
+        binding.rvConversations.addItemDecoration(itemDecoration)
         adapter = ConversationAdapter()
         binding.rvConversations.adapter = adapter
     }
