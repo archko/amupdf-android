@@ -10,6 +10,7 @@ import org.vudroid.pdfdroid.codec.PdfDocument;
 
 import cn.archko.pdf.core.App;
 import cn.archko.pdf.core.common.Logcat;
+import cn.archko.pdf.core.utils.FontCSSGenerator;
 import cn.archko.pdf.core.utils.Utils;
 
 public class EpubDocument extends PdfDocument {

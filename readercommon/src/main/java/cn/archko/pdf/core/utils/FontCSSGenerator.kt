@@ -1,9 +1,10 @@
-package org.vudroid.epub.codec
+package cn.archko.pdf.core.utils
+
+import java.io.File
 
 /**
  * @author: archko 2025/9/18 :20:09
  */
-import java.io.File
 
 object FontCSSGenerator {
 

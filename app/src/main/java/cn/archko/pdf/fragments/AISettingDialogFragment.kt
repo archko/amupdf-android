@@ -49,10 +49,15 @@ class AISettingDialogFragment : DialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         dialog?.apply {
-            window!!.setBackgroundDrawable(androidx.core.content.ContextCompat.getDrawable(requireContext(), cn.archko.pdf.R.drawable.dialog_background))
+            window!!.setBackgroundDrawable(
+                androidx.core.content.ContextCompat.getDrawable(
+                    requireContext(),
+                    cn.archko.pdf.R.drawable.dialog_background
+                )
+            )
             window!!.decorView?.elevation = 16f // 16dp 的阴影深度，可根据需要调整
             val lp: WindowManager.LayoutParams = window!!.attributes
-            lp.dimAmount = 0.5f 
+            lp.dimAmount = 0.5f
             lp.flags = lp.flags or WindowManager.LayoutParams.FLAG_DIM_BEHIND
             setCanceledOnTouchOutside(true)
             setCancelable(true)
@@ -119,9 +124,29 @@ class AISettingDialogFragment : DialogFragment() {
         etBaseUrl.setText(provider.baseUrl)
         etModel.setText(provider.model)
 
-        val dialog = AlertDialog.Builder(requireContext())
+        val dialog = AlertDialog.Builder(requireContext(), R.style.AppDialogTheme)
             .setView(dialogView)
             .create()
+        dialog.apply {
+            window!!.setBackgroundDrawable(
+                androidx.core.content.ContextCompat.getDrawable(
+                    context,
+                    cn.archko.pdf.R.drawable.dialog_background
+                )
+            )
+            window!!.decorView.elevation = 16f // 16dp 的阴影深度，可根据需要调整
+            val lp: WindowManager.LayoutParams = window!!.attributes
+            lp.dimAmount = 0.5f
+            lp.flags = lp.flags or WindowManager.LayoutParams.FLAG_DIM_BEHIND
+            setCanceledOnTouchOutside(true)
+            setCancelable(true)
+
+            val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
+            window?.setLayout(
+                width,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
 
         toolbar.setTitle(provider.name)
         toolbar.setNavigationOnClickListener { dialog.dismiss() }

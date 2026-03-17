@@ -52,7 +52,20 @@ dependencies {
         exclude("stax-api")
         exclude("xpp3")
     }
-    api("org.jsoup:jsoup:1.21.2")
+
+    api(libs.penfeizhou.awebp)
+    api(libs.android.gif.drawable)
+
+    api("org.jsoup:jsoup:1.22.1")
 
     api(project(":pdf-recyclerview"))
+
+    //docx to html
+    api(libs.mammoth)
+    //html to epub
+    api("io.documentnode:epub4j-core:4.2.2") {
+        exclude("xmlpull")
+    }
+
+    api(libs.tiff.loader)
 }

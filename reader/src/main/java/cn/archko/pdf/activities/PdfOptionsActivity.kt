@@ -12,6 +12,7 @@ import android.text.TextWatcher
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.CompoundButton
@@ -30,14 +31,12 @@ import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.Logcat.d
 import cn.archko.pdf.core.common.PdfOptionKeys
 import cn.archko.pdf.core.common.PdfOptionRepository
-import cn.archko.pdf.core.common.PdfOptionRepository.getAutoScan
 import cn.archko.pdf.core.common.PdfOptionRepository.getAutocrop
 import cn.archko.pdf.core.common.PdfOptionRepository.getColorMode
 import cn.archko.pdf.core.common.PdfOptionRepository.getDirsFirst
 import cn.archko.pdf.core.common.PdfOptionRepository.getFullscreen
 import cn.archko.pdf.core.common.PdfOptionRepository.getKeepOn
 import cn.archko.pdf.core.common.PdfOptionRepository.getOrientation
-import cn.archko.pdf.core.common.PdfOptionRepository.getScanFolder
 import cn.archko.pdf.core.common.PdfOptionRepository.getShowExtension
 import cn.archko.pdf.core.common.PdfOptionRepository.setAutoScan
 import cn.archko.pdf.core.common.PdfOptionRepository.setAutocrop
@@ -168,23 +167,23 @@ class PdfOptionsActivity : FragmentActivity() {
         )
         prefsList.add(prefs)
 
-        prefs = Prefs(
-            TYPE_CHECK,
-            getString(R.string.opts_scan),
-            getString(R.string.opts_scan),
-            PdfOptionKeys.PREF_AUTO_SCAN,
-            getAutoScan()
-        )
-        prefsList.add(prefs)
+        //prefs = Prefs(
+        //    TYPE_CHECK,
+        //    getString(R.string.opts_scan),
+        //    getString(R.string.opts_scan),
+        //    PdfOptionKeys.PREF_AUTO_SCAN,
+        //    getAutoScan()
+        //)
+        //prefsList.add(prefs)
 
-        prefs = Prefs(
-            TYPE_EDIT,
-            getString(R.string.opts_scan_folder),
-            getString(R.string.opts_scan_folder),
-            PdfOptionKeys.PREF_SCAN_FOLDER,
-            getScanFolder()
-        )
-        prefsList.add(prefs)
+        //prefs = Prefs(
+        //    TYPE_EDIT,
+        //    getString(R.string.opts_scan_folder),
+        //    getString(R.string.opts_scan_folder),
+        //    PdfOptionKeys.PREF_SCAN_FOLDER,
+        //    getScanFolder()
+        //)
+        //prefsList.add(prefs)
 
         prefs = Prefs(
             TYPE_LIST, getString(R.string.opts_list_style), getString(R.string.opts_list_style),
@@ -294,7 +293,7 @@ class PdfOptionsActivity : FragmentActivity() {
         fun showListDialog(data: Prefs, summary: TextView) {
             val builder = AlertDialog.Builder(
                 this@PdfOptionsActivity,
-                androidx.appcompat.R.style.Theme_AppCompat_Dialog
+                R.style.AppDialogTheme
             )
             builder.setTitle(data.title)
             builder.setSingleChoiceItems(
@@ -306,7 +305,29 @@ class PdfOptionsActivity : FragmentActivity() {
                 data.index = which
                 setCheckListVal(data.key, data.vals?.get(which) ?: false)
             }
-            builder.create().show()
+            val dialog = builder.create()
+
+            dialog.apply {
+                window!!.setBackgroundDrawable(
+                    androidx.core.content.ContextCompat.getDrawable(
+                        itemView.context,
+                        R.drawable.dialog_background
+                    )
+                )
+                window!!.decorView.elevation = 16f // 16dp 的阴影深度，可根据需要调整
+                val lp: WindowManager.LayoutParams = window!!.attributes
+                lp.dimAmount = 0.5f
+                lp.flags = lp.flags or WindowManager.LayoutParams.FLAG_DIM_BEHIND
+                setCanceledOnTouchOutside(true)
+                setCancelable(true)
+
+                val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
+                window?.setLayout(width,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
+
+            dialog.show()
         }
 
         fun showColorModeDialog(data: Prefs, summary: TextView) {
@@ -326,11 +347,33 @@ class PdfOptionsActivity : FragmentActivity() {
                 }
             recyclerView.adapter = adapter
 
-            val dialog = AlertDialog.Builder(this@PdfOptionsActivity)
-                .setView(dialogView)
+            val dialog = AlertDialog.Builder(
+                this@PdfOptionsActivity,
+                R.style.AppDialogTheme
+            ).setView(dialogView)
                 .create()
 
             adapter.setDialog(dialog)
+            dialog.apply {
+                window!!.setBackgroundDrawable(
+                    androidx.core.content.ContextCompat.getDrawable(
+                        itemView.context,
+                        R.drawable.dialog_background
+                    )
+                )
+                window!!.decorView.elevation = 16f // 16dp 的阴影深度，可根据需要调整
+                val lp: WindowManager.LayoutParams = window!!.attributes
+                lp.dimAmount = 0.5f
+                lp.flags = lp.flags or WindowManager.LayoutParams.FLAG_DIM_BEHIND
+                setCanceledOnTouchOutside(true)
+                setCancelable(true)
+
+                val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
+                window?.setLayout(
+                    width,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
             dialog.show()
         }
 
@@ -505,9 +548,32 @@ class PdfOptionsActivity : FragmentActivity() {
                 })
             }
 
-            val dialog = AlertDialog.Builder(context)
+            val dialog = AlertDialog.Builder(
+                context,
+                R.style.AppDialogTheme
+            )
                 .setView(dialogView)
                 .create()
+            dialog.apply {
+                window!!.setBackgroundDrawable(
+                    androidx.core.content.ContextCompat.getDrawable(
+                        context,
+                        R.drawable.dialog_background
+                    )
+                )
+                window!!.decorView.elevation = 16f // 16dp 的阴影深度，可根据需要调整
+                val lp: WindowManager.LayoutParams = window!!.attributes
+                lp.dimAmount = 0.5f
+                lp.flags = lp.flags or WindowManager.LayoutParams.FLAG_DIM_BEHIND
+                setCanceledOnTouchOutside(true)
+                setCancelable(true)
+
+                val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
+                window?.setLayout(
+                    width,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
 
             dialogView.findViewById<Button>(R.id.btn_reset).setOnClickListener {
                 val appleGreenMatrix = ColorUtil.getColorMode(3) ?: floatArrayOf(
@@ -670,7 +736,10 @@ class PdfOptionsActivity : FragmentActivity() {
         }
 
         fun showEditDialog(data: Prefs, summary: TextView?) {
-            val builder = AlertDialog.Builder(this@PdfOptionsActivity)
+            val builder = AlertDialog.Builder(
+                this@PdfOptionsActivity,
+                R.style.AppDialogTheme
+            )
             val editText = EditText(this@PdfOptionsActivity)
             editText.setText(data.value.toString())
             builder.setTitle(data.title)
@@ -685,7 +754,28 @@ class PdfOptionsActivity : FragmentActivity() {
             builder.setNegativeButton(
                 "Cancel"
             ) { dialog: DialogInterface, _: Int -> dialog.dismiss() }
-            builder.create().show()
+            val dialog = builder.create()
+            dialog.apply {
+                window!!.setBackgroundDrawable(
+                    androidx.core.content.ContextCompat.getDrawable(
+                        itemView.context,
+                        R.drawable.dialog_background
+                    )
+                )
+                window!!.decorView.elevation = 16f // 16dp 的阴影深度，可根据需要调整
+                val lp: WindowManager.LayoutParams = window!!.attributes
+                lp.dimAmount = 0.5f
+                lp.flags = lp.flags or WindowManager.LayoutParams.FLAG_DIM_BEHIND
+                setCanceledOnTouchOutside(true)
+                setCancelable(true)
+
+                val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
+                window?.setLayout(
+                    width,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
+            dialog.show()
         }
 
         fun setEditVal(key: String, value: String) {

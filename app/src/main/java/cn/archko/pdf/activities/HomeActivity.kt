@@ -17,6 +17,8 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
 import android.util.SparseArray
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.app.ActivityCompat
@@ -96,6 +98,8 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
             mPath = savedInstanceState.getString("path", null)
         }
         parseIntent()
+
+        loadView()
     }
 
     override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
@@ -128,7 +132,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
 
         // 如果是图片，弹出“是否浏览目录”
         if (file.isFile && IntentFile.isImage(mPath!!)) {
-            androidx.appcompat.app.AlertDialog.Builder(this)
+            val dialog = androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppDialogTheme)
                 .setTitle(R.string.app_name)
                 .setMessage(R.string.show_as_dir)
                 .setPositiveButton(R.string.show_as_dir_ok) { _, _ ->
@@ -141,7 +145,24 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
                     PDFViewerHelper.openImage(mPath, this)
                 }
                 .setOnCancelListener { }
-                .show()
+            dialog.apply {
+                window!!.setBackgroundDrawable(
+                    androidx.core.content.ContextCompat.getDrawable(
+                        context,
+                        cn.archko.pdf.R.drawable.dialog_background
+                    )
+                )
+                window!!.decorView.elevation = 16f // 16dp 的阴影深度，可根据需要调整
+                val lp: WindowManager.LayoutParams = window!!.attributes
+                lp.dimAmount = 0.5f
+                lp.flags = lp.flags or WindowManager.LayoutParams.FLAG_DIM_BEHIND
+                setCancelable(true)
+                window?.setLayout(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
+            dialog.show()
         }
     }
 
@@ -300,7 +321,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
             builder.setCancelable(false)
             builder.create().show()
         } else {
-            loadView()
+            //loadView()
         }
     }
 
@@ -328,7 +349,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
     }
 
     override fun onPermissionGranted() {
-        loadView()
+        //loadView()
     }
 
     //========================================

@@ -1,6 +1,7 @@
 package org.vudroid.core;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -11,6 +12,8 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.GestureDetector;
@@ -829,11 +832,11 @@ public class DocumentView extends View implements ZoomListener {
             //Log.d(TAG, String.format("scrollX:%s, scrollY:%s, scale:%s, zoom:%s, index:%s, e.x:%s, e.y:%s, bound:%s",
             //        scrollX, scrollY, scale, zoomModel.getZoom(), page.index, e.getX(), e.getY(), page.bounds.top));
 
-            Hyperlink link = Hyperlink.Companion.mapPointToPage(page, x, y);
+            Hyperlink link = mapPointToPage(page, x, y);
             //Log.d(TAG, String.format("x:%s, y:%s, bounds:%s, link:%s, links:%s", x, y, page.bounds, link, page.links));
             if (link != null) {
                 if (Hyperlink.LINKTYPE_URL == link.getLinkType()) {
-                    Hyperlink.Companion.openSystemBrowser(getContext(), link.getUrl());
+                    openSystemBrowser(getContext(), link.getUrl());
                     return page;
                 } else {
                     goToPage(link.getPage());
@@ -842,6 +845,33 @@ public class DocumentView extends View implements ZoomListener {
             }
         }
         return null;
+    }
+
+    private Hyperlink mapPointToPage(Page page, Float atX, Float atY) {
+        if (null == page.links) {
+            return null;
+        }
+        for (Hyperlink hyper : page.links) {
+            if (null != hyper.getBbox() && hyper.getBbox().contains(atX.intValue(), atY.intValue())) {
+                return hyper;
+            }
+        }
+        return null;
+    }
+
+    private void openSystemBrowser(Context context, String url) {
+        if (context != null && !TextUtils.isEmpty(url)) {
+            try {
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Uri uri = Uri.parse(url);
+                intent.setData(uri);
+                context.startActivity(intent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public Rect getBounds(Page page) {
