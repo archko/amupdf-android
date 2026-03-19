@@ -1,5 +1,8 @@
 package cn.archko.pdf.core.utils
 
+import cn.archko.pdf.core.App.Companion.instance
+import cn.archko.pdf.core.common.Logcat.d
+import com.tencent.mmkv.MMKV
 import java.io.File
 
 /**
@@ -7,6 +10,38 @@ import java.io.File
  */
 
 object FontCSSGenerator {
+    fun getDefFontSize(): Float {
+        val fontSize = (8.4f * Utils.getDensityDpi(instance) / 72)
+        return fontSize
+    }
+
+    fun getFontSize(name: String): Float {
+        val mmkv = MMKV.mmkvWithID("epub")
+        var fs = mmkv.decodeFloat("font_" + name.hashCode(), getDefFontSize())
+        if (fs > 90) {
+            fs = 90f
+        }
+        return fs
+    }
+
+    fun setFontSize(name: String, size: Float) {
+        val mmkv = MMKV.mmkvWithID("epub")
+        d("setFontSize:" + size)
+        mmkv.encode("font_" + name.hashCode(), size)
+    }
+
+    //"/sdcard/fonts/simsun.ttf"
+    fun getFontFace(): String? {
+        val mmkv = MMKV.mmkvWithID("epub")
+        val fs = mmkv.decodeString("font_face", "")
+        return fs
+    }
+
+    fun setFontFace(name: String?) {
+        val mmkv = MMKV.mmkvWithID("epub")
+        d("setFontFace:" + name)
+        mmkv.encode("font_face", name)
+    }
 
     fun generateFontCSS(fontPath: String?, margin: String): String {
         val buffer = StringBuilder()

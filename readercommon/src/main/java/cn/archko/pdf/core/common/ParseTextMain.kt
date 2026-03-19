@@ -17,6 +17,11 @@ object ParseTextMain {
 
     private val txtParser: TxtParser = TxtParser()
 
+    fun parseAsText(bytes: ByteArray): String {
+        val content = String(bytes)
+        return txtParser.parseAsText(content)
+    }
+
     /**
      * 解析为spanned,可以直接使用于html
      */
@@ -42,6 +47,56 @@ object ParseTextMain {
         lateinit var path: String
 
         constructor() {}
+
+        internal fun parse(lists: List<String>): String {
+            val sb = StringBuilder()
+            var isImage = false
+            var maxNumberCharOfLine = 20
+            for (s in lists) {
+                if (s.length > maxNumberCharOfLine) {
+                    maxNumberCharOfLine = s.length
+                }
+            }
+
+            var lastLine: Line? = null
+            for (s in lists) {
+                val ss = s.trim { it <= ' ' }
+                if (ss.isNotEmpty()) {
+                    if (ss.startsWith(IMAGE_START_MARK)) {
+                        isImage = true
+                        sb.append(LINE_END)
+                    }
+                    if (!isImage) {
+                        lastLine = parseLine(ss, sb, MAX_PAGEINDEX, lastLine, maxNumberCharOfLine)
+                    } else {
+                        sb.append(ss)
+                    }
+
+                    if (ss.endsWith("</p>")) {
+                        isImage = false
+                    }
+                }
+            }
+            return sb.toString()
+        }
+
+        public fun parseAsText(content: String): String {
+            //println("parse:==>" + content)
+            val sb = StringBuilder()
+            val list = ArrayList<String>()
+            var aChar: Char
+            for (element in content) {
+                aChar = element
+                if (aChar == '\n') {
+                    list.add(sb.toString())
+                    sb.setLength(0)
+                } else {
+                    sb.append(aChar)
+                }
+            }
+            //println("result=>>" + result)
+            return parse(list)
+        }
 
         /**
          * parse text as List<ReflowBean>
@@ -367,6 +422,11 @@ object ParseTextMain {
 
     //========================== decode image ==========================
     private const val IMAGE_HEADER = "base64,"
+
+    /**
+     * 最大的页面是30页,如果是30页前的,一行小于25字,认为可能是目录.在这之后的,文本重排时不认为是目录.合并为一行.
+     */
+    internal const val MAX_PAGEINDEX = 20
 
     var minImgHeight = 32f
         set

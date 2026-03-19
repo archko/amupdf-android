@@ -288,8 +288,8 @@ class AScanReflowViewController(
     }
 
     private fun doLoadDoc(pageSizeBean: APageSizeLoader.PageSizeBean, document: CodecDocument) {
-        Logcat.d(TAG, "doLoadDoc:${pageSizeBean.crop}, ${pageSizeBean.List!!.size}")
-        this.mPageSizes = pageSizeBean.List!!
+        Logcat.d(TAG, "doLoadDoc:${pageSizeBean.crop}, ${pageSizeBean.list!!.size}")
+        this.mPageSizes = pageSizeBean.list!!
         if (null == mPageSizes) {
             return
         }

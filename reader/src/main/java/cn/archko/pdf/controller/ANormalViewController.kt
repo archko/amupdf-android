@@ -193,8 +193,8 @@ open class ANormalViewController(
     }
 
     open fun doLoadDoc(pageSizeBean: APageSizeLoader.PageSizeBean, document: CodecDocument) {
-        Logcat.d("doLoadDoc:${pageSizeBean.crop}, ${pageSizeBean.List!!.size}")
-        this.mPageSizes = pageSizeBean.List!!
+        Logcat.d("doLoadDoc:${pageSizeBean.crop}, ${pageSizeBean.list!!.size}")
+        this.mPageSizes = pageSizeBean.list!!
         if (null == mPageSizes) {
             return
         }

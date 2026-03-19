@@ -81,6 +81,10 @@ class APage {
         return cropBounds!!.height()
     }
 
+    fun hasCrop(): Boolean {
+        return false
+    }
+
     override fun toString(): String {
         return "APage(index=$index, width=$width, height=$height, zoom=$zoom, cropScale=$cropScale, cropBounds=$cropBounds)"
     }

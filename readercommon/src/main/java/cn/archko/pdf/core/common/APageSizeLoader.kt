@@ -103,7 +103,7 @@ object APageSizeLoader {
         }
         val pageSizeBean = PageSizeBean()
         val list = fromJson(ja)
-        pageSizeBean.List = list
+        pageSizeBean.list = list
         pageSizeBean.crop = jo.optBoolean("crop")
         return pageSizeBean
     }
@@ -148,7 +148,7 @@ object APageSizeLoader {
     }
 
     class PageSizeBean {
-        var List: List<APage>? = null
+        var list: List<APage>? = null
         var crop = false
         var fileSize = 0L
     }
