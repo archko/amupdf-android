@@ -44,7 +44,12 @@ class PageNode(
     private var cachedTileSpec: TileSpec? = null
 
     fun update(newBounds: RectF, newAPage: APage) {
-        this.bounds = Rect(newBounds.left.toInt(), newBounds.top.toInt(), newBounds.right.toInt(), newBounds.bottom.toInt())
+        this.bounds = Rect(
+            newBounds.left.toInt(),
+            newBounds.top.toInt(),
+            newBounds.right.toInt(),
+            newBounds.bottom.toInt()
+        )
         this.aPage = newAPage
     }
 
@@ -251,10 +256,10 @@ class PageNode(
                 (if (null != aPage.cropBounds && pageViewState.isCropEnabled()) aPage.cropBounds!!.top.toFloat()
                 else 1f) * pageHeight / height
             val srcRect = RectF(
-                bounds.left * pageWidth + left,
-                bounds.top * pageHeight + top,
-                bounds.right * pageWidth + left,
-                bounds.bottom * pageHeight + top
+                bounds.left.toFloat() * pageWidth + left,
+                bounds.top.toFloat() * pageHeight + top,
+                bounds.right.toFloat() * pageWidth + left,
+                bounds.bottom.toFloat() * pageHeight + top
             )
             //println("[PageNode].decode:$pageWidth-$pageHeight, left:$left, $scale, width:$width, $srcRect, $aPage")
             val outWidth = ((srcRect.right - srcRect.left)).toInt()

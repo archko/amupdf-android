@@ -191,7 +191,7 @@ class DocumentView @JvmOverloads constructor(
                 if (isZooming) {
                     isZooming = false
                     zoomBaseDistance = 0f
-                    // 缩放结束时重新计算页面布局
+
                     pageViewState?.updateViewSize(IntSize(viewWidth, viewHeight), vZoom, orientation)
                     pageViewState?.updateVisiblePages(
                         viewOffset,
@@ -231,6 +231,7 @@ class DocumentView @JvmOverloads constructor(
                     // 应用边界限制（现在 totalWidth/totalHeight 已经是新的缩放值了）
                     viewOffset = calculateBounds(newOffset, vZoom, pageViewState, orientation)
 
+                    pageViewState?.updateVisiblePages(viewOffset, IntSize(viewWidth, viewHeight), vZoom)
                     invalidate()
                     return true
                 }
