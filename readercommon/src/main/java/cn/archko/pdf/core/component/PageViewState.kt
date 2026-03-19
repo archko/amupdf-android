@@ -45,7 +45,6 @@ class PageViewState(
     var speakingPageIndex: Int? = null
         private set
 
-    // 搜索高亮状态
     // var searchHighlightQuads: Map<Int, List<DocQuad>> = emptyMap()
     //    private set
     var currentSearchPageIndex: Int? = null
@@ -53,12 +52,10 @@ class PageViewState(
     var currentSearchResultIndex: Int = -1
         private set
 
-    // 预加载配置
     private var preloadScreens: Float = 0.8f // 预加载1屏的距离
 
     private var lastPageKeys: Set<Int> = emptySet()
 
-    // 添加关闭标志
     private var isShutdown = false
 
     // 链接处理回调

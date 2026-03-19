@@ -18,6 +18,7 @@ import com.archko.reader.pdf.component.Vertical
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 private const val MAX_ZOOM = 30f
 
@@ -36,7 +37,6 @@ class DocumentView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    // 核心状态
     var viewWidth: Int = 0
     var viewHeight: Int = 0
 
@@ -51,7 +51,10 @@ class DocumentView @JvmOverloads constructor(
             val clamped = value.coerceIn(1f, MAX_ZOOM)
             if (field != clamped) {
                 field = clamped
-                pageViewState?.updateViewSize(IntSize(viewWidth, viewHeight), vZoom, orientation)
+                if (!isZooming) {
+                    // 只在非缩放过程中调用 updateViewSize
+                    pageViewState?.updateViewSize(IntSize(viewWidth, viewHeight), vZoom, orientation)
+                }
                 invalidate()
             }
         }
@@ -68,7 +71,6 @@ class DocumentView @JvmOverloads constructor(
     var toPage: Int = -1
     var isJumping: Boolean = false
 
-    // PageViewState
     var pageViewState: PageViewState? = null
         set(value) {
             field = value
@@ -82,48 +84,46 @@ class DocumentView @JvmOverloads constructor(
                     }
                     isJumping = false
                 }
+
+                viewScope.launch {
+                    value.renderFlow.collect {
+                        invalidate()
+                    }
+                }
+                value.onDecodeCompleted = {
+                    invalidate()
+                }
             }
         }
 
-    // 协程作用域
     private val viewScope = CoroutineScope(Dispatchers.Main)
 
-    // 手势检测器
     private val gestureDetector: GestureDetector
     private val flinger: Flinger
 
-    // Fling 动画相关
     private var flingRunnable: FlingRunnable? = null
 
-    // 多点触控缩放相关
     private var isZooming = false
     private var zoomBaseDistance = 0f
     private var zoomStartZoom = 1f
 
-    // 回调
     var onPageChanged: ((page: Int) -> Unit)? = null
     var onSaveDocument: ((page: Int, pageCount: Int, zoom: Double, scrollX: Long, scrollY: Long, scrollOri: Long, reflow: Long, crop: Long) -> Unit)? =
         null
     var onCloseDocument: (() -> Unit)? = null
 
-    // 跳转相关
     var jumpToPage: Int? = null
     var jumpOffsetY: Float? = null
 
-    // 重新流动/切边相关
     var reflow: Long = 0L
     var crop: Boolean = false
 
-    // 搜索相关
     //var searchHighlightQuads: Map<Int, List<cn.archko.pdf.core.entity.DocQuad>> = emptyMap()
 
-    // 解码器相关
     var decoder: ImageDecoder? = null
 
-    // 朗读相关
     var speakingPageIndex: Int? = null
 
-    // 初始化相关
     var initialOrientation: Int = Vertical
     var initialScrollX: Long = 0L
     var initialScrollY: Long = 0L
@@ -133,7 +133,6 @@ class DocumentView @JvmOverloads constructor(
         gestureDetector = GestureDetector(context, DocumentGestureListener())
         flinger = Flinger()
 
-        // 启用硬件加速
         setLayerType(LAYER_TYPE_HARDWARE, null)
     }
 
@@ -150,12 +149,10 @@ class DocumentView @JvmOverloads constructor(
         super.onDraw(canvas)
 
         val pvs = pageViewState ?: return
-
         canvas.save()
 
         canvas.translate(viewOffset.x, viewOffset.y)
 
-        // 绘制可见页面
         pvs.drawVisiblePages(canvas, viewOffset, vZoom)
 
         canvas.restore()
@@ -182,7 +179,6 @@ class DocumentView @JvmOverloads constructor(
 
         when (action) {
             MotionEvent.ACTION_POINTER_DOWN -> {
-                // 第二个手指按下，开始缩放
                 if (event.pointerCount == 2) {
                     isZooming = true
                     zoomBaseDistance = getZoomDistance(event)
@@ -192,11 +188,11 @@ class DocumentView @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_POINTER_UP -> {
-                // 缩放结束，应用布局更新
                 if (isZooming) {
                     isZooming = false
                     zoomBaseDistance = 0f
-                    // 缩放结束后，更新可见页面
+                    // 缩放结束时重新计算页面布局
+                    pageViewState?.updateViewSize(IntSize(viewWidth, viewHeight), vZoom, orientation)
                     pageViewState?.updateVisiblePages(
                         viewOffset,
                         IntSize(viewWidth, viewHeight),
@@ -208,7 +204,6 @@ class DocumentView @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_MOVE -> {
-                // 处理缩放移动
                 if (isZooming && event.pointerCount >= 2 && zoomBaseDistance != 0f) {
                     val currentDistance = getZoomDistance(event)
                     val zoomRatio = currentDistance / zoomBaseDistance
@@ -278,9 +273,6 @@ class DocumentView @JvmOverloads constructor(
             distanceX: Float,
             distanceY: Float
         ): Boolean {
-            // 参考 DocumentView.onScroll: scrollBy(distanceX, distanceY)
-            // scrollBy 中 distanceX 是手指移动的相反方向，所以要用减法
-            // scrollX = scrollX + distanceX，相当于 viewOffset.x = viewOffset.x - distanceX
             viewOffset = Offset(
                 viewOffset.x - distanceX,
                 viewOffset.y - distanceY
@@ -316,7 +308,6 @@ class DocumentView @JvmOverloads constructor(
     }
 
     private fun handlePageTurn(tapPos: Offset) {
-        // TODO: 实现点击翻页逻辑
         // 点击屏幕左侧向前翻页,点击右侧向后翻页
         val pvs = pageViewState ?: return
         val tapX = tapPos.x
@@ -325,33 +316,34 @@ class DocumentView @JvmOverloads constructor(
         if (orientation == Vertical) {
             // 纵向模式
             if (tapX < viewWidthThird) {
-                // 点击左上角,向上滚动一屏
-                val scrollAmount = viewHeight.toFloat()
-                val newY = (viewOffset.y + scrollAmount).coerceAtMost(0f)
-                viewOffset = Offset(viewOffset.x, newY)
-                pvs.updateOffset(viewOffset)
-            } else if (tapX > viewWidth * 2 / 3) {
-                // 点击右上角,向下滚动一屏
+                // 点击左侧,向上滚动一屏(减小 offset.y，使其更负)
                 val scrollAmount = viewHeight.toFloat()
                 val contentHeight = pvs.totalHeight * (vZoom / pvs.vZoom)
                 val minY = if (contentHeight > viewHeight) viewHeight - contentHeight else 0f
                 val newY = (viewOffset.y - scrollAmount).coerceAtLeast(minY)
                 viewOffset = Offset(viewOffset.x, newY)
                 pvs.updateOffset(viewOffset)
+            } else if (tapX > viewWidth * 2 / 3) {
+                // 点击右侧,向下滚动一屏(增大 offset.y，使其更接近 0)
+                val scrollAmount = viewHeight.toFloat()
+                val newY = (viewOffset.y + scrollAmount).coerceAtMost(0f)
+                viewOffset = Offset(viewOffset.x, newY)
+                pvs.updateOffset(viewOffset)
             }
         } else {
             // 横向模式
+            val contentWidth = pvs.totalWidth * (vZoom / pvs.vZoom)
+            val minX = if (contentWidth > viewWidth) viewWidth - contentWidth else 0f
+
             if (tapX < viewWidthThird) {
-                // 点击左侧,向右滚动一屏
+                // 点击左侧,向右滚动一屏(增大 offset.x，使其更接近 0)
                 val scrollAmount = viewWidth.toFloat()
                 val newX = (viewOffset.x + scrollAmount).coerceAtMost(0f)
                 viewOffset = Offset(newX, viewOffset.y)
                 pvs.updateOffset(viewOffset)
             } else if (tapX > viewWidth * 2 / 3) {
-                // 点击右侧,向左滚动一屏
+                // 点击右侧,向左滚动一屏(减小 offset.x，使其更负)
                 val scrollAmount = viewWidth.toFloat()
-                val contentWidth = pvs.totalWidth * (vZoom / pvs.vZoom)
-                val minX = if (contentWidth > viewWidth) viewWidth - contentWidth else 0f
                 val newX = (viewOffset.x - scrollAmount).coerceAtLeast(minX)
                 viewOffset = Offset(newX, viewOffset.y)
                 pvs.updateOffset(viewOffset)
@@ -366,7 +358,6 @@ class DocumentView @JvmOverloads constructor(
         val scrollX = (-viewOffset.x).toInt()
         val scrollY = (-viewOffset.y).toInt()
 
-        // 参考 DocumentView.onFling：velocityX/Y 取负值
         flingRunnable = FlingRunnable()
         flingRunnable?.fling(
             scrollX, scrollY,
@@ -384,7 +375,6 @@ class DocumentView @JvmOverloads constructor(
 
     private fun getBottomLimit(): Int {
         val pvs = pageViewState ?: return 0
-        // 参考 DocumentView.getBottomLimit
         return if (orientation == Horizontal) {
             (viewHeight * vZoom - viewHeight).toInt()
         } else {
@@ -394,7 +384,6 @@ class DocumentView @JvmOverloads constructor(
 
     private fun getRightLimit(): Int {
         val pvs = pageViewState ?: return 0
-        // 参考 DocumentView.getRightLimit
         return if (orientation == Horizontal) {
             (pvs.totalWidth * vZoom - viewWidth).toInt()
         } else {
@@ -460,7 +449,6 @@ class DocumentView @JvmOverloads constructor(
         this.crop = crop
         this.speakingPageIndex = speakingPageIndex
 
-        // 创建 PageViewState
         pageViewState = PageViewState(
             list,
             decoder,
@@ -470,10 +458,13 @@ class DocumentView @JvmOverloads constructor(
             columnCount = columnCount
         )
 
-        // 设置初始缩放和偏移
         vZoom = initialZoom.toFloat()
         viewOffset = Offset(initialScrollX.toFloat(), initialScrollY.toFloat())
         orientation = initialOrientation
+
+        // 初始化后更新可见页面并触发重绘
+        pageViewState?.updateVisiblePages(viewOffset, IntSize(viewWidth, viewHeight), vZoom)
+        invalidate()
     }
 
     fun jumpToPage(page: Int, offsetY: Float? = null) {

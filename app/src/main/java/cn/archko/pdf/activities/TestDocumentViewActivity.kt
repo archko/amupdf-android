@@ -37,18 +37,15 @@ class TestDocumentViewActivity : AppCompatActivity() {
         }
 
         try {
-            // 创建PDF解码器
             val pdfDecoder = PdfDecoder(pdfFile)
             decoder = pdfDecoder
 
-            // 检查是否需要密码
             if (pdfDecoder.needsPassword) {
                 Log.e("TestDocumentView", "PDF文件需要密码")
                 finish()
                 return
             }
 
-            // 获取页面尺寸信息
             val pageSize = pdfDecoder.size(
                 com.archko.reader.pdf.component.IntSize(
                     resources.displayMetrics.widthPixels,
@@ -56,11 +53,9 @@ class TestDocumentViewActivity : AppCompatActivity() {
                 )
             )
 
-            // 从decoder中获取页面列表
             val pages: List<APage> = if (!pdfDecoder.aPageList.isNullOrEmpty()) {
                 pdfDecoder.aPageList!!
             } else {
-                // 如果aPageList为空，从originalPageSizes创建
                 createPagesFromDecoder(pdfDecoder)
             }
 
