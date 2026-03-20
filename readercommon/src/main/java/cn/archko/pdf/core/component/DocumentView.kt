@@ -163,11 +163,8 @@ class DocumentView @JvmOverloads constructor(
                         vZoom,
                         orientation
                     )
-                    pageViewState?.updateVisiblePages(
-                        viewOffset,
-                        IntSize(viewWidth, viewHeight),
-                        vZoom
-                    )
+
+                    pageViewState?.updateOffset(viewOffset)
                     postInvalidate()
                     return true
                 }
@@ -451,6 +448,7 @@ class DocumentView @JvmOverloads constructor(
         orientation = initialOrientation
 
         // 初始化后更新可见页面并触发重绘
+        pageViewState?.updateOffset(viewOffset)
         pageViewState?.updateVisiblePages(viewOffset, IntSize(viewWidth, viewHeight), vZoom)
         invalidate()
     }

@@ -353,6 +353,7 @@ class Page(
 
         // 如果没有配置或没有可见nodes，不绘制
         if (config == null || visibleNodes.isEmpty()) {
+            //println("Page.${aPage.index}, config:$config, ${visibleNodes.size}")
             return
         }
 
@@ -856,7 +857,6 @@ class Page(
 
         // 新的可见 nodes 集合
         val newVisibleKeys = mutableSetOf<Pair<Int, Int>>()
-        //println("Page.updateVisibleNodes.config:$config, x:$minBlockX-$maxBlockX, y:$minBlockY-$maxBlockY, visible:${visibleNodes.size}")
 
         for (y in minBlockY..maxBlockY) {
             for (x in minBlockX..maxBlockX) {
@@ -877,7 +877,7 @@ class Page(
                 }
             }
         }
-        //println("updateVisibleNodes:${visibleNodes.size}")
+        //println("Page.updateVisibleNodes.config:$config, x:$minBlockX-$maxBlockX, y:$minBlockY-$maxBlockY, visible:${visibleNodes.size}, key:$newVisibleKeys")
 
         // 清理不再可见的 nodes
         val iterator = visibleNodes.iterator()
