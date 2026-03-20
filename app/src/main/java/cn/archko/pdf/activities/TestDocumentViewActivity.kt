@@ -5,10 +5,11 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import cn.archko.pdf.core.common.AnnotationManager
 import cn.archko.pdf.core.component.DocumentView
+import cn.archko.pdf.core.component.IntSize
 import cn.archko.pdf.core.decoder.PdfDecoder
 import cn.archko.pdf.core.decoder.internal.ImageDecoder
 import cn.archko.pdf.core.entity.APage
-import com.archko.reader.pdf.component.Vertical
+import cn.archko.pdf.core.component.Vertical
 import java.io.File
 
 /**
@@ -47,7 +48,7 @@ class TestDocumentViewActivity : AppCompatActivity() {
             }
 
             val pageSize = pdfDecoder.size(
-                com.archko.reader.pdf.component.IntSize(
+                IntSize(
                     resources.displayMetrics.widthPixels,
                     resources.displayMetrics.heightPixels
                 )

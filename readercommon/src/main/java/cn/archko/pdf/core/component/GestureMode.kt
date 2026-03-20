@@ -1,4 +1,4 @@
-package com.archko.reader.pdf.component
+package cn.archko.pdf.core.component
 
 /**
  * @author: archko 2026/2/2 :16:40

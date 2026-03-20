@@ -11,8 +11,8 @@ import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.link.Hyperlink
 import cn.archko.pdf.core.utils.SmartCropUtils
 import com.archko.reader.image.DjvuLoader
-import com.archko.reader.pdf.component.IntSize
-import com.archko.reader.pdf.component.Size
+import cn.archko.pdf.core.component.IntSize
+import cn.archko.pdf.core.component.Size
 import java.io.File
 
 /**

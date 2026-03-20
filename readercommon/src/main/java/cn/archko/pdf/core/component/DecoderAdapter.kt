@@ -5,6 +5,7 @@ import android.graphics.RectF
 import cn.archko.pdf.core.component.CropResult
 import cn.archko.pdf.core.component.DecodeTask
 import cn.archko.pdf.core.component.Decoder
+import cn.archko.pdf.core.component.IntSize
 import cn.archko.pdf.core.utils.SmartCropUtils
 import cn.archko.pdf.core.decoder.internal.ImageDecoder
 

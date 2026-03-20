@@ -1,7 +1,6 @@
 package cn.archko.pdf.core.decoder
 
 import android.graphics.Bitmap
-import android.graphics.Rect
 import android.graphics.RectF
 import cn.archko.pdf.core.cache.ImageCache
 import cn.archko.pdf.core.decoder.internal.ImageDecoder
@@ -9,8 +8,8 @@ import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.link.Hyperlink
 import com.archko.reader.image.TiffLoader
-import com.archko.reader.pdf.component.IntSize
-import com.archko.reader.pdf.component.Size
+import cn.archko.pdf.core.component.IntSize
+import cn.archko.pdf.core.component.Size
 import java.io.File
 
 /**

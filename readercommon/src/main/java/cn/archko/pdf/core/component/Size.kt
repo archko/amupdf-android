@@ -1,9 +1,9 @@
-package com.archko.reader.pdf.component
+package cn.archko.pdf.core.component
 
 /**
  * @author: archko 2025/1/5 :07:53
  */
-public data class Size(
+data class Size(
     val width: Int,
     val height: Int,
     val page: Int,
@@ -11,7 +11,7 @@ public data class Size(
     val offsetHeight: Int = 0,
 )
 
-public data class IntSize(
+data class IntSize(
     val width: Int,
     val height: Int,
 )

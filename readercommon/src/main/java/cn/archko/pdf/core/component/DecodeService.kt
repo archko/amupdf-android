@@ -1,9 +1,6 @@
-package com.archko.reader.pdf.component
+package cn.archko.pdf.core.component
 
 import cn.archko.pdf.core.cache.ImageCache
-import cn.archko.pdf.core.component.DecodeTask
-import cn.archko.pdf.core.component.Decoder
-import cn.archko.pdf.core.component.TaskType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

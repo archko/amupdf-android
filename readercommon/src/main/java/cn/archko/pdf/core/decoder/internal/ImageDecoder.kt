@@ -1,14 +1,12 @@
 package cn.archko.pdf.core.decoder.internal
 
 import android.graphics.Bitmap
-import android.graphics.Rect
 import android.graphics.RectF
-import cn.archko.pdf.core.component.DecodeTask
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.link.Hyperlink
-import com.archko.reader.pdf.component.IntSize
-import com.archko.reader.pdf.component.Size
+import cn.archko.pdf.core.component.IntSize
+import cn.archko.pdf.core.component.Size
 
 /**
  * @author: archko 2025/4/11 :15:51

@@ -18,8 +18,8 @@ import cn.archko.pdf.core.utils.FileTypeUtils
 import cn.archko.pdf.core.utils.FontCSSGenerator
 import cn.archko.pdf.core.utils.SmartCropUtils
 import cn.archko.pdf.core.utils.Utils
-import com.archko.reader.pdf.component.IntSize
-import com.archko.reader.pdf.component.Size
+import cn.archko.pdf.core.component.IntSize
+import cn.archko.pdf.core.component.Size
 import com.artifex.mupdf.fitz.Document
 import com.artifex.mupdf.fitz.Matrix
 import com.artifex.mupdf.fitz.Page

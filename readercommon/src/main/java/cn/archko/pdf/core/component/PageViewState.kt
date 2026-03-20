@@ -9,11 +9,7 @@ import cn.archko.pdf.core.entity.AnnotationPath
 import cn.archko.pdf.core.entity.Offset
 import cn.archko.pdf.core.entity.PathConfig
 import cn.archko.pdf.core.link.Hyperlink
-import com.archko.reader.pdf.component.DecodeService
 import com.archko.reader.pdf.component.DecoderAdapter
-import com.archko.reader.pdf.component.IntSize
-import com.archko.reader.pdf.component.TileSpec
-import com.archko.reader.pdf.component.Vertical
 import cn.archko.pdf.core.decoder.internal.ImageDecoder
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -75,9 +71,6 @@ class PageViewState(
 
     // throttle机制（34ms内最多触发一次）
     private var lastRenderTime = 0L
-
-    // 解码完成回调
-    var onDecodeCompleted: (() -> Unit)? = null
 
     var activeDrawingAnno: Pair<Int, AnnotationPath>? = null
 

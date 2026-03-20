@@ -6,15 +6,13 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.graphics.withTranslation
 import cn.archko.pdf.core.cache.ImageCache
 import cn.archko.pdf.core.common.AnnotationManager
 import cn.archko.pdf.core.decoder.internal.ImageDecoder
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.Offset
 import cn.archko.pdf.widgets.Flinger
-import com.archko.reader.pdf.component.Horizontal
-import com.archko.reader.pdf.component.IntSize
-import com.archko.reader.pdf.component.Vertical
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -23,13 +21,6 @@ import kotlinx.coroutines.launch
 private const val MAX_ZOOM = 30f
 
 /**
- * 文档视图 - Android View 版本
- * 用于显示和交互 PDF 文档
- * 
- * 核心功能：
- * - 缩放
- * - 惯性滑动
- * - 页面布局
  */
 class DocumentView @JvmOverloads constructor(
     context: Context,
@@ -37,29 +28,32 @@ class DocumentView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    var viewWidth: Int = 0
-    var viewHeight: Int = 0
+    private var viewWidth: Int = 0
+    private var viewHeight: Int = 0
 
-    var viewOffset: Offset = Offset(0f, 0f)
+    private var viewOffset: Offset = Offset(0f, 0f)
         set(value) {
             field = calculateBounds(value, vZoom, pageViewState, orientation)
             invalidate()
         }
 
-    var vZoom: Float = 1f
+    private var vZoom: Float = 1f
         set(value) {
             val clamped = value.coerceIn(1f, MAX_ZOOM)
             if (field != clamped) {
                 field = clamped
                 if (!isZooming) {
-                    // 只在非缩放过程中调用 updateViewSize
-                    pageViewState?.updateViewSize(IntSize(viewWidth, viewHeight), vZoom, orientation)
+                    pageViewState?.updateViewSize(
+                        IntSize(viewWidth, viewHeight),
+                        vZoom,
+                        orientation
+                    )
                 }
                 invalidate()
             }
         }
 
-    var orientation: Int = Vertical
+    private var orientation: Int = Vertical
         set(value) {
             if (field != value) {
                 field = value
@@ -68,33 +62,10 @@ class DocumentView @JvmOverloads constructor(
             }
         }
 
-    var toPage: Int = -1
-    var isJumping: Boolean = false
+    private var toPage: Int = -1
+    private var isJumping: Boolean = false
 
-    var pageViewState: PageViewState? = null
-        set(value) {
-            field = value
-            if (value != null) {
-                value.onPageLinkClick = { pageIndex ->
-                    isJumping = true
-                    val targetPage = value.pages.getOrNull(pageIndex)
-                    if (targetPage != null) {
-                        viewOffset = Offset(viewOffset.x, -targetPage.bounds.top)
-                        value.updateOffset(viewOffset)
-                    }
-                    isJumping = false
-                }
-
-                viewScope.launch {
-                    value.renderFlow.collect {
-                        invalidate()
-                    }
-                }
-                value.onDecodeCompleted = {
-                    invalidate()
-                }
-            }
-        }
+    private var pageViewState: PageViewState? = null
 
     private val viewScope = CoroutineScope(Dispatchers.Main)
 
@@ -112,22 +83,22 @@ class DocumentView @JvmOverloads constructor(
         null
     var onCloseDocument: (() -> Unit)? = null
 
-    var jumpToPage: Int? = null
-    var jumpOffsetY: Float? = null
+    private var jumpToPage: Int? = null
+    private var jumpOffsetY: Float? = null
 
-    var reflow: Long = 0L
-    var crop: Boolean = false
+    private var reflow: Long = 0L
+    private var crop: Boolean = false
 
     //var searchHighlightQuads: Map<Int, List<cn.archko.pdf.core.entity.DocQuad>> = emptyMap()
 
-    var decoder: ImageDecoder? = null
+    private var decoder: ImageDecoder? = null
 
-    var speakingPageIndex: Int? = null
+    private var speakingPageIndex: Int? = null
 
-    var initialOrientation: Int = Vertical
-    var initialScrollX: Long = 0L
-    var initialScrollY: Long = 0L
-    var initialZoom: Double = 1.0
+    private var initialOrientation: Int = Vertical
+    private var initialScrollX: Long = 0L
+    private var initialScrollY: Long = 0L
+    private var initialZoom: Double = 1.0
 
     init {
         gestureDetector = GestureDetector(context, DocumentGestureListener())
@@ -149,13 +120,9 @@ class DocumentView @JvmOverloads constructor(
         super.onDraw(canvas)
 
         val pvs = pageViewState ?: return
-        canvas.save()
-
-        canvas.translate(viewOffset.x, viewOffset.y)
-
-        pvs.drawVisiblePages(canvas, viewOffset, vZoom)
-
-        canvas.restore()
+        canvas.withTranslation(viewOffset.x, viewOffset.y) {
+            pvs.drawVisiblePages(this, viewOffset, vZoom)
+        }
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -172,7 +139,6 @@ class DocumentView @JvmOverloads constructor(
 
     /**
      * 处理多点触控缩放
-     * 参考 MultiTouchZoomImpl 和 DocumentView.zoomChanged 的实现
      */
     private fun handleMultiTouchZoom(event: MotionEvent): Boolean {
         val action = event.action and MotionEvent.ACTION_MASK
@@ -192,13 +158,17 @@ class DocumentView @JvmOverloads constructor(
                     isZooming = false
                     zoomBaseDistance = 0f
 
-                    pageViewState?.updateViewSize(IntSize(viewWidth, viewHeight), vZoom, orientation)
+                    pageViewState?.updateViewSize(
+                        IntSize(viewWidth, viewHeight),
+                        vZoom,
+                        orientation
+                    )
                     pageViewState?.updateVisiblePages(
                         viewOffset,
                         IntSize(viewWidth, viewHeight),
                         vZoom
                     )
-                    invalidate()
+                    postInvalidate()
                     return true
                 }
             }
@@ -209,7 +179,6 @@ class DocumentView @JvmOverloads constructor(
                     val zoomRatio = currentDistance / zoomBaseDistance
                     val newZoom = (zoomStartZoom * zoomRatio).coerceIn(1f, MAX_ZOOM)
 
-                    // 参考 DocumentView.zoomChanged：
                     // 1. 计算缩放比例
                     // 2. 使用屏幕中心点缩放公式调整位置
                     val oldZoom = vZoom
@@ -231,7 +200,11 @@ class DocumentView @JvmOverloads constructor(
                     // 应用边界限制（现在 totalWidth/totalHeight 已经是新的缩放值了）
                     viewOffset = calculateBounds(newOffset, vZoom, pageViewState, orientation)
 
-                    pageViewState?.updateVisiblePages(viewOffset, IntSize(viewWidth, viewHeight), vZoom)
+                    pageViewState?.updateVisiblePages(
+                        viewOffset,
+                        IntSize(viewWidth, viewHeight),
+                        vZoom
+                    )
                     invalidate()
                     return true
                 }
@@ -303,7 +276,6 @@ class DocumentView @JvmOverloads constructor(
         )
 
         if (!linkHandled) {
-            // 处理翻页
             handlePageTurn(tapPos)
         }
     }
@@ -353,8 +325,6 @@ class DocumentView @JvmOverloads constructor(
     }
 
     private fun performFling(velocityX: Float, velocityY: Float) {
-        val pvs = pageViewState ?: return
-
         // 将 viewOffset（文档偏移，负值）转换为 scrollX/Y（滚动偏移，正值）
         val scrollX = (-viewOffset.x).toInt()
         val scrollY = (-viewOffset.y).toInt()
@@ -458,6 +428,23 @@ class DocumentView @JvmOverloads constructor(
             crop,
             columnCount = columnCount
         )
+        pageViewState!!.apply {
+            onPageLinkClick = { pageIndex ->
+                isJumping = true
+                val targetPage = pages.getOrNull(pageIndex)
+                if (targetPage != null) {
+                    viewOffset = Offset(viewOffset.x, -targetPage.bounds.top)
+                    updateOffset(viewOffset)
+                }
+                isJumping = false
+            }
+
+            viewScope.launch {
+                renderFlow.collect {
+                    invalidate()
+                }
+            }
+        }
 
         vZoom = initialZoom.toFloat()
         viewOffset = Offset(initialScrollX.toFloat(), initialScrollY.toFloat())
@@ -638,10 +625,6 @@ class DocumentView @JvmOverloads constructor(
         cleanup()
     }
 
-    /**
-     * Fling 动画 Runnable
-     * 参考 vudroid DocumentView.FlingRunnable 的实现
-     */
     private inner class FlingRunnable : Runnable {
 
         fun cancelFling() {
@@ -681,7 +664,6 @@ class DocumentView @JvmOverloads constructor(
                 pageViewState?.updateOffset(viewOffset)
                 invalidate()
 
-                // Post On animation
                 postOnAnimation(this)
             }
         }

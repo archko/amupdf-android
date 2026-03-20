@@ -9,7 +9,6 @@ import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.Offset
 import cn.archko.pdf.core.link.Hyperlink
 import com.archko.reader.pdf.component.DecoderAdapter
-import com.archko.reader.pdf.component.Vertical
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

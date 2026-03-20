@@ -7,7 +7,6 @@ import cn.archko.pdf.core.cache.BitmapState
 import cn.archko.pdf.core.cache.ImageCache
 import cn.archko.pdf.core.component.Page.Companion.MAX_BLOCK
 import cn.archko.pdf.core.entity.APage
-import com.archko.reader.pdf.component.TileSpec
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
