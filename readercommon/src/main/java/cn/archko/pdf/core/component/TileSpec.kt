@@ -2,6 +2,7 @@ package com.archko.reader.pdf.component
 
 import android.graphics.Bitmap
 import android.graphics.Rect
+import android.graphics.RectF
 
 /**
  * @author: archko 2025/7/26 :10:58
@@ -9,7 +10,7 @@ import android.graphics.Rect
 data class TileSpec(
     val page: Int,
     val pageScale: Float,
-    val bounds: Rect, // 0~1
+    val bounds: RectF, // 0~1
     val pageWidth: Int,
     val pageHeight: Int,
     val viewSize: IntSize,

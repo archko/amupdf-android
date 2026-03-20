@@ -600,7 +600,7 @@ class PageViewState(
             tilesToRenderCopy.forEach { page ->
                 page.updateVisibleNodes(visibleRect, scaleRatio)
             }
-            println("updateVisiblePages.multiColumn: visible=${tilesToRenderCopy.map { it.aPage.index }}")
+            //println("updateVisiblePages.multiColumn: visible=${tilesToRenderCopy.size}")
         } else if (orientation == Vertical) {
             val visibleTop = -offset.y
             val visibleBottom = viewSize.height - offset.y
@@ -637,6 +637,7 @@ class PageViewState(
                 pageToRender = tilesToRenderCopy
             }
 
+            //println("updateVisiblePages.Vertical: visible=${tilesToRenderCopy.size}")
             // 更新每个可见页面的可见 nodes
             tilesToRenderCopy.forEach { page ->
                 page.updateVisibleNodes(preloadRect, scaleRatio)

@@ -2,7 +2,6 @@ package cn.archko.pdf.core.component
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Rect
 import android.graphics.RectF
 import cn.archko.pdf.core.cache.BitmapState
 import cn.archko.pdf.core.cache.ImageCache
@@ -19,7 +18,7 @@ import java.util.concurrent.Future
  */
 class PageNode(
     private val pageViewState: PageViewState,
-    var bounds: Rect,  // 逻辑坐标(0~1)
+    var bounds: RectF,  // 逻辑坐标(0~1)
     var aPage: APage
 ) {
 
@@ -44,11 +43,11 @@ class PageNode(
     private var cachedTileSpec: TileSpec? = null
 
     fun update(newBounds: RectF, newAPage: APage) {
-        this.bounds = Rect(
-            newBounds.left.toInt(),
-            newBounds.top.toInt(),
-            newBounds.right.toInt(),
-            newBounds.bottom.toInt()
+        this.bounds = RectF(
+            newBounds.left,
+            newBounds.top,
+            newBounds.right,
+            newBounds.bottom
         )
         this.aPage = newAPage
     }
@@ -256,12 +255,12 @@ class PageNode(
                 (if (null != aPage.cropBounds && pageViewState.isCropEnabled()) aPage.cropBounds!!.top.toFloat()
                 else 1f) * pageHeight / height
             val srcRect = RectF(
-                bounds.left.toFloat() * pageWidth + left,
-                bounds.top.toFloat() * pageHeight + top,
-                bounds.right.toFloat() * pageWidth + left,
-                bounds.bottom.toFloat() * pageHeight + top
+                bounds.left * pageWidth + left,
+                bounds.top * pageHeight + top,
+                bounds.right * pageWidth + left,
+                bounds.bottom * pageHeight + top
             )
-            //println("[PageNode].decode:$pageWidth-$pageHeight, left:$left, $scale, width:$width, $srcRect, $aPage")
+            //println("[PageNode].decode:$pageWidth-$pageHeight, left:$left, $scale, width:$width, $srcRect, bounds:$bounds, $aPage")
             val outWidth = ((srcRect.right - srcRect.left)).toInt()
             val outHeight = ((srcRect.bottom - srcRect.top)).toInt()
 

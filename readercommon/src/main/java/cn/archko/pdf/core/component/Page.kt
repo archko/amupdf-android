@@ -329,10 +329,10 @@ class Page(
         }
     }
 
-    fun update(width: Float, height: Float, rect: RectF) {
+    fun update(width: Float, height: Float, rectF: RectF) {
         this.width = width
         this.height = height
-        this.bounds = rect
+        this.bounds = rectF
         this.yOffset = bounds.top
         this.xOffset = bounds.left
         this.totalScale = if (aPage.width == 0f) 1f else width / aPage.width
@@ -857,6 +857,7 @@ class Page(
 
         // 新的可见 nodes 集合
         val newVisibleKeys = mutableSetOf<Pair<Int, Int>>()
+        //println("Page.updateVisibleNodes.config:$config, x:$minBlockX-$maxBlockX, y:$minBlockY-$maxBlockY, visible:${visibleNodes.size}")
 
         for (y in minBlockY..maxBlockY) {
             for (x in minBlockX..maxBlockX) {
@@ -869,9 +870,10 @@ class Page(
                     val top = y / config.yBlocks.toFloat()
                     val right = (x + 1) / config.xBlocks.toFloat()
                     val bottom = (y + 1) / config.yBlocks.toFloat()
-                    val rect = RectF(left, top, right, bottom)
+                    val rectF = RectF(left, top, right, bottom)
+                    //println("Page.updateVisibleNodes.node:$left-$top-$right-$bottom")
 
-                    val node = pageViewState.nodePool.acquire(pageViewState, rect, aPage)
+                    val node = pageViewState.nodePool.acquire(pageViewState, rectF, aPage)
                     visibleNodes[key] = node
                 }
             }
@@ -883,6 +885,7 @@ class Page(
         while (iterator.hasNext()) {
             val entry = iterator.next()
             if (entry.key !in newVisibleKeys) {
+                //println("updateVisibleNodes.recycle:${entry}")
                 pageViewState.nodePool.release(entry.value)
                 iterator.remove()
             }
