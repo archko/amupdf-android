@@ -6,6 +6,7 @@ import android.graphics.RectF
 import cn.archko.pdf.core.cache.BitmapState
 import cn.archko.pdf.core.cache.ImageCache
 import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.entity.DocQuad
 import cn.archko.pdf.core.entity.Offset
 import cn.archko.pdf.core.link.Hyperlink
 import com.archko.reader.pdf.component.DecoderAdapter
@@ -26,8 +27,6 @@ class Page(
     var yOffset: Float = 0f,
     var xOffset: Float = 0f
 ) {
-    var totalScale: Float = 1f
-
     // 可见的 nodes 映射：(x, y) -> PageNode，按需创建
     private val visibleNodes: MutableMap<Pair<Int, Int>, PageNode> = mutableMapOf()
     private var currentTileConfig: TileConfig? = null
@@ -89,7 +88,7 @@ class Page(
     /**
      * 查找点击位置的链接
      */
-    /* fun findLinkAtPoint(x: Float, y: Float): Hyperlink? {
+    fun findLinkAtPoint(x: Float, y: Float): Hyperlink? {
         if (links.isEmpty()) {
             return null
         }
@@ -97,7 +96,7 @@ class Page(
         val pagePoint = screenToPagePoint(x, y)
         val foundLink = Hyperlink.findLinkAtPoint(links, pagePoint.x, pagePoint.y)
         return foundLink
-    }*/
+    }
 
     /**
      * 将屏幕坐标转换为Page坐标
@@ -111,7 +110,7 @@ class Page(
         val orignalX: Float
         val orignalY: Float
 
-        /*if (aPage.hasCrop() && pageViewState.isCropEnabled()) {
+        if (aPage.hasCrop() && pageViewState.isCropEnabled()) {
             // 有切边且启用切边：先转换为切边区域内的相对坐标，再转换为原始Page坐标
             val cropBounds = aPage.cropBounds!!
             val relativeX = pageX / bounds.width()
@@ -126,11 +125,10 @@ class Page(
 
             orignalX = relativeX * aPage.width
             orignalY = relativeY * aPage.height
-        }*/
+        }
 
         //println("Page.screenToPagePoint: screen($screenX, $screenY) -> page($pageX, $pageY) -> page($orignalX, $orignalY), bounds: $bounds, aPage: ${aPage.width}x${aPage.height}")
-        //return Offset(orignalX, orignalY)
-        return Offset(0f, 0f)
+        return Offset(orignalX, orignalY)
     }
 
     /**
@@ -334,7 +332,6 @@ class Page(
         this.bounds = rectF
         this.yOffset = bounds.top
         this.xOffset = bounds.left
-        this.totalScale = if (aPage.width == 0f) 1f else width / aPage.width
 
         if (aspectRatio == 0f) {
             aspectRatio = width * 1.0f / height
@@ -369,13 +366,8 @@ class Page(
             return
         }
 
-        // 分块模式：按行列顺序绘制可见的 nodes
-        val sortedNodes = visibleNodes.entries
-            .sortedBy { it.key.second * config.xBlocks + it.key.first }
-            .map { it.value }
-
-        for (node in sortedNodes) {
-            node.draw(
+        for (node in visibleNodes) {
+            node.value.draw(
                 canvas,
                 currentWidth,
                 currentHeight,
@@ -588,7 +580,7 @@ class Page(
      * 绘制搜索结果高亮
      */
     private fun drawSearchHighlight(canvas: Canvas, currentBounds: RectF) {
-        /*val highlightQuads = pageViewState.searchHighlightQuads[aPage.index] ?: return
+        val highlightQuads = pageViewState.searchHighlightQuads[aPage.index] ?: return
         val isCurrentPage = pageViewState.currentSearchPageIndex == aPage.index
 
         // 所有结果用黄色半透明
@@ -597,9 +589,9 @@ class Page(
         val paint = android.graphics.Paint().apply {
             color = normalHighlightColor
             style = android.graphics.Paint.Style.FILL
-        }*/
+        }
 
-        /*highlightQuads.forEach { quad ->
+        highlightQuads.forEach { quad ->
             // 将Page坐标的Quad转换为屏幕坐标
             val screenQuad = quadToScreenQuad(quad, currentBounds)
 
@@ -625,23 +617,23 @@ class Page(
             val bottom = maxOf(screenQuad.ul.y, screenQuad.ll.y, screenQuad.ur.y, screenQuad.lr.y)
 
             canvas.drawRect(left, top, right, bottom, paint)
-        }*/
+        }
     }
 
     /**
      * 将Page坐标的Quad转换为屏幕坐标的Quad
      */
-    /*private fun quadToScreenQuad(
+    private fun quadToScreenQuad(
         quad: DocQuad,
         currentBounds: RectF
     ): DocQuad {
-        return com.archko.reader.pdf.entity.DocQuad(
+        return DocQuad(
             ul = pagePointToScreenPoint(quad.ul.x, quad.ul.y, currentBounds),
             ur = pagePointToScreenPoint(quad.ur.x, quad.ur.y, currentBounds),
             ll = pagePointToScreenPoint(quad.ll.x, quad.ll.y, currentBounds),
             lr = pagePointToScreenPoint(quad.lr.x, quad.lr.y, currentBounds)
         )
-    }*/
+    }
 
     /**
      * 将Page坐标点转换为屏幕坐标点
@@ -877,7 +869,7 @@ class Page(
                 }
             }
         }
-        //println("Page.updateVisibleNodes.config:$config, x:$minBlockX-$maxBlockX, y:$minBlockY-$maxBlockY, visible:${visibleNodes.size}, key:$newVisibleKeys")
+        //println("Page.updateVisibleNodes.config:$config, x:$minBlockX-$maxBlockX, y:$minBlockY-$maxBlockY, visible:${oldVisibleNodes.size}, key:$newVisibleKeys")
 
         // 清理不再可见的 nodes
         val iterator = visibleNodes.iterator()

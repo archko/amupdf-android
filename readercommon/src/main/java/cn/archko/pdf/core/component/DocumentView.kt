@@ -2,6 +2,10 @@ package cn.archko.pdf.core.component
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -11,7 +15,10 @@ import cn.archko.pdf.core.cache.ImageCache
 import cn.archko.pdf.core.common.AnnotationManager
 import cn.archko.pdf.core.decoder.internal.ImageDecoder
 import cn.archko.pdf.core.entity.APage
+import cn.archko.pdf.core.entity.AnnotationPath
+import cn.archko.pdf.core.entity.DrawType
 import cn.archko.pdf.core.entity.Offset
+import cn.archko.pdf.core.entity.PathConfig
 import cn.archko.pdf.widgets.Flinger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -83,6 +90,28 @@ class DocumentView @JvmOverloads constructor(
         null
     var onCloseDocument: (() -> Unit)? = null
 
+    // 模式控制
+    private var selectionMode = false
+    private var drawMode = false
+
+    // 选择模式相关状态
+    private var isSelecting = false
+    private var selectedPage: Page? = null
+    private var selectionStartX = 0f
+    private var selectionStartY = 0f
+    private var selectionEndX = 0f
+    private var selectionEndY = 0f
+
+    // 绘制模式相关状态
+    private var isDrawing = false
+    private var drawingPage: Page? = null
+    private val drawingPoints = mutableListOf<PointF>()
+    private var drawingPaint: Paint? = null
+    private var pathConfig = PathConfig()
+
+    // 回调
+    var onTextSelected: ((text: String) -> Unit)? = null
+
     private var jumpToPage: Int? = null
     private var jumpOffsetY: Float? = null
 
@@ -123,9 +152,29 @@ class DocumentView @JvmOverloads constructor(
         canvas.withTranslation(viewOffset.x, viewOffset.y) {
             pvs.drawVisiblePages(this, viewOffset, vZoom)
         }
+
+        // 绘制选择区域和绘制路径
+        drawSelectionAndDrawing(canvas)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (!isInitialized()) {
+            return true
+        }
+
+        // 根据当前模式处理触摸事件
+        return when {
+            selectionMode -> handleSelectionTouch(event)
+            drawMode -> handleDrawTouch(event)
+            else -> handleViewModeTouch(event)
+        }
+    }
+
+    private fun isInitialized(): Boolean {
+        return pageViewState != null && decoder != null
+    }
+
+    private fun handleViewModeTouch(event: MotionEvent): Boolean {
         if (handleMultiTouchZoom(event)) {
             return true
         }
@@ -621,6 +670,307 @@ class DocumentView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         cleanup()
+    }
+
+    // ============ 模式切换方法 ============
+
+    fun setSelectionMode(enabled: Boolean) {
+        if (selectionMode != enabled) {
+            selectionMode = enabled
+            if (enabled) {
+                drawMode = false
+            }
+            resetGestureState()
+            invalidate()
+        }
+    }
+
+    fun setDrawMode(enabled: Boolean) {
+        if (drawMode != enabled) {
+            drawMode = enabled
+            if (enabled) {
+                selectionMode = false
+            }
+            resetGestureState()
+            initDrawingPaint()
+            invalidate()
+        }
+    }
+
+    fun setDrawConfig(config: PathConfig) {
+        this.pathConfig = config
+        initDrawingPaint()
+    }
+
+    private fun resetGestureState() {
+        pageViewState?.pages?.forEach { page ->
+            page.clearTextSelection()
+        }
+
+        isSelecting = false
+        isDrawing = false
+        selectedPage = null
+        drawingPage = null
+        drawingPoints.clear()
+    }
+
+    private fun initDrawingPaint() {
+        drawingPaint = Paint().apply {
+            color = pathConfig.color
+            strokeWidth = pathConfig.strokeWidth
+            style = Paint.Style.STROKE
+            isAntiAlias = true
+            strokeCap = Paint.Cap.ROUND
+            strokeJoin = Paint.Join.ROUND
+        }
+    }
+
+    // ============ 选择模式处理 ============
+
+    private fun handleSelectionTouch(event: MotionEvent): Boolean {
+        when (event.action and MotionEvent.ACTION_MASK) {
+            MotionEvent.ACTION_DOWN -> return handleSelectionDown(event.x, event.y)
+            MotionEvent.ACTION_MOVE -> return handleSelectionMove(event.x, event.y)
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> return handleSelectionUp()
+        }
+        return true
+    }
+
+    private fun handleSelectionDown(x: Float, y: Float): Boolean {
+        val page = getEventPageFromScreen(x, y)
+        if (page != null) {
+            isSelecting = true
+            selectedPage = page
+            selectionStartX = x
+            selectionStartY = y
+            selectionEndX = x
+            selectionEndY = y
+            invalidate()
+            return true
+        }
+        return false
+    }
+
+    private fun handleSelectionMove(x: Float, y: Float): Boolean {
+        if (isSelecting && selectedPage != null) {
+            selectionEndX = x
+            selectionEndY = y
+            invalidate()
+            return true
+        }
+        return false
+    }
+
+    private fun handleSelectionUp(): Boolean {
+        if (isSelecting && selectedPage != null) {
+            // TODO: 实现实际的文本选择逻辑
+            // 目前只计算选择区域，后续可以添加与decoder交互获取选中文本
+
+            isSelecting = false
+            selectedPage = null
+            invalidate()
+            return true
+        }
+        return false
+    }
+
+    // ============ 绘制模式处理 ============
+
+    private fun handleDrawTouch(event: MotionEvent): Boolean {
+        when (event.action and MotionEvent.ACTION_MASK) {
+            MotionEvent.ACTION_DOWN -> return handleDrawDown(event.x, event.y)
+            MotionEvent.ACTION_MOVE -> return handleDrawMove(event.x, event.y)
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> return handleDrawUp()
+        }
+        return true
+    }
+
+    private fun handleDrawDown(x: Float, y: Float): Boolean {
+        val page = getEventPageFromScreen(x, y)
+        if (page != null) {
+            isDrawing = true
+            drawingPage = page
+            drawingPoints.clear()
+
+            // 将屏幕坐标转换为页面相对坐标(0-1)
+            val relativePoint = convertScreenToRelativePoint(x, y, page)
+            drawingPoints.add(PointF(relativePoint.x, relativePoint.y))
+
+            invalidate()
+            return true
+        }
+        return false
+    }
+
+    private fun handleDrawMove(x: Float, y: Float): Boolean {
+        if (isDrawing && drawingPage != null) {
+            val relativePoint = convertScreenToRelativePoint(x, y, drawingPage!!)
+            drawingPoints.add(PointF(relativePoint.x, relativePoint.y))
+            invalidate()
+            return true
+        }
+        return false
+    }
+
+    private fun handleDrawUp(): Boolean {
+        if (isDrawing && drawingPage != null && drawingPoints.size > 1) {
+            val annotationManager = pageViewState?.annotationManager
+            if (annotationManager != null) {
+                try {
+                    val offsetList = mutableListOf<Offset>()
+
+                    if (pathConfig.drawType == DrawType.LINE) {
+                        // LINE模式: 计算水平或垂直线的终点
+                        val startPoint = drawingPoints[0]
+                        val endPoint = drawingPoints[drawingPoints.size - 1]
+
+                        val dx = kotlin.math.abs(endPoint.x - startPoint.x)
+                        val dy = kotlin.math.abs(endPoint.y - startPoint.y)
+
+                        val finalEndPoint = if (dx > dy) {
+                            PointF(endPoint.x, startPoint.y)
+                        } else {
+                            PointF(startPoint.x, endPoint.y)
+                        }
+
+                        offsetList.add(Offset(startPoint.x, startPoint.y))
+                        offsetList.add(Offset(finalEndPoint.x, finalEndPoint.y))
+                    } else {
+                        for (point in drawingPoints) {
+                            offsetList.add(Offset(point.x, point.y))
+                        }
+                    }
+
+                    val annotationPath = AnnotationPath(offsetList, pathConfig)
+                    annotationManager.addPath(drawingPage!!.aPage.index, annotationPath)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+            // 重置绘制状态
+            isDrawing = false
+            drawingPage = null
+            drawingPoints.clear()
+            invalidate()
+            return true
+        }
+        return false
+    }
+
+    // ============ 辅助方法 ============
+
+    private fun getEventPageFromScreen(screenX: Float, screenY: Float): Page? {
+        val pvs = pageViewState ?: return null
+        val pages = pvs.pages
+        if (pages.isEmpty()) return null
+
+        val offset = viewOffset
+
+        for (page in pages) {
+            val rect = page.bounds
+            val pageTop = rect.top + offset.y
+            val pageBottom = rect.bottom + offset.y
+            val pageLeft = rect.left + offset.x
+            val pageRight = rect.right + offset.x
+
+            if (screenX >= pageLeft && screenX <= pageRight &&
+                screenY >= pageTop && screenY <= pageBottom
+            ) {
+                return page
+            }
+        }
+
+        return null
+    }
+
+    private fun convertScreenToRelativePoint(screenX: Float, screenY: Float, page: Page): Offset {
+        // 转换为页面坐标
+        val pageX = screenX - viewOffset.x - page.bounds.left
+        val pageY = screenY - viewOffset.y - page.bounds.top
+
+        // 转换为相对坐标(0-1)
+        val relativeX = pageX / page.bounds.width()
+        val relativeY = pageY / page.bounds.height()
+
+        return Offset(relativeX, relativeY)
+    }
+
+    private fun convertRelativeToScreen(relativeX: Float, relativeY: Float, page: Page): PointF {
+        val pageX = relativeX * page.bounds.width()
+        val pageY = relativeY * page.bounds.height()
+
+        val screenX = pageX + page.bounds.left + viewOffset.x
+        val screenY = pageY + page.bounds.top + viewOffset.y
+
+        return PointF(screenX, screenY)
+    }
+
+    // ============ 绘制辅助方法 ============
+
+    private fun drawSelectionAndDrawing(canvas: Canvas) {
+        if (isSelecting && selectedPage != null) {
+            drawSelectionRect(canvas)
+        }
+
+        if (isDrawing && drawingPage != null && drawingPoints.size > 1) {
+            drawCurrentPath(canvas)
+        }
+    }
+
+    private fun drawSelectionRect(canvas: Canvas) {
+        val paint = Paint().apply {
+            color = Color.argb(100, 0, 120, 215) // 半透明蓝色
+            style = Paint.Style.FILL
+        }
+
+        val left = kotlin.math.min(selectionStartX, selectionEndX)
+        val top = kotlin.math.min(selectionStartY, selectionEndY)
+        val right = kotlin.math.max(selectionStartX, selectionEndX)
+        val bottom = kotlin.math.max(selectionStartY, selectionEndY)
+
+        canvas.drawRect(left, top, right, bottom, paint)
+
+        // 绘制边框
+        paint.color = Color.rgb(0, 120, 215)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2f
+        canvas.drawRect(left, top, right, bottom, paint)
+    }
+
+    private fun drawCurrentPath(canvas: Canvas) {
+        val paint = drawingPaint ?: return
+        val page = drawingPage ?: return
+
+        if (pathConfig.drawType == DrawType.LINE) {
+            val startPoint = drawingPoints[0]
+            val endPoint = drawingPoints[drawingPoints.size - 1]
+
+            val dx = kotlin.math.abs(endPoint.x - startPoint.x)
+            val dy = kotlin.math.abs(endPoint.y - startPoint.y)
+
+            val finalEndPoint = if (dx > dy) {
+                PointF(endPoint.x, startPoint.y)
+            } else {
+                PointF(startPoint.x, endPoint.y)
+            }
+
+            val startScreen = convertRelativeToScreen(startPoint.x, startPoint.y, page)
+            val endScreen = convertRelativeToScreen(finalEndPoint.x, finalEndPoint.y, page)
+
+            canvas.drawLine(startScreen.x, startScreen.y, endScreen.x, endScreen.y, paint)
+        } else if (pathConfig.drawType == DrawType.CURVE) {
+            val path = Path()
+            val firstScreen = convertRelativeToScreen(drawingPoints[0].x, drawingPoints[0].y, page)
+            path.moveTo(firstScreen.x, firstScreen.y)
+
+            for (i in 1 until drawingPoints.size) {
+                val screen = convertRelativeToScreen(drawingPoints[i].x, drawingPoints[i].y, page)
+                path.lineTo(screen.x, screen.y)
+            }
+
+            canvas.drawPath(path, paint)
+        }
     }
 
     private inner class FlingRunnable : Runnable {

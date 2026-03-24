@@ -6,6 +6,7 @@ import cn.archko.pdf.core.cache.ImageCache
 import cn.archko.pdf.core.common.AnnotationManager
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.AnnotationPath
+import cn.archko.pdf.core.entity.DocQuad
 import cn.archko.pdf.core.entity.Offset
 import cn.archko.pdf.core.entity.PathConfig
 import cn.archko.pdf.core.link.Hyperlink
@@ -41,8 +42,8 @@ class PageViewState(
     var speakingPageIndex: Int? = null
         private set
 
-    // var searchHighlightQuads: Map<Int, List<DocQuad>> = emptyMap()
-    //    private set
+    var searchHighlightQuads: Map<Int, List<DocQuad>> = emptyMap()
+        private set
     var currentSearchPageIndex: Int? = null
         private set
     var currentSearchResultIndex: Int = -1
@@ -161,7 +162,7 @@ class PageViewState(
      * @param highlightQuads 每个页面的高亮区域映射
      * @param currentPageIndex 当前搜索结果所在的页面索引
      */
-    /* fun updateSearchHighlight(
+    fun updateSearchHighlight(
         highlightQuads: Map<Int, List<DocQuad>>,
         currentPageIndex: Int?,
         currentResultIndex: Int = -1
@@ -169,16 +170,16 @@ class PageViewState(
         searchHighlightQuads = highlightQuads
         currentSearchPageIndex = currentPageIndex
         currentSearchResultIndex = currentResultIndex
-    }*/
+    }
 
     /**
      * 清除搜索高亮
      */
-    /* fun clearSearchHighlight() {
+    fun clearSearchHighlight() {
         searchHighlightQuads = emptyMap()
         currentSearchPageIndex = null
         currentSearchResultIndex = -1
-    }*/
+    }
 
     fun isTileVisible(spec: TileSpec, strictMode: Boolean = false): Boolean {
         val page = pages.getOrNull(spec.page) ?: return false
@@ -710,12 +711,12 @@ class PageViewState(
      * @return 如果找到链接并处理成功返回true，否则返回false
      */
     fun handleClick(x: Float, y: Float): Boolean {
-        /*for (page in pageToRender) {
+        for (page in pageToRender) {
             val link = page.findLinkAtPoint(x, y)
             if (link != null) {
                 return handleLink(link)
             }
-        }*/
+        }
 
         return false
     }

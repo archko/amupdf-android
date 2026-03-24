@@ -20,5 +20,33 @@ class Hyperlink {
 
         const val LINKTYPE_PAGE = 0
         const val LINKTYPE_URL = 1
+
+        /**
+         * 检查点是否在链接区域内
+         */
+        fun contains(
+            hyperlink: Hyperlink,
+            x: Float,
+            y: Float
+        ): Boolean {
+            val bbox = hyperlink.bbox ?: return false
+            return bbox.contains(Rect(0, x.toInt(), 0, y.toInt()))
+        }
+
+        /**
+         * 在链接列表中查找包含指定点的链接
+         */
+        fun findLinkAtPoint(
+            links: List<Hyperlink>,
+            x: Float,
+            y: Float
+        ): Hyperlink? {
+            for (link in links) {
+                if (contains(link, x, y)) {
+                    return link
+                }
+            }
+            return null
+        }
     }
 }
