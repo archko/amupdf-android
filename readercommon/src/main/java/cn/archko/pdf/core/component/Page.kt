@@ -871,10 +871,14 @@ class Page(
         }
         //println("Page.updateVisibleNodes.config:$config, x:$minBlockX-$maxBlockX, y:$minBlockY-$maxBlockY, visible:${oldVisibleNodes.size}, key:$newVisibleKeys")
 
-        // 清理不再可见的 nodes
+        val currentWidth = width * scaleRatio
+        val currentHeight = height * scaleRatio
+
         val iterator = visibleNodes.iterator()
         while (iterator.hasNext()) {
             val entry = iterator.next()
+            entry.value.decode(currentWidth, currentHeight)
+
             if (entry.key !in newVisibleKeys) {
                 //println("updateVisibleNodes.recycle:${entry}")
                 pageViewState.nodePool.release(entry.value)

@@ -154,6 +154,9 @@ class PageNode(
         xOffset: Float,
         yOffset: Float,
     ) {
+        if (isDecoding) {
+            return
+        }
         // 页码合法性判断，防止越界
         if (aPage.index < 0 || aPage.index >= pageViewState.list.size) {
             recycle()
@@ -207,12 +210,12 @@ class PageNode(
         }
 
         // 4. 无论是否绘制，都尝试解码（预加载区域内）
-        if (bitmapState == null) {
-            decode(pageWidth, pageHeight)
-        }
+        //if (bitmapState == null && !isDecoding) {
+        //    decode(pageWidth, pageHeight)
+        //}
     }
 
-    private fun decode(pageWidth: Float, pageHeight: Float) {
+    fun decode(pageWidth: Float, pageHeight: Float) {
         val currentKey = cacheKey
 
         if (activeDecodeKey == currentKey || isDecoding) return
@@ -259,7 +262,7 @@ class PageNode(
                 bounds.right * pageWidth + left,
                 bounds.bottom * pageHeight + top
             )
-            //println("[PageNode].decode:$pageWidth-$pageHeight, left:$left, $scale, width:$width, $srcRect, bounds:$bounds, $aPage")
+            println("[PageNode].decode:$pageWidth-$pageHeight, left:$left, $scale, width:$width, $srcRect, bounds:$bounds, $aPage")
             val outWidth = ((srcRect.right - srcRect.left)).toInt()
             val outHeight = ((srcRect.bottom - srcRect.top)).toInt()
 
