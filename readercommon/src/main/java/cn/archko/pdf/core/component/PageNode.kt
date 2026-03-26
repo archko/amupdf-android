@@ -262,7 +262,7 @@ class PageNode(
                 bounds.right * pageWidth + left,
                 bounds.bottom * pageHeight + top
             )
-            println("[PageNode].decode:$pageWidth-$pageHeight, left:$left, $scale, width:$width, $srcRect, bounds:$bounds, $aPage")
+            //println("[PageNode].decode:$pageWidth-$pageHeight, left:$left, $scale, width:$width, $srcRect, bounds:$bounds, $aPage")
             val outWidth = ((srcRect.right - srcRect.left)).toInt()
             val outHeight = ((srcRect.bottom - srcRect.top)).toInt()
 
