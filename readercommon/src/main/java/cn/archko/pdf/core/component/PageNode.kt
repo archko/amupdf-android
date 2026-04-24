@@ -24,8 +24,8 @@ class PageNode(
     private var activeDecodeKey: String? = null
 
     //不能用bounds.toString(),切边切换,key变化
-    val cacheKey: String
-        get() = "${aPage.index}-${bounds.left}-${bounds.top}-${bounds.right}-${bounds.bottom}-${pageViewState.vZoom}-${pageViewState.orientation}-${pageViewState.isCropEnabled()}"
+    var cacheKey: String =
+        "${aPage.index}-${bounds.left}-${bounds.top}-${bounds.right}-${bounds.bottom}-${pageViewState.vZoom}-${pageViewState.orientation}-${pageViewState.isCropEnabled()}"
 
     private var bitmapState: BitmapState? = null
     private var isDecoding = false
@@ -40,6 +40,14 @@ class PageNode(
 
     // 缓存TileSpec计算结果
     private var cachedTileSpec: TileSpec? = null
+    private val drawRect = RectF()
+
+    fun updateKey() {
+        // 只有在 orientation 或 crop 改变时才重新生成字符串
+        // 或者使用更快的位运算生成 Long 型 ID
+        cacheKey =
+            "${aPage.index}-${bounds.left}-${bounds.top}-${bounds.right}-${bounds.bottom}-${pageViewState.vZoom}-${pageViewState.orientation}-${pageViewState.isCropEnabled()}"
+    }
 
     fun update(newBounds: RectF, newAPage: APage) {
         this.bounds = RectF(
@@ -49,6 +57,7 @@ class PageNode(
             newBounds.bottom
         )
         this.aPage = newAPage
+        updateKey()
     }
 
     // 逻辑rect转实际像素
@@ -195,17 +204,13 @@ class PageNode(
                 val dstWidth = (pixelRect.width()).toInt() + 1
                 val dstHeight = (pixelRect.height()).toInt() + 1
 
-                canvas.drawBitmap(
-                    bitmap,
-                    null,
-                    RectF(
-                        dstLeft.toFloat(),
-                        dstTop.toFloat(),
-                        (dstLeft + dstWidth).toFloat(),
-                        (dstTop + dstHeight).toFloat()
-                    ),
-                    null
+                drawRect.set(
+                    dstLeft.toFloat(),
+                    dstTop.toFloat(),
+                    (dstLeft + dstWidth).toFloat(),
+                    (dstTop + dstHeight).toFloat()
                 )
+                canvas.drawBitmap(bitmap, null, drawRect, null)
             }
         }
 

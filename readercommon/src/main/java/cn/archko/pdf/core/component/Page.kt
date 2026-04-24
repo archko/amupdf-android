@@ -41,6 +41,7 @@ class Page(
 
     // 缓存的cacheKey，只在viewSize有值时计算一次
     private var cachedCacheKey: String? = null
+    private val drawRect = RectF()
 
     // 页面链接
     var links: List<Hyperlink> = emptyList()
@@ -447,17 +448,13 @@ class Page(
             thumbBitmapState?.let { state ->
                 val bitmap = state.bitmap as? Bitmap
                 if (bitmap != null) {
-                    canvas.drawBitmap(
-                        bitmap,
-                        null,
-                        RectF(
-                            currentBounds.left,
-                            currentBounds.top,
-                            currentBounds.right,
-                            currentBounds.bottom
-                        ),
-                        null
+                    drawRect.set(
+                        currentBounds.left,
+                        currentBounds.top,
+                        currentBounds.right,
+                        currentBounds.bottom
                     )
+                    canvas.drawBitmap(bitmap, null, drawRect, null)
                 }
 
                 if (!linksLoaded) {
