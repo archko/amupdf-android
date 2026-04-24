@@ -51,8 +51,6 @@ class PageViewState(
 
     private var preloadScreens: Float = 0.8f // 预加载1屏的距离
 
-    private var lastPageKeys: Set<Int> = emptySet()
-
     private var isShutdown = false
 
     // 链接处理回调
@@ -576,22 +574,21 @@ class PageViewState(
                 RectF.intersects(scaledBounds, visibleRect)
             }
 
-            val newPageKeys = tilesToRenderCopy.map { page ->
-                page.aPage.index
-            }.toSet()
-            val toRemove = lastPageKeys - newPageKeys
-            toRemove.forEach { key ->
-                val page = pages.getOrNull(key) ?: return@forEach
-                page.clearVisibleNodes()
-            }
-            lastPageKeys = newPageKeys
-
-            if (tilesToRenderCopy != pageToRender) {
+            // 优化：避免创建临时 Set，直接比较列表
+            if (tilesToRenderCopy.size != pageToRender.size || 
+                !tilesToRenderCopy.indices.all { i -> tilesToRenderCopy[i] === pageToRender.getOrNull(i) }) {
+                
+                // 清理不再可见的页面
+                for (oldPage in pageToRender) {
+                    if (!tilesToRenderCopy.contains(oldPage)) {
+                        oldPage.clearVisibleNodes()
+                    }
+                }
                 pageToRender = tilesToRenderCopy
             }
 
             // 更新每个可见页面的可见 nodes
-            tilesToRenderCopy.forEach { page ->
+            for (page in tilesToRenderCopy) {
                 page.updateVisibleNodes(visibleRect, scaleRatio)
             }
             //println("updateVisiblePages.multiColumn: visible=${tilesToRenderCopy.size}")
@@ -616,24 +613,21 @@ class PageViewState(
             } else {
                 emptyList()
             }
-            // 主动移除不再可见的页面图片缓存
-            val newPageKeys = tilesToRenderCopy.map { page ->
-                page.aPage.index
-            }.toSet()
-            val toRemove = lastPageKeys - newPageKeys
-            toRemove.forEach { key ->
-                val page = pages.getOrNull(key) ?: return@forEach
-                page.clearVisibleNodes()
-            }
-            lastPageKeys = newPageKeys
 
-            if (tilesToRenderCopy != pageToRender) {
+            // 优化：避免创建临时 Set，直接比较列表引用
+            if (tilesToRenderCopy !== pageToRender) {
+                // 清理不再可见的页面
+                for (oldPage in pageToRender) {
+                    if (!tilesToRenderCopy.contains(oldPage)) {
+                        oldPage.clearVisibleNodes()
+                    }
+                }
                 pageToRender = tilesToRenderCopy
             }
 
             //println("updateVisiblePages.Vertical: visible=${tilesToRenderCopy.size}")
             // 更新每个可见页面的可见 nodes
-            tilesToRenderCopy.forEach { page ->
+            for (page in tilesToRenderCopy) {
                 page.updateVisibleNodes(preloadRect, scaleRatio)
             }
         } else {
@@ -657,23 +651,20 @@ class PageViewState(
             } else {
                 emptyList()
             }
-            // 主动移除不再可见的页面图片缓存
-            val newPageKeys = tilesToRenderCopy.map { page ->
-                page.aPage.index
-            }.toSet()
-            val toRemove = lastPageKeys - newPageKeys
-            toRemove.forEach { key ->
-                val page = pages.getOrNull(key) ?: return@forEach
-                page.clearVisibleNodes()
-            }
-            lastPageKeys = newPageKeys
 
-            if (tilesToRenderCopy != pageToRender) {
+            // 优化：避免创建临时 Set，直接比较列表引用
+            if (tilesToRenderCopy !== pageToRender) {
+                // 清理不再可见的页面
+                for (oldPage in pageToRender) {
+                    if (!tilesToRenderCopy.contains(oldPage)) {
+                        oldPage.clearVisibleNodes()
+                    }
+                }
                 pageToRender = tilesToRenderCopy
             }
 
             // 更新每个可见页面的可见 nodes
-            tilesToRenderCopy.forEach { page ->
+            for (page in tilesToRenderCopy) {
                 page.updateVisibleNodes(preloadRect, scaleRatio)
             }
         }
@@ -684,7 +675,7 @@ class PageViewState(
      * 优化：O(1) 快速检查页面是否在可见列表中
      */
     fun isPageInVisibleList(pageIndex: Int): Boolean {
-        return lastPageKeys.contains(pageIndex)
+        return pageToRender.any { it.aPage.index == pageIndex }
     }
 
     fun updateOffset(newOffset: Offset) {

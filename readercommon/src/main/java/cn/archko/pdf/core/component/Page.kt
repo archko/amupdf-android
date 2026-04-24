@@ -27,9 +27,16 @@ class Page(
     var yOffset: Float = 0f,
     var xOffset: Float = 0f
 ) {
-    // 可见的 nodes 映射：(x, y) -> PageNode，按需创建
-    private val visibleNodes: MutableMap<Pair<Int, Int>, PageNode> = mutableMapOf()
+    // 可见的 nodes 映射：一维索引 -> PageNode，按需创建
+    // 索引编码：index = y * xBlocks + x
+    private val visibleNodes: MutableMap<Int, PageNode> = mutableMapOf()
     private var currentTileConfig: TileConfig? = null
+
+    // 缓存上一帧的块范围，避免重复计算
+    private var lastMinBlockX = -1
+    private var lastMaxBlockX = -1
+    private var lastMinBlockY = -1
+    private var lastMaxBlockY = -1
 
     //page bound, should be caculate after view measured
     internal var bounds = RectF(0f, 0f, 1f, 1f)
@@ -356,8 +363,8 @@ class Page(
         }
 
         if (config.isSingleBlock) {
-            // 单块模式：只绘制 (0, 0) 节点
-            visibleNodes[Pair(0, 0)]?.draw(
+            // 单块模式：只绘制 key=0 的节点
+            visibleNodes[0]?.draw(
                 canvas,
                 currentWidth,
                 currentHeight,
@@ -367,8 +374,9 @@ class Page(
             return
         }
 
-        for (node in visibleNodes) {
-            node.value.draw(
+        // 多块模式：绘制所有可见节点
+        for (node in visibleNodes.values) {
+            node.draw(
                 canvas,
                 currentWidth,
                 currentHeight,
@@ -446,16 +454,14 @@ class Page(
 
             // 优先绘制缩略图
             thumbBitmapState?.let { state ->
-                val bitmap = state.bitmap as? Bitmap
-                if (bitmap != null) {
-                    drawRect.set(
-                        currentBounds.left,
-                        currentBounds.top,
-                        currentBounds.right,
-                        currentBounds.bottom
-                    )
-                    canvas.drawBitmap(bitmap, null, drawRect, null)
-                }
+                val bitmap = state.bitmap
+                drawRect.set(
+                    currentBounds.left,
+                    currentBounds.top,
+                    currentBounds.right,
+                    currentBounds.bottom
+                )
+                canvas.drawBitmap(bitmap, null, drawRect, null)
 
                 if (!linksLoaded) {
                     loadLinks()
@@ -790,7 +796,22 @@ class Page(
         // 配置变化，清空所有可见 nodes
         visibleNodes.values.forEach { pageViewState.nodePool.release(it) }
         visibleNodes.clear()
+
+        // 重置块范围缓存
+        lastMinBlockX = -1
+        lastMaxBlockX = -1
+        lastMinBlockY = -1
+        lastMaxBlockY = -1
     }
+
+    /**
+     * 编码二维坐标为一维索引
+     * @param x 块的 x 坐标
+     * @param y 块的 y 坐标
+     * @param xBlocks 总块数（x 方向）
+     * @return 一维索引
+     */
+    private fun encodeKey(x: Int, y: Int, xBlocks: Int): Int = y * xBlocks + x
 
     /**
      * 根据可见区域按需创建/释放 nodes
@@ -813,7 +834,7 @@ class Page(
 
         // 单块模式：只有一个 node
         if (config.isSingleBlock) {
-            val key = Pair(0, 0)
+            val key = 0  // 直接用 0 代替 Pair(0, 0)
             if (!visibleNodes.containsKey(key)) {
                 val node =
                     pageViewState.nodePool.acquire(pageViewState, RectF(0f, 0f, 1f, 1f), aPage)
@@ -821,10 +842,7 @@ class Page(
             }
 
             // 清理其他可能的
-            val keysToRemove = visibleNodes.keys.filter { it != key }
-            keysToRemove.forEach { removeKey ->
-                visibleNodes.remove(removeKey)?.let { pageViewState.nodePool.release(it) }
-            }
+            visibleNodes.keys.removeAll { it != key }
             return
         }
 
@@ -844,44 +862,82 @@ class Page(
         val maxBlockY = kotlin.math.ceil(pageVisibleBottom * config.yBlocks).toInt()
             .coerceIn(0, config.yBlocks - 1)
 
-        // 新的可见 nodes 集合
-        val newVisibleKeys = mutableSetOf<Pair<Int, Int>>()
+        val currentWidth = width * scaleRatio
+        val currentHeight = height * scaleRatio
 
-        for (y in minBlockY..maxBlockY) {
-            for (x in minBlockX..maxBlockX) {
-                val key = Pair(x, y)
-                newVisibleKeys.add(key)
+        // 优化：如果块范围没变，只需要 decode，不需要创建/销毁
+        if (minBlockX == lastMinBlockX && maxBlockX == lastMaxBlockX &&
+            minBlockY == lastMinBlockY && maxBlockY == lastMaxBlockY) {
+            // 范围没变，只需要 decode 现有节点
+            visibleNodes.values.forEach { it.decode(currentWidth, currentHeight) }
+            return
+        }
 
-                // 按需创建 node
-                if (!visibleNodes.containsKey(key)) {
+        // 范围变了，需要创建/销毁节点
+        // 方案 A：直接重建（简单，适合块数不多的情况）
+        if (config.xBlocks * config.yBlocks <= 16) {
+            // 清空所有，重新创建
+            visibleNodes.values.forEach { pageViewState.nodePool.release(it) }
+            visibleNodes.clear()
+
+            for (y in minBlockY..maxBlockY) {
+                for (x in minBlockX..maxBlockX) {
+                    val key = encodeKey(x, y, config.xBlocks)
                     val left = x / config.xBlocks.toFloat()
                     val top = y / config.yBlocks.toFloat()
                     val right = (x + 1) / config.xBlocks.toFloat()
                     val bottom = (y + 1) / config.yBlocks.toFloat()
-                    val rectF = RectF(left, top, right, bottom)
-                    //println("Page.updateVisibleNodes.node:$left-$top-$right-$bottom")
 
-                    val node = pageViewState.nodePool.acquire(pageViewState, rectF, aPage)
+                    val node = pageViewState.nodePool.acquire(
+                        pageViewState,
+                        RectF(left, top, right, bottom),
+                        aPage
+                    )
                     visibleNodes[key] = node
+                    node.decode(currentWidth, currentHeight)
+                }
+            }
+        } else {
+            // 方案 B：增量更新（块数多时才值得）
+            // 移除不在新范围内的块
+            visibleNodes.keys.removeAll { key ->
+                val y = key / config.xBlocks
+                val x = key % config.xBlocks
+                val shouldRemove = x < minBlockX || x > maxBlockX ||
+                        y < minBlockY || y > maxBlockY
+                if (shouldRemove) {
+                    pageViewState.nodePool.release(visibleNodes[key]!!)
+                }
+                shouldRemove
+            }
+
+            // 创建新的块
+            for (y in minBlockY..maxBlockY) {
+                for (x in minBlockX..maxBlockX) {
+                    val key = encodeKey(x, y, config.xBlocks)
+                    if (!visibleNodes.containsKey(key)) {
+                        val left = x / config.xBlocks.toFloat()
+                        val top = y / config.yBlocks.toFloat()
+                        val right = (x + 1) / config.xBlocks.toFloat()
+                        val bottom = (y + 1) / config.yBlocks.toFloat()
+
+                        val node = pageViewState.nodePool.acquire(
+                            pageViewState,
+                            RectF(left, top, right, bottom),
+                            aPage
+                        )
+                        visibleNodes[key] = node
+                    }
+                    visibleNodes[key]?.decode(currentWidth, currentHeight)
                 }
             }
         }
-        //println("Page.updateVisibleNodes.config:$config, x:$minBlockX-$maxBlockX, y:$minBlockY-$maxBlockY, visible:${oldVisibleNodes.size}, key:$newVisibleKeys")
 
-        val currentWidth = width * scaleRatio
-        val currentHeight = height * scaleRatio
-
-        val iterator = visibleNodes.iterator()
-        while (iterator.hasNext()) {
-            val entry = iterator.next()
-            entry.value.decode(currentWidth, currentHeight)
-
-            if (entry.key !in newVisibleKeys) {
-                //println("updateVisibleNodes.recycle:${entry}")
-                pageViewState.nodePool.release(entry.value)
-                iterator.remove()
-            }
-        }
+        // 缓存本次的块范围
+        lastMinBlockX = minBlockX
+        lastMaxBlockX = maxBlockX
+        lastMinBlockY = minBlockY
+        lastMaxBlockY = maxBlockY
     }
 
     /**
