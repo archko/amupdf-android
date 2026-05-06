@@ -68,8 +68,6 @@ public abstract class AbsOcrActivity extends BaseActivity {
 
     private String name;
 
-    public abstract void onActivityCreate();
-
     public abstract void onActivityDestory();
 
     public abstract void onOcrBitmap(Bitmap bitmap, float confidence, ResultListener.OcrListener listener);
@@ -81,10 +79,9 @@ public abstract class AbsOcrActivity extends BaseActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         name = getIntent().getStringExtra("name");
         //model = getIntent().getIntExtra("model_type", MODEL_DETECT);
-
+        super.onCreate(savedInstanceState);  // 触发权限检查，权限完成后调用 onPermissionsGranted()
         init();
     }
 
@@ -115,7 +112,7 @@ public abstract class AbsOcrActivity extends BaseActivity {
 
         addListener();
         updateRealtimeResultPopViewGroup();
-        onActivityCreate();
+        // onActivityCreate() 移到了 onPermissionsGranted() 中调用，等待权限完成
     }
 
     public void save(List<BaseResultModel> models) {

@@ -73,7 +73,7 @@ public class OcrActivity extends AbsOcrActivity {
     private String name = "ocr";
 
     @Override
-    public void onActivityCreate() {
+    public void onPermissionsGranted() {
         parseIntent();
         ChipConfig chipConfig = new ChipConfig(this);
         if (chipConfig.checkChip()) {
@@ -101,8 +101,8 @@ public class OcrActivity extends AbsOcrActivity {
             case "arm-gpu":
                 platform = Consts.TYPE_ARM_GPU;
                 break;
-            default:
             case "arm":
+            default:
                 platform = Consts.TYPE_INFER;
         }
     }

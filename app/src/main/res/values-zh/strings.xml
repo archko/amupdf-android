@@ -220,4 +220,8 @@
     <string name="label_bookmark_count">书签数量：</string>
     <string name="label_first_read_at">首次阅读时间：</string>
     <string name="label_last_read_at">最后阅读时间：</string>
+
+    <!-- AI 设置 -->
+    <string name="ai_setting_title">AI 设置</string>
+    <string name="ai_setting_button">AI 设置</string>
 </resources>

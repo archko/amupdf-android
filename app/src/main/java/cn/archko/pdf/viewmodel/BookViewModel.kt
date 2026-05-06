@@ -91,12 +91,13 @@ class BookViewModel : ViewModel() {
 
                 entry = FileBean(FileBean.HOME, home)
                 fileList.add(entry)
-                if (!TextUtils.equals(currentPath, "/")
-                    && !TextUtils.equals("/storage/emulated/0", currentPath)
-                ) {
+                // 只在不是根目录时添加上一级目录，支持所有外置存储设备
+                if (!TextUtils.equals(currentPath, "/")) {
                     val upFolder = File(currentPath).parentFile
-                    entry = FileBean(FileBean.NORMAL, upFolder!!, "..")
-                    fileList.add(entry)
+                    if (upFolder != null) {
+                        entry = FileBean(FileBean.NORMAL, upFolder, "..")
+                        fileList.add(entry)
+                    }
                 }
                 val files = File(currentPath).listFiles(fileFilter)
                 if (files != null) {
