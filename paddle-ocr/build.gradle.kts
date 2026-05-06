@@ -27,7 +27,6 @@ android {
 }
 dependencies {
     //api fileTree(include: ["*.jar"], dir: "libs")
-    api (files("libs/easyedge-sdk.jar"))
     api(project(":readercommon"))
     api("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation(libs.material)
