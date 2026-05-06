@@ -23,14 +23,15 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
 import cn.archko.pdf.R
-import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.ReflowViewCache
 import cn.archko.pdf.core.common.APageSizeLoader
 import cn.archko.pdf.core.common.AppExecutors.Companion.instance
 import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.BookProgress
+import cn.archko.pdf.core.entity.PathConfig
 import cn.archko.pdf.core.utils.ColorUtil.getColorMode
 import cn.archko.pdf.core.utils.Utils
 import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
@@ -378,6 +379,10 @@ class AScanReflowViewController(
         return bitmap
     }
 
+    override fun getCurrentContent(start: Int, end: Int): List<String>? {
+        return null
+    }
+
     override fun getCurrentPos(): Int {
         if (null == mRecyclerView.layoutManager) {
             return 0
@@ -407,6 +412,18 @@ class AScanReflowViewController(
     }
 
     override fun setOrientation(ori: Int) {
+    }
+
+    override fun setSelection(selection: Boolean) {
+    }
+
+    override fun setDraw(draw: Boolean) {
+    }
+
+    override fun setInvalidate() {
+    }
+
+    override fun setDrawConfig(pathConfig: PathConfig) {
     }
 
     override fun setCrop(crop: Boolean) {

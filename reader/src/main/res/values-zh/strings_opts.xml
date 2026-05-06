@@ -32,7 +32,7 @@
     <string name="menu_exit">退出</string>
     <string name="menu_font">字体</string>
     <string name="menu_settings">设置</string>
-    
+
     <string name="menu_opt_album">查看相册</string>
     <string name="menu_opt_delete_page">删除页面</string>
     <string name="menu_opt_insert_image">插入图片</string>
@@ -66,15 +66,6 @@
         <item>感应横屏</item>
     </string-array>
 
-    <string-array name="opts_color_modes">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-    </string-array>
     <string-array name="opts_color_mode_labels">
         <item>原色</item>
         <item>反色</item>
@@ -83,6 +74,7 @@
         <item>浅灰底灰度</item>
         <item>灰底灰度</item>
         <item>深灰底灰度</item>
+        <item>自定义</item>
     </string-array>
 
     <string name="opts_list_style">列表风格</string>
@@ -154,8 +146,67 @@
     <string name="no_bookmark">没有书签,先添加一个吧</string>
 
     <string name="tts_failed">初始化语音引擎失败</string>
+    <string name="tts_title">朗读页面列表</string>
 
     <string name="opts_decode_block_title">位图尺寸</string>
+
+    <!-- Color Picker Dialog Strings -->
+    <string name="color_picker_title">选择颜色</string>
+    <string name="color_value_label">颜色值:</string>
+    <string name="apply_button">应用</string>
+    <string name="alpha_label">透明度 (A):</string>
+    <string name="red_label">红色 (R):</string>
+    <string name="green_label">绿色 (G):</string>
+    <string name="blue_label">蓝色 (B):</string>
+    <string name="cancel_button">取消</string>
+    <string name="ok_button">确定</string>
+
+    <string name="color_filter_title">自定义颜色矩阵</string>
+    <string name="color_filter_reset">重置</string>
+    <string name="color_filter_filter_error">矩阵值无效</string>
+
+    <string name="document_outline">大纲</string>
+    <string name="outline_empty">没有大纲</string>
+    <string name="annotation_empty">没有批注</string>
+    <string name="bookmark_empty">没有书签</string>
+    <string name="page_label">%d页</string>
+    <string name="annotations_count">批注数:%d</string>
+
+    <!-- Draw Config Dialog Strings -->
+    <string name="draw_config_title">绘图设置</string>
+    <string name="color_preview_label">颜色预览:</string>
+    <string name="select_color_label">选择颜色:</string>
+    <string name="stroke_width_label">线宽:</string>
+    <string name="draw_type_label">绘制类型:</string>
+    <string name="line_type">直线</string>
+    <string name="curve_type">曲线</string>
+    <string name="confirm_button">确定</string>
+
+    <!-- Bookmark -->
+    <string name="bookmark_dialog_title">书签</string>
+
+    <!-- AI 对话相关 -->
+    <string name="ai_chat_empty">没有 AI 会话</string>
+    <string name="ai_conversations_count">会话数%d</string>
+    <string name="ai_tab">AI Chat</string>
+
+    <!-- AI 页面对话框相关 -->
+    <string name="ai_assistant_page">AI 助手 - 页 %d</string>
+    <string name="ask_based_on_content">基于当前页面问答…</string>
+    <string name="conversation_history">会话历史</string>
+    <string name="no_conversation_records">没有会话</string>
+    <string name="page_content">页面内容</string>
+    <string name="unable_to_get_page_text">无法获取页面文本</string>
+    <string name="send">发送</string>
+    <string name="close">关闭</string>
+    <string name="prompt_tokens">消耗: %d</string>
+    <string name="completion_tokens">完成: %d</string>
+    <string name="total_tokens">总: %d</string>
+
+    <string name="copy">复制</string>
+    <string name="selected_text">选中的文本</string>
+    <string name="copy_to_clipboard">复制到剪切板了</string>
+
 
     <string name="ocr_title">OCR 识别</string>
     <string name="ocr_recognize">OCR 识别</string>

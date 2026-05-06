@@ -1,106 +1,93 @@
 package cn.archko.pdf.fragments
 
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.view.WindowManager
 import android.widget.TextView
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentActivity
-import androidx.recyclerview.awidget.ARecyclerView
-import androidx.recyclerview.awidget.LinearLayoutManager
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import cn.archko.pdf.R
-import cn.archko.pdf.core.utils.Utils
-import cn.archko.pdf.listeners.OutlineListener
+import cn.archko.pdf.core.adapters.BaseRecyclerAdapter
+import cn.archko.pdf.core.adapters.BaseViewHolder
+import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.widgets.ColorItemDecoration
+import cn.archko.pdf.databinding.FragmentOutlineBinding
+import cn.archko.pdf.fragments.OutlineTabFragment.Companion.ARG_CURRENT_PAGE
 import org.vudroid.core.codec.OutlineLink
 
 /**
  * @author: archko 2019/7/11 :17:55
  */
-open class OutlineFragment : DialogFragment() {
+open class OutlineFragment : Fragment(R.layout.fragment_outline) {
 
-    private lateinit var adapter: ARecyclerView.Adapter<ViewHolder>
-    var outlineItems: ArrayList<OutlineLink>? = null
-    private var currentPage: Int = 0
-    private var recyclerView: ARecyclerView? = null
-    private var nodataView: View? = null
+    private lateinit var binding: FragmentOutlineBinding
+    private lateinit var adapter: BaseRecyclerAdapter<OutlineLink>
+    var outlineItems: List<OutlineLink>? = null
+    var currentPage: Int = 0
     private var pendingPos = -1
     private var found = -1
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        var themeId = R.style.AppTheme
-        setStyle(STYLE_NORMAL, themeId)
+    companion object {
 
-        arguments?.let {
-            currentPage = it.getInt("POSITION", 0)
-            if (it.getSerializable("OUTLINE") != null) {
-                outlineItems = it.getSerializable("OUTLINE") as ArrayList<OutlineLink>
+        fun newInstance(arguments: Bundle?, outlineItems: List<OutlineLink>?): OutlineFragment {
+            val fragment = OutlineFragment()
+            arguments?.run {
+                fragment.outlineItems = outlineItems
+                updateArgs(fragment, arguments)
             }
+            return fragment
+        }
 
-            //if (it.getSerializable("out") != null) {
-            //    outlineItems = it.getSerializable("out") as ArrayList<OutlineItem>
-            //}
+        fun updateArgs(
+            fragment: OutlineFragment,
+            arguments: Bundle?
+        ) {
+            arguments?.run {
+                fragment.currentPage = arguments.getInt(ARG_CURRENT_PAGE)
+                if (fragment.currentPage > 0) {
+                    fragment.pendingPos = fragment.currentPage
+                }
+            }
         }
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        dialog?.apply {
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            val lp: WindowManager.LayoutParams = window!!.attributes
-            lp.dimAmount = 0f
-            lp.height =
-                ((Utils.getScreenHeightPixelWithOrientation(requireActivity()) * 0.9f).toInt())
-            lp.width = (Utils.getScreenWidthPixelWithOrientation(requireActivity()) * 0.8f).toInt()
-            window!!.attributes = lp
-            setCanceledOnTouchOutside(true)
-            setCancelable(true)
-        }
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentOutlineBinding.inflate(layoutInflater)
+        return binding.root
+    }
 
-        val view = inflater.inflate(R.layout.fragment_outline, container, false)
-        recyclerView = view.findViewById(R.id.recyclerView)
-        recyclerView?.itemAnimator = null
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        val itemDecoration = ColorItemDecoration(requireContext())
+        binding.recyclerView.addItemDecoration(itemDecoration)
 
-        //if (null != outlineItems) {
-        //    val treeAdapter = TreeAdapter(activity, outlineItems)
-        //    treeAdapter.setListener(object : OnItemClickListener<Any?> {
-        //        override fun onItemClick(view: View, data: Any?, position: Int) {
-        //            val ac = activity as OutlineListener
-        //            ac.onSelectedOutline((data as OutlineItem).page)
-        //        }
-        //        override fun onItemClick2(view: View, data: Any?, position: Int) {}
-        //    })
-        //    recyclerView.adapter = treeAdapter
-        //    return view
-        //}
-
-        if (outlineItems == null) {
-            nodataView?.visibility = View.VISIBLE
-        } else {
-            adapter = object : ARecyclerView.Adapter<ViewHolder>() {
-
-                override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-                    val root = inflater.inflate(R.layout.item_outline, parent, false)
-                    return ViewHolder(root)
-                }
-
-                override fun getItemCount(): Int {
-                    return outlineItems!!.size
-                }
-
-                override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-                    holder.onBind(outlineItems!![position], position)
-                }
+        adapter = object : BaseRecyclerAdapter<OutlineLink>(requireContext()) {
+            override fun onCreateViewHolder(
+                parent: ViewGroup,
+                viewType: Int
+            ): BaseViewHolder<OutlineLink> {
+                val root = inflater.inflate(R.layout.item_outline, parent, false)
+                return ViewHolder(root)
             }
-            recyclerView?.adapter = adapter
         }
-        return view
+
+        binding.recyclerView.adapter = adapter
+        adapter.data = outlineItems
+
+        if (outlineItems.isNullOrEmpty()) {
+            binding.recyclerView.visibility = View.GONE
+            binding.nodataView.visibility = View.VISIBLE
+        } else {
+            binding.recyclerView.visibility = View.VISIBLE
+            binding.nodataView.visibility = View.GONE
+        }
     }
 
     override fun onResume() {
@@ -131,13 +118,13 @@ open class OutlineFragment : DialogFragment() {
                 found = i
             }
         }
-        //println(String.format("found:%s, currentPage:%s", found, currentPage))
+        Logcat.d(String.format("found:%s, currentPage:%s", found, currentPage))
         if (found >= 0) {
-            recyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object :
+            binding.recyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object :
                 ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    recyclerView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
-                    (recyclerView?.layoutManager as LinearLayoutManager)
+                    binding.recyclerView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+                    (binding.recyclerView.layoutManager as LinearLayoutManager)
                         .scrollToPositionWithOffset(found, -10)
                 }
             })
@@ -145,13 +132,15 @@ open class OutlineFragment : DialogFragment() {
     }
 
     protected fun onListItemClick(item: OutlineLink) {
-        val ac = activity as OutlineListener
-        ac.onSelectedOutline(item.targetPage)
-        dismiss()
+        parentFragment?.let {
+            if (it is OutlineTabFragment) {
+                it.onListItemClick(item.targetPage)
+            }
+        }
     }
 
     inner class ViewHolder(private val root: View) :
-        ARecyclerView.ViewHolder(root) {
+        BaseViewHolder<OutlineLink>(root) {
 
         var title: TextView? = null
         var page: TextView? = null
@@ -161,26 +150,16 @@ open class OutlineFragment : DialogFragment() {
             page = root.findViewById(R.id.page)
         }
 
-        fun onBind(data: OutlineLink, position: Int) {
+        override fun onBind(data: OutlineLink, position: Int) {
             if (position == found) {
                 root.setBackgroundColor(root.context.resources.getColor(R.color.toc_color_bg))
             } else {
                 root.setBackgroundColor(Color.TRANSPARENT)
             }
-            title?.text = data.title
+            val indent = "   ".repeat(data.level)
+            title?.text = String.format("%s%s", indent, data.title)
             page?.text = (data.targetPage.plus(1)).toString()
             itemView.setOnClickListener { onListItemClick(data) }
         }
-    }
-
-    fun showDialog(activity: FragmentActivity?) {
-        val ft = activity?.supportFragmentManager?.beginTransaction()
-        val prev = activity?.supportFragmentManager?.findFragmentByTag("create_dialog")
-        if (prev != null) {
-            ft?.remove(prev)
-        }
-        ft?.addToBackStack(null)
-
-        show(ft!!, "create_dialog")
     }
 }

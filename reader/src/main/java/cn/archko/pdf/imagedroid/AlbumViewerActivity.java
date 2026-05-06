@@ -45,7 +45,6 @@ public class AlbumViewerActivity extends BaseViewerActivity {
                             return;
                         }
 
-                        ((DecodeServiceBase) decodeService).set(dir, false, document);
                         isDocLoaded = true;
                         documentView.showDocument(autoCrop);
                         seekbarControls.update(decodeService.getPageCount(), 0);

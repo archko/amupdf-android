@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content"
     android:layout_width="match_parent"
@@ -22,25 +23,26 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="42dp"
             android:orientation="horizontal"
             android:paddingStart="4dp"
             android:paddingEnd="4dp">
 
             <ImageButton
                 android:id="@+id/back_button"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:background="@drawable/button"
                 android:contentDescription="back"
                 android:scaleType="center"
-                android:src="@drawable/ic_back" />
+                android:src="@drawable/ic_back"
+                app:tint="@color/white" />
 
             <HorizontalScrollView
                 android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
                 android:layout_weight="1"
-                android:layout_gravity="right"
-                android:layout_height="40dp"
                 android:scrollbars="none">
 
                 <LinearLayout
@@ -50,8 +52,8 @@
 
                     <ImageButton
                         android:id="@+id/ttsButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/menu_tts"
                         android:src="@drawable/ic_tts"
@@ -59,9 +61,29 @@
                         tools:visibility="visible" />
 
                     <ImageButton
+                        android:id="@+id/selectButton"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="select"
+                        android:src="@drawable/ic_select"
+                        android:visibility="visible"
+                        tools:visibility="visible" />
+
+                    <ImageButton
+                        android:id="@+id/penButton"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="pen"
+                        android:src="@drawable/ic_draw_pen"
+                        android:visibility="visible"
+                        tools:visibility="visible" />
+
+                    <ImageButton
                         android:id="@+id/autoCropButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/auto_crop"
                         android:src="@drawable/ic_crop"
@@ -69,9 +91,17 @@
                         tools:visibility="visible" />
 
                     <ImageButton
+                        android:id="@+id/outlineButton"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="@string/outline_title"
+                        android:src="@drawable/ic_toc" />
+
+                    <ImageButton
                         android:id="@+id/reflowButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/toggle_reflow_mode"
                         android:src="@drawable/ic_reflow"
@@ -80,8 +110,8 @@
 
                     <ImageButton
                         android:id="@+id/imageButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/toggle_reflow_image"
                         android:src="@drawable/ic_image_text"
@@ -89,33 +119,53 @@
                         tools:visibility="visible" />
 
                     <ImageButton
-                        android:id="@+id/outlineButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/button"
-                        android:contentDescription="@string/outline_title"
-                        android:src="@drawable/ic_toc" />
-
-                    <ImageButton
                         android:id="@+id/ocrButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/menu_ocr"
                         android:src="@drawable/ic_ocr" />
 
                     <ImageButton
+                        android:id="@+id/aiButton"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="ai"
+                        android:src="@drawable/ic_ai"
+                        android:visibility="visible"
+                        tools:visibility="visible" />
+
+                    <ImageButton
+                        android:id="@+id/bookmarkButton"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="ai"
+                        android:src="@drawable/ic_bookmark"
+                        android:visibility="visible"
+                        tools:visibility="visible" />
+
+                    <ImageButton
                         android:id="@+id/oriButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/opts_orientation"
                         android:src="@drawable/ic_vertical" />
 
                     <ImageButton
+                        android:id="@+id/searchButton"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/button"
+                        android:contentDescription="@string/menu_search"
+                        android:src="@drawable/ic_search" />
+
+                    <ImageButton
                         android:id="@+id/previewButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/menu_thumb"
                         android:src="@drawable/ic_pdf_preview"
@@ -123,17 +173,9 @@
                         tools:visibility="visible" />
 
                     <ImageButton
-                        android:id="@+id/searchButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/button"
-                        android:contentDescription="@string/menu_search"
-                        android:src="@drawable/ic_search" />
-
-                    <ImageButton
                         android:id="@+id/fontButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/button"
                         android:contentDescription="@string/menu_search"
                         android:src="@drawable/ic_font"
@@ -149,7 +191,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="8dp"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/path"
@@ -175,9 +217,62 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/layout_draw"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <cn.archko.pdf.widgets.DrawPreviewView
+                android:id="@+id/drawWidthButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="4dp" />
+
+            <cn.archko.pdf.widgets.DrawPreviewView
+                android:id="@+id/drawTypeButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="4dp" />
+
+
+            <cn.archko.pdf.widgets.DrawPreviewView
+                android:id="@+id/drawColorButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="4dp" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="#80FFFFFF" />
+
+            <ImageButton
+                android:id="@+id/drawUndoButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/button"
+                android:contentDescription="undo"
+                android:src="@drawable/ic_undo"
+                app:tint="#80FFFFFF" />
+
+            <ImageButton
+                android:id="@+id/drawRedoButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/button"
+                android:contentDescription="redo"
+                android:src="@drawable/ic_redo"
+                app:tint="#80FFFFFF" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/layout_search"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="42dp"
             android:orientation="horizontal"
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
@@ -186,8 +281,8 @@
 
             <ImageButton
                 android:id="@+id/closeButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:background="@drawable/button"
                 android:contentDescription="@string/menu_clear_search"
                 android:src="@drawable/ic_close"
@@ -196,16 +291,16 @@
 
             <!--<ImageButton
                 android:id="@+id/showSearchButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:background="@drawable/button"
                 android:contentDescription="@string/menu_open_search"
                 android:src="@drawable/ic_search" />-->
 
             <ImageButton
                 android:id="@+id/prevButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:background="@drawable/button"
                 android:contentDescription=""
                 android:src="@drawable/ic_arrow_left"
@@ -214,8 +309,8 @@
 
             <ImageButton
                 android:id="@+id/nextButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:background="@drawable/button"
                 android:contentDescription=""
                 android:src="@drawable/ic_arrow_right"

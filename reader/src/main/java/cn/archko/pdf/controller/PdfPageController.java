@@ -17,13 +17,17 @@ public class PdfPageController extends DefaultPageController {
     public PdfPageController(View view, DocViewModel docViewModel, PageControllerListener controlerListener) {
         super(view, docViewModel, controlerListener);
 
+        ttsButton.setVisibility(View.VISIBLE);
+        selectButton.setVisibility(View.VISIBLE);
+        penButton.setVisibility(View.VISIBLE);
         reflowButton.setVisibility(View.VISIBLE);
         imageButton.setVisibility(View.VISIBLE);
         autoCropButton.setVisibility(View.VISIBLE);
         outlineButton.setVisibility(View.VISIBLE);
         oriButton.setVisibility(View.VISIBLE);
-        ttsButton.setVisibility(View.VISIBLE);
         ocrButton.setVisibility(View.VISIBLE);
+        aiButton.setVisibility(View.VISIBLE);
+        bookmarkButton.setVisibility(View.VISIBLE);
         previewButton.setVisibility(View.VISIBLE);
     }
 
@@ -33,19 +37,27 @@ public class PdfPageController extends DefaultPageController {
         showReflow(docViewModel.getReflow());
         showReflowImage(docViewModel.getReflow());
 
+        ttsButton.setVisibility(View.VISIBLE);
         reflowButton.setVisibility(View.VISIBLE);
         imageButton.setVisibility(View.VISIBLE);
         autoCropButton.setVisibility(View.VISIBLE);
         outlineButton.setVisibility(View.VISIBLE);
-        ttsButton.setVisibility(View.VISIBLE);
         ocrButton.setVisibility(View.VISIBLE);
 
         if (viewMode == ViewMode.REFLOW_SCAN) {
+            selectButton.setVisibility(View.GONE);
+            penButton.setVisibility(View.GONE);
             oriButton.setVisibility(View.GONE);
             searchButton.setVisibility(View.GONE);
+            aiButton.setVisibility(View.GONE);
+            bookmarkButton.setVisibility(View.GONE);
         } else {
+            selectButton.setVisibility(View.VISIBLE);
+            penButton.setVisibility(View.VISIBLE);
             oriButton.setVisibility(View.VISIBLE);
             previewButton.setVisibility(View.VISIBLE);
+            aiButton.setVisibility(View.VISIBLE);
+            bookmarkButton.setVisibility(View.VISIBLE);
         }
     }
 
@@ -54,12 +66,12 @@ public class PdfPageController extends DefaultPageController {
         boolean crop;
         if (reflow == BookProgress.REFLOW_TXT) {
             crop = false;
-            reflowButton.setColorFilter(Color.argb(0xFF, 172, 114, 37));
+            reflowButton.setColorFilter(Color.argb(0xFF, 0, 255, 0));
             imageButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
         } else if (reflow == BookProgress.REFLOW_SCAN) {
             crop = false;
             reflowButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
-            imageButton.setColorFilter(Color.argb(0xFF, 172, 114, 37));
+            imageButton.setColorFilter(Color.argb(0xFF, 0, 255, 0));
         } else {
             reflowButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
             imageButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));

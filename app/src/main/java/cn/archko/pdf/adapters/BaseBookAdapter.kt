@@ -38,8 +38,9 @@ open class BaseBookAdapter(
         mInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val screenHeight: Int = Utils.getScreenHeightPixelWithOrientation(context)
         val screenWidth: Int = Utils.getScreenWidthPixelWithOrientation(context)
-        var h: Int = (screenHeight - Utils.dipToPixel(12f)) / 3
-        var w: Int = (screenWidth - Utils.dipToPixel(12f)) / 3
+        val margin = Utils.dipToPixel(12f).toInt()
+        var h: Int = (screenHeight - margin) / 3
+        var w: Int = (screenWidth - margin) / 3
         if (h < w) {
             w = h
         }
@@ -176,14 +177,12 @@ open class BaseBookAdapter(
         var mName: TextView? = null
         var mIcon: ImageView? = null
 
-        // var mSize: TextView? = null
-        var mProgressBar: ProgressBar? = null
+        var mProgressText: TextView? = null
 
         init {
             mIcon = itemView.findViewById(R.id.icon)
             mName = itemView.findViewById(R.id.name)
-            //mSize = itemView.findViewById(R.id.size)
-            mProgressBar = itemView.findViewById(R.id.progressbar)
+            mProgressText = itemView.findViewById(R.id.progressText)
         }
 
         override fun onBind(entry: FileBean, position: Int) {
@@ -209,16 +208,13 @@ open class BaseBookAdapter(
             val bookProgress = entry.bookProgress
             if (null != bookProgress) {
                 if (bookProgress.page > 0) {
-                    mProgressBar!!.visibility = View.VISIBLE
-                    mProgressBar!!.max = bookProgress.pageCount
-                    mProgressBar!!.progress = bookProgress.page
+                    mProgressText!!.visibility = View.VISIBLE
+                    mProgressText!!.text = "${bookProgress.page}/${bookProgress.pageCount}"
                 } else {
-                    mProgressBar!!.visibility = View.INVISIBLE
+                    mProgressText!!.visibility = View.INVISIBLE
                 }
-                //mSize!!.text = Utils.getFileSize(bookProgress.size)
             } else {
-                mProgressBar!!.visibility = View.INVISIBLE
-                //mSize!!.text = null
+                mProgressText!!.visibility = View.INVISIBLE
             }
 
             if (bookProgress?.ext != null) {

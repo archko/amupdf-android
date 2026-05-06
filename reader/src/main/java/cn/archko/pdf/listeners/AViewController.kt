@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.view.MotionEvent
 import android.view.View
 import cn.archko.pdf.controller.TtsDataCallback
+import cn.archko.pdf.core.entity.PathConfig
 
 /**
  * @author: archko 2020/5/15 :12:43
@@ -19,7 +20,11 @@ interface AViewController {
 
     fun getCurrentPos(): Int
     fun getCurrentBitmap(): Bitmap?
+    fun getCurrentContent(start: Int, end: Int): List<String>?
     fun getCount(): Int
+    fun setSelection(selection: Boolean)
+    fun setDraw(draw: Boolean)
+    fun setInvalidate()
     fun setOrientation(ori: Int)
     fun setCrop(crop: Boolean)
     fun getCrop(): Boolean
@@ -47,4 +52,5 @@ interface AViewController {
     fun setSpeakingPage(page: Int)
     fun toggleThumbnail()
     fun selectFont()
+    fun setDrawConfig(pathConfig: PathConfig)
 }

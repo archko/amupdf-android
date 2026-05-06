@@ -9,8 +9,6 @@ import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import cn.archko.pdf.common.R;
-
 /**
  * @author: archko 2024/3/12 :19:18
  */

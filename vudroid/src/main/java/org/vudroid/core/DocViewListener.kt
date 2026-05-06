@@ -12,4 +12,6 @@ interface DocViewListener {
     fun onDoubleTap(ev: MotionEvent, currentPage: Int)
 
     fun setCurrentPage(page: Int)
+
+    fun selectedText(text: String)
 }

@@ -42,7 +42,6 @@ dependencies {
     implementation(libs.material)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
-    implementation(libs.colorPickerDialog)
     api(libs.recyclerview)
 
     //api(Libs.Umeng.asms) {

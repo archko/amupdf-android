@@ -17,18 +17,8 @@ object ParseTextMain {
 
     private val txtParser: TxtParser = TxtParser()
 
-    fun parseAsText(bytes: ByteArray): String {
-        val content = String(bytes)
-        return txtParser.parseAsText(content)
-    }
-
-    fun parseAsList(bytes: ByteArray, pageIndex: Int): List<ReflowBean> {
-        val content = String(bytes)
-        return txtParser.parseAsList(content, pageIndex)
-    }
-
     /**
-     * 解析为spanned,可以直接使用
+     * 解析为spanned,可以直接使用于html
      */
     fun parseAsHtmlList(bytes: ByteArray, pageIndex: Int): List<ReflowBean> {
         val content = String(bytes)
@@ -41,7 +31,7 @@ object ParseTextMain {
         return list
     }
 
-    //解析为普通文件,原数据就是普通文本+图片,没有html标签
+    //解析为普通文件,原数据就是普通文本+图片,没有html标签，tts用到
     fun parseAsTextList(bytes: ByteArray, pageIndex: Int): List<ReflowBean> {
         val content = String(bytes)
         val list = txtParser.parseAsTextList(content, pageIndex)
@@ -52,56 +42,6 @@ object ParseTextMain {
         lateinit var path: String
 
         constructor() {}
-
-        internal fun parse(lists: List<String>): String {
-            val sb = StringBuilder()
-            var isImage = false
-            var maxNumberCharOfLine = 20
-            for (s in lists) {
-                if (s.length > maxNumberCharOfLine) {
-                    maxNumberCharOfLine = s.length
-                }
-            }
-
-            var lastLine: Line? = null
-            for (s in lists) {
-                val ss = s.trim { it <= ' ' }
-                if (ss.isNotEmpty()) {
-                    if (ss.startsWith(IMAGE_START_MARK)) {
-                        isImage = true
-                        sb.append(LINE_END)
-                    }
-                    if (!isImage) {
-                        lastLine = parseLine(ss, sb, MAX_PAGEINDEX, lastLine, maxNumberCharOfLine)
-                    } else {
-                        sb.append(ss)
-                    }
-
-                    if (ss.endsWith("</p>")) {
-                        isImage = false
-                    }
-                }
-            }
-            return sb.toString()
-        }
-
-        fun parseAsText(content: String): String {
-            //Logcat.d("parse:==>" + content)
-            val sb = StringBuilder()
-            val list = ArrayList<String>()
-            var aChar: Char
-            for (element in content) {
-                aChar = element
-                if (aChar == '\n') {
-                    list.add(sb.toString())
-                    sb.setLength(0)
-                } else {
-                    sb.append(aChar)
-                }
-            }
-            //Logcat.d("result=>>" + result)
-            return parse(list)
-        }
 
         /**
          * parse text as List<ReflowBean>
@@ -142,7 +82,7 @@ object ParseTextMain {
                                 ReflowBean(null, ReflowBean.TYPE_STRING, pageIndex.toString())
                             reflowBeans.add(reflowBean)
                         }
-                        lastLine = parseLine(ss, sb, pageIndex, lastLine, maxNumberCharOfLine - 5)
+                        lastLine = parseLine(ss, sb, pageIndex, lastLine, maxNumberCharOfLine)
                         reflowBean.data = sb.toString()
                     } else {
                         sb.append(ss)
@@ -157,11 +97,11 @@ object ParseTextMain {
                 }
             }
 
-            //if (Logcat.loggable) {
-            //    for (rb in reflowBeans) {
-            //        Logcat.longLog("result", rb.toString())
-            //    }
-            //}
+            if (Logcat.loggable) {
+                for (rb in reflowBeans) {
+                    Logcat.longLog("result", rb.toString())
+                }
+            }
             return reflowBeans
         }
 
@@ -314,7 +254,7 @@ object ParseTextMain {
         }
 
         fun parseAsList(content: String, pageIndex: Int): List<ReflowBean> {
-            //Logcat.d("parse:==>" + content)
+            Logcat.d("parse:==>$content")
             val sb = StringBuilder()
             val list = ArrayList<String>()
             var aChar: Char
@@ -328,7 +268,7 @@ object ParseTextMain {
                     sb.append(aChar)
                 }
             }
-            //Logcat.d("result=>>" + result)
+            //Logcat.d("result=>>$sb")
             return parseList(list, pageIndex)
         }
 
@@ -423,15 +363,6 @@ object ParseTextMain {
      */
     internal const val IMAGE_END_MARK = "</p>"
 
-    /**
-     * 一行如果不到20个字符,有可能是目录或是标题.
-     */
-    internal const val LINE_LENGTH = 20
-
-    /**
-     * 最大的页面是30页,如果是30页前的,一行小于25字,认为可能是目录.在这之后的,文本重排时不认为是目录.合并为一行.
-     */
-    internal const val MAX_PAGEINDEX = 20
     private const val LINE_END = "&nbsp;<br>"
 
     //========================== decode image ==========================

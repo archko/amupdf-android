@@ -1,7 +1,7 @@
 package cn.archko.pdf.fragments
 
 import androidx.lifecycle.ViewModel
-import cn.archko.pdf.common.PdfOptionRepository
+import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.entity.FontBean
 import kotlinx.coroutines.Dispatchers

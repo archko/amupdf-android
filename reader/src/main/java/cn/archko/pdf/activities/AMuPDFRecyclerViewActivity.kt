@@ -27,7 +27,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import cn.archko.pdf.R
-import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.controller.AEpubViewController
 import cn.archko.pdf.controller.ANormalViewController
 import cn.archko.pdf.controller.AScanReflowViewController
@@ -43,28 +42,38 @@ import cn.archko.pdf.controller.TtsDataCallback
 import cn.archko.pdf.controller.ViewMode
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.BitmapPool
+import cn.archko.pdf.core.common.AnnotationManager
 import cn.archko.pdf.core.common.Event
 import cn.archko.pdf.core.common.GlobalEvent
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.common.SensorHelper
 import cn.archko.pdf.core.common.StatusBarHelper
 import cn.archko.pdf.core.entity.BookProgress
-import cn.archko.pdf.core.entity.Bookmark
+import cn.archko.pdf.core.entity.PathConfig
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.listeners.DataListener
 import cn.archko.pdf.core.utils.Utils
+import cn.archko.pdf.dialogs.AIPageDialog
+import cn.archko.pdf.dialogs.DrawConfigDialog
+import cn.archko.pdf.dialogs.SelectionDialog
 import cn.archko.pdf.fragments.OcrFragment
-import cn.archko.pdf.fragments.OutlineFragment
+import cn.archko.pdf.fragments.BookmarkEditDialog
+import cn.archko.pdf.fragments.OutlineTabFragment
 import cn.archko.pdf.fragments.SleepTimerDialog
 import cn.archko.pdf.fragments.TtsTextFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.tts.TtsForegroundService
+import cn.archko.pdf.viewmodel.AIViewModel
+import cn.archko.pdf.viewmodel.BookmarkViewModel
 import cn.archko.pdf.viewmodel.DocViewModel
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.vudroid.core.codec.OutlineLink
@@ -86,10 +95,14 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private var documentLayout: FrameLayout? = null
     private var viewController: AViewController? = null
     private val docViewModel: DocViewModel = DocViewModel()
-
+    private val bookmarkViewModel: BookmarkViewModel = BookmarkViewModel()
+    private val aiViewModel: AIViewModel = AIViewModel()
+    private var annotationManager: AnnotationManager? = null
     private var pageController: IPageController? = null
+
+    private var pathConfig: PathConfig = PathConfig()
     private var outlineLinks = mutableListOf<OutlineLink>()
-    private var outlineFragment: OutlineFragment? = null
+    private var outlineTabFragment: OutlineTabFragment? = null
     private lateinit var mReflowLayout: RelativeLayout
     private lateinit var mContentView: View
     private lateinit var ttsLayout: View
@@ -103,6 +116,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private var ttsMode = false
     private val handler = Handler(Looper.getMainLooper())
     private var pendingPos = -1
+    private var sessionStartTime: Long = 0L
+
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
+    private var annotationsJob: Job? = null
 
     // TTS数据缓存
     private var cachedTtsData: List<ReflowBean>? = null
@@ -185,7 +202,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
         clean()
 
-        loadBookmark()
+        loadBook()
         initView()
 
         createControls()
@@ -234,10 +251,15 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
     }
 
-    private fun loadBookmark() {
+    private fun loadBook() {
+        annotationManager = AnnotationManager(mPath)
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                mPath!!.run { docViewModel.loadBookProgressByPath(this) }
+                mPath!!.run {
+                    docViewModel.loadBookProgressByPath(this)
+                    bookmarkViewModel.loadBookmarks(this)
+                    aiViewModel.loadAllConversations(this)
+                }
             }
         }
     }
@@ -383,6 +405,10 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             override fun reloadDoc() {
                 applyViewMode(getCurrentPos())
             }
+
+            override fun selectedText(text: String) {
+                showSelectedTextDialog(text)
+            }
         }
     }
 
@@ -425,6 +451,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             mReflowLayout,
             docViewModel,
             mPath!!,
+            annotationManager,
             pageController!!,
             controllerListener
         )
@@ -493,6 +520,12 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
             isDocLoaded = true
 
+            // 开始阅读会话统计
+            sessionStartTime = System.currentTimeMillis()
+            lifecycleScope.launch {
+                bookmarkViewModel.startSession(mPath!!, count)
+            }
+
             val sp = getSharedPreferences(PREF_READER, MODE_PRIVATE)
             val isFirst = sp.getBoolean(PREF_READER_KEY_FIRST, true)
             if (isFirst) {
@@ -512,34 +545,9 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun setupOutline(currentPos: Int?) {
-        if (null == outlineFragment) {
-            outlineFragment = OutlineFragment()
-            val bundle = Bundle()
-            if (outlineLinks.size > 0) {
-                outlineFragment!!.outlineItems = ArrayList(outlineLinks)
-                bundle.putSerializable("out", outlineFragment!!.outlineItems)
-            }
-            bundle.putSerializable("POSITION", currentPos)
-            outlineFragment?.arguments = bundle
+        if (null == outlineTabFragment) {
+            outlineTabFragment = OutlineTabFragment()
         }
-    }
-
-    private fun deleteBookmark(bookmark: Bookmark) {
-        /*lifecycleScope.launch {
-            pdfViewModel.deleteBookmark(bookmark).collectLatest {
-                mMenuHelper?.updateBookmark(getCurrentPos(), it)
-                viewController?.notifyDataSetChanged()
-            }
-        }*/
-    }
-
-    private fun addBookmark(page: Int) {
-        /*lifecycleScope.launch {
-            val currentPos = getCurrentPos()
-            pdfViewModel.addBookmark(currentPos).collectLatest {
-                viewController?.notifyDataSetChanged()
-            }
-        }*/
     }
 
     /**
@@ -649,6 +657,25 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             }
         }
 
+        override fun setSelection(selection: Boolean) {
+            viewController?.setSelection(selection)
+        }
+
+        override fun setDraw(draw: Boolean) {
+            viewController?.setDraw(draw)
+            if (draw) {
+                updateUndoRedoButtons()
+            }
+        }
+
+        override fun ai() {
+            this@AMuPDFRecyclerViewActivity.ai()
+        }
+
+        override fun bookmark() {
+            this@AMuPDFRecyclerViewActivity.editBookmark()
+        }
+
         override fun ocr() {
             this@AMuPDFRecyclerViewActivity.ocr()
         }
@@ -675,6 +702,22 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
         override fun selectFont() {
             viewController?.selectFont()
+        }
+
+        override fun showDrawConfig() {
+            showDrawConfigDialog()
+        }
+
+        override fun undoDraw() {
+            annotationManager?.undo()
+            viewController?.setInvalidate()
+            updateUndoRedoButtons()
+        }
+
+        override fun redoDraw() {
+            annotationManager?.redo()
+            viewController?.setInvalidate()
+            updateUndoRedoButtons()
         }
     }
 
@@ -792,12 +835,18 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     }
 
     private fun showOutline() {
-        if (outlineLinks.size > 0) {
-            outlineFragment?.updateSelection(getCurrentPos())
-            outlineFragment?.showDialog(this)
-        } else {
-            Toast.makeText(this, "no outline", Toast.LENGTH_SHORT).show()
-        }
+        OutlineTabFragment.showDialog(
+            this,
+            bookmarkViewModel,
+            annotationManager,
+            getCurrentPos(),
+            outlineLinks,
+            mPath ?: "",
+            aiViewModel = aiViewModel,
+            onItemClick = { page ->
+                onSelectedOutline(page)
+            },
+        )
     }
 
     private fun toggleCrop() {
@@ -813,6 +862,70 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             docViewModel.storeCrop(prefCrop)
             applyViewMode(getCurrentPos())
             setReflowButton(docViewModel.getReflow())
+        }
+    }
+
+    private fun ai() {
+        lifecycleScope.launch {
+            val pageIndex = getCurrentPos()
+            val content = withContext(Dispatchers.IO) {
+                val list = viewController?.getCurrentContent(pageIndex, pageIndex)
+                val sb = StringBuilder()
+                if (list != null) {
+                    for (str in list) {
+                        sb.append(str)
+                    }
+                }
+                sb.toString()
+            }
+
+            val dialog = AIPageDialog.newInstance(mPath!!, pageIndex, content, aiViewModel)
+            dialog.show(supportFragmentManager, "aiDialog")
+        }
+    }
+
+    private fun showSelectedTextDialog(text: String) {
+        val dialog = SelectionDialog.newInstance(text)
+        dialog.show(supportFragmentManager, "selectionDialog")
+    }
+
+    private fun editBookmark() {
+        lifecycleScope.launch {
+            val pageIndex = getCurrentPos()
+            val existingBookmark = withContext(Dispatchers.IO) {
+                bookmarkViewModel.getBookmarkAtPage(mPath ?: "", pageIndex)
+            }
+
+            val dialog = BookmarkEditDialog.showDialog(
+                pageIndex = pageIndex,
+                path = mPath ?: "",
+                bookmarkViewModel = bookmarkViewModel,
+                existingBookmark = existingBookmark
+            )
+            dialog.show(supportFragmentManager, "BookmarkEditDialog")
+        }
+    }
+
+    private fun showDrawConfigDialog() {
+        val dialog = DrawConfigDialog().withConfig(
+            pathConfig.color,
+            pathConfig.strokeWidth,
+            pathConfig.drawType
+        ).withListener { color, width, drawType ->
+            pathConfig.color = color
+            pathConfig.strokeWidth = width
+            pathConfig.drawType = drawType
+            viewController?.setDrawConfig(pathConfig)
+        }
+        dialog.show(supportFragmentManager, "DrawConfigDialog")
+    }
+
+    private fun updateUndoRedoButtons() {
+        if (annotationManager != null && pageController != null) {
+            pageController!!.updateUndoRedoButtons(
+                annotationManager!!.canUndo.value,
+                annotationManager!!.canRedo.value
+            )
         }
     }
 
@@ -841,7 +954,37 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
 
     //--------------------------------------
 
+    private fun startObservingAnnotations() {
+        annotationsJob?.cancel()
+        annotationsJob = coroutineScope.launch {
+            annotationManager?.canUndo?.collectLatest { canUndo ->
+                pageController?.updateUndoRedoButtons(canUndo, annotationManager!!.canRedo.value)
+            }
+            annotationManager?.canRedo?.collectLatest { canRedo ->
+                pageController?.updateUndoRedoButtons(annotationManager!!.canRedo.value, canRedo)
+            }
+        }
+    }
+
+    private fun stopObservingAnnotations() {
+        annotationsJob?.cancel()
+        annotationsJob = null
+    }
+
     override fun onDestroy() {
+        // 结束阅读会话统计
+        if (isDocLoaded && sessionStartTime > 0) {
+            val sessionDuration = (System.currentTimeMillis() - sessionStartTime) / 1000 // 转换为秒
+            val currentPage = getCurrentPos()
+            val bookmarkCount = bookmarkViewModel.currentPathBookmarks.value.size
+            bookmarkViewModel.endSession(
+                path = mPath!!,
+                sessionDuration = sessionDuration,
+                currentPage = currentPage,
+                bookmarkCount = bookmarkCount
+            )
+        }
+
         super.onDestroy()
 
         viewController?.onDestroy()
@@ -893,6 +1036,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             locatePageForTTS()
             resetSpeakingPage(pendingPos)
         }
+        startObservingAnnotations()
     }
 
     private fun locatePageForTTS() {
@@ -915,6 +1059,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
         }
         sensorHelper?.onPause()
         viewController?.onPause()
+        stopObservingAnnotations()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -964,6 +1109,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             controllerLayout: RelativeLayout,
             docViewModel: DocViewModel,
             path: String,
+            annotationManager: AnnotationManager?,
             pageSeekBarControls: IPageController,
             controllerListener: ControllerListener?,
         ): AViewController {
@@ -978,6 +1124,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                 controllerLayout,
                 docViewModel,
                 path,
+                annotationManager,
                 pageSeekBarControls,
                 controllerListener,
             )
@@ -993,6 +1140,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
             controllerLayout: RelativeLayout,
             docViewModel: DocViewModel,
             path: String,
+            annotationManager: AnnotationManager?,
             pageController: IPageController,
             controllerListener: ControllerListener?,
         ): AViewController {
@@ -1004,6 +1152,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                         controllerLayout,
                         docViewModel,
                         path,
+                        annotationManager,
                         pageController,
                         controllerListener,
                     )
@@ -1014,6 +1163,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     controllerLayout,
                     docViewModel,
                     path,
+                    annotationManager,
                     pageController,
                     controllerListener,
                 )
@@ -1055,6 +1205,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                         controllerLayout,
                         docViewModel,
                         path,
+                        annotationManager,
                         pageController,
                         controllerListener,
                     )
@@ -1065,6 +1216,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
                     controllerLayout,
                     docViewModel,
                     path,
+                    annotationManager,
                     pageController,
                     controllerListener,
                 )
@@ -1076,7 +1228,7 @@ class AMuPDFRecyclerViewActivity : AnalysticActivity(), OutlineListener {
     private fun bindTtsService() {
         if (!isTtsServiceBound) {
             val intent = Intent(this, TtsForegroundService::class.java)
-            bindService(intent, ttsServiceConnection, Context.BIND_AUTO_CREATE)
+            bindService(intent, ttsServiceConnection, BIND_AUTO_CREATE)
             Logcat.d(TAG, "Binding TTS service")
         }
     }

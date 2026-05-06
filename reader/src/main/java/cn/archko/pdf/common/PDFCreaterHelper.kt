@@ -18,10 +18,11 @@ import cn.archko.pdf.core.cache.BitmapPool
 import cn.archko.pdf.core.common.EncodingDetect
 import cn.archko.pdf.core.common.IntentFile
 import cn.archko.pdf.core.common.Logcat
-import cn.archko.pdf.core.decode.MupdfDocument
 import cn.archko.pdf.core.utils.BitmapUtils
 import cn.archko.pdf.core.utils.FileUtils
 import cn.archko.pdf.core.utils.StreamUtils
+import com.archko.reader.image.MobiConverter
+import com.archko.reader.image.MobiMetadata
 import com.artifex.mupdf.fitz.Device
 import com.artifex.mupdf.fitz.Document
 import com.artifex.mupdf.fitz.DocumentWriter
@@ -29,8 +30,10 @@ import com.artifex.mupdf.fitz.Image
 import com.artifex.mupdf.fitz.Matrix
 import com.artifex.mupdf.fitz.PDFDocument
 import com.artifex.mupdf.fitz.PDFObject
+import com.artifex.mupdf.fitz.Page
 import com.artifex.mupdf.fitz.Rect
 import com.artifex.mupdf.fitz.Story
+import com.artifex.mupdf.fitz.android.AndroidDrawDevice
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -286,9 +289,8 @@ object PDFCreaterHelper {
                 "TAG",
                 "extractToImages:$screenWidth, start:$start, end:$end dir:$dir, dst:$pdfPath"
             )
-            val mupdfDocument = MupdfDocument(context)
-            mupdfDocument.newDocument(pdfPath, null)
-            val count: Int = mupdfDocument.countPages()
+            val document = Document.openDocument(pdfPath)
+            val count: Int = document.countPages()
             var startPage = start
             if (startPage < 0) {
                 startPage = 0
@@ -306,7 +308,7 @@ object PDFCreaterHelper {
                     Log.d("TAG", "extractToImages.stop")
                     return i
                 }
-                val page = mupdfDocument.loadPage(i)
+                val page = document.loadPage(i)
                 if (null != page) {
                     val pageWidth = page.bounds.x1 - page.bounds.x0
                     val pageHeight = page.bounds.y1 - page.bounds.y0
@@ -320,7 +322,7 @@ object PDFCreaterHelper {
                     val height = pageHeight * scale
                     val bitmap = BitmapPool.getInstance().acquire(width, height.toInt())
                     val ctm = Matrix(scale)
-                    MupdfDocument.render(page, ctm, bitmap, 0, 0, 0)
+                    render(page, ctm, bitmap, 0, 0, 0)
                     page.destroy()
                     BitmapUtils.saveBitmapToFile(bitmap, File("$dir/${i + 1}.jpg"))
                     BitmapPool.getInstance().release(bitmap)
@@ -334,12 +336,28 @@ object PDFCreaterHelper {
         return 0
     }
 
+    fun render(
+        page: Page?,
+        ctm: Matrix?,
+        bitmap: Bitmap?,
+        xOrigin: Int,
+        leftBound: Int,
+        topBound: Int
+    ) {
+        if (page == null) {
+            return
+        }
+        val dev = AndroidDrawDevice(bitmap, xOrigin + leftBound, topBound)
+        page.run(dev, ctm, null)
+        dev.close()
+        dev.destroy()
+    }
+
     fun extractToHtml(
         start: Int, end: Int, context: Context, path: String, pdfPath: String
     ): Boolean {
         try {
-            val mupdfDocument = MupdfDocument(context)
-            mupdfDocument.newDocument(pdfPath, null)
+            val mupdfDocument = Document.openDocument(pdfPath)
             val count: Int = mupdfDocument.countPages()
             var startPage = start
             if (startPage < 0) {
@@ -676,7 +694,7 @@ object PDFCreaterHelper {
                 // pdfDoc.authenticatePassword("original_password");
             }
 
-            val options = java.lang.StringBuilder()
+            val options = StringBuilder()
             // 设置加密算法 (AES 256位是最安全的)
             options.append("encrypt=aes-256")
 
@@ -708,7 +726,7 @@ object PDFCreaterHelper {
     /**
      * 移除PDF密码保护（解密）
      */
-    fun decryptPDF(inputFile: String?, outputFile: String?, password: String?): Boolean  {
+    fun decryptPDF(inputFile: String?, outputFile: String?, password: String?): Boolean {
         try {
             val doc: Document? = Document.openDocument(inputFile)
             if (doc !is PDFDocument) {
@@ -744,7 +762,7 @@ object PDFCreaterHelper {
     fun changePDFPassword(
         inputFile: String?, outputFile: String?,
         oldPassword: String?, newUserPassword: String?, newOwnerPassword: String?
-    ): Boolean  {
+    ): Boolean {
         try {
             val doc: Document? = Document.openDocument(inputFile)
             if (doc !is PDFDocument) {
@@ -762,7 +780,7 @@ object PDFCreaterHelper {
             }
 
             // 构建保存选项字符串
-            val options = java.lang.StringBuilder()
+            val options = StringBuilder()
 
             // 设置新的加密算法
             options.append("encrypt=aes-256")
@@ -786,5 +804,258 @@ object PDFCreaterHelper {
             System.err.println("修改PDF密码时出错: " + e.message)
         }
         return false
+    }
+
+    // =================== split PDF ===================
+
+    /**
+     * 解析拆分范围字符串
+     * 例如: "1-10,11-20" -> [(1,10), (11,20)]
+     */
+    private fun parseRanges(rangeInput: String, maxPage: Int): List<Pair<Int, Int>>? {
+        try {
+            val ranges = mutableListOf<Pair<Int, Int>>()
+            val parts = rangeInput.split(",").map { it.trim() }
+
+            for (part in parts) {
+                if (part.isEmpty()) continue
+
+                val rangeParts = part.split("-").map { it.trim() }
+                when (rangeParts.size) {
+                    1 -> {
+                        // 单页，如 "5"
+                        val page = rangeParts[0].toInt()
+                        if (page < 1 || page > maxPage) return null
+                        ranges.add(Pair(page, page))
+                    }
+
+                    2 -> {
+                        // 范围，如 "1-10"
+                        val start = rangeParts[0].toInt()
+                        val end = rangeParts[1].toInt()
+                        if (start < 1 || end > maxPage || start > end) return null
+                        ranges.add(Pair(start, end))
+                    }
+
+                    else -> return null
+                }
+            }
+
+            return ranges
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+    }
+
+    /**
+     * 拆分PDF文件 - 使用临时文件和删除页面的方式
+     * @param inputFile 输入PDF文件路径
+     * @param outputBaseName 输出文件基础名称
+     * @param rangeInput 拆分范围，如 "1-10,11-20"
+     * @return 成功拆分的文件数量，失败返回-1
+     */
+    fun splitPDF(
+        outDir: File,
+        inputFile: String,
+        outputBaseName: String,
+        rangeInput: String
+    ): Int {
+        try {
+            val checkDoc = Document.openDocument(inputFile)
+            if (checkDoc !is PDFDocument) {
+                System.err.println("输入文件不是PDF格式")
+                return -1
+            }
+            val totalPages = checkDoc.countPages()
+            checkDoc.destroy()
+
+            println("源PDF总页数: $totalPages")
+
+            val ranges = parseRanges(rangeInput, totalPages)
+            if (ranges == null || ranges.isEmpty()) {
+                System.err.println("无效的页面范围")
+                return -1
+            }
+
+            var successCount = 0
+
+            for ((index, range) in ranges.withIndex()) {
+                val (startPage, endPage) = range
+                println("处理范围: $startPage-$endPage")
+
+                try {
+                    // 创建临时文件
+                    val tempFile = File.createTempFile("pdf_split_", ".pdf")
+
+                    // 先保存一份完整的副本到临时文件
+                    val sourceDoc = Document.openDocument(inputFile) as PDFDocument
+                    sourceDoc.save(tempFile.absolutePath, "compress")
+                    sourceDoc.destroy()
+
+                    // 重新打开临时文件进行编辑
+                    val editDoc = Document.openDocument(tempFile.absolutePath) as PDFDocument
+
+                    // 构建要保留的页面列表（0-based index）
+                    val pagesToKeep = (startPage - 1 until endPage).toSet()
+
+                    // 从后往前删除不需要的页面
+                    for (pageIndex in totalPages - 1 downTo 0) {
+                        if (pageIndex !in pagesToKeep) {
+                            editDoc.deletePage(pageIndex)
+                        }
+                    }
+
+                    println("保留页面: $startPage-$endPage, 当前文档页数: ${editDoc.countPages()}")
+
+                    // 保存最终文件
+                    val outputFileName = if (ranges.size == 1) {
+                        "$outputBaseName.pdf"
+                    } else {
+                        "${outputBaseName}_${index + 1}_p${startPage}-${endPage}.pdf"
+                    }
+                    val outputFile = File(outDir, outputFileName)
+
+                    // 使用 clean 选项，这会清理未使用的对象
+                    editDoc.save(outputFile.absolutePath, "clean,compress,garbage")
+                    editDoc.destroy()
+
+                    // 删除临时文件
+                    tempFile.delete()
+
+                    println("已保存: ${outputFile.absolutePath}")
+                    successCount++
+
+                } catch (e: Exception) {
+                    System.err.println("处理范围 $startPage-$endPage 时出错: ${e.message}")
+                    e.printStackTrace()
+                }
+            }
+
+            return successCount
+        } catch (e: Exception) {
+            System.err.println("拆分PDF时出错: ${e.message}")
+            e.printStackTrace()
+            return -1
+        }
+    }
+
+    /**
+     * 合并多个PDF文件
+     * @param outputFile 输出PDF文件的完整路径
+     * @param pdfFiles 要合并的PDF文件路径列表（按顺序）
+     * @return 成功合并的文件数量，失败返回-1
+     */
+    fun mergePDF(
+        outputFile: String,
+        pdfFiles: List<String>
+    ): Int {
+        try {
+            if (pdfFiles.isEmpty()) {
+                System.err.println("没有要合并的PDF文件")
+                return -1
+            }
+
+            val firstPdfPath = pdfFiles[0]
+            val mergedDoc = Document.openDocument(firstPdfPath) as PDFDocument
+
+            var successCount = 0
+            println("以文件 $firstPdfPath 为基础（${mergedDoc.countPages()}页），开始合并后续文件...")
+
+            for ((index, pdfPath) in pdfFiles.withIndex().filter { it.index >= 1 }) {
+                try {
+                    val sourceDoc = Document.openDocument(pdfPath)
+                    if (sourceDoc !is PDFDocument) {
+                        System.err.println("文件 $pdfPath 不是有效的PDF格式")
+                        sourceDoc.destroy()
+                        continue
+                    }
+
+                    val pageCount = sourceDoc.countPages()
+                    println("正在合并文件 ${index + 1}/${pdfFiles.size}: $pdfPath (${pageCount}页)")
+
+                    // 将源文档的所有页面 graft 到合并文档末尾
+                    for (pageIndex in 0 until pageCount) {
+                        mergedDoc.graftPage(-1, sourceDoc, pageIndex)
+                    }
+
+                    sourceDoc.destroy()
+                    successCount++
+                } catch (e: Exception) {
+                    System.err.println("处理文件 $pdfPath 时出错: ${e.message}")
+                    e.printStackTrace()
+                }
+            }
+
+            mergedDoc.save(outputFile, "incremental")
+            mergedDoc.destroy()
+
+            println("PDF合并成功: $outputFile (合并了 ${successCount + 1} 个文件)")
+            return successCount
+        } catch (e: Exception) {
+            System.err.println("合并PDF时出错: ${e.message}")
+            e.printStackTrace()
+            return -1
+        }
+    }
+
+    fun convertToEpub(
+        outputFile: String,
+        files: List<String>
+    ): Int {
+        try {
+            if (files.isEmpty()) {
+                System.err.println("没有要转换的文件")
+                return -1
+            }
+
+            var count = 0
+            for (path in files) {
+                try {
+                    val converter = MobiConverter()
+
+                    // 测试1: 验证文件
+                    println("=== 测试1: 验证 MOBI 文件 ===")
+                    val isValid: Boolean = converter.isValidMobiFile(path)
+                    println("文件有效性: " + (if (isValid) "✓ 有效" else "✗ 无效"))
+
+                    if (!isValid) {
+                        System.err.println("文件无效，退出测试")
+                        System.exit(1)
+                    }
+
+                    // 测试2: 获取元数据
+                    println("\n=== 测试2: 获取文件元数据 ===")
+                    val metadata: MobiMetadata? = converter.getMetadata(path)
+                    if (metadata != null) {
+                        println("标题: " + metadata.title)
+                        println("作者: " + metadata.author)
+                        println("出版社: " + metadata.publisher)
+                        println("语言: " + metadata.language)
+                        println("有封面: " + metadata.hasCover)
+                        //println("有目录: " + metadata.hasToc)
+                    } else {
+                        println("✗ 无法获取元数据")
+                    }
+
+                    // 测试3: 转换为 EPUB
+                    println("\n=== 测试3: 转换为 EPUB ===")
+
+                    val success: Boolean = converter.convertToEpub(path, outputFile)
+                    println("输出路径: $outputFile, 结果:$success")
+                    if (success) {
+                        count++
+                    }
+                } catch (e: Exception) {
+                    System.err.println("转换为epub时出错: ${e.message}")
+                }
+            }
+
+            return count
+        } catch (e: Exception) {
+            System.err.println("转换为epub时出错: ${e.message}")
+            e.printStackTrace()
+            return -1
+        }
     }
 }

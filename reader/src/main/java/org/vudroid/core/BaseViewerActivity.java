@@ -216,6 +216,9 @@ public abstract class BaseViewerActivity extends FragmentActivity implements Dec
         @Override
         public void onDoubleTap(MotionEvent ev, int currentPage) {
         }
+
+        @Override
+        public void selectedText(String text) {}
     };
 
     @Override

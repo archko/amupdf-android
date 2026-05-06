@@ -27,15 +27,14 @@ room = "2.8.0"
 constraintLayout = "2.2.1"
 umengCommon = "9.6.5"
 umengAsms = "1.8.0"
-colorPickerDialog = "0.2.2"
 flinger = "1.1.1"
 paging = "3.3.2"
-tiff-android = "1.1.4"
+tiff-android = "1.1.5"
 penfeizhou = "3.0.5"
 android-gif-drawable = "1.2.29"
 
 # @keep
-targetSdk = "35"
+targetSdk = "36"
 version-catalog-update = "0.8.0"
 material = "1.13.0"
 material3 = "1.1.2"
@@ -50,8 +49,8 @@ k2pdfopt = "0.2.0"
 juniversalchardet = "2.5.0"
 ppocrv5ncnn = "1.0.0"
 
-versionCode = "480"
-versionName = "7.8.0"
+versionCode = "484"
+versionName = "7.8.3"
 
 [libraries]
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
@@ -90,7 +89,6 @@ room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", vers
 
 umeng-asms = { module = "com.umeng.umsdk:asms", version.ref = "umengAsms" }
 umeng-common = { module = "com.umeng.umsdk:common", version.ref = "umengCommon" }
-colorPickerDialog = { module = "me.jfenn.ColorPickerDialog:base", version.ref = "colorPickerDialog" }
 
 multidex = { group = "androidx.multidex", name = "multidex", version.ref = "multidex" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }

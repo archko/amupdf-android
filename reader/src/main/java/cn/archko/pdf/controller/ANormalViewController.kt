@@ -11,13 +11,15 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
-import cn.archko.pdf.common.PdfOptionRepository
 import cn.archko.pdf.core.common.APageSizeLoader
+import cn.archko.pdf.core.common.AnnotationManager
 import cn.archko.pdf.core.common.AppExecutors.Companion.instance
 import cn.archko.pdf.core.common.Logcat
+import cn.archko.pdf.core.common.PdfOptionRepository
 import cn.archko.pdf.core.common.TtsHelper
 import cn.archko.pdf.core.entity.APage
 import cn.archko.pdf.core.entity.BookProgress
+import cn.archko.pdf.core.entity.PathConfig
 import cn.archko.pdf.core.entity.ReflowBean
 import cn.archko.pdf.core.entity.TtsBean
 import cn.archko.pdf.core.listeners.ClickListener
@@ -27,7 +29,6 @@ import cn.archko.pdf.fragments.SearchFragment
 import cn.archko.pdf.listeners.AViewController
 import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
-import cn.archko.pdf.viewmodel.PDFViewModel
 import kotlinx.coroutines.CoroutineScope
 import org.vudroid.core.DecodeService
 import org.vudroid.core.DecodeServiceBase
@@ -49,6 +50,7 @@ open class ANormalViewController(
     protected val mControllerLayout: RelativeLayout,
     private var docViewModel: DocViewModel,
     private var mPath: String,
+    var annotationManager: AnnotationManager? = null,
     protected var pageController: IPageController?,
     protected var controllerListener: ControllerListener?,
 ) :
@@ -81,6 +83,10 @@ open class ANormalViewController(
 
         override fun setCurrentPage(page: Int) {
             updateProgress(page)
+        }
+
+        override fun selectedText(text: String) {
+            controllerListener?.selectedText(text)
         }
     }
     val clickListener = object : ClickListener<View> {
@@ -150,6 +156,8 @@ open class ANormalViewController(
         recyclerView?.visibility = View.GONE
 
         setFilter(PdfOptionRepository.getColorMode())
+
+        documentView.setAnnotationManager(annotationManager)
     }
 
     fun loadDocument() {
@@ -238,6 +246,10 @@ open class ANormalViewController(
         return decodeService?.decodeThumb(getCurrentPos())
     }
 
+    override fun getCurrentContent(start: Int, end: Int): List<String>? {
+        return decodeService?.getSelectedText(start, end)
+    }
+
     override fun getCurrentPos(): Int {
         var position = documentView.getCurrentPage()
         if (position < 0) {
@@ -248,6 +260,22 @@ open class ANormalViewController(
 
     override fun getCount(): Int {
         return mPageSizes?.size ?: 0
+    }
+
+    override fun setSelection(selection: Boolean) {
+        documentView.setSelection(selection)
+    }
+
+    override fun setDraw(draw: Boolean) {
+        documentView.setDraw(draw)
+    }
+
+    override fun setDrawConfig(pathConfig: PathConfig) {
+        documentView.setDrawConfig(pathConfig)
+    }
+
+    override fun setInvalidate() {
+        documentView.postInvalidate()
     }
 
     override fun setOrientation(ori: Int) {

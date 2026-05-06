@@ -42,13 +42,17 @@ class EpubPageController(
                 })
         }
 
+        ttsButton.visibility = View.VISIBLE
+        selectButton.setVisibility(View.VISIBLE);
+        penButton.setVisibility(View.VISIBLE);
         reflowButton.visibility = View.GONE
         imageButton.visibility = View.GONE
         autoCropButton.visibility = View.VISIBLE
         outlineButton.visibility = View.VISIBLE
         oriButton.visibility = View.VISIBLE
-        ttsButton.visibility = View.VISIBLE
         ocrButton.visibility = View.VISIBLE
+        aiButton.setVisibility(View.VISIBLE);
+        bookmarkButton.setVisibility(View.VISIBLE);
         previewButton.visibility = View.VISIBLE
 
         reflowLayout = view.findViewById<View>(R.id.reflow_layout)
@@ -58,6 +62,10 @@ class EpubPageController(
     override fun update(count: Int, page: Int, viewMode: ViewMode?) {
         super.update(count, page)
         if (viewMode == ViewMode.REFLOW) {
+            selectButton.setVisibility(View.GONE);
+            penButton.setVisibility(View.GONE);
+            aiButton.setVisibility(View.GONE);
+            bookmarkButton.setVisibility(View.GONE);
             reflowLayout.visibility = View.GONE
         }
     }

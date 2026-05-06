@@ -31,9 +31,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import cn.archko.pdf.core.cache.BitmapCache;
 import cn.archko.pdf.core.cache.BitmapPool;
+import cn.archko.pdf.core.cache.FetcherCache;
 import cn.archko.pdf.core.common.APageSizeLoader;
 import cn.archko.pdf.core.common.IntentFile;
+import cn.archko.pdf.core.common.Logcat;
 import cn.archko.pdf.core.entity.APage;
+import cn.archko.pdf.core.entity.ReflowBean;
 import cn.archko.pdf.core.utils.SmartCropUtils;
 
 public class DecodeServiceBase implements DecodeService {
@@ -217,28 +220,29 @@ public class DecodeServiceBase implements DecodeService {
         this.containerView = containerView;
     }
 
-    public CodecDocument set(String path, boolean cachePage, CodecDocument document) {
-        this.path = path;
-        this.cachePage = cachePage;
-        this.document = document;
-
-        int count = document.getPageCount();
-        pageSizeBean = new APageSizeLoader.PageSizeBean();
-        pageSizeBean.setList(aPageList);
+    private void cacheCoverIfNeeded() {
         try {
-            for (int i = 0; i < count; i++) {
-                CodecPage codecPage = document.getPage(i);
-                APage aPage = new APage(i, codecPage.getWidth(), codecPage.getHeight(), 1f);
-                aPageList.add(aPage);
-                codecPage.recycle();
+            if (null != BitmapCache.getInstance().getBitmap(path)) {
+                return;
             }
+
+            DecodeCallback callback = new DecodeCallback() {
+                @Override
+                public void decodeComplete(Bitmap bitmap, boolean isThumb, Object args) {
+                    FetcherCache.Companion.cacheBitmap(path, bitmap);
+                }
+
+                @Override
+                public boolean shouldRender(int pageNumber, boolean isFullPage) {
+                    return true;
+                }
+            };
+            DecodeTask task = new DecodeTask(null, false, 0, callback, 1f, path, null, 270, 40);
+            CodecPage vuPage = getPage(0);
+            decodeThumb(task, vuPage);
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-            path = null;
-            aPageList.clear();
-            cachePage = false;
+            Logcat.longLog(TAG, String.format("缓存封面失败:%s", e.getMessage()));
         }
-        return document;
     }
 
     public CodecDocument open(String path, boolean cachePage, boolean crop) {
@@ -252,6 +256,7 @@ public class DecodeServiceBase implements DecodeService {
             return null;
         }
         int count = document.getPageCount();
+        cacheCoverIfNeeded();
         APageSizeLoader.PageSizeBean psb = APageSizeLoader.INSTANCE.loadPageSizeFromFile(count, path);
         if (null != psb) {
             pageSizeBean = psb;
@@ -678,5 +683,73 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     //=========================
+
+    @Override
+    public String getSelectedText(int pageIndex, float startX, float startY, float endX, float endY) {
+        try {
+            CodecPage codecPage = getPage(pageIndex);
+            if (codecPage == null) {
+                Log.d(TAG, String.format("getSelectedText: 页面%d的CodecPage为空", pageIndex));
+                return "";
+            }
+
+            // 直接调用接口方法
+            String selectedText = codecPage.getSelectedText(startX, startY, endX, endY);
+            Log.d(TAG, String.format("getSelectedText: 页面%d, 选中文本长度: %d",
+                    pageIndex, selectedText != null ? selectedText.length() : 0));
+            return selectedText;
+        } catch (Exception e) {
+            Log.e(TAG, "getSelectedText异常: " + e.getMessage());
+            return "";
+        }
+    }
+
+    @Override
+    public List<String> getSelectedText(int startIndex, int endIndex) {
+        List<String> list = new ArrayList<>();
+        try {
+            for (int i = startIndex; i <= endIndex; i++) {
+                CodecPage codecPage = getPage(startIndex);
+                if (codecPage == null) {
+                    Log.d(TAG, String.format("getSelectedText: 页面%d的CodecPage为空", startIndex));
+                    return list;
+                }
+
+                List<ReflowBean> reflowBeans = codecPage.getReflowBean();
+                Log.d(TAG, String.format("page: 页面%d, 文本长度: %d",
+                        startIndex, reflowBeans != null ? reflowBeans.size() : 0));
+                StringBuilder sb = new StringBuilder();
+                for (ReflowBean bean : reflowBeans) {
+                    sb.append(bean.getData());
+                }
+                list.add(sb.toString());
+            }
+            return list;
+        } catch (Exception e) {
+            Log.e(TAG, "getSelectedText异常: " + e.getMessage());
+            return list;
+        }
+    }
+
+    @Override
+    public List<RectF> getTextSelectionRects(int pageIndex, float startX, float startY, float endX, float endY) {
+        List<RectF> rects = new ArrayList<>();
+        try {
+            CodecPage codecPage = getPage(pageIndex);
+            if (codecPage == null) {
+                Log.d(TAG, String.format("getTextSelectionRects: 页面%d的CodecPage为空", pageIndex));
+                return rects;
+            }
+
+            // 直接调用接口方法
+            rects = codecPage.getTextSelectionRects(startX, startY, endX, endY);
+            Log.d(TAG, String.format("getTextSelectionRects: 页面%d, 找到%d个矩形区域",
+                    pageIndex, rects.size()));
+            return rects;
+        } catch (Exception e) {
+            Log.e(TAG, "getTextSelectionRects异常: " + e.getMessage());
+            return rects;
+        }
+    }
 
 }

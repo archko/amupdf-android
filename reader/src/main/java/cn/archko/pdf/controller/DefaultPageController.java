@@ -1,5 +1,6 @@
 package cn.archko.pdf.controller;
 
+import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -7,8 +8,11 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import cn.archko.pdf.R;
+import cn.archko.pdf.core.entity.DrawType;
+import cn.archko.pdf.core.entity.PathConfig;
 import cn.archko.pdf.core.utils.FileUtils;
 import cn.archko.pdf.viewmodel.DocViewModel;
+import cn.archko.pdf.widgets.DrawPreviewView;
 
 /**
  * 公用的顶部栏,有公共的按钮与对应的处理事件
@@ -24,13 +28,17 @@ public abstract class DefaultPageController implements IPageController, View.OnC
     protected SeekBar mPageSlider;
     protected TextView mPageNumber;
 
+    protected ImageButton ttsButton;
+    protected ImageButton selectButton;
+    protected ImageButton penButton;
+    protected ImageButton autoCropButton;
+    protected ImageButton outlineButton;
     protected ImageButton reflowButton;
     protected ImageButton imageButton;
-    protected ImageButton outlineButton;
-    protected ImageButton autoCropButton;
     protected ImageButton oriButton;
-    protected ImageButton ttsButton;
     protected ImageButton ocrButton;
+    protected ImageButton aiButton;
+    protected ImageButton bookmarkButton;
     protected ImageButton previewButton;
     //protected TextView pathView;
     protected TextView titleView;
@@ -42,9 +50,19 @@ public abstract class DefaultPageController implements IPageController, View.OnC
     protected ImageButton closeBtn;
     protected ImageButton mBackButton;
     protected int ori = LinearLayout.VERTICAL;
+    protected boolean selection = false;
+    protected boolean draw = false;
     protected int count = 1;
     protected PageControllerListener controllerListener;
     protected DocViewModel docViewModel;
+
+    // 绘制工具栏相关
+    protected View layoutDraw;
+    protected DrawPreviewView drawWidthButton;
+    protected DrawPreviewView drawTypeButton;
+    protected DrawPreviewView drawColorButton;
+    protected ImageButton drawUndoButton;
+    protected ImageButton drawRedoButton;
 
     public DefaultPageController(View view, DocViewModel docViewModel, PageControllerListener controlListener) {
         this.controllerListener = controlListener;
@@ -56,37 +74,60 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         mPageSlider = view.findViewById(R.id.seek_bar);
         mPageNumber = view.findViewById(R.id.page_num);
 
+        ttsButton = view.findViewById(R.id.ttsButton);
+        selectButton = view.findViewById(R.id.selectButton);
+        penButton = view.findViewById(R.id.penButton);
+        autoCropButton = view.findViewById(R.id.autoCropButton);
+        outlineButton = view.findViewById(R.id.outlineButton);
         reflowButton = view.findViewById(R.id.reflowButton);
         imageButton = view.findViewById(R.id.imageButton);
-        outlineButton = view.findViewById(R.id.outlineButton);
-        autoCropButton = view.findViewById(R.id.autoCropButton);
         oriButton = view.findViewById(R.id.oriButton);
-        ttsButton = view.findViewById(R.id.ttsButton);
         ocrButton = view.findViewById(R.id.ocrButton);
+        aiButton = view.findViewById(R.id.aiButton);
+        bookmarkButton = view.findViewById(R.id.bookmarkButton);
         previewButton = view.findViewById(R.id.previewButton);
         //pathView = view.findViewById(R.id.path);
         titleView = view.findViewById(R.id.title);
         layoutTitle = view.findViewById(R.id.layout_path);
         layoutSearch = view.findViewById(R.id.layout_search);
+        layoutDraw = view.findViewById(R.id.layout_draw);
         searchButton = view.findViewById(R.id.searchButton);
         nextBtn = view.findViewById(R.id.nextButton);
         prevBtn = view.findViewById(R.id.prevButton);
         closeBtn = view.findViewById(R.id.closeButton);
         mBackButton = view.findViewById(R.id.back_button);
+        drawWidthButton = view.findViewById(R.id.drawWidthButton);
+        drawTypeButton = view.findViewById(R.id.drawTypeButton);
+        drawColorButton = view.findViewById(R.id.drawColorButton);
+        drawUndoButton = view.findViewById(R.id.drawUndoButton);
+        drawRedoButton = view.findViewById(R.id.drawRedoButton);
 
-        imageButton.setOnClickListener(this);
+        drawWidthButton.setDrawType(DrawType.LINE);
+        drawTypeButton.setDrawType(DrawType.CURVE);
+        drawColorButton.setDrawType(DrawType.CIRCLE);
+
+        ttsButton.setOnClickListener(this);
+        selectButton.setOnClickListener(this);
+        penButton.setOnClickListener(this);
+        autoCropButton.setOnClickListener(this);
         outlineButton.setOnClickListener(this);
         reflowButton.setOnClickListener(this);
-        autoCropButton.setOnClickListener(this);
+        imageButton.setOnClickListener(this);
         oriButton.setOnClickListener(this);
-        ttsButton.setOnClickListener(this);
         mBackButton.setOnClickListener(this);
         ocrButton.setOnClickListener(this);
+        aiButton.setOnClickListener(this);
+        bookmarkButton.setOnClickListener(this);
         previewButton.setOnClickListener(this);
         nextBtn.setOnClickListener(this);
         prevBtn.setOnClickListener(this);
         closeBtn.setOnClickListener(this);
         searchButton.setOnClickListener(this);
+        drawWidthButton.setOnClickListener(this);
+        drawTypeButton.setOnClickListener(this);
+        drawColorButton.setOnClickListener(this);
+        drawUndoButton.setOnClickListener(this);
+        drawRedoButton.setOnClickListener(this);
 
         mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -147,6 +188,39 @@ public abstract class DefaultPageController implements IPageController, View.OnC
         }
     }
 
+    public void updateSelection() {
+        if (selection) {
+            selectButton.setColorFilter(Color.argb(0xFF, 0, 255, 0));
+        } else {
+            selectButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
+        }
+    }
+
+    public void updateDraw() {
+        if (draw) {
+            penButton.setColorFilter(Color.argb(0xFF, 0, 255, 0));
+            layoutDraw.setVisibility(View.VISIBLE);
+        } else {
+            penButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
+            layoutDraw.setVisibility(View.GONE);
+        }
+    }
+
+    public void updateUndoRedoButtons(boolean canUndo, boolean canRedo) {
+        if (drawUndoButton != null) {
+            drawUndoButton.setColorFilter(
+                    canUndo ? Color.argb(0xFF, 255, 255, 255)
+                            : Color.argb(0xFF, 128, 128, 128)
+            );
+        }
+        if (drawRedoButton != null) {
+            drawRedoButton.setColorFilter(
+                    canRedo ? Color.argb(0xFF, 255, 255, 255)
+                            : Color.argb(0xFF, 128, 128, 128)
+            );
+        }
+    }
+
     public void show() {
         topLayout.setVisibility(View.VISIBLE);
         bottomLayout.setVisibility(View.VISIBLE);
@@ -195,6 +269,36 @@ public abstract class DefaultPageController implements IPageController, View.OnC
             controllerListener.next("");
         } else if (R.id.prevButton == id) {
             controllerListener.prev("");
+        } else if (R.id.selectButton == id) {
+            selection = !selection;
+            updateSelection();
+            if (selection) {
+                draw = false;
+                updateDraw();
+            }
+            controllerListener.setSelection(selection);
+        } else if (R.id.penButton == id) {
+            draw = !draw;
+            updateDraw();
+            if (draw) {
+                selection = false;
+                updateSelection();
+            }
+            controllerListener.setDraw(draw);
+        } else if (R.id.aiButton == id) {
+            controllerListener.ai();
+        } else if (R.id.bookmarkButton == id) {
+            controllerListener.bookmark();
+        } else if (R.id.drawWidthButton == id) {
+            controllerListener.showDrawConfig();
+        } else if (R.id.drawTypeButton == id) {
+            controllerListener.showDrawConfig();
+        } else if (R.id.drawColorButton == id) {
+            controllerListener.showDrawConfig();
+        } else if (R.id.drawUndoButton == id) {
+            controllerListener.undoDraw();
+        } else if (R.id.drawRedoButton == id) {
+            controllerListener.redoDraw();
         }
     }
 

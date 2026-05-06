@@ -21,6 +21,10 @@ public interface PageControllerListener {
 
     void toggleTts();
 
+    void setSelection(boolean selection);
+
+    void setDraw(boolean draw);
+
     void ocr();
 
     void prev(String string);
@@ -31,7 +35,17 @@ public interface PageControllerListener {
 
     void showSearch();
 
+    void ai();
+
+    void bookmark();
+
     void preview();
 
     void selectFont();
+
+    void showDrawConfig();
+
+    void undoDraw();
+
+    void redoDraw();
 }

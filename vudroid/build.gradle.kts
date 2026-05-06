@@ -28,15 +28,4 @@ android {
 }
 dependencies {
     api(project(":readercommon"))
-
-    //docx to html
-    api(libs.mammoth)
-    //html to epub
-    api("io.documentnode:epub4j-core:4.2.2") {
-        exclude("xmlpull")
-    }
-
-    api(libs.penfeizhou.awebp)
-    api(libs.android.gif.drawable)
-    api(libs.tiff.loader)
 }

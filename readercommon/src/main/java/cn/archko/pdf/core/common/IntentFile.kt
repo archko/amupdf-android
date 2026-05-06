@@ -91,11 +91,38 @@ object IntentFile {
                 // TODO handle non-primary volumes
             } else if (isDownloadsDocument(uri)) {
                 val id = DocumentsContract.getDocumentId(uri)
-                val contentUri = ContentUris.withAppendedId(
-                    Uri.parse("content://downloads/public_downloads"), id.toLong()
-                )
 
-                return getDataColumn(context!!, contentUri, null, null)
+                // Handle special cases like "msf:189013" or "raw:/storage/..."
+                if (id.startsWith("raw:")) {
+                    return id.substring(4)
+                } else if (id.startsWith("msf:") || id.startsWith("msd:")) {
+                    // For media store files, try to get the file name and construct path
+                    val fileName = getFileName(uri, context)
+                    if (fileName != null) {
+                        val downloadsPath =
+                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
+                        return "$downloadsPath/$fileName"
+                    }
+                    return null
+                }
+
+                // Try to parse as numeric ID
+                try {
+                    val contentUri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), id.toLong()
+                    )
+                    return getDataColumn(context!!, contentUri, null, null)
+                } catch (e: NumberFormatException) {
+                    // If parsing fails, try alternative approaches
+                    Log.e("IntentFile", "Cannot parse download ID as long: $id")
+                    val fileName = getFileName(uri, context)
+                    if (fileName != null) {
+                        val downloadsPath =
+                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
+                        return "$downloadsPath/$fileName"
+                    }
+                    return null
+                }
             } else if (isMediaDocument(uri)) {
                 val docId = DocumentsContract.getDocumentId(uri)
                 val split: Array<String?> =

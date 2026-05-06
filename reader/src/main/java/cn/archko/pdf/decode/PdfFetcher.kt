@@ -2,23 +2,16 @@ package cn.archko.pdf.decode
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.RectF
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
 import android.util.Size
-import cn.archko.pdf.R
 import cn.archko.pdf.core.App
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.cache.BitmapPool
-import cn.archko.pdf.core.common.IntentFile
-import cn.archko.pdf.core.common.Logcat
-import cn.archko.pdf.core.utils.BitmapUtils
+import cn.archko.pdf.core.cache.FetcherCache
 import cn.archko.pdf.core.utils.FileUtils
-import cn.archko.pdf.widgets.CoverDrawable
 import coil3.BitmapImage
 import coil3.ImageLoader
 import coil3.asImage
@@ -35,7 +28,6 @@ import com.artifex.mupdf.fitz.android.AndroidDrawDevice
 import org.vudroid.djvudroid.codec.DjvuContext
 import org.vudroid.djvudroid.codec.DjvuPage
 import java.io.File
-import java.nio.ByteBuffer
 
 /**
  * @author: archko 2024/8/133 :08:02
@@ -44,29 +36,6 @@ class PdfFetcher(
     private val data: PdfFetcherData,
     private val options: Options
 ) : Fetcher {
-
-    private fun cacheBitmap(bitmap: Bitmap?) {
-        if (null == bitmap) {
-            return
-        }
-        BitmapCache.getInstance().addBitmap(data.path, bitmap)
-        val dir = FileUtils.getExternalCacheDir(App.instance)
-        val cacheDir = File(dir, "image")
-        if (!cacheDir.exists()) {
-            cacheDir.mkdirs()
-        }
-        val path = "${cacheDir.absolutePath}/${data.path.hashCode()}"
-        val bmp = Bitmap.createBitmap(
-            bitmap.width,
-            bitmap.height,
-            bitmap.config!!
-        )
-        val buffer = ByteBuffer.allocate(bitmap.getByteCount())
-        bitmap.copyPixelsToBuffer(buffer)
-        buffer.position(0)
-        bmp.copyPixelsFromBuffer(buffer);
-        BitmapUtils.saveBitmapToFile(bmp, File(path))
-    }
 
     private fun loadBitmapFromCache(): Bitmap? {
         var bmp = BitmapCache.getInstance().getBitmap(data.path)
@@ -83,19 +52,14 @@ class PdfFetcher(
     override suspend fun fetch(): FetchResult {
         var bitmap = loadBitmapFromCache()
         if (bitmap == null) {
-            bitmap = if (IntentFile.isDjvu(data.path)) {
+            /*bitmap = if (IntentFile.isDjvu(data.path)) {
                 decodeDjvu()
             } else if (IntentFile.isPdf(data.path)) {
                 decodePdfSys()
             } else {
                 decodeMuPdf()
-            }
-        }
-
-        if (bitmap == null) {
-            bitmap = BitmapFactory.decodeResource(App.instance!!.resources, R.drawable.ic_book_text)
-        } else {
-            cacheBitmap(bitmap)
+            }*/
+            bitmap = FetcherCache.createWhiteBitmap(data.width, data.height)
         }
 
         //val drawable = CoverDrawable(bitmap)

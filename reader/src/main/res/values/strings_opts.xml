@@ -32,7 +32,7 @@
     <string name="menu_exit">Exit</string>
     <string name="menu_font">Font</string>
     <string name="menu_settings">Settings</string>
-    
+
     <string name="menu_opt_album">View as Album</string>
     <string name="menu_opt_delete_page">Delete Page</string>
     <string name="menu_opt_insert_image">Insert Image</string>
@@ -85,6 +85,7 @@
         <item>4</item>
         <item>5</item>
         <item>6</item>
+        <item>7</item>
     </string-array>
     <string-array name="opts_color_mode_labels">
         <item>Normal</item>
@@ -94,6 +95,7 @@
         <item>Grayscale on greyish</item>
         <item>Grayscale on gray</item>
         <item>Grayscale on dark gray</item>
+        <item>Custom Matrix...</item>
     </string-array>
 
     <string name="opts_default_list_style" translatable="false">1</string>
@@ -180,6 +182,7 @@
     <string name="no_bookmark">No bookmark,add one?</string>
 
     <string name="tts_failed">Init tts engine failed.</string>
+    <string name="tts_title">TTS pages</string>
 
     <string name="opts_decode_block_title">Bitmap size</string>
     <string name="opts_default_decode_block" translatable="false">2</string>
@@ -196,6 +199,64 @@
         <item>2</item>
         <item>3</item>
     </string-array>
+    
+    <!-- Color Picker Dialog Strings -->
+    <string name="color_picker_title">Select Color</string>
+    <string name="color_value_label">Color Value:</string>
+    <string name="apply_button">Apply</string>
+    <string name="alpha_label">Alpha (A):</string>
+    <string name="red_label">Red (R):</string>
+    <string name="green_label">Green (G):</string>
+    <string name="blue_label">Blue (B):</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="ok_button">OK</string>
+
+    <string name="color_filter_title">Custom background color filter</string>
+    <string name="color_filter_reset">Reset</string>
+    <string name="color_filter_filter_error">矩阵值无效</string>
+
+    <!-- Outline Tab Strings -->
+    <string name="document_outline">Document Outline</string>
+    <string name="outline_empty">No outline</string>
+    <string name="annotation_empty">No annotations</string>
+    <string name="bookmark_empty">No bookmarks</string>
+    <string name="page_label">Page %d</string>
+    <string name="annotations_count">%d annotations</string>
+    
+    <!-- Draw Config Dialog Strings -->
+    <string name="draw_config_title">Drawing Settings</string>
+    <string name="color_preview_label">Color Preview:</string>
+    <string name="select_color_label">Select Color:</string>
+    <string name="stroke_width_label">Stroke Width:</string>
+    <string name="draw_type_label">Draw Type:</string>
+    <string name="line_type">Line</string>
+    <string name="curve_type">Curve</string>
+    <string name="confirm_button">OK</string>
+
+    <!-- Bookmark -->
+    <string name="bookmark_dialog_title">Bookmark Settings</string>
+
+    <!-- AI 对话相关 -->
+    <string name="ai_chat_empty">No AI conversations yet</string>
+    <string name="ai_conversations_count">%d conversations</string>
+    <string name="ai_tab">AI Chat</string>
+
+    <!-- AI 页面对话框相关 -->
+    <string name="ai_assistant_page">AI Assistant - Page %d</string>
+    <string name="ask_based_on_content">Ask based on page content…</string>
+    <string name="conversation_history">Conversation History</string>
+    <string name="no_conversation_records">No conversation records</string>
+    <string name="page_content">Page Content</string>
+    <string name="unable_to_get_page_text">Unable to get page text</string>
+    <string name="send">Send</string>
+    <string name="close">Close</string>
+    <string name="prompt_tokens">Prompt: %d</string>
+    <string name="completion_tokens">Completion: %d</string>
+    <string name="total_tokens">Total: %d</string>
+
+    <string name="copy">Copy</string>
+    <string name="selected_text">Selected text</string>
+    <string name="copy_to_clipboard">Copy to clipboard</string>
 
     <string name="ocr_title">OCR Recognition</string>
     <string name="ocr_recognize">Recognize</string>

@@ -28,4 +28,7 @@ public interface IPageController {
     int bottomVisibility();
 
     void showSearch();
+
+    void updateUndoRedoButtons(boolean canUndo, boolean canRedo);
+
 }

@@ -12,6 +12,7 @@ import vn.chungha.flowbus.FlowBusInitApplication
 open class App : Application() {
     var screenHeight = 2160
     var screenWidth = 1080
+
     override fun onCreate() {
         super.onCreate()
         instance = this

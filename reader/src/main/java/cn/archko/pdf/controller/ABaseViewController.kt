@@ -11,6 +11,7 @@ import android.widget.RelativeLayout
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.awidget.ARecyclerView
 import androidx.recyclerview.awidget.LinearLayoutManager
+import cn.archko.pdf.core.entity.PathConfig
 import cn.archko.pdf.core.widgets.ExtraSpaceLinearLayoutManager
 import cn.archko.pdf.core.widgets.ViewerDividerItemDecoration
 import cn.archko.pdf.listeners.AViewController
@@ -112,6 +113,10 @@ abstract class ABaseViewController(
         return null
     }
 
+    override fun getCurrentContent(start: Int, end: Int): List<String>? {
+        return null
+    }
+
     override fun getCurrentPos(): Int {
         if (null == mRecyclerView.layoutManager) {
             return 0
@@ -139,6 +144,14 @@ abstract class ABaseViewController(
     override fun setOrientation(ori: Int) {
         (mRecyclerView.layoutManager as LinearLayoutManager).orientation = ori
     }
+
+    override fun setSelection(selection: Boolean) {}
+
+    override fun setDraw(draw: Boolean) {}
+
+    override fun setDrawConfig(pathConfig: PathConfig) {}
+
+    override fun setInvalidate() {}
 
     override fun setCrop(crop: Boolean) {
     }

@@ -129,7 +129,6 @@ dependencies {
 
     implementation(libs.material)
     implementation(libs.swiperefreshlayout)
-    implementation(libs.colorPickerDialog)
 
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
@@ -139,4 +138,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.github.axet/k2pdfopt
     implementation(libs.k2pdfopt)
+
+    // HTTP client for AI service
+    implementation(libs.okhttp3)
 }

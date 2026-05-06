@@ -1,38 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="2dp">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="4dp">
 
-    <ImageView
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
             android:id="@+id/icon"
             android:layout_width="120dp"
             android:layout_height="160dp"
-            android:layout_margin="4dp"
             android:scaleType="centerCrop"
             tools:src="@drawable/ic_book_pdf" />
 
-    <ProgressBar
-            android:id="@+id/progressbar"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/progressText"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:indeterminateOnly="false"
-            android:max="100"
-            android:maxHeight="4dp"
-            android:minHeight="4dp"
-            android:progressDrawable="@drawable/progressbar_horizontal"
-            tools:progress="10" />
+            android:layout_gravity="bottom|end"
+            android:layout_margin="4dp"
+            android:background="@drawable/rounded_progress_bg"
+            android:gravity="center"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:text="1/100"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+
+    </FrameLayout>
 
     <TextView
-            android:id="@+id/name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="2"
-            android:textAppearance="?attr/textAppearanceBody1"
-            android:textSize="13sp"
-            tools:text="书架" />
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textAppearance="?attr/textAppearanceBody1"
+        android:textSize="13sp"
+        tools:text="书架" />
 
 </LinearLayout>
