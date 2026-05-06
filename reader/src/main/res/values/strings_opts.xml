@@ -260,5 +260,8 @@
 
     <string name="ocr_title">OCR Recognition</string>
     <string name="ocr_recognize">Recognize</string>
+    <string name="ocr_save">Save</string>
+    <string name="ocr_copy">Copy</string>
+    <string name="ocr_result">OCR Result</string>
 
 </resources>

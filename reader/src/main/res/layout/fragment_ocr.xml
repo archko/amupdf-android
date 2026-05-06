@@ -18,17 +18,17 @@
             android:background="@color/toc_color_bg"
             android:orientation="horizontal">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/back"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
-                android:text="&lt;返回"
+                android:src="@drawable/ic_back"
                 android:textSize="18sp" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
                 android:text="@string/ocr_title"
                 android:textSize="18sp" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btnSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -46,10 +46,10 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                android:text="Save"
+                android:text="@string/ocr_save"
                 android:textSize="18sp" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btnCopy"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:layout_toStartOf="@id/btnSave"
-                android:text="Copy"
+                android:text="@string/ocr_copy"
                 android:textSize="18sp" />
         </RelativeLayout>
 
@@ -66,7 +66,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/action_bar">
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -86,17 +86,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="120dp"
-        android:background="@android:color/white"
+        android:background="#A6FFFFFF"
         android:orientation="vertical"
         app:layout_behavior="@string/bottom_sheet_behavior">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:text="OCR Result"
+            android:text="@string/ocr_result"
             android:textColor="@android:color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -106,7 +106,7 @@
             android:layout_height="wrap_content"
             android:padding="16dp">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/textResult"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -210,4 +210,7 @@
 
     <string name="ocr_title">OCR 识别</string>
     <string name="ocr_recognize">OCR 识别</string>
+    <string name="ocr_save">保存</string>
+    <string name="ocr_copy">复制</string>
+    <string name="ocr_result">识别结果</string>
 </resources>

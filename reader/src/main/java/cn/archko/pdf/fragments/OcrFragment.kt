@@ -8,6 +8,7 @@ import android.graphics.Point
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -68,7 +69,7 @@ class OcrFragment : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        var themeId = R.style.AppTheme
+        val themeId = R.style.AppTheme
         setStyle(STYLE_NO_TITLE, themeId)
 
         parseArguments()
@@ -151,6 +152,11 @@ class OcrFragment : DialogFragment() {
 
         AppExecutors.instance.diskIO().execute {
             ocrResultString = ocrManager?.detectAndRecognize(bitmap)
+
+            // 打印原始识别结果
+            Log.d("OcrFragment", "=== OCR Raw Result ===")
+            Log.d("OcrFragment", "Raw result: $ocrResultString")
+
             polygonResults = parseResult(ocrResultString ?: "")
 
             requireActivity().runOnUiThread {
@@ -188,6 +194,8 @@ class OcrFragment : DialogFragment() {
         if (result.isEmpty()) return modelList
 
         val items = result.split(";")
+        Log.d("OcrFragment", "=== Parsing Result ===")
+        Log.d("OcrFragment", "Total items: ${items.size}")
         for (item in items) {
             val parts = item.split(",")
             if (parts.size >= 5) {
@@ -197,6 +205,8 @@ class OcrFragment : DialogFragment() {
                 val h = parts[3].toIntOrNull() ?: continue
                 val text = parts[4]
 
+                Log.d("OcrFragment", "Item: x=$x, y=$y, w=$w, h=$h, text='$text'")
+
                 val model = BasePolygonResultModel().apply {
                     setRect(Rect(x, y, x + w, y + h))
                     setName(text)
@@ -205,6 +215,7 @@ class OcrFragment : DialogFragment() {
                 modelList.add(model)
             }
         }
+        Log.d("OcrFragment", "=== End Parsing ===")
 
         // Group by lines like in MainActivity
         modelList.sortBy { it.getRect(1.0f, Point(0, 0)).top }
@@ -230,9 +241,12 @@ class OcrFragment : DialogFragment() {
 
         // Combine each line
         val combinedList = mutableListOf<BasePolygonResultModel>()
+        Log.d("OcrFragment", "=== Grouping Result ===")
+        Log.d("OcrFragment", "Total lines: ${lines.size}")
         for (line in lines) {
             line.sortBy { it.getRect(1.0f, Point(0, 0)).left }
             val combinedText = line.joinToString(" ") { it.name }
+            Log.d("OcrFragment", "Line ${lines.indexOf(line)}: $line => '$combinedText' (${line.size} items)")
             var minX = Int.MAX_VALUE
             var minY = Int.MAX_VALUE
             var maxX = 0
@@ -251,6 +265,7 @@ class OcrFragment : DialogFragment() {
             }
             combinedList.add(combinedModel)
         }
+        Log.d("OcrFragment", "=== End Grouping ===")
 
         return combinedList
     }
@@ -303,5 +318,6 @@ class OcrFragment : DialogFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        ocrManager?.closeCamera()
     }
 }
