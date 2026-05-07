@@ -72,63 +72,87 @@ class AIViewModel : ViewModel() {
     fun initializeDefaultProviders() {
         viewModelScope.launch {
             val existing = database.aiProviderDao().getAllProviders()
-            if (existing.isEmpty()) {
-                val defaults = listOf(
-                    // 国内提供商
-                    AIProvider(
-                        id = "deepseek",
-                        name = "DeepSeek",
-                        apiKey = "",
-                        baseUrl = "https://api.deepseek.com",
-                        model = "deepseek-chat",
-                        maxTokens = 100000,
-                        temperature = 0.7f,
-                        isDefault = false
-                    ),
-                    AIProvider(
-                        id = "qwen",
-                        name = "通义千问",
-                        apiKey = "",
-                        baseUrl = "https://dashscope.aliyuncs.com",
-                        model = "qwen-turbo",
-                        maxTokens = 100000,
-                        temperature = 0.7f,
-                        isDefault = false
-                    ),
-                    AIProvider(
-                        id = "glm",
-                        name = "智谱清言",
-                        apiKey = "",
-                        baseUrl = "https://open.bigmodel.cn",
-                        model = "glm-4-flash",
-                        maxTokens = 100000,
-                        temperature = 0.7f,
-                        isDefault = false
-                    ),
-                    // 国外提供商
-                    AIProvider(
-                        id = "openai",
-                        name = "OpenAI GPT",
-                        apiKey = "",
-                        baseUrl = "https://api.openai.com",
-                        model = "gpt-4o-mini",
-                        maxTokens = 100000,
-                        temperature = 0.7f,
-                        isDefault = true
-                    ),
-                    AIProvider(
-                        id = "gemini",
-                        name = "Google Gemini",
-                        apiKey = "",
-                        baseUrl = "https://generativelanguage.googleapis.com",
-                        model = "gemini-2.0-flash",
-                        maxTokens = 100000,
-                        temperature = 0.7f,
-                        isDefault = false
-                    )
+            val existingIds = existing.map { it.id }.toSet()
+
+            // 所有默认提供商配置
+            val allDefaults = listOf(
+                // 国内提供商
+                AIProvider(
+                    id = "deepseek",
+                    name = "DeepSeek",
+                    apiKey = "",
+                    baseUrl = "https://api.deepseek.com",
+                    model = "deepseek-chat",
+                    maxTokens = 100000,
+                    temperature = 0.7f,
+                    isDefault = false
+                ),
+                AIProvider(
+                    id = "qwen",
+                    name = "通义千问",
+                    apiKey = "",
+                    baseUrl = "https://dashscope.aliyuncs.com",
+                    model = "qwen-turbo",
+                    maxTokens = 100000,
+                    temperature = 0.7f,
+                    isDefault = false
+                ),
+                AIProvider(
+                    id = "glm",
+                    name = "智谱清言",
+                    apiKey = "",
+                    baseUrl = "https://open.bigmodel.cn",
+                    model = "glm-4-flash",
+                    maxTokens = 100000,
+                    temperature = 0.7f,
+                    isDefault = false
+                ),
+                // 国外提供商
+                AIProvider(
+                    id = "openai",
+                    name = "OpenAI GPT",
+                    apiKey = "",
+                    baseUrl = "https://api.openai.com",
+                    model = "gpt-4o-mini",
+                    maxTokens = 100000,
+                    temperature = 0.7f,
+                    isDefault = false
+                ),
+                AIProvider(
+                    id = "gemini",
+                    name = "Google Gemini",
+                    apiKey = "",
+                    baseUrl = "https://generativelanguage.googleapis.com",
+                    model = "gemini-2.0-flash",
+                    maxTokens = 100000,
+                    temperature = 0.7f,
+                    isDefault = false
                 )
-                database.aiProviderDao().insertAllProviders(defaults)
+            )
+
+            // 1. 插入缺失的提供商
+            val toInsert = allDefaults.filter { it.id !in existingIds }
+            if (toInsert.isNotEmpty()) {
+                database.aiProviderDao().insertAllProviders(toInsert)
             }
+
+            // 2. 更新已有提供商的配置（保留用户配置的 apiKey）
+            existing.forEach { provider ->
+                val defaultProvider = allDefaults.find { it.id == provider.id }
+                if (defaultProvider != null) {
+                    // 只更新基础配置，保留用户的 apiKey
+                    val updated = provider.apply {
+                        name = defaultProvider.name
+                        baseUrl = defaultProvider.baseUrl
+                        model = defaultProvider.model
+                        maxTokens = defaultProvider.maxTokens
+                        temperature = defaultProvider.temperature
+                        updatedAt = System.currentTimeMillis()
+                    }
+                    database.aiProviderDao().updateProvider(updated)
+                }
+            }
+
             loadProviders()
         }
     }
