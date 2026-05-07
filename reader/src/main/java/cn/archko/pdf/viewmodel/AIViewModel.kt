@@ -34,6 +34,19 @@ class AIViewModel : ViewModel() {
 
     init {
         initializeDefaultProviders()
+        initializeAIService()
+    }
+
+    /**
+     * 初始化 AI 服务配置（用于国际化）
+     */
+    private fun initializeAIService() {
+        try {
+            val config = cn.archko.pdf.core.App.getAIPromptConfig()
+            aiService.setPromptConfig(config)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     /**
@@ -44,15 +57,16 @@ class AIViewModel : ViewModel() {
             val existing = database.aiProviderDao().getAllProviders()
             if (existing.isEmpty()) {
                 val defaults = listOf(
+                    // 国内提供商
                     AIProvider(
                         id = "deepseek",
                         name = "DeepSeek",
                         apiKey = "",
                         baseUrl = "https://api.deepseek.com",
                         model = "deepseek-chat",
-                        maxTokens = 4000,
+                        maxTokens = 100000,
                         temperature = 0.7f,
-                        isDefault = true
+                        isDefault = false
                     ),
                     AIProvider(
                         id = "qwen",
@@ -60,7 +74,7 @@ class AIViewModel : ViewModel() {
                         apiKey = "",
                         baseUrl = "https://dashscope.aliyuncs.com",
                         model = "qwen-turbo",
-                        maxTokens = 4000,
+                        maxTokens = 100000,
                         temperature = 0.7f,
                         isDefault = false
                     ),
@@ -70,7 +84,28 @@ class AIViewModel : ViewModel() {
                         apiKey = "",
                         baseUrl = "https://open.bigmodel.cn",
                         model = "glm-4-flash",
-                        maxTokens = 4000,
+                        maxTokens = 100000,
+                        temperature = 0.7f,
+                        isDefault = false
+                    ),
+                    // 国外提供商
+                    AIProvider(
+                        id = "openai",
+                        name = "OpenAI GPT",
+                        apiKey = "",
+                        baseUrl = "https://api.openai.com",
+                        model = "gpt-4o-mini",
+                        maxTokens = 100000,
+                        temperature = 0.7f,
+                        isDefault = true
+                    ),
+                    AIProvider(
+                        id = "gemini",
+                        name = "Google Gemini",
+                        apiKey = "",
+                        baseUrl = "https://generativelanguage.googleapis.com",
+                        model = "gemini-2.0-flash",
+                        maxTokens = 100000,
                         temperature = 0.7f,
                         isDefault = false
                     )

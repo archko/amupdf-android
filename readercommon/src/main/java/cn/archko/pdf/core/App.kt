@@ -5,6 +5,7 @@ import android.app.Application
 import cn.archko.pdf.core.cache.BitmapCache
 import cn.archko.pdf.core.common.CrashHandler
 import cn.archko.pdf.core.common.Graph
+import cn.archko.pdf.viewmodel.AIService
 import com.tencent.bugly.crashreport.CrashReport
 import com.tencent.mmkv.MMKV
 import vn.chungha.flowbus.FlowBusInitApplication
@@ -62,5 +63,21 @@ open class App : Application() {
     companion object {
         var instance: App? = null
             private set
+
+        /**
+         * 获取 AI 提示语配置（用于国际化）
+         */
+        fun getAIPromptConfig(): AIService.AIPromptConfig {
+            val ctx = instance ?: throw IllegalStateException("Application not initialized")
+            return AIService.AIPromptConfig(
+                systemPrompt = ctx.getString(cn.archko.pdf.R.string.ai_system_prompt),
+                userPromptFormat = ctx.getString(cn.archko.pdf.R.string.ai_user_prompt_format),
+                unsupportedProvider = ctx.getString(cn.archko.pdf.R.string.ai_unsupported_provider),
+                apiRequestFailed = ctx.getString(cn.archko.pdf.R.string.ai_api_request_failed),
+                apiEmptyResponse = ctx.getString(cn.archko.pdf.R.string.ai_api_empty_response),
+                emptyResponse = ctx.getString(cn.archko.pdf.R.string.ai_empty_response),
+                apiCallFailed = ctx.getString(cn.archko.pdf.R.string.ai_api_call_failed)
+            )
+        }
     }
 }

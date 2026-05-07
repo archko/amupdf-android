@@ -207,4 +207,15 @@
     <string name="selected_text">选中的文本</string>
     <string name="copy_to_clipboard">复制到剪切板了</string>
 
+    <!-- AI 系统提示语 -->
+    <string name="ai_system_prompt">你是一个专业的文档阅读助手。用户会提供文档页面的内容，并基于这些内容提问。请根据页面内容准确回答问题。</string>
+    <string name="ai_user_prompt_format">页面内容：\n%1$s\n\n问题：%2$s</string>
+
+    <!-- AI 错误信息 -->
+    <string name="ai_unsupported_provider">不支持的 AI 提供商: %s</string>
+    <string name="ai_api_request_failed">API 请求失败: %d %s</string>
+    <string name="ai_api_empty_response">API 返回空响应体</string>
+    <string name="ai_empty_response">AI 返回空响应</string>
+    <string name="ai_api_call_failed">API 调用失败: %s</string>
+
 </resources>
