@@ -82,7 +82,7 @@ class AIViewModel : ViewModel() {
                     name = "DeepSeek",
                     apiKey = "",
                     baseUrl = "https://api.deepseek.com",
-                    model = "deepseek-chat",
+                    model = "deepseek-v4-flash",
                     maxTokens = 100000,
                     temperature = 0.7f,
                     isDefault = false
