@@ -1,0 +1,13 @@
+<resources>
+    <string name="action_bar_back">返回</string>
+
+    <string name="result_label">识别结果</string>
+    <string name="result_save">保存</string>
+    <string name="result_copy">复制</string>
+
+    <string name="result_table_header_index">序号</string>
+    <string name="result_table_header_name">名称</string>
+    <string name="result_table_header_confidence">置信度</string>
+
+    <string name="operation_confidence_control">阈值控制</string>
+</resources>
