@@ -138,7 +138,7 @@ open class HomeActivity : AnalysticActivity(), OnPermissionGranted {
                 .setPositiveButton(R.string.show_as_dir_ok) { _, _ ->
                     val intent = Intent(Intent.ACTION_VIEW)
                     intent.setClass(this, AlbumViewerActivity::class.java)
-                    intent.putExtra("dir", file.parentFile?.absolutePath)
+                    intent.putExtra("path", file.parentFile?.absolutePath)
                     this.startActivity(intent)
                 }
                 .setNegativeButton(R.string.show_as_dir_cancel) { _, _ ->
