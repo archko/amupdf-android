@@ -28,7 +28,7 @@ class TestDocumentViewActivity : AppCompatActivity() {
         setContentView(documentView)
 
         // 加载PDF文件
-        val pdfPath = "/storage/emulated/0/book/test.pdf"
+        val pdfPath = "/storage/emulated/0/book/家乡.pdf"
         val pdfFile = File(pdfPath)
 
         if (!pdfFile.exists()) {

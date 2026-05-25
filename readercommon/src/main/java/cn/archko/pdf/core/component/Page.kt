@@ -15,6 +15,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.Future
 import kotlin.math.abs
+import kotlin.math.ceil
+import kotlin.math.floor
 
 /**
  * @author: archko 2025/7/24 :08:20
@@ -27,16 +29,9 @@ class Page(
     var yOffset: Float = 0f,
     var xOffset: Float = 0f
 ) {
-    // 可见的 nodes 映射：一维索引 -> PageNode，按需创建
-    // 索引编码：index = y * xBlocks + x
+    // 可见的 nodes 映射：Int key = (x shl 16) or y，按需创建，零Pair分配
     private val visibleNodes: MutableMap<Int, PageNode> = mutableMapOf()
     private var currentTileConfig: TileConfig? = null
-
-    // 缓存上一帧的块范围，避免重复计算
-    private var lastMinBlockX = -1
-    private var lastMaxBlockX = -1
-    private var lastMinBlockY = -1
-    private var lastMaxBlockY = -1
 
     //page bound, should be caculate after view measured
     internal var bounds = RectF(0f, 0f, 1f, 1f)
@@ -247,66 +242,63 @@ class Page(
 
     private fun startThumbnailDecoding(cacheKey: String) {
         thumbDecoding = true
-        thumbJob?.cancel(true)
-        thumbJob = pageViewState.decodeService!!.submit {
-            if (!isScopeActive()) {
-                thumbDecoding = false
-                return@submit
-            }
 
-            val decodeTask = DecodeTask(
-                type = TaskType.PAGE,
-                pageIndex = aPage.index,
-                key = cacheKey,
-                aPage = aPage,
-                zoom = 1f,
-                bounds,
-                width.toInt(),
-                height.toInt(),
-                crop = pageViewState.isCropEnabled(),
-                callback = object : DecodeCallback {
-                    override fun onDecodeComplete(
-                        bitmap: Bitmap?,
-                        isThumb: Boolean,
-                        error: Throwable?
-                    ) {
-                        if (bitmap != null && !pageViewState.isShutdown()) {
-                            val newState = ImageCache.putPage(cacheKey, bitmap)
-                            CoroutineScope(Dispatchers.Main).launch {
-                                if (!pageViewState.isShutdown()) {
-                                    thumbBitmapState?.let { ImageCache.releasePage(it) }
-                                    thumbBitmapState = newState
-                                    setAspectRatio(bitmap.width, bitmap.height)
-                                } else {
-                                    ImageCache.releasePage(newState)
-                                }
-                            }
-                            // 解码完成，触发UI刷新
-                            pageViewState.notifyDecodeCompleted()
-                        } else {
-                            if (error != null) {
-                                println("Page thumbnail decode error: ${error.message}")
+        if (!isScopeActive()) {
+            thumbDecoding = false
+            return
+        }
+
+        val decodeTask = DecodeTask(
+            type = TaskType.PAGE,
+            pageIndex = aPage.index,
+            key = cacheKey,
+            aPage = aPage,
+            zoom = 1f,
+            bounds,
+            width.toInt(),
+            height.toInt(),
+            crop = pageViewState.isCropEnabled(),
+            callback = object : DecodeCallback {
+                override fun onDecodeComplete(
+                    bitmap: Bitmap?,
+                    isThumb: Boolean,
+                    error: Throwable?
+                ) {
+                    if (bitmap != null && !pageViewState.isShutdown()) {
+                        val newState = ImageCache.putPage(cacheKey, bitmap)
+                        CoroutineScope(Dispatchers.Main).launch {
+                            if (!pageViewState.isShutdown()) {
+                                thumbBitmapState?.let { ImageCache.releasePage(it) }
+                                thumbBitmapState = newState
+                                setAspectRatio(bitmap.width, bitmap.height)
+                            } else {
+                                ImageCache.releasePage(newState)
                             }
                         }
-                        thumbDecoding = false
+                        // 解码完成，触发UI刷新
+                        pageViewState.notifyDecodeCompleted()
+                    } else {
+                        if (error != null) {
+                            println("Page thumbnail decode error: ${error.message}")
+                        }
                     }
-
-                    override fun shouldRender(pageNumber: Int, isFullPage: Boolean): Boolean {
-                        // 优化：使用快速查找方法
-                        return !pageViewState.isShutdown() && pageViewState.isPageInVisibleList(
-                            pageNumber
-                        )
-                    }
-
-                    override fun onFinish(pageNumber: Int) {
-                        thumbDecoding = false
-                    }
+                    thumbDecoding = false
                 }
-            )
 
-            // 提交任务到DecodeService
-            pageViewState.decodeService?.submitTask(decodeTask)
-        }
+                override fun shouldRender(pageNumber: Int, isFullPage: Boolean): Boolean {
+                    // 优化：使用快速查找方法
+                    return !pageViewState.isShutdown() && pageViewState.isPageInVisibleList(
+                        pageNumber
+                    )
+                }
+
+                override fun onFinish(pageNumber: Int) {
+                    thumbDecoding = false
+                }
+            }
+        )
+
+        pageViewState.decodeService?.submitTask(decodeTask)
     }
 
     private fun isScopeActive(): Boolean {
@@ -363,7 +355,7 @@ class Page(
         }
 
         if (config.isSingleBlock) {
-            // 单块模式：只绘制 key=0 的节点
+            // 单块模式：只绘制 (0, 0) 节点，key=0
             visibleNodes[0]?.draw(
                 canvas,
                 currentWidth,
@@ -374,7 +366,6 @@ class Page(
             return
         }
 
-        // 多块模式：绘制所有可见节点
         for (node in visibleNodes.values) {
             node.draw(
                 canvas,
@@ -397,18 +388,17 @@ class Page(
             bounds.bottom * scaleRatio
         )
 
-        // 获取画布的可视区域
-        val viewWidth = canvas.width.toFloat()
-        val viewHeight = canvas.height.toFloat()
-        val visibleRect = RectF(
-            -offset.x,
-            -offset.y,
-            viewWidth - offset.x,
-            viewHeight - offset.y
-        )
+        // 直接计算可见区域边界，避免创建 visibleRect 对象
+        val vrLeft = -offset.x
+        val vrTop = -offset.y
+        val vrRight = canvas.width - offset.x
+        val vrBottom = canvas.height - offset.y
 
-        // 检查页面是否真正可见（用于绘制判断）
-        val isActuallyVisible = isPageVisible(visibleRect, currentBounds)
+        // 检查页面是否真正可见：内联 overlaps 检查
+        val isActuallyVisible = currentBounds.left < vrRight
+                && currentBounds.right > vrLeft
+                && currentBounds.top < vrBottom
+                && currentBounds.bottom > vrTop
 
         // 如果页面不在可见区域且不在预加载列表中，直接返回
         if (!isActuallyVisible && !pageViewState.isPageInVisibleList(aPage.index)) {
@@ -796,148 +786,92 @@ class Page(
         // 配置变化，清空所有可见 nodes
         visibleNodes.values.forEach { pageViewState.nodePool.release(it) }
         visibleNodes.clear()
-
-        // 重置块范围缓存
-        lastMinBlockX = -1
-        lastMaxBlockX = -1
-        lastMinBlockY = -1
-        lastMaxBlockY = -1
     }
 
     /**
-     * 编码二维坐标为一维索引
-     * @param x 块的 x 坐标
-     * @param y 块的 y 坐标
-     * @param xBlocks 总块数（x 方向）
-     * @return 一维索引
-     */
-    private fun encodeKey(x: Int, y: Int, xBlocks: Int): Int = y * xBlocks + x
-
-    /**
      * 根据可见区域按需创建/释放 nodes
-     * @param visibleRect 可见区域（屏幕坐标）
+     * @param visLeft/visTop/visRight/visBottom 可见区域边界（屏幕坐标），避免Rect分配
      * @param scaleRatio 缩放比例
      */
-    fun updateVisibleNodes(visibleRect: RectF, scaleRatio: Float) {
+    public fun updateVisibleNodes(
+        visLeft: Float, visTop: Float, visRight: Float, visBottom: Float,
+        scaleRatio: Float
+    ) {
         val config = currentTileConfig ?: run {
             invalidateNodes()
             currentTileConfig!!
         }
 
-        // 计算当前缩放下的页面边界
-        val currentBounds = RectF(
-            bounds.left * scaleRatio,
-            bounds.top * scaleRatio,
-            bounds.right * scaleRatio,
-            bounds.bottom * scaleRatio
-        )
-
-        // 单块模式：只有一个 node
-        if (config.isSingleBlock) {
-            val key = 0  // 直接用 0 代替 Pair(0, 0)
-            if (!visibleNodes.containsKey(key)) {
-                val node =
-                    pageViewState.nodePool.acquire(pageViewState, RectF(0f, 0f, 1f, 1f), aPage)
-                visibleNodes[key] = node
-            }
-
-            // 清理其他可能的
-            visibleNodes.keys.removeAll { it != key }
-            return
-        }
-
-        // 分块模式：计算可见区域在页面中的相对位置 [0, 1]
-        val pageVisibleLeft = (visibleRect.left - currentBounds.left) / (width * scaleRatio)
-        val pageVisibleRight = (visibleRect.right - currentBounds.left) / (width * scaleRatio)
-        val pageVisibleTop = (visibleRect.top - currentBounds.top) / (height * scaleRatio)
-        val pageVisibleBottom = (visibleRect.bottom - currentBounds.top) / (height * scaleRatio)
-
-        // 计算需要可见的 block x/y indices 范围
-        val minBlockX = kotlin.math.floor(pageVisibleLeft * config.xBlocks).toInt()
-            .coerceIn(0, config.xBlocks - 1)
-        val maxBlockX = kotlin.math.ceil(pageVisibleRight * config.xBlocks).toInt()
-            .coerceIn(0, config.xBlocks - 1)
-        val minBlockY = kotlin.math.floor(pageVisibleTop * config.yBlocks).toInt()
-            .coerceIn(0, config.yBlocks - 1)
-        val maxBlockY = kotlin.math.ceil(pageVisibleBottom * config.yBlocks).toInt()
-            .coerceIn(0, config.yBlocks - 1)
+        // 内联 currentBounds 计算，避免 Rect 分配
+        val cbLeft = bounds.left * scaleRatio
+        val cbTop = bounds.top * scaleRatio
+        val cbRight = bounds.right * scaleRatio
+        val cbBottom = bounds.bottom * scaleRatio
 
         val currentWidth = width * scaleRatio
         val currentHeight = height * scaleRatio
 
-        // 优化：如果块范围没变，只需要 decode，不需要创建/销毁
-        if (minBlockX == lastMinBlockX && maxBlockX == lastMaxBlockX &&
-            minBlockY == lastMinBlockY && maxBlockY == lastMaxBlockY) {
-            // 范围没变，只需要 decode 现有节点
-            visibleNodes.values.forEach { it.decode(currentWidth, currentHeight) }
+        // 单块模式：只有一个 node
+        if (config.isSingleBlock) {
+            visibleNodes.values.forEach { pageViewState.nodePool.release(it) }
+            visibleNodes.clear()
+            val node = pageViewState.nodePool.acquire(pageViewState, RectF(0f, 0f, 1f, 1f), aPage)
+            visibleNodes[0] = node  // key=0 表示 (0,0)
+            node.decode(currentWidth, currentHeight, pageViewState.vZoom)
             return
         }
 
-        // 范围变了，需要创建/销毁节点
-        // 方案 A：直接重建（简单，适合块数不多的情况）
-        if (config.xBlocks * config.yBlocks <= 16) {
-            // 清空所有，重新创建
-            visibleNodes.values.forEach { pageViewState.nodePool.release(it) }
-            visibleNodes.clear()
+        // 分块模式：计算可见区域在页面中的相对位置 [0, 1]
+        val pageVisibleLeft = (visLeft - cbLeft) / currentWidth
+        val pageVisibleRight = (visRight - cbLeft) / currentWidth
+        val pageVisibleTop = (visTop - cbTop) / currentHeight
+        val pageVisibleBottom = (visBottom - cbTop) / currentHeight
 
-            for (y in minBlockY..maxBlockY) {
-                for (x in minBlockX..maxBlockX) {
-                    val key = encodeKey(x, y, config.xBlocks)
-                    val left = x / config.xBlocks.toFloat()
-                    val top = y / config.yBlocks.toFloat()
-                    val right = (x + 1) / config.xBlocks.toFloat()
-                    val bottom = (y + 1) / config.yBlocks.toFloat()
+        // 计算需要可见的 block x/y indices 范围
+        val minBlockX =
+            floor(pageVisibleLeft * config.xBlocks).toInt().coerceIn(0, config.xBlocks - 1)
+        val maxBlockX =
+            ceil(pageVisibleRight * config.xBlocks).toInt().coerceIn(0, config.xBlocks - 1)
+        val minBlockY =
+            floor(pageVisibleTop * config.yBlocks).toInt().coerceIn(0, config.yBlocks - 1)
+        val maxBlockY =
+            ceil(pageVisibleBottom * config.yBlocks).toInt().coerceIn(0, config.yBlocks - 1)
 
-                    val node = pageViewState.nodePool.acquire(
-                        pageViewState,
-                        RectF(left, top, right, bottom),
-                        aPage
-                    )
+        // 创建/更新可见的 nodes（不创建临时Set）
+        val xBlockCount = config.xBlocks.toFloat()
+        val yBlockCount = config.yBlocks.toFloat()
+        for (y in minBlockY..maxBlockY) {
+            for (x in minBlockX..maxBlockX) {
+                val key = (x shl 16) or y  // Int 编码代替 Pair，零分配
+
+                // 按需创建 node
+                if (!visibleNodes.containsKey(key)) {
+                    val left = x / xBlockCount
+                    val top = y / yBlockCount
+                    val right = (x + 1) / xBlockCount
+                    val bottom = (y + 1) / yBlockCount
+                    val rect = RectF(left, top, right, bottom)
+
+                    val node = pageViewState.nodePool.acquire(pageViewState, rect, aPage)
                     visibleNodes[key] = node
-                    node.decode(currentWidth, currentHeight)
-                }
-            }
-        } else {
-            // 方案 B：增量更新（块数多时才值得）
-            // 移除不在新范围内的块
-            visibleNodes.keys.removeAll { key ->
-                val y = key / config.xBlocks
-                val x = key % config.xBlocks
-                val shouldRemove = x < minBlockX || x > maxBlockX ||
-                        y < minBlockY || y > maxBlockY
-                if (shouldRemove) {
-                    pageViewState.nodePool.release(visibleNodes[key]!!)
-                }
-                shouldRemove
-            }
-
-            // 创建新的块
-            for (y in minBlockY..maxBlockY) {
-                for (x in minBlockX..maxBlockX) {
-                    val key = encodeKey(x, y, config.xBlocks)
-                    if (!visibleNodes.containsKey(key)) {
-                        val left = x / config.xBlocks.toFloat()
-                        val top = y / config.yBlocks.toFloat()
-                        val right = (x + 1) / config.xBlocks.toFloat()
-                        val bottom = (y + 1) / config.yBlocks.toFloat()
-
-                        val node = pageViewState.nodePool.acquire(
-                            pageViewState,
-                            RectF(left, top, right, bottom),
-                            aPage
-                        )
-                        visibleNodes[key] = node
-                    }
-                    visibleNodes[key]?.decode(currentWidth, currentHeight)
                 }
             }
         }
 
-        // 缓存本次的块范围
-        lastMinBlockX = minBlockX
-        lastMaxBlockX = maxBlockX
-        lastMinBlockY = minBlockY
-        lastMaxBlockY = maxBlockY
+        // 移除不在范围内的 nodes，同时触发保留节点的解码
+        val iterator = visibleNodes.iterator()
+        while (iterator.hasNext()) {
+            val entry = iterator.next()
+            val key = entry.key
+            val x = key ushr 16
+            val y = key and 0xFFFF
+            if (x !in minBlockX..maxBlockX || y !in minBlockY..maxBlockY) {
+                pageViewState.nodePool.release(entry.value)
+                iterator.remove()
+            } else {
+                entry.value.decode(currentWidth, currentHeight, pageViewState.vZoom)
+            }
+        }
     }
 
     /**
@@ -980,8 +914,8 @@ class Page(
 
     companion object {
         // 核心约束：仅保留最小块、最大块，取消基础块
-        const val MIN_BLOCK: Float = 256f * 2f // 512
-        const val MAX_BLOCK: Float = 256f * 5f // 1280
+        const val MIN_BLOCK: Float = 256f
+        const val MAX_BLOCK: Float = 256f * 2f
 
         // 单轴块数计算：优先1块，仅超出MAX_BLOCK才分块（延迟重建核心）
         private fun calcAxisBlocks(length: Float): Int {
@@ -993,12 +927,12 @@ class Page(
             }
 
             // 长度 > 最大块1536 → 按1536分块，保证实际块大小 ≥ 512
-            var blocks = kotlin.math.ceil(length / MAX_BLOCK).toInt()
+            var blocks = ceil(length / MAX_BLOCK).toInt()
             val actualBlockSize = length / blocks
 
             // 兜底：如果分块后实际块大小 < 512，按最小块重新分
             if (actualBlockSize < MIN_BLOCK) {
-                blocks = kotlin.math.ceil(length / MIN_BLOCK).toInt()
+                blocks = ceil(length / MIN_BLOCK).toInt()
             }
             return blocks
         }

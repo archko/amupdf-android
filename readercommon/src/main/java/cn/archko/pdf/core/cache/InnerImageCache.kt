@@ -1,6 +1,9 @@
 package cn.archko.pdf.core.cache
 
 import android.graphics.Bitmap
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 
 private const val CANDIDATE_TIMEOUT = 60_000L
 private var MAX_MEMORY_BYTES = 256 * 1024 * 1024L
@@ -12,91 +15,105 @@ private var PAGE_CANDIDATE_MEMORY_BYTES = PAGE_CACHE_MEMORY_BYTES / 4
 /**
  * Bitmap状态管理器，解决并发访问和生命周期问题
  * 使用引用计数确保正在使用的bitmap不会被回收
+ *
+ * 用一个 AtomicInteger 合并编码 refCount（低31位）和 recycled 标志（第32位），
+ * 通过 CAS 循环实现所有方法完全无锁。
  */
 public class BitmapState(
-    bitmap: Bitmap,
-    key: String,
-    byteSize: Long // 缓存尺寸，避免重复计算
+    public val bitmap: Bitmap,
+    public val key: String,
+    public val byteSize: Long
 ) {
-    @JvmField
-    public val bitmap: Bitmap = bitmap
-    @JvmField
-    public val key: String = key
-    @JvmField
-    public val byteSize: Long = byteSize
+    private val state = AtomicInteger(0)
 
-    private var referenceCount = 0
-    private var isRecycled = false
-
-    public fun acquire(): Boolean = synchronized(this) {
-        if (isRecycled) return false
-        referenceCount++
-        return true
-    }
-
-    public fun release(): Unit = synchronized(this) {
-        if (referenceCount > 0) referenceCount--
-    }
-
-    public fun markRecycled(): Boolean = synchronized(this) {
-        if (referenceCount == 0 && !isRecycled) {
-            isRecycled = true
-            return true
+    public fun acquire(): Boolean {
+        while (true) {
+            val current = state.get()
+            if (current < 0) return false
+            if (state.compareAndSet(current, current + 1)) return true
         }
-        return false
     }
 
-    public fun canRecycle(): Boolean = synchronized(this) { referenceCount == 0 }
-    public fun isRecycled(): Boolean = synchronized(this) { isRecycled }
+    public fun release(): Unit {
+        while (true) {
+            val current = state.get()
+            val refCount = current and Int.MAX_VALUE
+            if (refCount == 0) break
+            if (state.compareAndSet(current, current - 1)) break
+        }
+    }
+
+    public fun markRecycled(): Boolean {
+        while (true) {
+            val current = state.get()
+            if (current < 0) return false
+            val refCount = current and Int.MAX_VALUE
+            if (refCount != 0) return false
+            if (state.compareAndSet(current, current or Int.MIN_VALUE)) return true
+        }
+    }
+
+    public fun canRecycle(): Boolean = (state.get() and Int.MAX_VALUE) == 0
+    public fun isRecycled(): Boolean = state.get() < 0
 }
 
 /**
- * 线程安全的图片缓存，使用引用计数防止正在使用的bitmap被回收
+ * 线程安全的图片缓存，使用 ConcurrentHashMap + 独立的 LRU 列表，
+ * 将内存记账 eviction 与 查询/插入 分离，主线程读写完全无锁。
  */
 private class InnerImageCacheImpl(
     private var maxMemoryBytes: Long,
     private var maxCandidateMemoryBytes: Long = maxMemoryBytes / 4
 ) {
-    // 使用 LinkedHashMap (accessOrder=true) 实现真正的 LRU
-    private val cache = LinkedHashMap<String, BitmapState>(0, 0.75f, true)
+    // 主缓存：ConcurrentHashMap 保证并发的 get/put/remove 无锁
+    private val cache = ConcurrentHashMap<String, BitmapState>()
 
-    // 候选池：暂时不用的 Bitmap 停留区
-    private val candidatePool = mutableMapOf<String, Pair<BitmapState, Long>>()
+    // LRU 顺序链表：只用于 trimToSize() eviction 决策，不在主线程热路径上
+    private val lruList = LinkedHashMap<String, BitmapState>(0, 0.75f, true)
 
-    private var currentMemoryBytes = 0L
-    private var candidateMemoryBytes = 0L
+    // 候选池：用 ConcurrentHashMap 避免与主线程锁争用
+    private val candidatePool = ConcurrentHashMap<String, CandidateEntry>()
 
-    /**
-     * 设置最大内存限制
-     */
+    private val currentMemoryBytes = AtomicLong(0)
+    private val candidateMemoryBytes = AtomicLong(0)
+
+    private val evictionLock = Any()
+
+    private class CandidateEntry(
+        val state: BitmapState,
+        val timestamp: Long = System.currentTimeMillis()
+    )
+
     public fun setMaxMemory(maxMemoryBytes: Long) {
-        synchronized(this) {
-            this.maxMemoryBytes = maxMemoryBytes
-            this.maxCandidateMemoryBytes = maxMemoryBytes / 3
-            trimToSize()
-        }
+        this.maxMemoryBytes = maxMemoryBytes
+        this.maxCandidateMemoryBytes = maxMemoryBytes / 3
+        val toRecycle = mutableListOf<Bitmap>()
+        synchronized(evictionLock) { trimToSize(toRecycle) }
+        toRecycle.forEach { recycleImageBitmap(it) }
     }
 
-    public fun acquire(key: String): BitmapState? = synchronized(this) {
-        // 1. 检查主缓存 (LinkedHashMap 会自动更新访问顺序)
+    public fun acquire(key: String): BitmapState? {
+        // 1. 检查主缓存（ConcurrentHashMap 无锁读）
         cache[key]?.let { state ->
-            if (state.acquire()) return state
+            if (state.acquire()) {
+                return state
+            }
         }
 
-        // 2. 检查候选池
-        candidatePool[key]?.let { (state, timestamp) ->
-            if (System.currentTimeMillis() - timestamp < CANDIDATE_TIMEOUT) {
-                if (state.acquire()) {
-                    candidatePool.remove(key)
-                    candidateMemoryBytes -= state.byteSize
-
-                    cache[key] = state
-                    currentMemoryBytes += state.byteSize
-                    return state
+        // 2. 检查候选池（ConcurrentHashMap 无锁读）
+        candidatePool.remove(key)?.let { entry ->
+            if (System.currentTimeMillis() - entry.timestamp < CANDIDATE_TIMEOUT) {
+                if (entry.state.acquire()) {
+                    candidateMemoryBytes.addAndGet(-entry.state.byteSize)
+                    cache[key] = entry.state
+                    currentMemoryBytes.addAndGet(entry.state.byteSize)
+                    return entry.state
                 }
             } else {
-                // 超时自动清理
-                internalRecycle(key, state, fromCandidate = true)
+                if (entry.state.markRecycled()) {
+                    candidateMemoryBytes.addAndGet(-entry.state.byteSize)
+                    recycleImageBitmap(entry.state.bitmap)
+                }
             }
         }
         return null
@@ -106,102 +123,114 @@ private class InnerImageCacheImpl(
         state.release()
     }
 
-    public fun put(key: String, bitmap: Bitmap): BitmapState = synchronized(this) {
+    public fun put(key: String, bitmap: Bitmap): BitmapState {
         val imageSize = calculateImageSize(bitmap)
+        val state = BitmapState(bitmap, key, imageSize)
 
-        // 如果已存在旧的，先移入候选池
-        cache.remove(key)?.let { oldState ->
-            currentMemoryBytes -= oldState.byteSize
+        val oldState = cache.put(key, state)
+        if (oldState != null) {
+            currentMemoryBytes.addAndGet(-oldState.byteSize)
             addToCandidatePool(key, oldState)
         }
+        currentMemoryBytes.addAndGet(imageSize)
 
-        val state = BitmapState(bitmap, key, imageSize)
-        cache[key] = state
-        currentMemoryBytes += imageSize
+        // trimToSize 把需要回收的 bitmap 收集到列表，锁外统一回收
+        val toRecycle = mutableListOf<Bitmap>()
+        synchronized(evictionLock) {
+            lruList[key] = state
+            trimToSize(toRecycle)
+        }
+        toRecycle.forEach { recycleImageBitmap(it) }
 
-        trimToSize()
         return state
     }
 
-    /**
-     * 核心逻辑：根据 LRU 顺序和引用计数清理内存
-     */
-    private fun trimToSize() {
-        if (currentMemoryBytes <= maxMemoryBytes) return
+    private fun trimToSize(toRecycle: MutableList<Bitmap>) {
+        if (currentMemoryBytes.get() <= maxMemoryBytes) return
 
-        val iterator = cache.entries.iterator()
-        while (iterator.hasNext() && currentMemoryBytes > maxMemoryBytes) {
+        val iterator = lruList.entries.iterator()
+        while (iterator.hasNext() && currentMemoryBytes.get() > maxMemoryBytes) {
             val entry = iterator.next()
-            // 只有没有引用的才能被踢出主缓存
             if (entry.value.canRecycle()) {
-                val state = entry.value
+                val evicted = cache.remove(entry.key)
+                if (evicted != null) {
+                    currentMemoryBytes.addAndGet(-evicted.byteSize)
+                    addToCandidatePool(entry.key, evicted, toRecycle)
+                }
                 iterator.remove()
-                currentMemoryBytes -= state.byteSize
-                addToCandidatePool(entry.key, state)
             }
         }
     }
 
-    private fun addToCandidatePool(key: String, state: BitmapState) {
-        // 如果候选池超限，先清理最老的
-        while (candidateMemoryBytes + state.byteSize > maxCandidateMemoryBytes && candidatePool.isNotEmpty()) {
-            val oldestKey = candidatePool.entries.minByOrNull { it.value.second }?.key
-            oldestKey?.let { k ->
-                candidatePool.remove(k)?.let { (s, _) ->
-                    internalRecycle(k, s, fromCandidate = true)
+    private fun addToCandidatePool(key: String, state: BitmapState, toRecycle: MutableList<Bitmap>? = null) {
+        val entry = CandidateEntry(state)
+        candidatePool[key] = entry
+        candidateMemoryBytes.addAndGet(state.byteSize)
+
+        // 候选池超限时回收最老的
+        while (candidateMemoryBytes.get() > maxCandidateMemoryBytes) {
+            val oldest = candidatePool.entries.minByOrNull { it.value.timestamp } ?: break
+            val oldestKey = oldest.key
+            val oldestEntry = oldest.value
+            if (candidatePool.remove(oldestKey) != null) {
+                if (oldestEntry.state.markRecycled()) {
+                    candidateMemoryBytes.addAndGet(-oldestEntry.state.byteSize)
+                    if (toRecycle != null) {
+                        toRecycle.add(oldestEntry.state.bitmap)
+                    } else {
+                        recycleImageBitmap(oldestEntry.state.bitmap)
+                    }
                 }
             }
         }
-
-        candidatePool[key] = Pair(state, System.currentTimeMillis())
-        candidateMemoryBytes += state.byteSize
     }
 
-    private fun internalRecycle(key: String, state: BitmapState, fromCandidate: Boolean) {
-        if (state.markRecycled()) {
-            if (fromCandidate) candidateMemoryBytes -= state.byteSize
-            else currentMemoryBytes -= state.byteSize
-
-            recycleImageBitmap(state.bitmap)
-        }
-    }
-
-    public fun remove(key: String) = synchronized(this) {
+    public fun remove(key: String) {
         cache.remove(key)?.let { state ->
-            currentMemoryBytes -= state.byteSize
+            currentMemoryBytes.addAndGet(-state.byteSize)
             addToCandidatePool(key, state)
         }
-        cleanCandidatePool()
+        val toRecycle = mutableListOf<Bitmap>()
+        synchronized(evictionLock) {
+            lruList.remove(key)
+            cleanCandidatePool(toRecycle)
+        }
+        toRecycle.forEach { recycleImageBitmap(it) }
     }
 
-    public fun hasNode(key: String): Boolean = synchronized(this) {
+    public fun hasNode(key: String): Boolean {
         return cache.containsKey(key) || candidatePool.containsKey(key)
     }
 
-    public fun clear() = synchronized(this) {
-        cache.values.forEach { if (it.markRecycled()) recycleImageBitmap(it.bitmap) }
-        cache.clear()
-        currentMemoryBytes = 0L
+    public fun clear() {
+        synchronized(evictionLock) {
+            cache.values.forEach { if (it.markRecycled()) recycleImageBitmap(it.bitmap) }
+            cache.clear()
+            currentMemoryBytes.set(0)
 
-        candidatePool.values.forEach { (state, _) ->
-            if (state.markRecycled()) recycleImageBitmap(state.bitmap)
+            val candValues = candidatePool.values.toList()
+            candidatePool.clear()
+            candidateMemoryBytes.set(0)
+            candValues.forEach { entry ->
+                if (entry.state.markRecycled()) recycleImageBitmap(entry.state.bitmap)
+            }
+
+            lruList.clear()
         }
-        candidatePool.clear()
-        candidateMemoryBytes = 0L
     }
 
-    public fun size(): Int = synchronized(this) { cache.size }
+    public fun size(): Int = cache.size
 
-    private fun cleanCandidatePool() {
+    private fun cleanCandidatePool(toRecycle: MutableList<Bitmap>) {
         val now = System.currentTimeMillis()
-        val iterator = candidatePool.iterator()
+        val iterator = candidatePool.entries.iterator()
         while (iterator.hasNext()) {
             val entry = iterator.next()
-            val (state, timestamp) = entry.value
-            if (now - timestamp > CANDIDATE_TIMEOUT) {
-                if (state.markRecycled()) {
-                    recycleImageBitmap(state.bitmap)
-                    candidateMemoryBytes -= state.byteSize
+            val candidate = entry.value
+            if (now - candidate.timestamp > CANDIDATE_TIMEOUT) {
+                if (candidate.state.markRecycled()) {
+                    toRecycle.add(candidate.state.bitmap)
+                    candidateMemoryBytes.addAndGet(-candidate.state.byteSize)
                     iterator.remove()
                 }
             }

@@ -32,13 +32,13 @@ class DecoderAdapter(
         ): Pair<Int, Int> {
             var size = baseSize
             if (pageWidth > 100_000 || pageHeight > 100_000) {
-                size = 20
+                size = 60
             } else if (pageWidth > 30_000 || pageHeight > 30_000) {
-                size = 30
-            } else if (pageWidth > 20_000 || pageHeight > 20_000) {
-                size = 40
-            } else if (pageWidth > 10_000 || pageHeight > 10_000) {
                 size = 80
+            } else if (pageWidth > 20_000 || pageHeight > 20_000) {
+                size = 120
+            } else if (pageWidth > 10_000 || pageHeight > 10_000) {
+                size = 180
             }
             val aspectRatio = pageWidth.toFloat() / pageHeight.toFloat()
             return when {
