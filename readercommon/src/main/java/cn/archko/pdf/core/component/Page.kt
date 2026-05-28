@@ -38,7 +38,6 @@ class Page(
 
     private var thumbBitmapState: BitmapState? = null
     private var thumbDecoding = false
-    private var thumbJob: Future<*>? = null
     private var aspectRatio = 0f
 
     // 缓存的cacheKey，只在viewSize有值时计算一次
@@ -60,8 +59,6 @@ class Page(
         thumbBitmapState?.let { ImageCache.releasePage(it) }
         thumbBitmapState = null
         thumbDecoding = false
-        thumbJob?.cancel(true)
-        thumbJob = null
     }
 
     /**
@@ -817,7 +814,7 @@ class Page(
             visibleNodes.clear()
             val node = pageViewState.nodePool.acquire(pageViewState, RectF(0f, 0f, 1f, 1f), aPage)
             visibleNodes[0] = node  // key=0 表示 (0,0)
-            node.decode(currentWidth, currentHeight, pageViewState.vZoom)
+            //node.decode(currentWidth, currentHeight, pageViewState.vZoom)
             return
         }
 
@@ -859,7 +856,7 @@ class Page(
         }
 
         // 移除不在范围内的 nodes，同时触发保留节点的解码
-        val iterator = visibleNodes.iterator()
+        /*val iterator = visibleNodes.iterator()
         while (iterator.hasNext()) {
             val entry = iterator.next()
             val key = entry.key
@@ -871,7 +868,7 @@ class Page(
             } else {
                 entry.value.decode(currentWidth, currentHeight, pageViewState.vZoom)
             }
-        }
+        }*/
     }
 
     /**
@@ -915,18 +912,18 @@ class Page(
     companion object {
         // 核心约束：仅保留最小块、最大块，取消基础块
         const val MIN_BLOCK: Float = 256f
-        const val MAX_BLOCK: Float = 256f * 2f
+        const val MAX_BLOCK: Float = 256f * 3f
 
         // 单轴块数计算：优先1块，仅超出MAX_BLOCK才分块（延迟重建核心）
         private fun calcAxisBlocks(length: Float): Int {
             if (length <= 0) return 1
 
-            // 核心规则：只要长度 ≤ 最大块1536，就用1块（不管最小块512）
+            // 核心规则：只要长度 ≤ 最大块，就用1块（不管最小块）
             if (length <= MAX_BLOCK) {
                 return 1
             }
 
-            // 长度 > 最大块1536 → 按1536分块，保证实际块大小 ≥ 512
+            // 长度 > 最大块 → 按最大块分块，保证实际块大小 ≥ 最小块
             var blocks = ceil(length / MAX_BLOCK).toInt()
             val actualBlockSize = length / blocks
 

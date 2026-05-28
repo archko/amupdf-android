@@ -174,9 +174,9 @@ class PageNode(
         }
 
         // 4. 无论是否绘制，都尝试解码（预加载区域内）
-        //if (bitmapState == null && !isDecoding) {
-        //    decode(pageWidth, pageHeight, pageViewState.vZoom)
-        //}
+        if (bitmapState == null && !isDecoding) {
+            decode(pageWidth, pageHeight, pageViewState.vZoom)
+        }
     }
 
     fun decode(pageWidth: Float, pageHeight: Float, vZoom: Float) {
@@ -230,7 +230,7 @@ class PageNode(
             bounds.right * pageWidth + left,
             bounds.bottom * pageHeight + top
         )
-        //println("[PageNode].decode:$pageWidth-$pageHeight, left:$left, $scale, width:$width, $srcRect, bounds:$bounds, $aPage")
+        //println("[PageNode.decode].w-h:$pageWidth-$pageHeight, left:$left, $scale, width:$width, $srcRect, $aPage")
         val outWidth = ((srcRect.right - srcRect.left)).toInt()
         val outHeight = ((srcRect.bottom - srcRect.top)).toInt()
 
