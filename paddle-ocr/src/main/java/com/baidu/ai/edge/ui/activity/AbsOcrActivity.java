@@ -68,8 +68,6 @@ public abstract class AbsOcrActivity extends BaseActivity {
 
     private String name;
 
-    public abstract void onActivityCreate();
-
     public abstract void onActivityDestory();
 
     public abstract void onOcrBitmap(Bitmap bitmap, float confidence, ResultListener.OcrListener listener);
@@ -81,10 +79,9 @@ public abstract class AbsOcrActivity extends BaseActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         name = getIntent().getStringExtra("name");
         //model = getIntent().getIntExtra("model_type", MODEL_DETECT);
-
+        super.onCreate(savedInstanceState);  // 触发权限检查，权限完成后调用 onPermissionsGranted()
         init();
     }
 
@@ -93,7 +90,6 @@ public abstract class AbsOcrActivity extends BaseActivity {
 
         setContentView(R.layout.result_page);
         resultImage = findViewById(R.id.result_image);
-        //mResultPageView = findViewById(R.id.result_page);
 
         resultMaskView = findViewById(R.id.result_mask);
 
@@ -108,14 +104,12 @@ public abstract class AbsOcrActivity extends BaseActivity {
 
         resultMaskView = findViewById(R.id.result_mask);
 
-        //((TextView) findViewById(R.id.model_name)).setText(name);
         findViewById(R.id.back).setOnClickListener(v -> finish());
         findViewById(R.id.save).setOnClickListener(v -> save(adapter.getData()));
         findViewById(R.id.copy).setOnClickListener(v -> copy(adapter.getData()));
 
         addListener();
         updateRealtimeResultPopViewGroup();
-        onActivityCreate();
     }
 
     public void save(List<BaseResultModel> models) {

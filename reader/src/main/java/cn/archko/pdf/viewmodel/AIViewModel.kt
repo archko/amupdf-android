@@ -2,6 +2,7 @@ package cn.archko.pdf.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cn.archko.pdf.core.App.Companion.instance
 import cn.archko.pdf.core.common.AKDatabase
 import cn.archko.pdf.core.common.Graph
 import cn.archko.pdf.core.entity.AIPageConversation
@@ -34,6 +35,35 @@ class AIViewModel : ViewModel() {
 
     init {
         initializeDefaultProviders()
+        initializeAIService()
+    }
+
+    /**
+     * 获取 AI 提示语配置（用于国际化）
+     */
+    fun getAIPromptConfig(): AIService.AIPromptConfig {
+        val ctx = instance ?: throw IllegalStateException("Application not initialized")
+        return AIService.AIPromptConfig(
+            systemPrompt = ctx.getString(cn.archko.pdf.R.string.ai_system_prompt),
+            userPromptFormat = ctx.getString(cn.archko.pdf.R.string.ai_user_prompt_format),
+            unsupportedProvider = ctx.getString(cn.archko.pdf.R.string.ai_unsupported_provider),
+            apiRequestFailed = ctx.getString(cn.archko.pdf.R.string.ai_api_request_failed),
+            apiEmptyResponse = ctx.getString(cn.archko.pdf.R.string.ai_api_empty_response),
+            emptyResponse = ctx.getString(cn.archko.pdf.R.string.ai_empty_response),
+            apiCallFailed = ctx.getString(cn.archko.pdf.R.string.ai_api_call_failed)
+        )
+    }
+
+    /**
+     * 初始化 AI 服务配置（用于国际化）
+     */
+    private fun initializeAIService() {
+        try {
+            val config = getAIPromptConfig()
+            aiService.setPromptConfig(config)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     /**
@@ -42,41 +72,87 @@ class AIViewModel : ViewModel() {
     fun initializeDefaultProviders() {
         viewModelScope.launch {
             val existing = database.aiProviderDao().getAllProviders()
-            if (existing.isEmpty()) {
-                val defaults = listOf(
-                    AIProvider(
-                        id = "deepseek",
-                        name = "DeepSeek",
-                        apiKey = "",
-                        baseUrl = "https://api.deepseek.com",
-                        model = "deepseek-chat",
-                        maxTokens = 4000,
-                        temperature = 0.7f,
-                        isDefault = true
-                    ),
-                    AIProvider(
-                        id = "qwen",
-                        name = "通义千问",
-                        apiKey = "",
-                        baseUrl = "https://dashscope.aliyuncs.com",
-                        model = "qwen-turbo",
-                        maxTokens = 4000,
-                        temperature = 0.7f,
-                        isDefault = false
-                    ),
-                    AIProvider(
-                        id = "glm",
-                        name = "智谱清言",
-                        apiKey = "",
-                        baseUrl = "https://open.bigmodel.cn",
-                        model = "glm-4-flash",
-                        maxTokens = 4000,
-                        temperature = 0.7f,
-                        isDefault = false
-                    )
+            val existingIds = existing.map { it.id }.toSet()
+
+            // 所有默认提供商配置
+            val allDefaults = listOf(
+                // 国内提供商
+                AIProvider(
+                    id = "deepseek",
+                    name = "DeepSeek",
+                    apiKey = "",
+                    baseUrl = "https://api.deepseek.com",
+                    model = "deepseek-v4-flash",
+                    maxTokens = 100000,
+                    temperature = 0.7f,
+                    isDefault = false
+                ),
+                AIProvider(
+                    id = "qwen",
+                    name = "通义千问",
+                    apiKey = "",
+                    baseUrl = "https://dashscope.aliyuncs.com",
+                    model = "qwen-turbo",
+                    maxTokens = 100000,
+                    temperature = 0.7f,
+                    isDefault = false
+                ),
+                AIProvider(
+                    id = "glm",
+                    name = "智谱清言",
+                    apiKey = "",
+                    baseUrl = "https://open.bigmodel.cn",
+                    model = "glm-4-flash",
+                    maxTokens = 100000,
+                    temperature = 0.7f,
+                    isDefault = false
+                ),
+                // 国外提供商
+                AIProvider(
+                    id = "openai",
+                    name = "OpenAI GPT",
+                    apiKey = "",
+                    baseUrl = "https://api.openai.com",
+                    model = "gpt-4o-mini",
+                    maxTokens = 100000,
+                    temperature = 0.7f,
+                    isDefault = false
+                ),
+                AIProvider(
+                    id = "gemini",
+                    name = "Google Gemini",
+                    apiKey = "",
+                    baseUrl = "https://generativelanguage.googleapis.com",
+                    model = "gemini-2.0-flash",
+                    maxTokens = 100000,
+                    temperature = 0.7f,
+                    isDefault = false
                 )
-                database.aiProviderDao().insertAllProviders(defaults)
+            )
+
+            // 1. 插入缺失的提供商
+            val toInsert = allDefaults.filter { it.id !in existingIds }
+            if (toInsert.isNotEmpty()) {
+                database.aiProviderDao().insertAllProviders(toInsert)
             }
+
+            // 2. 更新已有提供商的配置（保留用户配置的 apiKey）
+            existing.forEach { provider ->
+                val defaultProvider = allDefaults.find { it.id == provider.id }
+                if (defaultProvider != null) {
+                    // 只更新基础配置，保留用户的 apiKey
+                    val updated = provider.apply {
+                        name = defaultProvider.name
+                        baseUrl = defaultProvider.baseUrl
+                        model = defaultProvider.model
+                        maxTokens = defaultProvider.maxTokens
+                        temperature = defaultProvider.temperature
+                        updatedAt = System.currentTimeMillis()
+                    }
+                    database.aiProviderDao().updateProvider(updated)
+                }
+            }
+
             loadProviders()
         }
     }

@@ -27,30 +27,7 @@ public class AlbumViewerActivity extends BaseViewerActivity {
     public void loadDocument(String path, boolean crop) {
         boolean autoCrop = false;
         if (TextUtils.isEmpty(path)) {
-            String dir = getIntent().getStringExtra("dir");
-            if (TextUtils.isEmpty(dir)) {
-
-            } else {
-                AppExecutors.Companion.getInstance().diskIO().execute(() -> {
-                    CodecDocument document = AlbumDocument.openDocument(dir);
-                    AppExecutors.Companion.getInstance().mainThread().execute(() -> {
-                        if (null == document) {
-                            Toast.makeText(this, "Open Failed", Toast.LENGTH_LONG).show();
-                            finish();
-                            return;
-                        }
-                        if (document.getPageCount() == 0) {
-                            Toast.makeText(this, "no images", Toast.LENGTH_LONG).show();
-                            finish();
-                            return;
-                        }
-
-                        isDocLoaded = true;
-                        documentView.showDocument(autoCrop);
-                        seekbarControls.update(decodeService.getPageCount(), 0);
-                    });
-                });
-            }
+            finish();
 
             return;
         }

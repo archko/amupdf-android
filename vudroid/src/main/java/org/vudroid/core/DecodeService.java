@@ -7,7 +7,6 @@ import android.view.View;
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
 import org.vudroid.core.codec.OutlineLink;
-import org.vudroid.core.codec.PageTextBox;
 
 import java.util.List;
 
@@ -81,9 +80,5 @@ public interface DecodeService {
         void decodeComplete(Bitmap bitmap, boolean isThumb, Object args);
 
         boolean shouldRender(int pageNumber, boolean isFullPage);
-    }
-
-    interface SearchCallback {
-        void result(List<PageTextBox> result, int index);
     }
 }

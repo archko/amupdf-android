@@ -66,14 +66,12 @@ public class OcrActivity extends AbsOcrActivity {
 
     private boolean isInitializing = false;
 
-    // 模型加载状态
-    private boolean modelLoadStatus = false;
     private String mPath;
     private Bitmap bitmap;
     private String name = "ocr";
 
     @Override
-    public void onActivityCreate() {
+    public void onPermissionsGranted() {
         parseIntent();
         ChipConfig chipConfig = new ChipConfig(this);
         if (chipConfig.checkChip()) {
@@ -101,8 +99,8 @@ public class OcrActivity extends AbsOcrActivity {
             case "arm-gpu":
                 platform = Consts.TYPE_ARM_GPU;
                 break;
-            default:
             case "arm":
+            default:
                 platform = Consts.TYPE_INFER;
         }
     }
@@ -210,7 +208,6 @@ public class OcrActivity extends AbsOcrActivity {
     }
 
     private void initManager() {
-        //serialNum = getIntent().getStringExtra("serial_num");
         serialNum = ChipConfig.SERIAL_NUM;
 
         float threshold = BaseConfig.DEFAULT_THRESHOLD;
@@ -245,9 +242,9 @@ public class OcrActivity extends AbsOcrActivity {
             String filePath = dir.getAbsolutePath() + File.separator + name + ".txt";
             try {
                 StreamUtils.copyStringToFile(sb.toString(), filePath);
-                Toast.makeText(this, "保存成功:" + filePath, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Save to:" + filePath, Toast.LENGTH_LONG).show();
             } catch (IOException e) {
-                Toast.makeText(this, "保存失败:" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Failed :" + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }

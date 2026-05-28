@@ -258,4 +258,15 @@
     <string name="selected_text">Selected text</string>
     <string name="copy_to_clipboard">Copy to clipboard</string>
 
+    <!-- AI System Prompt -->
+    <string name="ai_system_prompt">You are a professional document reading assistant. Users will provide the content of document pages and ask questions based on that content. Please answer questions accurately based on the page content.</string>
+    <string name="ai_user_prompt_format">Page content:\n%1$s\n\nQuestion: %2$s</string>
+
+    <!-- AI Error Messages -->
+    <string name="ai_unsupported_provider">Unsupported AI provider: %s</string>
+    <string name="ai_api_request_failed">API request failed: %d %s</string>
+    <string name="ai_api_empty_response">API returned empty response body</string>
+    <string name="ai_empty_response">AI returned empty response</string>
+    <string name="ai_api_call_failed">API call failed: %s</string>
+
 </resources>
