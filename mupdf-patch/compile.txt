@@ -1,0 +1,18 @@
+compile:
+cd libmupdf
+->make -C libmupdf generate
+->git pull
+->git submodule update
+->cd ..
+->./gradlew assembleRelease
+cp /Users/archko/Projects/PDF/mupdf-fiz/build/outputs/aar/mupdf-fiz-release.aar  /Users/archko/Projects/PDF/amupdf-android/solib/mupdf-android-fitz/libs/mupdf_c-release.aar
+
+git diff ./ > archko.patch
+
+现在只要在根目录运行
+./gradlew publishToMavenLocal
+桌面:
+make -C platform/java build=release JAVA_VM=/Users/archko/Developer/jdk-21.0.9.jdk/Contents/Home
+
+在根目录如果已经生成dylib,发布jar
+v=1.28.1 && g=com.artifex.mupdf && a=mupdf-fitz-java && j=libmupdf/build/java/release/libmupdf.jar && d=$HOME/.m2/repository/${g//.//}/$a/$v && mkdir -p "$d" && cp "$j" "$d/$a-$v.jar" && cat > "$d/$a-$v.pom" <<<"<project><modelVersion>4.0.0</modelVersion><groupId>$g</groupId><artifactId>$a</artifactId><version>$v</version><packaging>jar</packaging></project>" && echo "Published: $d"
