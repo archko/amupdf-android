@@ -90,7 +90,6 @@ public abstract class AbsOcrActivity extends BaseActivity {
 
         setContentView(R.layout.result_page);
         resultImage = findViewById(R.id.result_image);
-        //mResultPageView = findViewById(R.id.result_page);
 
         resultMaskView = findViewById(R.id.result_mask);
 
@@ -105,14 +104,12 @@ public abstract class AbsOcrActivity extends BaseActivity {
 
         resultMaskView = findViewById(R.id.result_mask);
 
-        //((TextView) findViewById(R.id.model_name)).setText(name);
         findViewById(R.id.back).setOnClickListener(v -> finish());
         findViewById(R.id.save).setOnClickListener(v -> save(adapter.getData()));
         findViewById(R.id.copy).setOnClickListener(v -> copy(adapter.getData()));
 
         addListener();
         updateRealtimeResultPopViewGroup();
-        // onActivityCreate() 移到了 onPermissionsGranted() 中调用，等待权限完成
     }
 
     public void save(List<BaseResultModel> models) {
