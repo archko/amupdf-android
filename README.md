@@ -1,3 +1,5 @@
+
+
 ### This is a pdf reader base on mupdf.
 it's not only a pdf reader, also a imageviewer
 
@@ -16,7 +18,7 @@ I want to create a simple PDF reader that supports smooth scrolling, displays hi
 * album viewer(view images continuously)
 * export pdf to image/html
 * create pdf from image/txt
-* webdave store/restore reading histories
+* webdav store/restore reading histories
 * tiff, bigtiff
 
 ### native-lib
