@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -37,11 +39,6 @@ android {
         encoding = "UTF-8"
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
-        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
     }
 
     buildTypes {
@@ -87,17 +84,24 @@ android {
         resources.excludes.add("META-INF/*.kotlin_module")
         jniLibs.keepDebugSymbols += "*/armeabi-v7a/*.so"
         jniLibs.keepDebugSymbols += "*/arm64-v8a/*.so"
+        jniLibs.useLegacyPackaging = true
     }
 
-    android.applicationVariants.all {
-        val buildType = this.buildType.name
-        val variant = this
-        outputs.all {
-            if (this is com.android.build.gradle.internal.api.ApkVariantOutputImpl) {
-                //修改apk名称
-                this.outputFileName = "Dragon Viewer-${variant.versionName}.apk"
-            }
+}
+
+androidComponents {
+    onVariants { variant ->
+        variant.outputs.forEach { output ->
+            //修改apk名称
+            output.outputFileName.set("Dragon Viewer-${libs.versions.versionName.get()}.apk")
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+        freeCompilerArgs.add("-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi")
     }
 }
 
@@ -136,9 +140,6 @@ dependencies {
 
     implementation(project(":reader"))
     implementation(project(":paddle-ocr"))
-
-    // https://mvnrepository.com/artifact/com.github.axet/k2pdfopt
-    implementation(libs.k2pdfopt)
 
     // HTTP client for AI service
     implementation(libs.okhttp3)

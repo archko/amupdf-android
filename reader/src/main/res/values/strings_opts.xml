@@ -167,6 +167,7 @@
     <string name="menu_font_size">Font Size</string>
     <string name="menu_font_face">Font Face</string>
     <string name="menu_line_space">Line Space</string>
+    <string name="menu_word_space">Word Space</string>
     <string name="menu_font_color">Font Color</string>
     <string name="menu_font_bg">Background</string>
     <string name="menu_font_fg">Forground</string>

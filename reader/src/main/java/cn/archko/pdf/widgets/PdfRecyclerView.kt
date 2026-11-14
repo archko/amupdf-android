@@ -181,7 +181,6 @@ class PdfRecyclerView @JvmOverloads constructor(
         super.dispatchDraw(canvas)
 
         canvas.restore()
-        invalidate()
     }
 
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
@@ -199,6 +198,10 @@ class PdfRecyclerView @JvmOverloads constructor(
 
         override fun onScaleEnd(detector: ScaleGestureDetector) {
             super.onScaleEnd(detector)
+
+            if (!mIsZoomEnabled) {
+                return
+            }
 
             val adapter: Adapter<*> = adapter as Adapter<*>
             val lm = (layoutManager as LinearLayoutManager)

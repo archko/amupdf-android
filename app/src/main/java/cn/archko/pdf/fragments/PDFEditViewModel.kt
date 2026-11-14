@@ -10,7 +10,7 @@ import com.artifex.mupdf.fitz.Document
 import com.artifex.mupdf.fitz.Outline
 import com.artifex.mupdf.fitz.PDFDocument
 import com.artifex.mupdf.fitz.Page
-import com.github.axet.k2pdfopt.K2PdfOpt
+import com.archko.reader.k2pdfopt.K2PdfOpt
 
 class PDFEditViewModel : MupdfListener {
 

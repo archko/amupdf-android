@@ -9,7 +9,7 @@ import android.os.Message;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.github.axet.k2pdfopt.K2PdfOpt;
+import com.archko.reader.k2pdfopt.K2PdfOpt;
 
 import org.vudroid.core.DecodeService;
 import org.vudroid.core.DecodeTask;
@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
+import cn.archko.pdf.common.ReflowCache;
 import cn.archko.pdf.common.ReflowHelper;
 import cn.archko.pdf.core.cache.BitmapCache;
 import cn.archko.pdf.core.cache.BitmapPool;
@@ -66,6 +67,7 @@ public class DocDecodeService {
     private APageSizeLoader.PageSizeBean pageSizeBean;
 
     private K2PdfOpt k2PdfOpt = new K2PdfOpt();
+    private volatile ReflowCache reflowCache;
     private final Handler.Callback mCallback = new Handler.Callback() {
         public boolean handleMessage(Message msg) {
             int what = msg.what;
@@ -173,6 +175,7 @@ public class DocDecodeService {
         if (null == document) {
             return null;
         }
+        reflowCache = new ReflowCache(path);
         int count = document.getPageCount();
         APageSizeLoader.PageSizeBean psb = APageSizeLoader.INSTANCE.loadPageSizeFromFile(count, path);
         if (null != psb) {
@@ -247,7 +250,12 @@ public class DocDecodeService {
     }
 
     public void decodePage(String decodeKey, PageTreeNode node, boolean crop, int pageNumber, final DecodeService.DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds, int dpi, float fontSize) {
+        decodePage(decodeKey, node, crop, pageNumber, decodeCallback, zoom, pageSliceBounds, dpi, fontSize, -0.2f);
+    }
+
+    public void decodePage(String decodeKey, PageTreeNode node, boolean crop, int pageNumber, final DecodeService.DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds, int dpi, float fontSize, float wordSpacing) {
         final DecodeTask decodeTask = new DecodeTask(node, crop, pageNumber, decodeCallback, zoom, decodeKey, pageSliceBounds, dpi, fontSize);
+        decodeTask.wordSpacing = wordSpacing;
         Message message = Message.obtain();
         message.obj = decodeTask;
         message.what = MSG_DECODE_START;
@@ -268,6 +276,36 @@ public class DocDecodeService {
         if (isRecycled || isTaskDead(task)) {
             return;
         }
+
+        String reflowKey = null;
+        ReflowCache cache = reflowCache;
+        if (task.dpi > 0 && cache != null) {
+            reflowKey = cache.buildKey(
+                    task.pageNumber,
+                    getTargetWidth(),
+                    getTargetHeight(),
+                    task.dpi,
+                    task.zoom,
+                    task.fontSize,
+                    task.wordSpacing,
+                    task.crop,
+                    oriention,
+                    task.pageSliceBounds
+            );
+            List<Bitmap> cached = cache.load(reflowKey);
+            if (cached != null && !cached.isEmpty()) {
+                if (isTaskDead(task)) {
+                    for (Bitmap bmp : cached) {
+                        bmp.recycle();
+                    }
+                    return;
+                }
+                Log.d(TAG, String.format("performDecode.hit reflow cache:%s", task.pageNumber));
+                finishDecoding(task, null, cached);
+                return;
+            }
+        }
+
         CodecPage vuPage = getPage(task.pageNumber);
         preloadNextPage(task.pageNumber);
 
@@ -275,17 +313,18 @@ public class DocDecodeService {
             vuPage.loadPage(task.pageNumber);
         }
 
+        APage aPage = aPageList.get(task.pageNumber);
+
         Bitmap bitmap = BitmapCache.getInstance().getBitmap(task.decodeKey);
         if (null != bitmap) {
             Log.d("TAG", String.format("performDecode.hit cache:%s-%s", task.pageNumber, task.decodeKey));
-            k2pdfAndFinish(task, bitmap);
+            float sourceDpi = task.dpi * ReflowHelper.REFLOW_DPI_RATIO * task.zoom;
+            k2pdfAndFinish(task, bitmap, sourceDpi, reflowKey);
             return;
         }
         if (isTaskDead(task)) {
             return;
         }
-
-        APage aPage = aPageList.get(task.pageNumber);
 
         Rect cropBounds;
         if (task.crop) {
@@ -313,23 +352,29 @@ public class DocDecodeService {
             return;
         }
 
-        k2pdfAndFinish(task, bitmap);
+        k2pdfAndFinish(task, bitmap, task.dpi * ReflowHelper.REFLOW_DPI_RATIO * task.zoom, reflowKey);
     }
 
-    private void k2pdfAndFinish(DecodeTask task, Bitmap bitmap) {
+    private void k2pdfAndFinish(DecodeTask task, Bitmap bitmap, float sourceDpi, String reflowKey) {
         List<Bitmap> bitmaps = null;
-        if (task.dpi > 0) {
+        if (task.dpi > 0 && bitmap != null) {
             bitmaps = ReflowHelper.INSTANCE.k2pdf2bitmap(
                     k2PdfOpt,
                     task.fontSize,
                     bitmap,
                     getTargetWidth(),
                     getTargetHeight(),
-                    task.dpi
+                    task.dpi,
+                    sourceDpi,
+                    task.wordSpacing
             );
         }
 
         finishDecoding(task, bitmap, bitmaps);
+        ReflowCache cache = reflowCache;
+        if (bitmaps != null && !bitmaps.isEmpty() && cache != null && reflowKey != null) {
+            cache.save(reflowKey, bitmaps);
+        }
     }
 
     Rect getScaledSize(final DecodeTask task, final APage vuPage, float scale, boolean crop) {
@@ -463,6 +508,7 @@ public class DocDecodeService {
             if (null != document) {
                 document.recycle();
             }
+            reflowCache = null;
             if (null != codecContext) {
                 codecContext.recycle();
             }

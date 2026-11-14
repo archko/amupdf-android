@@ -131,13 +131,20 @@ class ReflowDialog(
             val bitmap =
                 ReflowHelper.loadBitmapByPage(pdfEditViewModel.mupdfDocument, width, page)
             if (null != bitmap) {
+                val sourceDpi = if (screenWidth > 0) {
+                    dm.densityDpi * ReflowHelper.REFLOW_DPI_RATIO * width / screenWidth
+                } else {
+                    dm.densityDpi * ReflowHelper.REFLOW_DPI_RATIO
+                }
                 val bitmaps: MutableList<Bitmap> = ReflowHelper.k2pdf2bitmap(
                     pdfEditViewModel.opt,
                     fontSize,
                     bitmap,
                     screenWidth,
                     screenHeight,
-                    dm.densityDpi
+                    dm.densityDpi,
+                    sourceDpi,
+                    -0.2f
                 )
                 withContext(Dispatchers.Main) {
                     imageAdapter.bitmaps = bitmaps

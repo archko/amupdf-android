@@ -39,7 +39,7 @@ vectordrawable = "1.2.0"
 swiperefreshlayout = "1.2.0-beta01"
 recyclerview = "1.4.0"
 sardine = "0.9"
-k2pdfopt = "0.2.0"
+k2pdfopt = "0.3.0"
 juniversalchardet = "2.5.0"
 
 versionCode = "485"

@@ -44,6 +44,7 @@ import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.widgets.PdfRecyclerView
 import com.google.android.material.slider.Slider
 import com.tencent.mmkv.MMKV
+import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import org.vudroid.core.DecodeService
 import org.vudroid.core.DecodeServiceBase
@@ -74,7 +75,7 @@ class AScanReflowViewController(
     private lateinit var mPageSizes: List<APage>
     protected var mStyleControls: View? = null
     private var fontSlider: Slider? = null
-    private var scaleSlider: Slider? = null
+    private var wordSpacingSlider: Slider? = null
 
     private fun getFontSize(): Float {
         val mmkv = MMKV.mmkvWithID("scan")
@@ -87,32 +88,35 @@ class AScanReflowViewController(
         mmkv.encode("font", size)
     }
 
-    private fun getPageScale(): Float {
+    private fun getWordSpacing(): Float {
         val mmkv = MMKV.mmkvWithID("scan")
-        return mmkv.decodeFloat("scale", 1.5f)
+        return mmkv.decodeFloat("word_space", 0.2f)
     }
 
-    private fun setPageScale(size: Float) {
+    private fun setWordSpacing(size: Float) {
         val mmkv = MMKV.mmkvWithID("scan")
-        Logcat.d("scale:$size")
-        mmkv.encode("scale", size)
+        Logcat.d("word_space:$size")
+        mmkv.encode("word_space", size)
     }
 
     private fun initStyleControls() {
         pageController?.hide()
         if (null == mStyleControls) {
             mStyleControls = LayoutInflater.from(context).inflate(R.layout.scan_style, null, false)
+            wordSpacingSlider = mStyleControls!!.findViewById(R.id.word_spacing_slider)
+            wordSpacingSlider?.apply {
+                valueFrom = 0.05f
+                valueTo = 0.8f
+                stepSize = 0.05f
+                value = (Math.round(getWordSpacing() * 20f) / 20f).coerceIn(0.05f, 0.8f)
+            }
             fontSlider = mStyleControls!!.findViewById(R.id.font_slider)
             fontSlider?.apply {
                 valueFrom = 0.5f
                 valueTo = 2.4f
-                value = getFontSize()
-            }
-            scaleSlider = mStyleControls!!.findViewById(R.id.scale_slider)
-            scaleSlider?.apply {
-                valueFrom = 1.0f
-                valueTo = 2.5f
-                value = getPageScale()
+                value = getFontSize().let {
+                    (Math.round(it * 10f) / 10f).coerceIn(0.5f, 2.4f)
+                }
             }
 
             val lp = RelativeLayout.LayoutParams(
@@ -130,23 +134,25 @@ class AScanReflowViewController(
                 applyFontSize(slider.value)
             }
         })
-        scaleSlider?.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+        wordSpacingSlider?.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
             override fun onStartTrackingTouch(slider: Slider) {
             }
 
             override fun onStopTrackingTouch(slider: Slider) {
-                applyPageScale(slider.value)
+                applyWordSpacing(slider.value)
             }
         })
     }
 
     private fun applyFontSize(old: Float) {
         setFontSize(old)
+        widthHeightMap.clear()
         notifyDataSetChanged()
     }
 
-    private fun applyPageScale(old: Float) {
-        setPageScale(old)
+    private fun applyWordSpacing(old: Float) {
+        setWordSpacing(old)
+        widthHeightMap.clear()
         notifyDataSetChanged()
     }
 
@@ -202,6 +208,7 @@ class AScanReflowViewController(
 
         val gestureDetector = GestureDetector(context, MySimpleOnGestureListener())
         mRecyclerView = PdfRecyclerView(context)
+        mRecyclerView.setZoomEnabled(false)
 
         val iView = object : IView {
             override fun getWidth(): Int {
@@ -328,7 +335,7 @@ class AScanReflowViewController(
 
             override fun onViewRecycled(holder: ReflowViewHolder) {
                 super.onViewRecycled(holder)
-                holder.recycleViews(reflowCache)
+                holder.onRecycled(reflowCache)
             }
         }
         mRecyclerView.adapter = pdfAdapter
@@ -375,7 +382,7 @@ class AScanReflowViewController(
 
     override fun getCurrentBitmap(): Bitmap? {
         val bitmap = BitmapCache.getInstance()
-            .getBitmap(generateCacheKey(getCurrentPos(), viewWidth, viewHeight, crop))
+            .getBitmap(generateCacheKey(getCurrentPos(), viewWidth, viewHeight, crop, RENDER_SCALE))
         return bitmap
     }
 
@@ -622,10 +629,28 @@ class AScanReflowViewController(
 
     companion object {
         const val TAG = "ScanReflow"
+        const val RENDER_SCALE = 1.8f
 
-        private fun generateCacheKey(index: Int, w: Int, h: Int, crop: Boolean): String {
-            return String.format("%s-%s-%s-%s", index, w, h, crop)
+        private fun generateCacheKey(
+            index: Int,
+            w: Int,
+            h: Int,
+            crop: Boolean,
+            scale: Float
+        ): String {
+            return String.format(Locale.US, "%s-%s-%s-%s-%.2f", index, w, h, crop, scale)
         }
+    }
+
+    private fun heightKey(index: Int): String {
+        return String.format(
+            Locale.US,
+            "%d-%d-%.2f-%.2f",
+            index,
+            viewWidth,
+            getFontSize(),
+            getWordSpacing()
+        )
     }
 
     inner class ReflowViewHolder(private var pageView: ReflowView) :
@@ -633,36 +658,46 @@ class AScanReflowViewController(
 
         private var index: Int = 0
 
-        private fun updateImage(args: Any?, reflowViewCache: ReflowViewCache?) {
+        @Volatile
+        private var bindSeq: Int = 0
+
+        private var decodeKey: String? = null
+
+        private fun updateImage(
+            args: Any?,
+            reflowViewCache: ReflowViewCache?,
+            expectedIndex: Int,
+            expectedSeq: Int
+        ) {
+            if (expectedSeq != bindSeq || expectedIndex != index) {
+                Logcat.d(TAG, "updateImage.stale:$expectedIndex, $index, $expectedSeq, $bindSeq")
+                return
+            }
             if (args is Array<*>) {
-                val bitmaps = args[0] as List<Bitmap>
-                val pageNumber = args[1]
+                val bitmaps = args[0] as? List<*> ?: return
+                val pageNumber = args[1] as? Int ?: return
                 if (pageNumber != index) {
                     Logcat.d(TAG, "updateImage.not same page:$pageNumber, $index")
                     return
                 }
+                if (bitmaps.isEmpty()) {
+                    Logcat.d(TAG, "updateImage.empty:$index")
+                    return
+                }
+                recycleViews(reflowViewCache)
                 var allHeight = 0
                 for (bitmap in bitmaps) {
-                    allHeight += pageView.addImageView(
-                        bitmap,
-                        viewWidth,
-                        reflowViewCache,
-                        filter
-                    )
+                    if (bitmap is Bitmap) {
+                        allHeight += pageView.addImageView(
+                            bitmap,
+                            viewWidth,
+                            reflowViewCache,
+                            filter
+                        )
+                    }
                 }
-                widthHeightMap["$index-$viewWidth"] = allHeight
-                var lp = pageView.layoutParams as ARecyclerView.LayoutParams?
-                if (null == lp) {
-                    lp = ARecyclerView.LayoutParams(
-                        ARecyclerView.LayoutParams.MATCH_PARENT,
-                        allHeight
-                    )
-                    pageView.layoutParams = lp
-                } else {
-                    lp.width = ARecyclerView.LayoutParams.MATCH_PARENT
-                    lp.height = allHeight
-                    pageView.layoutParams = lp
-                }
+                widthHeightMap[heightKey(index)] = allHeight
+                setItemHeight(allHeight)
             }
         }
 
@@ -671,54 +706,72 @@ class AScanReflowViewController(
             index: Int,
             reflowViewCache: ReflowViewCache?
         ) {
-            val height: Int? = widthHeightMap["$index-$viewWidth"]
-            if (height != null) {
-                var lp = pageView.layoutParams as ARecyclerView.LayoutParams?
-                if (null == lp) {
-                    lp = ARecyclerView.LayoutParams(ARecyclerView.LayoutParams.MATCH_PARENT, height)
-                    pageView.layoutParams = lp
-                } else {
-                    lp.width = ARecyclerView.LayoutParams.MATCH_PARENT
-                    lp.height = height
-                    pageView.layoutParams = lp
-                }
+            val height: Int? = widthHeightMap[heightKey(index)]
+            val pageChanged = this.index != index
+            bindSeq++
+            val seq = bindSeq
+            this.index = index
+            if (pageChanged || height == null) {
+                recycleViews(reflowViewCache)
             }
+            setItemHeight(height ?: viewHeight)
 
             val callback = object : DecodeService.DecodeCallback {
                 override fun decodeComplete(bitmap: Bitmap?, param: Boolean, args: Any?) {
                     instance.mainThread().execute {
-                        updateImage(args, reflowViewCache)
+                        updateImage(args, reflowViewCache, index, seq)
                     }
                 }
 
                 override fun shouldRender(index: Int, param: Boolean): Boolean {
-                    return this@ReflowViewHolder.index == index
+                    return this@ReflowViewHolder.index == index && seq == bindSeq
                 }
             }
 
-            this.index = index
-            val key = generateCacheKey(index, viewWidth, viewHeight, crop)
+            val scale = RENDER_SCALE
+            val key = generateCacheKey(index, viewWidth, viewHeight, crop, scale)
+            decodeKey = key
             decodeService?.decodePage(
                 key,
                 null,
                 false,
                 index,
                 callback,
-                getPageScale(),
+                scale,
                 RectF(0f, 0f, 1f, 1f),
                 dpi,
-                getFontSize()
+                getFontSize(),
+                -getWordSpacing()
             )
         }
 
-        fun recycleViews(reflowViewCache: ReflowViewCache?) {
-            if (null != reflowViewCache) {
-                for (i in 0 until pageView.childCount) {
-                    val child = pageView.getChildAt(i)
-                    reflowViewCache.addImageView((child as ImageView))
-                }
-                pageView.removeAllViews()
+        fun onRecycled(reflowViewCache: ReflowViewCache?) {
+            bindSeq++
+            decodeKey?.let { decodeService?.stopDecoding(it) }
+            decodeKey = null
+            recycleViews(reflowViewCache)
+        }
+
+        private fun setItemHeight(height: Int) {
+            var lp = pageView.layoutParams as ARecyclerView.LayoutParams?
+            if (null == lp) {
+                lp = ARecyclerView.LayoutParams(ARecyclerView.LayoutParams.MATCH_PARENT, height)
+                pageView.layoutParams = lp
+            } else {
+                lp.width = ARecyclerView.LayoutParams.MATCH_PARENT
+                lp.height = height
+                pageView.layoutParams = lp
             }
+        }
+
+        fun recycleViews(reflowViewCache: ReflowViewCache?) {
+            for (i in 0 until pageView.childCount) {
+                val child = pageView.getChildAt(i)
+                if (child is ImageView) {
+                    reflowViewCache?.addImageView(child)
+                }
+            }
+            pageView.removeAllViews()
         }
     }
 
@@ -746,8 +799,8 @@ class AScanReflowViewController(
                 imageView.adjustViewBounds = true
                 imageView.scaleType = ImageView.ScaleType.FIT_CENTER
             }
-            val ratio = 1f * width / bitmap.width
             val rw = width - leftPadding - rightPadding
+            val ratio = 1f * rw / bitmap.width
             val height = (bitmap.height * ratio).toInt()
             //Logcat.d(TAG, String.format("w-h:%s-%s,%s", rw, height, ratio))
             val lp = LayoutParams(rw, height)
