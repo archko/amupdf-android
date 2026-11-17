@@ -29,7 +29,7 @@ class ReflowCache(private val documentPath: String) {
 
     companion object {
         private const val MAGIC = 0x4b325246
-        private const val CACHE_VERSION = 2
+        private const val CACHE_VERSION = 3
         private const val MAX_SIZE_BYTES = 256L * 1024 * 1024
         private const val TILE_FORMAT_PNG = 1
         private const val TILE_FORMAT_WEBP = 2
@@ -82,7 +82,7 @@ class ReflowCache(private val documentPath: String) {
         targetWidth: Int,
         targetHeight: Int,
         densityDpi: Int,
-        renderScale: Float,
+        renderDpi: Float,
         fontSize: Float,
         wordSpacing: Float,
         crop: Boolean,
@@ -91,18 +91,17 @@ class ReflowCache(private val documentPath: String) {
     ): String {
         val source = String.format(
             Locale.US,
-            "%d|%d|%d|%d|%d|%.3f|%.3f|%.3f|%s|%d|%.3f|%s",
+            "%d|%d|%d|%d|%d|%.2f|%.3f|%.3f|%s|%d|%s",
             CACHE_VERSION,
             pageNumber,
             targetWidth,
             targetHeight,
             densityDpi,
-            renderScale,
+            renderDpi,
             fontSize,
             wordSpacing,
             crop,
             orientation,
-            ReflowHelper.REFLOW_DPI_RATIO,
             pageSliceBounds?.toString() ?: ""
         )
         return String.format(Locale.US, "%d-%s", pageNumber, sha1(source).substring(0, 16))

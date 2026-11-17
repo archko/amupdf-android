@@ -359,7 +359,7 @@ Java_com_archko_reader_k2pdfopt_K2PdfOpt_load(JNIEnv *env, jobject thiz, jobject
 
     handle->kctx.src = src;
     handle->kctx.page_width = src.width;
-    handle->kctx.page_height = handle->dev_height;
+    handle->kctx.page_height = src.height;
     handle->kctx.bbox.x0 = 0.0f;
     handle->kctx.bbox.y0 = 0.0f;
     handle->kctx.bbox.x1 = (float) src.width;

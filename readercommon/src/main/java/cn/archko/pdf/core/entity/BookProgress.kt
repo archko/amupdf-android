@@ -122,6 +122,20 @@ class BookProgress : Serializable, Comparator<BookProgress> {
     @ColumnInfo(name = "scroll_orientation")
     var scrollOrientation = 1
 
+    /**
+     * 扫描版重排字号倍率,1.0为原始字号
+     */
+    @JvmField
+    @ColumnInfo(name = "reflow_font_size", defaultValue = "1.0")
+    var reflowFontSize = 1.0f
+
+    /**
+     * 扫描版重排字间距,0.3为默认值
+     */
+    @JvmField
+    @ColumnInfo(name = "reflow_word_spacing", defaultValue = "0.3")
+    var reflowWordSpacing = 0.3f
+
     constructor(path: String?) {
         index = 0
         this.path = path
@@ -169,6 +183,8 @@ class BookProgress : Serializable, Comparator<BookProgress> {
         isFavorited: Int,
         inRecent: Int,
         scrollOrientation: Int,
+        reflowFontSize: Float = 1.0f,
+        reflowWordSpacing: Float = 0.3f,
     ) {
         this._id = _id
         this.index = index
@@ -192,6 +208,8 @@ class BookProgress : Serializable, Comparator<BookProgress> {
         this.isFavorited = isFavorited
         this.inRecent = inRecent
         this.scrollOrientation = scrollOrientation
+        this.reflowFontSize = reflowFontSize
+        this.reflowWordSpacing = reflowWordSpacing
     }
 
     override fun toString(): String {
@@ -205,6 +223,8 @@ class BookProgress : Serializable, Comparator<BookProgress> {
                 ", progress=" + progress +
                 ", page=" + page +
                 ", scrollOrientation=" + scrollOrientation +
+                ", reflowFontSize=" + reflowFontSize +
+                ", reflowWordSpacing=" + reflowWordSpacing +
                 ", firstTimestampe=" + firstTimestampe +
                 ", lastTimestampe=" + lastTimestampe +
                 ", autoCrop=" + autoCrop +
@@ -258,6 +278,8 @@ class BookProgress : Serializable, Comparator<BookProgress> {
         if (isFavorited != other.isFavorited) return false
         if (inRecent != other.inRecent) return false
         if (scrollOrientation != other.scrollOrientation) return false
+        if (reflowFontSize != other.reflowFontSize) return false
+        if (reflowWordSpacing != other.reflowWordSpacing) return false
 
         return true
     }
@@ -285,6 +307,8 @@ class BookProgress : Serializable, Comparator<BookProgress> {
         result = 31 * result + isFavorited
         result = 31 * result + inRecent
         result = 31 * result + scrollOrientation
+        result = 31 * result + reflowFontSize.hashCode()
+        result = 31 * result + reflowWordSpacing.hashCode()
         return result
     }
 

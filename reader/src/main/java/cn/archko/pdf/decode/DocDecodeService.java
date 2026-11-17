@@ -279,13 +279,17 @@ public class DocDecodeService {
 
         String reflowKey = null;
         ReflowCache cache = reflowCache;
+        APage aPage = aPageList.get(task.pageNumber);
+        float pageWidthPts = aPage.getWidth(task.crop);
+        float pageHeightPts = aPage.getHeight(task.crop);
+        float renderDpi = ReflowHelper.renderDpiForPage(pageWidthPts, pageHeightPts);
         if (task.dpi > 0 && cache != null) {
             reflowKey = cache.buildKey(
                     task.pageNumber,
                     getTargetWidth(),
                     getTargetHeight(),
                     task.dpi,
-                    task.zoom,
+                    renderDpi,
                     task.fontSize,
                     task.wordSpacing,
                     task.crop,
@@ -313,12 +317,15 @@ public class DocDecodeService {
             vuPage.loadPage(task.pageNumber);
         }
 
-        APage aPage = aPageList.get(task.pageNumber);
-
         Bitmap bitmap = BitmapCache.getInstance().getBitmap(task.decodeKey);
         if (null != bitmap) {
             Log.d("TAG", String.format("performDecode.hit cache:%s-%s", task.pageNumber, task.decodeKey));
-            float sourceDpi = task.dpi * ReflowHelper.REFLOW_DPI_RATIO * task.zoom;
+            float sourceDpi = ReflowHelper.sourceDpiForBitmap(
+                    bitmap.getWidth(),
+                    aPage.getWidth(task.crop) * task.pageSliceBounds.width());
+            if (sourceDpi <= 0f) {
+                sourceDpi = renderDpi;
+            }
             k2pdfAndFinish(task, bitmap, sourceDpi, reflowKey);
             return;
         }
@@ -335,7 +342,7 @@ public class DocDecodeService {
         }
 
         //scale需要在切边后计算,否则缩放值是不对
-        float scale = calculateScale(aPage, task.crop) * task.zoom;
+        float scale = renderDpi / 72f;
         Rect rect = getScaledSize(task, aPage, scale, task.crop);
         bitmap = vuPage.renderBitmap(
                 cropBounds,
@@ -352,7 +359,16 @@ public class DocDecodeService {
             return;
         }
 
-        k2pdfAndFinish(task, bitmap, task.dpi * ReflowHelper.REFLOW_DPI_RATIO * task.zoom, reflowKey);
+        float sourceDpi = renderDpi;
+        if (null != bitmap) {
+            float bitmapDpi = ReflowHelper.sourceDpiForBitmap(
+                    bitmap.getWidth(),
+                    aPage.getWidth(task.crop) * task.pageSliceBounds.width());
+            if (bitmapDpi > 0f) {
+                sourceDpi = bitmapDpi;
+            }
+        }
+        k2pdfAndFinish(task, bitmap, sourceDpi, reflowKey);
     }
 
     private void k2pdfAndFinish(DecodeTask task, Bitmap bitmap, float sourceDpi, String reflowKey) {

@@ -137,6 +137,25 @@ class DocViewModel : ViewModel() {
         bookProgress?.reflow = reflow
     }
 
+    fun storeReflowFontSize(size: Float) {
+        bookProgress?.reflowFontSize = size
+        saveReflowOptions()
+    }
+
+    fun storeReflowWordSpacing(spacing: Float) {
+        bookProgress?.reflowWordSpacing = spacing
+        saveReflowOptions()
+    }
+
+    private fun saveReflowOptions() {
+        val progress = bookProgress ?: return
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                addToDb(progress)
+            }
+        }
+    }
+
     fun checkCrop(): Boolean {
         if (null == bookProgress) {
             return PdfOptionRepository.getAutocrop()

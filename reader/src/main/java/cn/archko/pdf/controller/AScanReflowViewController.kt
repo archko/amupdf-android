@@ -43,7 +43,6 @@ import cn.archko.pdf.listeners.OutlineListener
 import cn.archko.pdf.viewmodel.DocViewModel
 import cn.archko.pdf.widgets.PdfRecyclerView
 import com.google.android.material.slider.Slider
-import com.tencent.mmkv.MMKV
 import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import org.vudroid.core.DecodeService
@@ -78,25 +77,21 @@ class AScanReflowViewController(
     private var wordSpacingSlider: Slider? = null
 
     private fun getFontSize(): Float {
-        val mmkv = MMKV.mmkvWithID("scan")
-        return mmkv.decodeFloat("font", 1f)
+        return docViewModel.bookProgress?.reflowFontSize ?: 1f
     }
 
     private fun setFontSize(size: Float) {
-        val mmkv = MMKV.mmkvWithID("scan")
         Logcat.d("font:$size")
-        mmkv.encode("font", size)
+        docViewModel.storeReflowFontSize(size)
     }
 
     private fun getWordSpacing(): Float {
-        val mmkv = MMKV.mmkvWithID("scan")
-        return mmkv.decodeFloat("word_space", 0.2f)
+        return docViewModel.bookProgress?.reflowWordSpacing ?: 0.3f
     }
 
     private fun setWordSpacing(size: Float) {
-        val mmkv = MMKV.mmkvWithID("scan")
         Logcat.d("word_space:$size")
-        mmkv.encode("word_space", size)
+        docViewModel.storeReflowWordSpacing(size)
     }
 
     private fun initStyleControls() {
@@ -741,7 +736,7 @@ class AScanReflowViewController(
                 RectF(0f, 0f, 1f, 1f),
                 dpi,
                 getFontSize(),
-                -getWordSpacing()
+                getWordSpacing()
             )
         }
 

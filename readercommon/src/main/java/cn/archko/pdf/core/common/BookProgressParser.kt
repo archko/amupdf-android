@@ -39,6 +39,8 @@ object BookProgressParser {
             tmp.put("isFavorited", progress.isFavorited)
             tmp.put("inRecent", progress.inRecent)
             tmp.put("scrollOrientation", progress.scrollOrientation)
+            tmp.put("reflowFontSize", progress.reflowFontSize)
+            tmp.put("reflowWordSpacing", progress.reflowWordSpacing)
             ja.put(tmp)
         } catch (e: JSONException) {
             e.printStackTrace()
@@ -77,6 +79,8 @@ object BookProgressParser {
             } else {
                 bean.scrollOrientation = 1
             }
+            bean.reflowFontSize = jsonobject.optDouble("reflowFontSize", 1.0).toFloat()
+            bean.reflowWordSpacing = jsonobject.optDouble("reflowWordSpacing", 0.3).toFloat()
 
         } catch (jsonexception: Exception) {
             throw Exception(jsonexception.message + ":" + jsonobject, jsonexception)

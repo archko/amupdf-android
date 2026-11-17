@@ -16,7 +16,7 @@ import cn.archko.pdf.core.entity.*
         ABookmark::class,
         ReadingStats::class,
     ],
-    version = 8,
+    version = 9,
     exportSchema = false
 )
 //@TypeConverters(DateTimeTypeConverters::class)

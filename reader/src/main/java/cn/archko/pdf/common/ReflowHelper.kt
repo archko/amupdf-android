@@ -13,13 +13,47 @@ import com.artifex.mupdf.fitz.Matrix
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice
 import com.archko.reader.k2pdfopt.K2PdfOpt
 import java.io.File
+import kotlin.math.sqrt
 
 /**
  * @author: archko 2024/8/30 :08:39
  */
 object ReflowHelper {
 
-    const val REFLOW_DPI_RATIO = 0.5f
+    const val MAX_REFLOW_PIXELS = 8_000_000f
+    const val MIN_RENDER_DPI = 120f
+    const val MAX_RENDER_DPI = 400f
+
+    @JvmStatic
+    fun renderDpiForPage(pageWidthPts: Float, pageHeightPts: Float): Float {
+        if (pageWidthPts <= 0f || pageHeightPts <= 0f) {
+            return MAX_RENDER_DPI
+        }
+        val areaInches = pageWidthPts / 72f * (pageHeightPts / 72f)
+        if (areaInches <= 0f) {
+            return MAX_RENDER_DPI
+        }
+        val dpi = sqrt(MAX_REFLOW_PIXELS / areaInches)
+        return dpi.coerceIn(MIN_RENDER_DPI, MAX_RENDER_DPI)
+    }
+
+    @JvmStatic
+    fun sourceDpiForBitmap(bitmapWidth: Int, pageWidthPts: Float): Float {
+        if (bitmapWidth <= 0 || pageWidthPts <= 0f) {
+            return 0f
+        }
+        return 72f * bitmapWidth / pageWidthPts
+    }
+
+    @JvmStatic
+    fun getPageWidthPts(mupdfDocument: MupdfDocument?, pageNo: Int): Float {
+        val page = mupdfDocument?.loadPage(pageNo) ?: return 0f
+        return try {
+            page.bounds.x1 - page.bounds.x0
+        } finally {
+            page.destroy()
+        }
+    }
 
     fun loadBitmapByPage(mupdfDocument: MupdfDocument?, viewWidth: Int, pageNo: Int): Bitmap? {
         val start = System.currentTimeMillis()
@@ -71,7 +105,12 @@ object ReflowHelper {
         list: MutableList<String>,
     ): Int {
         val start = System.currentTimeMillis()
-        opt.create(viewWidth, viewHeight, densityDpi)
+        val devDpi = if (sourceDpi > 1f) {
+            Math.min(densityDpi.toFloat(), sourceDpi).toInt()
+        } else {
+            densityDpi
+        }
+        opt.create(viewWidth, viewHeight, devDpi)
         opt.setSourceDpi(sourceDpi)
         opt.load(bitmap)
 
@@ -89,9 +128,9 @@ object ReflowHelper {
         )
         list.add(path)
         Log.d(
-            "reflow", String.format(
+                "reflow", String.format(
                 "dpi:%s, srcDpi:%s, view.w-h:%s-%s, page.w-h:%s-%s, cos:%s",
-                densityDpi,
+                devDpi,
                 sourceDpi,
                 viewWidth,
                 viewHeight,
@@ -122,7 +161,12 @@ object ReflowHelper {
     ): MutableList<Bitmap> {
         val list = mutableListOf<Bitmap>()
         val start = System.currentTimeMillis()
-        opt.create(viewWidth, viewHeight, densityDpi)
+        val devDpi = if (sourceDpi > 1f) {
+            Math.min(densityDpi.toFloat(), sourceDpi).toInt()
+        } else {
+            densityDpi
+        }
+        opt.create(viewWidth, viewHeight, devDpi)
         opt.setSourceDpi(sourceDpi)
         opt.setWordSpacing(wordSpacing)
         opt.fontSize = fontSize
@@ -151,7 +195,7 @@ object ReflowHelper {
             "reflow", String.format(
                 "font:%s, dpi:%s, srcDpi:%s, view.w-h:%s-%s, page.w-h:%s-%s, tiles:%s, cos:%s",
                 fontSize,
-                densityDpi,
+                devDpi,
                 sourceDpi,
                 viewWidth,
                 viewHeight,
@@ -181,12 +225,11 @@ object ReflowHelper {
         FileUtils.cleanDir(File(dir))
         val list = mutableListOf<String>()
         for (index in start until end) {
+            val pageWidthPts = getPageWidthPts(mupdfDocument, index)
             val bitmap = loadBitmapByPage(mupdfDocument, pageWidth, index)
             if (null != bitmap) {
-                val sourceDpi = if (screenWidth > 0) {
-                    densityDpi * REFLOW_DPI_RATIO * pageWidth / screenWidth
-                } else {
-                    densityDpi * REFLOW_DPI_RATIO
+                val sourceDpi = sourceDpiForBitmap(bitmap.width, pageWidthPts).let {
+                    if (it > 1f) it else densityDpi.toFloat()
                 }
                 val result = k2pdf(
                     opt,

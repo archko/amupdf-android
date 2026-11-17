@@ -119,6 +119,15 @@ class ReflowDialog(
 
         val dm = context.resources.displayMetrics
         binding.fontSlider.value = 1f
+        val aPage = pdfEditViewModel.aPageList.getOrNull(page)
+        if (aPage != null && aPage.width > 0f) {
+            val renderDpi = ReflowHelper.renderDpiForPage(aPage.width, aPage.height)
+            val renderWidth = Math.round(aPage.width / 72f * renderDpi).toFloat()
+            binding.resolutionSlider.value = renderWidth.coerceIn(
+                binding.resolutionSlider.valueFrom,
+                binding.resolutionSlider.valueTo
+            )
+        }
     }
 
     private fun preview() {
@@ -131,10 +140,9 @@ class ReflowDialog(
             val bitmap =
                 ReflowHelper.loadBitmapByPage(pdfEditViewModel.mupdfDocument, width, page)
             if (null != bitmap) {
-                val sourceDpi = if (screenWidth > 0) {
-                    dm.densityDpi * ReflowHelper.REFLOW_DPI_RATIO * width / screenWidth
-                } else {
-                    dm.densityDpi * ReflowHelper.REFLOW_DPI_RATIO
+                val pageWidthPts = pdfEditViewModel.aPageList.getOrNull(page)?.width ?: 0f
+                val sourceDpi = ReflowHelper.sourceDpiForBitmap(bitmap.width, pageWidthPts).let {
+                    if (it > 1f) it else dm.densityDpi.toFloat()
                 }
                 val bitmaps: MutableList<Bitmap> = ReflowHelper.k2pdf2bitmap(
                     pdfEditViewModel.opt,

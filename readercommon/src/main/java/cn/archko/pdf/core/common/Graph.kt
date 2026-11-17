@@ -62,12 +62,20 @@ object Graph {
         }
     }
 
+    private val MIGRATION_8_9: Migration = object : Migration(8, 9) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE progress ADD 'reflow_font_size' REAL default 1.0 not null")
+            database.execSQL("ALTER TABLE progress ADD 'reflow_word_spacing' REAL default 0.3 not null")
+        }
+    }
+
     fun provide(context: Context) {
         database = Room.databaseBuilder(context, AKDatabase::class.java, "abook_progress.db")
             .fallbackToDestructiveMigration()
             .addMigrations(MIGRATION_5_6)
             .addMigrations(MIGRATION_6_7)
             .addMigrations(MIGRATION_7_8)
+            .addMigrations(MIGRATION_8_9)
             .build()
     }
 }
