@@ -61,5 +61,5 @@ dependencies {
     //}
     api(project(":vudroid"))
     api(project(":pdf-recyclerview"))
-    api(project(":k2pdfoptlib"))
+    api(libs.k2pdfopt)
 }
