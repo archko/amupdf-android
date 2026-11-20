@@ -212,6 +212,59 @@ static jobject bmp_to_bitmap(JNIEnv *env, WILLUSBITMAP *bmp, int x, int y, int w
     return result;
 }
 
+/*
+** 从 WILLUSBITMAP 底部向上扫描，找到最后一个包含非空白像素的行，
+** 裁掉多余空白（保留 pad_rows 行底边距）。
+*/
+static int trim_bottom_whitespace(WILLUSBITMAP *bmp, int pad_rows) {
+    if (bmp == NULL || bmp->data == NULL || bmp->width <= 0 || bmp->height <= 0) {
+        return 0;
+    }
+    int bytes_per_pixel = bmp->bpp / 8;
+    if (bytes_per_pixel <= 0) {
+        return bmp->height;
+    }
+
+    int last_content_row = -1;
+    for (int row = bmp->height - 1; row >= 0; row--) {
+        unsigned char *p = bmp_rowptr_from_top(bmp, row);
+        int has_ink = 0;
+        for (int col = 0; col < bmp->width; col++) {
+            unsigned char r, g, b;
+            if (bmp->bpp == 24) {
+                r = p[col * 3 + 0];
+                g = p[col * 3 + 1];
+                b = p[col * 3 + 2];
+            } else {
+                unsigned char v = p[col];
+                r = bmp->red[v];
+                g = bmp->green[v];
+                b = bmp->blue[v];
+            }
+            // 非浅白即视为有内容（阈值 242 兼顾抗锯齿灰边）
+            if (r < 242 || g < 242 || b < 242) {
+                has_ink = 1;
+                break;
+            }
+        }
+        if (has_ink) {
+            last_content_row = row;
+            break;
+        }
+    }
+
+    if (last_content_row < 0) {
+        // 整页空白，保留很小高度避免 0 高度异常
+        return bmp->height > 64 ? 64 : bmp->height;
+    }
+
+    int trimmed_h = last_content_row + 1 + pad_rows;
+    if (trimmed_h < bmp->height && trimmed_h > 16) {
+        bmp->height = trimmed_h;
+    }
+    return bmp->height;
+}
+
 extern "C" {
 
 JNIEXPORT void JNICALL
@@ -367,6 +420,28 @@ Java_com_archko_reader_k2pdfopt_K2PdfOpt_load(JNIEnv *env, jobject thiz, jobject
     handle->kctx.zoom = 1.0;
 
     k2pdfopt_reflow_bmp(&handle->kctx);
+
+    // 轻量兜底：若 rectmaps 为空（常见于左侧竖排小字等干扰版面），裁掉左右 4% 窄边栏再试一次
+    if (handle->kctx.rectmaps.n == 0 && src.width > 100 && src.height > 100) {
+        free_page(handle);
+        WILLUSBITMAP retry_src;
+        if (bitmap_to_bmp(env, bitmap, &retry_src) == 0) {
+            int side_cut = (int) (retry_src.width * 0.04f);
+            handle->kctx.src = retry_src;
+            handle->kctx.page_width = retry_src.width;
+            handle->kctx.page_height = retry_src.height;
+            handle->kctx.bbox.x0 = (float) side_cut;
+            handle->kctx.bbox.y0 = 0.0f;
+            handle->kctx.bbox.x1 = (float) (retry_src.width - side_cut);
+            handle->kctx.bbox.y1 = (float) retry_src.height;
+            k2pdfopt_reflow_bmp(&handle->kctx);
+            handle->kctx.src.data = NULL;
+            handle->kctx.src.size_allocated = 0;
+        }
+    }
+
+    // 裁掉底部多余空白，保留约 12px 边距
+    trim_bottom_whitespace(&handle->kctx.dst, 12);
 
     handle->kctx.src.data = NULL;
     handle->kctx.src.size_allocated = 0;
