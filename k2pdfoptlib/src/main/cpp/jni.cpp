@@ -1,9 +1,19 @@
 #include <jni.h>
-#include <android/bitmap.h>
-#include <android/log.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef __ANDROID__
+#include <android/bitmap.h>
+#include <android/log.h>
+#define LOG_TAG "K2PdfOpt"
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#else
+#include <stdio.h>
+#define LOGI(...) do { printf("[K2PdfOpt] "); printf(__VA_ARGS__); printf("\n"); } while (0)
+#define LOGE(...) do { fprintf(stderr, "[K2PdfOpt ERR] "); fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); } while (0)
+#endif
 
 extern "C" {
 #include <willus.h>
@@ -12,10 +22,6 @@ extern "C" {
 #include "koptreflow.h"
 #include "setting.h"
 }
-
-#define LOG_TAG "K2PdfOpt"
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 typedef struct {
     int dev_width;
@@ -68,9 +74,210 @@ static void throw_illegal_argument(JNIEnv *env, const char *message) {
     }
 }
 
+static void init_bmp_24(WILLUSBITMAP *bmp, int width, int height) {
+    bmp_init(bmp);
+    bmp->width = width;
+    bmp->height = height;
+    bmp->bpp = 24;
+    for (int i = 0; i < 256; i++) {
+        bmp->red[i] = (unsigned char) i;
+        bmp->green[i] = (unsigned char) i;
+        bmp->blue[i] = (unsigned char) i;
+    }
+    bmp_alloc(bmp);
+}
+
 /*
-** Android Bitmap -> WILLUSBITMAP (24 bpp, alpha composited on white).
+** 从 WILLUSBITMAP 底部向上扫描，找到最后一个包含非空白像素的行，
+** 裁掉多余空白（保留 pad_rows 行底边距）。
 */
+static int trim_bottom_whitespace(WILLUSBITMAP *bmp, int pad_rows) {
+    if (bmp == NULL || bmp->data == NULL || bmp->width <= 0 || bmp->height <= 0) {
+        return 0;
+    }
+    int bytes_per_pixel = bmp->bpp / 8;
+    if (bytes_per_pixel <= 0) {
+        return bmp->height;
+    }
+
+    int last_content_row = -1;
+    for (int row = bmp->height - 1; row >= 0; row--) {
+        unsigned char *p = bmp_rowptr_from_top(bmp, row);
+        int has_ink = 0;
+        for (int col = 0; col < bmp->width; col++) {
+            unsigned char r, g, b;
+            if (bmp->bpp == 24) {
+                r = p[col * 3 + 0];
+                g = p[col * 3 + 1];
+                b = p[col * 3 + 2];
+            } else {
+                unsigned char v = p[col];
+                r = bmp->red[v];
+                g = bmp->green[v];
+                b = bmp->blue[v];
+            }
+            if (r < 242 || g < 242 || b < 242) {
+                has_ink = 1;
+                break;
+            }
+        }
+        if (has_ink) {
+            last_content_row = row;
+            break;
+        }
+    }
+
+    if (last_content_row < 0) {
+        return bmp->height > 64 ? 64 : bmp->height;
+    }
+
+    int trimmed_h = last_content_row + 1 + pad_rows;
+    if (trimmed_h < bmp->height && trimmed_h > 16) {
+        bmp->height = trimmed_h;
+    }
+    return bmp->height;
+}
+
+/*
+** 通用重排执行：含 rectmaps 为空时的左右窄边栏兜底与尾部空白裁剪。
+*/
+static void execute_reflow(K2PDFOPT_JNI *handle, WILLUSBITMAP src, int allow_side_retry) {
+    int orig_w = src.width;
+    int orig_h = src.height;
+
+    handle->kctx.src = src;
+    handle->kctx.page_width = src.width;
+    handle->kctx.page_height = src.height;
+    handle->kctx.bbox.x0 = 0.0f;
+    handle->kctx.bbox.y0 = 0.0f;
+    handle->kctx.bbox.x1 = (float) src.width;
+    handle->kctx.bbox.y1 = (float) src.height;
+    handle->kctx.zoom = 1.0;
+
+    k2pdfopt_reflow_bmp(&handle->kctx);
+
+    if (allow_side_retry && handle->kctx.rectmaps.n == 0 && orig_w > 100 && orig_h > 100) {
+        WILLUSBITMAP retry_src;
+        init_bmp_24(&retry_src, orig_w, orig_h);
+        if (retry_src.data != NULL && handle->kctx.src.data != NULL) {
+            for (int r = 0; r < orig_h; r++) {
+                memcpy(bmp_rowptr_from_top(&retry_src, r),
+                       bmp_rowptr_from_top(&handle->kctx.src, r),
+                       (size_t) orig_w * 3);
+            }
+            free_page(handle);
+            int side_cut = (int) (orig_w * 0.04f);
+            handle->kctx.src = retry_src;
+            handle->kctx.page_width = retry_src.width;
+            handle->kctx.page_height = retry_src.height;
+            handle->kctx.bbox.x0 = (float) side_cut;
+            handle->kctx.bbox.y0 = 0.0f;
+            handle->kctx.bbox.x1 = (float) (retry_src.width - side_cut);
+            handle->kctx.bbox.y1 = (float) retry_src.height;
+            k2pdfopt_reflow_bmp(&handle->kctx);
+        } else {
+            bmp_free(&retry_src);
+        }
+    }
+
+    trim_bottom_whitespace(&handle->kctx.dst, 12);
+
+    handle->kctx.src.data = NULL;
+    handle->kctx.src.size_allocated = 0;
+    handle->has_page = 1;
+}
+
+/*
+** 桌面/通用：ARGB_8888 像素数组 (int[width * height]) -> WILLUSBITMAP (24 bpp, 白底合成)
+*/
+static int argb_pixels_to_bmp(const uint32_t *argb, int width, int height, WILLUSBITMAP *bmp) {
+    if (argb == NULL || width <= 0 || height <= 0) {
+        return -1;
+    }
+    init_bmp_24(bmp, width, height);
+    if (bmp->data == NULL) {
+        return -1;
+    }
+    for (int row = 0; row < height; row++) {
+        const uint32_t *src = argb + row * width;
+        unsigned char *dst = bmp_rowptr_from_top(bmp, row);
+        for (int col = 0; col < width; col++, dst += 3) {
+            uint32_t px = src[col];
+            int alpha = (int) ((px >> 24) & 0xFF);
+            int r = (int) ((px >> 16) & 0xFF);
+            int g = (int) ((px >> 8) & 0xFF);
+            int b = (int) (px & 0xFF);
+            if (alpha >= 255) {
+                dst[0] = (unsigned char) r;
+                dst[1] = (unsigned char) g;
+                dst[2] = (unsigned char) b;
+            } else {
+                dst[0] = (unsigned char) ((r * alpha + 255 * (255 - alpha)) / 255);
+                dst[1] = (unsigned char) ((g * alpha + 255 * (255 - alpha)) / 255);
+                dst[2] = (unsigned char) ((b * alpha + 255 * (255 - alpha)) / 255);
+            }
+        }
+    }
+    return 0;
+}
+
+/*
+** 桌面/通用：裁剪 WILLUSBITMAP 矩形区域输出为 ARGB_8888 jintArray
+*/
+static jintArray bmp_to_argb_array(JNIEnv *env, WILLUSBITMAP *bmp, int x, int y, int w, int h) {
+    if (bmp == NULL || bmp->data == NULL) {
+        return NULL;
+    }
+    if (x < 0) { w += x; x = 0; }
+    if (y < 0) { h += y; y = 0; }
+    if (x >= bmp->width || y >= bmp->height) {
+        return NULL;
+    }
+    if (x + w > bmp->width) { w = bmp->width - x; }
+    if (y + h > bmp->height) { h = bmp->height - y; }
+    if (w <= 0 || h <= 0) {
+        return NULL;
+    }
+
+    jintArray out = env->NewIntArray(w * h);
+    if (out == NULL) {
+        return NULL;
+    }
+    jint *dst_buf = (jint *) malloc((size_t) w * (size_t) h * sizeof(jint));
+    if (dst_buf == NULL) {
+        return NULL;
+    }
+
+    int bytes_per_pixel = bmp->bpp / 8;
+    for (int row = 0; row < h; row++) {
+        unsigned char *src = bmp_rowptr_from_top(bmp, y + row) + x * bytes_per_pixel;
+        jint *dst_row = dst_buf + row * w;
+        if (bmp->bpp == 24) {
+            for (int col = 0; col < w; col++, src += 3) {
+                uint32_t v = 0xFF000000u
+                    | ((uint32_t) src[0] << 16)
+                    | ((uint32_t) src[1] << 8)
+                    | ((uint32_t) src[2]);
+                dst_row[col] = (jint) v;
+            }
+        } else {
+            for (int col = 0; col < w; col++) {
+                unsigned char idx = src[col];
+                uint32_t v = 0xFF000000u
+                    | ((uint32_t) bmp->red[idx] << 16)
+                    | ((uint32_t) bmp->green[idx] << 8)
+                    | ((uint32_t) bmp->blue[idx]);
+                dst_row[col] = (jint) v;
+            }
+        }
+    }
+
+    env->SetIntArrayRegion(out, 0, w * h, dst_buf);
+    free(dst_buf);
+    return out;
+}
+
+#ifdef __ANDROID__
 static int bitmap_to_bmp(JNIEnv *env, jobject bitmap, WILLUSBITMAP *bmp) {
     AndroidBitmapInfo info;
     if (AndroidBitmap_getInfo(env, bitmap, &info) != ANDROID_BITMAP_RESULT_SUCCESS) {
@@ -88,16 +295,7 @@ static int bitmap_to_bmp(JNIEnv *env, jobject bitmap, WILLUSBITMAP *bmp) {
 
     int width = (int) info.width;
     int height = (int) info.height;
-    bmp_init(bmp);
-    bmp->width = width;
-    bmp->height = height;
-    bmp->bpp = 24;
-    for (int i = 0; i < 256; i++) {
-        bmp->red[i] = (unsigned char) i;
-        bmp->green[i] = (unsigned char) i;
-        bmp->blue[i] = (unsigned char) i;
-    }
-    bmp_alloc(bmp);
+    init_bmp_24(bmp, width, height);
 
     for (int row = 0; row < height; row++) {
         unsigned char *src = (unsigned char *) pixels + row * info.stride;
@@ -133,30 +331,17 @@ static int bitmap_to_bmp(JNIEnv *env, jobject bitmap, WILLUSBITMAP *bmp) {
     return 0;
 }
 
-/*
-** Crop a rectangle out of WILLUSBITMAP into an Android ARGB_8888 Bitmap.
-*/
 static jobject bmp_to_bitmap(JNIEnv *env, WILLUSBITMAP *bmp, int x, int y, int w, int h, int dpi) {
     if (bmp == NULL || bmp->data == NULL) {
         return NULL;
     }
-    if (x < 0) {
-        w += x;
-        x = 0;
-    }
-    if (y < 0) {
-        h += y;
-        y = 0;
-    }
+    if (x < 0) { w += x; x = 0; }
+    if (y < 0) { h += y; y = 0; }
     if (x >= bmp->width || y >= bmp->height) {
         return NULL;
     }
-    if (x + w > bmp->width) {
-        w = bmp->width - x;
-    }
-    if (y + h > bmp->height) {
-        h = bmp->height - y;
-    }
+    if (x + w > bmp->width) { w = bmp->width - x; }
+    if (y + h > bmp->height) { h = bmp->height - y; }
     if (w <= 0 || h <= 0) {
         return NULL;
     }
@@ -211,59 +396,7 @@ static jobject bmp_to_bitmap(JNIEnv *env, WILLUSBITMAP *bmp, int x, int y, int w
     }
     return result;
 }
-
-/*
-** 从 WILLUSBITMAP 底部向上扫描，找到最后一个包含非空白像素的行，
-** 裁掉多余空白（保留 pad_rows 行底边距）。
-*/
-static int trim_bottom_whitespace(WILLUSBITMAP *bmp, int pad_rows) {
-    if (bmp == NULL || bmp->data == NULL || bmp->width <= 0 || bmp->height <= 0) {
-        return 0;
-    }
-    int bytes_per_pixel = bmp->bpp / 8;
-    if (bytes_per_pixel <= 0) {
-        return bmp->height;
-    }
-
-    int last_content_row = -1;
-    for (int row = bmp->height - 1; row >= 0; row--) {
-        unsigned char *p = bmp_rowptr_from_top(bmp, row);
-        int has_ink = 0;
-        for (int col = 0; col < bmp->width; col++) {
-            unsigned char r, g, b;
-            if (bmp->bpp == 24) {
-                r = p[col * 3 + 0];
-                g = p[col * 3 + 1];
-                b = p[col * 3 + 2];
-            } else {
-                unsigned char v = p[col];
-                r = bmp->red[v];
-                g = bmp->green[v];
-                b = bmp->blue[v];
-            }
-            // 非浅白即视为有内容（阈值 242 兼顾抗锯齿灰边）
-            if (r < 242 || g < 242 || b < 242) {
-                has_ink = 1;
-                break;
-            }
-        }
-        if (has_ink) {
-            last_content_row = row;
-            break;
-        }
-    }
-
-    if (last_content_row < 0) {
-        // 整页空白，保留很小高度避免 0 高度异常
-        return bmp->height > 64 ? 64 : bmp->height;
-    }
-
-    int trimmed_h = last_content_row + 1 + pad_rows;
-    if (trimmed_h < bmp->height && trimmed_h > 16) {
-        bmp->height = trimmed_h;
-    }
-    return bmp->height;
-}
+#endif
 
 extern "C" {
 
@@ -390,6 +523,69 @@ Java_com_archko_reader_k2pdfopt_K2PdfOpt_setWordSpacing(JNIEnv *env, jobject thi
     }
 }
 
+/*
+** 桌面端接口：传入 ARGB_8888 像素数组 (length >= width * height)
+*/
+JNIEXPORT void JNICALL
+Java_com_archko_reader_k2pdfopt_K2PdfOpt_loadBuffer(JNIEnv *env, jobject thiz,
+                                                    jintArray argbPixels, jint width, jint height) {
+    K2PDFOPT_JNI *handle = get_handle(env, thiz);
+    if (handle == NULL) {
+        throw_illegal_argument(env, "create() must be called before loadBuffer()");
+        return;
+    }
+    if (argbPixels == NULL || width <= 0 || height <= 0) {
+        throw_illegal_argument(env, "invalid argb buffer or dimensions");
+        return;
+    }
+    jsize len = env->GetArrayLength(argbPixels);
+    if (len < width * height) {
+        throw_illegal_argument(env, "argb buffer smaller than width*height");
+        return;
+    }
+    jint *elems = env->GetIntArrayElements(argbPixels, NULL);
+    if (elems == NULL) {
+        throw_illegal_argument(env, "failed to lock int array");
+        return;
+    }
+
+    free_page(handle);
+    WILLUSBITMAP src;
+    int rc = argb_pixels_to_bmp(reinterpret_cast<const uint32_t *>(elems), width, height, &src);
+    env->ReleaseIntArrayElements(argbPixels, elems, JNI_ABORT);
+
+    if (rc != 0) {
+        throw_illegal_argument(env, "failed to convert argb pixels");
+        return;
+    }
+
+    execute_reflow(handle, src, 1);
+    LOGI("reflow(desktop): %dx%d -> %dx%d, srcDpi=%.1f, rectmaps=%d",
+         width, height,
+         handle->kctx.dst.width, handle->kctx.dst.height,
+         handle->kctx.source_dpi, handle->kctx.rectmaps.n);
+}
+
+JNIEXPORT jintArray JNICALL
+Java_com_archko_reader_k2pdfopt_K2PdfOpt_renderPageBuffer(JNIEnv *env, jobject thiz) {
+    K2PDFOPT_JNI *handle = get_handle(env, thiz);
+    if (handle == NULL || !handle->has_page) {
+        return NULL;
+    }
+    return bmp_to_argb_array(env, &handle->kctx.dst, 0, 0, handle->kctx.dst.width, handle->kctx.dst.height);
+}
+
+JNIEXPORT jintArray JNICALL
+Java_com_archko_reader_k2pdfopt_K2PdfOpt_renderTileBuffer(JNIEnv *env, jobject thiz,
+                                                          jint x, jint y, jint width, jint height) {
+    K2PDFOPT_JNI *handle = get_handle(env, thiz);
+    if (handle == NULL || !handle->has_page) {
+        return NULL;
+    }
+    return bmp_to_argb_array(env, &handle->kctx.dst, x, y, width, height);
+}
+
+#ifdef __ANDROID__
 JNIEXPORT void JNICALL
 Java_com_archko_reader_k2pdfopt_K2PdfOpt_load(JNIEnv *env, jobject thiz, jobject bitmap) {
     K2PDFOPT_JNI *handle = get_handle(env, thiz);
@@ -410,59 +606,12 @@ Java_com_archko_reader_k2pdfopt_K2PdfOpt_load(JNIEnv *env, jobject thiz, jobject
         return;
     }
 
-    handle->kctx.src = src;
-    handle->kctx.page_width = src.width;
-    handle->kctx.page_height = src.height;
-    handle->kctx.bbox.x0 = 0.0f;
-    handle->kctx.bbox.y0 = 0.0f;
-    handle->kctx.bbox.x1 = (float) src.width;
-    handle->kctx.bbox.y1 = (float) src.height;
-    handle->kctx.zoom = 1.0;
-
-    k2pdfopt_reflow_bmp(&handle->kctx);
-
-    // 轻量兜底：若 rectmaps 为空（常见于左侧竖排小字等干扰版面），裁掉左右 4% 窄边栏再试一次
-    if (handle->kctx.rectmaps.n == 0 && src.width > 100 && src.height > 100) {
-        free_page(handle);
-        WILLUSBITMAP retry_src;
-        if (bitmap_to_bmp(env, bitmap, &retry_src) == 0) {
-            int side_cut = (int) (retry_src.width * 0.04f);
-            handle->kctx.src = retry_src;
-            handle->kctx.page_width = retry_src.width;
-            handle->kctx.page_height = retry_src.height;
-            handle->kctx.bbox.x0 = (float) side_cut;
-            handle->kctx.bbox.y0 = 0.0f;
-            handle->kctx.bbox.x1 = (float) (retry_src.width - side_cut);
-            handle->kctx.bbox.y1 = (float) retry_src.height;
-            k2pdfopt_reflow_bmp(&handle->kctx);
-            handle->kctx.src.data = NULL;
-            handle->kctx.src.size_allocated = 0;
-        }
-    }
-
-    // 裁掉底部多余空白，保留约 12px 边距
-    trim_bottom_whitespace(&handle->kctx.dst, 12);
-
-    handle->kctx.src.data = NULL;
-    handle->kctx.src.size_allocated = 0;
-    handle->has_page = 1;
+    execute_reflow(handle, src, 1);
 
     LOGI("reflow: %dx%d -> %dx%d, srcDpi=%.1f, rectmaps=%d",
          src.width, src.height,
          handle->kctx.dst.width, handle->kctx.dst.height,
          handle->kctx.source_dpi, handle->kctx.rectmaps.n);
-}
-
-JNIEXPORT jint JNICALL
-Java_com_archko_reader_k2pdfopt_K2PdfOpt_getPageWidth(JNIEnv *env, jobject thiz) {
-    K2PDFOPT_JNI *handle = get_handle(env, thiz);
-    return handle == NULL || !handle->has_page ? 0 : handle->kctx.dst.width;
-}
-
-JNIEXPORT jint JNICALL
-Java_com_archko_reader_k2pdfopt_K2PdfOpt_getPageHeight(JNIEnv *env, jobject thiz) {
-    K2PDFOPT_JNI *handle = get_handle(env, thiz);
-    return handle == NULL || !handle->has_page ? 0 : handle->kctx.dst.height;
 }
 
 JNIEXPORT jobject JNICALL
@@ -483,14 +632,6 @@ Java_com_archko_reader_k2pdfopt_K2PdfOpt_renderTile(JNIEnv *env, jobject thiz, j
         return NULL;
     }
     return bmp_to_bitmap(env, &handle->kctx.dst, x, y, width, height, handle->dev_dpi);
-}
-
-JNIEXPORT void JNICALL
-Java_com_archko_reader_k2pdfopt_K2PdfOpt_releasePage(JNIEnv *env, jobject thiz) {
-    K2PDFOPT_JNI *handle = get_handle(env, thiz);
-    if (handle != NULL) {
-        free_page(handle);
-    }
 }
 
 JNIEXPORT jobject JNICALL
@@ -532,6 +673,27 @@ Java_com_archko_reader_k2pdfopt_K2PdfOpt_getRectMaps(JNIEnv *env, jobject thiz) 
         env->DeleteLocalRef(dst);
     }
     return map;
+}
+#endif
+
+JNIEXPORT jint JNICALL
+Java_com_archko_reader_k2pdfopt_K2PdfOpt_getPageWidth(JNIEnv *env, jobject thiz) {
+    K2PDFOPT_JNI *handle = get_handle(env, thiz);
+    return handle == NULL || !handle->has_page ? 0 : handle->kctx.dst.width;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_archko_reader_k2pdfopt_K2PdfOpt_getPageHeight(JNIEnv *env, jobject thiz) {
+    K2PDFOPT_JNI *handle = get_handle(env, thiz);
+    return handle == NULL || !handle->has_page ? 0 : handle->kctx.dst.height;
+}
+
+JNIEXPORT void JNICALL
+Java_com_archko_reader_k2pdfopt_K2PdfOpt_releasePage(JNIEnv *env, jobject thiz) {
+    K2PDFOPT_JNI *handle = get_handle(env, thiz);
+    if (handle != NULL) {
+        free_page(handle);
+    }
 }
 
 JNIEXPORT void JNICALL
