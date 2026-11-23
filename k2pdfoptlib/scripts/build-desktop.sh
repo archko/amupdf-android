@@ -65,7 +65,7 @@ mkdir -p "$BUILD_DIR/classes" "$BUILD_DIR/native/$PLATFORM_OS-$PLATFORM_ARCH"
 cmake "${CMAKE_ARGS[@]}"
 cmake --build "$BUILD_DIR/cmake" --config Release --parallel
 
-BUILT_LIB="$(find "$BUILD_DIR/cmake" -maxdepth 3 -name "$LIB_FILE" -type f | head -n 1)"
+BUILT_LIB="$(find "$BUILD_DIR/cmake" -maxdepth 3 -name "$LIB_FILE" -type f | head -n 1 || true)"
 if [[ -z "$BUILT_LIB" ]]; then
     echo "native library not found: $LIB_FILE" >&2
     exit 1
@@ -82,7 +82,8 @@ JAR_FILE="$BUILD_DIR/$ARTIFACT_ID-$VERSION.jar"
 "$JAVA_HOME/bin/jar" --create --file "$JAR_FILE" -C "$BUILD_DIR/classes" .
 
 MAVEN_REPO="${MAVEN_LOCAL_REPO:-$HOME/.m2/repository}"
-DEST_DIR="$MAVEN_REPO/${GROUP_ID//./\/}/$ARTIFACT_ID/$VERSION"
+GROUP_PATH="$(printf '%s' "$GROUP_ID" | tr '.' '/')"
+DEST_DIR="$MAVEN_REPO/$GROUP_PATH/$ARTIFACT_ID/$VERSION"
 mkdir -p "$DEST_DIR"
 cp "$JAR_FILE" "$DEST_DIR/"
 cat > "$DEST_DIR/$ARTIFACT_ID-$VERSION.pom" <<EOF
